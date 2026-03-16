@@ -1,7 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import {
+  collection, getDocs, orderBy, query,
+  doc, updateDoc, addDoc, serverTimestamp
+} from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -16,12 +19,32 @@ interface Order {
   createdAt?: { seconds: number };
 }
 
+interface SoferApplication {
+  id: string;
+  name: string;
+  city: string;
+  phone: string;
+  whatsapp?: string;
+  email?: string;
+  description?: string;
+  style?: string;
+  categories: string[];
+  imageUrl?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt?: { seconds: number };
+}
+
+type TabType = 'orders' | 'commissions' | 'soferim';
+
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [applications, setApplications] = useState<SoferApplication[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'orders' | 'commissions'>('orders');
+  const [appsLoading, setAppsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabType>('orders');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) {
@@ -32,6 +55,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (user?.role === 'admin') {
       loadOrders();
+      loadApplications();
     }
   }, [user]);
 
@@ -48,6 +72,71 @@ export default function AdminPage() {
     }
   }
 
+  async function loadApplications() {
+    try {
+      const snap = await getDocs(query(collection(db, 'soferim_applications'), orderBy('createdAt', 'desc')));
+      const data: SoferApplication[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as SoferApplication));
+      setApplications(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setAppsLoading(false);
+    }
+  }
+
+  async function approveApplication(app: SoferApplication) {
+    setActionLoading(app.id);
+    try {
+      // עדכן סטטוס הבקשה
+      await updateDoc(doc(db, 'soferim_applications', app.id), {
+        status: 'approved',
+        approvedAt: serverTimestamp(),
+      });
+      // צור רשומת סופר ב-soferim collection
+      await addDoc(collection(db, 'soferim'), {
+        name: app.name,
+        city: app.city,
+        phone: app.phone,
+        whatsapp: app.whatsapp || '',
+        email: app.email || '',
+        description: app.description || '',
+        style: app.style || '',
+        categories: app.categories,
+        imageUrl: app.imageUrl || '',
+        status: 'active',
+        createdAt: serverTimestamp(),
+      });
+      // עדכן רשימה מקומית
+      setApplications(prev => prev.map(a =>
+        a.id === app.id ? { ...a, status: 'approved' } : a
+      ));
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה באישור');
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function rejectApplication(id: string) {
+    setActionLoading(id);
+    try {
+      await updateDoc(doc(db, 'soferim_applications', id), {
+        status: 'rejected',
+        rejectedAt: serverTimestamp(),
+      });
+      setApplications(prev => prev.map(a =>
+        a.id === id ? { ...a, status: 'rejected' } : a
+      ));
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בדחייה');
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
   if (loading || ordersLoading) return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-2xl">טוען...</div>
@@ -59,6 +148,7 @@ export default function AdminPage() {
   const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
   const totalCommissions = orders.reduce((sum, o) => sum + (o.commissionAmount || 0), 0);
   const shaliachOrders = orders.filter(o => o.shaliachName);
+  const pendingApps = applications.filter(a => a.status === 'pending');
 
   return (
     <main className="max-w-6xl mx-auto p-6" dir="rtl">
@@ -85,13 +175,15 @@ export default function AdminPage() {
           <div className="text-sm text-gray-500 mt-1">הזמנות שליחים</div>
         </div>
         <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-orange-500">₪{totalCommissions.toFixed(0)}</div>
-          <div className="text-sm text-gray-500 mt-1">עמלות לתשלום</div>
+          <div className="text-3xl font-black text-orange-500">
+            {pendingApps.length}
+          </div>
+          <div className="text-sm text-gray-500 mt-1">בקשות סופרים</div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 flex-wrap">
         <button onClick={() => setActiveTab('orders')}
           className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'orders' ? 'bg-green-700 text-white' : 'bg-white text-gray-600'}`}>
           📦 הזמנות
@@ -99,6 +191,15 @@ export default function AdminPage() {
         <button onClick={() => setActiveTab('commissions')}
           className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'commissions' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}>
           🤝 עמלות שליחים
+        </button>
+        <button onClick={() => setActiveTab('soferim')}
+          className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === 'soferim' ? 'bg-amber-600 text-white' : 'bg-white text-gray-600'}`}>
+          ✍️ בקשות סופרים
+          {pendingApps.length > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {pendingApps.length}
+            </span>
+          )}
         </button>
       </div>
 
@@ -116,7 +217,9 @@ export default function AdminPage() {
               </tr>
             </thead>
             <tbody>
-              {orders.map(o => (
+              {orders.length === 0 ? (
+                <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין הזמנות עדיין</td></tr>
+              ) : orders.map(o => (
                 <tr key={o.id} className="border-t hover:bg-gray-50">
                   <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
                   <td className="p-3 font-bold">{o.customerName}</td>
@@ -167,6 +270,90 @@ export default function AdminPage() {
                 ))}
               </tbody>
             </table>
+          )}
+        </div>
+      )}
+
+      {/* Sofer Applications */}
+      {activeTab === 'soferim' && (
+        <div>
+          {appsLoading ? (
+            <div className="p-10 text-center text-gray-400">טוען בקשות...</div>
+          ) : applications.length === 0 ? (
+            <div className="p-10 text-center text-gray-400">אין בקשות סופרים עדיין</div>
+          ) : (
+            <div className="grid gap-4">
+              {applications.map(app => (
+                <div key={app.id} className="bg-white rounded-xl shadow p-5">
+                  <div className="flex items-start justify-between gap-4">
+
+                    {/* תמונה */}
+                    <div className="flex-shrink-0">
+                      {app.imageUrl ? (
+                        <img src={app.imageUrl} alt={app.name}
+                          className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-2xl">✍️</div>
+                      )}
+                    </div>
+
+                    {/* פרטים */}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-black">{app.name}</h3>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold
+                          ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                            app.status === 'approved' ? 'bg-green-100 text-green-700' :
+                            'bg-red-100 text-red-600'}`}>
+                          {app.status === 'pending' ? '⏳ ממתין' :
+                           app.status === 'approved' ? '✅ מאושר' : '❌ נדחה'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-3">
+                        {app.city && <span>📍 {app.city}</span>}
+                        {app.phone && <span>📞 {app.phone}</span>}
+                        {app.whatsapp && <span>💬 {app.whatsapp}</span>}
+                        {app.email && <span>✉️ {app.email}</span>}
+                        {app.style && <span>✍️ {app.style}</span>}
+                      </div>
+
+                      {app.categories?.length > 0 && (
+                        <div className="flex gap-2 flex-wrap mb-3">
+                          {app.categories.map(cat => (
+                            <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">
+                              {cat}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {app.description && (
+                        <p className="text-sm text-gray-500 mb-3 line-clamp-2">{app.description}</p>
+                      )}
+                    </div>
+
+                    {/* כפתורי פעולה */}
+                    {app.status === 'pending' && (
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => approveApplication(app)}
+                          disabled={actionLoading === app.id}
+                          className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">
+                          {actionLoading === app.id ? '...' : '✅ אשר'}
+                        </button>
+                        <button
+                          onClick={() => rejectApplication(app.id)}
+                          disabled={actionLoading === app.id}
+                          className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">
+                          ❌ דחה
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
