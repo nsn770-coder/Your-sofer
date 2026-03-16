@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart } from '../CartContext';
-import { useShaliach } from '../ShaliachContext';
+import { useCart } from '../contexts/CartContext';
+import { useShaliach } from '../contexts/ShaliachContext';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -40,7 +40,6 @@ export default function CheckoutPage() {
     try {
       const orderNumber = 'YS-' + Date.now().toString().slice(-6);
 
-      // חשב עמלה אם יש שליח
       const commissionPercent = shaliach?.commissionPercent || 0;
       const commissionAmount = commissionPercent > 0
         ? Math.round(total * commissionPercent / 100 * 100) / 100
@@ -61,7 +60,6 @@ export default function CheckoutPage() {
         total,
         status: 'new',
         createdAt: serverTimestamp(),
-        // שליח
         shaliachRef: refCode || null,
         shaliachId: shaliach?.id || null,
         shaliachName: shaliach?.name || null,
@@ -88,7 +86,6 @@ export default function CheckoutPage() {
 
       <h1 className="text-2xl font-bold mb-8">💳 השלמת הזמנה</h1>
 
-      {/* באנר שליח */}
       {shaliach && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-6 text-sm text-blue-800 font-semibold">
           🤝 הזמנה זו מיוחסת לשליח: {shaliach.name}
