@@ -8,7 +8,8 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
-export type UserRole = 'customer' | 'shaliach' | 'admin';
+
+export type UserRole = 'customer' | 'shaliach' | 'sofer' | 'admin';
 
 interface AuthUser {
   uid: string;
@@ -16,6 +17,8 @@ interface AuthUser {
   displayName: string | null;
   photoURL: string | null;
   role: UserRole;
+  soferId?: string;
+  shaliachId?: string;
 }
 
 interface AuthContextType {
@@ -35,23 +38,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         let role: UserRole = 'customer';
+        let soferId: string | undefined;
+        let shaliachId: string | undefined;
 
-        // בדוק אם admin
+        // בדוק admins
         const adminSnap = await getDoc(doc(db, 'admins', firebaseUser.uid));
-        if (adminSnap.exists() && adminSnap.data().role === 'admin') {
+        if (adminSnap.exists()) {
           role = 'admin';
         } else {
-          // בדוק ב-users
+          // בדוק users collection
           const userRef = doc(db, 'users', firebaseUser.uid);
           const userSnap = await getDoc(userRef);
+
           if (userSnap.exists()) {
-            role = userSnap.data().role || 'customer';
+            const data = userSnap.data();
+            role = data.role || 'customer';
+            soferId = data.soferId;
+            shaliachId = data.shaliachId;
           } else {
+            // משתמש חדש — צור רשומה
             await setDoc(userRef, {
               email: firebaseUser.email,
               displayName: firebaseUser.displayName,
               photoURL: firebaseUser.photoURL,
               role: 'customer',
+              status: 'active',
               createdAt: new Date(),
             });
           }
@@ -63,6 +74,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           displayName: firebaseUser.displayName,
           photoURL: firebaseUser.photoURL,
           role,
+          soferId,
+          shaliachId,
         });
       } else {
         setUser(null);

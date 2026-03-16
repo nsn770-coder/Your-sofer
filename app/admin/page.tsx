@@ -7,6 +7,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
+import type { UserRole } from '../contexts/AuthContext';
 
 interface Order {
   id: string;
@@ -34,28 +35,55 @@ interface SoferApplication {
   createdAt?: { seconds: number };
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim';
+interface AppUser {
+  id: string;
+  email: string;
+  displayName?: string;
+  role: UserRole;
+  status: string;
+  createdAt?: { seconds: number };
+  soferId?: string;
+  shaliachId?: string;
+}
+
+type TabType = 'orders' | 'commissions' | 'soferim' | 'users';
+
+const ROLE_LABELS: Record<UserRole, string> = {
+  admin: '👑 מנהל',
+  sofer: '✍️ סופר',
+  shaliach: '🟦 שליח',
+  customer: '👤 לקוח',
+};
+
+const ROLE_COLORS: Record<UserRole, string> = {
+  admin: 'bg-purple-100 text-purple-700',
+  sofer: 'bg-amber-100 text-amber-700',
+  shaliach: 'bg-blue-100 text-blue-700',
+  customer: 'bg-gray-100 text-gray-600',
+};
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [applications, setApplications] = useState<SoferApplication[]>([]);
+  const [users, setUsers] = useState<AppUser[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [appsLoading, setAppsLoading] = useState(true);
+  const [usersLoading, setUsersLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('orders');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [roleFilter, setRoleFilter] = useState<string>('הכל');
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== 'admin')) {
-      router.push('/');
-    }
+    if (!loading && (!user || user.role !== 'admin')) router.push('/');
   }, [user, loading]);
 
   useEffect(() => {
     if (user?.role === 'admin') {
       loadOrders();
       loadApplications();
+      loadUsers();
     }
   }, [user]);
 
@@ -65,11 +93,8 @@ export default function AdminPage() {
       const data: Order[] = [];
       snap.forEach(d => data.push({ id: d.id, ...d.data() } as Order));
       setOrders(data);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setOrdersLoading(false);
-    }
+    } catch (e) { console.error(e); }
+    finally { setOrdersLoading(false); }
   }
 
   async function loadApplications() {
@@ -78,63 +103,60 @@ export default function AdminPage() {
       const data: SoferApplication[] = [];
       snap.forEach(d => data.push({ id: d.id, ...d.data() } as SoferApplication));
       setApplications(data);
+    } catch (e) { console.error(e); }
+    finally { setAppsLoading(false); }
+  }
+
+  async function loadUsers() {
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      const data: AppUser[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as AppUser));
+      setUsers(data);
+    } catch (e) { console.error(e); }
+    finally { setUsersLoading(false); }
+  }
+
+  async function changeUserRole(userId: string, newRole: UserRole) {
+    setActionLoading(userId);
+    try {
+      await updateDoc(doc(db, 'users', userId), { role: newRole });
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
     } catch (e) {
       console.error(e);
+      alert('שגיאה בעדכון תפקיד');
     } finally {
-      setAppsLoading(false);
+      setActionLoading(null);
     }
   }
 
   async function approveApplication(app: SoferApplication) {
     setActionLoading(app.id);
     try {
-      // עדכן סטטוס הבקשה
       await updateDoc(doc(db, 'soferim_applications', app.id), {
-        status: 'approved',
-        approvedAt: serverTimestamp(),
+        status: 'approved', approvedAt: serverTimestamp(),
       });
-      // צור רשומת סופר ב-soferim collection
       await addDoc(collection(db, 'soferim'), {
-        name: app.name,
-        city: app.city,
-        phone: app.phone,
-        whatsapp: app.whatsapp || '',
-        email: app.email || '',
-        description: app.description || '',
-        style: app.style || '',
-        categories: app.categories,
-        imageUrl: app.imageUrl || '',
-        status: 'active',
-        createdAt: serverTimestamp(),
+        name: app.name, city: app.city, phone: app.phone,
+        whatsapp: app.whatsapp || '', email: app.email || '',
+        description: app.description || '', style: app.style || '',
+        categories: app.categories, imageUrl: app.imageUrl || '',
+        status: 'active', createdAt: serverTimestamp(),
       });
-      // עדכן רשימה מקומית
-      setApplications(prev => prev.map(a =>
-        a.id === app.id ? { ...a, status: 'approved' } : a
-      ));
-    } catch (e) {
-      console.error(e);
-      alert('שגיאה באישור');
-    } finally {
-      setActionLoading(null);
-    }
+      setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
+    } catch (e) { console.error(e); alert('שגיאה באישור'); }
+    finally { setActionLoading(null); }
   }
 
   async function rejectApplication(id: string) {
     setActionLoading(id);
     try {
       await updateDoc(doc(db, 'soferim_applications', id), {
-        status: 'rejected',
-        rejectedAt: serverTimestamp(),
+        status: 'rejected', rejectedAt: serverTimestamp(),
       });
-      setApplications(prev => prev.map(a =>
-        a.id === id ? { ...a, status: 'rejected' } : a
-      ));
-    } catch (e) {
-      console.error(e);
-      alert('שגיאה בדחייה');
-    } finally {
-      setActionLoading(null);
-    }
+      setApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' } : a));
+    } catch (e) { console.error(e); alert('שגיאה בדחייה'); }
+    finally { setActionLoading(null); }
   }
 
   if (loading || ordersLoading) return (
@@ -146,16 +168,15 @@ export default function AdminPage() {
   if (!user || user.role !== 'admin') return null;
 
   const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const totalCommissions = orders.reduce((sum, o) => sum + (o.commissionAmount || 0), 0);
   const shaliachOrders = orders.filter(o => o.shaliachName);
   const pendingApps = applications.filter(a => a.status === 'pending');
+  const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
 
   return (
     <main className="max-w-6xl mx-auto p-6" dir="rtl">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">👑 דשבורד מנהל</h1>
-        <button onClick={() => router.push('/')}
-          className="text-green-700 font-bold hover:underline">
+        <button onClick={() => router.push('/')} className="text-green-700 font-bold hover:underline">
           ← חזרה לחנות
         </button>
       </div>
@@ -171,13 +192,11 @@ export default function AdminPage() {
           <div className="text-sm text-gray-500 mt-1">הזמנות</div>
         </div>
         <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-purple-600">{shaliachOrders.length}</div>
-          <div className="text-sm text-gray-500 mt-1">הזמנות שליחים</div>
+          <div className="text-3xl font-black text-purple-600">{users.length}</div>
+          <div className="text-sm text-gray-500 mt-1">משתמשים</div>
         </div>
         <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-orange-500">
-            {pendingApps.length}
-          </div>
+          <div className="text-3xl font-black text-orange-500">{pendingApps.length}</div>
           <div className="text-sm text-gray-500 mt-1">בקשות סופרים</div>
         </div>
       </div>
@@ -200,6 +219,10 @@ export default function AdminPage() {
               {pendingApps.length}
             </span>
           )}
+        </button>
+        <button onClick={() => setActiveTab('users')}
+          className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'users' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>
+          👥 משתמשים
         </button>
       </div>
 
@@ -286,8 +309,6 @@ export default function AdminPage() {
               {applications.map(app => (
                 <div key={app.id} className="bg-white rounded-xl shadow p-5">
                   <div className="flex items-start justify-between gap-4">
-
-                    {/* תמונה */}
                     <div className="flex-shrink-0">
                       {app.imageUrl ? (
                         <img src={app.imageUrl} alt={app.name}
@@ -296,8 +317,6 @@ export default function AdminPage() {
                         <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-2xl">✍️</div>
                       )}
                     </div>
-
-                    {/* פרטים */}
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-black">{app.name}</h3>
@@ -309,7 +328,6 @@ export default function AdminPage() {
                            app.status === 'approved' ? '✅ מאושר' : '❌ נדחה'}
                         </span>
                       </div>
-
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-3">
                         {app.city && <span>📍 {app.city}</span>}
                         {app.phone && <span>📞 {app.phone}</span>}
@@ -317,33 +335,25 @@ export default function AdminPage() {
                         {app.email && <span>✉️ {app.email}</span>}
                         {app.style && <span>✍️ {app.style}</span>}
                       </div>
-
                       {app.categories?.length > 0 && (
                         <div className="flex gap-2 flex-wrap mb-3">
                           {app.categories.map(cat => (
-                            <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">
-                              {cat}
-                            </span>
+                            <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">{cat}</span>
                           ))}
                         </div>
                       )}
-
                       {app.description && (
                         <p className="text-sm text-gray-500 mb-3 line-clamp-2">{app.description}</p>
                       )}
                     </div>
-
-                    {/* כפתורי פעולה */}
                     {app.status === 'pending' && (
                       <div className="flex flex-col gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => approveApplication(app)}
+                        <button onClick={() => approveApplication(app)}
                           disabled={actionLoading === app.id}
                           className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">
                           {actionLoading === app.id ? '...' : '✅ אשר'}
                         </button>
-                        <button
-                          onClick={() => rejectApplication(app.id)}
+                        <button onClick={() => rejectApplication(app.id)}
                           disabled={actionLoading === app.id}
                           className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">
                           ❌ דחה
@@ -353,6 +363,66 @@ export default function AdminPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Users */}
+      {activeTab === 'users' && (
+        <div>
+          {/* פילטר */}
+          <div className="flex gap-2 mb-4 flex-wrap">
+            {['הכל', 'admin', 'sofer', 'shaliach', 'customer'].map(r => (
+              <button key={r} onClick={() => setRoleFilter(r)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-bold transition ${roleFilter === r ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>
+                {r === 'הכל' ? 'הכל' : ROLE_LABELS[r as UserRole]}
+              </button>
+            ))}
+          </div>
+
+          {usersLoading ? (
+            <div className="p-10 text-center text-gray-400">טוען משתמשים...</div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="p-10 text-center text-gray-400">אין משתמשים</div>
+          ) : (
+            <div className="bg-white rounded-xl shadow overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-3 text-right">משתמש</th>
+                    <th className="p-3 text-right">אימייל</th>
+                    <th className="p-3 text-right">תפקיד נוכחי</th>
+                    <th className="p-3 text-right">שנה תפקיד</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map(u => (
+                    <tr key={u.id} className="border-t hover:bg-gray-50">
+                      <td className="p-3 font-bold">{u.displayName || '—'}</td>
+                      <td className="p-3 text-gray-500 text-xs">{u.email}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>
+                          {ROLE_LABELS[u.role]}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <select
+                          value={u.role}
+                          disabled={actionLoading === u.id}
+                          onChange={e => changeUserRole(u.id, e.target.value as UserRole)}
+                          className="border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer">
+                          <option value="customer">👤 לקוח</option>
+                          <option value="sofer">✍️ סופר</option>
+                          <option value="shaliach">🟦 שליח</option>
+                          <option value="admin">👑 מנהל</option>
+                        </select>
+                        {actionLoading === u.id && <span className="text-xs text-gray-400 mr-2">שומר...</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
