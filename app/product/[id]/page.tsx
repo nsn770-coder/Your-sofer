@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams, useRouter } from 'next/navigation';
-import { useCart } from '../../CartContext';
+import { useCart } from '../../contexts/CartContext';
 
 interface Product {
   id: string;
