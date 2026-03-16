@@ -41,12 +41,28 @@ interface AppUser {
   displayName?: string;
   role: UserRole;
   status: string;
-  createdAt?: { seconds: number };
   soferId?: string;
   shaliachId?: string;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'users';
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  cat?: string;
+  category?: string;
+  status?: string;
+  soferId?: string;
+  imgUrl?: string;
+  image_url?: string;
+}
+
+interface Sofer {
+  id: string;
+  name: string;
+}
+
+type TabType = 'orders' | 'commissions' | 'soferim' | 'users' | 'products';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: '👑 מנהל',
@@ -68,12 +84,16 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [applications, setApplications] = useState<SoferApplication[]>([]);
   const [users, setUsers] = useState<AppUser[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [soferim, setSoferim] = useState<Sofer[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [appsLoading, setAppsLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('orders');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>('הכל');
+  const [productSearch, setProductSearch] = useState('');
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
@@ -84,6 +104,8 @@ export default function AdminPage() {
       loadOrders();
       loadApplications();
       loadUsers();
+      loadProducts();
+      loadSoferim();
     }
   }, [user]);
 
@@ -115,6 +137,52 @@ export default function AdminPage() {
       setUsers(data);
     } catch (e) { console.error(e); }
     finally { setUsersLoading(false); }
+  }
+
+  async function loadProducts() {
+    try {
+      const snap = await getDocs(collection(db, 'products'));
+      const data: Product[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Product));
+      setProducts(data);
+    } catch (e) { console.error(e); }
+    finally { setProductsLoading(false); }
+  }
+
+  async function loadSoferim() {
+    try {
+      const snap = await getDocs(collection(db, 'soferim'));
+      const data: Sofer[] = [];
+      snap.forEach(d => data.push({ id: d.id, name: d.data().name } as Sofer));
+      setSoferim(data);
+    } catch (e) { console.error(e); }
+  }
+
+  async function assignSoferToProduct(productId: string, soferId: string) {
+    setActionLoading(productId);
+    try {
+      await updateDoc(doc(db, 'products', productId), { soferId: soferId || null });
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, soferId: soferId || undefined } : p));
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בשיוך סופר');
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function toggleProductStatus(productId: string, currentStatus: string) {
+    setActionLoading(productId + '_status');
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    try {
+      await updateDoc(doc(db, 'products', productId), { status: newStatus });
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, status: newStatus } : p));
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בעדכון סטטוס');
+    } finally {
+      setActionLoading(null);
+    }
   }
 
   async function changeUserRole(userId: string, newRole: UserRole) {
@@ -171,6 +239,10 @@ export default function AdminPage() {
   const shaliachOrders = orders.filter(o => o.shaliachName);
   const pendingApps = applications.filter(a => a.status === 'pending');
   const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
+  const filteredProducts = products.filter(p =>
+    !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase())
+  );
+  const unassignedProducts = products.filter(p => !p.soferId).length;
 
   return (
     <main className="max-w-6xl mx-auto p-6" dir="rtl">
@@ -188,8 +260,8 @@ export default function AdminPage() {
           <div className="text-sm text-gray-500 mt-1">סה"כ הכנסות</div>
         </div>
         <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-blue-600">{orders.length}</div>
-          <div className="text-sm text-gray-500 mt-1">הזמנות</div>
+          <div className="text-3xl font-black text-blue-600">{products.length}</div>
+          <div className="text-sm text-gray-500 mt-1">מוצרים</div>
         </div>
         <div className="bg-white rounded-xl shadow p-4 text-center">
           <div className="text-3xl font-black text-purple-600">{users.length}</div>
@@ -206,6 +278,15 @@ export default function AdminPage() {
         <button onClick={() => setActiveTab('orders')}
           className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'orders' ? 'bg-green-700 text-white' : 'bg-white text-gray-600'}`}>
           📦 הזמנות
+        </button>
+        <button onClick={() => setActiveTab('products')}
+          className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === 'products' ? 'bg-teal-600 text-white' : 'bg-white text-gray-600'}`}>
+          📜 מוצרים
+          {unassignedProducts > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {unassignedProducts}
+            </span>
+          )}
         </button>
         <button onClick={() => setActiveTab('commissions')}
           className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'commissions' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}>
@@ -225,6 +306,86 @@ export default function AdminPage() {
           👥 משתמשים
         </button>
       </div>
+
+      {/* Products */}
+      {activeTab === 'products' && (
+        <div>
+          <div className="flex gap-3 mb-4 items-center">
+            <input
+              value={productSearch}
+              onChange={e => setProductSearch(e.target.value)}
+              placeholder="חיפוש מוצר..."
+              className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs"
+            />
+            <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
+            {unassignedProducts > 0 && (
+              <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>
+            )}
+          </div>
+
+          {productsLoading ? (
+            <div className="p-10 text-center text-gray-400">טוען מוצרים...</div>
+          ) : (
+            <div className="bg-white rounded-xl shadow overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-3 text-right">מוצר</th>
+                    <th className="p-3 text-right">קטגוריה</th>
+                    <th className="p-3 text-right">מחיר</th>
+                    <th className="p-3 text-right">סטטוס</th>
+                    <th className="p-3 text-right">שיוך לסופר</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.length === 0 ? (
+                    <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
+                  ) : filteredProducts.map(p => (
+                    <tr key={p.id} className="border-t hover:bg-gray-50">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          {(p.imgUrl || p.image_url) && (
+                            <img src={p.imgUrl || p.image_url} alt={p.name}
+                              className="w-10 h-10 rounded-lg object-cover" />
+                          )}
+                          <span className="font-bold text-xs">{p.name}</span>
+                        </div>
+                      </td>
+                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
+                      <td className="p-3 font-bold text-green-700">₪{p.price}</td>
+                      <td className="p-3">
+                        <button
+                          onClick={() => toggleProductStatus(p.id, p.status || 'active')}
+                          disabled={actionLoading === p.id + '_status'}
+                          className={`px-2 py-1 rounded-full text-xs font-bold transition
+                            ${p.status === 'inactive'
+                              ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                              : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                          {p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}
+                        </button>
+                      </td>
+                      <td className="p-3">
+                        <select
+                          value={p.soferId || ''}
+                          disabled={actionLoading === p.id}
+                          onChange={e => assignSoferToProduct(p.id, e.target.value)}
+                          className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer
+                            ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}>
+                          <option value="">⚠️ ללא סופר</option>
+                          {soferim.map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </select>
+                        {actionLoading === p.id && <span className="text-xs text-gray-400 mr-1">שומר...</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Orders */}
       {activeTab === 'orders' && (
@@ -371,7 +532,6 @@ export default function AdminPage() {
       {/* Users */}
       {activeTab === 'users' && (
         <div>
-          {/* פילטר */}
           <div className="flex gap-2 mb-4 flex-wrap">
             {['הכל', 'admin', 'sofer', 'shaliach', 'customer'].map(r => (
               <button key={r} onClick={() => setRoleFilter(r)}
@@ -380,7 +540,6 @@ export default function AdminPage() {
               </button>
             ))}
           </div>
-
           {usersLoading ? (
             <div className="p-10 text-center text-gray-400">טוען משתמשים...</div>
           ) : filteredUsers.length === 0 ? (
