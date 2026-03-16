@@ -68,7 +68,15 @@ interface HomeContent {
   heroText: string;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'users' | 'products' | 'content';
+interface Category {
+  id: string;
+  name: string;
+  imgUrl: string;
+  sub: string;
+  order: number;
+}
+
+type TabType = 'orders' | 'commissions' | 'soferim' | 'users' | 'products' | 'content' | 'categories';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: '👑 מנהל',
@@ -92,9 +100,12 @@ export default function AdminPage() {
   const [users, setUsers] = useState<AppUser[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [content, setContent] = useState<HomeContent>({ heroTitle: '', heroSubtitle: '', heroText: '' });
   const [contentSaving, setContentSaving] = useState(false);
   const [contentSaved, setContentSaved] = useState(false);
+  const [catSaving, setCatSaving] = useState<string | null>(null);
+  const [catSaved, setCatSaved] = useState<string | null>(null);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [appsLoading, setAppsLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -116,6 +127,7 @@ export default function AdminPage() {
       loadProducts();
       loadSoferim();
       loadContent();
+      loadCategories();
     }
   }, [user]);
 
@@ -175,18 +187,35 @@ export default function AdminPage() {
     } catch (e) { console.error(e); }
   }
 
+  async function loadCategories() {
+    try {
+      const snap = await getDocs(collection(db, 'categories'));
+      const data: Category[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Category));
+      data.sort((a, b) => (a.order || 0) - (b.order || 0));
+      setCategories(data);
+    } catch (e) { console.error(e); }
+  }
+
   async function saveContent() {
     setContentSaving(true);
     try {
       await setDoc(doc(db, 'content', 'homepage'), content, { merge: true });
       setContentSaved(true);
       setTimeout(() => setContentSaved(false), 3000);
-    } catch (e) {
-      console.error(e);
-      alert('שגיאה בשמירה');
-    } finally {
-      setContentSaving(false);
-    }
+    } catch (e) { console.error(e); alert('שגיאה בשמירה'); }
+    finally { setContentSaving(false); }
+  }
+
+  async function saveCategoryImg(catId: string, imgUrl: string, sub: string) {
+    setCatSaving(catId);
+    try {
+      await updateDoc(doc(db, 'categories', catId), { imgUrl, sub });
+      setCategories(prev => prev.map(c => c.id === catId ? { ...c, imgUrl, sub } : c));
+      setCatSaved(catId);
+      setTimeout(() => setCatSaved(null), 2500);
+    } catch (e) { console.error(e); alert('שגיאה בשמירה'); }
+    finally { setCatSaving(null); }
   }
 
   async function assignSoferToProduct(productId: string, soferId: string) {
@@ -286,118 +315,98 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6 flex-wrap">
-        <button onClick={() => setActiveTab('orders')}
-          className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'orders' ? 'bg-green-700 text-white' : 'bg-white text-gray-600'}`}>
-          📦 הזמנות
-        </button>
-        <button onClick={() => setActiveTab('products')}
-          className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === 'products' ? 'bg-teal-600 text-white' : 'bg-white text-gray-600'}`}>
-          📜 מוצרים
-          {unassignedProducts > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{unassignedProducts}</span>
-          )}
-        </button>
-        <button onClick={() => setActiveTab('commissions')}
-          className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'commissions' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}>
-          🤝 עמלות שליחים
-        </button>
-        <button onClick={() => setActiveTab('soferim')}
-          className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === 'soferim' ? 'bg-amber-600 text-white' : 'bg-white text-gray-600'}`}>
-          ✍️ בקשות סופרים
-          {pendingApps.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{pendingApps.length}</span>
-          )}
-        </button>
-        <button onClick={() => setActiveTab('users')}
-          className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'users' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>
-          👥 משתמשים
-        </button>
-        <button onClick={() => setActiveTab('content')}
-          className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'content' ? 'bg-pink-600 text-white' : 'bg-white text-gray-600'}`}>
-          ✏️ ניהול תוכן
-        </button>
+        {[
+          { key: 'orders', label: '📦 הזמנות', color: 'bg-green-700' },
+          { key: 'products', label: '📜 מוצרים', color: 'bg-teal-600', badge: unassignedProducts },
+          { key: 'commissions', label: '🤝 עמלות', color: 'bg-blue-600' },
+          { key: 'soferim', label: '✍️ בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
+          { key: 'users', label: '👥 משתמשים', color: 'bg-purple-600' },
+          { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
+          { key: 'categories', label: '🖼️ קטגוריות', color: 'bg-indigo-600' },
+        ].map(t => (
+          <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
+            className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
+            {t.label}
+            {t.badge && t.badge > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{t.badge}</span>
+            )}
+          </button>
+        ))}
       </div>
 
-      {/* Content Management */}
-      {activeTab === 'content' && (
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-xl font-black mb-6 text-gray-800">✏️ עריכת תוכן דף הבית</h2>
+      {/* ══ CATEGORIES TAB ══ */}
+      {activeTab === 'categories' && (
+        <div className="grid gap-6">
+          <div className="bg-white rounded-xl shadow p-6">
+            <h2 className="text-xl font-black mb-2">🖼️ ניהול תמונות קטגוריות</h2>
+            <p className="text-sm text-gray-500 mb-6">עדכן תמונה וכיתוב לכל קטגוריה. התמונות מופיעות בדף הבית.</p>
 
-          <div className="grid gap-6">
-            {/* Hero */}
-            <div className="border border-gray-100 rounded-xl p-5 bg-gray-50">
-              <h3 className="font-bold text-gray-700 mb-4">🏠 אזור Hero (הבאנר הראשי)</h3>
-              <div className="grid gap-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-600 mb-1">כותרת ראשית</label>
-                  <input
-                    value={content.heroTitle}
-                    onChange={e => setContent(prev => ({ ...prev, heroTitle: e.target.value }))}
-                    placeholder='רכישת סת"מ'
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-600 mb-1">כותרת משנה (בזהב)</label>
-                  <input
-                    value={content.heroSubtitle}
-                    onChange={e => setContent(prev => ({ ...prev, heroSubtitle: e.target.value }))}
-                    placeholder="ישירות מהסופר"
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-600 mb-1">טקסט תיאור</label>
-                  <textarea
-                    value={content.heroText}
-                    onChange={e => setContent(prev => ({ ...prev, heroText: e.target.value }))}
-                    placeholder="בחר את הסופר שלך..."
-                    rows={3}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500 resize-none"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* תצוגה מקדימה */}
-            <div className="border border-gray-100 rounded-xl p-5">
-              <h3 className="font-bold text-gray-700 mb-4">👁️ תצוגה מקדימה</h3>
-              <div style={{ background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', borderRadius: 12, padding: '24px 32px', direction: 'rtl' }}>
-                <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', lineHeight: 1.3, marginBottom: 8 }}>
-                  {content.heroTitle || 'רכישת סת"מ'}
-                </div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a', marginBottom: 12 }}>
-                  {content.heroSubtitle || 'ישירות מהסופר'}
-                </div>
-                <div style={{ fontSize: 14, color: '#a8c8b4', lineHeight: 1.6 }}>
-                  {content.heroText || 'בחר את הסופר שלך...'}
-                </div>
-              </div>
-            </div>
-
-            {/* כפתור שמירה */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={saveContent}
-                disabled={contentSaving}
-                className="bg-green-700 text-white px-8 py-3 rounded-xl font-bold text-base hover:bg-green-600 disabled:opacity-50 transition">
-                {contentSaving ? '⏳ שומר...' : '💾 שמור שינויים'}
-              </button>
-              {contentSaved && (
-                <span className="text-green-600 font-bold text-sm">✅ נשמר בהצלחה! רענן את דף הבית לראות שינויים.</span>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {categories.map(cat => (
+                <CategoryCard
+                  key={cat.id}
+                  cat={cat}
+                  saving={catSaving === cat.id}
+                  saved={catSaved === cat.id}
+                  onSave={(imgUrl, sub) => saveCategoryImg(cat.id, imgUrl, sub)}
+                />
+              ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* Products */}
+      {/* ══ CONTENT TAB ══ */}
+      {activeTab === 'content' && (
+        <div className="bg-white rounded-xl shadow p-6">
+          <h2 className="text-xl font-black mb-6 text-gray-800">✏️ עריכת תוכן דף הבית</h2>
+          <div className="grid gap-6">
+            <div className="border border-gray-100 rounded-xl p-5 bg-gray-50">
+              <h3 className="font-bold text-gray-700 mb-4">🏠 אזור Hero</h3>
+              <div className="grid gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">כותרת ראשית</label>
+                  <input value={content.heroTitle} onChange={e => setContent(prev => ({ ...prev, heroTitle: e.target.value }))}
+                    placeholder='רכישת סת"מ' className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">כותרת משנה (בזהב)</label>
+                  <input value={content.heroSubtitle} onChange={e => setContent(prev => ({ ...prev, heroSubtitle: e.target.value }))}
+                    placeholder="ישירות מהסופר" className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">טקסט תיאור</label>
+                  <textarea value={content.heroText} onChange={e => setContent(prev => ({ ...prev, heroText: e.target.value }))}
+                    placeholder="בחר את הסופר שלך..." rows={3}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500 resize-none" />
+                </div>
+              </div>
+            </div>
+            <div className="border border-gray-100 rounded-xl p-5">
+              <h3 className="font-bold text-gray-700 mb-4">👁️ תצוגה מקדימה</h3>
+              <div style={{ background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', borderRadius: 12, padding: '24px 32px', direction: 'rtl' }}>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', marginBottom: 6 }}>{content.heroTitle || 'רכישת סת"מ'}</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a', marginBottom: 10 }}>{content.heroSubtitle || 'ישירות מהסופר'}</div>
+                <div style={{ fontSize: 13, color: '#a8c8b4', lineHeight: 1.6 }}>{content.heroText || 'בחר את הסופר שלך...'}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <button onClick={saveContent} disabled={contentSaving}
+                className="bg-green-700 text-white px-8 py-3 rounded-xl font-bold text-base hover:bg-green-600 disabled:opacity-50 transition">
+                {contentSaving ? '⏳ שומר...' : '💾 שמור שינויים'}
+              </button>
+              {contentSaved && <span className="text-green-600 font-bold text-sm">✅ נשמר!</span>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══ PRODUCTS TAB ══ */}
       {activeTab === 'products' && (
         <div>
           <div className="flex gap-3 mb-4 items-center">
             <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
-              placeholder="חיפוש מוצר..."
-              className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
+              placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
             <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
             {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
           </div>
@@ -422,17 +431,14 @@ export default function AdminPage() {
                     <tr key={p.id} className="border-t hover:bg-gray-50">
                       <td className="p-3">
                         <div className="flex items-center gap-2">
-                          {(p.imgUrl || p.image_url) && (
-                            <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />
-                          )}
+                          {(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />}
                           <span className="font-bold text-xs">{p.name}</span>
                         </div>
                       </td>
                       <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
                       <td className="p-3 font-bold text-green-700">₪{p.price}</td>
                       <td className="p-3">
-                        <button onClick={() => toggleProductStatus(p.id, p.status || 'active')}
-                          disabled={actionLoading === p.id + '_status'}
+                        <button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'}
                           className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
                           {p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}
                         </button>
@@ -444,7 +450,6 @@ export default function AdminPage() {
                           <option value="">⚠️ ללא סופר</option>
                           {soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                         </select>
-                        {actionLoading === p.id && <span className="text-xs text-gray-400 mr-1">שומר...</span>}
                       </td>
                     </tr>
                   ))}
@@ -455,7 +460,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Orders */}
+      {/* ══ ORDERS TAB ══ */}
       {activeTab === 'orders' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
           <table className="w-full text-sm">
@@ -489,7 +494,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Commissions */}
+      {/* ══ COMMISSIONS TAB ══ */}
       {activeTab === 'commissions' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
           {shaliachOrders.length === 0 ? (
@@ -500,8 +505,8 @@ export default function AdminPage() {
                 <tr>
                   <th className="p-3 text-right">מספר הזמנה</th>
                   <th className="p-3 text-right">שליח</th>
-                  <th className="p-3 text-right">סכום הזמנה</th>
-                  <th className="p-3 text-right">אחוז עמלה</th>
+                  <th className="p-3 text-right">סכום</th>
+                  <th className="p-3 text-right">אחוז</th>
                   <th className="p-3 text-right">עמלה</th>
                 </tr>
               </thead>
@@ -521,24 +526,19 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Sofer Applications */}
+      {/* ══ SOFERIM APPLICATIONS TAB ══ */}
       {activeTab === 'soferim' && (
         <div>
-          {appsLoading ? (
-            <div className="p-10 text-center text-gray-400">טוען בקשות...</div>
-          ) : applications.length === 0 ? (
-            <div className="p-10 text-center text-gray-400">אין בקשות סופרים עדיין</div>
-          ) : (
+          {appsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
+          : applications.length === 0 ? <div className="p-10 text-center text-gray-400">אין בקשות עדיין</div>
+          : (
             <div className="grid gap-4">
               {applications.map(app => (
                 <div key={app.id} className="bg-white rounded-xl shadow p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-shrink-0">
-                      {app.imageUrl ? (
-                        <img src={app.imageUrl} alt={app.name} className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
-                      ) : (
-                        <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-2xl">✍️</div>
-                      )}
+                      {app.imageUrl ? <img src={app.imageUrl} alt={app.name} className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
+                      : <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-2xl">✍️</div>}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
@@ -550,15 +550,12 @@ export default function AdminPage() {
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-3">
                         {app.city && <span>📍 {app.city}</span>}
                         {app.phone && <span>📞 {app.phone}</span>}
-                        {app.whatsapp && <span>💬 {app.whatsapp}</span>}
                         {app.email && <span>✉️ {app.email}</span>}
                         {app.style && <span>✍️ {app.style}</span>}
                       </div>
                       {app.categories?.length > 0 && (
                         <div className="flex gap-2 flex-wrap mb-3">
-                          {app.categories.map(cat => (
-                            <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">{cat}</span>
-                          ))}
+                          {app.categories.map(cat => <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">{cat}</span>)}
                         </div>
                       )}
                       {app.description && <p className="text-sm text-gray-500 mb-3 line-clamp-2">{app.description}</p>}
@@ -583,7 +580,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Users */}
+      {/* ══ USERS TAB ══ */}
       {activeTab === 'users' && (
         <div>
           <div className="flex gap-2 mb-4 flex-wrap">
@@ -594,11 +591,9 @@ export default function AdminPage() {
               </button>
             ))}
           </div>
-          {usersLoading ? (
-            <div className="p-10 text-center text-gray-400">טוען משתמשים...</div>
-          ) : filteredUsers.length === 0 ? (
-            <div className="p-10 text-center text-gray-400">אין משתמשים</div>
-          ) : (
+          {usersLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
+          : filteredUsers.length === 0 ? <div className="p-10 text-center text-gray-400">אין משתמשים</div>
+          : (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
@@ -637,5 +632,57 @@ export default function AdminPage() {
         </div>
       )}
     </main>
+  );
+}
+
+// ══ קומפוננט כרטיס קטגוריה ══
+function CategoryCard({ cat, saving, saved, onSave }: {
+  cat: Category;
+  saving: boolean;
+  saved: boolean;
+  onSave: (imgUrl: string, sub: string) => void;
+}) {
+  const [imgUrl, setImgUrl] = useState(cat.imgUrl || '');
+  const [sub, setSub] = useState(cat.sub || '');
+  const [preview, setPreview] = useState(cat.imgUrl || '');
+
+  return (
+    <div className="border border-gray-200 rounded-xl overflow-hidden">
+      {/* תצוגה מקדימה */}
+      <div style={{ height: 120, background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', position: 'relative', overflow: 'hidden' }}>
+        {preview ? (
+          <img src={preview} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={e => (e.currentTarget.style.display = 'none')} />
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 40 }}>🖼️</div>
+        )}
+        <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)', padding: '8px 12px' }}>
+          <div style={{ color: '#fff', fontWeight: 900, fontSize: 15 }}>{cat.name}</div>
+        </div>
+      </div>
+
+      {/* עריכה */}
+      <div className="p-4 bg-white">
+        <div className="mb-3">
+          <label className="block text-xs font-bold text-gray-500 mb-1">כיתוב</label>
+          <input value={sub} onChange={e => setSub(e.target.value)}
+            placeholder="מכל הסוגים והגדלים"
+            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-400" />
+        </div>
+        <div className="mb-3">
+          <label className="block text-xs font-bold text-gray-500 mb-1">קישור תמונה (URL)</label>
+          <input value={imgUrl} onChange={e => { setImgUrl(e.target.value); setPreview(e.target.value); }}
+            placeholder="https://..."
+            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-400" />
+        </div>
+        <div className="flex items-center gap-3">
+          <button onClick={() => onSave(imgUrl, sub)} disabled={saving}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition">
+            {saving ? '⏳ שומר...' : '💾 שמור'}
+          </button>
+          {saved && <span className="text-green-600 text-sm font-bold">✅ נשמר!</span>}
+        </div>
+      </div>
+    </div>
   );
 }
