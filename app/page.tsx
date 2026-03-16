@@ -5,6 +5,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 import { useCart } from './CartContext';
 import { useAuth } from './AuthContext';
+import { CATS, NAV_ITEMS } from './constants/categories';
 
 interface Product {
   id: string;
@@ -19,8 +20,6 @@ interface Product {
   reviews?: number;
   days?: string;
 }
-
-const CATS = ['הכל','מזוזות','תפילין','מגילות','ספרי תורה','יודאיקה','מתנות'];
 
 const PROMO_CATS = [
   { name: 'מזוזות',    emoji: '📜', sub: 'מכל הסוגים והגדלים' },
@@ -163,14 +162,17 @@ export default function Home() {
             <button style={{ background: 'none', border: 'none', color: '#fff', padding: '8px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}>
               ☰ כל הקטגוריות
             </button>
-            {['🔥 מבצעי היום', 'מזוזות', 'תפילין', 'מגילות', 'יודאיקה', '🎁 מתנות', '✡️ חגים ומועדים', '✍️ הסופרים שלנו', '🌟 הצטרף לפלטפורמה'].map(item => (
-              <button key={item}
-                onClick={() => {
-                  const cat = item.replace(/[🔥🎁✡️✍️🌟]\s*/g, '');
-                  if (CATS.includes(cat)) setActiveCat(cat);
-                }}
-                style={{ background: 'none', border: 'none', color: '#fff', padding: '8px 12px', fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                {item}
+            {NAV_ITEMS.map(item => (
+              <button key={item.label}
+                onClick={() => { if (item.cat) setActiveCat(item.cat); }}
+                style={{
+                  background: 'none', border: 'none',
+                  color: item.cat && activeCat === item.cat ? '#b8972a' : '#fff',
+                  padding: '8px 12px', fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap',
+                  fontWeight: item.cat && activeCat === item.cat ? 700 : 400,
+                  borderBottom: item.cat && activeCat === item.cat ? '2px solid #b8972a' : '2px solid transparent'
+                }}>
+                {item.label}
               </button>
             ))}
           </div>
@@ -285,7 +287,7 @@ export default function Home() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: 60, fontSize: 18, color: '#666' }}>טוען מוצרים...</div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>לא נמצאו מוצרים</div>
+          <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>לא נמצאו מוצרים בקטגוריה זו</div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
             {filtered.map(p => {
