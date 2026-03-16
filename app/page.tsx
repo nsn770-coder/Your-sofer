@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
-import { useCart } from './CartContext';
-import { useAuth } from './AuthContext';
+import { useCart } from './contexts/CartContext';
+import { useAuth } from './contexts/AuthContext';
 import { CATS, NAV_ITEMS } from './constants/categories';
 
 interface Product {

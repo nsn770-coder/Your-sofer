@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../firebase';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Order {
   id: string;
