@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, orderBy, query,
-  doc, updateDoc, addDoc, serverTimestamp
+  doc, updateDoc, addDoc, serverTimestamp, getDoc, setDoc
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -62,7 +62,13 @@ interface Sofer {
   name: string;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'users' | 'products';
+interface HomeContent {
+  heroTitle: string;
+  heroSubtitle: string;
+  heroText: string;
+}
+
+type TabType = 'orders' | 'commissions' | 'soferim' | 'users' | 'products' | 'content';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: '👑 מנהל',
@@ -86,6 +92,9 @@ export default function AdminPage() {
   const [users, setUsers] = useState<AppUser[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
+  const [content, setContent] = useState<HomeContent>({ heroTitle: '', heroSubtitle: '', heroText: '' });
+  const [contentSaving, setContentSaving] = useState(false);
+  const [contentSaved, setContentSaved] = useState(false);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [appsLoading, setAppsLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -106,6 +115,7 @@ export default function AdminPage() {
       loadUsers();
       loadProducts();
       loadSoferim();
+      loadContent();
     }
   }, [user]);
 
@@ -158,17 +168,34 @@ export default function AdminPage() {
     } catch (e) { console.error(e); }
   }
 
+  async function loadContent() {
+    try {
+      const snap = await getDoc(doc(db, 'content', 'homepage'));
+      if (snap.exists()) setContent(snap.data() as HomeContent);
+    } catch (e) { console.error(e); }
+  }
+
+  async function saveContent() {
+    setContentSaving(true);
+    try {
+      await setDoc(doc(db, 'content', 'homepage'), content, { merge: true });
+      setContentSaved(true);
+      setTimeout(() => setContentSaved(false), 3000);
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בשמירה');
+    } finally {
+      setContentSaving(false);
+    }
+  }
+
   async function assignSoferToProduct(productId: string, soferId: string) {
     setActionLoading(productId);
     try {
       await updateDoc(doc(db, 'products', productId), { soferId: soferId || null });
       setProducts(prev => prev.map(p => p.id === productId ? { ...p, soferId: soferId || undefined } : p));
-    } catch (e) {
-      console.error(e);
-      alert('שגיאה בשיוך סופר');
-    } finally {
-      setActionLoading(null);
-    }
+    } catch (e) { console.error(e); alert('שגיאה בשיוך סופר'); }
+    finally { setActionLoading(null); }
   }
 
   async function toggleProductStatus(productId: string, currentStatus: string) {
@@ -177,12 +204,8 @@ export default function AdminPage() {
     try {
       await updateDoc(doc(db, 'products', productId), { status: newStatus });
       setProducts(prev => prev.map(p => p.id === productId ? { ...p, status: newStatus } : p));
-    } catch (e) {
-      console.error(e);
-      alert('שגיאה בעדכון סטטוס');
-    } finally {
-      setActionLoading(null);
-    }
+    } catch (e) { console.error(e); alert('שגיאה בעדכון סטטוס'); }
+    finally { setActionLoading(null); }
   }
 
   async function changeUserRole(userId: string, newRole: UserRole) {
@@ -190,20 +213,14 @@ export default function AdminPage() {
     try {
       await updateDoc(doc(db, 'users', userId), { role: newRole });
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
-    } catch (e) {
-      console.error(e);
-      alert('שגיאה בעדכון תפקיד');
-    } finally {
-      setActionLoading(null);
-    }
+    } catch (e) { console.error(e); alert('שגיאה בעדכון תפקיד'); }
+    finally { setActionLoading(null); }
   }
 
   async function approveApplication(app: SoferApplication) {
     setActionLoading(app.id);
     try {
-      await updateDoc(doc(db, 'soferim_applications', app.id), {
-        status: 'approved', approvedAt: serverTimestamp(),
-      });
+      await updateDoc(doc(db, 'soferim_applications', app.id), { status: 'approved', approvedAt: serverTimestamp() });
       await addDoc(collection(db, 'soferim'), {
         name: app.name, city: app.city, phone: app.phone,
         whatsapp: app.whatsapp || '', email: app.email || '',
@@ -219,9 +236,7 @@ export default function AdminPage() {
   async function rejectApplication(id: string) {
     setActionLoading(id);
     try {
-      await updateDoc(doc(db, 'soferim_applications', id), {
-        status: 'rejected', rejectedAt: serverTimestamp(),
-      });
+      await updateDoc(doc(db, 'soferim_applications', id), { status: 'rejected', rejectedAt: serverTimestamp() });
       setApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' } : a));
     } catch (e) { console.error(e); alert('שגיאה בדחייה'); }
     finally { setActionLoading(null); }
@@ -239,18 +254,14 @@ export default function AdminPage() {
   const shaliachOrders = orders.filter(o => o.shaliachName);
   const pendingApps = applications.filter(a => a.status === 'pending');
   const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
-  const filteredProducts = products.filter(p =>
-    !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase())
-  );
+  const filteredProducts = products.filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()));
   const unassignedProducts = products.filter(p => !p.soferId).length;
 
   return (
     <main className="max-w-6xl mx-auto p-6" dir="rtl">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">👑 דשבורד מנהל</h1>
-        <button onClick={() => router.push('/')} className="text-green-700 font-bold hover:underline">
-          ← חזרה לחנות
-        </button>
+        <button onClick={() => router.push('/')} className="text-green-700 font-bold hover:underline">← חזרה לחנות</button>
       </div>
 
       {/* Stats */}
@@ -283,9 +294,7 @@ export default function AdminPage() {
           className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === 'products' ? 'bg-teal-600 text-white' : 'bg-white text-gray-600'}`}>
           📜 מוצרים
           {unassignedProducts > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {unassignedProducts}
-            </span>
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{unassignedProducts}</span>
           )}
         </button>
         <button onClick={() => setActiveTab('commissions')}
@@ -296,33 +305,102 @@ export default function AdminPage() {
           className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === 'soferim' ? 'bg-amber-600 text-white' : 'bg-white text-gray-600'}`}>
           ✍️ בקשות סופרים
           {pendingApps.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {pendingApps.length}
-            </span>
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{pendingApps.length}</span>
           )}
         </button>
         <button onClick={() => setActiveTab('users')}
           className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'users' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>
           👥 משתמשים
         </button>
+        <button onClick={() => setActiveTab('content')}
+          className={`px-4 py-2 rounded-xl font-bold transition ${activeTab === 'content' ? 'bg-pink-600 text-white' : 'bg-white text-gray-600'}`}>
+          ✏️ ניהול תוכן
+        </button>
       </div>
+
+      {/* Content Management */}
+      {activeTab === 'content' && (
+        <div className="bg-white rounded-xl shadow p-6">
+          <h2 className="text-xl font-black mb-6 text-gray-800">✏️ עריכת תוכן דף הבית</h2>
+
+          <div className="grid gap-6">
+            {/* Hero */}
+            <div className="border border-gray-100 rounded-xl p-5 bg-gray-50">
+              <h3 className="font-bold text-gray-700 mb-4">🏠 אזור Hero (הבאנר הראשי)</h3>
+              <div className="grid gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">כותרת ראשית</label>
+                  <input
+                    value={content.heroTitle}
+                    onChange={e => setContent(prev => ({ ...prev, heroTitle: e.target.value }))}
+                    placeholder='רכישת סת"מ'
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">כותרת משנה (בזהב)</label>
+                  <input
+                    value={content.heroSubtitle}
+                    onChange={e => setContent(prev => ({ ...prev, heroSubtitle: e.target.value }))}
+                    placeholder="ישירות מהסופר"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">טקסט תיאור</label>
+                  <textarea
+                    value={content.heroText}
+                    onChange={e => setContent(prev => ({ ...prev, heroText: e.target.value }))}
+                    placeholder="בחר את הסופר שלך..."
+                    rows={3}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500 resize-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* תצוגה מקדימה */}
+            <div className="border border-gray-100 rounded-xl p-5">
+              <h3 className="font-bold text-gray-700 mb-4">👁️ תצוגה מקדימה</h3>
+              <div style={{ background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', borderRadius: 12, padding: '24px 32px', direction: 'rtl' }}>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', lineHeight: 1.3, marginBottom: 8 }}>
+                  {content.heroTitle || 'רכישת סת"מ'}
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a', marginBottom: 12 }}>
+                  {content.heroSubtitle || 'ישירות מהסופר'}
+                </div>
+                <div style={{ fontSize: 14, color: '#a8c8b4', lineHeight: 1.6 }}>
+                  {content.heroText || 'בחר את הסופר שלך...'}
+                </div>
+              </div>
+            </div>
+
+            {/* כפתור שמירה */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={saveContent}
+                disabled={contentSaving}
+                className="bg-green-700 text-white px-8 py-3 rounded-xl font-bold text-base hover:bg-green-600 disabled:opacity-50 transition">
+                {contentSaving ? '⏳ שומר...' : '💾 שמור שינויים'}
+              </button>
+              {contentSaved && (
+                <span className="text-green-600 font-bold text-sm">✅ נשמר בהצלחה! רענן את דף הבית לראות שינויים.</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Products */}
       {activeTab === 'products' && (
         <div>
           <div className="flex gap-3 mb-4 items-center">
-            <input
-              value={productSearch}
-              onChange={e => setProductSearch(e.target.value)}
+            <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
               placeholder="חיפוש מוצר..."
-              className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs"
-            />
+              className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
             <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
-            {unassignedProducts > 0 && (
-              <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>
-            )}
+            {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
           </div>
-
           {productsLoading ? (
             <div className="p-10 text-center text-gray-400">טוען מוצרים...</div>
           ) : (
@@ -345,8 +423,7 @@ export default function AdminPage() {
                       <td className="p-3">
                         <div className="flex items-center gap-2">
                           {(p.imgUrl || p.image_url) && (
-                            <img src={p.imgUrl || p.image_url} alt={p.name}
-                              className="w-10 h-10 rounded-lg object-cover" />
+                            <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />
                           )}
                           <span className="font-bold text-xs">{p.name}</span>
                         </div>
@@ -354,27 +431,18 @@ export default function AdminPage() {
                       <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
                       <td className="p-3 font-bold text-green-700">₪{p.price}</td>
                       <td className="p-3">
-                        <button
-                          onClick={() => toggleProductStatus(p.id, p.status || 'active')}
+                        <button onClick={() => toggleProductStatus(p.id, p.status || 'active')}
                           disabled={actionLoading === p.id + '_status'}
-                          className={`px-2 py-1 rounded-full text-xs font-bold transition
-                            ${p.status === 'inactive'
-                              ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                              : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
                           {p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}
                         </button>
                       </td>
                       <td className="p-3">
-                        <select
-                          value={p.soferId || ''}
-                          disabled={actionLoading === p.id}
+                        <select value={p.soferId || ''} disabled={actionLoading === p.id}
                           onChange={e => assignSoferToProduct(p.id, e.target.value)}
-                          className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer
-                            ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}>
+                          className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}>
                           <option value="">⚠️ ללא סופר</option>
-                          {soferim.map(s => (
-                            <option key={s.id} value={s.id}>{s.name}</option>
-                          ))}
+                          {soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                         </select>
                         {actionLoading === p.id && <span className="text-xs text-gray-400 mr-1">שומר...</span>}
                       </td>
@@ -410,13 +478,8 @@ export default function AdminPage() {
                   <td className="p-3 text-green-700 font-bold">₪{o.total}</td>
                   <td className="p-3 text-blue-600">{o.shaliachName || '—'}</td>
                   <td className="p-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold
-                      ${o.status === 'new' ? 'bg-yellow-100 text-yellow-700' :
-                        o.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                        'bg-gray-100 text-gray-600'}`}>
-                      {o.status === 'new' ? '⏳ חדש' :
-                       o.status === 'processing' ? '🔄 בעיבוד' :
-                       o.status === 'delivered' ? '✅ נמסר' : o.status}
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${o.status === 'new' ? 'bg-yellow-100 text-yellow-700' : o.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                      {o.status === 'new' ? '⏳ חדש' : o.status === 'processing' ? '🔄 בעיבוד' : o.status === 'delivered' ? '✅ נמסר' : o.status}
                     </span>
                   </td>
                 </tr>
@@ -472,8 +535,7 @@ export default function AdminPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-shrink-0">
                       {app.imageUrl ? (
-                        <img src={app.imageUrl} alt={app.name}
-                          className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
+                        <img src={app.imageUrl} alt={app.name} className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
                       ) : (
                         <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-2xl">✍️</div>
                       )}
@@ -481,12 +543,8 @@ export default function AdminPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-black">{app.name}</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold
-                          ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                            app.status === 'approved' ? 'bg-green-100 text-green-700' :
-                            'bg-red-100 text-red-600'}`}>
-                          {app.status === 'pending' ? '⏳ ממתין' :
-                           app.status === 'approved' ? '✅ מאושר' : '❌ נדחה'}
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                          {app.status === 'pending' ? '⏳ ממתין' : app.status === 'approved' ? '✅ מאושר' : '❌ נדחה'}
                         </span>
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-3">
@@ -503,19 +561,15 @@ export default function AdminPage() {
                           ))}
                         </div>
                       )}
-                      {app.description && (
-                        <p className="text-sm text-gray-500 mb-3 line-clamp-2">{app.description}</p>
-                      )}
+                      {app.description && <p className="text-sm text-gray-500 mb-3 line-clamp-2">{app.description}</p>}
                     </div>
                     {app.status === 'pending' && (
                       <div className="flex flex-col gap-2 flex-shrink-0">
-                        <button onClick={() => approveApplication(app)}
-                          disabled={actionLoading === app.id}
+                        <button onClick={() => approveApplication(app)} disabled={actionLoading === app.id}
                           className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">
                           {actionLoading === app.id ? '...' : '✅ אשר'}
                         </button>
-                        <button onClick={() => rejectApplication(app.id)}
-                          disabled={actionLoading === app.id}
+                        <button onClick={() => rejectApplication(app.id)} disabled={actionLoading === app.id}
                           className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">
                           ❌ דחה
                         </button>
@@ -561,14 +615,10 @@ export default function AdminPage() {
                       <td className="p-3 font-bold">{u.displayName || '—'}</td>
                       <td className="p-3 text-gray-500 text-xs">{u.email}</td>
                       <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>
-                          {ROLE_LABELS[u.role]}
-                        </span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span>
                       </td>
                       <td className="p-3">
-                        <select
-                          value={u.role}
-                          disabled={actionLoading === u.id}
+                        <select value={u.role} disabled={actionLoading === u.id}
                           onChange={e => changeUserRole(u.id, e.target.value as UserRole)}
                           className="border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer">
                           <option value="customer">👤 לקוח</option>
