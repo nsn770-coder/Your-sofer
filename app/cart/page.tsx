@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useCart } from '../CartContext';
+import { useCart } from '../contexts/CartContext';
 
 export default function CartPage() {
   const router = useRouter();

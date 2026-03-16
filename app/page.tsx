@@ -5,6 +5,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 import { useCart } from './contexts/CartContext';
 import { useAuth } from './contexts/AuthContext';
+import { useShaliach } from './contexts/ShaliachContext';
 import { CATS, NAV_ITEMS } from './constants/categories';
 
 interface Product {
@@ -45,6 +46,7 @@ export default function Home() {
   const router = useRouter();
   const { count, addItem } = useCart();
   const { user, signInWithGoogle, logout } = useAuth();
+  const { shaliach } = useShaliach();
 
   useEffect(() => {
     async function load() {
@@ -70,6 +72,58 @@ export default function Home() {
   return (
     <div className="min-h-screen" style={{ background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
 
+      {/* ══ באנר שליח ══ */}
+      {shaliach && (
+        <div style={{
+          background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)',
+          borderBottom: '3px solid #b8972a',
+          padding: '10px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 16,
+          direction: 'rtl',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {/* לוגו */}
+            {shaliach.logoUrl ? (
+              <img src={shaliach.logoUrl} alt={shaliach.chabadName}
+                style={{ width: 52, height: 52, borderRadius: 10, objectFit: 'cover', border: '2px solid #b8972a' }} />
+            ) : (
+              <div style={{ width: 52, height: 52, borderRadius: 10, background: '#b8972a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>
+                🟦
+              </div>
+            )}
+            <div>
+              <div style={{ fontSize: 11, color: '#b8972a', fontWeight: 700, marginBottom: 2 }}>
+                ברוכים הבאים — האתר הוגש על ידי
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>
+                {shaliach.chabadName || shaliach.name}
+              </div>
+              <div style={{ fontSize: 12, color: '#a8c0d8', marginTop: 1 }}>
+                {shaliach.rabbiName && `${shaliach.rabbiName}`}
+                {shaliach.city && ` · ${shaliach.city}`}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
+            <div style={{ fontSize: 12, color: '#a8c0d8', textAlign: 'center' }}>
+              <div>רכישה דרך הקישור שלנו</div>
+              <div style={{ color: '#b8972a', fontWeight: 700 }}>תומכת ישירות בבית חבד</div>
+            </div>
+            {shaliach.phone && (
+              <a href={`https://wa.me/972${shaliach.phone.replace(/\D/g, '').slice(1)}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ background: '#25D366', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                💬 צור קשר
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ══ NAVBAR ══ */}
       <header style={{ background: '#0c1a35', color: '#fff', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -92,8 +146,7 @@ export default function Home() {
               placeholder="חיפוש סת״ם ויודאיקה מאומתים..."
               style={{ flex: 1, border: 'none', padding: '9px 12px', fontSize: 14, color: '#333', outline: 'none' }}
             />
-            <button
-              onClick={() => {}}
+            <button onClick={() => {}}
               style={{ background: '#b8972a', border: 'none', padding: '0 14px', cursor: 'pointer', borderRadius: '8px 0 0 8px' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -116,6 +169,18 @@ export default function Home() {
                     👑 ניהול
                   </button>
                 )}
+                {user.role === 'sofer' && (
+                  <button onClick={() => router.push('/sofer-dashboard')}
+                    style={{ background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                    ✍️ פורטל
+                  </button>
+                )}
+                {user.role === 'shaliach' && (
+                  <button onClick={() => router.push('/shaliach-dashboard')}
+                    style={{ background: '#0c1a35', color: '#fff', border: '1px solid #b8972a', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                    🟦 פורטל
+                  </button>
+                )}
                 <button onClick={logout} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: 12, cursor: 'pointer' }}>יציאה</button>
               </div>
             ) : (
@@ -131,13 +196,11 @@ export default function Home() {
               </button>
             )}
 
-            {/* הזמנות */}
             <div style={{ textAlign: 'center', fontSize: 11, color: '#ccc', cursor: 'pointer' }}>
               <div>הזמנות</div>
               <div style={{ fontWeight: 700 }}>שלי</div>
             </div>
 
-            {/* Cart */}
             <div onClick={() => router.push('/cart')} style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ position: 'relative' }}>
                 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8">
@@ -165,11 +228,11 @@ export default function Home() {
             {NAV_ITEMS.map(item => (
               <button key={item.label}
                 onClick={() => {
-  if (item.cat) setActiveCat(item.cat);
-  else if (item.action === 'soferim') router.push('/soferim');
-  else if (item.action === 'join') router.push('/join');
-  else if (item.action === 'shluchim') router.push('/shluchim');
-}}
+                  if (item.cat) setActiveCat(item.cat);
+                  else if (item.action === 'soferim') router.push('/soferim');
+                  else if (item.action === 'join') router.push('/join');
+                  else if (item.action === 'shluchim') router.push('/shluchim');
+                }}
                 style={{
                   background: 'none', border: 'none',
                   color: item.cat && activeCat === item.cat ? '#b8972a' : '#fff',
@@ -207,28 +270,40 @@ export default function Home() {
             backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e6a817' fill-opacity='1'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40z'/%3E%3C/g%3E%3C/svg%3E\")" }} />
           <div style={{ position: 'relative', zIndex: 2 }}>
             <h2 style={{ fontSize: 34, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: 10 }}>
-              רכישת סת&quot;ם<br /><span style={{ color: '#b8972a' }}>ישירות מהסופר</span>
+              {shaliach ? (
+                <>רכישת סת&quot;ם<br /><span style={{ color: '#b8972a' }}>בית חבד {shaliach.city || ''}</span></>
+              ) : (
+                <>רכישת סת&quot;ם<br /><span style={{ color: '#b8972a' }}>ישירות מהסופר</span></>
+              )}
             </h2>
             <p style={{ fontSize: 16, color: '#a8c8b4', marginBottom: 24, maxWidth: 440, lineHeight: 1.6 }}>
-              בחר את הסופר שלך — דע מי כותב את המזוזה שלך, מי כתב את התפילין שלך. ללא מתווכים, ישירות מהמקור.
+              {shaliach
+                ? `${shaliach.chabadName || shaliach.name} ממליץ על מוצרי סת״ם מסופרים מוסמכים ומאומתים.`
+                : 'בחר את הסופר שלך — דע מי כותב את המזוזה שלך. ללא מתווכים, ישירות מהמקור.'
+              }
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <button style={{ background: '#b8972a', color: '#0c1a35', fontSize: 14, fontWeight: 700, padding: '10px 24px', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
-                בחר את הסופר שלך ←
+                {shaliach ? 'לקנייה עכשיו ←' : 'בחר את הסופר שלך ←'}
               </button>
-              <button style={{ background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 600, padding: '10px 22px', border: '1px solid rgba(255,255,255,0.5)', borderRadius: 8, cursor: 'pointer' }}>
-                הצטרף כסופר
-              </button>
+              {!shaliach && (
+                <button style={{ background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 600, padding: '10px 22px', border: '1px solid rgba(255,255,255,0.5)', borderRadius: 8, cursor: 'pointer' }}>
+                  הצטרף כסופר
+                </button>
+              )}
             </div>
           </div>
-          <div style={{ fontSize: 100, position: 'relative', zIndex: 2, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }}>📜</div>
+          <div style={{ fontSize: 100, position: 'relative', zIndex: 2, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }}>
+            {shaliach?.logoUrl ? (
+              <img src={shaliach.logoUrl} alt="" style={{ width: 160, height: 160, objectFit: 'contain', borderRadius: 16 }} />
+            ) : '📜'}
+          </div>
         </div>
       </div>
 
       {/* ══ MAIN ══ */}
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '16px 12px' }}>
 
-        {/* Results bar */}
         <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, padding: '10px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 14 }}>
           <div style={{ color: '#555' }}>
             1–{filtered.length} תוצאות עבור <span style={{ color: '#0e6ba8', fontWeight: 600 }}>&quot;{activeCat === 'הכל' ? 'כל המוצרים' : activeCat}&quot;</span>
@@ -244,11 +319,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Category pills */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
           {CATS.map(cat => (
-            <button key={cat}
-              onClick={() => setActiveCat(cat)}
+            <button key={cat} onClick={() => setActiveCat(cat)}
               style={{
                 padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer',
                 background: activeCat === cat ? '#0c1a35' : '#fff',
@@ -261,19 +334,13 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Promo categories */}
         {activeCat === 'הכל' && (
           <div style={{ marginBottom: 20 }}>
             <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0f1111', marginBottom: 12 }}>קטגוריות מובילות</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
               {PROMO_CATS.map(c => (
-                <div key={c.name}
-                  onClick={() => setActiveCat(c.name)}
-                  style={{
-                    background: '#fff', border: '1px solid #ddd', borderRadius: 8,
-                    overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.08)'
-                  }}>
+                <div key={c.name} onClick={() => setActiveCat(c.name)}
+                  style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
                   <div style={{ height: 120, background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 50 }}>
                     {c.emoji}
                   </div>
@@ -288,7 +355,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Products grid */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: 60, fontSize: 18, color: '#666' }}>טוען מוצרים...</div>
         ) : filtered.length === 0 ? (
@@ -298,11 +364,8 @@ export default function Home() {
             {filtered.map(p => {
               const img = p.imgUrl || p.image_url;
               return (
-                <div key={p.id}
-                  onClick={() => router.push(`/product/${p.id}`)}
-                  style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-
-                  {/* Image */}
+                <div key={p.id} onClick={() => router.push(`/product/${p.id}`)}
+                  style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                   <div style={{ position: 'relative', paddingTop: '100%', background: '#f7f8f8', overflow: 'hidden' }}>
                     {img ? (
                       <img src={img} alt={p.name}
@@ -318,18 +381,7 @@ export default function Home() {
                         color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4
                       }}>{p.badge}</span>
                     )}
-                    <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        addItem({ id: p.id, name: p.name, price: p.price, imgUrl: img, quantity: 1 });
-                      }}
-                      style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 6, padding: '5px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', opacity: 0 }}
-                      className="quick-add">
-                      + הוסף לסל
-                    </button>
                   </div>
-
-                  {/* Body */}
                   <div style={{ padding: '10px 8px 12px' }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: '#0f1111', marginBottom: 4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                       {p.name}
@@ -344,10 +396,7 @@ export default function Home() {
                       משלוח חינם · מגיע תוך <strong>{p.days || '7-14'} ימים</strong>
                     </div>
                     <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        addItem({ id: p.id, name: p.name, price: p.price, imgUrl: img, quantity: 1 });
-                      }}
+                      onClick={e => { e.stopPropagation(); addItem({ id: p.id, name: p.name, price: p.price, imgUrl: img, quantity: 1 }); }}
                       style={{ marginTop: 8, width: '100%', background: '#b8972a', border: '1px solid #a07820', color: '#0c1a35', borderRadius: 6, padding: '6px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                       הוסף לסל
                     </button>
@@ -367,6 +416,12 @@ export default function Home() {
       {/* ══ FOOTER ══ */}
       <footer style={{ marginTop: 40, background: '#162444', color: '#fff', padding: '30px 20px', textAlign: 'center' }}>
         <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a', marginBottom: 6 }}>✡ Your Sofer</div>
+        {shaliach && (
+          <div style={{ fontSize: 13, color: '#a8c0d8', marginBottom: 6 }}>
+            מוגש על ידי {shaliach.chabadName || shaliach.name}
+            {shaliach.city && ` · ${shaliach.city}`}
+          </div>
+        )}
         <div style={{ fontSize: 13, color: '#8899aa' }}>סת&quot;מ מסופרים מוסמכים — כל הזכויות שמורות © 2025</div>
       </footer>
     </div>

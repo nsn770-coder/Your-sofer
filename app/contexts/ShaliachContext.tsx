@@ -2,11 +2,17 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+
 interface Shaliach {
   id: string;
   name: string;
   email: string;
   commissionPercent: number;
+  chabadName?: string;
+  city?: string;
+  rabbiName?: string;
+  logoUrl?: string;
+  phone?: string;
 }
 
 interface ShaliachContextType {
@@ -21,17 +27,14 @@ export function ShaliachProvider({ children }: { children: React.ReactNode }) {
   const [refCode, setRefCode] = useState<string | null>(null);
 
   useEffect(() => {
-    // קרא ref מה-URL
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
 
     if (ref) {
-      // שמור ב-localStorage לכל הביקור
       localStorage.setItem('shaliachRef', ref);
       setRefCode(ref);
       loadShaliach(ref);
     } else {
-      // בדוק אם יש ref שמור
       const saved = localStorage.getItem('shaliachRef');
       if (saved) {
         setRefCode(saved);
