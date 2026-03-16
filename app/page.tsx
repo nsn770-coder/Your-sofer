@@ -24,7 +24,13 @@ interface Product {
   days?: string;
 }
 
-const PROMO_CATS = [
+interface PromoCat {
+  name: string;
+  img: string;
+  sub: string;
+}
+
+const PROMO_CATS_DEFAULT: PromoCat[] = [
   { name: 'מזוזות', img: 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=400&q=80', sub: 'מכל הסוגים והגדלים' },
   { name: 'תפילין', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', sub: 'אשכנז, ספרד, חב״ד' },
   { name: 'מגילות', img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'מגילת אסתר ועוד' },
@@ -49,15 +55,9 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
   const imgs = [p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[];
 
   return (
-    <div onClick={onClick} style={{
-      background: '#fff', border: '1px solid #ddd', borderRadius: 8,
-      overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s',
-      boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-    }}
+    <div onClick={onClick} style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
       onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)')}
       onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)')}>
-
-      {/* תמונה */}
       <div style={{ position: 'relative', paddingTop: '100%', background: '#f7f8f8', overflow: 'hidden' }}>
         {imgs.length > 0 ? (
           <img src={imgs[imgIdx]} alt={p.name}
@@ -66,33 +66,19 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
         ) : (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>📦</div>
         )}
-
-        {/* נקודות גלילה */}
         {imgs.length > 1 && (
           <div style={{ position: 'absolute', bottom: 6, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}
             onClick={e => e.stopPropagation()}>
             {imgs.map((_, i) => (
-              <button key={i}
-                onMouseEnter={() => setImgIdx(i)}
-                onClick={() => setImgIdx(i)}
-                style={{
-                  width: 6, height: 6, borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0,
-                  background: i === imgIdx ? '#0c1a35' : 'rgba(255,255,255,0.8)',
-                }} />
+              <button key={i} onMouseEnter={() => setImgIdx(i)} onClick={() => setImgIdx(i)}
+                style={{ width: 6, height: 6, borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0, background: i === imgIdx ? '#0c1a35' : 'rgba(255,255,255,0.8)' }} />
             ))}
           </div>
         )}
-
         {p.badge && (
-          <span style={{
-            position: 'absolute', top: 8, right: 8,
-            background: p.badge === 'מבצע' ? '#c0392b' : p.badge === 'חדש' ? '#2980b9' : '#27ae60',
-            color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4
-          }}>{p.badge}</span>
+          <span style={{ position: 'absolute', top: 8, right: 8, background: p.badge === 'מבצע' ? '#c0392b' : p.badge === 'חדש' ? '#2980b9' : '#27ae60', color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4 }}>{p.badge}</span>
         )}
       </div>
-
-      {/* תוכן */}
       <div style={{ padding: '10px 8px 12px' }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: '#0f1111', marginBottom: 4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {p.name}
@@ -106,9 +92,7 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
           <span style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>₪{p.price}</span>
           {p.was && <span style={{ fontSize: 11, color: '#c0392b', marginRight: 6 }}>({Math.round((1 - p.price / p.was) * 100)}% הנחה)</span>}
         </div>
-        <div style={{ fontSize: 11, color: '#c7511f', marginBottom: 8 }}>
-          🚚 משלוח חינם · {p.days || '7-14'} ימים
-        </div>
+        <div style={{ fontSize: 11, color: '#c7511f', marginBottom: 8 }}>🚚 משלוח חינם · {p.days || '7-14'} ימים</div>
         <button onClick={e => { e.stopPropagation(); onAddToCart(); }}
           style={{ width: '100%', background: '#b8972a', border: '1px solid #a07820', color: '#0c1a35', borderRadius: 20, padding: '7px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
           הוסף לסל
@@ -129,18 +113,19 @@ export default function Home() {
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState('מומלצים');
-  const [showFilter, setShowFilter] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
   const [filterNusach, setFilterNusach] = useState('הכל');
   const [filterHidur, setFilterHidur] = useState('הכל');
   const [minRating, setMinRating] = useState(0);
+  const [promoCats, setPromoCats] = useState<PromoCat[]>(PROMO_CATS_DEFAULT);
   const [homeContent, setHomeContent] = useState({
     heroTitle: 'רכישת סת"מ',
     heroSubtitle: 'ישירות מהסופר',
     heroText: 'בחר את הסופר שלך — דע מי כותב את המזוזה שלך. ללא מתווכים, ישירות מהמקור.',
   });
+
   const router = useRouter();
   const { count, addItem } = useCart();
   const { user, signInWithGoogle, logout } = useAuth();
@@ -150,12 +135,28 @@ export default function Home() {
   useEffect(() => {
     async function load() {
       try {
+        // מוצרים
         const snap = await getDocs(collection(db, 'products'));
         const data: Product[] = [];
         snap.forEach(d => data.push({ id: d.id, ...d.data() } as Product));
         setProducts(data);
+
+        // תוכן דף הבית
         const contentSnap = await getDoc(doc(db, 'content', 'homepage'));
         if (contentSnap.exists()) setHomeContent(contentSnap.data() as any);
+
+        // קטגוריות מ-Firestore
+        const catsSnap = await getDocs(collection(db, 'categories'));
+        const catsData: PromoCat[] = [];
+        catsSnap.forEach(d => {
+          const cat = d.data();
+          if (cat.imgUrl) catsData.push({ name: cat.name, img: cat.imgUrl, sub: cat.sub || '' });
+        });
+        if (catsData.length > 0) {
+          const order = ['מזוזות', 'תפילין', 'מגילות', 'יודאיקה', 'ספרי תורה', 'מתנות'];
+          catsData.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+          setPromoCats(catsData);
+        }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     }
@@ -220,16 +221,13 @@ export default function Home() {
       {/* ══ NAVBAR ══ */}
       <header style={{ background: '#0c1a35', color: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-
-          {/* המבורגר */}
           <button onClick={() => setShowHamburger(!showHamburger)}
-            style={{ background: 'none', border: '1px solid transparent', borderRadius: 4, color: '#fff', padding: '6px 8px', cursor: 'pointer', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0 }}>
+            style={{ background: 'none', border: '1px solid transparent', borderRadius: 4, color: '#fff', padding: '6px 8px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0 }}>
             <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
             <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
             <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
           </button>
 
-          {/* לוגו */}
           <div onClick={() => router.push('/')} style={{ cursor: 'pointer', flexShrink: 0, border: '1px solid transparent', borderRadius: 4, padding: '4px 8px' }}
             onMouseEnter={e => (e.currentTarget.style.borderColor = '#b8972a')}
             onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}>
@@ -237,7 +235,6 @@ export default function Home() {
             <div style={{ fontSize: 9, color: '#b8972a', fontWeight: 700 }}>ישראל ✡</div>
           </div>
 
-          {/* חיפוש */}
           <div style={{ flex: 1, display: 'flex', maxWidth: 800, borderRadius: 8, overflow: 'hidden' }}>
             <select onChange={e => setActiveCat(e.target.value)} value={activeCat}
               style={{ background: '#e8e8e8', border: 'none', padding: '10px 10px', fontSize: 12, color: '#333', cursor: 'pointer', borderRadius: '0 8px 8px 0', minWidth: 120 }}>
@@ -256,7 +253,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* משתמש */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginRight: 'auto' }}>
             {user ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -294,7 +290,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Nav2 */}
         <div style={{ background: '#162444', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 14px', display: 'flex', alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none' }}>
             {NAV_ITEMS.map(item => (
@@ -311,7 +306,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Benefits */}
         <div style={{ background: '#1a3a2a', padding: '5px 14px', fontSize: 12, color: '#a8c8b4', display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
           <span>✍️ <strong style={{ color: '#fff' }}>ישירות מהסופר</strong> לביתך</span>
           <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
@@ -380,19 +374,19 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ קטגוריות ══ */}
+      {/* ══ קטגוריות מ-Firestore ══ */}
       <div style={{ background: '#fff', borderBottom: '1px solid #ddd', padding: '20px 0' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 16px' }}>
           <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f1111', marginBottom: 14 }}>קטגוריות מובילות</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12 }}>
-            {PROMO_CATS.map(c => (
+            {promoCats.map(c => (
               <div key={c.name} onClick={() => { setActiveCat(c.name); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
                 style={{ cursor: 'pointer', borderRadius: 8, overflow: 'hidden', border: '1px solid #ddd', transition: 'box-shadow 0.2s' }}
                 onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)')}
                 onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
                 <div style={{ height: 100, overflow: 'hidden', position: 'relative' }}>
                   <img src={c.img} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={e => { e.currentTarget.style.display = 'none'; }} />
+                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }} />
                 </div>
                 <div style={{ padding: '8px 10px', background: '#fff' }}>
@@ -410,11 +404,7 @@ export default function Home() {
 
         {/* סרגל סינון */}
         <div style={{ width: 220, flexShrink: 0, background: '#fff', borderRadius: 8, border: '1px solid #ddd', padding: '16px', position: 'sticky', top: 120 }}>
-          <div style={{ fontWeight: 800, fontSize: 14, color: '#0f1111', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid #eee' }}>
-            🔍 סינון תוצאות
-          </div>
-
-          {/* מחיר */}
+          <div style={{ fontWeight: 800, fontSize: 14, color: '#0f1111', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid #eee' }}>🔍 סינון תוצאות</div>
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>טווח מחירים</div>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -424,8 +414,6 @@ export default function Home() {
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 6, padding: '6px 8px', fontSize: 12 }} />
             </div>
           </div>
-
-          {/* דירוג */}
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>דירוג מינימלי</div>
             {[4, 3, 2, 0].map(r => (
@@ -435,8 +423,6 @@ export default function Home() {
               </label>
             ))}
           </div>
-
-          {/* נוסח */}
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>נוסח</div>
             {FILTER_NUSACH.map(n => (
@@ -446,8 +432,6 @@ export default function Home() {
               </label>
             ))}
           </div>
-
-          {/* הידור */}
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>רמת הידור</div>
             {FILTER_HIDUR.map(h => (
@@ -457,8 +441,6 @@ export default function Home() {
               </label>
             ))}
           </div>
-
-          {/* אפס */}
           <button onClick={() => { setPriceMin(''); setPriceMax(''); setMinRating(0); setFilterNusach('הכל'); setFilterHidur('הכל'); }}
             style={{ width: '100%', background: '#f0f0f0', border: '1px solid #ddd', borderRadius: 6, padding: '8px', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
             נקה סינון
@@ -467,11 +449,10 @@ export default function Home() {
 
         {/* תוצאות */}
         <div style={{ flex: 1 }}>
-          {/* פס תוצאות */}
           <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, padding: '10px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ fontSize: 13, color: '#555' }}>
               {filtered.length} תוצאות עבור <strong style={{ color: '#0c1a35' }}>&quot;{activeCat === 'הכל' ? 'כל המוצרים' : activeCat}&quot;</strong>
-              {search && <> · חיפוש: <strong>"{search}"</strong></>}
+              {search && <> · חיפוש: <strong>&quot;{search}&quot;</strong></>}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 12, color: '#555' }}>מיין לפי:</span>
@@ -485,7 +466,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* פילטר כפתורים */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
             {CATS.map(cat => (
               <button key={cat} onClick={() => setActiveCat(cat)}
@@ -495,7 +475,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* גריד מוצרים */}
           {loading ? (
             <div style={{ textAlign: 'center', padding: 60, color: '#666' }}>טוען מוצרים...</div>
           ) : paginated.length === 0 ? (
@@ -510,16 +489,14 @@ export default function Home() {
             </div>
           )}
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 32, flexWrap: 'wrap' }}>
               <button onClick={() => goToPage(Math.max(1, page - 1))} disabled={page === 1}
                 style={{ padding: '8px 14px', borderRadius: 6, border: '1px solid #ddd', background: '#fff', cursor: page === 1 ? 'not-allowed' : 'pointer', opacity: page === 1 ? 0.5 : 1, fontSize: 13 }}>
                 ‹ הקודם
               </button>
-
               {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-                let p2;
+                let p2: number;
                 if (totalPages <= 7) p2 = i + 1;
                 else if (page <= 4) p2 = i + 1;
                 else if (page >= totalPages - 3) p2 = totalPages - 6 + i;
@@ -531,12 +508,10 @@ export default function Home() {
                   </button>
                 );
               })}
-
               <button onClick={() => goToPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}
                 style={{ padding: '8px 14px', borderRadius: 6, border: '1px solid #ddd', background: '#fff', cursor: page === totalPages ? 'not-allowed' : 'pointer', opacity: page === totalPages ? 0.5 : 1, fontSize: 13 }}>
                 הבא ›
               </button>
-
               <span style={{ fontSize: 12, color: '#888', marginRight: 8 }}>עמוד {page} מתוך {totalPages}</span>
             </div>
           )}
@@ -545,46 +520,29 @@ export default function Home() {
 
       {/* ══ FOOTER ══ */}
       <footer style={{ marginTop: 40, background: '#0f1111', color: '#fff' }}>
-        {/* שורה עליונה */}
         <div style={{ borderBottom: '1px solid #333', padding: '30px 20px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 30 }}>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: '#ddd' }}>קבלו מידע</div>
-              {['אודות Your Sofer', 'השקעות ומשקיעים', 'הצהרת נגישות', 'הצהרת פרטיות'].map(item => (
-                <div key={item} style={{ fontSize: 12, color: '#999', marginBottom: 6, cursor: 'pointer' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#999')}>{item}</div>
-              ))}
-            </div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: '#ddd' }}>הרוויחו אתנו</div>
-              {['מכרו בפלטפורמה', 'הצטרפו כסופר', 'הצטרפו כשליח', 'פרסמו אצלנו'].map(item => (
-                <div key={item} style={{ fontSize: 12, color: '#999', marginBottom: 6, cursor: 'pointer' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#999')}>{item}</div>
-              ))}
-            </div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: '#ddd' }}>שירות לקוחות</div>
-              {['עזרה ושאלות נפוצות', 'עקבו אחר הזמנה', 'מדיניות החזרות', 'צרו קשר'].map(item => (
-                <div key={item} style={{ fontSize: 12, color: '#999', marginBottom: 6, cursor: 'pointer' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#999')}>{item}</div>
-              ))}
-            </div>
+            {[
+              { title: 'קבלו מידע', items: ['אודות Your Sofer', 'השקעות ומשקיעים', 'הצהרת נגישות', 'הצהרת פרטיות'] },
+              { title: 'הרוויחו אתנו', items: ['מכרו בפלטפורמה', 'הצטרפו כסופר', 'הצטרפו כשליח', 'פרסמו אצלנו'] },
+              { title: 'שירות לקוחות', items: ['עזרה ושאלות נפוצות', 'עקבו אחר הזמנה', 'מדיניות החזרות', 'צרו קשר'] },
+            ].map(col => (
+              <div key={col.title}>
+                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: '#ddd' }}>{col.title}</div>
+                {col.items.map(item => (
+                  <div key={item} style={{ fontSize: 12, color: '#999', marginBottom: 6, cursor: 'pointer' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+                    onMouseLeave={e => (e.currentTarget.style.color = '#999')}>{item}</div>
+                ))}
+              </div>
+            ))}
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: '#ddd' }}>פיקוח הלכתי</div>
-              <div style={{ fontSize: 12, color: '#999', lineHeight: 1.6 }}>
-                כל מוצרי הסת"מ נכתבים על ידי סופרים מוסמכים, עם פיקוח רבני בפיקוח מחשב ותעודת כשרות.
-              </div>
-              <div style={{ marginTop: 12, background: '#1a3a2a', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#a8c8b4', display: 'inline-block' }}>
-                ✓ מאושר ומפוקח הלכתית
-              </div>
+              <div style={{ fontSize: 12, color: '#999', lineHeight: 1.6 }}>כל מוצרי הסת"מ נכתבים על ידי סופרים מוסמכים, עם פיקוח רבני בפיקוח מחשב ותעודת כשרות.</div>
+              <div style={{ marginTop: 12, background: '#1a3a2a', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#a8c8b4', display: 'inline-block' }}>✓ מאושר ומפוקח הלכתית</div>
             </div>
           </div>
         </div>
-
-        {/* שורה תחתונה */}
         <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a' }}>✡ Your Sofer</div>
           {shaliach && <div style={{ fontSize: 12, color: '#888' }}>מוגש על ידי {shaliach.chabadName || shaliach.name}{shaliach.city && ` · ${shaliach.city}`}</div>}
