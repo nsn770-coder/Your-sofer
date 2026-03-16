@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import { CartProvider } from "./CartContext";
-import { AuthProvider } from "./AuthContext";
-import { ShaliachProvider } from "./ShaliachContext";
+import { CartProvider } from "./contexts/CartContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ShaliachProvider } from "./contexts/ShaliachContext";
 
 const geist = Geist({ subsets: ["latin"] });
 

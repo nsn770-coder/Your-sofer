@@ -164,7 +164,12 @@ export default function Home() {
             </button>
             {NAV_ITEMS.map(item => (
               <button key={item.label}
-                onClick={() => { if (item.cat) setActiveCat(item.cat); }}
+                onClick={() => {
+  if (item.cat) setActiveCat(item.cat);
+  else if (item.action === 'soferim') router.push('/soferim');
+  else if (item.action === 'join') router.push('/join');
+  else if (item.action === 'shluchim') router.push('/shluchim');
+}}
                 style={{
                   background: 'none', border: 'none',
                   color: item.cat && activeCat === item.cat ? '#b8972a' : '#fff',

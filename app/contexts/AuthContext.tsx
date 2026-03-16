@@ -7,8 +7,7 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from './firebase';
-
+import { auth, db } from '../firebase';
 export type UserRole = 'customer' | 'shaliach' | 'admin';
 
 interface AuthUser {

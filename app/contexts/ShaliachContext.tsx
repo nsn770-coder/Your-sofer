@@ -1,8 +1,7 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from './firebase';
-
+import { db } from '../firebase';
 interface Shaliach {
   id: string;
   name: string;

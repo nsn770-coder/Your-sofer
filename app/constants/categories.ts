@@ -1,13 +1,26 @@
-export const CATS = ['הכל','מזוזות','תפילין','מגילות','ספרי תורה','יודאיקה','מתנות'];
+export const CATS = [
+  'הכל',
+  'מזוזות',
+  'תפילין',
+  'מגילות',
+  'ספרי תורה',
+  'יודאיקה',
+  'מתנות',
+  'בר מצווה',
+  'חגים ומועדים',
+];
 
-export const NAV_ITEMS = [
-  { label: '🔥 מבצעי היום', cat: null },
-  { label: 'מזוזות',         cat: 'מזוזות' },
-  { label: 'תפילין',         cat: 'תפילין' },
-  { label: 'מגילות',         cat: 'מגילות' },
-  { label: 'יודאיקה',        cat: 'יודאיקה' },
-  { label: '🎁 מתנות',       cat: 'מתנות' },
-  { label: '✡️ חגים ומועדים', cat: null },
-  { label: '✍️ הסופרים שלנו', cat: null },
-  { label: '🌟 הצטרף לפלטפורמה', cat: null },
+export const NAV_ITEMS: { label: string; cat: string | null; action: string | null }[] = [
+  { label: '🔥 מבצעי היום',       cat: null,             action: null },
+  { label: 'מזוזות',              cat: 'מזוזות',         action: null },
+  { label: 'תפילין',              cat: 'תפילין',         action: null },
+  { label: 'מגילות',              cat: 'מגילות',         action: null },
+  { label: 'ספרי תורה',           cat: 'ספרי תורה',      action: null },
+  { label: 'יודאיקה',             cat: 'יודאיקה',        action: null },
+  { label: '🎁 מתנות',            cat: 'מתנות',          action: null },
+  { label: '✡️ חגים ומועדים',     cat: 'חגים ומועדים',  action: null },
+  { label: '🎉 בר מצווה',         cat: 'בר מצווה',       action: null },
+  { label: '✍️ הסופרים שלנו',     cat: null,             action: 'soferim' },
+  { label: '🌟 הצטרף לפלטפורמה', cat: null,             action: 'join' },
+  { label: '🟦 חבד שליחים',       cat: null,             action: 'shluchim' },
 ];
