@@ -31,6 +31,13 @@ interface Product {
   reviews?: number;
 }
 
+interface KlafItem {
+  id: string;
+  name: string;
+  imageUrl: string;
+  status: string;
+}
+
 function Stars({ n = 4.5, size = 16 }: { n?: number; size?: number }) {
   return (
     <span style={{ color: '#e6a817', fontSize: size }}>
@@ -39,7 +46,7 @@ function Stars({ n = 4.5, size = 16 }: { n?: number; size?: number }) {
   );
 }
 
-// ══ גלריית קלפים מ-Google Drive ══
+// ══ גלריית קלפים — קוראת מ-Firestore, מציגה רק available ══
 function KlafGallery({
   productId,
   onSelect,
@@ -47,46 +54,38 @@ function KlafGallery({
   productId: string;
   onSelect: (klafId: string | null, klafName: string | null) => void;
 }) {
-  const [klafImages, setKlafImages] = useState<{ id: string; url: string; name: string }[]>([]);
+  const [klafImages, setKlafImages] = useState<KlafItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
   const [zoomImg, setZoomImg] = useState<string | null>(null);
 
-  const ROOT_FOLDER = '1wkvwr_zUb7intTFIUk_ilYhP-yKjPqR9';
-  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-
   useEffect(() => {
     async function loadKlafim() {
       try {
-        const searchRes = await fetch(
-          `https://www.googleapis.com/drive/v3/files?q=%27${ROOT_FOLDER}%27+in+parents+and+name%3D%27${productId}%27+and+mimeType%3D%27application%2Fvnd.google-apps.folder%27+and+trashed%3Dfalse&key=${API_KEY}`
+        const q = query(
+          collection(db, 'klafim'),
+          where('productId', '==', productId),
+          where('status', '==', 'available')
         );
-        const searchData = await searchRes.json();
-        if (!searchData.files?.length) { setLoading(false); return; }
-
-        const folderId = searchData.files[0].id;
-
-        const imgRes = await fetch(
-          `https://www.googleapis.com/drive/v3/files?q=%27${folderId}%27+in+parents+and+mimeType+contains+%27image%2F%27+and+trashed%3Dfalse&fields=files(id%2Cname)&key=${API_KEY}`
-        );
-        const imgData = await imgRes.json();
-        const imgs = (imgData.files || []).map((f: { id: string; name: string }) => ({
-          id: f.id,
-          name: f.name,
-          url: `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`,
-        }));
-        setKlafImages(imgs);
-      } catch (e) { console.error(e); }
-      finally { setLoading(false); }
+        const snap = await getDocs(q);
+        const items: KlafItem[] = [];
+        snap.forEach(d => items.push({ id: d.id, ...d.data() } as KlafItem));
+        setKlafImages(items);
+        console.log('קלפים מ-Firestore:', items.length, items.map(i => i.name + ' - ' + i.status));
+      } catch (e) {
+        console.error('שגיאה בטעינת קלפים:', e);
+      } finally {
+        setLoading(false);
+      }
     }
     loadKlafim();
-  }, [productId, API_KEY]);
+  }, [productId]);
 
-  function handleSelect(img: { id: string; name: string }) {
-    const newVal = selected === img.id ? null : img.id;
+  function handleSelect(img: KlafItem) {
+    const newVal  = selected === img.id ? null : img.id;
     const newName = selected === img.id ? null : img.name;
     setSelected(newVal);
-    onSelect(newVal, newName); // ← מעביר לדף המוצר
+    onSelect(newVal, newName);
   }
 
   if (loading) return (
@@ -97,14 +96,15 @@ function KlafGallery({
   return (
     <div style={{ marginTop: 24, paddingTop: 20, borderTop: '2px solid #f0f0f0' }}>
       <div style={{ fontWeight: 800, fontSize: 17, color: '#0f1111', marginBottom: 4 }}>📜 בחר את הקלף שלך</div>
-      <div style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>{klafImages.length} קלפים זמינים — כל קלף ייחודי וכתוב ביד</div>
-
+      <div style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>
+        {klafImages.length} קלפים זמינים — כל קלף ייחודי וכתוב ביד
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 10 }}>
         {klafImages.map(img => (
           <div key={img.id}
             style={{ border: `2px solid ${selected === img.id ? '#b8972a' : '#ddd'}`, borderRadius: 8, overflow: 'hidden', cursor: 'pointer', background: selected === img.id ? '#fffbf0' : '#fff', transition: 'all 0.15s', position: 'relative' }}>
             <div onClick={() => handleSelect(img)}>
-              <img src={img.url} alt={img.name}
+              <img src={img.imageUrl} alt={img.name}
                 style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', display: 'block' }}
                 onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3'; }} />
               {selected === img.id && (
@@ -113,13 +113,12 @@ function KlafGallery({
             </div>
             <div style={{ padding: '4px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 10, color: '#666', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', flex: 1 }}>{img.name}</span>
-              <button onClick={() => setZoomImg(img.url)}
+              <button onClick={() => setZoomImg(img.imageUrl)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, padding: '0 2px', color: '#0e6ba8', flexShrink: 0 }}>🔍</button>
             </div>
           </div>
         ))}
       </div>
-
       {selected && (
         <div style={{ marginTop: 14, background: '#fffbf0', border: '1px solid #b8972a', borderRadius: 8, padding: '12px 16px', fontSize: 13, color: '#0c1a35', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
           ✅ בחרת קלף — הוא ישמר בהזמנה שלך
@@ -127,15 +126,12 @@ function KlafGallery({
             style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 12, marginRight: 'auto' }}>ביטול</button>
         </div>
       )}
-
       {zoomImg && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={() => setZoomImg(null)}>
           <img src={zoomImg} alt="קלף" style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} />
           <button onClick={() => setZoomImg(null)}
-            style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', fontSize: 24, cursor: 'pointer', borderRadius: '50%', width: 44, height: 44 }}>
-            ✕
-          </button>
+            style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', fontSize: 24, cursor: 'pointer', borderRadius: '50%', width: 44, height: 44 }}>✕</button>
         </div>
       )}
     </div>
@@ -165,10 +161,7 @@ function EditModal({ product, onClose, onSave }: {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'yoursofer_upload');
-    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', {
-      method: 'POST',
-      body: formData,
-    });
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
     const data = await res.json();
     return data.secure_url;
   }
@@ -203,12 +196,10 @@ function EditModal({ product, onClose, onSave }: {
       onClick={onClose}>
       <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
         onClick={e => e.stopPropagation()}>
-
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>✏️ עריכת מוצר</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
         </div>
-
         <div style={{ display: 'grid', gap: 14 }}>
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>שם מוצר</label>
@@ -281,7 +272,6 @@ function EditModal({ product, onClose, onSave }: {
             {uploadingImg && <div style={{ fontSize: 12, color: '#0e6ba8', marginTop: 8 }}>⏳ מעלה תמונה...</div>}
           </div>
         </div>
-
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
             style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
@@ -311,8 +301,8 @@ export default function ProductPage() {
   const [zoomVisible, setZoomVisible] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [selectedKlafId, setSelectedKlafId] = useState<string | null>(null);     // ← חדש
-  const [selectedKlafName, setSelectedKlafName] = useState<string | null>(null); // ← חדש
+  const [selectedKlafId, setSelectedKlafId] = useState<string | null>(null);
+  const [selectedKlafName, setSelectedKlafName] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -381,8 +371,8 @@ export default function ProductPage() {
         price: product!.price,
         imgUrl: product!.imgUrl || product!.image_url,
         quantity: 1,
-        selectedKlafId: selectedKlafId || undefined,     // ← חדש
-        selectedKlafName: selectedKlafName || undefined, // ← חדש
+        selectedKlafId: selectedKlafId || undefined,
+        selectedKlafName: selectedKlafName || undefined,
       });
     }
     setAdded(true);
@@ -391,14 +381,12 @@ export default function ProductPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
-
       {saveSuccess && (
         <div style={{ position: 'fixed', top: 20, right: 20, background: '#27ae60', color: '#fff', padding: '12px 20px', borderRadius: 8, fontWeight: 700, fontSize: 14, zIndex: 999, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
           ✅ המוצר עודכן בהצלחה!
         </div>
       )}
 
-      {/* Breadcrumb */}
       <div style={{ background: '#fff', borderBottom: '1px solid #ddd', padding: '10px 20px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#555' }}>
@@ -418,8 +406,6 @@ export default function ProductPage() {
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 16px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 280px', gap: 24, alignItems: 'start' }}>
-
-          {/* גלריה */}
           <div>
             <div style={{ position: 'relative', background: '#fff', border: '1px solid #ddd', borderRadius: 8, overflow: 'hidden', marginBottom: 10, cursor: 'zoom-in' }}
               onClick={() => setZoomVisible(true)}>
@@ -451,7 +437,6 @@ export default function ProductPage() {
             )}
           </div>
 
-          {/* פרטי מוצר */}
           <div>
             {product.badge && (
               <div style={{ display: 'inline-block', background: product.badge === 'מבצע' ? '#c0392b' : product.badge === 'חדש' ? '#2980b9' : '#27ae60', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 4, marginBottom: 10 }}>
@@ -490,7 +475,6 @@ export default function ProductPage() {
               </div>
             )}
 
-            {/* ══ גלריית קלפים — מחובר ל-state של הדף ══ */}
             <KlafGallery
               productId={product.id}
               onSelect={(klafId, klafName) => {
@@ -499,7 +483,6 @@ export default function ProductPage() {
               }}
             />
 
-            {/* הודעה לכפתור הסל אם בחר קלף */}
             {selectedKlafName && (
               <div style={{ marginTop: 12, fontSize: 12, color: '#1a6b3c', background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 6, padding: '8px 12px' }}>
                 📜 קלף נבחר: <strong>{selectedKlafName}</strong> — יצורף להזמנה
@@ -524,19 +507,15 @@ export default function ProductPage() {
             </div>
           </div>
 
-          {/* תיבת קנייה */}
           <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, padding: '20px 16px', position: 'sticky', top: 20 }}>
             <div style={{ fontSize: 24, fontWeight: 900, color: '#0c1a35', marginBottom: 4 }}>₪{product.price}</div>
             {product.was && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 12 }}>חסכת {discount}% — ₪{(product.was - product.price).toFixed(0)}</div>}
             <div style={{ color: '#1a6b3c', fontWeight: 700, fontSize: 13, marginBottom: selectedKlafName ? 8 : 16 }}>✓ במלאי — משלוח חינם</div>
-
-            {/* תצוגת קלף נבחר בתיבת קנייה */}
             {selectedKlafName && (
               <div style={{ fontSize: 11, color: '#1a6b3c', background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 6, padding: '6px 10px', marginBottom: 12 }}>
                 📜 {selectedKlafName}
               </div>
             )}
-
             <div style={{ marginBottom: 12 }}>
               <label style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 4 }}>כמות:</label>
               <select value={qty} onChange={e => setQty(Number(e.target.value))}
@@ -561,7 +540,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* מוצרים קשורים */}
         {related.length > 0 && (
           <div style={{ marginTop: 40 }}>
             <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0f1111', marginBottom: 16 }}>
@@ -593,20 +571,16 @@ export default function ProductPage() {
         )}
       </div>
 
-      {/* זום תמונה ראשית */}
       {zoomVisible && imgs.length > 0 && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={() => setZoomVisible(false)}>
           <img src={imgs[activeImg]} alt={product.name}
             style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} />
           <button onClick={() => setZoomVisible(false)}
-            style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', fontSize: 24, cursor: 'pointer', borderRadius: '50%', width: 44, height: 44 }}>
-            ✕
-          </button>
+            style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', fontSize: 24, cursor: 'pointer', borderRadius: '50%', width: 44, height: 44 }}>✕</button>
         </div>
       )}
 
-      {/* מודל עריכה */}
       {showEdit && (
         <EditModal product={product} onClose={() => setShowEdit(false)} onSave={handleSave} />
       )}
