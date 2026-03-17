@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export default function CheckoutPage() {
@@ -43,14 +43,22 @@ export default function CheckoutPage() {
       const commissionPercent = shaliach?.commissionPercent || 0;
       const commissionAmount = commissionPercent > 0 ? Math.round(total * commissionPercent / 100 * 100) / 100 : 0;
 
-      await addDoc(collection(db, 'orders'), {
+      // שמור הזמנה עם פרטי קלפים נבחרים
+      const orderRef = await addDoc(collection(db, 'orders'), {
         orderNumber,
         customerName: form.name,
         email: form.email,
         phone: form.phone,
         address: `${form.address}, ${form.city}`,
         notes: form.notes || '',
-        items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+        items: items.map(i => ({
+          id: i.id,
+          name: i.name,
+          price: i.price,
+          quantity: i.quantity,
+          selectedKlafId: i.selectedKlafId || null,     // ← שמור קלף נבחר
+          selectedKlafName: i.selectedKlafName || null, // ← שמור שם קלף
+        })),
         total,
         status: 'new',
         createdAt: serverTimestamp(),
@@ -60,6 +68,22 @@ export default function CheckoutPage() {
         commissionPercent,
         commissionAmount,
       });
+
+      // ══ סמן קלפים נבחרים כ-sold ══
+      const klafUpdates = items
+        .filter(i => i.selectedKlafId)
+        .map(i =>
+          updateDoc(doc(db, 'klafim', i.selectedKlafId!), {
+            status: 'sold',
+            orderId: orderRef.id,
+            soldAt: new Date().toISOString(),
+          })
+        );
+
+      if (klafUpdates.length > 0) {
+        await Promise.all(klafUpdates);
+        console.log(`✅ ${klafUpdates.length} קלפים סומנו כנמכרו`);
+      }
 
       clearCart();
       router.push(`/thank-you?order=${orderNumber}`);
@@ -130,7 +154,6 @@ export default function CheckoutPage() {
                       onBlur={e => (e.currentTarget.style.borderColor = '#ddd')} />
                   </div>
                 </div>
-
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#333' }}>אימייל *</label>
                   <input name="email" value={form.email} onChange={handleChange} placeholder="your@email.com" type="email"
@@ -138,7 +161,6 @@ export default function CheckoutPage() {
                     onFocus={e => (e.currentTarget.style.borderColor = '#b8972a')}
                     onBlur={e => (e.currentTarget.style.borderColor = '#ddd')} />
                 </div>
-
                 <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 16 }}>
                   <div>
                     <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#333' }}>רחוב ומספר בית *</label>
@@ -155,7 +177,6 @@ export default function CheckoutPage() {
                       onBlur={e => (e.currentTarget.style.borderColor = '#ddd')} />
                   </div>
                 </div>
-
                 <div style={{ marginBottom: 20 }}>
                   <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: '#333' }}>הערות למשלוח (אופציונלי)</label>
                   <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="הוראות מיוחדות, קומה, דירה..."
@@ -164,7 +185,6 @@ export default function CheckoutPage() {
                     onFocus={e => (e.currentTarget.style.borderColor = '#b8972a')}
                     onBlur={e => (e.currentTarget.style.borderColor = '#ddd')} />
                 </div>
-
                 <button onClick={() => isShippingValid && setStep('review')}
                   style={{ width: '100%', background: isShippingValid ? '#b8972a' : '#ccc', color: isShippingValid ? '#0c1a35' : '#888', border: 'none', borderRadius: 20, padding: '13px', fontSize: 15, fontWeight: 700, cursor: isShippingValid ? 'pointer' : 'not-allowed' }}>
                   המשך לאישור ←
@@ -206,6 +226,12 @@ export default function CheckoutPage() {
                       <div style={{ flex: 1, fontSize: 13 }}>
                         <div style={{ fontWeight: 600 }}>{item.name}</div>
                         <div style={{ color: '#888' }}>כמות: {item.quantity}</div>
+                        {/* ── הצג קלף נבחר ── */}
+                        {item.selectedKlafName && (
+                          <div style={{ color: '#1a6b3c', fontSize: 11, marginTop: 2 }}>
+                            📜 קלף: {item.selectedKlafName}
+                          </div>
+                        )}
                       </div>
                       <div style={{ fontWeight: 700, fontSize: 14 }}>₪{(item.price * item.quantity).toFixed(2)}</div>
                     </div>
@@ -217,7 +243,6 @@ export default function CheckoutPage() {
                 style={{ width: '100%', background: loading ? '#888' : '#0c1a35', color: '#fff', border: 'none', borderRadius: 20, padding: '14px', fontSize: 16, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer' }}>
                 {loading ? '⏳ שולח הזמנה...' : '✅ אשר והזמן עכשיו'}
               </button>
-
               <div style={{ fontSize: 11, color: '#888', textAlign: 'center', marginTop: 10 }}>
                 🔒 הזמנתך מאובטחת ומוצפנת
               </div>
@@ -228,7 +253,6 @@ export default function CheckoutPage() {
         {/* סיכום */}
         <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, padding: '20px', position: 'sticky', top: 20 }}>
           <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #eee' }}>סיכום הזמנה</h3>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
             {items.map(item => (
               <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
@@ -237,7 +261,6 @@ export default function CheckoutPage() {
               </div>
             ))}
           </div>
-
           <div style={{ borderTop: '1px solid #eee', paddingTop: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 6 }}>
               <span style={{ color: '#555' }}>סכום ביניים:</span>
@@ -253,14 +276,12 @@ export default function CheckoutPage() {
             </div>
             <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע"מ</div>
           </div>
-
           {shaliach && (
             <div style={{ marginTop: 12, padding: '10px 12px', background: '#f0f7ff', borderRadius: 6, fontSize: 12 }}>
               <div style={{ color: '#0e6ba8', fontWeight: 700 }}>🤝 דרך שליח: {shaliach.chabadName || shaliach.name}</div>
               <div style={{ color: '#888', marginTop: 2 }}>עמלה: {shaliach.commissionPercent}% = ₪{(total * (shaliach.commissionPercent || 0) / 100).toFixed(2)}</div>
             </div>
           )}
-
           <div style={{ marginTop: 16, fontSize: 11, color: '#888', lineHeight: 2, borderTop: '1px solid #eee', paddingTop: 12 }}>
             <div>🔒 תשלום מאובטח</div>
             <div>🚚 משלוח חינם לכל הארץ</div>
