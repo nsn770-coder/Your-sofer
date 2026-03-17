@@ -71,7 +71,6 @@ function KlafGallery({
         const items: KlafItem[] = [];
         snap.forEach(d => items.push({ id: d.id, ...d.data() } as KlafItem));
         setKlafImages(items);
-        console.log('קלפים מ-Firestore:', items.length, items.map(i => i.name + ' - ' + i.status));
       } catch (e) {
         console.error('שגיאה בטעינת קלפים:', e);
       } finally {
