@@ -39,6 +39,99 @@ function Stars({ n = 4.5, size = 16 }: { n?: number; size?: number }) {
   );
 }
 
+// ══ גלריית קלפים מ-Google Drive ══
+function KlafGallery({ productId }: { productId: string }) {
+  const [klafImages, setKlafImages] = useState<{ id: string; url: string; name: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [zoomImg, setZoomImg] = useState<string | null>(null);
+
+  const ROOT_FOLDER = '1wkvwr_zUb7intTFIUk_ilYhP-yKjPqR9';
+  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+
+  useEffect(() => {
+    async function loadKlafim() {
+      try {
+        // מצא תיקייה בשם productId בתוך התיקייה הראשית
+        const searchRes = await fetch(
+          `https://www.googleapis.com/drive/v3/files?q=%27${ROOT_FOLDER}%27+in+parents+and+name%3D%27${productId}%27+and+mimeType%3D%27application%2Fvnd.google-apps.folder%27+and+trashed%3Dfalse&key=${API_KEY}`
+        );
+        const searchData = await searchRes.json();
+        if (!searchData.files?.length) { setLoading(false); return; }
+
+        const folderId = searchData.files[0].id;
+
+        // שלוף תמונות מהתיקייה
+        const imgRes = await fetch(
+          `https://www.googleapis.com/drive/v3/files?q=%27${folderId}%27+in+parents+and+mimeType+contains+%27image%2F%27+and+trashed%3Dfalse&fields=files(id%2Cname)&key=${API_KEY}`
+        );
+        const imgData = await imgRes.json();
+        const imgs = (imgData.files || []).map((f: { id: string; name: string }) => ({
+          id: f.id,
+          name: f.name,
+          url: `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`,
+        }));
+        setKlafImages(imgs);
+      } catch (e) { console.error(e); }
+      finally { setLoading(false); }
+    }
+    loadKlafim();
+  }, [productId, API_KEY]);
+
+  if (loading) return (
+    <div style={{ padding: '16px 0', color: '#888', fontSize: 13 }}>⏳ טוען קלפים זמינים...</div>
+  );
+  if (!klafImages.length) return null;
+
+  return (
+    <div style={{ marginTop: 24, paddingTop: 20, borderTop: '2px solid #f0f0f0' }}>
+      <div style={{ fontWeight: 800, fontSize: 17, color: '#0f1111', marginBottom: 4 }}>📜 בחר את הקלף שלך</div>
+      <div style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>{klafImages.length} קלפים זמינים — כל קלף ייחודי וכתוב ביד</div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 10 }}>
+        {klafImages.map(img => (
+          <div key={img.id}
+            style={{ border: `2px solid ${selected === img.id ? '#b8972a' : '#ddd'}`, borderRadius: 8, overflow: 'hidden', cursor: 'pointer', background: selected === img.id ? '#fffbf0' : '#fff', transition: 'all 0.15s', position: 'relative' }}>
+            <div onClick={() => setSelected(selected === img.id ? null : img.id)}>
+              <img src={img.url} alt={img.name}
+                style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', display: 'block' }}
+                onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3'; }} />
+              {selected === img.id && (
+                <div style={{ position: 'absolute', top: 4, right: 4, background: '#b8972a', color: '#fff', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 }}>✓</div>
+              )}
+            </div>
+            <div style={{ padding: '4px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 10, color: '#666', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', flex: 1 }}>{img.name}</span>
+              <button onClick={() => setZoomImg(img.url)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, padding: '0 2px', color: '#0e6ba8', flexShrink: 0 }}>🔍</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {selected && (
+        <div style={{ marginTop: 14, background: '#fffbf0', border: '1px solid #b8972a', borderRadius: 8, padding: '12px 16px', fontSize: 13, color: '#0c1a35', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+          ✅ בחרת קלף — הוא ישמר בהזמנה שלך
+          <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 12, marginRight: 'auto' }}>ביטול</button>
+        </div>
+      )}
+
+      {/* זום קלף */}
+      {zoomImg && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setZoomImg(null)}>
+          <img src={zoomImg} alt="קלף" style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} />
+          <button onClick={() => setZoomImg(null)}
+            style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', fontSize: 24, cursor: 'pointer', borderRadius: '50%', width: 44, height: 44 }}>
+            ✕
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══ מודל עריכה ══
 function EditModal({ product, onClose, onSave }: {
   product: Product;
   onClose: () => void;
@@ -60,7 +153,7 @@ function EditModal({ product, onClose, onSave }: {
   async function uploadToCloudinary(file: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('yoursofer_upload', 'dyxzq3ucy');
+    formData.append('upload_preset', 'yoursofer_upload');
     const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', {
       method: 'POST',
       body: formData,
@@ -88,18 +181,7 @@ function EditModal({ product, onClose, onSave }: {
   async function handleSave() {
     setSaving(true);
     try {
-      onSave({
-        name,
-        price: Number(price),
-        was: was ? Number(was) : undefined,
-        desc,
-        cat,
-        imgUrl,
-        imgUrl2,
-        imgUrl3,
-        badge,
-        days,
-      });
+      onSave({ name, price: Number(price), was: was ? Number(was) : undefined, desc, cat, imgUrl, imgUrl2, imgUrl3, badge, days });
     } finally {
       setSaving(false);
     }
@@ -122,7 +204,6 @@ function EditModal({ product, onClose, onSave }: {
             <input value={name} onChange={e => setName(e.target.value)}
               style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>מחיר ₪</label>
@@ -135,7 +216,6 @@ function EditModal({ product, onClose, onSave }: {
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
           </div>
-
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>קטגוריה</label>
             <select value={cat} onChange={e => setCat(e.target.value)}
@@ -143,7 +223,6 @@ function EditModal({ product, onClose, onSave }: {
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תווית</label>
@@ -161,17 +240,14 @@ function EditModal({ product, onClose, onSave }: {
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
           </div>
-
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תיאור</label>
             <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={4}
               style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box' }} />
           </div>
-
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>תמונות</label>
-
-            {['main', 'img2', 'img3'].map((field, idx) => {
+            {(['main', 'img2', 'img3'] as const).map((field, idx) => {
               const currentUrl = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : imgUrl3;
               const setUrl = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : setImgUrl3;
               const label = field === 'main' ? 'תמונה ראשית' : `תמונה ${idx + 1} (אופציונלי)`;
@@ -183,7 +259,7 @@ function EditModal({ product, onClose, onSave }: {
                     <label style={{ background: field === 'main' ? '#0c1a35' : '#555', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                       📷 העלה
                       <input type="file" accept="image/*" capture="environment" style={{ display: 'none' }}
-                        onChange={e => handleImageUpload(e, field as 'main' | 'img2' | 'img3')} />
+                        onChange={e => handleImageUpload(e, field)} />
                     </label>
                     <input value={currentUrl} onChange={e => setUrl(e.target.value)} placeholder="או URL"
                       style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12, minWidth: 0 }} />
@@ -191,7 +267,6 @@ function EditModal({ product, onClose, onSave }: {
                 </div>
               );
             })}
-
             {uploadingImg && <div style={{ fontSize: 12, color: '#0e6ba8', marginTop: 8 }}>⏳ מעלה תמונה...</div>}
           </div>
         </div>
@@ -311,7 +386,6 @@ export default function ProductPage() {
             {product.cat && <><span onClick={() => router.push('/')} style={{ cursor: 'pointer', color: '#0e6ba8' }}>{product.cat}</span><span>›</span></>}
             <span style={{ color: '#333', fontWeight: 600 }}>{product.name.slice(0, 40)}{product.name.length > 40 ? '...' : ''}</span>
           </div>
-
           {user?.role === 'admin' && (
             <button onClick={() => setShowEdit(true)}
               style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
@@ -343,7 +417,6 @@ export default function ProductPage() {
                 </div>
               )}
             </div>
-
             {imgs.length > 1 && (
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {imgs.map((img, i) => (
@@ -395,7 +468,11 @@ export default function ProductPage() {
                 {product.desc || product.description}
               </div>
             )}
-            <div style={{ background: '#f8f9fa', borderRadius: 8, padding: '14px 16px', fontSize: 13 }}>
+
+            {/* ══ גלריית קלפים ══ */}
+            <KlafGallery productId={product.id} />
+
+            <div style={{ background: '#f8f9fa', borderRadius: 8, padding: '14px 16px', fontSize: 13, marginTop: 20 }}>
               <div style={{ fontWeight: 700, marginBottom: 10, color: '#0f1111' }}>מידע חשוב</div>
               <div style={{ display: 'grid', gap: 6 }}>
                 {[
@@ -474,7 +551,7 @@ export default function ProductPage() {
         )}
       </div>
 
-      {/* זום */}
+      {/* זום תמונה ראשית */}
       {zoomVisible && imgs.length > 0 && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={() => setZoomVisible(false)}>
