@@ -285,6 +285,19 @@ export default function AdminPage() {
   const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
   const filteredProducts = products.filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()));
   const unassignedProducts = products.filter(p => !p.soferId).length;
+function exportToExcel() {
+  const rows = [
+    ['id', 'name', 'cat', 'price', 'badge', 'days', 'soferId'],
+    ...products.map(p => [p.id, p.name, p.cat || '', p.price, (p as any).badge || '', (p as any).days || '', p.soferId || ''])
+  ];
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'products.csv';
+  a.click();
+}
 
   return (
     <main className="max-w-6xl mx-auto p-6" dir="rtl">
@@ -404,12 +417,16 @@ export default function AdminPage() {
       {/* ══ PRODUCTS TAB ══ */}
       {activeTab === 'products' && (
         <div>
-          <div className="flex gap-3 mb-4 items-center">
-            <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
-              placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
-            <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
-            {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
-          </div>
+        <div className="flex gap-3 mb-4 items-center">
+  <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
+    placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
+  <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
+  {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
+  <button onClick={exportToExcel}
+    className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-700">
+    📥 ייצוא ל-Excel
+  </button>
+</div>
           {productsLoading ? (
             <div className="p-10 text-center text-gray-400">טוען מוצרים...</div>
           ) : (

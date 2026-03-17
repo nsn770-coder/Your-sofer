@@ -18,6 +18,7 @@ interface Product {
   imgUrl2?: string;
   imgUrl3?: string;
   cat?: string;
+  category?: string;   // ← הוסף את זה
   badge?: string;
   stars?: number;
   reviews?: number;
@@ -165,8 +166,9 @@ export default function Home() {
 
   useEffect(() => {
     let r = [...products];
-    if (activeCat !== 'הכל') r = r.filter(p => p.cat === activeCat);
-    if (search) r = r.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+if (activeCat !== 'הכל') r = r.filter(p => 
+  (p.cat?.trim() || p.category?.trim()) === activeCat.trim()
+);    if (search) r = r.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
     if (priceMin) r = r.filter(p => p.price >= Number(priceMin));
     if (priceMax) r = r.filter(p => p.price <= Number(priceMax));
     if (minRating > 0) r = r.filter(p => (p.stars || 4.5) >= minRating);
