@@ -259,7 +259,7 @@ function EditModal({ product, onClose, onSave }: {
                     {currentUrl && <img src={currentUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
                     <label style={{ background: field === 'main' ? '#0c1a35' : '#555', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                       📷 העלה
-                      <input type="file" accept="image/*" capture="environment" style={{ display: 'none' }}
+                      <input type="file" accept="image/*"  style={{ display: 'none' }}
                         onChange={e => handleImageUpload(e, field)} />
                     </label>
                     <input value={currentUrl} onChange={e => setUrl(e.target.value)} placeholder="או URL"
