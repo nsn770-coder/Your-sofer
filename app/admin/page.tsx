@@ -321,18 +321,6 @@ function exportToExcel() {
   alert(`✅ עודכנו ${updated} מוצרים!`);
   loadProducts();
 }
-  const rows = [
-    ['id', 'name', 'cat', 'price', 'badge', 'days', 'soferId'],
-    ...products.map(p => [p.id, p.name, p.cat || '', p.price, (p as any).badge || '', (p as any).days || '', p.soferId || ''])
-  ];
-  const csv = rows.map(r => r.join(',')).join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'products.csv';
-  a.click();
-}
 
   return (
     <main className="max-w-6xl mx-auto p-6" dir="rtl">
