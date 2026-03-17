@@ -308,6 +308,28 @@ function exportToExcel() {
   alert(`✅ עודכנו ${updated} מוצרים!`);
   loadProducts();
 }
+  async function importFromExcel(file: File) {
+  const text = await file.text();
+  const rows = text.split('\n').filter(r => r.trim());
+  const headers = rows[0].split(',');
+  const idIdx = headers.indexOf('id');
+  const catIdx = headers.indexOf('cat');
+  
+  let updated = 0;
+  for (let i = 1; i < rows.length; i++) {
+    const cols = rows[i].split(',');
+    const id = cols[idIdx]?.trim();
+    const cat = cols[catIdx]?.trim();
+    if (id && cat) {
+      try {
+        await updateDoc(doc(db, 'products', id), { cat });
+        updated++;
+      } catch (e) { console.error('שגיאה במוצר', id, e); }
+    }
+  }
+  alert(`✅ עודכנו ${updated} מוצרים!`);
+  loadProducts();
+}
   const rows = [
     ['id', 'name', 'cat', 'price', 'badge', 'days', 'soferId'],
     ...products.map(p => [p.id, p.name, p.cat || '', p.price, (p as any).badge || '', (p as any).days || '', p.soferId || ''])
