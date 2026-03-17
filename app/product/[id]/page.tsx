@@ -40,7 +40,13 @@ function Stars({ n = 4.5, size = 16 }: { n?: number; size?: number }) {
 }
 
 // ══ גלריית קלפים מ-Google Drive ══
-function KlafGallery({ productId }: { productId: string }) {
+function KlafGallery({
+  productId,
+  onSelect,
+}: {
+  productId: string;
+  onSelect: (klafId: string | null, klafName: string | null) => void;
+}) {
   const [klafImages, setKlafImages] = useState<{ id: string; url: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
@@ -52,7 +58,6 @@ function KlafGallery({ productId }: { productId: string }) {
   useEffect(() => {
     async function loadKlafim() {
       try {
-        // מצא תיקייה בשם productId בתוך התיקייה הראשית
         const searchRes = await fetch(
           `https://www.googleapis.com/drive/v3/files?q=%27${ROOT_FOLDER}%27+in+parents+and+name%3D%27${productId}%27+and+mimeType%3D%27application%2Fvnd.google-apps.folder%27+and+trashed%3Dfalse&key=${API_KEY}`
         );
@@ -61,7 +66,6 @@ function KlafGallery({ productId }: { productId: string }) {
 
         const folderId = searchData.files[0].id;
 
-        // שלוף תמונות מהתיקייה
         const imgRes = await fetch(
           `https://www.googleapis.com/drive/v3/files?q=%27${folderId}%27+in+parents+and+mimeType+contains+%27image%2F%27+and+trashed%3Dfalse&fields=files(id%2Cname)&key=${API_KEY}`
         );
@@ -78,6 +82,13 @@ function KlafGallery({ productId }: { productId: string }) {
     loadKlafim();
   }, [productId, API_KEY]);
 
+  function handleSelect(img: { id: string; name: string }) {
+    const newVal = selected === img.id ? null : img.id;
+    const newName = selected === img.id ? null : img.name;
+    setSelected(newVal);
+    onSelect(newVal, newName); // ← מעביר לדף המוצר
+  }
+
   if (loading) return (
     <div style={{ padding: '16px 0', color: '#888', fontSize: 13 }}>⏳ טוען קלפים זמינים...</div>
   );
@@ -92,7 +103,7 @@ function KlafGallery({ productId }: { productId: string }) {
         {klafImages.map(img => (
           <div key={img.id}
             style={{ border: `2px solid ${selected === img.id ? '#b8972a' : '#ddd'}`, borderRadius: 8, overflow: 'hidden', cursor: 'pointer', background: selected === img.id ? '#fffbf0' : '#fff', transition: 'all 0.15s', position: 'relative' }}>
-            <div onClick={() => setSelected(selected === img.id ? null : img.id)}>
+            <div onClick={() => handleSelect(img)}>
               <img src={img.url} alt={img.name}
                 style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', display: 'block' }}
                 onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3'; }} />
@@ -112,11 +123,11 @@ function KlafGallery({ productId }: { productId: string }) {
       {selected && (
         <div style={{ marginTop: 14, background: '#fffbf0', border: '1px solid #b8972a', borderRadius: 8, padding: '12px 16px', fontSize: 13, color: '#0c1a35', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
           ✅ בחרת קלף — הוא ישמר בהזמנה שלך
-          <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 12, marginRight: 'auto' }}>ביטול</button>
+          <button onClick={() => { setSelected(null); onSelect(null, null); }}
+            style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 12, marginRight: 'auto' }}>ביטול</button>
         </div>
       )}
 
-      {/* זום קלף */}
       {zoomImg && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={() => setZoomImg(null)}>
@@ -300,6 +311,8 @@ export default function ProductPage() {
   const [zoomVisible, setZoomVisible] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [selectedKlafId, setSelectedKlafId] = useState<string | null>(null);     // ← חדש
+  const [selectedKlafName, setSelectedKlafName] = useState<string | null>(null); // ← חדש
 
   useEffect(() => {
     async function load() {
@@ -362,7 +375,15 @@ export default function ProductPage() {
 
   function handleAddToCart() {
     for (let i = 0; i < qty; i++) {
-      addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1 });
+      addItem({
+        id: product!.id,
+        name: product!.name,
+        price: product!.price,
+        imgUrl: product!.imgUrl || product!.image_url,
+        quantity: 1,
+        selectedKlafId: selectedKlafId || undefined,     // ← חדש
+        selectedKlafName: selectedKlafName || undefined, // ← חדש
+      });
     }
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
@@ -469,8 +490,21 @@ export default function ProductPage() {
               </div>
             )}
 
-            {/* ══ גלריית קלפים ══ */}
-            <KlafGallery productId={product.id} />
+            {/* ══ גלריית קלפים — מחובר ל-state של הדף ══ */}
+            <KlafGallery
+              productId={product.id}
+              onSelect={(klafId, klafName) => {
+                setSelectedKlafId(klafId);
+                setSelectedKlafName(klafName);
+              }}
+            />
+
+            {/* הודעה לכפתור הסל אם בחר קלף */}
+            {selectedKlafName && (
+              <div style={{ marginTop: 12, fontSize: 12, color: '#1a6b3c', background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 6, padding: '8px 12px' }}>
+                📜 קלף נבחר: <strong>{selectedKlafName}</strong> — יצורף להזמנה
+              </div>
+            )}
 
             <div style={{ background: '#f8f9fa', borderRadius: 8, padding: '14px 16px', fontSize: 13, marginTop: 20 }}>
               <div style={{ fontWeight: 700, marginBottom: 10, color: '#0f1111' }}>מידע חשוב</div>
@@ -494,7 +528,15 @@ export default function ProductPage() {
           <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, padding: '20px 16px', position: 'sticky', top: 20 }}>
             <div style={{ fontSize: 24, fontWeight: 900, color: '#0c1a35', marginBottom: 4 }}>₪{product.price}</div>
             {product.was && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 12 }}>חסכת {discount}% — ₪{(product.was - product.price).toFixed(0)}</div>}
-            <div style={{ color: '#1a6b3c', fontWeight: 700, fontSize: 13, marginBottom: 16 }}>✓ במלאי — משלוח חינם</div>
+            <div style={{ color: '#1a6b3c', fontWeight: 700, fontSize: 13, marginBottom: selectedKlafName ? 8 : 16 }}>✓ במלאי — משלוח חינם</div>
+
+            {/* תצוגת קלף נבחר בתיבת קנייה */}
+            {selectedKlafName && (
+              <div style={{ fontSize: 11, color: '#1a6b3c', background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 6, padding: '6px 10px', marginBottom: 12 }}>
+                📜 {selectedKlafName}
+              </div>
+            )}
+
             <div style={{ marginBottom: 12 }}>
               <label style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 4 }}>כמות:</label>
               <select value={qty} onChange={e => setQty(Number(e.target.value))}

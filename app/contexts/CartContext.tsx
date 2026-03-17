@@ -8,6 +8,8 @@ interface CartItem {
   imgUrl?: string;
   image_url?: string;
   quantity: number;
+  selectedKlafId?: string;   // ← חדש: ID של קלף נבחר מ-Google Drive
+  selectedKlafName?: string; // ← חדש: שם הקלף לתצוגה
 }
 
 interface CartContextType {
@@ -25,13 +27,11 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  // טען מ-localStorage
   useEffect(() => {
     const saved = localStorage.getItem('cart');
     if (saved) setItems(JSON.parse(saved));
   }, []);
 
-  // שמור ב-localStorage
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
@@ -40,8 +40,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems(prev => {
       const existing = prev.find(x => x.id === product.id);
       if (existing) {
+        // אם יש קלף נבחר חדש — עדכן אותו, אחרת רק הוסף כמות
         return prev.map(x => x.id === product.id
-          ? { ...x, quantity: x.quantity + 1 }
+          ? {
+              ...x,
+              quantity: x.quantity + 1,
+              selectedKlafId: product.selectedKlafId ?? x.selectedKlafId,
+              selectedKlafName: product.selectedKlafName ?? x.selectedKlafName,
+            }
           : x
         );
       }
