@@ -333,9 +333,10 @@ export default function ProductPage() {
     setShowEdit(false);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
-  } catch {
-    alert('שגיאה בשמירה');
-  }
+  } catch (err) {
+  console.error('שגיאת שמירה:', err);
+  alert('שגיאה בשמירה');
+}
 }
 
   if (loading) return (
