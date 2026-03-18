@@ -328,8 +328,11 @@ export default function ProductPage() {
   if (!product) return;
   console.log('מנסה לשמור:', product.id, updated);
   try {
-    const result = await updateDoc(doc(db, 'products', product.id), updated as any);
-    console.log('נשמר בהצלחה!', result);      setProduct(prev => prev ? { ...prev, ...updated } : prev);
+   await updateDoc(doc(db, 'products', product.id), updated as any);
+setProduct(prev => prev ? { ...prev, ...updated } : prev);
+setShowEdit(false);
+setSaveSuccess(true);
+setTimeout(() => setSaveSuccess(false), 3000);
       setShowEdit(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
