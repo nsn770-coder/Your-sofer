@@ -328,18 +328,15 @@ export default function ProductPage() {
   if (!product) return;
   console.log('מנסה לשמור:', product.id, updated);
   try {
-   await updateDoc(doc(db, 'products', product.id), updated as any);
-setProduct(prev => prev ? { ...prev, ...updated } : prev);
-setShowEdit(false);
-setSaveSuccess(true);
-setTimeout(() => setSaveSuccess(false), 3000);
-      setShowEdit(false);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch {
-      alert('שגיאה בשמירה');
-    }
+    await updateDoc(doc(db, 'products', product.id), updated as any);
+    setProduct(prev => prev ? { ...prev, ...updated } : prev);
+    setShowEdit(false);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  } catch {
+    alert('שגיאה בשמירה');
   }
+}
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: 'Heebo, Arial, sans-serif' }}>
