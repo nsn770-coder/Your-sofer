@@ -325,10 +325,11 @@ export default function ProductPage() {
   }, [id]);
 
   async function handleSave(updated: Partial<Product>) {
-    if (!product) return;
-    try {
-      await updateDoc(doc(db, 'products', product.id), updated as any);
-      setProduct(prev => prev ? { ...prev, ...updated } : prev);
+  if (!product) return;
+  console.log('מנסה לשמור:', product.id, updated);
+  try {
+    const result = await updateDoc(doc(db, 'products', product.id), updated as any);
+    console.log('נשמר בהצלחה!', result);      setProduct(prev => prev ? { ...prev, ...updated } : prev);
       setShowEdit(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
