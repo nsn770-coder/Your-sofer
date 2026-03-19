@@ -133,6 +133,7 @@ export default function Home() {
   const { count, addItem } = useCart();
   const { user, signInWithGoogle, logout } = useAuth();
   const { shaliach } = useShaliach();
+const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
 
   // בדיקת מובייל
@@ -141,6 +142,12 @@ export default function Home() {
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const soferId = params.get('soferId');
+    if (soferId) setSoferIdFilter(soferId);
   }, []);
 
   useEffect(() => {
@@ -173,6 +180,7 @@ export default function Home() {
 
   useEffect(() => {
     let r = [...products];
+    if (soferIdFilter) r = r.filter(p => (p as any).soferId === soferIdFilter);
     if (activeCat !== 'הכל') r = r.filter(p =>
       (p.cat?.trim() || p.category?.trim()) === activeCat.trim()
     );
@@ -185,8 +193,7 @@ export default function Home() {
     else if (sortBy === 'דירוג') r.sort((a, b) => (b.stars || 0) - (a.stars || 0));
     setFiltered(r);
     setPage(1);
-  }, [activeCat, search, products, priceMin, priceMax, minRating, sortBy]);
-
+}, [activeCat, search, products, priceMin, priceMax, minRating, sortBy, soferIdFilter]);
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
