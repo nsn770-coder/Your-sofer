@@ -6,6 +6,8 @@ import { useShaliach } from '../contexts/ShaliachContext';
 import { collection, addDoc, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
+const UPAY_API_KEY = '25a75652ac0786a256fb913c3c980dfb';
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, total, clearCart } = useCart();
@@ -43,7 +45,7 @@ export default function CheckoutPage() {
       const commissionPercent = shaliach?.commissionPercent || 0;
       const commissionAmount = commissionPercent > 0 ? Math.round(total * commissionPercent / 100 * 100) / 100 : 0;
 
-      // שמור הזמנה עם פרטי קלפים נבחרים
+      // שמור הזמנה ב-Firestore עם סטטוס pending_payment
       const orderRef = await addDoc(collection(db, 'orders'), {
         orderNumber,
         customerName: form.name,
@@ -56,11 +58,11 @@ export default function CheckoutPage() {
           name: i.name,
           price: i.price,
           quantity: i.quantity,
-          selectedKlafId: i.selectedKlafId || null,     // ← שמור קלף נבחר
-          selectedKlafName: i.selectedKlafName || null, // ← שמור שם קלף
+          selectedKlafId: i.selectedKlafId || null,
+          selectedKlafName: i.selectedKlafName || null,
         })),
         total,
-        status: 'new',
+        status: 'pending_payment',
         createdAt: serverTimestamp(),
         shaliachRef: refCode || null,
         shaliachId: shaliach?.id || null,
@@ -69,28 +71,42 @@ export default function CheckoutPage() {
         commissionAmount,
       });
 
-      // ══ סמן קלפים נבחרים כ-sold ══
+      // סמן קלפים כ-reserved עד שהתשלום יאושר
       const klafUpdates = items
         .filter(i => i.selectedKlafId)
         .map(i =>
           updateDoc(doc(db, 'klafim', i.selectedKlafId!), {
-            status: 'sold',
+            status: 'reserved',
             orderId: orderRef.id,
-            soldAt: new Date().toISOString(),
+            reservedAt: new Date().toISOString(),
           })
         );
+      if (klafUpdates.length > 0) await Promise.all(klafUpdates);
 
-      if (klafUpdates.length > 0) {
-        await Promise.all(klafUpdates);
-        console.log(`✅ ${klafUpdates.length} קלפים סומנו כנמכרו`);
-      }
+      // בנה URL לתשלום UPAY
+      const baseUrl = window.location.origin;
+      const successUrl = `${baseUrl}/thank-you?order=${orderNumber}&orderId=${orderRef.id}`;
+      const failUrl = `${baseUrl}/checkout?error=payment_failed`;
 
-      clearCart();
-      router.push(`/thank-you?order=${orderNumber}`);
+      const upayParams = new URLSearchParams({
+        apikey: UPAY_API_KEY,
+        amount: total.toFixed(2),
+        description: `הזמנה ${orderNumber} - YourSofer`,
+        customer_name: form.name,
+        customer_email: form.email,
+        customer_phone: form.phone,
+        success_url: successUrl,
+        fail_url: failUrl,
+        order_id: orderRef.id,
+        currency: 'ILS',
+      });
+
+      // הפנה לדף תשלום UPAY
+      window.location.href = `https://app.upay.co.il/api/paypage?${upayParams.toString()}`;
+
     } catch (e) {
       alert('שגיאה בשליחת ההזמנה. נסה שוב.');
       console.error(e);
-    } finally {
       setLoading(false);
     }
   }
@@ -109,7 +125,7 @@ export default function CheckoutPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
           <span style={{ color: step === 'shipping' ? '#b8972a' : '#fff', fontWeight: step === 'shipping' ? 700 : 400 }}>1. פרטי משלוח</span>
           <span style={{ color: '#555' }}>›</span>
-          <span style={{ color: step === 'review' ? '#b8972a' : '#aaa', fontWeight: step === 'review' ? 700 : 400 }}>2. אישור הזמנה</span>
+          <span style={{ color: step === 'review' ? '#b8972a' : '#aaa', fontWeight: step === 'review' ? 700 : 400 }}>2. אישור ותשלום</span>
         </div>
         <button onClick={() => router.push('/cart')} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: 13, cursor: 'pointer' }}>
           ← חזרה לסל
@@ -226,7 +242,6 @@ export default function CheckoutPage() {
                       <div style={{ flex: 1, fontSize: 13 }}>
                         <div style={{ fontWeight: 600 }}>{item.name}</div>
                         <div style={{ color: '#888' }}>כמות: {item.quantity}</div>
-                        {/* ── הצג קלף נבחר ── */}
                         {item.selectedKlafName && (
                           <div style={{ color: '#1a6b3c', fontSize: 11, marginTop: 2 }}>
                             📜 קלף: {item.selectedKlafName}
@@ -239,12 +254,18 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {/* אמצעי תשלום */}
+              <div style={{ background: '#f0f7f3', border: '1px solid #b7e4c7', borderRadius: 8, padding: '14px 20px', marginBottom: 12 }}>
+                <div style={{ fontSize: 13, color: '#1a6b3c', fontWeight: 700, marginBottom: 6 }}>💳 תשלום מאובטח</div>
+                <div style={{ fontSize: 12, color: '#555' }}>לאחר לחיצה על "המשך לתשלום" תועבר לדף תשלום מאובטח של UPAY — ויזה, מסטרקארד, ביט ועוד.</div>
+              </div>
+
               <button onClick={handleSubmit} disabled={loading}
                 style={{ width: '100%', background: loading ? '#888' : '#0c1a35', color: '#fff', border: 'none', borderRadius: 20, padding: '14px', fontSize: 16, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer' }}>
-                {loading ? '⏳ שולח הזמנה...' : '✅ אשר והזמן עכשיו'}
+                {loading ? '⏳ מכין תשלום...' : '💳 המשך לתשלום ←'}
               </button>
               <div style={{ fontSize: 11, color: '#888', textAlign: 'center', marginTop: 10 }}>
-                🔒 הזמנתך מאובטחת ומוצפנת
+                🔒 תשלום מאובטח דרך UPAY · ויזה · מסטרקארד · ביט
               </div>
             </div>
           )}
@@ -283,7 +304,7 @@ export default function CheckoutPage() {
             </div>
           )}
           <div style={{ marginTop: 16, fontSize: 11, color: '#888', lineHeight: 2, borderTop: '1px solid #eee', paddingTop: 12 }}>
-            <div>🔒 תשלום מאובטח</div>
+            <div>🔒 תשלום מאובטח דרך UPAY</div>
             <div>🚚 משלוח חינם לכל הארץ</div>
             <div>↩️ ביטול עד 24 שעות</div>
             <div>🛡️ אחריות פלטפורמה</div>
