@@ -93,7 +93,6 @@ const ROLE_COLORS: Record<UserRole, string> = {
   customer: 'bg-gray-100 text-gray-600',
 };
 
-// ══ מודל הוספת מוצר חדש ══
 function AddProductModal({ soferim, onClose, onSave }: {
   soferim: Sofer[];
   onClose: () => void;
@@ -117,10 +116,7 @@ function AddProductModal({ soferim, onClose, onSave }: {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'yoursofer_upload');
-    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', {
-      method: 'POST',
-      body: formData,
-    });
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
     const data = await res.json();
     if (!data.secure_url) throw new Error(data.error?.message || 'שגיאה בהעלאה');
     return data.secure_url;
@@ -147,19 +143,11 @@ function AddProductModal({ soferim, onClose, onSave }: {
     setSaving(true);
     try {
       await addDoc(collection(db, 'products'), {
-        name,
-        price: Number(price),
-        was: was ? Number(was) : null,
-        desc,
-        cat,
-        badge: badge || null,
-        days,
-        soferId: soferId || null,
-        imgUrl: imgUrl || null,
-        imgUrl2: imgUrl2 || null,
-        imgUrl3: imgUrl3 || null,
-        status: 'active',
-        createdAt: serverTimestamp(),
+        name, price: Number(price), was: was ? Number(was) : null,
+        desc, cat, badge: badge || null, days,
+        soferId: soferId || null, imgUrl: imgUrl || null,
+        imgUrl2: imgUrl2 || null, imgUrl3: imgUrl3 || null,
+        status: 'active', createdAt: serverTimestamp(),
       });
       onSave();
       onClose();
@@ -176,19 +164,16 @@ function AddProductModal({ soferim, onClose, onSave }: {
       onClick={onClose}>
       <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
         onClick={e => e.stopPropagation()}>
-
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>➕ הוספת מוצר חדש</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
         </div>
-
         <div style={{ display: 'grid', gap: 14 }}>
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>שם מוצר *</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="מזוזה מהודרת..."
               style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>מחיר ₪ *</label>
@@ -201,7 +186,6 @@ function AddProductModal({ soferim, onClose, onSave }: {
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>קטגוריה</label>
@@ -219,7 +203,6 @@ function AddProductModal({ soferim, onClose, onSave }: {
               </select>
             </div>
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תווית</label>
@@ -237,13 +220,11 @@ function AddProductModal({ soferim, onClose, onSave }: {
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
           </div>
-
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תיאור</label>
             <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3}
               style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box' }} />
           </div>
-
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>תמונות</label>
             {(['main', 'img2', 'img3'] as const).map((field, idx) => {
@@ -257,8 +238,7 @@ function AddProductModal({ soferim, onClose, onSave }: {
                     {currentUrl && <img src={currentUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
                     <label style={{ background: field === 'main' ? '#0c1a35' : '#555', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                       {uploadingImg === field ? '⏳...' : '📷 העלה'}
-                      <input type="file" accept="image/*" style={{ display: 'none' }}
-                        onChange={e => handleImageUpload(e, field)} />
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(e, field)} />
                     </label>
                     <input value={currentUrl} onChange={e => setUrl(e.target.value)} placeholder="או הדבק URL"
                       style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12, minWidth: 0 }} />
@@ -268,7 +248,6 @@ function AddProductModal({ soferim, onClose, onSave }: {
             })}
           </div>
         </div>
-
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
             style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
@@ -314,13 +293,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (user?.role === 'admin') {
-      loadOrders();
-      loadApplications();
-      loadUsers();
-      loadProducts();
-      loadSoferim();
-      loadContent();
-      loadCategories();
+      loadOrders(); loadApplications(); loadUsers();
+      loadProducts(); loadSoferim(); loadContent(); loadCategories();
     }
   }, [user]);
 
@@ -442,17 +416,41 @@ export default function AdminPage() {
   async function approveApplication(app: SoferApplication) {
     setActionLoading(app.id);
     try {
-      await updateDoc(doc(db, 'soferim_applications', app.id), { status: 'approved', approvedAt: serverTimestamp() });
-      await addDoc(collection(db, 'soferim'), {
+      await updateDoc(doc(db, 'soferim_applications', app.id), {
+        status: 'approved',
+        approvedAt: serverTimestamp(),
+      });
+      const soferRef = await addDoc(collection(db, 'soferim'), {
         name: app.name, city: app.city, phone: app.phone,
         whatsapp: app.whatsapp || '', email: app.email || '',
         description: app.description || '', style: app.style || '',
         categories: app.categories, imageUrl: app.imageUrl || '',
         status: 'active', createdAt: serverTimestamp(),
       });
+      const appProducts = (app as any).products || [];
+      for (const product of appProducts) {
+        if (product.type && product.images?.length > 0) {
+          await addDoc(collection(db, 'products'), {
+            name: product.type,
+            price: 0,
+            imgUrl: product.images[0] || null,
+            imgUrl2: product.images[1] || null,
+            imgUrl3: product.images[2] || null,
+            imgUrl4: product.images[3] || null,
+            cat: product.type,
+            soferId: soferRef.id,
+            status: 'active',
+            createdAt: serverTimestamp(),
+          });
+        }
+      }
       setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
-    } catch (e) { console.error(e); alert('שגיאה באישור'); }
-    finally { setActionLoading(null); }
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה באישור');
+    } finally {
+      setActionLoading(null);
+    }
   }
 
   async function rejectApplication(id: string) {
@@ -488,9 +486,7 @@ export default function AdminPage() {
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = 'products.csv';
-    a.click();
+    a.href = url; a.download = 'products.csv'; a.click();
   }
 
   async function importFromExcel(file: File) {
@@ -522,7 +518,6 @@ export default function AdminPage() {
         <button onClick={() => router.push('/')} className="text-green-700 font-bold hover:underline">← חזרה לחנות</button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl shadow p-4 text-center">
           <div className="text-3xl font-black text-green-700">₪{totalRevenue.toFixed(0)}</div>
@@ -542,7 +537,6 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {[
           { key: 'orders', label: '📦 הזמנות', color: 'bg-green-700' },
@@ -563,7 +557,6 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* ══ CATEGORIES TAB ══ */}
       {activeTab === 'categories' && (
         <div className="grid gap-6">
           <div className="bg-white rounded-xl shadow p-6">
@@ -579,7 +572,6 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ CONTENT TAB ══ */}
       {activeTab === 'content' && (
         <div className="bg-white rounded-xl shadow p-6">
           <h2 className="text-xl font-black mb-6 text-gray-800">✏️ עריכת תוכן דף הבית</h2>
@@ -624,7 +616,6 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ PRODUCTS TAB ══ */}
       {activeTab === 'products' && (
         <div>
           <div className="flex gap-3 mb-4 items-center flex-wrap">
@@ -632,15 +623,11 @@ export default function AdminPage() {
               placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
             <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
             {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
-
-            {/* ══ כפתור הוסף מוצר ══ */}
             <button onClick={() => setShowAddProduct(true)}
               className="bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-amber-600 transition">
               ➕ הוסף מוצר
             </button>
-
-            <button onClick={exportToExcel}
-              className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-700">
+            <button onClick={exportToExcel} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-700">
               📥 ייצוא ל-Excel
             </button>
             <label className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 cursor-pointer">
@@ -649,7 +636,6 @@ export default function AdminPage() {
                 onChange={e => e.target.files?.[0] && importFromExcel(e.target.files[0])} />
             </label>
           </div>
-
           {productsLoading ? (
             <div className="p-10 text-center text-gray-400">טוען מוצרים...</div>
           ) : (
@@ -700,7 +686,6 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ ORDERS TAB ══ */}
       {activeTab === 'orders' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
           <table className="w-full text-sm">
@@ -734,7 +719,6 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ COMMISSIONS TAB ══ */}
       {activeTab === 'commissions' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
           {shaliachOrders.length === 0 ? (
@@ -766,7 +750,6 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ SOFERIM APPLICATIONS TAB ══ */}
       {activeTab === 'soferim' && (
         <div>
           {appsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
@@ -820,7 +803,6 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ USERS TAB ══ */}
       {activeTab === 'users' && (
         <div>
           <div className="flex gap-2 mb-4 flex-wrap">
@@ -872,7 +854,6 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ מודל הוספת מוצר ══ */}
       {showAddProduct && (
         <AddProductModal
           soferim={soferim}
@@ -884,7 +865,6 @@ export default function AdminPage() {
   );
 }
 
-// ══ קומפוננט כרטיס קטגוריה ══
 function CategoryCard({ cat, saving, saved, onSave }: {
   cat: Category;
   saving: boolean;
