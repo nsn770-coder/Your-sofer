@@ -149,7 +149,6 @@ export default function SoferimPage() {
                   ) : (
                     <div style={{ fontSize: 72, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }}>✍️</div>
                   )}
-                  {/* תג מאושר */}
                   <div style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(26,107,60,0.9)', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 20 }}>
                     ✓ מאושר ומאומת
                   </div>
@@ -166,10 +165,10 @@ export default function SoferimPage() {
                     </div>
                   </div>
 
+                  {/* עיר וסגנון בלבד — ללא טלפון/וואטסאפ */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, fontSize: 12, color: '#555', marginBottom: 10 }}>
                     {s.city && <span>📍 {s.city}</span>}
                     {s.style && <span>✍️ {s.style}</span>}
-                    {s.phone && <span>📞 {s.phone}</span>}
                   </div>
 
                   {s.description && (
@@ -189,16 +188,9 @@ export default function SoferimPage() {
                     </div>
                   )}
 
-                  {/* כפתורים */}
+                  {/* כפתורים — רק "המוצרים שלו", ללא וואטסאפ */}
                   <div style={{ display: 'flex', gap: 8 }}>
-                    {s.whatsapp && (
-                      <a href={`https://wa.me/972${s.whatsapp.replace(/\D/g, '').slice(1)}`}
-                        target="_blank" rel="noopener noreferrer"
-                        style={{ flex: 1, background: '#25D366', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', display: 'block' }}>
-                        💬 וואטסאפ
-                      </a>
-                    )}
-                    <button onClick={() => router.push(`/?sofer=${s.id}`)}
+                    <button onClick={() => router.push(`/?soferId=${s.id}`)}
                       style={{ flex: 1, background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                       📜 המוצרים שלו
                     </button>
@@ -210,7 +202,6 @@ export default function SoferimPage() {
         )}
       </div>
 
-      {/* Footer קצר */}
       <footer style={{ background: '#0f1111', color: '#fff', padding: '20px', textAlign: 'center' }}>
         <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>✡ Your Sofer</div>
         <div style={{ fontSize: 12, color: '#666' }}>© 2025 Your Sofer — סת"מ מסופרים מוסמכים</div>
