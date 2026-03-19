@@ -933,10 +933,12 @@ export default function AdminPage() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="p-3 text-right">משתמש</th>
-                    <th className="p-3 text-right">אימייל</th>
-                    <th className="p-3 text-right">תפקיד נוכחי</th>
-                    <th className="p-3 text-right">שנה תפקיד</th>
+                   <th className="p-3 text-right">משתמש</th>
+<th className="p-3 text-right">אימייל</th>
+<th className="p-3 text-right">תפקיד נוכחי</th>
+<th className="p-3 text-right">לינק שליח</th>
+<th className="p-3 text-right">לינק שליח</th>
+<th className="p-3 text-right">שנה תפקיד</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -948,6 +950,16 @@ export default function AdminPage() {
                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span>
                       </td>
                       <td className="p-3">
+                       <td className="p-3">
+  {u.shaliachId ? (
+    <button onClick={() => {
+      navigator.clipboard.writeText(`${window.location.origin}/?ref=${u.shaliachId}`);
+      alert('הלינק הועתק!');
+    }} className="text-blue-600 text-xs font-bold hover:underline">
+      📋 העתק לינק
+    </button>
+  ) : '—'}
+</td> 
                         <select value={u.role} disabled={actionLoading === u.id}
                           onChange={e => changeUserRole(u.id, e.target.value as UserRole)}
                           className="border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer">
