@@ -8,7 +8,8 @@ export const CATS = [
   'מתנות',
   'בר מצווה',
   'חגים ומועדים',
-  'סט טלית תפילין'
+  'סט טלית תפילין',
+  'קלפים',
 ];
 
 export const NAV_ITEMS: { label: string; cat: string | null; action: string | null }[] = [
@@ -21,8 +22,9 @@ export const NAV_ITEMS: { label: string; cat: string | null; action: string | nu
   { label: '🎁 מתנות',            cat: 'מתנות',          action: null },
   { label: '✡️ חגים ומועדים',     cat: 'חגים ומועדים',  action: null },
   { label: '🎉 בר מצווה',         cat: 'בר מצווה',       action: null },
+  { label: '📜 קלפים',            cat: 'קלפים',          action: null },
   { label: '✍️ הסופרים שלנו',     cat: null,             action: 'soferim' },
   { label: '🌟 הצטרף לפלטפורמה', cat: null,             action: 'join' },
   { label: '🟦 חבד שליחים',       cat: null,             action: 'shluchim' },
-  { label: 'סט טלית תפילין',      cat: 'סט טלית תפילין',      action: null },
+  { label: 'סט טלית תפילין',      cat: 'סט טלית תפילין', action: null },
 ];
