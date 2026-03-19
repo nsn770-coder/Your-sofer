@@ -11,7 +11,7 @@ interface Product {
   id: string;
   name: string;
   price: number;
-  was?: number;
+  was?: number | null;
   desc?: string;
   description?: string;
   imgUrl?: string;
@@ -184,7 +184,7 @@ function EditModal({ product, onClose, onSave }: {
   async function handleSave() {
     setSaving(true);
     try {
-      onSave({ name, price: Number(price), was: was ? Number(was) : undefined, desc, cat, imgUrl, imgUrl2, imgUrl3, badge, days });
+      onSave({ name, price: Number(price), was: was ? Number(was) : null, desc, cat, imgUrl, imgUrl2, imgUrl3, badge, days });
     } finally {
       setSaving(false);
     }
@@ -328,15 +328,18 @@ export default function ProductPage() {
   if (!product) return;
   console.log('מנסה לשמור:', product.id, updated);
   try {
-    await updateDoc(doc(db, 'products', product.id), updated as any);
+    const cleanData = Object.fromEntries(
+      Object.entries(updated).filter(([_, v]) => v !== undefined)
+    );
+    await updateDoc(doc(db, 'products', product.id), cleanData);
     setProduct(prev => prev ? { ...prev, ...updated } : prev);
     setShowEdit(false);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
   } catch (err) {
-  console.error('שגיאת שמירה:', err);
-  alert('שגיאה בשמירה');
-}
+    console.error('שגיאת שמירה:', err);
+    alert('שגיאה בשמירה');
+  }
 }
 
   if (loading) return (
