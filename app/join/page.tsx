@@ -105,7 +105,7 @@ export default function JoinPage() {
             <button onClick={() => {
               const subject = encodeURIComponent('בקשת הצטרפות כשליח — Your Sofer');
               const body = encodeURIComponent('שלום,\n\nאני מעוניין להצטרף לפלטפורמה כשליח חבד.\n\nשם: \nמיקום: \nטלפון: \n\nתודה');
-              window.open(`mailto:info@yoursofer.com?subject=${subject}&body=${body}`);
+              router.push('/join/apply')
             }}
               style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
               שלח בקשת הצטרפות ←
