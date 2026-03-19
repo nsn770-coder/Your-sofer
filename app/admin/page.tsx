@@ -36,6 +36,19 @@ interface SoferApplication {
   createdAt?: { seconds: number };
 }
 
+interface ShaliachApplication {
+  id: string;
+  name: string;
+  chabadName?: string;
+  city: string;
+  phone: string;
+  email?: string;
+  rabbiName?: string;
+  logoUrl?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt?: { seconds: number };
+}
+
 interface AppUser {
   id: string;
   email: string;
@@ -77,7 +90,7 @@ interface Category {
   order: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'users' | 'products' | 'content' | 'categories';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'shluchim' | 'users' | 'products' | 'content' | 'categories';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: '👑 מנהל',
@@ -268,6 +281,8 @@ export default function AdminPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [applications, setApplications] = useState<SoferApplication[]>([]);
+  const [shaliachApplications, setShaliachApplications] = useState<ShaliachApplication[]>([]);
+  const [shaliachAppsLoading, setShaliachAppsLoading] = useState(true);
   const [users, setUsers] = useState<AppUser[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
@@ -293,8 +308,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (user?.role === 'admin') {
-      loadOrders(); loadApplications(); loadUsers();
-      loadProducts(); loadSoferim(); loadContent(); loadCategories();
+      loadOrders(); loadApplications(); loadShaliachApplications();
+      loadUsers(); loadProducts(); loadSoferim(); loadContent(); loadCategories();
     }
   }, [user]);
 
@@ -316,6 +331,16 @@ export default function AdminPage() {
       setApplications(data);
     } catch (e) { console.error(e); }
     finally { setAppsLoading(false); }
+  }
+
+  async function loadShaliachApplications() {
+    try {
+      const snap = await getDocs(query(collection(db, 'shluchim_applications'), orderBy('createdAt', 'desc')));
+      const data: ShaliachApplication[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as ShaliachApplication));
+      setShaliachApplications(data);
+    } catch (e) { console.error(e); }
+    finally { setShaliachAppsLoading(false); }
   }
 
   async function loadUsers() {
@@ -417,8 +442,7 @@ export default function AdminPage() {
     setActionLoading(app.id);
     try {
       await updateDoc(doc(db, 'soferim_applications', app.id), {
-        status: 'approved',
-        approvedAt: serverTimestamp(),
+        status: 'approved', approvedAt: serverTimestamp(),
       });
       const soferRef = await addDoc(collection(db, 'soferim'), {
         name: app.name, city: app.city, phone: app.phone,
@@ -431,26 +455,17 @@ export default function AdminPage() {
       for (const product of appProducts) {
         if (product.type && product.images?.length > 0) {
           await addDoc(collection(db, 'products'), {
-            name: product.type,
-            price: 0,
-            imgUrl: product.images[0] || null,
-            imgUrl2: product.images[1] || null,
-            imgUrl3: product.images[2] || null,
-            imgUrl4: product.images[3] || null,
-            cat: product.type,
-            soferId: soferRef.id,
-            status: 'active',
-            createdAt: serverTimestamp(),
+            name: product.type, price: 0,
+            imgUrl: product.images[0] || null, imgUrl2: product.images[1] || null,
+            imgUrl3: product.images[2] || null, imgUrl4: product.images[3] || null,
+            cat: product.type, soferId: soferRef.id,
+            status: 'active', createdAt: serverTimestamp(),
           });
         }
       }
       setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
-    } catch (e) {
-      console.error(e);
-      alert('שגיאה באישור');
-    } finally {
-      setActionLoading(null);
-    }
+    } catch (e) { console.error(e); alert('שגיאה באישור'); }
+    finally { setActionLoading(null); }
   }
 
   async function rejectApplication(id: string) {
@@ -458,6 +473,52 @@ export default function AdminPage() {
     try {
       await updateDoc(doc(db, 'soferim_applications', id), { status: 'rejected', rejectedAt: serverTimestamp() });
       setApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' } : a));
+    } catch (e) { console.error(e); alert('שגיאה בדחייה'); }
+    finally { setActionLoading(null); }
+  }
+
+  async function approveShaliach(app: ShaliachApplication) {
+    setActionLoading(app.id);
+    try {
+      await updateDoc(doc(db, 'shluchim_applications', app.id), {
+        status: 'approved', approvedAt: serverTimestamp(),
+      });
+      // יצירת שליח ב-shluchim
+      const shaliachRef = await addDoc(collection(db, 'shluchim'), {
+        name: app.name,
+        chabadName: app.chabadName || '',
+        city: app.city,
+        phone: app.phone,
+        email: app.email || '',
+        rabbiName: app.rabbiName || '',
+        logoUrl: app.logoUrl || '',
+        commissionPercent: 10,
+        status: 'active',
+        createdAt: serverTimestamp(),
+      });
+      // עדכון המשתמש המתאים עם shaliachId
+      const usersSnap = await getDocs(collection(db, 'users'));
+      for (const userDoc of usersSnap.docs) {
+        const userData = userDoc.data();
+        if (userData.email === app.email) {
+          await updateDoc(doc(db, 'users', userDoc.id), {
+            role: 'shaliach',
+            shaliachId: shaliachRef.id,
+          });
+          break;
+        }
+      }
+      setShaliachApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
+      alert('✅ השליח אושר! הלינק האישי שלו: ' + window.location.origin + '/?ref=' + shaliachRef.id);
+    } catch (e) { console.error(e); alert('שגיאה באישור'); }
+    finally { setActionLoading(null); }
+  }
+
+  async function rejectShaliach(id: string) {
+    setActionLoading(id);
+    try {
+      await updateDoc(doc(db, 'shluchim_applications', id), { status: 'rejected', rejectedAt: serverTimestamp() });
+      setShaliachApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' } : a));
     } catch (e) { console.error(e); alert('שגיאה בדחייה'); }
     finally { setActionLoading(null); }
   }
@@ -473,6 +534,7 @@ export default function AdminPage() {
   const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
   const shaliachOrders = orders.filter(o => o.shaliachName);
   const pendingApps = applications.filter(a => a.status === 'pending');
+  const pendingShaliachApps = shaliachApplications.filter(a => a.status === 'pending');
   const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
   const filteredProducts = products.filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()));
   const unassignedProducts = products.filter(p => !p.soferId).length;
@@ -532,8 +594,8 @@ export default function AdminPage() {
           <div className="text-sm text-gray-500 mt-1">משתמשים</div>
         </div>
         <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-orange-500">{pendingApps.length}</div>
-          <div className="text-sm text-gray-500 mt-1">בקשות סופרים</div>
+          <div className="text-3xl font-black text-orange-500">{pendingApps.length + pendingShaliachApps.length}</div>
+          <div className="text-sm text-gray-500 mt-1">בקשות ממתינות</div>
         </div>
       </div>
 
@@ -543,6 +605,7 @@ export default function AdminPage() {
           { key: 'products', label: '📜 מוצרים', color: 'bg-teal-600', badge: unassignedProducts },
           { key: 'commissions', label: '🤝 עמלות', color: 'bg-blue-600' },
           { key: 'soferim', label: '✍️ בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
+          { key: 'shluchim', label: '🟦 בקשות שליחים', color: 'bg-blue-800', badge: pendingShaliachApps.length },
           { key: 'users', label: '👥 משתמשים', color: 'bg-purple-600' },
           { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
           { key: 'categories', label: '🖼️ קטגוריות', color: 'bg-indigo-600' },
@@ -556,6 +619,56 @@ export default function AdminPage() {
           </button>
         ))}
       </div>
+
+      {/* ══ SHALIACH APPLICATIONS TAB ══ */}
+      {activeTab === 'shluchim' && (
+        <div>
+          {shaliachAppsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
+          : shaliachApplications.length === 0 ? <div className="p-10 text-center text-gray-400">אין בקשות שליחים עדיין</div>
+          : (
+            <div className="grid gap-4">
+              {shaliachApplications.map(app => (
+                <div key={app.id} className="bg-white rounded-xl shadow p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-shrink-0">
+                      {app.logoUrl
+                        ? <img src={app.logoUrl} alt={app.name} className="w-16 h-16 rounded-xl object-cover border-2 border-blue-200" />
+                        : <div className="w-16 h-16 rounded-xl bg-blue-100 flex items-center justify-center text-2xl">🟦</div>}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-black">{app.chabadName || app.name}</h3>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                          {app.status === 'pending' ? '⏳ ממתין' : app.status === 'approved' ? '✅ מאושר' : '❌ נדחה'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600">
+                        {app.name && <span>👤 {app.name}</span>}
+                        {app.city && <span>📍 {app.city}</span>}
+                        {app.phone && <span>📞 {app.phone}</span>}
+                        {app.email && <span>✉️ {app.email}</span>}
+                        {app.rabbiName && <span>🎓 {app.rabbiName}</span>}
+                      </div>
+                    </div>
+                    {app.status === 'pending' && (
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <button onClick={() => approveShaliach(app)} disabled={actionLoading === app.id}
+                          className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-800 disabled:opacity-50">
+                          {actionLoading === app.id ? '...' : '✅ אשר'}
+                        </button>
+                        <button onClick={() => rejectShaliach(app.id)} disabled={actionLoading === app.id}
+                          className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">
+                          ❌ דחה
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {activeTab === 'categories' && (
         <div className="grid gap-6">
