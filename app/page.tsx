@@ -51,9 +51,20 @@ function Stars({ n = 4.5 }: { n?: number }) {
   );
 }
 
+// ══ כרטיס מוצר עם חצים ══
 function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () => void; onClick: () => void }) {
   const [imgIdx, setImgIdx] = useState(0);
   const imgs = [p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[];
+
+  function prevImg(e: React.MouseEvent) {
+    e.stopPropagation();
+    setImgIdx(i => (i - 1 + imgs.length) % imgs.length);
+  }
+
+  function nextImg(e: React.MouseEvent) {
+    e.stopPropagation();
+    setImgIdx(i => (i + 1) % imgs.length);
+  }
 
   return (
     <div onClick={onClick} style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
@@ -67,17 +78,30 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
         ) : (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>📦</div>
         )}
+
+        {/* חצים ניווט */}
         {imgs.length > 1 && (
-          <div style={{ position: 'absolute', bottom: 6, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}
-            onClick={e => e.stopPropagation()}>
-            {imgs.map((_, i) => (
-              <button key={i} onMouseEnter={() => setImgIdx(i)} onClick={() => setImgIdx(i)}
-                style={{ width: 6, height: 6, borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0, background: i === imgIdx ? '#0c1a35' : 'rgba(255,255,255,0.8)' }} />
-            ))}
-          </div>
+          <>
+            <button onClick={prevImg}
+              style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.2)', zIndex: 2 }}>
+              ‹
+            </button>
+            <button onClick={nextImg}
+              style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.2)', zIndex: 2 }}>
+              ›
+            </button>
+            {/* נקודות */}
+            <div style={{ position: 'absolute', bottom: 6, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4, zIndex: 2 }}>
+              {imgs.map((_, i) => (
+                <div key={i} onClick={e => { e.stopPropagation(); setImgIdx(i); }}
+                  style={{ width: 6, height: 6, borderRadius: '50%', background: i === imgIdx ? '#0c1a35' : 'rgba(255,255,255,0.8)', cursor: 'pointer' }} />
+              ))}
+            </div>
+          </>
         )}
+
         {p.badge && (
-          <span style={{ position: 'absolute', top: 8, right: 8, background: p.badge === 'מבצע' ? '#c0392b' : p.badge === 'חדש' ? '#2980b9' : '#27ae60', color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4 }}>{p.badge}</span>
+          <span style={{ position: 'absolute', top: 8, right: 8, background: p.badge === 'מבצע' ? '#c0392b' : p.badge === 'חדש' ? '#2980b9' : '#27ae60', color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4, zIndex: 2 }}>{p.badge}</span>
         )}
       </div>
       <div style={{ padding: '10px 8px 12px' }}>
@@ -128,15 +152,15 @@ export default function Home() {
     heroSubtitle: 'ישירות מהסופר',
     heroText: 'בחר את הסופר שלך — דע מי כותב את המזוזה שלך. ללא מתווכים, ישירות מהמקור.',
   });
+  const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
 
   const router = useRouter();
   const { count, addItem } = useCart();
   const { user, signInWithGoogle, logout } = useAuth();
   const { shaliach } = useShaliach();
-const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
+  const catsScrollRef = useRef<HTMLDivElement>(null);
 
-  // בדיקת מובייל
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
@@ -193,13 +217,20 @@ const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
     else if (sortBy === 'דירוג') r.sort((a, b) => (b.stars || 0) - (a.stars || 0));
     setFiltered(r);
     setPage(1);
-}, [activeCat, search, products, priceMin, priceMax, minRating, sortBy, soferIdFilter]);
+  }, [activeCat, search, products, priceMin, priceMax, minRating, sortBy, soferIdFilter]);
+
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   function goToPage(p: number) {
     setPage(p);
     mainRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function scrollCats(dir: 'right' | 'left') {
+    if (catsScrollRef.current) {
+      catsScrollRef.current.scrollBy({ left: dir === 'left' ? 200 : -200, behavior: 'smooth' });
+    }
   }
 
   return (
@@ -322,7 +353,6 @@ const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
           </div>
         </div>
 
-        {/* סרט אמון — נסתר במובייל */}
         {!isMobile && (
           <div style={{ background: '#1a3a2a', padding: '5px 14px', fontSize: 12, color: '#a8c8b4', display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span>✍️ <strong style={{ color: '#fff' }}>ישירות מהסופר</strong> לביתך</span>
@@ -395,24 +425,37 @@ const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
         </div>
       </div>
 
-      {/* ══ קטגוריות ══ */}
+      {/* ══ קטגוריות — גלילה אופקית ══ */}
       <div style={{ background: '#fff', borderBottom: '1px solid #ddd', padding: '16px 0' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 12px' }}>
-          <h2 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 10 }}>קטגוריות מובילות</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(6, 1fr)', gap: isMobile ? 8 : 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <h2 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 800, color: '#0f1111' }}>קטגוריות מובילות</h2>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button onClick={() => scrollCats('right')}
+                style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>›</button>
+              <button onClick={() => scrollCats('left')}
+                style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>‹</button>
+            </div>
+          </div>
+
+          {/* גלילה אופקית */}
+          <div ref={catsScrollRef} style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 4 }}>
             {promoCats.map(c => (
               <div key={c.name} onClick={() => { setActiveCat(c.name); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
-                style={{ cursor: 'pointer', borderRadius: 8, overflow: 'hidden', border: '1px solid #ddd', transition: 'box-shadow 0.2s' }}
+                style={{ cursor: 'pointer', borderRadius: 12, overflow: 'hidden', border: '1px solid #ddd', transition: 'box-shadow 0.2s', flexShrink: 0, width: isMobile ? 130 : 180 }}
                 onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)')}
                 onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
-                <div style={{ height: isMobile ? 70 : 100, overflow: 'hidden', position: 'relative' }}>
+                <div style={{ height: isMobile ? 100 : 140, overflow: 'hidden', position: 'relative' }}>
                   <img src={c.img} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }} />
+                  <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '8px 10px' }}>
+                    <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 15, color: '#fff' }}>{c.name}</div>
+                    {c.sub && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>{c.sub}</div>}
+                  </div>
                 </div>
-                <div style={{ padding: isMobile ? '5px 6px' : '8px 10px', background: '#fff' }}>
-                  <div style={{ fontWeight: 800, fontSize: isMobile ? 11 : 13, color: '#0f1111' }}>{c.name}</div>
-                  {!isMobile && <div style={{ fontSize: 11, color: '#0e6ba8', marginTop: 2 }}>לכל המבחר ←</div>}
+                <div style={{ padding: '8px 10px', background: '#fff' }}>
+                  <div style={{ fontSize: 11, color: '#0e6ba8' }}>לכל המבחר ←</div>
                 </div>
               </div>
             ))}
@@ -423,7 +466,6 @@ const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
       {/* ══ MAIN ══ */}
       <div ref={mainRef} style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '12px 8px' : '16px 12px' }}>
 
-        {/* כפתור סינון — מובייל בלבד */}
         {isMobile && (
           <button onClick={() => setShowSidebar(!showSidebar)}
             style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
@@ -433,7 +475,6 @@ const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
 
         <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
 
-          {/* סרגל סינון */}
           {(!isMobile || showSidebar) && (
             <div style={{ width: isMobile ? '100%' : 220, flexShrink: 0, background: '#fff', borderRadius: 8, border: '1px solid #ddd', padding: '16px', position: isMobile ? 'relative' : 'sticky', top: isMobile ? 'auto' : 120, marginBottom: isMobile ? 12 : 0 }}>
               <div style={{ fontWeight: 800, fontSize: 14, color: '#0f1111', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -441,7 +482,6 @@ const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
                 {isMobile && <button onClick={() => setShowSidebar(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#888' }}>✕</button>}
               </div>
 
-              {/* קטגוריות בתוך הסינון — מובייל בלבד */}
               {isMobile && (
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>קטגוריה</div>
@@ -499,7 +539,6 @@ const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
             </div>
           )}
 
-          {/* תוצאות — נסתר במובייל כשסינון פתוח */}
           {(!isMobile || !showSidebar) && (
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
@@ -518,7 +557,6 @@ const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
                 </div>
               </div>
 
-              {/* כפתורי קטגוריות — דסקטופ בלבד */}
               {!isMobile && (
                 <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
                   {CATS.map(cat => (
