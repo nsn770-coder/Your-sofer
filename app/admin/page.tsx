@@ -455,11 +455,17 @@ export default function AdminPage() {
       for (const product of appProducts) {
         if (product.type && product.images?.length > 0) {
           await addDoc(collection(db, 'products'), {
-            name: product.type, price: 0,
-            imgUrl: product.images[0] || null, imgUrl2: product.images[1] || null,
-            imgUrl3: product.images[2] || null, imgUrl4: product.images[3] || null,
-            cat: product.type, soferId: soferRef.id,
-            status: 'active', createdAt: serverTimestamp(),
+            name: product.type,
+            price: 0,
+            imgUrl: product.images[0] || null,
+            imgUrl2: product.images[1] || null,
+            imgUrl3: product.images[2] || null,
+            imgUrl4: product.images[3] || null,
+            cat: 'קלפים',
+            subCat: product.type,
+            soferId: soferRef.id,
+            status: 'active',
+            createdAt: serverTimestamp(),
           });
         }
       }
@@ -483,27 +489,18 @@ export default function AdminPage() {
       await updateDoc(doc(db, 'shluchim_applications', app.id), {
         status: 'approved', approvedAt: serverTimestamp(),
       });
-      // יצירת שליח ב-shluchim
       const shaliachRef = await addDoc(collection(db, 'shluchim'), {
-        name: app.name,
-        chabadName: app.chabadName || '',
-        city: app.city,
-        phone: app.phone,
-        email: app.email || '',
-        rabbiName: app.rabbiName || '',
-        logoUrl: app.logoUrl || '',
-        commissionPercent: 10,
-        status: 'active',
-        createdAt: serverTimestamp(),
+        name: app.name, chabadName: app.chabadName || '',
+        city: app.city, phone: app.phone, email: app.email || '',
+        rabbiName: app.rabbiName || '', logoUrl: app.logoUrl || '',
+        commissionPercent: 10, status: 'active', createdAt: serverTimestamp(),
       });
-      // עדכון המשתמש המתאים עם shaliachId
       const usersSnap = await getDocs(collection(db, 'users'));
       for (const userDoc of usersSnap.docs) {
         const userData = userDoc.data();
         if (userData.email === app.email) {
           await updateDoc(doc(db, 'users', userDoc.id), {
-            role: 'shaliach',
-            shaliachId: shaliachRef.id,
+            role: 'shaliach', shaliachId: shaliachRef.id,
           });
           break;
         }
@@ -620,7 +617,6 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* ══ SHALIACH APPLICATIONS TAB ══ */}
       {activeTab === 'shluchim' && (
         <div>
           {shaliachAppsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
@@ -933,12 +929,11 @@ export default function AdminPage() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                   <th className="p-3 text-right">משתמש</th>
-<th className="p-3 text-right">אימייל</th>
-<th className="p-3 text-right">תפקיד נוכחי</th>
-<th className="p-3 text-right">לינק שליח</th>
-<th className="p-3 text-right">לינק שליח</th>
-<th className="p-3 text-right">שנה תפקיד</th>
+                    <th className="p-3 text-right">משתמש</th>
+                    <th className="p-3 text-right">אימייל</th>
+                    <th className="p-3 text-right">תפקיד נוכחי</th>
+                    <th className="p-3 text-right">לינק שליח</th>
+                    <th className="p-3 text-right">שנה תפקיד</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -950,16 +945,16 @@ export default function AdminPage() {
                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span>
                       </td>
                       <td className="p-3">
-                       <td className="p-3">
-  {u.shaliachId ? (
-    <button onClick={() => {
-      navigator.clipboard.writeText(`${window.location.origin}/?ref=${u.shaliachId}`);
-      alert('הלינק הועתק!');
-    }} className="text-blue-600 text-xs font-bold hover:underline">
-      📋 העתק לינק
-    </button>
-  ) : '—'}
-</td> 
+                        {u.shaliachId ? (
+                          <button onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/?ref=${u.shaliachId}`);
+                            alert('הלינק הועתק!');
+                          }} className="text-blue-600 text-xs font-bold hover:underline">
+                            📋 העתק לינק
+                          </button>
+                        ) : '—'}
+                      </td>
+                      <td className="p-3">
                         <select value={u.role} disabled={actionLoading === u.id}
                           onChange={e => changeUserRole(u.id, e.target.value as UserRole)}
                           className="border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer">
