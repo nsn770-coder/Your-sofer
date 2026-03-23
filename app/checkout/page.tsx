@@ -6,8 +6,6 @@ import { useShaliach } from '../contexts/ShaliachContext';
 import { collection, addDoc, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
-const UPAY_API_KEY = '25a75652ac0786a256fb913c3c980dfb';
-
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, total, clearCart } = useCart();
@@ -71,7 +69,7 @@ export default function CheckoutPage() {
         commissionAmount,
       });
 
-      // סמן קלפים כ-reserved עד שהתשלום יאושר
+      // סמן קלפים כ-reserved
       const klafUpdates = items
         .filter(i => i.selectedKlafId)
         .map(i =>
@@ -83,29 +81,31 @@ export default function CheckoutPage() {
         );
       if (klafUpdates.length > 0) await Promise.all(klafUpdates);
 
-      // בנה URL לתשלום UPAY
+      // קבל URL תשלום מ-Sumit דרך ה-API route
       const baseUrl = window.location.origin;
-      const successUrl = `${baseUrl}/thank-you?order=${orderNumber}&orderId=${orderRef.id}`;
-      const failUrl = `${baseUrl}/checkout?error=payment_failed`;
-
-      const upayParams = new URLSearchParams({
-        apikey: UPAY_API_KEY,
-        amount: total.toFixed(2),
-        description: `הזמנה ${orderNumber} - YourSofer`,
-        customer_name: form.name,
-        customer_email: form.email,
-        customer_phone: form.phone,
-        success_url: successUrl,
-        fail_url: failUrl,
-        order_id: orderRef.id,
-        currency: 'ILS',
+      const paymentRes = await fetch('/api/payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+          total,
+          customer: { name: form.name, email: form.email, phone: form.phone },
+          orderNumber,
+          orderId: orderRef.id,
+          baseUrl,
+        }),
       });
 
-      // הפנה לדף תשלום UPAY
-      window.location.href = `https://app.upay.co.il/api/paypage?${upayParams.toString()}`;
+      const paymentData = await paymentRes.json();
 
-    } catch (e) {
-      alert('שגיאה בשליחת ההזמנה. נסה שוב.');
+      if (paymentData.url) {
+        window.location.href = paymentData.url;
+      } else {
+        throw new Error(paymentData.error || 'שגיאה בקבלת דף תשלום');
+      }
+
+    } catch (e: any) {
+      alert('שגיאה: ' + (e.message || 'נסה שוב'));
       console.error(e);
       setLoading(false);
     }
@@ -132,12 +132,12 @@ export default function CheckoutPage() {
         </button>
       </div>
 
-      {/* באנר שליח */}
+      {/* באנר רב קהילה */}
       {shaliach && (
         <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a3a6a)', borderBottom: '2px solid #b8972a', padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 12, direction: 'rtl' }}>
           <div style={{ fontSize: 20 }}>🤝</div>
           <div style={{ fontSize: 13, color: '#a8c0d8' }}>
-            הזמנה זו מיוחסת לשליח: <strong style={{ color: '#fff' }}>{shaliach.chabadName || shaliach.name}</strong>
+            הזמנה זו מיוחסת לרב הקהילה: <strong style={{ color: '#fff' }}>{shaliach.chabadName || shaliach.name}</strong>
             {shaliach.city && <span style={{ color: '#b8972a' }}> · {shaliach.city}</span>}
           </div>
         </div>
@@ -254,10 +254,10 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* אמצעי תשלום */}
+              {/* תשלום */}
               <div style={{ background: '#f0f7f3', border: '1px solid #b7e4c7', borderRadius: 8, padding: '14px 20px', marginBottom: 12 }}>
                 <div style={{ fontSize: 13, color: '#1a6b3c', fontWeight: 700, marginBottom: 6 }}>💳 תשלום מאובטח</div>
-                <div style={{ fontSize: 12, color: '#555' }}>לאחר לחיצה על "המשך לתשלום" תועבר לדף תשלום מאובטח של UPAY — ויזה, מסטרקארד, ביט ועוד.</div>
+                <div style={{ fontSize: 12, color: '#555' }}>לאחר לחיצה על "המשך לתשלום" תועבר לדף תשלום מאובטח — ויזה, מסטרקארד, ביט ועוד.</div>
               </div>
 
               <button onClick={handleSubmit} disabled={loading}
@@ -265,7 +265,7 @@ export default function CheckoutPage() {
                 {loading ? '⏳ מכין תשלום...' : '💳 המשך לתשלום ←'}
               </button>
               <div style={{ fontSize: 11, color: '#888', textAlign: 'center', marginTop: 10 }}>
-                🔒 תשלום מאובטח דרך UPAY · ויזה · מסטרקארד · ביט
+                🔒 תשלום מאובטח · ויזה · מסטרקארד · ביט
               </div>
             </div>
           )}
@@ -299,15 +299,15 @@ export default function CheckoutPage() {
           </div>
           {shaliach && (
             <div style={{ marginTop: 12, padding: '10px 12px', background: '#f0f7ff', borderRadius: 6, fontSize: 12 }}>
-              <div style={{ color: '#0e6ba8', fontWeight: 700 }}>🤝 דרך שליח: {shaliach.chabadName || shaliach.name}</div>
-              <div style={{ color: '#888', marginTop: 2 }}>עמלה: {shaliach.commissionPercent}% = ₪{(total * (shaliach.commissionPercent || 0) / 100).toFixed(2)}</div>
+              <div style={{ color: '#0e6ba8', fontWeight: 700 }}>🤝 דרך עמותה: {shaliach.chabadName || shaliach.name}</div>
+              <div style={{ color: '#555', marginTop: 2 }}>10% מהרכישה יועברו כתרומה לעמותה</div>
             </div>
           )}
           <div style={{ marginTop: 16, fontSize: 11, color: '#888', lineHeight: 2, borderTop: '1px solid #eee', paddingTop: 12 }}>
-            <div>🔒 תשלום מאובטח דרך UPAY</div>
+            <div>🔒 תשלום מאובטח</div>
             <div>🚚 משלוח חינם לכל הארץ</div>
             <div>↩️ ביטול עד 24 שעות</div>
-            <div>🛡️ אחריות פלטפורמה</div>
+            <div>🛡️ אחריות פלטפורמה מלאה</div>
           </div>
         </div>
       </div>
