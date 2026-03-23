@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
       RedirectURL: `${baseUrl}/thank-you?order=${orderNumber}&orderId=${orderId}`,
       CancelRedirectURL: `${baseUrl}/checkout?error=payment_cancelled`,
       ExternalIdentifier: orderNumber,
-      Language: 'he',
       Credentials: {
         CompanyID: parseInt(SUMIT_COMPANY_ID),
         APIKey: SUMIT_API_KEY,
