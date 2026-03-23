@@ -71,24 +71,24 @@ export default function JoinPage() {
           </div>
         </div>
 
-        {/* שליח */}
+        {/* רב קהילה */}
         <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', border: '1px solid #eee' }}>
           <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a3a6a)', padding: '32px 28px', textAlign: 'center' }}>
-            <div style={{ fontSize: 56, marginBottom: 12 }}>🟦</div>
-            <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הצטרף כשליח חבד</h2>
+            <div style={{ fontSize: 56, marginBottom: 12 }}>🏛️</div>
+            <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הצטרף כרב קהילה</h2>
             <p style={{ color: '#a8c0d8', fontSize: 14, lineHeight: 1.6 }}>
-              שלח את קהילתך לקנות סת"מ מאומת וקבל עמלה על כל הזמנה
+              הפנה את קהילתך לקנות סת"מ מאומת — 10% מכל הזמנה יועברו כתרומה לעמותה שלך
             </p>
           </div>
           <div style={{ padding: '28px' }}>
             <div style={{ marginBottom: 20 }}>
               {[
-                'לינק אישי עם ברנדינג של בית החבד שלך',
+                'לינק אישי עם ברנדינג של העמותה שלך',
                 'באנר מותאם אישית על האתר',
-                'עמלה על כל הזמנה דרך הלינק שלך',
-                'דשבורד מכירות ועמלות',
-                'תמיכה ייעודית לשליחים',
-                'הצגה בדף שליחי חבד',
+                '10% מכל הזמנה כתרומה לעמותה',
+                'דשבורד מכירות ותרומות',
+                'תמיכה ייעודית לרבני קהילה',
+                'הצגה בדף רבני הקהילה',
               ].map(item => (
                 <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 14, color: '#333' }}>
                   <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#0c1a35', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>✓</div>
@@ -98,15 +98,11 @@ export default function JoinPage() {
             </div>
 
             <div style={{ background: '#f0f4ff', borderRadius: 8, padding: '14px 16px', marginBottom: 20, fontSize: 13 }}>
-              <div style={{ fontWeight: 700, marginBottom: 4, color: '#0c1a35' }}>עמלה: 5%-15% על כל הזמנה</div>
-              <div style={{ color: '#888' }}>בהתאם לנפח המכירות של הקהילה שלך</div>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: '#0c1a35' }}>תרומה: 10% מכל הזמנה לעמותה</div>
+              <div style={{ color: '#888' }}>הכסף מועבר ישירות לעמותה שלך מדי חודש</div>
             </div>
 
-            <button onClick={() => {
-              const subject = encodeURIComponent('בקשת הצטרפות כשליח — Your Sofer');
-              const body = encodeURIComponent('שלום,\n\nאני מעוניין להצטרף לפלטפורמה כשליח חבד.\n\nשם: \nמיקום: \nטלפון: \n\nתודה');
-              router.push('/join/apply')
-            }}
+            <button onClick={() => router.push('/join/apply')}
               style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
               שלח בקשת הצטרפות ←
             </button>
@@ -122,7 +118,7 @@ export default function JoinPage() {
             {[
               { icon: '🛡️', title: 'פיקוח הלכתי', desc: 'כל מוצר עובר בדיקת מחשב ופיקוח רבני מוסמך' },
               { icon: '📈', title: 'קהל לקוחות גדול', desc: 'גישה לאלפי לקוחות פוטנציאליים ברחבי הארץ' },
-              { icon: '💰', title: 'הכנסה נוספת', desc: 'עמלות אטרקטיביות ותשלום מהיר ואמין' },
+              { icon: '💰', title: 'תרומה לעמותה', desc: '10% מכל הזמנה מועברים לעמותת הקהילה שלך' },
               { icon: '🔧', title: 'כלים מתקדמים', desc: 'דשבורד ניהול, נתונים ודוחות בלחיצה אחת' },
               { icon: '🤝', title: 'תמיכה מלאה', desc: 'צוות מקצועי זמין לעזור בכל שאלה' },
               { icon: '🌟', title: 'מוניטין ואמון', desc: 'פלטפורמה מובילה בתחום סת"מ בישראל' },

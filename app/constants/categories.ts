@@ -25,6 +25,6 @@ export const NAV_ITEMS: { label: string; cat: string | null; action: string | nu
   { label: '📜 קלפים',            cat: 'קלפים',          action: null },
   { label: '✍️ הסופרים שלנו',     cat: null,             action: 'soferim' },
   { label: '🌟 הצטרף לפלטפורמה', cat: null,             action: 'join' },
-  { label: '🟦 חבד שליחים',       cat: null,             action: 'shluchim' },
+  { label: '🏛️ רבני קהילה',       cat: null,             action: 'shluchim' },
   { label: 'סט טלית תפילין',      cat: 'סט טלית תפילין', action: null },
 ];

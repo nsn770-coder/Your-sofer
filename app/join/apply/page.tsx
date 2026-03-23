@@ -98,27 +98,27 @@ export default function ShaliachApplyPage() {
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer', display: 'inline-block', marginBottom: 12 }}>
           <span style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>Your Sofer</span>
         </div>
-        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', margin: 0 }}>הצטרף כשליח חבד</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', margin: 0 }}>הצטרף כרב קהילה</h1>
         <p style={{ color: '#a8c0d8', marginTop: 8, fontSize: 15 }}>מלא את הפרטים ונחזור אליך בהקדם</p>
       </div>
 
       <div style={{ maxWidth: 580, margin: '32px auto', padding: '0 16px' }}>
         <form onSubmit={handleSubmit}>
 
-          {/* פרטי בית החבד */}
+          {/* פרטי העמותה */}
           <div style={cardStyle}>
-            <h3 style={sectionTitle}>🟦 פרטי בית החבד</h3>
+            <h3 style={sectionTitle}>🏛️ פרטי העמותה</h3>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>שם השליח (שם מלא) *</label>
+              <label style={labelStyle}>שם רב הקהילה (שם מלא) *</label>
               <input name="name" value={form.name} onChange={handleChange}
                 placeholder="הרב ישראל ישראלי" style={inputStyle} required />
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>שם בית החבד</label>
+              <label style={labelStyle}>שם העמותה</label>
               <input name="chabadName" value={form.chabadName} onChange={handleChange}
-                placeholder="בית חבד תל אביב מרכז" style={inputStyle} />
+                placeholder="עמותת קהילת ישראל תל אביב" style={inputStyle} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
@@ -143,14 +143,14 @@ export default function ShaliachApplyPage() {
               <div>
                 <label style={labelStyle}>אימייל</label>
                 <input name="email" value={form.email} onChange={handleChange}
-                  placeholder="chabad@gmail.com" type="email" style={inputStyle} />
+                  placeholder="info@amuta.org.il" type="email" style={inputStyle} />
               </div>
             </div>
           </div>
 
           {/* לוגו */}
           <div style={cardStyle}>
-            <h3 style={sectionTitle}>🖼️ לוגו בית החבד</h3>
+            <h3 style={sectionTitle}>🖼️ לוגו העמותה</h3>
             <p style={{ fontSize: 13, color: '#555', marginBottom: 16, background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 8, padding: '10px 14px' }}>
               הלוגו יופיע בבאנר האתר כשלקוחות נכנסים דרך הלינק שלך — מומלץ להעלות לוגו ברור ומקצועי.
             </p>
@@ -161,7 +161,7 @@ export default function ShaliachApplyPage() {
                   style={{ width: 80, height: 80, borderRadius: 10, objectFit: 'cover', border: '2px solid #0c1a35', flexShrink: 0 }} />
               ) : (
                 <div style={{ width: 80, height: 80, borderRadius: 10, background: '#e8eef8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, flexShrink: 0 }}>
-                  🟦
+                  🏛️
                 </div>
               )}
               <div>
@@ -181,14 +181,14 @@ export default function ShaliachApplyPage() {
             </div>
           </div>
 
-          {/* מידע על עמלות */}
+          {/* מידע על תרומות */}
           <div style={{ background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 12, padding: 20, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0c1a35', marginBottom: 10 }}>💰 מידע על עמלות</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0c1a35', marginBottom: 10 }}>💰 מידע על תרומות</h3>
             <div style={{ fontSize: 14, color: '#333', lineHeight: 1.8 }}>
-              <div>• עמלה של <strong>5%-15%</strong> על כל הזמנה דרך הלינק שלך</div>
-              <div>• תשלום חודשי ישירות לחשבונך</div>
-              <div>• דשבורד עם נתוני מכירות בזמן אמת</div>
-              <div>• לינק אישי עם ברנדינג של בית החבד שלך</div>
+              <div>• <strong>10%</strong> מכל הזמנה דרך הלינק שלך יועברו לעמותה</div>
+              <div>• תשלום חודשי ישירות לחשבון העמותה</div>
+              <div>• דשבורד עם נתוני מכירות ותרומות בזמן אמת</div>
+              <div>• לינק אישי עם ברנדינג של העמותה שלך</div>
             </div>
           </div>
 
