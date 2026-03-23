@@ -41,8 +41,8 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json();
 
-    if (data?.Data?.URL) {
-      return NextResponse.json({ url: data.Data.URL });
+ if (data?.Data?.RedirectURL) {
+  return NextResponse.json({ url: data.Data.RedirectURL });
     } else {
       console.error('Sumit error:', JSON.stringify(data));
       return NextResponse.json({ error: 'שגיאה בקבלת דף תשלום' }, { status: 500 });
