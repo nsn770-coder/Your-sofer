@@ -1,30 +1,40 @@
+// app/constants/categories.ts
+
 export const CATS = [
   'הכל',
   'מזוזות',
-  'תפילין',
+  'כיסוי תפילין',
+  'תפילין קומפלט',
+  'טליתות',
   'מגילות',
   'ספרי תורה',
   'יודאיקה',
   'מתנות',
   'בר מצווה',
   'חגים ומועדים',
-  'סט טלית תפילין',
   'קלפים',
 ];
 
+export const SUB_CATS: Record<string, string[]> = {
+  'טליתות': ['טלית קטן', 'טלית צמר', 'סט טלית תפילין'],
+  'יודאיקה': ['נוי הבית', 'נוי השולחן', 'חנוכיות', 'אומנות יהודית'],
+  'בר מצווה': ['סטים לבר מצווה', 'תפילין קומפלט', 'טליתות', 'מתנות לבר מצווה'],
+};
+
 export const NAV_ITEMS: { label: string; cat: string | null; action: string | null }[] = [
-  { label: '🔥 מבצעי היום',       cat: null,             action: null },
-  { label: 'מזוזות',              cat: 'מזוזות',         action: null },
-  { label: 'תפילין',              cat: 'תפילין',         action: null },
-  { label: 'מגילות',              cat: 'מגילות',         action: null },
-  { label: 'ספרי תורה',           cat: 'ספרי תורה',      action: null },
-  { label: 'יודאיקה',             cat: 'יודאיקה',        action: null },
-  { label: '🎁 מתנות',            cat: 'מתנות',          action: null },
-  { label: '✡️ חגים ומועדים',     cat: 'חגים ומועדים',  action: null },
-  { label: '🎉 בר מצווה',         cat: 'בר מצווה',       action: null },
-  { label: '📜 קלפים',            cat: 'קלפים',          action: null },
-  { label: '✍️ הסופרים שלנו',     cat: null,             action: 'soferim' },
-  { label: '🌟 הצטרף לפלטפורמה', cat: null,             action: 'join' },
-  { label: '🏛️ רבני קהילה',       cat: null,             action: 'shluchim' },
-  { label: 'סט טלית תפילין',      cat: 'סט טלית תפילין', action: null },
+  { label: '🔥 מבצעי היום',       cat: null,               action: null },
+  { label: 'מזוזות',              cat: 'מזוזות',           action: null },
+  { label: 'כיסוי תפילין',        cat: 'כיסוי תפילין',    action: null },
+  { label: 'תפילין קומפלט',       cat: 'תפילין קומפלט',   action: null },
+  { label: 'טליתות',              cat: 'טליתות',           action: null },
+  { label: 'מגילות',              cat: 'מגילות',           action: null },
+  { label: 'ספרי תורה',           cat: 'ספרי תורה',        action: null },
+  { label: 'יודאיקה',             cat: 'יודאיקה',          action: null },
+  { label: '🎁 מתנות',            cat: 'מתנות',            action: null },
+  { label: '✡️ חגים ומועדים',     cat: 'חגים ומועדים',    action: null },
+  { label: '🎉 בר מצווה',         cat: 'בר מצווה',         action: null },
+  { label: '📜 קלפים',            cat: 'קלפים',            action: null },
+  { label: '✍️ הסופרים שלנו',     cat: null,               action: 'soferim' },
+  { label: '🌟 הצטרף לפלטפורמה', cat: null,               action: 'join' },
+  { label: '🏛️ רבני קהילה',       cat: null,               action: 'shluchim' },
 ];

@@ -32,12 +32,15 @@ interface PromoCat {
 }
 
 const PROMO_CATS_DEFAULT: PromoCat[] = [
-  { name: 'מזוזות', img: 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=400&q=80', sub: 'מכל הסוגים והגדלים' },
-  { name: 'תפילין', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', sub: 'אשכנז, ספרד, חב״ד' },
-  { name: 'מגילות', img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'מגילת אסתר ועוד' },
-  { name: 'יודאיקה', img: 'https://images.unsplash.com/photo-1519974719765-e6559eac2575?w=400&q=80', sub: 'חנוכיות, כוסות ועוד' },
-  { name: 'ספרי תורה', img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&q=80', sub: 'ספרי תורה מהודרים' },
-  { name: 'מתנות', img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'לכל אירוע ומועד' },
+  { name: 'מזוזות',          img: 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=400&q=80', sub: 'מכל הסוגים והגדלים' },
+  { name: 'כיסוי תפילין',    img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', sub: 'אשכנז, ספרד, חב״ד' },
+  { name: 'תפילין קומפלט',   img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'סט קומפלט — קלף, בתים, רצועות' },
+  { name: 'טליתות',          img: 'https://images.unsplash.com/photo-1519974719765-e6559eac2575?w=400&q=80', sub: 'טלית קטן, טלית צמר' },
+  { name: 'מגילות',          img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&q=80', sub: 'מגילת אסתר ועוד' },
+  { name: 'יודאיקה',         img: 'https://images.unsplash.com/photo-1519974719765-e6559eac2575?w=400&q=80', sub: 'חנוכיות, כוסות ועוד' },
+  { name: 'ספרי תורה',       img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'ספרי תורה מהודרים' },
+  { name: 'בר מצווה',        img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'סטים וחבילות מיוחדות' },
+  { name: 'מתנות',           img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'לכל אירוע ומועד' },
 ];
 
 const FILTER_NUSACH = ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'];
@@ -192,7 +195,7 @@ export default function Home() {
           if (cat.imgUrl) catsData.push({ name: cat.name, img: cat.imgUrl, sub: cat.sub || '' });
         });
         if (catsData.length > 0) {
-          const order = ['מזוזות', 'תפילין', 'מגילות', 'יודאיקה', 'ספרי תורה', 'מתנות'];
+         const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות'];
           catsData.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
           setPromoCats(catsData);
         }
