@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
@@ -32,29 +32,29 @@ interface PromoCat {
 }
 
 const PROMO_CATS_DEFAULT: PromoCat[] = [
-  { name: 'מזוזות',          img: 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=400&q=80', sub: 'מכל הסוגים והגדלים' },
-  { name: 'כיסוי תפילין',    img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', sub: 'אשכנז, ספרד, חב״ד' },
-  { name: 'תפילין קומפלט',   img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'סט קומפלט — קלף, בתים, רצועות' },
-  { name: 'טליתות',          img: 'https://images.unsplash.com/photo-1519974719765-e6559eac2575?w=400&q=80', sub: 'טלית קטן, טלית צמר' },
-  { name: 'מגילות',          img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&q=80', sub: 'מגילת אסתר ועוד' },
-  { name: 'יודאיקה',         img: 'https://images.unsplash.com/photo-1519974719765-e6559eac2575?w=400&q=80', sub: 'חנוכיות, כוסות ועוד' },
-  { name: 'ספרי תורה',       img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'ספרי תורה מהודרים' },
-  { name: 'בר מצווה',        img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'סטים וחבילות מיוחדות' },
-  { name: 'מתנות',           img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'לכל אירוע ומועד' },
+  { name: '׳׳–׳•׳–׳•׳×',          img: 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=400&q=80', sub: '׳׳›׳ ׳”׳¡׳•׳’׳™׳ ׳•׳”׳’׳“׳׳™׳' },
+  { name: '׳›׳™׳¡׳•׳™ ׳×׳₪׳™׳׳™׳',    img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', sub: '׳׳©׳›׳ ׳–, ׳¡׳₪׳¨׳“, ׳—׳‘׳´׳“' },
+  { name: '׳×׳₪׳™׳׳™׳ ׳§׳•׳׳₪׳׳˜',   img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: '׳¡׳˜ ׳§׳•׳׳₪׳׳˜ ג€” ׳§׳׳£, ׳‘׳×׳™׳, ׳¨׳¦׳•׳¢׳•׳×' },
+  { name: '׳˜׳׳™׳×׳•׳×',          img: 'https://images.unsplash.com/photo-1519974719765-e6559eac2575?w=400&q=80', sub: '׳˜׳׳™׳× ׳§׳˜׳, ׳˜׳׳™׳× ׳¦׳׳¨' },
+  { name: '׳׳’׳™׳׳•׳×',          img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&q=80', sub: '׳׳’׳™׳׳× ׳׳¡׳×׳¨ ׳•׳¢׳•׳“' },
+  { name: '׳™׳•׳“׳׳™׳§׳”',         img: 'https://images.unsplash.com/photo-1519974719765-e6559eac2575?w=400&q=80', sub: '׳—׳ ׳•׳›׳™׳•׳×, ׳›׳•׳¡׳•׳× ׳•׳¢׳•׳“' },
+  { name: '׳¡׳₪׳¨׳™ ׳×׳•׳¨׳”',       img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: '׳¡׳₪׳¨׳™ ׳×׳•׳¨׳” ׳׳”׳•׳“׳¨׳™׳' },
+  { name: '׳‘׳¨ ׳׳¦׳•׳•׳”',        img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: '׳¡׳˜׳™׳ ׳•׳—׳‘׳™׳׳•׳× ׳׳™׳•׳—׳“׳•׳×' },
+  { name: '׳׳×׳ ׳•׳×',           img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: '׳׳›׳ ׳׳™׳¨׳•׳¢ ׳•׳׳•׳¢׳“' },
 ];
 
-const FILTER_NUSACH = ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'];
-const FILTER_HIDUR = ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'];
+const FILTER_NUSACH = ['׳”׳›׳', '׳׳©׳›׳ ׳–', '׳¡׳₪׳¨׳“', '׳—׳‘"׳“', '׳×׳™׳׳ ׳™', '׳₪׳¨׳“׳™'];
+const FILTER_HIDUR = ['׳”׳›׳', '׳׳”׳•׳“׳¨', '׳׳”׳•׳“׳¨ ׳׳ ׳”׳׳•׳‘׳—׳¨', '׳¨׳’׳™׳'];
 
 function Stars({ n = 4.5 }: { n?: number }) {
   return (
     <span style={{ color: '#e6a817', fontSize: 12 }}>
-      {'★'.repeat(Math.floor(n))}{'☆'.repeat(5 - Math.floor(n))}
+      {'ג˜…'.repeat(Math.floor(n))}{'ג˜†'.repeat(5 - Math.floor(n))}
     </span>
   );
 }
 
-// ══ כרטיס מוצר עם חצים ══
+// ג•ג• ׳›׳¨׳˜׳™׳¡ ׳׳•׳¦׳¨ ׳¢׳ ׳—׳¦׳™׳ ג•ג•
 function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () => void; onClick: () => void }) {
   const [imgIdx, setImgIdx] = useState(0);
   const imgs = [p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[];
@@ -79,21 +79,21 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.2s' }}
             onError={e => (e.currentTarget.style.display = 'none')} />
         ) : (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>📦</div>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>נ“¦</div>
         )}
 
-        {/* חצים ניווט */}
+        {/* ׳—׳¦׳™׳ ׳ ׳™׳•׳•׳˜ */}
         {imgs.length > 1 && (
           <>
             <button onClick={prevImg}
               style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.2)', zIndex: 2 }}>
-              ‹
+              ג€¹
             </button>
             <button onClick={nextImg}
               style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.2)', zIndex: 2 }}>
-              ›
+              ג€÷
             </button>
-            {/* נקודות */}
+            {/* ׳ ׳§׳•׳“׳•׳× */}
             <div style={{ position: 'absolute', bottom: 6, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4, zIndex: 2 }}>
               {imgs.map((_, i) => (
                 <div key={i} onClick={e => { e.stopPropagation(); setImgIdx(i); }}
@@ -104,7 +104,7 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
         )}
 
         {p.badge && (
-          <span style={{ position: 'absolute', top: 8, right: 8, background: p.badge === 'מבצע' ? '#c0392b' : p.badge === 'חדש' ? '#2980b9' : '#27ae60', color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4, zIndex: 2 }}>{p.badge}</span>
+          <span style={{ position: 'absolute', top: 8, right: 8, background: p.badge === '׳׳‘׳¦׳¢' ? '#c0392b' : p.badge === '׳—׳“׳©' ? '#2980b9' : '#27ae60', color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 4, zIndex: 2 }}>{p.badge}</span>
         )}
       </div>
       <div style={{ padding: '10px 8px 12px' }}>
@@ -116,14 +116,14 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
           <span style={{ fontSize: 11, color: '#0e6ba8' }}>({p.reviews || 0})</span>
         </div>
         <div style={{ marginBottom: 6 }}>
-          {p.was && <div style={{ fontSize: 11, color: '#888', textDecoration: 'line-through' }}>₪{p.was}</div>}
-          <span style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>₪{p.price}</span>
-          {p.was && <span style={{ fontSize: 11, color: '#c0392b', marginRight: 6 }}>({Math.round((1 - p.price / p.was) * 100)}% הנחה)</span>}
+          {p.was && <div style={{ fontSize: 11, color: '#888', textDecoration: 'line-through' }}>ג‚×{p.was}</div>}
+          <span style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>ג‚×{p.price}</span>
+          {p.was && <span style={{ fontSize: 11, color: '#c0392b', marginRight: 6 }}>({Math.round((1 - p.price / p.was) * 100)}% ׳”׳ ׳—׳”)</span>}
         </div>
-        <div style={{ fontSize: 11, color: '#c7511f', marginBottom: 8 }}>🚚 משלוח חינם · {p.days || '7-14'} ימים</div>
+        <div style={{ fontSize: 11, color: '#c7511f', marginBottom: 8 }}>נ ׳׳©׳׳•׳— ׳—׳™׳ ׳ ֲ· {p.days || '7-14'} ׳™׳׳™׳</div>
         <button onClick={e => { e.stopPropagation(); onAddToCart(); }}
           style={{ width: '100%', background: '#b8972a', border: '1px solid #a07820', color: '#0c1a35', borderRadius: 20, padding: '7px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-          הוסף לסל
+          ׳”׳•׳¡׳£ ׳׳¡׳
         </button>
       </div>
     </div>
@@ -136,24 +136,24 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCat, setActiveCat] = useState('הכל');
+  const [activeCat, setActiveCat] = useState('׳”׳›׳');
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
-  const [sortBy, setSortBy] = useState('מומלצים');
+  const [sortBy, setSortBy] = useState('׳׳•׳׳׳¦׳™׳');
   const [showHamburger, setShowHamburger] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
-  const [filterNusach, setFilterNusach] = useState('הכל');
-  const [filterHidur, setFilterHidur] = useState('הכל');
+  const [filterNusach, setFilterNusach] = useState('׳”׳›׳');
+  const [filterHidur, setFilterHidur] = useState('׳”׳›׳');
   const [minRating, setMinRating] = useState(0);
   const [promoCats, setPromoCats] = useState<PromoCat[]>(PROMO_CATS_DEFAULT);
   const [homeContent, setHomeContent] = useState({
-    heroTitle: 'רכישת סת"מ',
-    heroSubtitle: 'ישירות מהסופר',
-    heroText: 'בחר את הסופר שלך — דע מי כותב את המזוזה שלך. ללא מתווכים, ישירות מהמקור.',
+    heroTitle: '׳¨׳›׳™׳©׳× ׳¡׳×"׳',
+    heroSubtitle: '׳™׳©׳™׳¨׳•׳× ׳׳”׳¡׳•׳₪׳¨',
+    heroText: '׳‘׳—׳¨ ׳׳× ׳”׳¡׳•׳₪׳¨ ׳©׳׳ ג€” ׳“׳¢ ׳׳™ ׳›׳•׳×׳‘ ׳׳× ׳”׳׳–׳•׳–׳” ׳©׳׳. ׳׳׳ ׳׳×׳•׳•׳›׳™׳, ׳™׳©׳™׳¨׳•׳× ׳׳”׳׳§׳•׳¨.',
   });
   const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
 
@@ -195,7 +195,7 @@ export default function Home() {
           if (cat.imgUrl) catsData.push({ name: cat.name, img: cat.imgUrl, sub: cat.sub || '' });
         });
         if (catsData.length > 0) {
-         const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות'];
+         const order = ['׳׳–׳•׳–׳•׳×', '׳›׳™׳¡׳•׳™ ׳×׳₪׳™׳׳™׳', '׳×׳₪׳™׳׳™׳ ׳§׳•׳׳₪׳׳˜', '׳˜׳׳™׳×׳•׳×', '׳׳’׳™׳׳•׳×', '׳™׳•׳“׳׳™׳§׳”', '׳¡׳₪׳¨׳™ ׳×׳•׳¨׳”', '׳‘׳¨ ׳׳¦׳•׳•׳”', '׳׳×׳ ׳•׳×'];
           catsData.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
           setPromoCats(catsData);
         }
@@ -208,16 +208,16 @@ export default function Home() {
   useEffect(() => {
     let r = [...products];
     if (soferIdFilter) r = r.filter(p => (p as any).soferId === soferIdFilter);
-    if (activeCat !== 'הכל') r = r.filter(p =>
+    if (activeCat !== '׳”׳›׳') r = r.filter(p =>
       (p.cat?.trim() || p.category?.trim()) === activeCat.trim()
     );
     if (search) r = r.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
     if (priceMin) r = r.filter(p => p.price >= Number(priceMin));
     if (priceMax) r = r.filter(p => p.price <= Number(priceMax));
     if (minRating > 0) r = r.filter(p => (p.stars || 4.5) >= minRating);
-    if (sortBy === 'מחיר: נמוך לגבוה') r.sort((a, b) => a.price - b.price);
-    else if (sortBy === 'מחיר: גבוה לנמוך') r.sort((a, b) => b.price - a.price);
-    else if (sortBy === 'דירוג') r.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+    if (sortBy === '׳׳—׳™׳¨: ׳ ׳׳•׳ ׳׳’׳‘׳•׳”') r.sort((a, b) => a.price - b.price);
+    else if (sortBy === '׳׳—׳™׳¨: ׳’׳‘׳•׳” ׳׳ ׳׳•׳') r.sort((a, b) => b.price - a.price);
+    else if (sortBy === '׳“׳™׳¨׳•׳’') r.sort((a, b) => (b.stars || 0) - (a.stars || 0));
     setFiltered(r);
     setPage(1);
   }, [activeCat, search, products, priceMin, priceMax, minRating, sortBy, soferIdFilter]);
@@ -239,31 +239,31 @@ export default function Home() {
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
-      {/* ══ באנר שליח ══ */}
+      {/* ג•ג• ׳‘׳׳ ׳¨ ׳©׳׳™׳— ג•ג• */}
       {shaliach && (
         <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)', borderBottom: '3px solid #b8972a', padding: isMobile ? '8px 12px' : '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, direction: 'rtl', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {shaliach.logoUrl ? (
               <img src={shaliach.logoUrl} alt="" style={{ width: isMobile ? 40 : 52, height: isMobile ? 40 : 52, borderRadius: 10, objectFit: 'cover', border: '2px solid #b8972a' }} />
             ) : (
-              <div style={{ width: isMobile ? 40 : 52, height: isMobile ? 40 : 52, borderRadius: 10, background: '#b8972a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🟦</div>
+              <div style={{ width: isMobile ? 40 : 52, height: isMobile ? 40 : 52, borderRadius: 10, background: '#b8972a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>נ¦</div>
             )}
             <div>
-              <div style={{ fontSize: 10, color: '#b8972a', fontWeight: 700 }}>ברוכים הבאים — האתר הוגש על ידי</div>
+              <div style={{ fontSize: 10, color: '#b8972a', fontWeight: 700 }}>׳‘׳¨׳•׳›׳™׳ ׳”׳‘׳׳™׳ ג€” ׳”׳׳×׳¨ ׳”׳•׳’׳© ׳¢׳ ׳™׳“׳™</div>
               <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: '#fff' }}>{shaliach.chabadName || shaliach.name}</div>
-              <div style={{ fontSize: 11, color: '#a8c0d8' }}>{shaliach.rabbiName}{shaliach.city && ` · ${shaliach.city}`}</div>
+              <div style={{ fontSize: 11, color: '#a8c0d8' }}>{shaliach.rabbiName}{shaliach.city && ` ֲ· ${shaliach.city}`}</div>
             </div>
           </div>
           {shaliach.phone && (
             <a href={`https://wa.me/972${shaliach.phone.replace(/\D/g, '').slice(1)}`} target="_blank" rel="noopener noreferrer"
               style={{ background: '#25D366', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 700, textDecoration: 'none', flexShrink: 0 }}>
-              💬 צור קשר
+              נ’¬ ׳¦׳•׳¨ ׳§׳©׳¨
             </a>
           )}
         </div>
       )}
 
-      {/* ══ NAVBAR ══ */}
+      {/* ג•ג• NAVBAR ג•ג• */}
       <header style={{ background: '#0c1a35', color: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '8px 10px', display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 12 }}>
           <button onClick={() => setShowHamburger(!showHamburger)}
@@ -277,20 +277,20 @@ export default function Home() {
             onMouseEnter={e => (e.currentTarget.style.borderColor = '#b8972a')}
             onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}>
             <div style={{ fontSize: isMobile ? 15 : 20, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1 }}>Your Sofer</div>
-            <div style={{ fontSize: 9, color: '#b8972a', fontWeight: 700 }}>ישראל ✡</div>
+            <div style={{ fontSize: 9, color: '#b8972a', fontWeight: 700 }}>׳™׳©׳¨׳׳ ג¡</div>
           </div>
 
           <div style={{ flex: 1, display: 'flex', maxWidth: 800, borderRadius: 8, overflow: 'hidden', minWidth: 0 }}>
             {!isMobile && (
               <select onChange={e => setActiveCat(e.target.value)} value={activeCat}
                 style={{ background: '#e8e8e8', border: 'none', padding: '10px 8px', fontSize: 12, color: '#333', cursor: 'pointer', borderRadius: '0 8px 8px 0', minWidth: 100 }}>
-                <option value="הכל">כל הקטגוריות</option>
+                <option value="׳”׳›׳">׳›׳ ׳”׳§׳˜׳’׳•׳¨׳™׳•׳×</option>
                 {CATS.slice(1).map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             )}
             <input value={searchInput} onChange={e => setSearchInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && setSearch(searchInput)}
-              placeholder={isMobile ? "חיפוש..." : "חיפוש סת״ם ויודאיקה מאומתים..."}
+              placeholder={isMobile ? "׳—׳™׳₪׳•׳©..." : "׳—׳™׳₪׳•׳© ׳¡׳×׳´׳ ׳•׳™׳•׳“׳׳™׳§׳” ׳׳׳•׳׳×׳™׳..."}
               style={{ flex: 1, border: 'none', padding: '10px 10px', fontSize: isMobile ? 13 : 14, color: '#333', outline: 'none', minWidth: 0 }} />
             <button onClick={() => setSearch(searchInput)}
               style={{ background: '#b8972a', border: 'none', padding: '0 12px', cursor: 'pointer', flexShrink: 0 }}>
@@ -306,14 +306,14 @@ export default function Home() {
                 {user.photoURL && !isMobile && <img src={user.photoURL} alt="" style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid #b8972a' }} />}
                 {!isMobile && (
                   <div style={{ fontSize: 11 }}>
-                    <div style={{ color: '#ccc', fontSize: 10 }}>שלום,</div>
+                    <div style={{ color: '#ccc', fontSize: 10 }}>׳©׳׳•׳,</div>
                     <div style={{ fontWeight: 700 }}>{user.displayName?.split(' ')[0]}</div>
                   </div>
                 )}
-                {user.role === 'admin' && <button onClick={() => router.push('/admin')} style={{ background: '#b8972a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>👑</button>}
-                {user.role === 'sofer' && <button onClick={() => router.push('/sofer-dashboard')} style={{ background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>✍️</button>}
-                {user.role === 'shaliach' && <button onClick={() => router.push('/shaliach-dashboard')} style={{ background: 'none', color: '#fff', border: '1px solid #b8972a', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>🟦</button>}
-                {!isMobile && <button onClick={logout} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: 11, cursor: 'pointer' }}>יציאה</button>}
+                {user.role === 'admin' && <button onClick={() => router.push('/admin')} style={{ background: '#b8972a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>נ‘‘</button>}
+                {user.role === 'sofer' && <button onClick={() => router.push('/sofer-dashboard')} style={{ background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>גן¸</button>}
+                {user.role === 'shaliach' && <button onClick={() => router.push('/shaliach-dashboard')} style={{ background: 'none', color: '#fff', border: '1px solid #b8972a', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>נ¦</button>}
+                {!isMobile && <button onClick={logout} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: 11, cursor: 'pointer' }}>׳™׳¦׳™׳׳”</button>}
               </div>
             ) : (
               <button onClick={signInWithGoogle} style={{ background: 'none', border: '1px solid #555', borderRadius: 6, padding: '6px 10px', color: '#fff', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -323,7 +323,7 @@ export default function Home() {
                   <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
                   <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
                 </svg>
-                {isMobile ? 'כניסה' : 'התחבר'}
+                {isMobile ? '׳›׳ ׳™׳¡׳”' : '׳”׳×׳—׳‘׳¨'}
               </button>
             )}
             <div onClick={() => router.push('/cart')} style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -334,12 +334,12 @@ export default function Home() {
                 </svg>
                 {count > 0 && <span style={{ position: 'absolute', top: -4, left: -4, background: '#b8972a', color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
               </div>
-              <div style={{ fontSize: 11, color: '#fff', fontWeight: 700 }}>סל ({count})</div>
+              <div style={{ fontSize: 11, color: '#fff', fontWeight: 700 }}>׳¡׳ ({count})</div>
             </div>
           </div>
         </div>
 
-        {/* נאב קטגוריות */}
+        {/* ׳ ׳׳‘ ׳§׳˜׳’׳•׳¨׳™׳•׳× */}
         <div style={{ background: '#162444', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 10px', display: 'flex', alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none' }}>
             {NAV_ITEMS.map(item => (
@@ -358,24 +358,24 @@ export default function Home() {
 
         {!isMobile && (
           <div style={{ background: '#1a3a2a', padding: '5px 14px', fontSize: 12, color: '#a8c8b4', display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
-            <span>✍️ <strong style={{ color: '#fff' }}>ישירות מהסופר</strong> לביתך</span>
+            <span>גן¸ <strong style={{ color: '#fff' }}>׳™׳©׳™׳¨׳•׳× ׳׳”׳¡׳•׳₪׳¨</strong> ׳׳‘׳™׳×׳</span>
             <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-            <span>🔒 <strong style={{ color: '#fff' }}>תשלום מאובטח</strong></span>
+            <span>נ”’ <strong style={{ color: '#fff' }}>׳×׳©׳׳•׳ ׳׳׳•׳‘׳˜׳—</strong></span>
             <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-            <span>🛡️ <strong style={{ color: '#fff' }}>אחריות הפלטפורמה</strong> על כל רכישה</span>
+            <span>נ›¡ן¸ <strong style={{ color: '#fff' }}>׳׳—׳¨׳™׳•׳× ׳”׳₪׳׳˜׳₪׳•׳¨׳׳”</strong> ׳¢׳ ׳›׳ ׳¨׳›׳™׳©׳”</span>
             <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-            <span>📦 <strong style={{ color: '#fff' }}>משלוח לכל הארץ</strong></span>
+            <span>נ“¦ <strong style={{ color: '#fff' }}>׳׳©׳׳•׳— ׳׳›׳ ׳”׳׳¨׳¥</strong></span>
           </div>
         )}
       </header>
 
-      {/* תפריט המבורגר */}
+      {/* ׳×׳₪׳¨׳™׳˜ ׳”׳׳‘׳•׳¨׳’׳¨ */}
       {showHamburger && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200 }} onClick={() => setShowHamburger(false)}>
           <div style={{ position: 'absolute', top: 0, right: 0, width: 280, height: '100%', background: '#fff', boxShadow: '-4px 0 20px rgba(0,0,0,0.2)', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div style={{ background: '#0c1a35', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#fff', fontWeight: 900, fontSize: 16 }}>☰ כל הקטגוריות</span>
-              <button onClick={() => setShowHamburger(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 20, cursor: 'pointer' }}>✕</button>
+              <span style={{ color: '#fff', fontWeight: 900, fontSize: 16 }}>ג˜° ׳›׳ ׳”׳§׳˜׳’׳•׳¨׳™׳•׳×</span>
+              <button onClick={() => setShowHamburger(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 20, cursor: 'pointer' }}>ג•</button>
             </div>
             {CATS.map(cat => (
               <button key={cat} onClick={() => { setActiveCat(cat); setShowHamburger(false); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
@@ -384,36 +384,36 @@ export default function Home() {
               </button>
             ))}
             <div style={{ padding: '12px 20px', borderTop: '2px solid #f0f0f0', marginTop: 8 }}>
-              <div style={{ fontSize: 12, color: '#888', fontWeight: 700, marginBottom: 8 }}>דפים נוספים</div>
-              <button onClick={() => { router.push('/soferim'); setShowHamburger(false); }} style={{ display: 'block', width: '100%', padding: '10px 0', textAlign: 'right', background: 'none', border: 'none', fontSize: 14, color: '#0c1a35', cursor: 'pointer' }}>✍️ הסופרים שלנו</button>
-              <button onClick={() => { router.push('/soferim/apply'); setShowHamburger(false); }} style={{ display: 'block', width: '100%', padding: '10px 0', textAlign: 'right', background: 'none', border: 'none', fontSize: 14, color: '#0c1a35', cursor: 'pointer' }}>🌟 הצטרף לפלטפורמה</button>
+              <div style={{ fontSize: 12, color: '#888', fontWeight: 700, marginBottom: 8 }}>׳“׳₪׳™׳ ׳ ׳•׳¡׳₪׳™׳</div>
+              <button onClick={() => { router.push('/soferim'); setShowHamburger(false); }} style={{ display: 'block', width: '100%', padding: '10px 0', textAlign: 'right', background: 'none', border: 'none', fontSize: 14, color: '#0c1a35', cursor: 'pointer' }}>גן¸ ׳”׳¡׳•׳₪׳¨׳™׳ ׳©׳׳ ׳•</button>
+              <button onClick={() => { router.push('/soferim/apply'); setShowHamburger(false); }} style={{ display: 'block', width: '100%', padding: '10px 0', textAlign: 'right', background: 'none', border: 'none', fontSize: 14, color: '#0c1a35', cursor: 'pointer' }}>נ ׳”׳¦׳˜׳¨׳£ ׳׳₪׳׳˜׳₪׳•׳¨׳׳”</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ══ HERO ══ */}
+      {/* ג•ג• HERO ג•ג• */}
       <div style={{ position: 'relative', overflow: 'hidden' }}>
         <div style={{ width: '100%', height: isMobile ? 200 : 300, background: 'linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 40%, #3d7a52 70%, #1a3a2a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 16px' : '0 6%', position: 'relative' }}>
           <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e6a817' fill-opacity='1'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40z'/%3E%3C/g%3E%3C/svg%3E\")" }} />
           <div style={{ position: 'relative', zIndex: 2, flex: 1 }}>
             <h1 style={{ fontSize: isMobile ? 22 : 36, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: isMobile ? 6 : 10 }}>
-              {shaliach ? <>רכישת סת&quot;ם<br /><span style={{ color: '#b8972a' }}>בית חבד {shaliach.city || ''}</span></> : <>{homeContent.heroTitle}<br /><span style={{ color: '#b8972a' }}>{homeContent.heroSubtitle}</span></>}
+              {shaliach ? <>׳¨׳›׳™׳©׳× ׳¡׳×&quot;׳<br /><span style={{ color: '#b8972a' }}>׳‘׳™׳× ׳—׳‘׳“ {shaliach.city || ''}</span></> : <>{homeContent.heroTitle}<br /><span style={{ color: '#b8972a' }}>{homeContent.heroSubtitle}</span></>}
             </h1>
             {!isMobile && (
               <p style={{ fontSize: 15, color: '#a8c8b4', marginBottom: 24, maxWidth: 440, lineHeight: 1.6 }}>
-                {shaliach ? `${shaliach.chabadName || shaliach.name} ממליץ על מוצרי סת״ם מסופרים מוסמכים ומאומתים.` : homeContent.heroText}
+                {shaliach ? `${shaliach.chabadName || shaliach.name} ׳׳׳׳™׳¥ ׳¢׳ ׳׳•׳¦׳¨׳™ ׳¡׳×׳´׳ ׳׳¡׳•׳₪׳¨׳™׳ ׳׳•׳¡׳׳›׳™׳ ׳•׳׳׳•׳׳×׳™׳.` : homeContent.heroText}
               </p>
             )}
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => mainRef.current?.scrollIntoView({ behavior: 'smooth' })}
                 style={{ background: '#b8972a', color: '#0c1a35', fontSize: isMobile ? 13 : 14, fontWeight: 700, padding: isMobile ? '9px 18px' : '11px 28px', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
-                {shaliach ? 'לקנייה עכשיו ←' : 'לקנייה ←'}
+                {shaliach ? '׳׳§׳ ׳™׳™׳” ׳¢׳›׳©׳™׳• ג†' : '׳׳§׳ ׳™׳™׳” ג†'}
               </button>
               {!shaliach && (
                 <button onClick={() => router.push('/soferim')}
                   style={{ background: 'transparent', color: '#fff', fontSize: isMobile ? 13 : 14, fontWeight: 600, padding: isMobile ? '9px 14px' : '11px 22px', border: '1px solid rgba(255,255,255,0.5)', borderRadius: 8, cursor: 'pointer' }}>
-                  הסופרים שלנו
+                  ׳”׳¡׳•׳₪׳¨׳™׳ ׳©׳׳ ׳•
                 </button>
               )}
             </div>
@@ -422,26 +422,26 @@ export default function Home() {
             {shaliach?.logoUrl ? (
               <img src={shaliach.logoUrl} alt="" style={{ width: isMobile ? 80 : 150, height: isMobile ? 80 : 150, objectFit: 'contain', borderRadius: 16 }} />
             ) : (
-              <div style={{ fontSize: isMobile ? 50 : 90, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }}>📜</div>
+              <div style={{ fontSize: isMobile ? 50 : 90, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }}>נ“</div>
             )}
           </div>
         </div>
       </div>
 
-      {/* ══ קטגוריות — גלילה אופקית ══ */}
+      {/* ג•ג• ׳§׳˜׳’׳•׳¨׳™׳•׳× ג€” ׳’׳׳™׳׳” ׳׳•׳₪׳§׳™׳× ג•ג• */}
       <div style={{ background: '#fff', borderBottom: '1px solid #ddd', padding: '16px 0' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <h2 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 800, color: '#0f1111' }}>קטגוריות מובילות</h2>
+            <h2 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 800, color: '#0f1111' }}>׳§׳˜׳’׳•׳¨׳™׳•׳× ׳׳•׳‘׳™׳׳•׳×</h2>
             <div style={{ display: 'flex', gap: 6 }}>
               <button onClick={() => scrollCats('right')}
-                style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>›</button>
+                style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>ג€÷</button>
               <button onClick={() => scrollCats('left')}
-                style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>‹</button>
+                style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>ג€¹</button>
             </div>
           </div>
 
-          {/* גלילה אופקית */}
+          {/* ׳’׳׳™׳׳” ׳׳•׳₪׳§׳™׳× */}
           <div ref={catsScrollRef} style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 4 }}>
             {promoCats.map(c => (
               <div key={c.name} onClick={() => { setActiveCat(c.name); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
@@ -458,7 +458,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div style={{ padding: '8px 10px', background: '#fff' }}>
-                  <div style={{ fontSize: 11, color: '#0e6ba8' }}>לכל המבחר ←</div>
+                  <div style={{ fontSize: 11, color: '#0e6ba8' }}>׳׳›׳ ׳”׳׳‘׳—׳¨ ג†</div>
                 </div>
               </div>
             ))}
@@ -466,13 +466,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ MAIN ══ */}
+      {/* ג•ג• MAIN ג•ג• */}
       <div ref={mainRef} style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '12px 8px' : '16px 12px' }}>
 
         {isMobile && (
           <button onClick={() => setShowSidebar(!showSidebar)}
             style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            🔍 סינון תוצאות {showSidebar ? '▲' : '▼'}
+            נ” ׳¡׳™׳ ׳•׳ ׳×׳•׳¦׳׳•׳× {showSidebar ? 'ג–²' : 'ג–¼'}
           </button>
         )}
 
@@ -481,13 +481,13 @@ export default function Home() {
           {(!isMobile || showSidebar) && (
             <div style={{ width: isMobile ? '100%' : 220, flexShrink: 0, background: '#fff', borderRadius: 8, border: '1px solid #ddd', padding: '16px', position: isMobile ? 'relative' : 'sticky', top: isMobile ? 'auto' : 120, marginBottom: isMobile ? 12 : 0 }}>
               <div style={{ fontWeight: 800, fontSize: 14, color: '#0f1111', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                🔍 סינון תוצאות
-                {isMobile && <button onClick={() => setShowSidebar(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#888' }}>✕</button>}
+                נ” ׳¡׳™׳ ׳•׳ ׳×׳•׳¦׳׳•׳×
+                {isMobile && <button onClick={() => setShowSidebar(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#888' }}>ג•</button>}
               </div>
 
               {isMobile && (
                 <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>קטגוריה</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>׳§׳˜׳’׳•׳¨׳™׳”</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {CATS.map(cat => (
                       <button key={cat} onClick={() => { setActiveCat(cat); setShowSidebar(false); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
@@ -500,25 +500,25 @@ export default function Home() {
               )}
 
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>טווח מחירים</div>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>׳˜׳•׳•׳— ׳׳—׳™׳¨׳™׳</div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <input type="number" placeholder="מינ" value={priceMin} onChange={e => setPriceMin(e.target.value)}
+                  <input type="number" placeholder="׳׳™׳ " value={priceMin} onChange={e => setPriceMin(e.target.value)}
                     style={{ width: '100%', border: '1px solid #ddd', borderRadius: 6, padding: '6px 8px', fontSize: 12 }} />
-                  <input type="number" placeholder="מקס" value={priceMax} onChange={e => setPriceMax(e.target.value)}
+                  <input type="number" placeholder="׳׳§׳¡" value={priceMax} onChange={e => setPriceMax(e.target.value)}
                     style={{ width: '100%', border: '1px solid #ddd', borderRadius: 6, padding: '6px 8px', fontSize: 12 }} />
                 </div>
               </div>
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>דירוג מינימלי</div>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>׳“׳™׳¨׳•׳’ ׳׳™׳ ׳™׳׳׳™</div>
                 {[4, 3, 2, 0].map(r => (
                   <label key={r} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, cursor: 'pointer', fontSize: 12 }}>
                     <input type="radio" name="rating" checked={minRating === r} onChange={() => setMinRating(r)} />
-                    {r > 0 ? <><span style={{ color: '#e6a817' }}>{'★'.repeat(r)}</span> ומעלה</> : 'הכל'}
+                    {r > 0 ? <><span style={{ color: '#e6a817' }}>{'ג˜…'.repeat(r)}</span> ׳•׳׳¢׳׳”</> : '׳”׳›׳'}
                   </label>
                 ))}
               </div>
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>נוסח</div>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>׳ ׳•׳¡׳—</div>
                 {FILTER_NUSACH.map(n => (
                   <label key={n} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, cursor: 'pointer', fontSize: 12 }}>
                     <input type="radio" name="nusach" checked={filterNusach === n} onChange={() => setFilterNusach(n)} />
@@ -527,7 +527,7 @@ export default function Home() {
                 ))}
               </div>
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>רמת הידור</div>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>׳¨׳׳× ׳”׳™׳“׳•׳¨</div>
                 {FILTER_HIDUR.map(h => (
                   <label key={h} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, cursor: 'pointer', fontSize: 12 }}>
                     <input type="radio" name="hidur" checked={filterHidur === h} onChange={() => setFilterHidur(h)} />
@@ -535,9 +535,9 @@ export default function Home() {
                   </label>
                 ))}
               </div>
-              <button onClick={() => { setPriceMin(''); setPriceMax(''); setMinRating(0); setFilterNusach('הכל'); setFilterHidur('הכל'); }}
+              <button onClick={() => { setPriceMin(''); setPriceMax(''); setMinRating(0); setFilterNusach('׳”׳›׳'); setFilterHidur('׳”׳›׳'); }}
                 style={{ width: '100%', background: '#f0f0f0', border: '1px solid #ddd', borderRadius: 6, padding: '8px', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
-                נקה סינון
+                ׳ ׳§׳” ׳¡׳™׳ ׳•׳
               </button>
             </div>
           )}
@@ -546,16 +546,16 @@ export default function Home() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
                 <div style={{ fontSize: isMobile ? 12 : 13, color: '#555' }}>
-                  {filtered.length} תוצאות — <strong style={{ color: '#0c1a35' }}>{activeCat === 'הכל' ? 'כל המוצרים' : activeCat}</strong>
+                  {filtered.length} ׳×׳•׳¦׳׳•׳× ג€” <strong style={{ color: '#0c1a35' }}>{activeCat === '׳”׳›׳' ? '׳›׳ ׳”׳׳•׳¦׳¨׳™׳' : activeCat}</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 11, color: '#555' }}>מיין:</span>
+                  <span style={{ fontSize: 11, color: '#555' }}>׳׳™׳™׳:</span>
                   <select value={sortBy} onChange={e => setSortBy(e.target.value)}
                     style={{ border: '1px solid #ddd', borderRadius: 6, padding: '4px 8px', fontSize: 12, background: '#fff', cursor: 'pointer' }}>
-                    <option>מומלצים</option>
-                    <option>מחיר: נמוך לגבוה</option>
-                    <option>מחיר: גבוה לנמוך</option>
-                    <option>דירוג</option>
+                    <option>׳׳•׳׳׳¦׳™׳</option>
+                    <option>׳׳—׳™׳¨: ׳ ׳׳•׳ ׳׳’׳‘׳•׳”</option>
+                    <option>׳׳—׳™׳¨: ׳’׳‘׳•׳” ׳׳ ׳׳•׳</option>
+                    <option>׳“׳™׳¨׳•׳’</option>
                   </select>
                 </div>
               </div>
@@ -572,9 +572,9 @@ export default function Home() {
               )}
 
               {loading ? (
-                <div style={{ textAlign: 'center', padding: 60, color: '#666' }}>טוען מוצרים...</div>
+                <div style={{ textAlign: 'center', padding: 60, color: '#666' }}>׳˜׳•׳¢׳ ׳׳•׳¦׳¨׳™׳...</div>
               ) : paginated.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>לא נמצאו מוצרים</div>
+                <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>׳׳ ׳ ׳׳¦׳׳• ׳׳•׳¦׳¨׳™׳</div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(195px, 1fr))', gap: isMobile ? 8 : 12 }}>
                   {paginated.map(p => (
@@ -589,7 +589,7 @@ export default function Home() {
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 4, marginTop: 24, flexWrap: 'wrap' }}>
                   <button onClick={() => goToPage(Math.max(1, page - 1))} disabled={page === 1}
                     style={{ padding: '7px 12px', borderRadius: 6, border: '1px solid #ddd', background: '#fff', cursor: page === 1 ? 'not-allowed' : 'pointer', opacity: page === 1 ? 0.5 : 1, fontSize: 13 }}>
-                    ‹ הקודם
+                    ג€¹ ׳”׳§׳•׳“׳
                   </button>
                   {Array.from({ length: Math.min(isMobile ? 5 : 7, totalPages) }, (_, i) => {
                     let p2: number;
@@ -606,7 +606,7 @@ export default function Home() {
                   })}
                   <button onClick={() => goToPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}
                     style={{ padding: '7px 12px', borderRadius: 6, border: '1px solid #ddd', background: '#fff', cursor: page === totalPages ? 'not-allowed' : 'pointer', opacity: page === totalPages ? 0.5 : 1, fontSize: 13 }}>
-                    הבא ›
+                    ׳”׳‘׳ ג€÷
                   </button>
                 </div>
               )}
@@ -615,14 +615,14 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ FOOTER ══ */}
+      {/* ג•ג• FOOTER ג•ג• */}
       <footer style={{ marginTop: 40, background: '#0f1111', color: '#fff' }}>
         <div style={{ borderBottom: '1px solid #333', padding: '24px 16px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 16 : 30 }}>
             {[
-              { title: 'קבלו מידע', items: ['אודות Your Sofer', 'הצהרת נגישות', 'הצהרת פרטיות'] },
-              { title: 'הרוויחו אתנו', items: ['הצטרפו כסופר', 'הצטרפו כשליח'] },
-              { title: 'שירות לקוחות', items: ['שאלות נפוצות', 'מדיניות החזרות', 'צרו קשר'] },
+              { title: '׳§׳‘׳׳• ׳׳™׳“׳¢', items: ['׳׳•׳“׳•׳× Your Sofer', '׳”׳¦׳”׳¨׳× ׳ ׳’׳™׳©׳•׳×', '׳”׳¦׳”׳¨׳× ׳₪׳¨׳˜׳™׳•׳×'] },
+              { title: '׳”׳¨׳•׳•׳™׳—׳• ׳׳×׳ ׳•', items: ['׳”׳¦׳˜׳¨׳₪׳• ׳›׳¡׳•׳₪׳¨', '׳”׳¦׳˜׳¨׳₪׳• ׳›׳©׳׳™׳—'] },
+              { title: '׳©׳™׳¨׳•׳× ׳׳§׳•׳—׳•׳×', items: ['׳©׳׳׳•׳× ׳ ׳₪׳•׳¦׳•׳×', '׳׳“׳™׳ ׳™׳•׳× ׳”׳—׳–׳¨׳•׳×', '׳¦׳¨׳• ׳§׳©׳¨'] },
             ].map(col => (
               <div key={col.title}>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>{col.title}</div>
@@ -635,17 +635,17 @@ export default function Home() {
             ))}
             {!isMobile && (
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>פיקוח הלכתי</div>
-                <div style={{ fontSize: 12, color: '#999', lineHeight: 1.6 }}>כל מוצרי הסת"מ נכתבים על ידי סופרים מוסמכים עם פיקוח רבני.</div>
-                <div style={{ marginTop: 10, background: '#1a3a2a', borderRadius: 8, padding: '6px 10px', fontSize: 11, color: '#a8c8b4', display: 'inline-block' }}>✓ מאושר ומפוקח הלכתית</div>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>׳₪׳™׳§׳•׳— ׳”׳׳›׳×׳™</div>
+                <div style={{ fontSize: 12, color: '#999', lineHeight: 1.6 }}>׳›׳ ׳׳•׳¦׳¨׳™ ׳”׳¡׳×"׳ ׳ ׳›׳×׳‘׳™׳ ׳¢׳ ׳™׳“׳™ ׳¡׳•׳₪׳¨׳™׳ ׳׳•׳¡׳׳›׳™׳ ׳¢׳ ׳₪׳™׳§׳•׳— ׳¨׳‘׳ ׳™.</div>
+                <div style={{ marginTop: 10, background: '#1a3a2a', borderRadius: 8, padding: '6px 10px', fontSize: 11, color: '#a8c8b4', display: 'inline-block' }}>ג“ ׳׳׳•׳©׳¨ ׳•׳׳₪׳•׳§׳— ׳”׳׳›׳×׳™׳×</div>
               </div>
             )}
           </div>
         </div>
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>✡ Your Sofer</div>
-          {shaliach && <div style={{ fontSize: 11, color: '#888' }}>מוגש על ידי {shaliach.chabadName || shaliach.name}</div>}
-          <div style={{ fontSize: 11, color: '#666' }}>© 2025 Your Sofer — כל הזכויות שמורות</div>
+          <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>ג¡ Your Sofer</div>
+          {shaliach && <div style={{ fontSize: 11, color: '#888' }}>׳׳•׳’׳© ׳¢׳ ׳™׳“׳™ {shaliach.chabadName || shaliach.name}</div>}
+          <div style={{ fontSize: 11, color: '#666' }}>ֲ© 2025 Your Sofer ג€” ׳›׳ ׳”׳–׳›׳•׳™׳•׳× ׳©׳׳•׳¨׳•׳×</div>
         </div>
       </footer>
     </div>
