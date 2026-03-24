@@ -234,7 +234,6 @@ export default function Home() {
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
-      {/* ══ באנר שליח ══ */}
       {shaliach && (
         <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)', borderBottom: '3px solid #b8972a', padding: isMobile ? '8px 12px' : '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, direction: 'rtl', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -258,7 +257,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* ══ NAVBAR ══ */}
       <header style={{ background: '#0c1a35', color: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '8px 10px', display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 12 }}>
           <button onClick={() => setShowHamburger(!showHamburger)}
@@ -267,14 +265,12 @@ export default function Home() {
             <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
             <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
           </button>
-
           <div onClick={() => router.push('/')} style={{ cursor: 'pointer', flexShrink: 0, border: '1px solid transparent', borderRadius: 4, padding: '4px 6px' }}
             onMouseEnter={e => (e.currentTarget.style.borderColor = '#b8972a')}
             onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}>
             <div style={{ fontSize: isMobile ? 15 : 20, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1 }}>Your Sofer</div>
             <div style={{ fontSize: 9, color: '#b8972a', fontWeight: 700 }}>ישראל ✡</div>
           </div>
-
           <div style={{ flex: 1, display: 'flex', maxWidth: 800, borderRadius: 8, overflow: 'hidden', minWidth: 0 }}>
             {!isMobile && (
               <select onChange={e => setActiveCat(e.target.value)} value={activeCat}
@@ -294,7 +290,6 @@ export default function Home() {
               </svg>
             </button>
           </div>
-
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 10, flexShrink: 0 }}>
             {user ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -333,8 +328,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        {/* נאב קטגוריות */}
         <div style={{ background: '#162444', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 10px', display: 'flex', alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none' }}>
             {NAV_ITEMS.map(item => (
@@ -350,7 +343,6 @@ export default function Home() {
             ))}
           </div>
         </div>
-
         {!isMobile && (
           <div style={{ background: '#1a3a2a', padding: '5px 14px', fontSize: 12, color: '#a8c8b4', display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span>✍️ <strong style={{ color: '#fff' }}>ישירות מהסופר</strong> לביתך</span>
@@ -364,7 +356,6 @@ export default function Home() {
         )}
       </header>
 
-      {/* ══ תפריט המבורגר ══ */}
       {showHamburger && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200 }} onClick={() => setShowHamburger(false)}>
           <div style={{ position: 'absolute', top: 0, right: 0, width: 280, height: '100%', background: '#fff', boxShadow: '-4px 0 20px rgba(0,0,0,0.2)', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
@@ -378,8 +369,6 @@ export default function Home() {
                 {cat}
               </button>
             ))}
-
-            {/* ══ כפתור מדריך — מעל "דפים נוספים" ══ */}
             <div style={{ padding: '12px 20px', borderTop: '2px solid #f0f0f0', marginTop: 8 }}>
               <button
                 onClick={() => { router.push('/madrich'); setShowHamburger(false); }}
@@ -391,7 +380,6 @@ export default function Home() {
                 </div>
               </button>
             </div>
-
             <div style={{ padding: '0 20px 12px' }}>
               <div style={{ fontSize: 12, color: '#888', fontWeight: 700, marginBottom: 8 }}>דפים נוספים</div>
               <button onClick={() => { router.push('/soferim'); setShowHamburger(false); }} style={{ display: 'block', width: '100%', padding: '10px 0', textAlign: 'right', background: 'none', border: 'none', fontSize: 14, color: '#0c1a35', cursor: 'pointer' }}>✍️ הסופרים שלנו</button>
@@ -401,7 +389,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* ══ HERO ══ */}
       <div style={{ position: 'relative', overflow: 'hidden' }}>
         <div style={{ width: '100%', height: isMobile ? 200 : 300, background: 'linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 40%, #3d7a52 70%, #1a3a2a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 16px' : '0 6%', position: 'relative' }}>
           <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e6a817' fill-opacity='1'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40z'/%3E%3C/g%3E%3C/svg%3E\")" }} />
@@ -437,16 +424,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ קטגוריות — גלילה אופקית ══ */}
       <div style={{ background: '#fff', borderBottom: '1px solid #ddd', padding: '16px 0' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <h2 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 800, color: '#0f1111' }}>קטגוריות מובילות</h2>
             <div style={{ display: 'flex', gap: 6 }}>
-              <button onClick={() => scrollCats('right')}
-                style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>›</button>
-              <button onClick={() => scrollCats('left')}
-                style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>‹</button>
+              <button onClick={() => scrollCats('right')} style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>›</button>
+              <button onClick={() => scrollCats('left')} style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>‹</button>
             </div>
           </div>
           <div ref={catsScrollRef} style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 4 }}>
@@ -473,25 +457,20 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ MAIN ══ */}
       <div ref={mainRef} style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '12px 8px' : '16px 12px' }}>
-
         {isMobile && (
           <button onClick={() => setShowSidebar(!showSidebar)}
             style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             🔍 סינון תוצאות {showSidebar ? '▲' : '▼'}
           </button>
         )}
-
         <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-
           {(!isMobile || showSidebar) && (
             <div style={{ width: isMobile ? '100%' : 220, flexShrink: 0, background: '#fff', borderRadius: 8, border: '1px solid #ddd', padding: '16px', position: isMobile ? 'relative' : 'sticky', top: isMobile ? 'auto' : 120, marginBottom: isMobile ? 12 : 0 }}>
               <div style={{ fontWeight: 800, fontSize: 14, color: '#0f1111', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 🔍 סינון תוצאות
                 {isMobile && <button onClick={() => setShowSidebar(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#888' }}>✕</button>}
               </div>
-
               {isMobile && (
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>קטגוריה</div>
@@ -505,14 +484,11 @@ export default function Home() {
                   </div>
                 </div>
               )}
-
               <div style={{ marginBottom: 16 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>טווח מחירים</div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <input type="number" placeholder="מינ" value={priceMin} onChange={e => setPriceMin(e.target.value)}
-                    style={{ width: '100%', border: '1px solid #ddd', borderRadius: 6, padding: '6px 8px', fontSize: 12 }} />
-                  <input type="number" placeholder="מקס" value={priceMax} onChange={e => setPriceMax(e.target.value)}
-                    style={{ width: '100%', border: '1px solid #ddd', borderRadius: 6, padding: '6px 8px', fontSize: 12 }} />
+                  <input type="number" placeholder="מינ" value={priceMin} onChange={e => setPriceMin(e.target.value)} style={{ width: '100%', border: '1px solid #ddd', borderRadius: 6, padding: '6px 8px', fontSize: 12 }} />
+                  <input type="number" placeholder="מקס" value={priceMax} onChange={e => setPriceMax(e.target.value)} style={{ width: '100%', border: '1px solid #ddd', borderRadius: 6, padding: '6px 8px', fontSize: 12 }} />
                 </div>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -548,7 +524,6 @@ export default function Home() {
               </button>
             </div>
           )}
-
           {(!isMobile || !showSidebar) && (
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
@@ -566,7 +541,6 @@ export default function Home() {
                   </select>
                 </div>
               </div>
-
               {!isMobile && (
                 <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
                   {CATS.map(cat => (
@@ -577,7 +551,6 @@ export default function Home() {
                   ))}
                 </div>
               )}
-
               {loading ? (
                 <div style={{ textAlign: 'center', padding: 60, color: '#666' }}>טוען מוצרים...</div>
               ) : paginated.length === 0 ? (
@@ -591,7 +564,6 @@ export default function Home() {
                   ))}
                 </div>
               )}
-
               {totalPages > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 4, marginTop: 24, flexWrap: 'wrap' }}>
                   <button onClick={() => goToPage(Math.max(1, page - 1))} disabled={page === 1}
@@ -622,7 +594,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ FOOTER ══ */}
       <footer style={{ marginTop: 40, background: '#0f1111', color: '#fff' }}>
         <div style={{ borderBottom: '1px solid #333', padding: '24px 16px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 16 : 30 }}>
@@ -640,8 +611,6 @@ export default function Home() {
                 ))}
               </div>
             ))}
-
-            {/* ══ עמודת מידע ולמידה בפוטר ══ */}
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>מידע ולמידה</div>
               {[
@@ -673,40 +642,46 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* ══ בועה צפה — מדריך ══ */}
-      <div
-        onClick={() => router.push('/madrich')}
+      {/* ══ כפתור וואטסאפ צף ══ */}
+      <a
+        href="https://wa.me/972584877770"
+        target="_blank"
+        rel="noopener noreferrer"
         style={{
           position: 'fixed',
           bottom: 24,
           left: 24,
           zIndex: 999,
-          background: 'linear-gradient(135deg, #b8972a, #e6c84a)',
-          color: '#0c1a35',
+          background: '#25D366',
+          color: '#fff',
           borderRadius: 50,
           padding: isMobile ? '10px 16px' : '12px 20px',
           fontSize: isMobile ? 13 : 14,
           fontWeight: 900,
           cursor: 'pointer',
-          boxShadow: '0 4px 20px rgba(184,151,42,0.5)',
+          boxShadow: '0 4px 20px rgba(37,211,102,0.5)',
           display: 'flex',
           alignItems: 'center',
           gap: 8,
           direction: 'rtl',
+          textDecoration: 'none',
           transition: 'transform 0.2s, box-shadow 0.2s',
         }}
         onMouseEnter={e => {
-          (e.currentTarget as HTMLDivElement).style.transform = 'scale(1.05)';
-          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 28px rgba(184,151,42,0.7)';
+          (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.05)';
+          (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 6px 28px rgba(37,211,102,0.7)';
         }}
         onMouseLeave={e => {
-          (e.currentTarget as HTMLDivElement).style.transform = 'scale(1)';
-          (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(184,151,42,0.5)';
+          (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1)';
+          (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 4px 20px rgba(37,211,102,0.5)';
         }}
       >
-        <span style={{ fontSize: 18 }}>📖</span>
-        {isMobile ? 'מדריך' : 'לא בטוח מה לקנות? קרא את המדריך'}
-      </div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.859L.057 23.286a.75.75 0 00.92.92l5.427-1.476A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.5-5.25-1.377l-.376-.217-3.898 1.059 1.059-3.898-.217-.376A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+        </svg>
+        {isMobile ? 'וואטסאפ' : 'שאלות? דברו איתנו בוואטסאפ'}
+      </a>
 
     </div>
   );
