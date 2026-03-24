@@ -27,6 +27,7 @@ export default function RootLayout({
             </CartProvider>
           </ShaliachProvider>
         </AuthProvider>
+        <script src="//code.tidio.co/i6evth9lfvxovmfpvcftjeb25pw4psme.js" async></script>
       </body>
     </html>
   );
