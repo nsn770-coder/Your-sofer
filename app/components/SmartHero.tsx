@@ -9,6 +9,7 @@ const WA_LINK = 'https://wa.me/972584877770';
 export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }: {
   isMobile: boolean;
   onScrollToProducts: () => void;
+  onSelectCat: (cat: string) => void;
 }) {
   const [state, setState] = useState<HeroState>('main');
   const [animating, setAnimating] = useState(false);

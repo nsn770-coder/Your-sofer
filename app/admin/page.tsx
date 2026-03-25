@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, orderBy, query,
-  doc, updateDoc, addDoc, serverTimestamp, getDoc, setDoc, deleteDoc
+  doc, updateDoc, addDoc, serverTimestamp, getDoc, setDoc
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -36,19 +36,6 @@ interface SoferApplication {
   createdAt?: { seconds: number };
 }
 
-interface ShaliachApplication {
-  id: string;
-  name: string;
-  chabadName?: string;
-  city: string;
-  phone: string;
-  email?: string;
-  rabbiName?: string;
-  logoUrl?: string;
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt?: { seconds: number };
-}
-
 interface AppUser {
   id: string;
   email: string;
@@ -74,14 +61,6 @@ interface Product {
 interface Sofer {
   id: string;
   name: string;
-  city?: string;
-  phone?: string;
-  email?: string;
-  description?: string;
-  style?: string;
-  categories?: string[];
-  imageUrl?: string;
-  status?: string;
 }
 
 interface HomeContent {
@@ -98,7 +77,7 @@ interface Category {
   order: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim_list' | 'soferim' | 'shluchim' | 'users' | 'products' | 'content' | 'categories';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'users' | 'products' | 'content' | 'categories';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: '👑 מנהל',
@@ -114,248 +93,7 @@ const ROLE_COLORS: Record<UserRole, string> = {
   customer: 'bg-gray-100 text-gray-600',
 };
 
-// ══ מודל הוספה/עריכת סופר ══
-function SoferModal({ sofer, soferim, onClose, onSave }: {
-  sofer?: Sofer;
-  soferim: Sofer[];
-  onClose: () => void;
-  onSave: () => void;
-}) {
-  const isEdit = !!sofer;
-  const [name, setName] = useState(sofer?.name || '');
-  const [city, setCity] = useState(sofer?.city || '');
-  const [phone, setPhone] = useState(sofer?.phone || '');
-  const [email, setEmail] = useState(sofer?.email || '');
-  const [description, setDescription] = useState(sofer?.description || '');
-  const [style, setStyle] = useState(sofer?.style || '');
-  const [imageUrl, setImageUrl] = useState(sofer?.imageUrl || '');
-  const [selectedCats, setSelectedCats] = useState<string[]>(sofer?.categories || []);
-  const [saving, setSaving] = useState(false);
-  const [uploadingImg, setUploadingImg] = useState(false);
-
-  // הוספת מוצרים לסופר החדש
-  const [addProducts, setAddProducts] = useState(false);
-  const [productName, setProductName] = useState('');
-  const [productPrice, setProductPrice] = useState('');
-  const [productCat, setProductCat] = useState(CATS.filter(c => c !== 'הכל')[0] || '');
-  const [productImgUrl, setProductImgUrl] = useState('');
-  const [products, setProducts] = useState<{ name: string; price: string; cat: string; imgUrl: string }[]>([]);
-
-  async function uploadToCloudinary(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'yoursofer_upload');
-    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
-    const data = await res.json();
-    if (!data.secure_url) throw new Error(data.error?.message || 'שגיאה בהעלאה');
-    return data.secure_url;
-  }
-
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingImg(true);
-    try {
-      const url = await uploadToCloudinary(file);
-      setImageUrl(url);
-    } catch (err: any) {
-      alert('שגיאה בהעלאת תמונה: ' + err.message);
-    } finally {
-      setUploadingImg(false);
-    }
-  }
-
-  function toggleCat(cat: string) {
-    setSelectedCats(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
-  }
-
-  function addProductToList() {
-    if (!productName || !productPrice) { alert('שם ומחיר חובה'); return; }
-    setProducts(prev => [...prev, { name: productName, price: productPrice, cat: productCat, imgUrl: productImgUrl }]);
-    setProductName(''); setProductPrice(''); setProductImgUrl('');
-  }
-
-  async function handleSave() {
-    if (!name) { alert('שם הסופר הוא שדה חובה'); return; }
-    setSaving(true);
-    try {
-      const soferData = {
-        name, city, phone, email, description, style,
-        imageUrl: imageUrl || null,
-        categories: selectedCats,
-        status: 'active',
-      };
-
-      if (isEdit && sofer) {
-        await updateDoc(doc(db, 'soferim', sofer.id), soferData);
-      } else {
-        const soferRef = await addDoc(collection(db, 'soferim'), {
-          ...soferData,
-          createdAt: serverTimestamp(),
-        });
-        // הוסף מוצרים אם יש
-        for (const p of products) {
-          await addDoc(collection(db, 'products'), {
-            name: p.name,
-            price: Number(p.price),
-            cat: p.cat,
-            imgUrl: p.imgUrl || null,
-            soferId: soferRef.id,
-            status: 'active',
-            createdAt: serverTimestamp(),
-          });
-        }
-      }
-      onSave();
-      onClose();
-    } catch (e) {
-      alert('שגיאה בשמירה');
-      console.error(e);
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
-      onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
-        onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>{isEdit ? '✏️ עריכת סופר' : '➕ הוספת סופר חדש'}</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
-        </div>
-
-        <div style={{ display: 'grid', gap: 14 }}>
-          {/* פרטים בסיסיים */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>שם הסופר *</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="ר' ישראל ישראלי"
-                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
-            </div>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>עיר</label>
-              <input value={city} onChange={e => setCity(e.target.value)} placeholder="בני ברק"
-                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>טלפון</label>
-              <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="050-0000000"
-                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
-            </div>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>אימייל</label>
-              <input value={email} onChange={e => setEmail(e.target.value)} placeholder="sofer@email.com"
-                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
-            </div>
-          </div>
-
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>סגנון כתיבה</label>
-            <input value={style} onChange={e => setStyle(e.target.value)} placeholder="בית יוסף, אר״י..."
-              style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
-          </div>
-
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תיאור</label>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3}
-              placeholder="סופר מוסמך עם 20 שנות ניסיון..."
-              style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box' }} />
-          </div>
-
-          {/* תמונה */}
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>תמונת פרופיל</label>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              {imageUrl && <img src={imageUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd', flexShrink: 0 }} />}
-              <label style={{ background: '#0c1a35', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
-                {uploadingImg ? '⏳...' : '📷 העלה'}
-                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
-              </label>
-              <input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="או הדבק URL"
-                style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12, minWidth: 0 }} />
-            </div>
-          </div>
-
-          {/* קטגוריות */}
-          <div>
-            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>קטגוריות</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {CATS.filter(c => c !== 'הכל').map(cat => (
-                <button key={cat} type="button" onClick={() => toggleCat(cat)}
-                  style={{ padding: '5px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', background: selectedCats.includes(cat) ? '#b8972a' : '#f0f0f0', color: selectedCats.includes(cat) ? '#fff' : '#333', border: 'none', fontWeight: selectedCats.includes(cat) ? 700 : 400 }}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* הוספת מוצרים — רק בהוספה חדשה */}
-          {!isEdit && (
-            <div style={{ border: '1px solid #e0e0e0', borderRadius: 10, padding: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <label style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>📦 הוספת מוצרים לסופר</label>
-                <button type="button" onClick={() => setAddProducts(!addProducts)}
-                  style={{ background: '#f0f0f0', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}>
-                  {addProducts ? 'סגור ▲' : 'פתח ▼'}
-                </button>
-              </div>
-              {products.length > 0 && (
-                <div style={{ marginBottom: 10 }}>
-                  {products.map((p, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f9f9f9', borderRadius: 6, padding: '6px 10px', marginBottom: 4, fontSize: 12 }}>
-                      <span>{p.name} — ₪{p.price} — {p.cat}</span>
-                      <button type="button" onClick={() => setProducts(prev => prev.filter((_, j) => j !== i))}
-                        style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: 14 }}>✕</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {addProducts && (
-                <div style={{ display: 'grid', gap: 8 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8 }}>
-                    <input value={productName} onChange={e => setProductName(e.target.value)} placeholder="שם המוצר"
-                      style={{ border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
-                    <input type="number" value={productPrice} onChange={e => setProductPrice(e.target.value)} placeholder="מחיר ₪"
-                      style={{ border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8 }}>
-                    <select value={productCat} onChange={e => setProductCat(e.target.value)}
-                      style={{ border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#fff', boxSizing: 'border-box' }}>
-                      {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                    <input value={productImgUrl} onChange={e => setProductImgUrl(e.target.value)} placeholder="URL תמונה (אופציונלי)"
-                      style={{ border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
-                  </div>
-                  <button type="button" onClick={addProductToList}
-                    style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-                    ➕ הוסף מוצר לרשימה
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
-          <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-            {saving ? '⏳ שומר...' : isEdit ? '💾 שמור שינויים' : '✅ הוסף סופר'}
-          </button>
-          <button onClick={onClose}
-            style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>
-            ביטול
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
+// ══ מודל הוספת מוצר ══
 function AddProductModal({ soferim, onClose, onSave }: {
   soferim: Sofer[];
   onClose: () => void;
@@ -381,7 +119,7 @@ function AddProductModal({ soferim, onClose, onSave }: {
     formData.append('upload_preset', 'yoursofer_upload');
     const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
     const data = await res.json();
-    if (!data.secure_url) throw new Error(data.error?.message || 'שגיאה בהעלאה');
+    if (!data.secure_url) throw new Error(data.error?.message || 'שגיאה');
     return data.secure_url;
   }
 
@@ -406,17 +144,22 @@ function AddProductModal({ soferim, onClose, onSave }: {
     setSaving(true);
     try {
       await addDoc(collection(db, 'products'), {
-        name, price: Number(price), was: was ? Number(was) : null,
-        desc, cat, badge: badge || null, days,
-        soferId: soferId || null, imgUrl: imgUrl || null,
-        imgUrl2: imgUrl2 || null, imgUrl3: imgUrl3 || null,
-        status: 'active', createdAt: serverTimestamp(),
+        name, price: Number(price),
+        was: was ? Number(was) : null,
+        desc, cat,
+        badge: badge || null,
+        days,
+        soferId: soferId || null,
+        imgUrl: imgUrl || null,
+        imgUrl2: imgUrl2 || null,
+        imgUrl3: imgUrl3 || null,
+        status: 'active',
+        createdAt: serverTimestamp(),
       });
       onSave();
       onClose();
-    } catch (e) {
+    } catch {
       alert('שגיאה בשמירה');
-      console.error(e);
     } finally {
       setSaving(false);
     }
@@ -440,7 +183,7 @@ function AddProductModal({ soferim, onClose, onSave }: {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>מחיר ₪ *</label>
-              <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="299"
+              <input type="number" value={price} onChange={e => setPrice(e.target.value)}
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
             <div>
@@ -531,12 +274,9 @@ export default function AdminPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [applications, setApplications] = useState<SoferApplication[]>([]);
-  const [shaliachApplications, setShaliachApplications] = useState<ShaliachApplication[]>([]);
-  const [shaliachAppsLoading, setShaliachAppsLoading] = useState(true);
   const [users, setUsers] = useState<AppUser[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
-  const [soferimLoading, setSoferimLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [content, setContent] = useState<HomeContent>({ heroTitle: '', heroSubtitle: '', heroText: '' });
   const [contentSaving, setContentSaving] = useState(false);
@@ -552,9 +292,7 @@ export default function AdminPage() {
   const [roleFilter, setRoleFilter] = useState<string>('הכל');
   const [productSearch, setProductSearch] = useState('');
   const [showAddProduct, setShowAddProduct] = useState(false);
-  const [showSoferModal, setShowSoferModal] = useState(false);
-  const [editingSofer, setEditingSofer] = useState<Sofer | undefined>(undefined);
-  const [copiedLink, setCopiedLink] = useState<string | null>(null);
+  const [importStatus, setImportStatus] = useState('');
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
@@ -562,8 +300,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (user?.role === 'admin') {
-      loadOrders(); loadApplications(); loadShaliachApplications();
-      loadUsers(); loadProducts(); loadSoferim(); loadContent(); loadCategories();
+      loadOrders(); loadApplications(); loadUsers();
+      loadProducts(); loadSoferim(); loadContent(); loadCategories();
     }
   }, [user]);
 
@@ -587,16 +325,6 @@ export default function AdminPage() {
     finally { setAppsLoading(false); }
   }
 
-  async function loadShaliachApplications() {
-    try {
-      const snap = await getDocs(query(collection(db, 'shluchim_applications'), orderBy('createdAt', 'desc')));
-      const data: ShaliachApplication[] = [];
-      snap.forEach(d => data.push({ id: d.id, ...d.data() } as ShaliachApplication));
-      setShaliachApplications(data);
-    } catch (e) { console.error(e); }
-    finally { setShaliachAppsLoading(false); }
-  }
-
   async function loadUsers() {
     try {
       const snap = await getDocs(collection(db, 'users'));
@@ -618,14 +346,12 @@ export default function AdminPage() {
   }
 
   async function loadSoferim() {
-    setSoferimLoading(true);
     try {
       const snap = await getDocs(collection(db, 'soferim'));
       const data: Sofer[] = [];
-      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Sofer));
+      snap.forEach(d => data.push({ id: d.id, name: d.data().name } as Sofer));
       setSoferim(data);
     } catch (e) { console.error(e); }
-    finally { setSoferimLoading(false); }
   }
 
   async function loadContent() {
@@ -698,27 +424,14 @@ export default function AdminPage() {
     setActionLoading(app.id);
     try {
       await updateDoc(doc(db, 'soferim_applications', app.id), { status: 'approved', approvedAt: serverTimestamp() });
-      const soferRef = await addDoc(collection(db, 'soferim'), {
+      await addDoc(collection(db, 'soferim'), {
         name: app.name, city: app.city, phone: app.phone,
         whatsapp: app.whatsapp || '', email: app.email || '',
         description: app.description || '', style: app.style || '',
         categories: app.categories, imageUrl: app.imageUrl || '',
         status: 'active', createdAt: serverTimestamp(),
       });
-      const appProducts = (app as any).products || [];
-      for (const product of appProducts) {
-        if (product.type && product.images?.length > 0) {
-          await addDoc(collection(db, 'products'), {
-            name: product.type, price: 0,
-            imgUrl: product.images[0] || null, imgUrl2: product.images[1] || null,
-            imgUrl3: product.images[2] || null, imgUrl4: product.images[3] || null,
-            cat: 'קלפים', subCat: product.type, soferId: soferRef.id,
-            status: 'active', createdAt: serverTimestamp(),
-          });
-        }
-      }
       setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
-      loadSoferim();
     } catch (e) { console.error(e); alert('שגיאה באישור'); }
     finally { setActionLoading(null); }
   }
@@ -732,44 +445,142 @@ export default function AdminPage() {
     finally { setActionLoading(null); }
   }
 
-  async function approveShaliach(app: ShaliachApplication) {
-    setActionLoading(app.id);
+  // ══ ייצוא ══
+  function exportToExcel() {
+    const rows = [
+      ['id', 'name', 'cat', 'price', 'was', 'desc', 'badge', 'days', 'imgUrl', 'imgUrl2', 'imgUrl3', 'soferId'],
+      ...products.map(p => [
+        p.id, p.name, p.cat || '', p.price,
+        (p as any).was || '', (p as any).desc || '',
+        (p as any).badge || '', (p as any).days || '7-14',
+        p.imgUrl || p.image_url || '',
+        (p as any).imgUrl2 || '', (p as any).imgUrl3 || '',
+        p.soferId || ''
+      ])
+    ];
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'products.csv';
+    a.click();
+  }
+
+  // ══ הורד תבנית ריקה ══
+  function downloadTemplate() {
+    const headers = ['id', 'name', 'cat', 'price', 'was', 'desc', 'badge', 'days', 'imgUrl', 'imgUrl2', 'imgUrl3', 'soferId'];
+    const example = ['', 'בית מזוזה כסף 10 ס"מ', 'מזוזות', '89.90', '', 'תיאור המוצר כאן', 'חדש', '7-14', 'https://example.com/image.jpg', '', '', ''];
+    const notes = ['# הסבר:', '# id — ריק למוצר חדש', '# cat — חייב להתאים לקטגוריה באתר', '# badge — חדש / מבצע / פופולרי / ריק', '# imgUrl — URL לתמונה ראשית', '', ''];
+    const csv = [headers.join(','), example.map(v => `"${v}"`).join(','), ...notes].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'products_template.csv';
+    a.click();
+  }
+
+  // ══ ייבוא CSV משופר ══
+  async function importFromCSV(file: File) {
+    setImportStatus('⏳ מייבא מוצרים...');
     try {
-      await updateDoc(doc(db, 'shluchim_applications', app.id), { status: 'approved', approvedAt: serverTimestamp() });
-      const shaliachRef = await addDoc(collection(db, 'shluchim'), {
-        name: app.name, chabadName: app.chabadName || '',
-        city: app.city, phone: app.phone, email: app.email || '',
-        rabbiName: app.rabbiName || '', logoUrl: app.logoUrl || '',
-        commissionPercent: 10, status: 'active', createdAt: serverTimestamp(),
-      });
-      const usersSnap = await getDocs(collection(db, 'users'));
-      for (const userDoc of usersSnap.docs) {
-        const userData = userDoc.data();
-        if (userData.email === app.email) {
-          await updateDoc(doc(db, 'users', userDoc.id), { role: 'shaliach', shaliachId: shaliachRef.id });
-          break;
+      const text = await file.text();
+      const lines = text.split('\n').filter(r => r.trim() && !r.trim().startsWith('#'));
+
+      const firstLine = lines[0].replace(/^\uFEFF/, '');
+      const headers = firstLine.split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+
+      const getIdx = (...names: string[]) => {
+        for (const n of names) {
+          const i = headers.indexOf(n);
+          if (i >= 0) return i;
+        }
+        return -1;
+      };
+
+      const idIdx    = getIdx('id');
+      const nameIdx  = getIdx('name', 'שם');
+      const catIdx   = getIdx('cat', 'category', 'קטגוריה');
+      const priceIdx = getIdx('price', 'מחיר');
+      const wasIdx   = getIdx('was', 'מחיר מקורי');
+      const descIdx  = getIdx('desc', 'description', 'תיאור');
+      const badgeIdx = getIdx('badge', 'תווית');
+      const daysIdx  = getIdx('days', 'ימי אספקה');
+      const imgIdx   = getIdx('imgurl', 'image_url', 'img_url', 'תמונה');
+      const img2Idx  = getIdx('imgurl2', 'image_url2');
+      const img3Idx  = getIdx('imgurl3', 'image_url3');
+      const soferIdx = getIdx('soferid', 'sofer_id');
+
+      if (nameIdx === -1) {
+        setImportStatus('❌ לא נמצאה עמודת שם — בדוק שהכותרות בעברית או באנגלית');
+        return;
+      }
+
+      let added = 0, updated = 0, skipped = 0;
+
+      for (let i = 1; i < lines.length; i++) {
+        // פרסר CSV עם תמיכה בגרשיים
+        const cols: string[] = [];
+        let cur = ''; let inQ = false;
+        for (const ch of lines[i]) {
+          if (ch === '"') { inQ = !inQ; }
+          else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+          else cur += ch;
+        }
+        cols.push(cur.trim());
+
+        const get = (idx: number) => idx >= 0 ? (cols[idx] || '').replace(/^"|"$/g, '').trim() : '';
+
+        const name  = get(nameIdx);
+        const price = parseFloat(get(priceIdx));
+        if (!name || isNaN(price) || price <= 0) { skipped++; continue; }
+
+        const productData: any = {
+          name,
+          cat: get(catIdx) || 'כללי',
+          price,
+          status: 'active',
+        };
+        const wasVal = get(wasIdx);
+        if (wasVal) productData.was = parseFloat(wasVal);
+        const descVal = get(descIdx);
+        if (descVal) productData.desc = descVal;
+        const badgeVal = get(badgeIdx);
+        if (badgeVal) productData.badge = badgeVal;
+        const daysVal = get(daysIdx);
+        if (daysVal) productData.days = daysVal;
+        const imgVal = get(imgIdx);
+        if (imgVal) productData.imgUrl = imgVal;
+        const img2Val = get(img2Idx);
+        if (img2Val) productData.imgUrl2 = img2Val;
+        const img3Val = get(img3Idx);
+        if (img3Val) productData.imgUrl3 = img3Val;
+        const soferVal = get(soferIdx);
+        if (soferVal) productData.soferId = soferVal;
+
+        const existingId = get(idIdx);
+
+        try {
+          if (existingId) {
+            await updateDoc(doc(db, 'products', existingId), productData);
+            updated++;
+          } else {
+            productData.createdAt = serverTimestamp();
+            await addDoc(collection(db, 'products'), productData);
+            added++;
+          }
+        } catch (e) {
+          console.error('שגיאה במוצר', name, e);
+          skipped++;
         }
       }
-      setShaliachApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
-      alert('✅ השליח אושר! הלינק האישי שלו: ' + window.location.origin + '/?ref=' + shaliachRef.id);
-    } catch (e) { console.error(e); alert('שגיאה באישור'); }
-    finally { setActionLoading(null); }
-  }
 
-  async function rejectShaliach(id: string) {
-    setActionLoading(id);
-    try {
-      await updateDoc(doc(db, 'shluchim_applications', id), { status: 'rejected', rejectedAt: serverTimestamp() });
-      setShaliachApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' } : a));
-    } catch (e) { console.error(e); alert('שגיאה בדחייה'); }
-    finally { setActionLoading(null); }
-  }
-
-  function copyLink(id: string) {
-    const link = `${window.location.origin}/?ref=${id}`;
-    navigator.clipboard.writeText(link);
-    setCopiedLink(id);
-    setTimeout(() => setCopiedLink(null), 2500);
+      setImportStatus(`✅ הושלם! נוספו: ${added} | עודכנו: ${updated} | דולגו: ${skipped}`);
+      setTimeout(() => setImportStatus(''), 6000);
+      loadProducts();
+    } catch (e) {
+      console.error(e);
+      setImportStatus('❌ שגיאה בייבוא — בדוק שהקובץ תקין');
+    }
   }
 
   if (loading || ordersLoading) return (
@@ -783,44 +594,9 @@ export default function AdminPage() {
   const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
   const shaliachOrders = orders.filter(o => o.shaliachName);
   const pendingApps = applications.filter(a => a.status === 'pending');
-  const pendingShaliachApps = shaliachApplications.filter(a => a.status === 'pending');
   const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
   const filteredProducts = products.filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()));
   const unassignedProducts = products.filter(p => !p.soferId).length;
-
-  function exportToExcel() {
-    const rows = [
-      ['id', 'name', 'cat', 'price', 'badge', 'days', 'soferId'],
-      ...products.map(p => [p.id, p.name, p.cat || '', p.price, (p as any).badge || '', (p as any).days || '', p.soferId || ''])
-    ];
-    const csv = rows.map(r => r.join(',')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'products.csv'; a.click();
-  }
-
-  async function importFromExcel(file: File) {
-    const text = await file.text();
-    const rows = text.split('\n').filter(r => r.trim());
-    const headers = rows[0].split(',');
-    const idIdx = headers.indexOf('id');
-    const catIdx = headers.indexOf('cat');
-    let updated = 0;
-    for (let i = 1; i < rows.length; i++) {
-      const cols = rows[i].split(',');
-      const id = cols[idIdx]?.trim();
-      const cat = cols[catIdx]?.trim();
-      if (id && cat) {
-        try {
-          await updateDoc(doc(db, 'products', id), { cat });
-          updated++;
-        } catch (e) { console.error('שגיאה במוצר', id, e); }
-      }
-    }
-    alert(`✅ עודכנו ${updated} מוצרים!`);
-    loadProducts();
-  }
 
   return (
     <main className="max-w-6xl mx-auto p-6" dir="rtl">
@@ -829,7 +605,7 @@ export default function AdminPage() {
         <button onClick={() => router.push('/')} className="text-green-700 font-bold hover:underline">← חזרה לחנות</button>
       </div>
 
-      {/* סטטיסטיקות */}
+      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl shadow p-4 text-center">
           <div className="text-3xl font-black text-green-700">₪{totalRevenue.toFixed(0)}</div>
@@ -844,20 +620,18 @@ export default function AdminPage() {
           <div className="text-sm text-gray-500 mt-1">משתמשים</div>
         </div>
         <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-orange-500">{pendingApps.length + pendingShaliachApps.length}</div>
-          <div className="text-sm text-gray-500 mt-1">בקשות ממתינות</div>
+          <div className="text-3xl font-black text-orange-500">{pendingApps.length}</div>
+          <div className="text-sm text-gray-500 mt-1">בקשות סופרים</div>
         </div>
       </div>
 
-      {/* טאבים */}
+      {/* Tabs */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {[
           { key: 'orders', label: '📦 הזמנות', color: 'bg-green-700' },
           { key: 'products', label: '📜 מוצרים', color: 'bg-teal-600', badge: unassignedProducts },
-          { key: 'soferim_list', label: '✍️ סופרים', color: 'bg-amber-500' },
           { key: 'commissions', label: '🤝 עמלות', color: 'bg-blue-600' },
-          { key: 'soferim', label: '📋 בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
-          { key: 'shluchim', label: '🟦 בקשות שליחים', color: 'bg-blue-800', badge: pendingShaliachApps.length },
+          { key: 'soferim', label: '✍️ בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
           { key: 'users', label: '👥 משתמשים', color: 'bg-purple-600' },
           { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
           { key: 'categories', label: '🖼️ קטגוריות', color: 'bg-indigo-600' },
@@ -872,133 +646,107 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* ══ טאב סופרים קיימים ══ */}
-      {activeTab === 'soferim_list' && (
+      {/* ══ PRODUCTS TAB ══ */}
+      {activeTab === 'products' && (
         <div>
-          <div className="flex gap-3 mb-4 items-center">
-            <h2 className="text-xl font-black flex-1">✍️ סופרים רשומים ({soferim.length})</h2>
-            <button onClick={() => { setEditingSofer(undefined); setShowSoferModal(true); }}
-              className="bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-amber-600 transition">
-              ➕ הוסף סופר
+          <div className="flex gap-2 mb-4 items-center flex-wrap">
+            <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
+              placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
+            <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
+            {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
+
+            {/* ➕ הוסף מוצר */}
+            <button onClick={() => setShowAddProduct(true)}
+              style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              ➕ הוסף מוצר
             </button>
+
+            {/* 📥 ייצוא */}
+            <button onClick={exportToExcel}
+              style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              📥 ייצוא ל-Excel
+            </button>
+
+            {/* 📋 הורד תבנית */}
+            <button onClick={downloadTemplate}
+              style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              📋 הורד תבנית
+            </button>
+
+            {/* 📤 ייבוא CSV */}
+            <label style={{ background: '#0284c7', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              📤 ייבוא CSV
+              <input type="file" accept=".csv" style={{ display: 'none' }}
+                onChange={e => { if (e.target.files?.[0]) { importFromCSV(e.target.files[0]); e.target.value = ''; } }} />
+            </label>
           </div>
-          {soferimLoading ? (
-            <div className="p-10 text-center text-gray-400">טוען...</div>
-          ) : soferim.length === 0 ? (
-            <div className="p-10 text-center text-gray-400">אין סופרים רשומים עדיין</div>
+
+          {/* סטטוס ייבוא */}
+          {importStatus && (
+            <div style={{
+              marginBottom: 16, padding: '12px 16px', borderRadius: 10, fontSize: 14, fontWeight: 700,
+              background: importStatus.startsWith('✅') ? '#f0fdf4' : importStatus.startsWith('❌') ? '#fef2f2' : '#eff6ff',
+              color: importStatus.startsWith('✅') ? '#15803d' : importStatus.startsWith('❌') ? '#dc2626' : '#1d4ed8',
+            }}>
+              {importStatus}
+            </div>
+          )}
+
+          {productsLoading ? (
+            <div className="p-10 text-center text-gray-400">טוען מוצרים...</div>
           ) : (
-            <div className="grid gap-4">
-              {soferim.map(s => {
-                const soferProducts = products.filter(p => p.soferId === s.id);
-                return (
-                  <div key={s.id} className="bg-white rounded-xl shadow p-4">
-                    <div className="flex items-center gap-4">
-                      {s.imageUrl
-                        ? <img src={s.imageUrl} alt={s.name} className="w-14 h-14 rounded-full object-cover border-2 border-amber-200 flex-shrink-0" />
-                        : <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center text-2xl flex-shrink-0">✍️</div>}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-black text-base">{s.name}</span>
-                          {s.city && <span className="text-sm text-gray-500">📍 {s.city}</span>}
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                            {s.status === 'active' ? '● פעיל' : '● לא פעיל'}
-                          </span>
+            <div className="bg-white rounded-xl shadow overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-3 text-right">מוצר</th>
+                    <th className="p-3 text-right">קטגוריה</th>
+                    <th className="p-3 text-right">מחיר</th>
+                    <th className="p-3 text-right">סטטוס</th>
+                    <th className="p-3 text-right">שיוך לסופר</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.length === 0 ? (
+                    <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
+                  ) : filteredProducts.map(p => (
+                    <tr key={p.id} className="border-t hover:bg-gray-50">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          {(p.imgUrl || p.image_url) && (
+                            <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover"
+                              onError={e => (e.currentTarget.style.display = 'none')} />
+                          )}
+                          <span className="font-bold text-xs">{p.name}</span>
                         </div>
-                        <div className="flex gap-3 text-xs text-gray-500 flex-wrap">
-                          {s.phone && <span>📞 {s.phone}</span>}
-                          {s.email && <span>✉️ {s.email}</span>}
-                          {s.style && <span>✍️ {s.style}</span>}
-                          <span className="text-amber-600 font-bold">📦 {soferProducts.length} מוצרים</span>
-                        </div>
-                        {s.categories && s.categories.length > 0 && (
-                          <div className="flex gap-1 mt-1 flex-wrap">
-                            {s.categories.map(cat => (
-                              <span key={cat} className="bg-amber-50 text-amber-700 text-xs px-2 py-0.5 rounded-full">{cat}</span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-2 flex-shrink-0">
-                        <button onClick={() => { setEditingSofer(s); setShowSoferModal(true); }}
-                          className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-200">
-                          ✏️ ערוך
+                      </td>
+                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
+                      <td className="p-3 font-bold text-green-700">₪{p.price}</td>
+                      <td className="p-3">
+                        <button onClick={() => toggleProductStatus(p.id, p.status || 'active')}
+                          disabled={actionLoading === p.id + '_status'}
+                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                          {p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}
                         </button>
-                        <button onClick={() => router.push(`/?soferId=${s.id}`)}
-                          className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-100">
-                          👁️ צפה
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                      </td>
+                      <td className="p-3">
+                        <select value={p.soferId || ''} disabled={actionLoading === p.id}
+                          onChange={e => assignSoferToProduct(p.id, e.target.value)}
+                          className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}>
+                          <option value="">⚠️ ללא סופר</option>
+                          {soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
       )}
 
-      {/* ══ טאב שליחים — עם לינק ══ */}
-      {activeTab === 'shluchim' && (
-        <div>
-          {shaliachAppsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
-          : shaliachApplications.length === 0 ? <div className="p-10 text-center text-gray-400">אין בקשות שליחים עדיין</div>
-          : (
-            <div className="grid gap-4">
-              {shaliachApplications.map(app => (
-                <div key={app.id} className="bg-white rounded-xl shadow p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-shrink-0">
-                      {app.logoUrl
-                        ? <img src={app.logoUrl} alt={app.name} className="w-16 h-16 rounded-xl object-cover border-2 border-blue-200" />
-                        : <div className="w-16 h-16 rounded-xl bg-blue-100 flex items-center justify-center text-2xl">🟦</div>}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-black">{app.chabadName || app.name}</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
-                          {app.status === 'pending' ? '⏳ ממתין' : app.status === 'approved' ? '✅ מאושר' : '❌ נדחה'}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600">
-                        {app.name && <span>👤 {app.name}</span>}
-                        {app.city && <span>📍 {app.city}</span>}
-                        {app.phone && <span>📞 {app.phone}</span>}
-                        {app.email && <span>✉️ {app.email}</span>}
-                        {app.rabbiName && <span>🎓 {app.rabbiName}</span>}
-                      </div>
-                      {/* לינק אם מאושר */}
-                      {app.status === 'approved' && (app as any).shaliachId && (
-                        <div className="mt-3 flex items-center gap-2">
-                          <code className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">
-                            {window.location.origin}/?ref={(app as any).shaliachId}
-                          </code>
-                          <button onClick={() => copyLink((app as any).shaliachId)}
-                            className={`px-3 py-1 rounded-lg text-xs font-bold transition ${copiedLink === (app as any).shaliachId ? 'bg-green-500 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}>
-                            {copiedLink === (app as any).shaliachId ? '✅ הועתק!' : '📋 העתק'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    {app.status === 'pending' && (
-                      <div className="flex flex-col gap-2 flex-shrink-0">
-                        <button onClick={() => approveShaliach(app)} disabled={actionLoading === app.id}
-                          className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-800 disabled:opacity-50">
-                          {actionLoading === app.id ? '...' : '✅ אשר'}
-                        </button>
-                        <button onClick={() => rejectShaliach(app.id)} disabled={actionLoading === app.id}
-                          className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">
-                          ❌ דחה
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
+      {/* ══ CATEGORIES TAB ══ */}
       {activeTab === 'categories' && (
         <div className="grid gap-6">
           <div className="bg-white rounded-xl shadow p-6">
@@ -1014,6 +762,7 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* ══ CONTENT TAB ══ */}
       {activeTab === 'content' && (
         <div className="bg-white rounded-xl shadow p-6">
           <h2 className="text-xl font-black mb-6 text-gray-800">✏️ עריכת תוכן דף הבית</h2>
@@ -1058,76 +807,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {activeTab === 'products' && (
-        <div>
-          <div className="flex gap-3 mb-4 items-center flex-wrap">
-            <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
-              placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
-            <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
-            {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
-            <button onClick={() => setShowAddProduct(true)}
-              className="bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-amber-600 transition">
-              ➕ הוסף מוצר
-            </button>
-            <button onClick={exportToExcel} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-700">
-              📥 ייצוא ל-Excel
-            </button>
-            <label className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 cursor-pointer">
-              📤 ייבוא מ-Excel
-              <input type="file" accept=".csv" className="hidden"
-                onChange={e => e.target.files?.[0] && importFromExcel(e.target.files[0])} />
-            </label>
-          </div>
-          {productsLoading ? (
-            <div className="p-10 text-center text-gray-400">טוען מוצרים...</div>
-          ) : (
-            <div className="bg-white rounded-xl shadow overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="p-3 text-right">מוצר</th>
-                    <th className="p-3 text-right">קטגוריה</th>
-                    <th className="p-3 text-right">מחיר</th>
-                    <th className="p-3 text-right">סטטוס</th>
-                    <th className="p-3 text-right">שיוך לסופר</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredProducts.length === 0 ? (
-                    <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
-                  ) : filteredProducts.map(p => (
-                    <tr key={p.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          {(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />}
-                          <span className="font-bold text-xs">{p.name}</span>
-                        </div>
-                      </td>
-                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
-                      <td className="p-3 font-bold text-green-700">₪{p.price}</td>
-                      <td className="p-3">
-                        <button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'}
-                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
-                          {p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}
-                        </button>
-                      </td>
-                      <td className="p-3">
-                        <select value={p.soferId || ''} disabled={actionLoading === p.id}
-                          onChange={e => assignSoferToProduct(p.id, e.target.value)}
-                          className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}>
-                          <option value="">⚠️ ללא סופר</option>
-                          {soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                        </select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
+      {/* ══ ORDERS TAB ══ */}
       {activeTab === 'orders' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
           <table className="w-full text-sm">
@@ -1161,6 +841,7 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* ══ COMMISSIONS TAB ══ */}
       {activeTab === 'commissions' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
           {shaliachOrders.length === 0 ? (
@@ -1192,6 +873,7 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* ══ SOFERIM APPLICATIONS TAB ══ */}
       {activeTab === 'soferim' && (
         <div>
           {appsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
@@ -1245,6 +927,7 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* ══ USERS TAB ══ */}
       {activeTab === 'users' && (
         <div>
           <div className="flex gap-2 mb-4 flex-wrap">
@@ -1265,7 +948,6 @@ export default function AdminPage() {
                     <th className="p-3 text-right">משתמש</th>
                     <th className="p-3 text-right">אימייל</th>
                     <th className="p-3 text-right">תפקיד נוכחי</th>
-                    <th className="p-3 text-right">לינק שליח</th>
                     <th className="p-3 text-right">שנה תפקיד</th>
                   </tr>
                 </thead>
@@ -1276,14 +958,6 @@ export default function AdminPage() {
                       <td className="p-3 text-gray-500 text-xs">{u.email}</td>
                       <td className="p-3">
                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span>
-                      </td>
-                      <td className="p-3">
-                        {u.shaliachId ? (
-                          <button onClick={() => copyLink(u.shaliachId!)}
-                            className={`text-xs font-bold px-3 py-1 rounded-lg transition ${copiedLink === u.shaliachId ? 'bg-green-500 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}>
-                            {copiedLink === u.shaliachId ? '✅ הועתק!' : '📋 העתק לינק'}
-                          </button>
-                        ) : '—'}
                       </td>
                       <td className="p-3">
                         <select value={u.role} disabled={actionLoading === u.id}
@@ -1305,26 +979,17 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* ══ מודל הוספת מוצר ══ */}
       {showAddProduct && (
         <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />
-      )}
-
-      {showSoferModal && (
-        <SoferModal
-          sofer={editingSofer}
-          soferim={soferim}
-          onClose={() => { setShowSoferModal(false); setEditingSofer(undefined); }}
-          onSave={() => loadSoferim()}
-        />
       )}
     </main>
   );
 }
 
+// ══ קומפוננט כרטיס קטגוריה ══
 function CategoryCard({ cat, saving, saved, onSave }: {
-  cat: Category;
-  saving: boolean;
-  saved: boolean;
+  cat: Category; saving: boolean; saved: boolean;
   onSave: (imgUrl: string, sub: string) => void;
 }) {
   const [imgUrl, setImgUrl] = useState(cat.imgUrl || '');
