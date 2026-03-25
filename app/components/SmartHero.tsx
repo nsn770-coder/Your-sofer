@@ -127,11 +127,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
 
       }} />
 
-      {/* ══ טקסטורה עדינה ══ */}
-      <div style={{
-        position: 'absolute', inset: 0, zIndex: 1, opacity: 0.035,
-        backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e6c84a' fill-opacity='1'%3E%3Cpath d='M0 0h30v30H0V0zm30 30h30v30H30V30z'/%3E%3C/g%3E%3C/svg%3E\")",
-      }} />
+      
 
       {/* ══ תוכן ══ */}
       <div style={{
