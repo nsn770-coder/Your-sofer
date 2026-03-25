@@ -7,6 +7,7 @@ import { useCart } from './contexts/CartContext';
 import { useAuth } from './contexts/AuthContext';
 import { useShaliach } from './contexts/ShaliachContext';
 import { CATS, NAV_ITEMS } from './constants/categories';
+import SmartHero from './components/SmartHero';
 
 interface Product {
   id: string;
@@ -234,6 +235,7 @@ export default function Home() {
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
+      {/* ══ באנר שליח ══ */}
       {shaliach && (
         <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)', borderBottom: '3px solid #b8972a', padding: isMobile ? '8px 12px' : '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, direction: 'rtl', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -257,6 +259,7 @@ export default function Home() {
         </div>
       )}
 
+      {/* ══ NAVBAR ══ */}
       <header style={{ background: '#0c1a35', color: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '8px 10px', display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 12 }}>
           <button onClick={() => setShowHamburger(!showHamburger)}
@@ -328,6 +331,8 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* נאב קטגוריות */}
         <div style={{ background: '#162444', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 10px', display: 'flex', alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none' }}>
             {NAV_ITEMS.map(item => (
@@ -343,6 +348,7 @@ export default function Home() {
             ))}
           </div>
         </div>
+
         {!isMobile && (
           <div style={{ background: '#1a3a2a', padding: '5px 14px', fontSize: 12, color: '#a8c8b4', display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span>✍️ <strong style={{ color: '#fff' }}>ישירות מהסופר</strong> לביתך</span>
@@ -356,6 +362,7 @@ export default function Home() {
         )}
       </header>
 
+      {/* ══ תפריט המבורגר ══ */}
       {showHamburger && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200 }} onClick={() => setShowHamburger(false)}>
           <div style={{ position: 'absolute', top: 0, right: 0, width: 280, height: '100%', background: '#fff', boxShadow: '-4px 0 20px rgba(0,0,0,0.2)', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
@@ -389,41 +396,15 @@ export default function Home() {
         </div>
       )}
 
-      <div style={{ position: 'relative', overflow: 'hidden' }}>
-        <div style={{ width: '100%', height: isMobile ? 200 : 300, background: 'linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 40%, #3d7a52 70%, #1a3a2a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 16px' : '0 6%', position: 'relative' }}>
-          <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e6a817' fill-opacity='1'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40z'/%3E%3C/g%3E%3C/svg%3E\")" }} />
-          <div style={{ position: 'relative', zIndex: 2, flex: 1 }}>
-            <h1 style={{ fontSize: isMobile ? 22 : 36, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: isMobile ? 6 : 10 }}>
-              {shaliach ? <>רכישת סת&quot;ם<br /><span style={{ color: '#b8972a' }}>בית חבד {shaliach.city || ''}</span></> : <>{homeContent.heroTitle}<br /><span style={{ color: '#b8972a' }}>{homeContent.heroSubtitle}</span></>}
-            </h1>
-            {!isMobile && (
-              <p style={{ fontSize: 15, color: '#a8c8b4', marginBottom: 24, maxWidth: 440, lineHeight: 1.6 }}>
-                {shaliach ? `${shaliach.chabadName || shaliach.name} ממליץ על מוצרי סת״ם מסופרים מוסמכים ומאומתים.` : homeContent.heroText}
-              </p>
-            )}
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => mainRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                style={{ background: '#b8972a', color: '#0c1a35', fontSize: isMobile ? 13 : 14, fontWeight: 700, padding: isMobile ? '9px 18px' : '11px 28px', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
-                {shaliach ? 'לקנייה עכשיו ←' : 'לקנייה ←'}
-              </button>
-              {!shaliach && (
-                <button onClick={() => router.push('/soferim')}
-                  style={{ background: 'transparent', color: '#fff', fontSize: isMobile ? 13 : 14, fontWeight: 600, padding: isMobile ? '9px 14px' : '11px 22px', border: '1px solid rgba(255,255,255,0.5)', borderRadius: 8, cursor: 'pointer' }}>
-                  הסופרים שלנו
-                </button>
-              )}
-            </div>
-          </div>
-          <div style={{ position: 'relative', zIndex: 2, flexShrink: 0 }}>
-            {shaliach?.logoUrl ? (
-              <img src={shaliach.logoUrl} alt="" style={{ width: isMobile ? 80 : 150, height: isMobile ? 80 : 150, objectFit: 'contain', borderRadius: 16 }} />
-            ) : (
-              <div style={{ fontSize: isMobile ? 50 : 90, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }}>📜</div>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* ══ SMART HERO ══ */}
+      <SmartHero
+        shaliach={shaliach}
+        isMobile={isMobile}
+        homeContent={homeContent}
+        onScrollToProducts={() => mainRef.current?.scrollIntoView({ behavior: 'smooth' })}
+      />
 
+      {/* ══ קטגוריות — גלילה אופקית ══ */}
       <div style={{ background: '#fff', borderBottom: '1px solid #ddd', padding: '16px 0' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -457,6 +438,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ══ MAIN ══ */}
       <div ref={mainRef} style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '12px 8px' : '16px 12px' }}>
         {isMobile && (
           <button onClick={() => setShowSidebar(!showSidebar)}
@@ -594,6 +576,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ══ FOOTER ══ */}
       <footer style={{ marginTop: 40, background: '#0f1111', color: '#fff' }}>
         <div style={{ borderBottom: '1px solid #333', padding: '24px 16px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 16 : 30 }}>
@@ -648,23 +631,13 @@ export default function Home() {
         target="_blank"
         rel="noopener noreferrer"
         style={{
-          position: 'fixed',
-          bottom: 24,
-          left: 24,
-          zIndex: 999,
-          background: '#25D366',
-          color: '#fff',
-          borderRadius: 50,
+          position: 'fixed', bottom: 24, left: 24, zIndex: 999,
+          background: '#25D366', color: '#fff', borderRadius: 50,
           padding: isMobile ? '10px 16px' : '12px 20px',
-          fontSize: isMobile ? 13 : 14,
-          fontWeight: 900,
-          cursor: 'pointer',
+          fontSize: isMobile ? 13 : 14, fontWeight: 900, cursor: 'pointer',
           boxShadow: '0 4px 20px rgba(37,211,102,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          direction: 'rtl',
-          textDecoration: 'none',
+          display: 'flex', alignItems: 'center', gap: 8,
+          direction: 'rtl', textDecoration: 'none',
           transition: 'transform 0.2s, box-shadow 0.2s',
         }}
         onMouseEnter={e => {
