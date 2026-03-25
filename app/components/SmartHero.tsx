@@ -298,7 +298,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       {/* ══ קו זהב תחתון ══ */}
       <div style={{
         position: 'absolute', bottom: 0, right: 0, left: 0, height: 3, zIndex: 3,
-        background: 'linear-gradient(to left, transparent, #b8972a 30%, #e6c84a 50%, #b8972a 70%, transparent)',
+background: 'linear-gradient(to left, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.75) 50%, rgba(0,0,0,0.88) 100%)',
       }} />
     </div>
   );
