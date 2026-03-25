@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-type HeroState = 'main' | 'mezuzah' | 'tefillin' | 'unsure';
+type HeroState = 'main' | 'mezuzah' | 'tefillin' | 'unsure' | 'klaf';
 
 const WA_LINK = 'https://wa.me/972584877770';
 
@@ -38,6 +38,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
         { label: '📿 אני מחפש בית מזוזה', action: () => switchState('mezuzah'), style: 'gold' },
         { label: '📦 אני מחפש תפילין', action: () => switchState('tefillin'), style: 'outline' },
         { label: '❓ אני לא בטוח מה לבחור', action: () => switchState('unsure'), style: 'ghost' },
+        { label: '📜 אני מחפש קלף מזוזה', action: () => switchState('klaf'), style: 'outline' },
       ],
     },
     mezuzah: {
@@ -58,6 +59,16 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
         { label: '🔍 ראה תפילין', action: () => onScrollToProducts(), style: 'gold' },
         { label: '📘 מדריך לבחירה נכונה', action: () => router.push('/madrich'), style: 'outline' },
         { label: '💬 שאל סופר', action: () => window.open(WA_LINK, '_blank'), style: 'ghost' },
+      ],
+    },
+    klaf: {
+      headline: 'בחר קלף מזוזה ספציפי',
+      body: 'אצלנו אתה לא קונה "סתם מזוזה" —\nאתה בוחר קלף ספציפי מתוך גלריה אמיתית.\n\nכל קלף מצולם, נבדק ומוצג לפני מכירה.\nאתה רואה בדיוק מה מגיע אליך.',
+      support: 'ניתן לשלוח את תמונת הקלף לרב שלך לפני הקנייה',
+      buttons: [
+        { label: '🔍 קלפי מזוזה', action: () => { onSelectCat('קלפים'); onScrollToProducts(); }, style: 'gold' },
+        { label: '📦 קלפי תפילין', action: () => { onSelectCat('קלפים'); onScrollToProducts(); }, style: 'outline' },
+        { label: '📘 למד על קלפים', action: () => router.push('/madrich'), style: 'ghost' },
       ],
     },
     unsure: {
@@ -103,7 +114,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       {/* ══ Fallback — מובייל או אם אין וידאו ══ */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 0,
-        background: 'linear-gradient(160deg, #1a1008 0%, #2d1f0a 30%, #1a3a2a 70%, #0c1a10 100%)',
+        background: 'linear-gradient(160deg, #0a0a1a 0%, #1a0a2e 30%, #0c1a35 70%, #080818 100%)',
         backgroundImage: isMobile ? 'none' : 'url(/images/stam-hero.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -112,7 +123,8 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       {/* ══ Overlay כהה לקריאות ══ */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 1,
-        background: 'linear-gradient(to left, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.75) 100%)',
+        background: 'rgba(0,0,0,0.7)',
+
       }} />
 
       {/* ══ טקסטורה עדינה ══ */}
@@ -298,7 +310,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       {/* ══ קו זהב תחתון ══ */}
       <div style={{
         position: 'absolute', bottom: 0, right: 0, left: 0, height: 3, zIndex: 3,
-background: 'linear-gradient(to left, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.75) 50%, rgba(0,0,0,0.88) 100%)',
+        background: 'linear-gradient(to left, transparent, #b8972a 30%, #e6c84a 50%, #b8972a 70%, transparent)',
       }} />
     </div>
   );
