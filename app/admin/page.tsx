@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, orderBy, query,
-  doc, updateDoc, addDoc, serverTimestamp, getDoc, setDoc
+  doc, updateDoc, addDoc, serverTimestamp, getDoc, setDoc, deleteDoc
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -74,6 +74,14 @@ interface Product {
 interface Sofer {
   id: string;
   name: string;
+  city?: string;
+  phone?: string;
+  email?: string;
+  description?: string;
+  style?: string;
+  categories?: string[];
+  imageUrl?: string;
+  status?: string;
 }
 
 interface HomeContent {
@@ -90,7 +98,7 @@ interface Category {
   order: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'shluchim' | 'users' | 'products' | 'content' | 'categories';
+type TabType = 'orders' | 'commissions' | 'soferim_list' | 'soferim' | 'shluchim' | 'users' | 'products' | 'content' | 'categories';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: '👑 מנהל',
@@ -105,6 +113,248 @@ const ROLE_COLORS: Record<UserRole, string> = {
   shaliach: 'bg-blue-100 text-blue-700',
   customer: 'bg-gray-100 text-gray-600',
 };
+
+// ══ מודל הוספה/עריכת סופר ══
+function SoferModal({ sofer, soferim, onClose, onSave }: {
+  sofer?: Sofer;
+  soferim: Sofer[];
+  onClose: () => void;
+  onSave: () => void;
+}) {
+  const isEdit = !!sofer;
+  const [name, setName] = useState(sofer?.name || '');
+  const [city, setCity] = useState(sofer?.city || '');
+  const [phone, setPhone] = useState(sofer?.phone || '');
+  const [email, setEmail] = useState(sofer?.email || '');
+  const [description, setDescription] = useState(sofer?.description || '');
+  const [style, setStyle] = useState(sofer?.style || '');
+  const [imageUrl, setImageUrl] = useState(sofer?.imageUrl || '');
+  const [selectedCats, setSelectedCats] = useState<string[]>(sofer?.categories || []);
+  const [saving, setSaving] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState(false);
+
+  // הוספת מוצרים לסופר החדש
+  const [addProducts, setAddProducts] = useState(false);
+  const [productName, setProductName] = useState('');
+  const [productPrice, setProductPrice] = useState('');
+  const [productCat, setProductCat] = useState(CATS.filter(c => c !== 'הכל')[0] || '');
+  const [productImgUrl, setProductImgUrl] = useState('');
+  const [products, setProducts] = useState<{ name: string; price: string; cat: string; imgUrl: string }[]>([]);
+
+  async function uploadToCloudinary(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'yoursofer_upload');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error(data.error?.message || 'שגיאה בהעלאה');
+    return data.secure_url;
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImg(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      setImageUrl(url);
+    } catch (err: any) {
+      alert('שגיאה בהעלאת תמונה: ' + err.message);
+    } finally {
+      setUploadingImg(false);
+    }
+  }
+
+  function toggleCat(cat: string) {
+    setSelectedCats(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+  }
+
+  function addProductToList() {
+    if (!productName || !productPrice) { alert('שם ומחיר חובה'); return; }
+    setProducts(prev => [...prev, { name: productName, price: productPrice, cat: productCat, imgUrl: productImgUrl }]);
+    setProductName(''); setProductPrice(''); setProductImgUrl('');
+  }
+
+  async function handleSave() {
+    if (!name) { alert('שם הסופר הוא שדה חובה'); return; }
+    setSaving(true);
+    try {
+      const soferData = {
+        name, city, phone, email, description, style,
+        imageUrl: imageUrl || null,
+        categories: selectedCats,
+        status: 'active',
+      };
+
+      if (isEdit && sofer) {
+        await updateDoc(doc(db, 'soferim', sofer.id), soferData);
+      } else {
+        const soferRef = await addDoc(collection(db, 'soferim'), {
+          ...soferData,
+          createdAt: serverTimestamp(),
+        });
+        // הוסף מוצרים אם יש
+        for (const p of products) {
+          await addDoc(collection(db, 'products'), {
+            name: p.name,
+            price: Number(p.price),
+            cat: p.cat,
+            imgUrl: p.imgUrl || null,
+            soferId: soferRef.id,
+            status: 'active',
+            createdAt: serverTimestamp(),
+          });
+        }
+      }
+      onSave();
+      onClose();
+    } catch (e) {
+      alert('שגיאה בשמירה');
+      console.error(e);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      onClick={onClose}>
+      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>{isEdit ? '✏️ עריכת סופר' : '➕ הוספת סופר חדש'}</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+        </div>
+
+        <div style={{ display: 'grid', gap: 14 }}>
+          {/* פרטים בסיסיים */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>שם הסופר *</label>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="ר' ישראל ישראלי"
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>עיר</label>
+              <input value={city} onChange={e => setCity(e.target.value)} placeholder="בני ברק"
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>טלפון</label>
+              <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="050-0000000"
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>אימייל</label>
+              <input value={email} onChange={e => setEmail(e.target.value)} placeholder="sofer@email.com"
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>סגנון כתיבה</label>
+            <input value={style} onChange={e => setStyle(e.target.value)} placeholder="בית יוסף, אר״י..."
+              style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+          </div>
+
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תיאור</label>
+            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3}
+              placeholder="סופר מוסמך עם 20 שנות ניסיון..."
+              style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box' }} />
+          </div>
+
+          {/* תמונה */}
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>תמונת פרופיל</label>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {imageUrl && <img src={imageUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd', flexShrink: 0 }} />}
+              <label style={{ background: '#0c1a35', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                {uploadingImg ? '⏳...' : '📷 העלה'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
+              </label>
+              <input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="או הדבק URL"
+                style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12, minWidth: 0 }} />
+            </div>
+          </div>
+
+          {/* קטגוריות */}
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>קטגוריות</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {CATS.filter(c => c !== 'הכל').map(cat => (
+                <button key={cat} type="button" onClick={() => toggleCat(cat)}
+                  style={{ padding: '5px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', background: selectedCats.includes(cat) ? '#b8972a' : '#f0f0f0', color: selectedCats.includes(cat) ? '#fff' : '#333', border: 'none', fontWeight: selectedCats.includes(cat) ? 700 : 400 }}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* הוספת מוצרים — רק בהוספה חדשה */}
+          {!isEdit && (
+            <div style={{ border: '1px solid #e0e0e0', borderRadius: 10, padding: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <label style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>📦 הוספת מוצרים לסופר</label>
+                <button type="button" onClick={() => setAddProducts(!addProducts)}
+                  style={{ background: '#f0f0f0', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}>
+                  {addProducts ? 'סגור ▲' : 'פתח ▼'}
+                </button>
+              </div>
+              {products.length > 0 && (
+                <div style={{ marginBottom: 10 }}>
+                  {products.map((p, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f9f9f9', borderRadius: 6, padding: '6px 10px', marginBottom: 4, fontSize: 12 }}>
+                      <span>{p.name} — ₪{p.price} — {p.cat}</span>
+                      <button type="button" onClick={() => setProducts(prev => prev.filter((_, j) => j !== i))}
+                        style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {addProducts && (
+                <div style={{ display: 'grid', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8 }}>
+                    <input value={productName} onChange={e => setProductName(e.target.value)} placeholder="שם המוצר"
+                      style={{ border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
+                    <input type="number" value={productPrice} onChange={e => setProductPrice(e.target.value)} placeholder="מחיר ₪"
+                      style={{ border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8 }}>
+                    <select value={productCat} onChange={e => setProductCat(e.target.value)}
+                      style={{ border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#fff', boxSizing: 'border-box' }}>
+                      {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <input value={productImgUrl} onChange={e => setProductImgUrl(e.target.value)} placeholder="URL תמונה (אופציונלי)"
+                      style={{ border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
+                  </div>
+                  <button type="button" onClick={addProductToList}
+                    style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                    ➕ הוסף מוצר לרשימה
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
+          <button onClick={handleSave} disabled={saving}
+            style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            {saving ? '⏳ שומר...' : isEdit ? '💾 שמור שינויים' : '✅ הוסף סופר'}
+          </button>
+          <button onClick={onClose}
+            style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>
+            ביטול
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function AddProductModal({ soferim, onClose, onSave }: {
   soferim: Sofer[];
@@ -286,6 +536,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState<AppUser[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
+  const [soferimLoading, setSoferimLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [content, setContent] = useState<HomeContent>({ heroTitle: '', heroSubtitle: '', heroText: '' });
   const [contentSaving, setContentSaving] = useState(false);
@@ -301,6 +552,9 @@ export default function AdminPage() {
   const [roleFilter, setRoleFilter] = useState<string>('הכל');
   const [productSearch, setProductSearch] = useState('');
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [showSoferModal, setShowSoferModal] = useState(false);
+  const [editingSofer, setEditingSofer] = useState<Sofer | undefined>(undefined);
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
@@ -364,12 +618,14 @@ export default function AdminPage() {
   }
 
   async function loadSoferim() {
+    setSoferimLoading(true);
     try {
       const snap = await getDocs(collection(db, 'soferim'));
       const data: Sofer[] = [];
-      snap.forEach(d => data.push({ id: d.id, name: d.data().name } as Sofer));
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Sofer));
       setSoferim(data);
     } catch (e) { console.error(e); }
+    finally { setSoferimLoading(false); }
   }
 
   async function loadContent() {
@@ -441,9 +697,7 @@ export default function AdminPage() {
   async function approveApplication(app: SoferApplication) {
     setActionLoading(app.id);
     try {
-      await updateDoc(doc(db, 'soferim_applications', app.id), {
-        status: 'approved', approvedAt: serverTimestamp(),
-      });
+      await updateDoc(doc(db, 'soferim_applications', app.id), { status: 'approved', approvedAt: serverTimestamp() });
       const soferRef = await addDoc(collection(db, 'soferim'), {
         name: app.name, city: app.city, phone: app.phone,
         whatsapp: app.whatsapp || '', email: app.email || '',
@@ -455,21 +709,16 @@ export default function AdminPage() {
       for (const product of appProducts) {
         if (product.type && product.images?.length > 0) {
           await addDoc(collection(db, 'products'), {
-            name: product.type,
-            price: 0,
-            imgUrl: product.images[0] || null,
-            imgUrl2: product.images[1] || null,
-            imgUrl3: product.images[2] || null,
-            imgUrl4: product.images[3] || null,
-            cat: 'קלפים',
-            subCat: product.type,
-            soferId: soferRef.id,
-            status: 'active',
-            createdAt: serverTimestamp(),
+            name: product.type, price: 0,
+            imgUrl: product.images[0] || null, imgUrl2: product.images[1] || null,
+            imgUrl3: product.images[2] || null, imgUrl4: product.images[3] || null,
+            cat: 'קלפים', subCat: product.type, soferId: soferRef.id,
+            status: 'active', createdAt: serverTimestamp(),
           });
         }
       }
       setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
+      loadSoferim();
     } catch (e) { console.error(e); alert('שגיאה באישור'); }
     finally { setActionLoading(null); }
   }
@@ -486,9 +735,7 @@ export default function AdminPage() {
   async function approveShaliach(app: ShaliachApplication) {
     setActionLoading(app.id);
     try {
-      await updateDoc(doc(db, 'shluchim_applications', app.id), {
-        status: 'approved', approvedAt: serverTimestamp(),
-      });
+      await updateDoc(doc(db, 'shluchim_applications', app.id), { status: 'approved', approvedAt: serverTimestamp() });
       const shaliachRef = await addDoc(collection(db, 'shluchim'), {
         name: app.name, chabadName: app.chabadName || '',
         city: app.city, phone: app.phone, email: app.email || '',
@@ -499,9 +746,7 @@ export default function AdminPage() {
       for (const userDoc of usersSnap.docs) {
         const userData = userDoc.data();
         if (userData.email === app.email) {
-          await updateDoc(doc(db, 'users', userDoc.id), {
-            role: 'shaliach', shaliachId: shaliachRef.id,
-          });
+          await updateDoc(doc(db, 'users', userDoc.id), { role: 'shaliach', shaliachId: shaliachRef.id });
           break;
         }
       }
@@ -518,6 +763,13 @@ export default function AdminPage() {
       setShaliachApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' } : a));
     } catch (e) { console.error(e); alert('שגיאה בדחייה'); }
     finally { setActionLoading(null); }
+  }
+
+  function copyLink(id: string) {
+    const link = `${window.location.origin}/?ref=${id}`;
+    navigator.clipboard.writeText(link);
+    setCopiedLink(id);
+    setTimeout(() => setCopiedLink(null), 2500);
   }
 
   if (loading || ordersLoading) return (
@@ -577,6 +829,7 @@ export default function AdminPage() {
         <button onClick={() => router.push('/')} className="text-green-700 font-bold hover:underline">← חזרה לחנות</button>
       </div>
 
+      {/* סטטיסטיקות */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl shadow p-4 text-center">
           <div className="text-3xl font-black text-green-700">₪{totalRevenue.toFixed(0)}</div>
@@ -596,12 +849,14 @@ export default function AdminPage() {
         </div>
       </div>
 
+      {/* טאבים */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {[
           { key: 'orders', label: '📦 הזמנות', color: 'bg-green-700' },
           { key: 'products', label: '📜 מוצרים', color: 'bg-teal-600', badge: unassignedProducts },
+          { key: 'soferim_list', label: '✍️ סופרים', color: 'bg-amber-500' },
           { key: 'commissions', label: '🤝 עמלות', color: 'bg-blue-600' },
-          { key: 'soferim', label: '✍️ בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
+          { key: 'soferim', label: '📋 בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
           { key: 'shluchim', label: '🟦 בקשות שליחים', color: 'bg-blue-800', badge: pendingShaliachApps.length },
           { key: 'users', label: '👥 משתמשים', color: 'bg-purple-600' },
           { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
@@ -617,6 +872,72 @@ export default function AdminPage() {
         ))}
       </div>
 
+      {/* ══ טאב סופרים קיימים ══ */}
+      {activeTab === 'soferim_list' && (
+        <div>
+          <div className="flex gap-3 mb-4 items-center">
+            <h2 className="text-xl font-black flex-1">✍️ סופרים רשומים ({soferim.length})</h2>
+            <button onClick={() => { setEditingSofer(undefined); setShowSoferModal(true); }}
+              className="bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-amber-600 transition">
+              ➕ הוסף סופר
+            </button>
+          </div>
+          {soferimLoading ? (
+            <div className="p-10 text-center text-gray-400">טוען...</div>
+          ) : soferim.length === 0 ? (
+            <div className="p-10 text-center text-gray-400">אין סופרים רשומים עדיין</div>
+          ) : (
+            <div className="grid gap-4">
+              {soferim.map(s => {
+                const soferProducts = products.filter(p => p.soferId === s.id);
+                return (
+                  <div key={s.id} className="bg-white rounded-xl shadow p-4">
+                    <div className="flex items-center gap-4">
+                      {s.imageUrl
+                        ? <img src={s.imageUrl} alt={s.name} className="w-14 h-14 rounded-full object-cover border-2 border-amber-200 flex-shrink-0" />
+                        : <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center text-2xl flex-shrink-0">✍️</div>}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-black text-base">{s.name}</span>
+                          {s.city && <span className="text-sm text-gray-500">📍 {s.city}</span>}
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                            {s.status === 'active' ? '● פעיל' : '● לא פעיל'}
+                          </span>
+                        </div>
+                        <div className="flex gap-3 text-xs text-gray-500 flex-wrap">
+                          {s.phone && <span>📞 {s.phone}</span>}
+                          {s.email && <span>✉️ {s.email}</span>}
+                          {s.style && <span>✍️ {s.style}</span>}
+                          <span className="text-amber-600 font-bold">📦 {soferProducts.length} מוצרים</span>
+                        </div>
+                        {s.categories && s.categories.length > 0 && (
+                          <div className="flex gap-1 mt-1 flex-wrap">
+                            {s.categories.map(cat => (
+                              <span key={cat} className="bg-amber-50 text-amber-700 text-xs px-2 py-0.5 rounded-full">{cat}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <button onClick={() => { setEditingSofer(s); setShowSoferModal(true); }}
+                          className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-200">
+                          ✏️ ערוך
+                        </button>
+                        <button onClick={() => router.push(`/?soferId=${s.id}`)}
+                          className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-100">
+                          👁️ צפה
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══ טאב שליחים — עם לינק ══ */}
       {activeTab === 'shluchim' && (
         <div>
           {shaliachAppsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
@@ -645,6 +966,18 @@ export default function AdminPage() {
                         {app.email && <span>✉️ {app.email}</span>}
                         {app.rabbiName && <span>🎓 {app.rabbiName}</span>}
                       </div>
+                      {/* לינק אם מאושר */}
+                      {app.status === 'approved' && (app as any).shaliachId && (
+                        <div className="mt-3 flex items-center gap-2">
+                          <code className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">
+                            {window.location.origin}/?ref={(app as any).shaliachId}
+                          </code>
+                          <button onClick={() => copyLink((app as any).shaliachId)}
+                            className={`px-3 py-1 rounded-lg text-xs font-bold transition ${copiedLink === (app as any).shaliachId ? 'bg-green-500 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}>
+                            {copiedLink === (app as any).shaliachId ? '✅ הועתק!' : '📋 העתק'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                     {app.status === 'pending' && (
                       <div className="flex flex-col gap-2 flex-shrink-0">
@@ -946,11 +1279,9 @@ export default function AdminPage() {
                       </td>
                       <td className="p-3">
                         {u.shaliachId ? (
-                          <button onClick={() => {
-                            navigator.clipboard.writeText(`${window.location.origin}/?ref=${u.shaliachId}`);
-                            alert('הלינק הועתק!');
-                          }} className="text-blue-600 text-xs font-bold hover:underline">
-                            📋 העתק לינק
+                          <button onClick={() => copyLink(u.shaliachId!)}
+                            className={`text-xs font-bold px-3 py-1 rounded-lg transition ${copiedLink === u.shaliachId ? 'bg-green-500 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}>
+                            {copiedLink === u.shaliachId ? '✅ הועתק!' : '📋 העתק לינק'}
                           </button>
                         ) : '—'}
                       </td>
@@ -975,10 +1306,15 @@ export default function AdminPage() {
       )}
 
       {showAddProduct && (
-        <AddProductModal
+        <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />
+      )}
+
+      {showSoferModal && (
+        <SoferModal
+          sofer={editingSofer}
           soferim={soferim}
-          onClose={() => setShowAddProduct(false)}
-          onSave={() => { loadProducts(); }}
+          onClose={() => { setShowSoferModal(false); setEditingSofer(undefined); }}
+          onSave={() => loadSoferim()}
         />
       )}
     </main>
