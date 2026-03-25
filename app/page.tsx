@@ -42,6 +42,7 @@ const PROMO_CATS_DEFAULT: PromoCat[] = [
   { name: 'ספרי תורה',       img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'ספרי תורה מהודרים' },
   { name: 'בר מצווה',        img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'סטים וחבילות מיוחדות' },
   { name: 'מתנות',           img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'לכל אירוע ומועד' },
+  { name: 'קלפים',           img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&q=80', sub: 'קלפי מזוזה מסופרים' },
 ];
 
 const FILTER_NUSACH = ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'];
@@ -191,7 +192,7 @@ export default function Home() {
           if (cat.imgUrl) catsData.push({ name: cat.name, img: cat.imgUrl, sub: cat.sub || '' });
         });
         if (catsData.length > 0) {
-         const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות'];
+         const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות', 'קלפים'];
           catsData.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
           setPromoCats(catsData);
         }
@@ -402,6 +403,7 @@ export default function Home() {
         isMobile={isMobile}
         homeContent={homeContent}
         onScrollToProducts={() => mainRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        onSelectCat={(cat: string) => { setActiveCat(cat); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
       />
 
       {/* ══ קטגוריות — גלילה אופקית ══ */}
