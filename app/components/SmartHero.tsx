@@ -98,7 +98,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
     }}>
 
       {/* ══ וידאו ברקע — דסקטופ בלבד ══ */}
-      {!isMobile && (
+      {(
         <video
           autoPlay muted loop playsInline
           style={{
