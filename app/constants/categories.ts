@@ -13,12 +13,15 @@ export const CATS = [
   'בר מצווה',
   'חגים ומועדים',
   'קלפים',
+  'קלפי מזוזה',
+  'קלפי תפילין',
 ];
 
 export const SUB_CATS: Record<string, string[]> = {
   'טליתות': ['טלית קטן', 'טלית צמר', 'סט טלית תפילין'],
   'יודאיקה': ['נוי הבית', 'נוי השולחן', 'חנוכיות', 'אומנות יהודית'],
   'בר מצווה': ['סטים לבר מצווה', 'תפילין קומפלט', 'טליתות', 'מתנות לבר מצווה'],
+  'קלפים': ['קלפי מזוזה', 'קלפי תפילין'],
 };
 
 export const NAV_ITEMS: { label: string; cat: string | null; action: string | null }[] = [
@@ -33,7 +36,8 @@ export const NAV_ITEMS: { label: string; cat: string | null; action: string | nu
   { label: '🎁 מתנות',            cat: 'מתנות',            action: null },
   { label: '✡️ חגים ומועדים',     cat: 'חגים ומועדים',    action: null },
   { label: '🎉 בר מצווה',         cat: 'בר מצווה',         action: null },
-  { label: '📜 קלפים',            cat: 'קלפים',            action: null },
+  { label: '📜 קלפי מזוזה',       cat: 'קלפי מזוזה',       action: null },
+  { label: '📦 קלפי תפילין',      cat: 'קלפי תפילין',      action: null },
   { label: '✍️ הסופרים שלנו',     cat: null,               action: 'soferim' },
   { label: '🌟 הצטרף לפלטפורמה', cat: null,               action: 'join' },
   { label: '🏛️ רבני קהילה',       cat: null,               action: 'shluchim' },
