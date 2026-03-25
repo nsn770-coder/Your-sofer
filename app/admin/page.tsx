@@ -8,6 +8,7 @@ import {
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
+import { CATS } from '../constants/categories';
 
 interface Order {
   id: string;
@@ -92,6 +93,182 @@ const ROLE_COLORS: Record<UserRole, string> = {
   customer: 'bg-gray-100 text-gray-600',
 };
 
+// ══ מודל הוספת מוצר ══
+function AddProductModal({ soferim, onClose, onSave }: {
+  soferim: Sofer[];
+  onClose: () => void;
+  onSave: () => void;
+}) {
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [was, setWas] = useState('');
+  const [desc, setDesc] = useState('');
+  const [cat, setCat] = useState(CATS.filter(c => c !== 'הכל')[0] || '');
+  const [badge, setBadge] = useState('');
+  const [days, setDays] = useState('7-14');
+  const [soferId, setSoferId] = useState('');
+  const [imgUrl, setImgUrl] = useState('');
+  const [imgUrl2, setImgUrl2] = useState('');
+  const [imgUrl3, setImgUrl3] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState<string | null>(null);
+
+  async function uploadToCloudinary(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'yoursofer_upload');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error(data.error?.message || 'שגיאה');
+    return data.secure_url;
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>, field: 'main' | 'img2' | 'img3') {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImg(field);
+    try {
+      const url = await uploadToCloudinary(file);
+      if (field === 'main') setImgUrl(url);
+      else if (field === 'img2') setImgUrl2(url);
+      else setImgUrl3(url);
+    } catch (err: any) {
+      alert('שגיאה בהעלאת תמונה: ' + err.message);
+    } finally {
+      setUploadingImg(null);
+    }
+  }
+
+  async function handleSave() {
+    if (!name || !price) { alert('שם ומחיר הם שדות חובה'); return; }
+    setSaving(true);
+    try {
+      await addDoc(collection(db, 'products'), {
+        name, price: Number(price),
+        was: was ? Number(was) : null,
+        desc, cat,
+        badge: badge || null,
+        days,
+        soferId: soferId || null,
+        imgUrl: imgUrl || null,
+        imgUrl2: imgUrl2 || null,
+        imgUrl3: imgUrl3 || null,
+        status: 'active',
+        createdAt: serverTimestamp(),
+      });
+      onSave();
+      onClose();
+    } catch {
+      alert('שגיאה בשמירה');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      onClick={onClose}>
+      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>➕ הוספת מוצר חדש</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+        </div>
+        <div style={{ display: 'grid', gap: 14 }}>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>שם מוצר *</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="מזוזה מהודרת..."
+              style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>מחיר ₪ *</label>
+              <input type="number" value={price} onChange={e => setPrice(e.target.value)}
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>מחיר לפני הנחה ₪</label>
+              <input type="number" value={was} onChange={e => setWas(e.target.value)} placeholder="לא חובה"
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>קטגוריה</label>
+              <select value={cat} onChange={e => setCat(e.target.value)}
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
+                {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>סופר</label>
+              <select value={soferId} onChange={e => setSoferId(e.target.value)}
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
+                <option value="">ללא סופר</option>
+                {soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תווית</label>
+              <select value={badge} onChange={e => setBadge(e.target.value)}
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
+                <option value="">ללא</option>
+                <option value="חדש">חדש</option>
+                <option value="מבצע">מבצע</option>
+                <option value="פופולרי">פופולרי</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>זמן אספקה</label>
+              <input value={days} onChange={e => setDays(e.target.value)} placeholder="7-14"
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+            </div>
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תיאור</label>
+            <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3}
+              style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>תמונות</label>
+            {(['main', 'img2', 'img3'] as const).map((field, idx) => {
+              const currentUrl = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : imgUrl3;
+              const setUrl = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : setImgUrl3;
+              const label = field === 'main' ? 'תמונה ראשית' : `תמונה ${idx + 1} (אופציונלי)`;
+              return (
+                <div key={field} style={{ marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>{label}</div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {currentUrl && <img src={currentUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
+                    <label style={{ background: field === 'main' ? '#0c1a35' : '#555', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                      {uploadingImg === field ? '⏳...' : '📷 העלה'}
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(e, field)} />
+                    </label>
+                    <input value={currentUrl} onChange={e => setUrl(e.target.value)} placeholder="או הדבק URL"
+                      style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12, minWidth: 0 }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
+          <button onClick={handleSave} disabled={saving}
+            style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            {saving ? '⏳ שומר...' : '✅ הוסף מוצר'}
+          </button>
+          <button onClick={onClose}
+            style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>
+            ביטול
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -114,6 +291,8 @@ export default function AdminPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>('הכל');
   const [productSearch, setProductSearch] = useState('');
+  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [importStatus, setImportStatus] = useState('');
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
@@ -121,13 +300,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (user?.role === 'admin') {
-      loadOrders();
-      loadApplications();
-      loadUsers();
-      loadProducts();
-      loadSoferim();
-      loadContent();
-      loadCategories();
+      loadOrders(); loadApplications(); loadUsers();
+      loadProducts(); loadSoferim(); loadContent(); loadCategories();
     }
   }, [user]);
 
@@ -271,6 +445,144 @@ export default function AdminPage() {
     finally { setActionLoading(null); }
   }
 
+  // ══ ייצוא ══
+  function exportToExcel() {
+    const rows = [
+      ['id', 'name', 'cat', 'price', 'was', 'desc', 'badge', 'days', 'imgUrl', 'imgUrl2', 'imgUrl3', 'soferId'],
+      ...products.map(p => [
+        p.id, p.name, p.cat || '', p.price,
+        (p as any).was || '', (p as any).desc || '',
+        (p as any).badge || '', (p as any).days || '7-14',
+        p.imgUrl || p.image_url || '',
+        (p as any).imgUrl2 || '', (p as any).imgUrl3 || '',
+        p.soferId || ''
+      ])
+    ];
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'products.csv';
+    a.click();
+  }
+
+  // ══ הורד תבנית ריקה ══
+  function downloadTemplate() {
+    const headers = ['id', 'name', 'cat', 'price', 'was', 'desc', 'badge', 'days', 'imgUrl', 'imgUrl2', 'imgUrl3', 'soferId'];
+    const example = ['', 'בית מזוזה כסף 10 ס"מ', 'מזוזות', '89.90', '', 'תיאור המוצר כאן', 'חדש', '7-14', 'https://example.com/image.jpg', '', '', ''];
+    const notes = ['# הסבר:', '# id — ריק למוצר חדש', '# cat — חייב להתאים לקטגוריה באתר', '# badge — חדש / מבצע / פופולרי / ריק', '# imgUrl — URL לתמונה ראשית', '', ''];
+    const csv = [headers.join(','), example.map(v => `"${v}"`).join(','), ...notes].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'products_template.csv';
+    a.click();
+  }
+
+  // ══ ייבוא CSV משופר ══
+  async function importFromCSV(file: File) {
+    setImportStatus('⏳ מייבא מוצרים...');
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(r => r.trim() && !r.trim().startsWith('#'));
+
+      const firstLine = lines[0].replace(/^\uFEFF/, '');
+      const headers = firstLine.split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+
+      const getIdx = (...names: string[]) => {
+        for (const n of names) {
+          const i = headers.indexOf(n);
+          if (i >= 0) return i;
+        }
+        return -1;
+      };
+
+      const idIdx    = getIdx('id');
+      const nameIdx  = getIdx('name', 'שם');
+      const catIdx   = getIdx('cat', 'category', 'קטגוריה');
+      const priceIdx = getIdx('price', 'מחיר');
+      const wasIdx   = getIdx('was', 'מחיר מקורי');
+      const descIdx  = getIdx('desc', 'description', 'תיאור');
+      const badgeIdx = getIdx('badge', 'תווית');
+      const daysIdx  = getIdx('days', 'ימי אספקה');
+      const imgIdx   = getIdx('imgurl', 'image_url', 'img_url', 'תמונה');
+      const img2Idx  = getIdx('imgurl2', 'image_url2');
+      const img3Idx  = getIdx('imgurl3', 'image_url3');
+      const soferIdx = getIdx('soferid', 'sofer_id');
+
+      if (nameIdx === -1) {
+        setImportStatus('❌ לא נמצאה עמודת שם — בדוק שהכותרות בעברית או באנגלית');
+        return;
+      }
+
+      let added = 0, updated = 0, skipped = 0;
+
+      for (let i = 1; i < lines.length; i++) {
+        // פרסר CSV עם תמיכה בגרשיים
+        const cols: string[] = [];
+        let cur = ''; let inQ = false;
+        for (const ch of lines[i]) {
+          if (ch === '"') { inQ = !inQ; }
+          else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+          else cur += ch;
+        }
+        cols.push(cur.trim());
+
+        const get = (idx: number) => idx >= 0 ? (cols[idx] || '').replace(/^"|"$/g, '').trim() : '';
+
+        const name  = get(nameIdx);
+        const price = parseFloat(get(priceIdx));
+        if (!name || isNaN(price) || price <= 0) { skipped++; continue; }
+
+        const productData: any = {
+          name,
+          cat: get(catIdx) || 'כללי',
+          price,
+          status: 'active',
+        };
+        const wasVal = get(wasIdx);
+        if (wasVal) productData.was = parseFloat(wasVal);
+        const descVal = get(descIdx);
+        if (descVal) productData.desc = descVal;
+        const badgeVal = get(badgeIdx);
+        if (badgeVal) productData.badge = badgeVal;
+        const daysVal = get(daysIdx);
+        if (daysVal) productData.days = daysVal;
+        const imgVal = get(imgIdx);
+        if (imgVal) productData.imgUrl = imgVal;
+        const img2Val = get(img2Idx);
+        if (img2Val) productData.imgUrl2 = img2Val;
+        const img3Val = get(img3Idx);
+        if (img3Val) productData.imgUrl3 = img3Val;
+        const soferVal = get(soferIdx);
+        if (soferVal) productData.soferId = soferVal;
+
+        const existingId = get(idIdx);
+
+        try {
+          if (existingId) {
+            await updateDoc(doc(db, 'products', existingId), productData);
+            updated++;
+          } else {
+            productData.createdAt = serverTimestamp();
+            await addDoc(collection(db, 'products'), productData);
+            added++;
+          }
+        } catch (e) {
+          console.error('שגיאה במוצר', name, e);
+          skipped++;
+        }
+      }
+
+      setImportStatus(`✅ הושלם! נוספו: ${added} | עודכנו: ${updated} | דולגו: ${skipped}`);
+      setTimeout(() => setImportStatus(''), 6000);
+      loadProducts();
+    } catch (e) {
+      console.error(e);
+      setImportStatus('❌ שגיאה בייבוא — בדוק שהקובץ תקין');
+    }
+  }
+
   if (loading || ordersLoading) return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-2xl">טוען...</div>
@@ -334,22 +646,116 @@ export default function AdminPage() {
         ))}
       </div>
 
+      {/* ══ PRODUCTS TAB ══ */}
+      {activeTab === 'products' && (
+        <div>
+          <div className="flex gap-2 mb-4 items-center flex-wrap">
+            <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
+              placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
+            <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
+            {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
+
+            {/* ➕ הוסף מוצר */}
+            <button onClick={() => setShowAddProduct(true)}
+              style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              ➕ הוסף מוצר
+            </button>
+
+            {/* 📥 ייצוא */}
+            <button onClick={exportToExcel}
+              style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              📥 ייצוא ל-Excel
+            </button>
+
+            {/* 📋 הורד תבנית */}
+            <button onClick={downloadTemplate}
+              style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              📋 הורד תבנית
+            </button>
+
+            {/* 📤 ייבוא CSV */}
+            <label style={{ background: '#0284c7', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              📤 ייבוא CSV
+              <input type="file" accept=".csv" style={{ display: 'none' }}
+                onChange={e => { if (e.target.files?.[0]) { importFromCSV(e.target.files[0]); e.target.value = ''; } }} />
+            </label>
+          </div>
+
+          {/* סטטוס ייבוא */}
+          {importStatus && (
+            <div style={{
+              marginBottom: 16, padding: '12px 16px', borderRadius: 10, fontSize: 14, fontWeight: 700,
+              background: importStatus.startsWith('✅') ? '#f0fdf4' : importStatus.startsWith('❌') ? '#fef2f2' : '#eff6ff',
+              color: importStatus.startsWith('✅') ? '#15803d' : importStatus.startsWith('❌') ? '#dc2626' : '#1d4ed8',
+            }}>
+              {importStatus}
+            </div>
+          )}
+
+          {productsLoading ? (
+            <div className="p-10 text-center text-gray-400">טוען מוצרים...</div>
+          ) : (
+            <div className="bg-white rounded-xl shadow overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-3 text-right">מוצר</th>
+                    <th className="p-3 text-right">קטגוריה</th>
+                    <th className="p-3 text-right">מחיר</th>
+                    <th className="p-3 text-right">סטטוס</th>
+                    <th className="p-3 text-right">שיוך לסופר</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.length === 0 ? (
+                    <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
+                  ) : filteredProducts.map(p => (
+                    <tr key={p.id} className="border-t hover:bg-gray-50">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          {(p.imgUrl || p.image_url) && (
+                            <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover"
+                              onError={e => (e.currentTarget.style.display = 'none')} />
+                          )}
+                          <span className="font-bold text-xs">{p.name}</span>
+                        </div>
+                      </td>
+                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
+                      <td className="p-3 font-bold text-green-700">₪{p.price}</td>
+                      <td className="p-3">
+                        <button onClick={() => toggleProductStatus(p.id, p.status || 'active')}
+                          disabled={actionLoading === p.id + '_status'}
+                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                          {p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}
+                        </button>
+                      </td>
+                      <td className="p-3">
+                        <select value={p.soferId || ''} disabled={actionLoading === p.id}
+                          onChange={e => assignSoferToProduct(p.id, e.target.value)}
+                          className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}>
+                          <option value="">⚠️ ללא סופר</option>
+                          {soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ══ CATEGORIES TAB ══ */}
       {activeTab === 'categories' && (
         <div className="grid gap-6">
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-xl font-black mb-2">🖼️ ניהול תמונות קטגוריות</h2>
             <p className="text-sm text-gray-500 mb-6">עדכן תמונה וכיתוב לכל קטגוריה. התמונות מופיעות בדף הבית.</p>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {categories.map(cat => (
-                <CategoryCard
-                  key={cat.id}
-                  cat={cat}
-                  saving={catSaving === cat.id}
-                  saved={catSaved === cat.id}
-                  onSave={(imgUrl, sub) => saveCategoryImg(cat.id, imgUrl, sub)}
-                />
+                <CategoryCard key={cat.id} cat={cat} saving={catSaving === cat.id} saved={catSaved === cat.id}
+                  onSave={(imgUrl, sub) => saveCategoryImg(cat.id, imgUrl, sub)} />
               ))}
             </div>
           </div>
@@ -398,65 +804,6 @@ export default function AdminPage() {
               {contentSaved && <span className="text-green-600 font-bold text-sm">✅ נשמר!</span>}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ══ PRODUCTS TAB ══ */}
-      {activeTab === 'products' && (
-        <div>
-          <div className="flex gap-3 mb-4 items-center">
-            <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
-              placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
-            <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
-            {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
-          </div>
-          {productsLoading ? (
-            <div className="p-10 text-center text-gray-400">טוען מוצרים...</div>
-          ) : (
-            <div className="bg-white rounded-xl shadow overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="p-3 text-right">מוצר</th>
-                    <th className="p-3 text-right">קטגוריה</th>
-                    <th className="p-3 text-right">מחיר</th>
-                    <th className="p-3 text-right">סטטוס</th>
-                    <th className="p-3 text-right">שיוך לסופר</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredProducts.length === 0 ? (
-                    <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
-                  ) : filteredProducts.map(p => (
-                    <tr key={p.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          {(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />}
-                          <span className="font-bold text-xs">{p.name}</span>
-                        </div>
-                      </td>
-                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
-                      <td className="p-3 font-bold text-green-700">₪{p.price}</td>
-                      <td className="p-3">
-                        <button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'}
-                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
-                          {p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}
-                        </button>
-                      </td>
-                      <td className="p-3">
-                        <select value={p.soferId || ''} disabled={actionLoading === p.id}
-                          onChange={e => assignSoferToProduct(p.id, e.target.value)}
-                          className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}>
-                          <option value="">⚠️ ללא סופר</option>
-                          {soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                        </select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       )}
 
@@ -631,15 +978,18 @@ export default function AdminPage() {
           )}
         </div>
       )}
+
+      {/* ══ מודל הוספת מוצר ══ */}
+      {showAddProduct && (
+        <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />
+      )}
     </main>
   );
 }
 
 // ══ קומפוננט כרטיס קטגוריה ══
 function CategoryCard({ cat, saving, saved, onSave }: {
-  cat: Category;
-  saving: boolean;
-  saved: boolean;
+  cat: Category; saving: boolean; saved: boolean;
   onSave: (imgUrl: string, sub: string) => void;
 }) {
   const [imgUrl, setImgUrl] = useState(cat.imgUrl || '');
@@ -648,7 +998,6 @@ function CategoryCard({ cat, saving, saved, onSave }: {
 
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden">
-      {/* תצוגה מקדימה */}
       <div style={{ height: 120, background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', position: 'relative', overflow: 'hidden' }}>
         {preview ? (
           <img src={preview} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -660,19 +1009,15 @@ function CategoryCard({ cat, saving, saved, onSave }: {
           <div style={{ color: '#fff', fontWeight: 900, fontSize: 15 }}>{cat.name}</div>
         </div>
       </div>
-
-      {/* עריכה */}
       <div className="p-4 bg-white">
         <div className="mb-3">
           <label className="block text-xs font-bold text-gray-500 mb-1">כיתוב</label>
-          <input value={sub} onChange={e => setSub(e.target.value)}
-            placeholder="מכל הסוגים והגדלים"
+          <input value={sub} onChange={e => setSub(e.target.value)} placeholder="מכל הסוגים והגדלים"
             className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-400" />
         </div>
         <div className="mb-3">
           <label className="block text-xs font-bold text-gray-500 mb-1">קישור תמונה (URL)</label>
-          <input value={imgUrl} onChange={e => { setImgUrl(e.target.value); setPreview(e.target.value); }}
-            placeholder="https://..."
+          <input value={imgUrl} onChange={e => { setImgUrl(e.target.value); setPreview(e.target.value); }} placeholder="https://..."
             className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-400" />
         </div>
         <div className="flex items-center gap-3">
