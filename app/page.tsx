@@ -7,6 +7,7 @@ import { useCart } from './contexts/CartContext';
 import { useAuth } from './contexts/AuthContext';
 import { useShaliach } from './contexts/ShaliachContext';
 import { CATS, NAV_ITEMS } from './constants/categories';
+import SmartHero from './components/SmartHero';
 
 interface Product {
   id: string;
@@ -41,6 +42,7 @@ const PROMO_CATS_DEFAULT: PromoCat[] = [
   { name: 'ספרי תורה',       img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'ספרי תורה מהודרים' },
   { name: 'בר מצווה',        img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'סטים וחבילות מיוחדות' },
   { name: 'מתנות',           img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'לכל אירוע ומועד' },
+  { name: 'קלפים',           img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&q=80', sub: 'קלפי מזוזה מסופרים' },
 ];
 
 const FILTER_NUSACH = ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'];
@@ -190,7 +192,7 @@ export default function Home() {
           if (cat.imgUrl) catsData.push({ name: cat.name, img: cat.imgUrl, sub: cat.sub || '' });
         });
         if (catsData.length > 0) {
-         const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות'];
+         const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות', 'קלפים'];
           catsData.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
           setPromoCats(catsData);
         }
@@ -389,40 +391,12 @@ export default function Home() {
         </div>
       )}
 
-      <div style={{ position: 'relative', overflow: 'hidden' }}>
-        <div style={{ width: '100%', height: isMobile ? 200 : 300, background: 'linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 40%, #3d7a52 70%, #1a3a2a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 16px' : '0 6%', position: 'relative' }}>
-          <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e6a817' fill-opacity='1'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40z'/%3E%3C/g%3E%3C/svg%3E\")" }} />
-          <div style={{ position: 'relative', zIndex: 2, flex: 1 }}>
-            <h1 style={{ fontSize: isMobile ? 22 : 36, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: isMobile ? 6 : 10 }}>
-              {shaliach ? <>רכישת סת&quot;ם<br /><span style={{ color: '#b8972a' }}>בית חבד {shaliach.city || ''}</span></> : <>{homeContent.heroTitle}<br /><span style={{ color: '#b8972a' }}>{homeContent.heroSubtitle}</span></>}
-            </h1>
-            {!isMobile && (
-              <p style={{ fontSize: 15, color: '#a8c8b4', marginBottom: 24, maxWidth: 440, lineHeight: 1.6 }}>
-                {shaliach ? `${shaliach.chabadName || shaliach.name} ממליץ על מוצרי סת״ם מסופרים מוסמכים ומאומתים.` : homeContent.heroText}
-              </p>
-            )}
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => mainRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                style={{ background: '#b8972a', color: '#0c1a35', fontSize: isMobile ? 13 : 14, fontWeight: 700, padding: isMobile ? '9px 18px' : '11px 28px', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
-                {shaliach ? 'לקנייה עכשיו ←' : 'לקנייה ←'}
-              </button>
-              {!shaliach && (
-                <button onClick={() => router.push('/soferim')}
-                  style={{ background: 'transparent', color: '#fff', fontSize: isMobile ? 13 : 14, fontWeight: 600, padding: isMobile ? '9px 14px' : '11px 22px', border: '1px solid rgba(255,255,255,0.5)', borderRadius: 8, cursor: 'pointer' }}>
-                  הסופרים שלנו
-                </button>
-              )}
-            </div>
-          </div>
-          <div style={{ position: 'relative', zIndex: 2, flexShrink: 0 }}>
-            {shaliach?.logoUrl ? (
-              <img src={shaliach.logoUrl} alt="" style={{ width: isMobile ? 80 : 150, height: isMobile ? 80 : 150, objectFit: 'contain', borderRadius: 16 }} />
-            ) : (
-              <div style={{ fontSize: isMobile ? 50 : 90, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.3))' }}>📜</div>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* ══ SMART HERO ══ */}
+      <SmartHero
+        isMobile={isMobile}
+        onScrollToProducts={() => mainRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        onSelectCat={(cat: string) => { setActiveCat(cat); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+      />
 
       <div style={{ background: '#fff', borderBottom: '1px solid #ddd', padding: '16px 0' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 12px' }}>
