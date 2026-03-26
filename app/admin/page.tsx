@@ -307,6 +307,7 @@ export default function AdminPage() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [soferimFull, setSoferimFull] = useState<SoferFull[]>([]);
   const [soferimLoading, setSoferimLoading] = useState(false);
+  const [showAddSofer, setShowAddSofer] = useState(false);
   const [importStatus, setImportStatus] = useState('');
 
   useEffect(() => {
@@ -906,6 +907,10 @@ export default function AdminPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-black">✍️ סופרים פעילים ({soferimFull.length})</h2>
+            <button onClick={() => setShowAddSofer(true)}
+              style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              ➕ הוסף סופר
+            </button>
           </div>
           {soferimLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
           : soferimFull.length === 0 ? <div className="p-10 text-center text-gray-400">אין סופרים עדיין</div>
@@ -1059,6 +1064,14 @@ export default function AdminPage() {
         </div>
       )}
 
+
+      {/* ══ מודל הוספת סופר ══ */}
+      {showAddSofer && (
+        <AddSoferModal
+          onClose={() => setShowAddSofer(false)}
+          onSave={() => { loadSoferimFull(); loadSoferim(); }}
+        />
+      )}
       {/* ══ מודל הוספת מוצר ══ */}
       {showAddProduct && (
         <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />
@@ -1066,6 +1079,169 @@ export default function AdminPage() {
     </main>
   );
 }
+
+function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () => void }) {
+  const [form, setForm] = useState({
+    name: '', city: '', phone: '', whatsapp: '', email: '',
+    description: '', style: '', imageUrl: '',
+  });
+  const [categories, setCategories] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState(false);
+
+  const SOFER_CATS = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין'];
+
+  function toggleCat(cat: string) {
+    setCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+  }
+
+  async function uploadToCloudinary(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'yoursofer_upload');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error('שגיאה בהעלאה');
+    return data.secure_url;
+  }
+
+  async function handleSave() {
+    if (!form.name || !form.phone) { alert('שם וטלפון הם שדות חובה'); return; }
+    setSaving(true);
+    try {
+      const { addDoc, collection, serverTimestamp } = await import('firebase/firestore');
+      const { db } = await import('../firebase');
+      await addDoc(collection(db, 'soferim'), {
+        ...form,
+        categories,
+        status: 'active',
+        createdAt: serverTimestamp(),
+      });
+      onSave();
+      onClose();
+    } catch (e) {
+      alert('שגיאה בשמירה');
+      console.error(e);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%', border: '1px solid #ddd', borderRadius: 8,
+    padding: '10px 12px', fontSize: 14, boxSizing: 'border-box',
+  };
+  const labelStyle: React.CSSProperties = {
+    fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4,
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      onClick={onClose}>
+      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>➕ הוספת סופר חדש</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+        </div>
+
+        <div style={{ display: 'grid', gap: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={labelStyle}>שם מלא *</label>
+              <input value={form.name} onChange={e => setForm(p => ({...p, name: e.target.value}))} placeholder="הרב ישראל ישראלי" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>עיר</label>
+              <input value={form.city} onChange={e => setForm(p => ({...p, city: e.target.value}))} placeholder="ירושלים" style={inputStyle} />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={labelStyle}>טלפון *</label>
+              <input value={form.phone} onChange={e => setForm(p => ({...p, phone: e.target.value}))} placeholder="050-0000000" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>וואטסאפ</label>
+              <input value={form.whatsapp} onChange={e => setForm(p => ({...p, whatsapp: e.target.value}))} placeholder="050-0000000" style={inputStyle} />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>אימייל</label>
+            <input value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} placeholder="sofer@example.com" type="email" style={inputStyle} />
+          </div>
+
+          <div>
+            <label style={labelStyle}>סגנון כתיבה</label>
+            <input value={form.style} onChange={e => setForm(p => ({...p, style: e.target.value}))} placeholder="חב״ד / אשכנז / ספרד" style={inputStyle} />
+          </div>
+
+          <div>
+            <label style={labelStyle}>תיאור</label>
+            <textarea value={form.description} onChange={e => setForm(p => ({...p, description: e.target.value}))} rows={3}
+              placeholder="סופר מוסמך עם ניסיון של 10 שנים..."
+              style={{ ...inputStyle, resize: 'vertical' }} />
+          </div>
+
+          <div>
+            <label style={labelStyle}>קטגוריות</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {SOFER_CATS.map(cat => (
+                <button key={cat} type="button" onClick={() => toggleCat(cat)}
+                  style={{
+                    padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer',
+                    background: categories.includes(cat) ? '#0c1a35' : '#f5f5f5',
+                    color: categories.includes(cat) ? '#fff' : '#333',
+                    border: categories.includes(cat) ? '1px solid #0c1a35' : '1px solid #ddd',
+                    fontWeight: categories.includes(cat) ? 700 : 400,
+                  }}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>תמונה</label>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              {form.imageUrl && <img src={form.imageUrl} alt="" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ddd' }} />}
+              <label style={{ background: '#0c1a35', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                {uploadingImg ? '⏳ מעלה...' : '📷 העלה תמונה'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async e => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploadingImg(true);
+                  try {
+                    const url = await uploadToCloudinary(file);
+                    setForm(p => ({...p, imageUrl: url}));
+                  } catch { alert('שגיאה בהעלאה'); }
+                  finally { setUploadingImg(false); }
+                }} />
+              </label>
+              <input value={form.imageUrl} onChange={e => setForm(p => ({...p, imageUrl: e.target.value}))}
+                placeholder="או הדבק URL"
+                style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12 }} />
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
+          <button onClick={handleSave} disabled={saving}
+            style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            {saving ? '⏳ שומר...' : '✅ הוסף סופר'}
+          </button>
+          <button onClick={onClose}
+            style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>
+            ביטול
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 // ══ קומפוננט כרטיס קטגוריה ══
 function CategoryCard({ cat, saving, saved, onSave }: {
