@@ -42,6 +42,7 @@ const PROMO_CATS_DEFAULT: PromoCat[] = [
   { name: 'ספרי תורה',       img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'ספרי תורה מהודרים' },
   { name: 'בר מצווה',        img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'סטים וחבילות מיוחדות' },
   { name: 'מתנות',           img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'לכל אירוע ומועד' },
+  { name: 'קלפים',           img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&q=80', sub: 'קלפי מזוזה מסופרים' },
 ];
 
 const FILTER_NUSACH = ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'];
@@ -191,7 +192,7 @@ export default function Home() {
           if (cat.imgUrl) catsData.push({ name: cat.name, img: cat.imgUrl, sub: cat.sub || '' });
         });
         if (catsData.length > 0) {
-         const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות'];
+         const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות', 'קלפים'];
           catsData.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
           setPromoCats(catsData);
         }
@@ -235,7 +236,6 @@ export default function Home() {
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
-      {/* ══ באנר שליח ══ */}
       {shaliach && (
         <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)', borderBottom: '3px solid #b8972a', padding: isMobile ? '8px 12px' : '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, direction: 'rtl', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -259,7 +259,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* ══ NAVBAR ══ */}
       <header style={{ background: '#0c1a35', color: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '8px 10px', display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 12 }}>
           <button onClick={() => setShowHamburger(!showHamburger)}
@@ -331,8 +330,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        {/* נאב קטגוריות */}
         <div style={{ background: '#162444', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 10px', display: 'flex', alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none' }}>
             {NAV_ITEMS.map(item => (
@@ -348,7 +345,6 @@ export default function Home() {
             ))}
           </div>
         </div>
-
         {!isMobile && (
           <div style={{ background: '#1a3a2a', padding: '5px 14px', fontSize: 12, color: '#a8c8b4', display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span>✍️ <strong style={{ color: '#fff' }}>ישירות מהסופר</strong> לביתך</span>
@@ -362,7 +358,6 @@ export default function Home() {
         )}
       </header>
 
-      {/* ══ תפריט המבורגר ══ */}
       {showHamburger && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200 }} onClick={() => setShowHamburger(false)}>
           <div style={{ position: 'absolute', top: 0, right: 0, width: 280, height: '100%', background: '#fff', boxShadow: '-4px 0 20px rgba(0,0,0,0.2)', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
@@ -398,13 +393,11 @@ export default function Home() {
 
       {/* ══ SMART HERO ══ */}
       <SmartHero
-        shaliach={shaliach}
         isMobile={isMobile}
-        homeContent={homeContent}
         onScrollToProducts={() => mainRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        onSelectCat={(cat: string) => { setActiveCat(cat); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
       />
 
-      {/* ══ קטגוריות — גלילה אופקית ══ */}
       <div style={{ background: '#fff', borderBottom: '1px solid #ddd', padding: '16px 0' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -438,7 +431,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ MAIN ══ */}
       <div ref={mainRef} style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '12px 8px' : '16px 12px' }}>
         {isMobile && (
           <button onClick={() => setShowSidebar(!showSidebar)}
@@ -576,7 +568,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ FOOTER ══ */}
       <footer style={{ marginTop: 40, background: '#0f1111', color: '#fff' }}>
         <div style={{ borderBottom: '1px solid #333', padding: '24px 16px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 16 : 30 }}>
@@ -631,13 +622,23 @@ export default function Home() {
         target="_blank"
         rel="noopener noreferrer"
         style={{
-          position: 'fixed', bottom: 24, left: 24, zIndex: 999,
-          background: '#25D366', color: '#fff', borderRadius: 50,
+          position: 'fixed',
+          bottom: 24,
+          left: 24,
+          zIndex: 999,
+          background: '#25D366',
+          color: '#fff',
+          borderRadius: 50,
           padding: isMobile ? '10px 16px' : '12px 20px',
-          fontSize: isMobile ? 13 : 14, fontWeight: 900, cursor: 'pointer',
+          fontSize: isMobile ? 13 : 14,
+          fontWeight: 900,
+          cursor: 'pointer',
           boxShadow: '0 4px 20px rgba(37,211,102,0.5)',
-          display: 'flex', alignItems: 'center', gap: 8,
-          direction: 'rtl', textDecoration: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          direction: 'rtl',
+          textDecoration: 'none',
           transition: 'transform 0.2s, box-shadow 0.2s',
         }}
         onMouseEnter={e => {

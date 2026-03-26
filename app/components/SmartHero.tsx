@@ -2,7 +2,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+<<<<<<< HEAD
 type HeroState = 'main' | 'mezuzah' | 'tefillin' | 'unsure';
+=======
+type HeroState = 'main' | 'mezuzah' | 'tefillin' | 'unsure' | 'klaf';
+>>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
 
 const WA_LINK = 'https://wa.me/972584877770';
 
@@ -38,6 +42,10 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
         { label: '📿 אני מחפש בית מזוזה', action: () => switchState('mezuzah'), style: 'gold' },
         { label: '📦 אני מחפש תפילין', action: () => switchState('tefillin'), style: 'outline' },
         { label: '❓ אני לא בטוח מה לבחור', action: () => switchState('unsure'), style: 'ghost' },
+<<<<<<< HEAD
+=======
+        { label: '📜 אני מחפש קלף מזוזה', action: () => switchState('klaf'), style: 'outline' },
+>>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
       ],
     },
     mezuzah: {
@@ -60,6 +68,19 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
         { label: '💬 שאל סופר', action: () => window.open(WA_LINK, '_blank'), style: 'ghost' },
       ],
     },
+<<<<<<< HEAD
+=======
+    klaf: {
+      headline: 'בחר קלף מזוזה ספציפי',
+      body: 'אצלנו אתה לא קונה "סתם מזוזה" —\nאתה בוחר קלף ספציפי מתוך גלריה אמיתית.\n\nכל קלף מצולם, נבדק ומוצג לפני מכירה.\nאתה רואה בדיוק מה מגיע אליך.',
+      support: 'ניתן לשלוח את תמונת הקלף לרב שלך לפני הקנייה',
+      buttons: [
+        { label: '🔍 קלפי מזוזה', action: () => { onSelectCat('קלפים'); onScrollToProducts(); }, style: 'gold' },
+        { label: '📦 קלפי תפילין', action: () => { onSelectCat('קלפים'); onScrollToProducts(); }, style: 'outline' },
+        { label: '📘 למד על קלפים', action: () => router.push('/madrich'), style: 'ghost' },
+      ],
+    },
+>>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
     unsure: {
       headline: 'בוא נבחר יחד',
       body: 'לא צריך להבין בסת״ם כדי לבחור נכון.\nתכתוב לנו מה אתה מחפש — ונכוון אותך בצורה פשוטה וברורה.',
@@ -87,7 +108,11 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
     }}>
 
       {/* ══ וידאו ברקע — דסקטופ בלבד ══ */}
+<<<<<<< HEAD
       {!isMobile && (
+=======
+      {(
+>>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
         <video
           autoPlay muted loop playsInline
           style={{
@@ -103,7 +128,11 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       {/* ══ Fallback — מובייל או אם אין וידאו ══ */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 0,
+<<<<<<< HEAD
         background: 'linear-gradient(160deg, #1a1008 0%, #2d1f0a 30%, #1a3a2a 70%, #0c1a10 100%)',
+=======
+        background: 'linear-gradient(160deg, #0a0a1a 0%, #1a0a2e 30%, #0c1a35 70%, #080818 100%)',
+>>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
         backgroundImage: isMobile ? 'none' : 'url(/images/stam-hero.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -112,6 +141,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       {/* ══ Overlay כהה לקריאות ══ */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 1,
+<<<<<<< HEAD
         background: 'linear-gradient(to left, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.75) 100%)',
       }} />
 
@@ -120,6 +150,13 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
         position: 'absolute', inset: 0, zIndex: 1, opacity: 0.035,
         backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e6c84a' fill-opacity='1'%3E%3Cpath d='M0 0h30v30H0V0zm30 30h30v30H30V30z'/%3E%3C/g%3E%3C/svg%3E\")",
       }} />
+=======
+        background: 'rgba(0,0,0,0.7)',
+
+      }} />
+
+      
+>>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
 
       {/* ══ תוכן ══ */}
       <div style={{

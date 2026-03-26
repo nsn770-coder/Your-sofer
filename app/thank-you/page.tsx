@@ -1,11 +1,55 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 function ThankYouContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('order');
+  const orderId = searchParams.get('orderId');
+  const [emailSent, setEmailSent] = useState(false);
+
+  useEffect(() => {
+    if (!orderId || emailSent) return;
+
+    async function sendEmail() {
+      try {
+        // קבל פרטי ההזמנה מ-Firestore
+        const orderSnap = await getDoc(doc(db, 'orders', orderId!));
+        if (!orderSnap.exists()) return;
+
+        const order = orderSnap.data();
+
+        // עדכן סטטוס הזמנה ל-paid
+        await updateDoc(doc(db, 'orders', orderId!), {
+          status: 'paid',
+          paidAt: new Date().toISOString(),
+        });
+
+        // שלח מייל
+        await fetch('/api/send-order-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerEmail: order.email,
+            customerName: order.customerName,
+            orderNumber: order.orderNumber,
+            items: order.items,
+            total: order.total,
+            address: order.address,
+          }),
+        });
+
+        setEmailSent(true);
+      } catch (e) {
+        console.error('Email send error:', e);
+      }
+    }
+
+    sendEmail();
+  }, [orderId]);
 
   return (
     <main className="max-w-lg mx-auto p-6 text-center" dir="rtl">
@@ -18,7 +62,7 @@ function ThankYouContent() {
           </div>
         )}
         <p className="text-gray-600 mb-8 leading-relaxed">
-          תודה על הזמנתך! נשלח אליך אישור במייל בקרוב.
+          תודה על הזמנתך! שלחנו אליך אישור במייל.
           הסופר יתחיל לעבוד על המוצר שלך בהקדם.
         </p>
         <button onClick={() => router.push('/')}
