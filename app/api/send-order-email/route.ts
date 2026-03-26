@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Your Sofer <onboarding@resend.dev>',
+        from: 'Your Sofer <noreply@your-sofer.com>',
         to: [customerEmail],
         subject: `✅ אישור הזמנה #${orderNumber} — Your Sofer`,
         html: customerHtml,
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Your Sofer <onboarding@resend.dev>',
+        from: 'Your Sofer <noreply@your-sofer.com>',
         to: ['nsn770@gmail.com'],
         subject: `🛒 הזמנה חדשה #${orderNumber} — ${customerName}`,
         html: adminHtml,
