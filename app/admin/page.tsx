@@ -316,7 +316,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (user?.role === 'admin') {
       loadOrders(); loadApplications(); loadUsers();
-      loadProducts(); loadSoferim(); loadContent(); loadCategories();
+      loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
     }
   }, [user]);
 
