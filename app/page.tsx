@@ -267,11 +267,11 @@ export default function Home() {
             <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
             <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
           </button>
-          <div onClick={() => router.push('/')} style={{ cursor: 'pointer', flexShrink: 0, border: '1px solid transparent', borderRadius: 4, padding: '4px 6px' }}
+          <div onClick={() => router.push('/')} style={{ cursor: 'pointer', flexShrink: 0, border: '1px solid transparent', borderRadius: 4, padding: '4px 6px', display: 'flex', alignItems: 'center', gap: 8 }}
             onMouseEnter={e => (e.currentTarget.style.borderColor = '#b8972a')}
             onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}>
+            <img src="/logo.png" alt="logo" style={{ height: isMobile ? 28 : 36, width: 'auto', objectFit: 'contain' }} onError={e => (e.currentTarget.style.display = 'none')} />
             <div style={{ fontSize: isMobile ? 15 : 20, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1 }}>Your Sofer</div>
-            <div style={{ fontSize: 9, color: '#b8972a', fontWeight: 700 }}>ישראל ✡</div>
           </div>
           <div style={{ flex: 1, display: 'flex', maxWidth: 800, borderRadius: 8, overflow: 'hidden', minWidth: 0 }}>
             {!isMobile && (
@@ -610,7 +610,10 @@ export default function Home() {
           </div>
         </div>
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>✡ Your Sofer</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+  <img src="/logo.png" alt="logo" style={{ height: 28, width: 'auto', filter: 'brightness(0) invert(1)' }} onError={e => (e.currentTarget.style.display = 'none')} />
+  <span style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>Your Sofer</span>
+</div>
           {shaliach && <div style={{ fontSize: 11, color: '#888' }}>מוגש על ידי {shaliach.chabadName || shaliach.name}</div>}
           <div style={{ fontSize: 11, color: '#666' }}>© 2025 Your Sofer — כל הזכויות שמורות</div>
         </div>
