@@ -48,6 +48,65 @@ const PROMO_CATS_DEFAULT: PromoCat[] = [
 const FILTER_NUSACH = ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'];
 const FILTER_HIDUR = ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'];
 
+const CAT_FILTERS: Record<string, { label: string; options: string[] }[]> = {
+  'מזוזות': [
+    { label: 'גודל קלף', options: ['הכל', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ'] },
+    { label: 'חומר', options: ['הכל', 'עץ', 'מתכת', 'זכוכית', 'קרמיקה', 'אבן', 'פלסטיק'] },
+    { label: 'סגנון', options: ['הכל', 'מודרני', 'קלאסי', 'מזרחי', 'ירושלמי', 'מינימליסטי'] },
+    { label: 'מיקום', options: ['הכל', 'דלת כניסה', 'חדר שינה', 'מרפסת', 'לרכב'] },
+  ],
+  'כיסוי תפילין': [
+    { label: 'נוסח', options: ['הכל', 'אשכנז', 'ספרד', 'חב"ד'] },
+    { label: 'חומר', options: ['הכל', 'עור', 'קטיפה', 'בד', 'משי'] },
+    { label: 'סגנון', options: ['הכל', 'רגיל', 'מהודר', 'מעוצב'] },
+  ],
+  'תפילין קומפלט': [
+    { label: 'נוסח', options: ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני'] },
+    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
+  ],
+  'טליתות': [
+    { label: 'סוג', options: ['הכל', 'טלית קטן', 'טלית גדולה'] },
+    { label: 'חומר', options: ['הכל', 'צמר', 'משי', 'פוליאסטר', 'כותנה'] },
+    { label: 'גודל', options: ['הכל', 'XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+  ],
+  'מגילות': [
+    { label: 'סוג', options: ['הכל', 'מגילת אסתר', 'מגילת רות', 'שיר השירים', 'קהלת', 'איכה'] },
+    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
+    { label: 'גודל', options: ['הכל', 'קטן', 'בינוני', 'גדול'] },
+  ],
+  'קלפים': [
+    { label: 'סוג', options: ['הכל', 'קלפי מזוזה', 'קלפי תפילין'] },
+    { label: 'נוסח', options: ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני'] },
+    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
+  ],
+  'קלפי מזוזה': [
+    { label: 'גודל', options: ['הכל', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ'] },
+    { label: 'נוסח', options: ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני'] },
+    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
+  ],
+  'קלפי תפילין': [
+    { label: 'נוסח', options: ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני'] },
+    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
+  ],
+  'יודאיקה': [
+    { label: 'סוג', options: ['הכל', 'חנוכיות', 'כוסות קידוש', 'מנורות', 'בשמים', 'מזכרות'] },
+    { label: 'חומר', options: ['הכל', 'כסף', 'מתכת', 'זכוכית', 'עץ', 'קרמיקה'] },
+  ],
+  'ספרי תורה': [
+    { label: 'גודל', options: ['הכל', 'קטן', 'בינוני', 'גדול'] },
+    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
+  ],
+  'בר מצווה': [
+    { label: 'סוג', options: ['הכל', 'סט תפילין', 'טלית וכיסוי', 'סט שלם', 'מתנות'] },
+  ],
+  'מתנות': [
+    { label: 'אירוע', options: ['הכל', 'בר מצווה', 'חתונה', 'ברית', 'חנוכת בית', 'ראש השנה'] },
+    { label: 'טווח מחיר', options: ['הכל', 'עד 100 ₪', '100-300 ₪', '300-500 ₪', 'מעל 500 ₪'] },
+  ],
+};
+
+
+
 function Stars({ n = 4.5 }: { n?: number }) {
   return (
     <span style={{ color: '#e6a817', fontSize: 12 }}>
@@ -153,6 +212,7 @@ export default function Home() {
     heroText: 'בחר את הסופר שלך — דע מי כותב את המזוזה שלך. ללא מתווכים, ישירות מהמקור.',
   });
   const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
+  const [catFilters, setCatFilters] = useState<Record<string, string>>({});
 
   const router = useRouter();
   const { count, addItem } = useCart();
@@ -212,12 +272,20 @@ export default function Home() {
     if (priceMin) r = r.filter(p => p.price >= Number(priceMin));
     if (priceMax) r = r.filter(p => p.price <= Number(priceMax));
     if (minRating > 0) r = r.filter(p => (p.stars || 4.5) >= minRating);
+    Object.entries(catFilters).forEach(([label, val]) => {
+      if (val && val !== 'הכל') {
+        r = r.filter(p => {
+          const searchIn = [p.name, (p as any).desc, (p as any).material, (p as any).size, (p as any).nusach, (p as any).badge].filter(Boolean).join(' ').toLowerCase();
+          return searchIn.includes(val.toLowerCase());
+        });
+      }
+    });
     if (sortBy === 'מחיר: נמוך לגבוה') r.sort((a, b) => a.price - b.price);
     else if (sortBy === 'מחיר: גבוה לנמוך') r.sort((a, b) => b.price - a.price);
     else if (sortBy === 'דירוג') r.sort((a, b) => (b.stars || 0) - (a.stars || 0));
     setFiltered(r);
     setPage(1);
-  }, [activeCat, search, products, priceMin, priceMax, minRating, sortBy, soferIdFilter]);
+  }, [activeCat, search, products, priceMin, priceMax, minRating, sortBy, soferIdFilter, catFilters]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -334,7 +402,7 @@ export default function Home() {
           <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 10px', display: 'flex', alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none' }}>
             {NAV_ITEMS.map(item => (
               <button key={item.label} onClick={() => {
-                if (item.cat) { setActiveCat(item.cat); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }
+                if (item.cat) { setActiveCat(item.cat); setCatFilters({}); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }
                 else if (item.action === 'soferim') router.push('/soferim');
                 else if (item.action === 'join') router.push('/join');
                 else if (item.action === 'shluchim') router.push('/shluchim');
@@ -409,7 +477,7 @@ export default function Home() {
           </div>
           <div ref={catsScrollRef} style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 4 }}>
             {promoCats.map(c => (
-              <div key={c.name} onClick={() => { setActiveCat(c.name); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+              <div key={c.name} onClick={() => { setActiveCat(c.name); setCatFilters({}); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
                 style={{ cursor: 'pointer', borderRadius: 12, overflow: 'hidden', border: '1px solid #ddd', transition: 'box-shadow 0.2s', flexShrink: 0, width: isMobile ? 130 : 180 }}
                 onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)')}
                 onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
@@ -492,7 +560,21 @@ export default function Home() {
                   </label>
                 ))}
               </div>
-              <button onClick={() => { setPriceMin(''); setPriceMax(''); setMinRating(0); setFilterNusach('הכל'); setFilterHidur('הכל'); }}
+              {/* ══ פילטרים דינמיים לפי קטגוריה ══ */}
+              {CAT_FILTERS[activeCat]?.map(filter => (
+                <div key={filter.label} style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: '#0c1a35' }}>{filter.label}</div>
+                  {filter.options.map(opt => (
+                    <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, cursor: 'pointer', fontSize: 12 }}>
+                      <input type="radio" name={`cf_${filter.label}`}
+                        checked={(catFilters[filter.label] || 'הכל') === opt}
+                        onChange={() => setCatFilters(prev => ({ ...prev, [filter.label]: opt }))} />
+                      {opt}
+                    </label>
+                  ))}
+                </div>
+              ))}
+              <button onClick={() => { setPriceMin(''); setPriceMax(''); setMinRating(0); setFilterNusach('הכל'); setFilterHidur('הכל'); setCatFilters({}); }}
                 style={{ width: '100%', background: '#f0f0f0', border: '1px solid #ddd', borderRadius: 6, padding: '8px', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
                 נקה סינון
               </button>
