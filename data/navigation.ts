@@ -1,4 +1,4 @@
-navigation.t// data/navigation.ts
+// data/navigation.ts
 // Central navigation data — edit here to update the entire menu system
 
 export interface SubItem {

@@ -3,55 +3,30 @@
 
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { navigationData, NavItem } from "@/data/navigation";
 import { ChevronDown } from "lucide-react";
 
-const HOVER_DELAY = 80;   // ms before opening
-const LEAVE_DELAY = 120;  // ms tolerance before closing
+const HOVER_DELAY = 80;
+const LEAVE_DELAY = 120;
 
-const menuVariants = {
-  hidden: {
-    opacity: 0,
-    y: -8,
-    scale: 0.98,
-    transformOrigin: "top center",
-  },
+const menuVariants: Variants = {
+  hidden: { opacity: 0, y: -8, scale: 0.98 },
   visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.22,
-      ease: [0.16, 1, 0.3, 1],
-      staggerChildren: 0.04,
-      delayChildren: 0.05,
-    },
+    opacity: 1, y: 0, scale: 1,
+    transition: { duration: 0.22, ease: "easeOut", staggerChildren: 0.04, delayChildren: 0.05 },
   },
-  exit: {
-    opacity: 0,
-    y: -6,
-    scale: 0.98,
-    transition: { duration: 0.15, ease: "easeIn" },
-  },
+  exit: { opacity: 0, y: -6, scale: 0.98, transition: { duration: 0.15, ease: "easeIn" } },
 };
 
-const columnVariants = {
+const columnVariants: Variants = {
   hidden: { opacity: 0, y: 6 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, x: 4 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.18, ease: "easeOut" },
-  },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.18, ease: "easeOut" } },
 };
 
 interface MegaMenuPanelProps {
@@ -73,46 +48,26 @@ function MegaMenuPanel({ item }: MegaMenuPanelProps) {
       role="dialog"
       aria-label={`תפריט ${item.label}`}
     >
-      {/* Arrow tip */}
       <div
         className="absolute -top-[6px] right-1/2 translate-x-1/2 w-3 h-3 rotate-45 bg-white border-t border-r border-gray-100"
         style={{ borderColor: "rgba(0,0,0,0.06)" }}
       />
-
-      {/* Panel */}
       <div
         className="relative bg-white rounded-2xl overflow-hidden"
-        style={{
-          boxShadow:
-            "0 4px 6px -1px rgba(0,0,0,0.04), 0 20px 60px -10px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.05)",
-        }}
+        style={{ boxShadow: "0 4px 6px -1px rgba(0,0,0,0.04), 0 20px 60px -10px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.05)" }}
       >
         <div className={`flex flex-row-reverse ${hasPromo ? "divide-x divide-x-reverse divide-gray-50" : ""}`}>
-          {/* Columns */}
-          <div
-            className={`flex flex-row-reverse gap-0 flex-1 p-7 ${
-              columnCount === 1 ? "justify-end" : ""
-            }`}
-          >
+          <div className={`flex flex-row-reverse gap-0 flex-1 p-7 ${columnCount === 1 ? "justify-end" : ""}`}>
             {item.columns?.map((col, colIdx) => (
-              <motion.div
-                key={colIdx}
-                variants={columnVariants}
-                className="flex-1 min-w-[160px] px-5 first:pr-0 last:pl-0"
-              >
+              <motion.div key={colIdx} variants={columnVariants} className="flex-1 min-w-[160px] px-5 first:pr-0 last:pl-0">
                 <p className="text-[11px] font-semibold tracking-widest text-gray-400 uppercase mb-4 text-right pb-2 border-b border-gray-50">
                   {col.title}
                 </p>
                 <ul className="space-y-1" role="list">
                   {col.items.map((sub, subIdx) => (
                     <motion.li key={subIdx} variants={itemVariants}>
-                      <Link
-                        href={sub.href}
-                        className="group flex items-center justify-end gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-150 text-right"
-                      >
-                        <span className="group-hover:translate-x-[-2px] transition-transform duration-150">
-                          {sub.label}
-                        </span>
+                      <Link href={sub.href} className="group flex items-center justify-end gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-150 text-right">
+                        <span className="group-hover:translate-x-[-2px] transition-transform duration-150">{sub.label}</span>
                         <span className="w-1 h-1 rounded-full bg-gray-200 group-hover:bg-amber-400 flex-shrink-0 transition-colors duration-150" />
                       </Link>
                     </motion.li>
@@ -122,37 +77,16 @@ function MegaMenuPanel({ item }: MegaMenuPanelProps) {
             ))}
           </div>
 
-          {/* Promo Card */}
           {hasPromo && item.promo && (
-            <motion.div
-              variants={columnVariants}
-              className="w-[220px] flex-shrink-0 p-5 bg-gradient-to-br from-stone-50 to-amber-50/40"
-            >
-              <Link
-                href={item.promo.ctaHref}
-                className="group block h-full"
-                tabIndex={0}
-              >
-                {/* Image placeholder */}
+            <motion.div variants={columnVariants} className="w-[220px] flex-shrink-0 p-5 bg-gradient-to-br from-stone-50 to-amber-50/40">
+              <Link href={item.promo.ctaHref} className="group block h-full" tabIndex={0}>
                 <div className="w-full h-[110px] rounded-xl bg-gradient-to-br from-amber-100 to-stone-200 mb-4 overflow-hidden relative">
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                    style={{
-                      backgroundImage: `url(${item.promo.image})`,
-                      backgroundSize: "cover",
-                    }}
-                  />
-                  {/* Fallback gradient overlay */}
+                  <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                    style={{ backgroundImage: `url(${item.promo.image})`, backgroundSize: "cover" }} />
                   <div className="absolute inset-0 bg-gradient-to-br from-amber-200/50 to-transparent" />
                 </div>
-
-                <p className="text-sm font-semibold text-gray-800 text-right mb-1 group-hover:text-amber-700 transition-colors duration-200">
-                  {item.promo.title}
-                </p>
-                <p className="text-xs text-gray-500 text-right leading-relaxed mb-4">
-                  {item.promo.description}
-                </p>
-
+                <p className="text-sm font-semibold text-gray-800 text-right mb-1 group-hover:text-amber-700 transition-colors duration-200">{item.promo.title}</p>
+                <p className="text-xs text-gray-500 text-right leading-relaxed mb-4">{item.promo.description}</p>
                 <div className="flex justify-end">
                   <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 border border-amber-200 bg-amber-50 px-3 py-1.5 rounded-full group-hover:bg-amber-100 group-hover:border-amber-300 transition-all duration-200">
                     {item.promo.ctaLabel}
@@ -164,12 +98,8 @@ function MegaMenuPanel({ item }: MegaMenuPanelProps) {
           )}
         </div>
 
-        {/* Footer strip */}
         <div className="px-7 py-3 bg-gray-50/60 border-t border-gray-100 flex justify-end">
-          <Link
-            href={item.href ?? "#"}
-            className="text-xs text-gray-400 hover:text-amber-700 transition-colors duration-150 flex items-center gap-1"
-          >
+          <Link href={item.href ?? "#"} className="text-xs text-gray-400 hover:text-amber-700 transition-colors duration-150 flex items-center gap-1">
             לכל {item.label}
             <span className="text-[10px]">←</span>
           </Link>
@@ -199,46 +129,23 @@ export default function DesktopMegaMenu() {
     closeTimer.current = setTimeout(() => setActiveId(null), LEAVE_DELAY);
   }, []);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent, id: string) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        setActiveId(activeId === id ? null : id);
-      }
-      if (e.key === "Escape") setActiveId(null);
-    },
-    [activeId]
-  );
+  const handleKeyDown = useCallback((e: React.KeyboardEvent, id: string) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActiveId(activeId === id ? null : id); }
+    if (e.key === "Escape") setActiveId(null);
+  }, [activeId]);
 
   return (
-    <nav
-      className="hidden lg:flex items-center gap-1 relative"
-      dir="rtl"
-      role="navigation"
-      aria-label="ניווט ראשי"
-    >
+    <nav className="hidden lg:flex items-center gap-1 relative" dir="rtl" role="navigation" aria-label="ניווט ראשי">
       {navigationData.map((item) => {
         const isActive = activeId === item.id;
         const hasMenu = !!item.columns?.length;
-
         return (
-          <div
-            key={item.id}
-            className="relative"
+          <div key={item.id} className="relative"
             onMouseEnter={() => hasMenu && handleMouseEnter(item.id)}
             onMouseLeave={handleMouseLeave}
           >
             <button
-              className={`
-                relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium
-                transition-all duration-200 outline-none
-                focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
-                ${
-                  isActive
-                    ? "text-gray-900 bg-gray-50"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50/80"
-                }
-              `}
+              className={`relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1 ${isActive ? "text-gray-900 bg-gray-50" : "text-gray-600 hover:text-gray-900 hover:bg-gray-50/80"}`}
               onKeyDown={(e) => handleKeyDown(e, item.id)}
               aria-expanded={isActive}
               aria-haspopup={hasMenu ? "true" : undefined}
@@ -246,15 +153,8 @@ export default function DesktopMegaMenu() {
             >
               {item.label}
               {hasMenu && (
-                <ChevronDown
-                  size={13}
-                  className={`transition-transform duration-300 text-gray-400 ${
-                    isActive ? "rotate-180 text-amber-500" : ""
-                  }`}
-                />
+                <ChevronDown size={13} className={`transition-transform duration-300 text-gray-400 ${isActive ? "rotate-180 text-amber-500" : ""}`} />
               )}
-
-              {/* Active underline */}
               <motion.span
                 className="absolute bottom-1 right-4 left-4 h-[2px] bg-amber-400 rounded-full"
                 initial={{ scaleX: 0 }}
@@ -263,7 +163,6 @@ export default function DesktopMegaMenu() {
                 style={{ originX: "50%" }}
               />
             </button>
-
             <AnimatePresence>
               {isActive && hasMenu && <MegaMenuPanel item={item} />}
             </AnimatePresence>

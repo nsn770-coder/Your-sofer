@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useShaliach } from "@/app/contexts/ShaliachContext";
@@ -58,22 +58,32 @@ const SIMPLE_NAV = [
   { label: "🏛️ רבני קהילה", action: "shluchim" },
 ];
 
-const menuVariants = {
+const menuVariants: Variants = {
   hidden: { opacity: 0, y: -8, scale: 0.98 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1], staggerChildren: 0.04, delayChildren: 0.04 } },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: "easeOut", staggerChildren: 0.04, delayChildren: 0.04 } },
   exit: { opacity: 0, y: -6, transition: { duration: 0.14, ease: "easeIn" } },
 };
-const colVariants = { hidden: { opacity: 0, y: 5 }, visible: { opacity: 1, y: 0, transition: { duration: 0.18 } } };
-const itemVariants = { hidden: { opacity: 0, x: 3 }, visible: { opacity: 1, x: 0, transition: { duration: 0.15 } } };
-const drawerVariants = {
+
+const colVariants: Variants = {
+  hidden: { opacity: 0, y: 5 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.18, ease: "easeOut" } },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, x: 3 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.15, ease: "easeOut" } },
+};
+
+const drawerVariants: Variants = {
   hidden: { x: "100%" },
   visible: { x: 0, transition: { type: "spring", stiffness: 300, damping: 35 } },
   exit: { x: "100%", transition: { duration: 0.2, ease: "easeIn" } },
 };
-const accordionVariants = {
+
+const accordionVariants: Variants = {
   hidden: { height: 0, opacity: 0 },
-  visible: { height: "auto", opacity: 1, transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] } },
-  exit: { height: 0, opacity: 0, transition: { duration: 0.18 } },
+  visible: { height: "auto", opacity: 1, transition: { duration: 0.25, ease: "easeOut" } },
+  exit: { height: 0, opacity: 0, transition: { duration: 0.18, ease: "easeIn" } },
 };
 
 function MegaPanel({ item, onSelect }: { item: typeof MEGA_MENU_DATA[0]; onSelect: (cat: string) => void }) {
@@ -118,7 +128,7 @@ function MobileAccordion({ item, onSelect }: { item: typeof MEGA_MENU_DATA[0]; o
   return (
     <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
       <button onClick={() => setOpen(!open)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "15px 20px", background: "none", border: "none", fontSize: 15, fontWeight: 500, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
-        <motion.span animate={{ rotate: open ? 90 : 0 }} style={{ color: "#b8972a", fontSize: 14 }}>‹</motion.span>
+        <motion.span animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.22 }} style={{ color: "#b8972a", fontSize: 14 }}>‹</motion.span>
         <span>{item.label}</span>
       </button>
       <AnimatePresence initial={false}>
@@ -248,7 +258,7 @@ export default function NavBar() {
                 <option>כל הקטגוריות</option>
               </select>
             )}
-            <input placeholder={isMobile ? "חיפוש..." : `חיפוש סת״מ ויודאיקה מאומתים...`}
+            <input placeholder={isMobile ? "חיפוש..." : "חיפוש סת״מ ויודאיקה מאומתים..."}
               style={{ flex: 1, border: "none", padding: "10px", fontSize: isMobile ? 13 : 14, color: "#333", outline: "none", minWidth: 0 }} />
             <button style={{ background: "#b8972a", border: "none", padding: "0 14px", cursor: "pointer" }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>

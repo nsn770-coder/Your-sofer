@@ -1,12 +1,12 @@
 ﻿'use client';
-import { useEffect, useState, useRef } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 import { useCart } from './contexts/CartContext';
 import { useAuth } from './contexts/AuthContext';
 import { useShaliach } from './contexts/ShaliachContext';
-import { CATS, NAV_ITEMS } from './constants/categories';
+import { CATS } from './constants/categories';
 import SmartHero from './components/SmartHero';
 
 interface Product {
@@ -117,15 +117,8 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
   const [imgIdx, setImgIdx] = useState(0);
   const imgs = [p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[];
 
-  function prevImg(e: React.MouseEvent) {
-    e.stopPropagation();
-    setImgIdx(i => (i - 1 + imgs.length) % imgs.length);
-  }
-
-  function nextImg(e: React.MouseEvent) {
-    e.stopPropagation();
-    setImgIdx(i => (i + 1) % imgs.length);
-  }
+  function prevImg(e: React.MouseEvent) { e.stopPropagation(); setImgIdx(i => (i - 1 + imgs.length) % imgs.length); }
+  function nextImg(e: React.MouseEvent) { e.stopPropagation(); setImgIdx(i => (i + 1) % imgs.length); }
 
   return (
     <div onClick={onClick} style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
@@ -133,26 +126,17 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
       onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)')}>
       <div style={{ position: 'relative', paddingTop: '100%', background: '#f7f8f8', overflow: 'hidden' }}>
         {imgs.length > 0 ? (
-          <img src={imgs[imgIdx]} alt={p.name}
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.2s' }}
-            onError={e => (e.currentTarget.style.display = 'none')} />
+          <img src={imgs[imgIdx]} alt={p.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
         ) : (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>📦</div>
         )}
         {imgs.length > 1 && (
           <>
-            <button onClick={prevImg}
-              style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.2)', zIndex: 2 }}>
-              ‹
-            </button>
-            <button onClick={nextImg}
-              style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.2)', zIndex: 2 }}>
-              ›
-            </button>
+            <button onClick={prevImg} style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>‹</button>
+            <button onClick={nextImg} style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>›</button>
             <div style={{ position: 'absolute', bottom: 6, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4, zIndex: 2 }}>
               {imgs.map((_, i) => (
-                <div key={i} onClick={e => { e.stopPropagation(); setImgIdx(i); }}
-                  style={{ width: 6, height: 6, borderRadius: '50%', background: i === imgIdx ? '#0c1a35' : 'rgba(255,255,255,0.8)', cursor: 'pointer' }} />
+                <div key={i} onClick={e => { e.stopPropagation(); setImgIdx(i); }} style={{ width: 6, height: 6, borderRadius: '50%', background: i === imgIdx ? '#0c1a35' : 'rgba(255,255,255,0.8)', cursor: 'pointer' }} />
               ))}
             </div>
           </>
@@ -162,9 +146,7 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
         )}
       </div>
       <div style={{ padding: '10px 8px 12px' }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#0f1111', marginBottom: 4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-          {p.name}
-        </div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#0f1111', marginBottom: 4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{p.name}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
           <Stars n={p.stars || 4.5} />
           <span style={{ fontSize: 11, color: '#0e6ba8' }}>({p.reviews || 0})</span>
@@ -175,8 +157,7 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
           {p.was && <span style={{ fontSize: 11, color: '#c0392b', marginRight: 6 }}>({Math.round((1 - p.price / p.was) * 100)}% הנחה)</span>}
         </div>
         <div style={{ fontSize: 11, color: '#c7511f', marginBottom: 8 }}>🚚 משלוח חינם · {p.days || '7-14'} ימים</div>
-        <button onClick={e => { e.stopPropagation(); onAddToCart(); }}
-          style={{ width: '100%', background: '#b8972a', border: '1px solid #a07820', color: '#0c1a35', borderRadius: 20, padding: '7px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+        <button onClick={e => { e.stopPropagation(); onAddToCart(); }} style={{ width: '100%', background: '#b8972a', border: '1px solid #a07820', color: '#0c1a35', borderRadius: 20, padding: '7px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
           הוסף לסל
         </button>
       </div>
@@ -186,13 +167,12 @@ function ProductCard({ p, onAddToCart, onClick }: { p: Product; onAddToCart: () 
 
 const ITEMS_PER_PAGE = 24;
 
-export default function Home() {
+function HomeContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCat, setActiveCat] = useState('הכל');
   const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState('מומלצים');
   const [showSidebar, setShowSidebar] = useState(false);
@@ -208,8 +188,7 @@ export default function Home() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { count, addItem } = useCart();
-  const { user, signInWithGoogle, logout } = useAuth();
+  const { addItem } = useCart();
   const { shaliach } = useShaliach();
   const mainRef = useRef<HTMLDivElement>(null);
   const catsScrollRef = useRef<HTMLDivElement>(null);
@@ -221,7 +200,6 @@ export default function Home() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // ── קריאת פרמטרים מה-URL ──
   useEffect(() => {
     const soferId = searchParams.get('soferId');
     if (soferId) setSoferIdFilter(soferId);
@@ -262,9 +240,7 @@ export default function Home() {
   useEffect(() => {
     let r = [...products];
     if (soferIdFilter) r = r.filter(p => (p as any).soferId === soferIdFilter);
-    if (activeCat !== 'הכל') r = r.filter(p =>
-      (p.cat?.trim() || p.category?.trim()) === activeCat.trim()
-    );
+    if (activeCat !== 'הכל') r = r.filter(p => (p.cat?.trim() || p.category?.trim()) === activeCat.trim());
     if (search) r = r.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
     if (priceMin) r = r.filter(p => p.price >= Number(priceMin));
     if (priceMax) r = r.filter(p => p.price <= Number(priceMax));
@@ -287,21 +263,14 @@ export default function Home() {
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  function goToPage(p: number) {
-    setPage(p);
-    mainRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }
-
+  function goToPage(p: number) { setPage(p); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }
   function scrollCats(dir: 'right' | 'left') {
-    if (catsScrollRef.current) {
-      catsScrollRef.current.scrollBy({ left: dir === 'left' ? 200 : -200, behavior: 'smooth' });
-    }
+    catsScrollRef.current?.scrollBy({ left: dir === 'left' ? 200 : -200, behavior: 'smooth' });
   }
 
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
-      {/* ══ SMART HERO ══ */}
       <SmartHero
         isMobile={isMobile}
         onScrollToProducts={() => mainRef.current?.scrollIntoView({ behavior: 'smooth' })}
@@ -324,8 +293,7 @@ export default function Home() {
                 onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)')}
                 onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
                 <div style={{ height: isMobile ? 100 : 140, overflow: 'hidden', position: 'relative' }}>
-                  <img src={c.img} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+                  <img src={c.img} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }} />
                   <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '8px 10px' }}>
                     <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 15, color: '#fff' }}>{c.name}</div>
@@ -343,8 +311,7 @@ export default function Home() {
 
       <div ref={mainRef} style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '12px 8px' : '16px 12px' }}>
         {isMobile && (
-          <button onClick={() => setShowSidebar(!showSidebar)}
-            style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <button onClick={() => setShowSidebar(!showSidebar)} style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             🔍 סינון תוצאות {showSidebar ? '▲' : '▼'}
           </button>
         )}
@@ -407,9 +374,7 @@ export default function Home() {
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: '#0c1a35' }}>{filter.label}</div>
                   {filter.options.map(opt => (
                     <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, cursor: 'pointer', fontSize: 12 }}>
-                      <input type="radio" name={`cf_${filter.label}`}
-                        checked={(catFilters[filter.label] || 'הכל') === opt}
-                        onChange={() => setCatFilters(prev => ({ ...prev, [filter.label]: opt }))} />
+                      <input type="radio" name={`cf_${filter.label}`} checked={(catFilters[filter.label] || 'הכל') === opt} onChange={() => setCatFilters(prev => ({ ...prev, [filter.label]: opt }))} />
                       {opt}
                     </label>
                   ))}
@@ -429,8 +394,7 @@ export default function Home() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 11, color: '#555' }}>מיין:</span>
-                  <select value={sortBy} onChange={e => setSortBy(e.target.value)}
-                    style={{ border: '1px solid #ddd', borderRadius: 6, padding: '4px 8px', fontSize: 12, background: '#fff', cursor: 'pointer' }}>
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ border: '1px solid #ddd', borderRadius: 6, padding: '4px 8px', fontSize: 12, background: '#fff', cursor: 'pointer' }}>
                     <option>מומלצים</option>
                     <option>מחיר: נמוך לגבוה</option>
                     <option>מחיר: גבוה לנמוך</option>
@@ -463,10 +427,7 @@ export default function Home() {
               )}
               {totalPages > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 4, marginTop: 24, flexWrap: 'wrap' }}>
-                  <button onClick={() => goToPage(Math.max(1, page - 1))} disabled={page === 1}
-                    style={{ padding: '7px 12px', borderRadius: 6, border: '1px solid #ddd', background: '#fff', cursor: page === 1 ? 'not-allowed' : 'pointer', opacity: page === 1 ? 0.5 : 1, fontSize: 13 }}>
-                    ‹ הקודם
-                  </button>
+                  <button onClick={() => goToPage(Math.max(1, page - 1))} disabled={page === 1} style={{ padding: '7px 12px', borderRadius: 6, border: '1px solid #ddd', background: '#fff', cursor: page === 1 ? 'not-allowed' : 'pointer', opacity: page === 1 ? 0.5 : 1, fontSize: 13 }}>‹ הקודם</button>
                   {Array.from({ length: Math.min(isMobile ? 5 : 7, totalPages) }, (_, i) => {
                     let p2: number;
                     if (totalPages <= 7) p2 = i + 1;
@@ -474,16 +435,10 @@ export default function Home() {
                     else if (page >= totalPages - 3) p2 = totalPages - 6 + i;
                     else p2 = page - 3 + i;
                     return (
-                      <button key={p2} onClick={() => goToPage(p2)}
-                        style={{ padding: '7px 11px', borderRadius: 6, border: '1px solid', borderColor: page === p2 ? '#0c1a35' : '#ddd', background: page === p2 ? '#0c1a35' : '#fff', color: page === p2 ? '#fff' : '#333', cursor: 'pointer', fontWeight: page === p2 ? 700 : 400, fontSize: 13 }}>
-                        {p2}
-                      </button>
+                      <button key={p2} onClick={() => goToPage(p2)} style={{ padding: '7px 11px', borderRadius: 6, border: '1px solid', borderColor: page === p2 ? '#0c1a35' : '#ddd', background: page === p2 ? '#0c1a35' : '#fff', color: page === p2 ? '#fff' : '#333', cursor: 'pointer', fontWeight: page === p2 ? 700 : 400, fontSize: 13 }}>{p2}</button>
                     );
                   })}
-                  <button onClick={() => goToPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}
-                    style={{ padding: '7px 12px', borderRadius: 6, border: '1px solid #ddd', background: '#fff', cursor: page === totalPages ? 'not-allowed' : 'pointer', opacity: page === totalPages ? 0.5 : 1, fontSize: 13 }}>
-                    הבא ›
-                  </button>
+                  <button onClick={() => goToPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} style={{ padding: '7px 12px', borderRadius: 6, border: '1px solid #ddd', background: '#fff', cursor: page === totalPages ? 'not-allowed' : 'pointer', opacity: page === totalPages ? 0.5 : 1, fontSize: 13 }}>הבא ›</button>
                 </div>
               )}
             </div>
@@ -502,25 +457,14 @@ export default function Home() {
               <div key={col.title}>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>{col.title}</div>
                 {col.items.map(item => (
-                  <div key={item} style={{ fontSize: 12, color: '#999', marginBottom: 5, cursor: 'pointer' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                    onMouseLeave={e => (e.currentTarget.style.color = '#999')}>{item}</div>
+                  <div key={item} style={{ fontSize: 12, color: '#999', marginBottom: 5, cursor: 'pointer' }} onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#999')}>{item}</div>
                 ))}
               </div>
             ))}
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>מידע ולמידה</div>
-              {[
-                { label: '📖 מדריך לקניית מזוזה', path: '/madrich' },
-                { label: '✍️ מי הסופרים שלנו', path: '/soferim' },
-                { label: '❓ שאלות נפוצות', path: '/madrich' },
-              ].map(link => (
-                <div key={link.label} onClick={() => router.push(link.path)}
-                  style={{ fontSize: 12, color: '#999', marginBottom: 5, cursor: 'pointer' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#999')}>
-                  {link.label}
-                </div>
+              {[{ label: '📖 מדריך לקניית מזוזה', path: '/madrich' }, { label: '✍️ מי הסופרים שלנו', path: '/soferim' }, { label: '❓ שאלות נפוצות', path: '/madrich' }].map(link => (
+                <div key={link.label} onClick={() => router.push(link.path)} style={{ fontSize: 12, color: '#999', marginBottom: 5, cursor: 'pointer' }} onMouseEnter={e => (e.currentTarget.style.color = '#fff')} onMouseLeave={e => (e.currentTarget.style.color = '#999')}>{link.label}</div>
               ))}
               {!isMobile && (
                 <div style={{ marginTop: 12 }}>
@@ -553,5 +497,13 @@ export default function Home() {
         {isMobile ? 'וואטסאפ' : 'שאלות? דברו איתנו בוואטסאפ'}
       </a>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }
