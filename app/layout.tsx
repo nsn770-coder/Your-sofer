@@ -4,6 +4,7 @@ import "./globals.css";
 import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ShaliachProvider } from "./contexts/ShaliachContext";
+import NavBar from "@/app/components/navigation/NavBar";
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         <AuthProvider>
           <ShaliachProvider>
             <CartProvider>
+              <NavBar />
               {children}
             </CartProvider>
           </ShaliachProvider>

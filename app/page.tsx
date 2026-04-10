@@ -1,6 +1,6 @@
 ﻿'use client';
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { useCart } from './contexts/CartContext';
@@ -105,8 +105,6 @@ const CAT_FILTERS: Record<string, { label: string; options: string[] }[]> = {
   ],
 };
 
-
-
 function Stars({ n = 4.5 }: { n?: number }) {
   return (
     <span style={{ color: '#e6a817', fontSize: 12 }}>
@@ -197,7 +195,6 @@ export default function Home() {
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState('מומלצים');
-  const [showHamburger, setShowHamburger] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [priceMin, setPriceMin] = useState('');
@@ -206,15 +203,11 @@ export default function Home() {
   const [filterHidur, setFilterHidur] = useState('הכל');
   const [minRating, setMinRating] = useState(0);
   const [promoCats, setPromoCats] = useState<PromoCat[]>(PROMO_CATS_DEFAULT);
-  const [homeContent, setHomeContent] = useState({
-    heroTitle: 'רכישת סת"מ',
-    heroSubtitle: 'ישירות מהסופר',
-    heroText: 'בחר את הסופר שלך — דע מי כותב את המזוזה שלך. ללא מתווכים, ישירות מהמקור.',
-  });
   const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
   const [catFilters, setCatFilters] = useState<Record<string, string>>({});
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { count, addItem } = useCart();
   const { user, signInWithGoogle, logout } = useAuth();
   const { shaliach } = useShaliach();
@@ -228,11 +221,18 @@ export default function Home() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  // ── קריאת פרמטרים מה-URL ──
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const soferId = params.get('soferId');
+    const soferId = searchParams.get('soferId');
     if (soferId) setSoferIdFilter(soferId);
-  }, []);
+    const cat = searchParams.get('cat');
+    if (cat) {
+      setActiveCat(decodeURIComponent(cat));
+      setTimeout(() => mainRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
+    } else {
+      setActiveCat('הכל');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function load() {
@@ -242,9 +242,6 @@ export default function Home() {
         snap.forEach(d => data.push({ id: d.id, ...d.data() } as Product));
         setProducts(data);
 
-        const contentSnap = await getDoc(doc(db, 'content', 'homepage'));
-        if (contentSnap.exists()) setHomeContent(contentSnap.data() as any);
-
         const catsSnap = await getDocs(collection(db, 'categories'));
         const catsData: PromoCat[] = [];
         catsSnap.forEach(d => {
@@ -252,7 +249,7 @@ export default function Home() {
           if (cat.imgUrl) catsData.push({ name: cat.name, img: cat.imgUrl, sub: cat.sub || '' });
         });
         if (catsData.length > 0) {
-         const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות', 'קלפים'];
+          const order = ['מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות', 'יודאיקה', 'ספרי תורה', 'בר מצווה', 'מתנות', 'קלפים'];
           catsData.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
           setPromoCats(catsData);
         }
@@ -303,161 +300,6 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: "'Heebo', Arial, sans-serif" }}>
-
-      {shaliach && (
-        <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)', borderBottom: '3px solid #b8972a', padding: isMobile ? '8px 12px' : '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, direction: 'rtl', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {shaliach.logoUrl ? (
-              <img src={shaliach.logoUrl} alt="" style={{ width: isMobile ? 40 : 52, height: isMobile ? 40 : 52, borderRadius: 10, objectFit: 'cover', border: '2px solid #b8972a' }} />
-            ) : (
-              <div style={{ width: isMobile ? 40 : 52, height: isMobile ? 40 : 52, borderRadius: 10, background: '#b8972a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🟦</div>
-            )}
-            <div>
-              <div style={{ fontSize: 10, color: '#b8972a', fontWeight: 700 }}>ברוכים הבאים — האתר הוגש על ידי</div>
-              <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: '#fff' }}>{shaliach.chabadName || shaliach.name}</div>
-              <div style={{ fontSize: 11, color: '#a8c0d8' }}>{shaliach.rabbiName}{shaliach.city && ` · ${shaliach.city}`}</div>
-            </div>
-          </div>
-          {shaliach.phone && (
-            <a href={`https://wa.me/972${shaliach.phone.replace(/\D/g, '').slice(1)}`} target="_blank" rel="noopener noreferrer"
-              style={{ background: '#25D366', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 700, textDecoration: 'none', flexShrink: 0 }}>
-              💬 צור קשר
-            </a>
-          )}
-        </div>
-      )}
-
-      <header style={{ background: '#0c1a35', color: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '8px 10px', display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 12 }}>
-          <button onClick={() => setShowHamburger(!showHamburger)}
-            style={{ background: 'none', border: '1px solid transparent', borderRadius: 4, color: '#fff', padding: '6px 8px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0 }}>
-            <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
-            <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
-            <div style={{ width: 20, height: 2, background: '#fff', borderRadius: 2 }} />
-          </button>
-          <div onClick={() => router.push('/')} style={{ cursor: 'pointer', flexShrink: 0, border: '1px solid transparent', borderRadius: 4, padding: '4px 6px', display: 'flex', alignItems: 'center', gap: 8 }}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = '#b8972a')}
-            onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}>
-            <img src="/logo.png" alt="logo" style={{ height: isMobile ? 28 : 36, width: 'auto', objectFit: 'contain' }} onError={e => (e.currentTarget.style.display = 'none')} />
-            <div style={{ fontSize: isMobile ? 15 : 20, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1 }}>Your Sofer</div>
-          </div>
-          <div style={{ flex: 1, display: 'flex', maxWidth: 800, borderRadius: 8, overflow: 'hidden', minWidth: 0 }}>
-            {!isMobile && (
-              <select onChange={e => setActiveCat(e.target.value)} value={activeCat}
-                style={{ background: '#e8e8e8', border: 'none', padding: '10px 8px', fontSize: 12, color: '#333', cursor: 'pointer', borderRadius: '0 8px 8px 0', minWidth: 100 }}>
-                <option value="הכל">כל הקטגוריות</option>
-                {CATS.slice(1).map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            )}
-            <input value={searchInput} onChange={e => setSearchInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && setSearch(searchInput)}
-              placeholder={isMobile ? "חיפוש..." : "חיפוש סת״ם ויודאיקה מאומתים..."}
-              style={{ flex: 1, border: 'none', padding: '10px 10px', fontSize: isMobile ? 13 : 14, color: '#333', outline: 'none', minWidth: 0 }} />
-            <button onClick={() => setSearch(searchInput)}
-              style={{ background: '#b8972a', border: 'none', padding: '0 12px', cursor: 'pointer', flexShrink: 0 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-            </button>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 10, flexShrink: 0 }}>
-            {user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                {user.photoURL && !isMobile && <img src={user.photoURL} alt="" style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid #b8972a' }} />}
-                {!isMobile && (
-                  <div style={{ fontSize: 11 }}>
-                    <div style={{ color: '#ccc', fontSize: 10 }}>שלום,</div>
-                    <div style={{ fontWeight: 700 }}>{user.displayName?.split(' ')[0]}</div>
-                  </div>
-                )}
-                {user.role === 'admin' && <button onClick={() => router.push('/admin')} style={{ background: '#b8972a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>👑</button>}
-                {user.role === 'sofer' && <button onClick={() => router.push('/sofer-dashboard')} style={{ background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>✍️</button>}
-                {user.role === 'shaliach' && <button onClick={() => router.push('/shaliach-dashboard')} style={{ background: 'none', color: '#fff', border: '1px solid #b8972a', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>🟦</button>}
-                {!isMobile && <button onClick={logout} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: 11, cursor: 'pointer' }}>יציאה</button>}
-              </div>
-            ) : (
-              <button onClick={signInWithGoogle} style={{ background: 'none', border: '1px solid #555', borderRadius: 6, padding: '6px 10px', color: '#fff', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                <svg width="13" height="13" viewBox="0 0 18 18">
-                  <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
-                  <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
-                  <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
-                  <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-                </svg>
-                {isMobile ? 'כניסה' : 'התחבר'}
-              </button>
-            )}
-            <div onClick={() => router.push('/cart')} style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3 }}>
-              <div style={{ position: 'relative' }}>
-                <svg width={isMobile ? 26 : 32} height={isMobile ? 26 : 32} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8">
-                  <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
-                  <path d="M16 10a4 4 0 01-8 0"/>
-                </svg>
-                {count > 0 && <span style={{ position: 'absolute', top: -4, left: -4, background: '#b8972a', color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
-              </div>
-              <div style={{ fontSize: 11, color: '#fff', fontWeight: 700 }}>סל ({count})</div>
-            </div>
-          </div>
-        </div>
-        <div style={{ background: '#162444', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 10px', display: 'flex', alignItems: 'center', overflowX: 'auto', scrollbarWidth: 'none' }}>
-            {NAV_ITEMS.map(item => (
-              <button key={item.label} onClick={() => {
-                if (item.cat) { setActiveCat(item.cat); setCatFilters({}); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }
-                else if (item.action === 'soferim') router.push('/soferim');
-                else if (item.action === 'join') router.push('/join');
-                else if (item.action === 'shluchim') router.push('/shluchim');
-              }}
-                style={{ background: 'none', border: 'none', color: item.cat && activeCat === item.cat ? '#b8972a' : '#fff', padding: isMobile ? '8px 10px' : '9px 12px', fontSize: isMobile ? 12 : 13, cursor: 'pointer', whiteSpace: 'nowrap', fontWeight: item.cat && activeCat === item.cat ? 700 : 400, borderBottom: item.cat && activeCat === item.cat ? '2px solid #b8972a' : '2px solid transparent', transition: 'color 0.15s' }}>
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        {!isMobile && (
-          <div style={{ background: '#1a3a2a', padding: '5px 14px', fontSize: 12, color: '#a8c8b4', display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
-            <span>✍️ <strong style={{ color: '#fff' }}>ישירות מהסופר</strong> לביתך</span>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-            <span>🔒 <strong style={{ color: '#fff' }}>תשלום מאובטח</strong></span>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-            <span>🛡️ <strong style={{ color: '#fff' }}>אחריות הפלטפורמה</strong> על כל רכישה</span>
-            <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-            <span>📦 <strong style={{ color: '#fff' }}>משלוח לכל הארץ</strong></span>
-          </div>
-        )}
-      </header>
-
-      {showHamburger && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200 }} onClick={() => setShowHamburger(false)}>
-          <div style={{ position: 'absolute', top: 0, right: 0, width: 280, height: '100%', background: '#fff', boxShadow: '-4px 0 20px rgba(0,0,0,0.2)', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
-            <div style={{ background: '#0c1a35', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#fff', fontWeight: 900, fontSize: 16 }}>☰ כל הקטגוריות</span>
-              <button onClick={() => setShowHamburger(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 20, cursor: 'pointer' }}>✕</button>
-            </div>
-            {CATS.map(cat => (
-              <button key={cat} onClick={() => { setActiveCat(cat); setShowHamburger(false); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
-                style={{ display: 'block', width: '100%', padding: '14px 20px', textAlign: 'right', background: activeCat === cat ? '#f0f7ff' : 'none', border: 'none', borderBottom: '1px solid #f0f0f0', fontSize: 14, fontWeight: activeCat === cat ? 700 : 400, color: activeCat === cat ? '#0e6ba8' : '#333', cursor: 'pointer' }}>
-                {cat}
-              </button>
-            ))}
-            <div style={{ padding: '12px 20px', borderTop: '2px solid #f0f0f0', marginTop: 8 }}>
-              <button
-                onClick={() => { router.push('/madrich'); setShowHamburger(false); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', background: 'linear-gradient(135deg, #fffbee, #fff8dc)', border: '1px solid #e6c84a', borderRadius: 10, padding: '12px 16px', cursor: 'pointer', marginBottom: 4 }}>
-                <span style={{ fontSize: 22 }}>📖</span>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35' }}>מדריך לקניית סת״מ</div>
-                  <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>לא בטוח מה לקנות? התחל כאן</div>
-                </div>
-              </button>
-            </div>
-            <div style={{ padding: '0 20px 12px' }}>
-              <div style={{ fontSize: 12, color: '#888', fontWeight: 700, marginBottom: 8 }}>דפים נוספים</div>
-              <button onClick={() => { router.push('/soferim'); setShowHamburger(false); }} style={{ display: 'block', width: '100%', padding: '10px 0', textAlign: 'right', background: 'none', border: 'none', fontSize: 14, color: '#0c1a35', cursor: 'pointer' }}>✍️ הסופרים שלנו</button>
-              <button onClick={() => { router.push('/soferim/apply'); setShowHamburger(false); }} style={{ display: 'block', width: '100%', padding: '10px 0', textAlign: 'right', background: 'none', border: 'none', fontSize: 14, color: '#0c1a35', cursor: 'pointer' }}>🌟 הצטרף לפלטפורמה</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ══ SMART HERO ══ */}
       <SmartHero
@@ -560,7 +402,6 @@ export default function Home() {
                   </label>
                 ))}
               </div>
-              {/* ══ פילטרים דינמיים לפי קטגוריה ══ */}
               {CAT_FILTERS[activeCat]?.map(filter => (
                 <div key={filter.label} style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: '#0c1a35' }}>{filter.label}</div>
@@ -674,8 +515,7 @@ export default function Home() {
                 { label: '✍️ מי הסופרים שלנו', path: '/soferim' },
                 { label: '❓ שאלות נפוצות', path: '/madrich' },
               ].map(link => (
-                <div key={link.label}
-                  onClick={() => router.push(link.path)}
+                <div key={link.label} onClick={() => router.push(link.path)}
                   style={{ fontSize: 12, color: '#999', marginBottom: 5, cursor: 'pointer' }}
                   onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
                   onMouseLeave={e => (e.currentTarget.style.color = '#999')}>
@@ -693,47 +533,18 @@ export default function Home() {
         </div>
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-  <img src="/logo.png" alt="logo" style={{ height: 28, width: 'auto', filter: 'brightness(0) invert(1)' }} onError={e => (e.currentTarget.style.display = 'none')} />
-  <span style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>Your Sofer</span>
-</div>
+            <img src="/logo.png" alt="logo" style={{ height: 28, width: 'auto', filter: 'brightness(0) invert(1)' }} onError={e => (e.currentTarget.style.display = 'none')} />
+            <span style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>Your Sofer</span>
+          </div>
           {shaliach && <div style={{ fontSize: 11, color: '#888' }}>מוגש על ידי {shaliach.chabadName || shaliach.name}</div>}
           <div style={{ fontSize: 11, color: '#666' }}>© 2025 Your Sofer — כל הזכויות שמורות</div>
         </div>
       </footer>
 
-      {/* ══ כפתור וואטסאפ צף ══ */}
-      <a
-        href="https://wa.me/972584877770"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          left: 24,
-          zIndex: 999,
-          background: '#25D366',
-          color: '#fff',
-          borderRadius: 50,
-          padding: isMobile ? '10px 16px' : '12px 20px',
-          fontSize: isMobile ? 13 : 14,
-          fontWeight: 900,
-          cursor: 'pointer',
-          boxShadow: '0 4px 20px rgba(37,211,102,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          direction: 'rtl',
-          textDecoration: 'none',
-          transition: 'transform 0.2s, box-shadow 0.2s',
-        }}
-        onMouseEnter={e => {
-          (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.05)';
-          (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 6px 28px rgba(37,211,102,0.7)';
-        }}
-        onMouseLeave={e => {
-          (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1)';
-          (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 4px 20px rgba(37,211,102,0.5)';
-        }}
+      <a href="https://wa.me/972584877770" target="_blank" rel="noopener noreferrer"
+        style={{ position: 'fixed', bottom: 24, left: 24, zIndex: 999, background: '#25D366', color: '#fff', borderRadius: 50, padding: isMobile ? '10px 16px' : '12px 20px', fontSize: isMobile ? 13 : 14, fontWeight: 900, cursor: 'pointer', boxShadow: '0 4px 20px rgba(37,211,102,0.5)', display: 'flex', alignItems: 'center', gap: 8, direction: 'rtl', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.05)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 6px 28px rgba(37,211,102,0.7)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 4px 20px rgba(37,211,102,0.5)'; }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -741,7 +552,6 @@ export default function Home() {
         </svg>
         {isMobile ? 'וואטסאפ' : 'שאלות? דברו איתנו בוואטסאפ'}
       </a>
-
     </div>
   );
 }
