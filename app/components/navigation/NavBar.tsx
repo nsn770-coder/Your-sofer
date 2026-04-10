@@ -11,43 +11,186 @@ const MEGA_MENU_DATA = [
   {
     id: "mezuzot", label: "מזוזות", cat: "מזוזות",
     columns: [
-      { title: "בתי מזוזה", items: [{ label: "עץ", cat: "מזוזות" }, { label: "מתכת", cat: "מזוזות" }, { label: "זכוכית", cat: "מזוזות" }, { label: "קרמיקה", cat: "מזוזות" }, { label: "אבן", cat: "מזוזות" }] },
-      { title: "קלפי מזוזה", items: [{ label: 'כל הגדלים', cat: "קלפי מזוזה" }, { label: 'קלף 10 ס״מ', cat: "קלפי מזוזה" }, { label: 'קלף 12 ס״מ', cat: "קלפי מזוזה" }, { label: 'קלף 15 ס״מ', cat: "קלפי מזוזה" }, { label: 'קלף 20 ס״מ', cat: "קלפי מזוזה" }] },
+      {
+        title: "לפי חומר",
+        items: [
+          { label: "כל המזוזות", cat: "מזוזות" },
+          { label: "פולימר", cat: "מזוזות" },
+          { label: "בטון וסמנט", cat: "מזוזות" },
+          { label: "פלסטיק", cat: "מזוזות" },
+          { label: "אלומיניום", cat: "מזוזות" },
+          { label: "מתכת", cat: "מזוזות" },
+          { label: "עץ", cat: "מזוזות" },
+          { label: "זכוכית", cat: "מזוזות" },
+          { label: "שיש", cat: "מזוזות" },
+        ]
+      },
+      {
+        title: "לפי גודל",
+        items: [
+          { label: '7 ס"מ', cat: "מזוזות" },
+          { label: '10 ס"מ', cat: "מזוזות" },
+          { label: '12 ס"מ', cat: "מזוזות" },
+          { label: '15 ס"מ', cat: "מזוזות" },
+          { label: '20 ס"מ', cat: "מזוזות" },
+          { label: '25 ס"מ', cat: "מזוזות" },
+          { label: '30 ס"מ', cat: "מזוזות" },
+        ]
+      },
+      {
+        title: "קלפי מזוזה",
+        items: [
+          { label: "כל הקלפים", cat: "קלפי מזוזה" },
+          { label: '10 ס"מ', cat: "קלפי מזוזה" },
+          { label: '12 ס"מ', cat: "קלפי מזוזה" },
+          { label: '15 ס"מ', cat: "קלפי מזוזה" },
+          { label: '20 ס"מ', cat: "קלפי מזוזה" },
+        ]
+      },
     ],
   },
   {
     id: "tefillin", label: "תפילין", cat: "תפילין קומפלט",
     columns: [
-      { title: "תפילין קומפלט", items: [{ label: "אשכנז", cat: "תפילין קומפלט" }, { label: "ספרד", cat: "תפילין קומפלט" }, { label: 'חב"ד', cat: "תפילין קומפלט" }, { label: "תימני", cat: "תפילין קומפלט" }] },
-      { title: "כיסויים", items: [{ label: "כיסויי תפילין", cat: "כיסוי תפילין" }, { label: "עור", cat: "כיסוי תפילין" }, { label: "קטיפה", cat: "כיסוי תפילין" }, { label: "משי", cat: "כיסוי תפילין" }] },
-      { title: "קלפי תפילין", items: [{ label: "כל הנוסחאות", cat: "קלפי תפילין" }, { label: "אשכנז", cat: "קלפי תפילין" }, { label: "ספרד", cat: "קלפי תפילין" }, { label: 'חב"ד', cat: "קלפי תפילין" }] },
+      {
+        title: "תפילין קומפלט",
+        items: [
+          { label: "כל התפילין", cat: "תפילין קומפלט" },
+          { label: "אשכנז", cat: "תפילין קומפלט" },
+          { label: "ספרד", cat: "תפילין קומפלט" },
+          { label: 'חב"ד', cat: "תפילין קומפלט" },
+          { label: "תימני", cat: "תפילין קומפלט" },
+        ]
+      },
+      {
+        title: "כיסויי תפילין",
+        items: [
+          { label: "כל הכיסויים", cat: "כיסוי תפילין" },
+          { label: "דמוי עור", cat: "כיסוי תפילין" },
+          { label: "עור", cat: "כיסוי תפילין" },
+          { label: "טרמי", cat: "כיסוי תפילין" },
+          { label: "פיו", cat: "כיסוי תפילין" },
+          { label: "קטיפה", cat: "כיסוי תפילין" },
+          { label: "פשתן", cat: "כיסוי תפילין" },
+          { label: "משי", cat: "כיסוי תפילין" },
+        ]
+      },
+      {
+        title: "קלפי תפילין",
+        items: [
+          { label: "כל הנוסחאות", cat: "קלפי תפילין" },
+          { label: "אשכנז", cat: "קלפי תפילין" },
+          { label: "ספרד", cat: "קלפי תפילין" },
+          { label: 'חב"ד', cat: "קלפי תפילין" },
+          { label: "תימני", cat: "קלפי תפילין" },
+        ]
+      },
     ],
   },
   {
-    id: "tallit", label: "טלית וציצית", cat: "טליתות",
+    id: "tallit", label: "טלית וציצית", cat: "סט טלית תפילין",
     columns: [
-      { title: "טליתות", items: [{ label: "טלית גדולה — צמר", cat: "טליתות" }, { label: "טלית גדולה — משי", cat: "טליתות" }, { label: "טלית קטן", cat: "טליתות" }, { label: "סט טלית ותפילין", cat: "טליתות" }] },
+      {
+        title: "לפי חומר",
+        items: [
+          { label: "כל הסטים", cat: "סט טלית תפילין" },
+          { label: "דמוי עור", cat: "סט טלית תפילין" },
+          { label: "עור", cat: "סט טלית תפילין" },
+          { label: "פיו", cat: "סט טלית תפילין" },
+          { label: "פשתן", cat: "סט טלית תפילין" },
+          { label: "קטיפה", cat: "סט טלית תפילין" },
+          { label: "בד", cat: "סט טלית תפילין" },
+          { label: "משי", cat: "סט טלית תפילין" },
+        ]
+      },
+      {
+        title: "לפי צבע",
+        items: [
+          { label: "שחור", cat: "סט טלית תפילין" },
+          { label: "לבן", cat: "סט טלית תפילין" },
+          { label: "אפור", cat: "סט טלית תפילין" },
+        ]
+      },
+      {
+        title: "טליתות",
+        items: [
+          { label: "טליתות", cat: "טליתות" },
+          { label: "לבר מצווה", cat: "בר מצווה" },
+          { label: "מגילות", cat: "מגילות" },
+        ]
+      },
     ],
   },
   {
     id: "hagim", label: "שבת וחגים", cat: "חגים ומועדים",
     columns: [
-      { title: "שבת", items: [{ label: "פמוטים", cat: "חגים ומועדים" }, { label: "גביעי קידוש", cat: "חגים ומועדים" }, { label: "כיסויי חלה", cat: "חגים ומועדים" }, { label: "הבדלה", cat: "חגים ומועדים" }] },
-      { title: "חגים", items: [{ label: "חנוכה", cat: "חגים ומועדים" }, { label: "פורים", cat: "חגים ומועדים" }, { label: "פסח", cat: "חגים ומועדים" }, { label: "סוכות", cat: "חגים ומועדים" }, { label: "ראש השנה", cat: "חגים ומועדים" }, { label: "יום כיפור", cat: "חגים ומועדים" }] },
+      {
+        title: "שבת",
+        items: [
+          { label: "פמוטים", cat: "חגים ומועדים" },
+          { label: "גביעי קידוש", cat: "חגים ומועדים" },
+          { label: "כיסויי חלה", cat: "חגים ומועדים" },
+          { label: "הבדלה", cat: "חגים ומועדים" },
+          { label: "מגשי חלה", cat: "חגים ומועדים" },
+        ]
+      },
+      {
+        title: "חגים",
+        items: [
+          { label: "חנוכה", cat: "חגים ומועדים" },
+          { label: "פורים", cat: "חגים ומועדים" },
+          { label: "פסח", cat: "חגים ומועדים" },
+          { label: "סוכות", cat: "חגים ומועדים" },
+          { label: "ראש השנה", cat: "חגים ומועדים" },
+          { label: "יום כיפור", cat: "חגים ומועדים" },
+          { label: "שבועות", cat: "חגים ומועדים" },
+        ]
+      },
     ],
   },
   {
     id: "gifts", label: "🎁 מתנות", cat: "מתנות",
     columns: [
-      { title: "מתנות לפי אדם", items: [{ label: "מתנות לאישה", cat: "מתנות" }, { label: "מתנות לגבר", cat: "מתנות" }, { label: "מתנות לחתן", cat: "מתנות" }, { label: "מתנות לכלה", cat: "מתנות" }, { label: "מתנות ליולדת", cat: "מתנות" }] },
-      { title: "מתנות לאירוע", items: [{ label: "בר / בת מצווה", cat: "בר מצווה" }, { label: "חנוכת בית", cat: "מתנות" }, { label: "חגים", cat: "חגים ומועדים" }, { label: "מארזים מיוחדים", cat: "מתנות" }] },
+      {
+        title: "מתנות לפי אדם",
+        items: [
+          { label: "מתנות לחתן", cat: "מתנות" },
+          { label: "מתנות לגבר", cat: "מתנות" },
+          { label: "מתנות לאישה", cat: "מתנות" },
+          { label: "מתנות לכלה", cat: "מתנות" },
+          { label: "מתנות ליולדת", cat: "מתנות" },
+        ]
+      },
+      {
+        title: "מתנות לאירוע",
+        items: [
+          { label: "בר / בת מצווה", cat: "בר מצווה" },
+          { label: "חנוכת בית", cat: "מתנות" },
+          { label: "חגים", cat: "חגים ומועדים" },
+          { label: "מארזים מיוחדים", cat: "מתנות" },
+        ]
+      },
     ],
   },
   {
     id: "judaica", label: "יודאיקה", cat: "יודאיקה",
     columns: [
-      { title: "יודאיקה", items: [{ label: "נוי הבית", cat: "יודאיקה" }, { label: "נוי השולחן", cat: "יודאיקה" }, { label: "חנוכיות", cat: "יודאיקה" }, { label: "אומנות יהודית", cat: "יודאיקה" }] },
-      { title: "ספרים ומגילות", items: [{ label: "מגילות", cat: "מגילות" }, { label: "ספרי תורה", cat: "ספרי תורה" }] },
+      {
+        title: "יודאיקה",
+        items: [
+          { label: "כל היודאיקה", cat: "יודאיקה" },
+          { label: "פיו — תיקי טלית", cat: "יודאיקה" },
+          { label: "כסף", cat: "יודאיקה" },
+          { label: "זכוכית", cat: "יודאיקה" },
+        ]
+      },
+      {
+        title: "ספרים ומגילות",
+        items: [
+          { label: "מגילות", cat: "מגילות" },
+          { label: "ספרי תורה", cat: "ספרי תורה" },
+        ]
+      },
     ],
   },
 ];
@@ -63,23 +206,19 @@ const menuVariants: Variants = {
   visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: "easeOut", staggerChildren: 0.04, delayChildren: 0.04 } },
   exit: { opacity: 0, y: -6, transition: { duration: 0.14, ease: "easeIn" } },
 };
-
 const colVariants: Variants = {
   hidden: { opacity: 0, y: 5 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.18, ease: "easeOut" } },
 };
-
 const itemVariants: Variants = {
   hidden: { opacity: 0, x: 3 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.15, ease: "easeOut" } },
 };
-
 const drawerVariants: Variants = {
   hidden: { x: "100%" },
   visible: { x: 0, transition: { type: "spring", stiffness: 300, damping: 35 } },
   exit: { x: "100%", transition: { duration: 0.2, ease: "easeIn" } },
 };
-
 const accordionVariants: Variants = {
   hidden: { height: 0, opacity: 0 },
   visible: { height: "auto", opacity: 1, transition: { duration: 0.25, ease: "easeOut" } },
@@ -89,14 +228,14 @@ const accordionVariants: Variants = {
 function MegaPanel({ item, onSelect }: { item: typeof MEGA_MENU_DATA[0]; onSelect: (cat: string) => void }) {
   return (
     <motion.div variants={menuVariants} initial="hidden" animate="visible" exit="exit"
-      style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 480, maxWidth: 780 }}
+      style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 520, maxWidth: 860 }}
       onMouseDown={e => e.preventDefault()}
     >
       <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "#1a2a4a", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
       <div style={{ background: "linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(184,151,42,0.15)", overflow: "hidden" }}>
         <div style={{ display: "flex", flexDirection: "row-reverse", padding: "24px 24px 16px" }}>
           {item.columns.map((col, ci) => (
-            <motion.div key={ci} variants={colVariants} style={{ flex: 1, minWidth: 150, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
+            <motion.div key={ci} variants={colVariants} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "#b8972a", textTransform: "uppercase", textAlign: "right", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(184,151,42,0.2)" }}>{col.title}</div>
               <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                 {col.items.map((sub, si) => (
