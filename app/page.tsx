@@ -48,15 +48,17 @@ const PROMO_CATS_DEFAULT: PromoCat[] = [
 const FILTER_NUSACH = ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'];
 const FILTER_HIDUR = ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'];
 
-// ── פילטרים מבוססים על נתונים אמיתיים מהמוצרים ──
 const CAT_FILTERS: Record<string, { label: string; options: string[] }[]> = {
   'מזוזות': [
     { label: 'גודל', options: ['הכל', '7 ס"מ', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ', '25 ס"מ', '30 ס"מ'] },
-    { label: 'חומר', options: ['הכל', 'פולימר', 'בטון', 'פלסטיק', 'אלומיניום', 'מתכת', 'עץ', 'זכוכית', 'שיש', 'סמנט'] },
+    { label: 'חומר', options: ['הכל', 'פולימר', 'בטון', 'סמנט', 'פלסטיק', 'אלומיניום', 'מתכת', 'עץ', 'זכוכית', 'שיש'] },
   ],
   'כיסוי תפילין': [
-    { label: 'חומר', options: ['הכל', 'דמוי עור', 'עור', 'פיו', 'פשתן', 'בד', 'קטיפה', 'טרמי', 'משי'] },
-    { label: 'סגנון', options: ['הכל', 'מהודר', 'רגיל', 'מעוצב'] },
+    { label: 'חומר', options: ['הכל', 'דמוי עור', 'עור', 'טרמי', 'פיו', 'קטיפה', 'פשתן', 'בד', 'משי'] },
+  ],
+  'סט טלית תפילין': [
+    { label: 'חומר', options: ['הכל', 'דמוי עור', 'עור', 'פיו', 'פשתן', 'קטיפה', 'בד', 'משי'] },
+    { label: 'צבע', options: ['הכל', 'שחור', 'לבן', 'אפור'] },
   ],
   'תפילין קומפלט': [
     { label: 'נוסח', options: ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני'] },
@@ -65,41 +67,34 @@ const CAT_FILTERS: Record<string, { label: string; options: string[] }[]> = {
   'טליתות': [
     { label: 'סוג', options: ['הכל', 'טלית קטן', 'טלית גדולה'] },
     { label: 'חומר', options: ['הכל', 'צמר', 'משי', 'פוליאסטר', 'כותנה'] },
-    { label: 'גודל', options: ['הכל', 'XS', 'S', 'M', 'L', 'XL', 'XXL'] },
   ],
   'מגילות': [
     { label: 'סוג', options: ['הכל', 'מגילת אסתר', 'מגילת רות', 'שיר השירים', 'קהלת', 'איכה'] },
     { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
-    { label: 'גודל', options: ['הכל', 'קטן', 'בינוני', 'גדול'] },
   ],
   'קלפים': [
     { label: 'סוג', options: ['הכל', 'קלפי מזוזה', 'קלפי תפילין'] },
     { label: 'נוסח', options: ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני'] },
-    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
   ],
   'קלפי מזוזה': [
     { label: 'גודל', options: ['הכל', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ'] },
     { label: 'נוסח', options: ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני'] },
-    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
   ],
   'קלפי תפילין': [
     { label: 'נוסח', options: ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני'] },
-    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
   ],
   'יודאיקה': [
-    { label: 'סוג', options: ['הכל', 'חנוכיות', 'כוסות קידוש', 'מנורות', 'בשמים', 'מזכרות'] },
-    { label: 'חומר', options: ['הכל', 'כסף', 'מתכת', 'זכוכית', 'עץ', 'קרמיקה'] },
+    { label: 'חומר', options: ['הכל', 'פיו', 'כסף', 'זכוכית', 'מתכת', 'עץ'] },
   ],
   'ספרי תורה': [
     { label: 'גודל', options: ['הכל', 'קטן', 'בינוני', 'גדול'] },
-    { label: 'רמת הידור', options: ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'] },
   ],
   'בר מצווה': [
-    { label: 'סוג', options: ['הכל', 'סט תפילין', 'טלית וכיסוי', 'סט שלם', 'מתנות'] },
+    { label: 'סוג', options: ['הכל', 'סט תפילין', 'טלית וכיסוי', 'סט שלם'] },
   ],
   'מתנות': [
-    { label: 'אירוע', options: ['הכל', 'בר מצווה', 'חתונה', 'ברית', 'חנוכת בית', 'ראש השנה'] },
-    { label: 'טווח מחיר', options: ['הכל', 'עד 100 ₪', '100-300 ₪', '300-500 ₪', 'מעל 500 ₪'] },
+    { label: 'לפי אדם', options: ['הכל', 'לחתן', 'לגבר', 'לאישה', 'לכלה', 'ליולדת'] },
+    { label: 'אירוע', options: ['הכל', 'בר מצווה', 'חנוכת בית', 'חגים'] },
   ],
 };
 
@@ -170,6 +165,7 @@ function HomeContent() {
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCat, setActiveCat] = useState('הכל');
+  const [activeFilter, setActiveFilter] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState('מומלצים');
@@ -201,12 +197,21 @@ function HomeContent() {
   useEffect(() => {
     const soferId = searchParams.get('soferId');
     if (soferId) setSoferIdFilter(soferId);
+
     const cat = searchParams.get('cat');
     if (cat) {
       setActiveCat(decodeURIComponent(cat));
       setTimeout(() => mainRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
     } else {
       setActiveCat('הכל');
+    }
+
+    // ── חדש: קריאת filter מה-URL ──
+    const filter = searchParams.get('filter');
+    if (filter) {
+      setActiveFilter(decodeURIComponent(filter));
+    } else {
+      setActiveFilter('');
     }
   }, [searchParams]);
 
@@ -239,6 +244,15 @@ function HomeContent() {
     let r = [...products];
     if (soferIdFilter) r = r.filter(p => (p as any).soferId === soferIdFilter);
     if (activeCat !== 'הכל') r = r.filter(p => (p.cat?.trim() || p.category?.trim()) === activeCat.trim());
+
+    // ── סינון לפי filter מהתפריט ──
+    if (activeFilter) {
+      r = r.filter(p => {
+        const searchIn = [p.name, (p as any).desc].filter(Boolean).join(' ').toLowerCase();
+        return searchIn.includes(activeFilter.toLowerCase());
+      });
+    }
+
     if (search) r = r.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
     if (priceMin) r = r.filter(p => p.price >= Number(priceMin));
     if (priceMax) r = r.filter(p => p.price <= Number(priceMax));
@@ -246,7 +260,7 @@ function HomeContent() {
     Object.entries(catFilters).forEach(([label, val]) => {
       if (val && val !== 'הכל') {
         r = r.filter(p => {
-          const searchIn = [p.name, (p as any).desc, (p as any).material, (p as any).size, (p as any).nusach, (p as any).badge].filter(Boolean).join(' ').toLowerCase();
+          const searchIn = [p.name, (p as any).desc, (p as any).material, (p as any).size, (p as any).nusach].filter(Boolean).join(' ').toLowerCase();
           return searchIn.includes(val.toLowerCase());
         });
       }
@@ -256,7 +270,7 @@ function HomeContent() {
     else if (sortBy === 'דירוג') r.sort((a, b) => (b.stars || 0) - (a.stars || 0));
     setFiltered(r);
     setPage(1);
-  }, [activeCat, search, products, priceMin, priceMax, minRating, sortBy, soferIdFilter, catFilters]);
+  }, [activeCat, activeFilter, search, products, priceMin, priceMax, minRating, sortBy, soferIdFilter, catFilters]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -272,7 +286,7 @@ function HomeContent() {
       <SmartHero
         isMobile={isMobile}
         onScrollToProducts={() => mainRef.current?.scrollIntoView({ behavior: 'smooth' })}
-        onSelectCat={(cat: string) => { setActiveCat(cat); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+        onSelectCat={(cat: string) => { setActiveCat(cat); setActiveFilter(''); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
       />
 
       <div style={{ background: '#fff', borderBottom: '1px solid #ddd', padding: '16px 0' }}>
@@ -286,7 +300,7 @@ function HomeContent() {
           </div>
           <div ref={catsScrollRef} style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 4 }}>
             {promoCats.map(c => (
-              <div key={c.name} onClick={() => { setActiveCat(c.name); setCatFilters({}); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+              <div key={c.name} onClick={() => { setActiveCat(c.name); setActiveFilter(''); setCatFilters({}); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
                 style={{ cursor: 'pointer', borderRadius: 12, overflow: 'hidden', border: '1px solid #ddd', transition: 'box-shadow 0.2s', flexShrink: 0, width: isMobile ? 130 : 180 }}
                 onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)')}
                 onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
@@ -320,12 +334,21 @@ function HomeContent() {
                 🔍 סינון תוצאות
                 {isMobile && <button onClick={() => setShowSidebar(false)} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#888' }}>✕</button>}
               </div>
+
+              {/* Active filter badge */}
+              {activeFilter && (
+                <div style={{ marginBottom: 12, padding: '6px 10px', background: '#fff8e1', border: '1px solid #b8972a', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 12, color: '#7a5c00', fontWeight: 700 }}>סינון: {activeFilter}</span>
+                  <button onClick={() => { setActiveFilter(''); router.push(`/?cat=${encodeURIComponent(activeCat)}`); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#b8972a', fontSize: 14 }}>✕</button>
+                </div>
+              )}
+
               {isMobile && (
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>קטגוריה</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {CATS.map(cat => (
-                      <button key={cat} onClick={() => { setActiveCat(cat); setShowSidebar(false); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+                      <button key={cat} onClick={() => { setActiveCat(cat); setActiveFilter(''); setShowSidebar(false); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
                         style={{ padding: '5px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', background: activeCat === cat ? '#0c1a35' : '#f5f5f5', color: activeCat === cat ? '#fff' : '#333', border: activeCat === cat ? '1px solid #0c1a35' : '1px solid #ddd', fontWeight: activeCat === cat ? 700 : 400 }}>
                         {cat}
                       </button>
@@ -378,7 +401,7 @@ function HomeContent() {
                   ))}
                 </div>
               ))}
-              <button onClick={() => { setPriceMin(''); setPriceMax(''); setMinRating(0); setFilterNusach('הכל'); setFilterHidur('הכל'); setCatFilters({}); }}
+              <button onClick={() => { setPriceMin(''); setPriceMax(''); setMinRating(0); setFilterNusach('הכל'); setFilterHidur('הכל'); setCatFilters({}); setActiveFilter(''); }}
                 style={{ width: '100%', background: '#f0f0f0', border: '1px solid #ddd', borderRadius: 6, padding: '8px', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
                 נקה סינון
               </button>
@@ -388,7 +411,9 @@ function HomeContent() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 8, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
                 <div style={{ fontSize: isMobile ? 12 : 13, color: '#555' }}>
-                  {filtered.length} תוצאות — <strong style={{ color: '#0c1a35' }}>{activeCat === 'הכל' ? 'כל המוצרים' : activeCat}</strong>
+                  {filtered.length} תוצאות —{' '}
+                  <strong style={{ color: '#0c1a35' }}>{activeCat === 'הכל' ? 'כל המוצרים' : activeCat}</strong>
+                  {activeFilter && <span style={{ color: '#b8972a', marginRight: 4 }}> — {activeFilter}</span>}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 11, color: '#555' }}>מיין:</span>
@@ -403,7 +428,7 @@ function HomeContent() {
               {!isMobile && (
                 <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
                   {CATS.map(cat => (
-                    <button key={cat} onClick={() => setActiveCat(cat)}
+                    <button key={cat} onClick={() => { setActiveCat(cat); setActiveFilter(''); }}
                       style={{ padding: '5px 14px', borderRadius: 20, fontSize: 12, cursor: 'pointer', background: activeCat === cat ? '#0c1a35' : '#fff', color: activeCat === cat ? '#fff' : '#333', border: activeCat === cat ? '1px solid #0c1a35' : '1px solid #ddd', fontWeight: activeCat === cat ? 700 : 400 }}>
                       {cat}
                     </button>

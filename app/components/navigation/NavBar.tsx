@@ -7,7 +7,25 @@ import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useShaliach } from "@/app/contexts/ShaliachContext";
 
-const MEGA_MENU_DATA = [
+interface NavSubItem {
+  label: string;
+  cat: string;
+  filter?: string;
+}
+
+interface NavColumn {
+  title: string;
+  items: NavSubItem[];
+}
+
+interface NavMenuItem {
+  id: string;
+  label: string;
+  cat: string;
+  columns: NavColumn[];
+}
+
+const MEGA_MENU_DATA: NavMenuItem[] = [
   {
     id: "mezuzot", label: "מזוזות", cat: "מזוזות",
     columns: [
@@ -15,36 +33,36 @@ const MEGA_MENU_DATA = [
         title: "לפי חומר",
         items: [
           { label: "כל המזוזות", cat: "מזוזות" },
-          { label: "פולימר", cat: "מזוזות" },
-          { label: "בטון וסמנט", cat: "מזוזות" },
-          { label: "פלסטיק", cat: "מזוזות" },
-          { label: "אלומיניום", cat: "מזוזות" },
-          { label: "מתכת", cat: "מזוזות" },
-          { label: "עץ", cat: "מזוזות" },
-          { label: "זכוכית", cat: "מזוזות" },
-          { label: "שיש", cat: "מזוזות" },
+          { label: "פולימר", cat: "מזוזות", filter: "פולימר" },
+          { label: "בטון וסמנט", cat: "מזוזות", filter: "בטון" },
+          { label: "פלסטיק", cat: "מזוזות", filter: "פלסטיק" },
+          { label: "אלומיניום", cat: "מזוזות", filter: "אלומיניום" },
+          { label: "מתכת", cat: "מזוזות", filter: "מתכת" },
+          { label: "עץ", cat: "מזוזות", filter: "עץ" },
+          { label: "זכוכית", cat: "מזוזות", filter: "זכוכית" },
+          { label: "שיש", cat: "מזוזות", filter: "שיש" },
         ]
       },
       {
         title: "לפי גודל",
         items: [
-          { label: '7 ס"מ', cat: "מזוזות" },
-          { label: '10 ס"מ', cat: "מזוזות" },
-          { label: '12 ס"מ', cat: "מזוזות" },
-          { label: '15 ס"מ', cat: "מזוזות" },
-          { label: '20 ס"מ', cat: "מזוזות" },
-          { label: '25 ס"מ', cat: "מזוזות" },
-          { label: '30 ס"מ', cat: "מזוזות" },
+          { label: '7 ס"מ', cat: "מזוזות", filter: '7 ס"מ' },
+          { label: '10 ס"מ', cat: "מזוזות", filter: '10 ס"מ' },
+          { label: '12 ס"מ', cat: "מזוזות", filter: '12 ס"מ' },
+          { label: '15 ס"מ', cat: "מזוזות", filter: '15 ס"מ' },
+          { label: '20 ס"מ', cat: "מזוזות", filter: '20 ס"מ' },
+          { label: '25 ס"מ', cat: "מזוזות", filter: '25 ס"מ' },
+          { label: '30 ס"מ', cat: "מזוזות", filter: '30 ס"מ' },
         ]
       },
       {
         title: "קלפי מזוזה",
         items: [
           { label: "כל הקלפים", cat: "קלפי מזוזה" },
-          { label: '10 ס"מ', cat: "קלפי מזוזה" },
-          { label: '12 ס"מ', cat: "קלפי מזוזה" },
-          { label: '15 ס"מ', cat: "קלפי מזוזה" },
-          { label: '20 ס"מ', cat: "קלפי מזוזה" },
+          { label: '10 ס"מ', cat: "קלפי מזוזה", filter: '10 ס"מ' },
+          { label: '12 ס"מ', cat: "קלפי מזוזה", filter: '12 ס"מ' },
+          { label: '15 ס"מ', cat: "קלפי מזוזה", filter: '15 ס"מ' },
+          { label: '20 ס"מ', cat: "קלפי מזוזה", filter: '20 ס"מ' },
         ]
       },
     ],
@@ -56,33 +74,33 @@ const MEGA_MENU_DATA = [
         title: "תפילין קומפלט",
         items: [
           { label: "כל התפילין", cat: "תפילין קומפלט" },
-          { label: "אשכנז", cat: "תפילין קומפלט" },
-          { label: "ספרד", cat: "תפילין קומפלט" },
-          { label: 'חב"ד', cat: "תפילין קומפלט" },
-          { label: "תימני", cat: "תפילין קומפלט" },
+          { label: "אשכנז", cat: "תפילין קומפלט", filter: "אשכנז" },
+          { label: "ספרד", cat: "תפילין קומפלט", filter: "ספרד" },
+          { label: 'חב"ד', cat: "תפילין קומפלט", filter: 'חב"ד' },
+          { label: "תימני", cat: "תפילין קומפלט", filter: "תימני" },
         ]
       },
       {
         title: "כיסויי תפילין",
         items: [
           { label: "כל הכיסויים", cat: "כיסוי תפילין" },
-          { label: "דמוי עור", cat: "כיסוי תפילין" },
-          { label: "עור", cat: "כיסוי תפילין" },
-          { label: "טרמי", cat: "כיסוי תפילין" },
-          { label: "פיו", cat: "כיסוי תפילין" },
-          { label: "קטיפה", cat: "כיסוי תפילין" },
-          { label: "פשתן", cat: "כיסוי תפילין" },
-          { label: "משי", cat: "כיסוי תפילין" },
+          { label: "דמוי עור", cat: "כיסוי תפילין", filter: "דמוי עור" },
+          { label: "עור", cat: "כיסוי תפילין", filter: "עור" },
+          { label: "טרמי", cat: "כיסוי תפילין", filter: "טרמי" },
+          { label: "פיו", cat: "כיסוי תפילין", filter: "פיו" },
+          { label: "קטיפה", cat: "כיסוי תפילין", filter: "קטיפה" },
+          { label: "פשתן", cat: "כיסוי תפילין", filter: "פשתן" },
+          { label: "משי", cat: "כיסוי תפילין", filter: "משי" },
         ]
       },
       {
         title: "קלפי תפילין",
         items: [
           { label: "כל הנוסחאות", cat: "קלפי תפילין" },
-          { label: "אשכנז", cat: "קלפי תפילין" },
-          { label: "ספרד", cat: "קלפי תפילין" },
-          { label: 'חב"ד', cat: "קלפי תפילין" },
-          { label: "תימני", cat: "קלפי תפילין" },
+          { label: "אשכנז", cat: "קלפי תפילין", filter: "אשכנז" },
+          { label: "ספרד", cat: "קלפי תפילין", filter: "ספרד" },
+          { label: 'חב"ד', cat: "קלפי תפילין", filter: 'חב"ד' },
+          { label: "תימני", cat: "קלפי תפילין", filter: "תימני" },
         ]
       },
     ],
@@ -94,25 +112,25 @@ const MEGA_MENU_DATA = [
         title: "לפי חומר",
         items: [
           { label: "כל הסטים", cat: "סט טלית תפילין" },
-          { label: "דמוי עור", cat: "סט טלית תפילין" },
-          { label: "עור", cat: "סט טלית תפילין" },
-          { label: "פיו", cat: "סט טלית תפילין" },
-          { label: "פשתן", cat: "סט טלית תפילין" },
-          { label: "קטיפה", cat: "סט טלית תפילין" },
-          { label: "בד", cat: "סט טלית תפילין" },
-          { label: "משי", cat: "סט טלית תפילין" },
+          { label: "דמוי עור", cat: "סט טלית תפילין", filter: "דמוי עור" },
+          { label: "עור", cat: "סט טלית תפילין", filter: "עור" },
+          { label: "פיו", cat: "סט טלית תפילין", filter: "פיו" },
+          { label: "פשתן", cat: "סט טלית תפילין", filter: "פשתן" },
+          { label: "קטיפה", cat: "סט טלית תפילין", filter: "קטיפה" },
+          { label: "בד", cat: "סט טלית תפילין", filter: "בד" },
+          { label: "משי", cat: "סט טלית תפילין", filter: "משי" },
         ]
       },
       {
         title: "לפי צבע",
         items: [
-          { label: "שחור", cat: "סט טלית תפילין" },
-          { label: "לבן", cat: "סט טלית תפילין" },
-          { label: "אפור", cat: "סט טלית תפילין" },
+          { label: "שחור", cat: "סט טלית תפילין", filter: "שחור" },
+          { label: "לבן", cat: "סט טלית תפילין", filter: "לבן" },
+          { label: "אפור", cat: "סט טלית תפילין", filter: "אפור" },
         ]
       },
       {
-        title: "טליתות",
+        title: "עוד",
         items: [
           { label: "טליתות", cat: "טליתות" },
           { label: "לבר מצווה", cat: "בר מצווה" },
@@ -127,23 +145,22 @@ const MEGA_MENU_DATA = [
       {
         title: "שבת",
         items: [
-          { label: "פמוטים", cat: "חגים ומועדים" },
-          { label: "גביעי קידוש", cat: "חגים ומועדים" },
-          { label: "כיסויי חלה", cat: "חגים ומועדים" },
-          { label: "הבדלה", cat: "חגים ומועדים" },
-          { label: "מגשי חלה", cat: "חגים ומועדים" },
+          { label: "פמוטים", cat: "חגים ומועדים", filter: "פמוט" },
+          { label: "גביעי קידוש", cat: "חגים ומועדים", filter: "קידוש" },
+          { label: "כיסויי חלה", cat: "חגים ומועדים", filter: "חלה" },
+          { label: "הבדלה", cat: "חגים ומועדים", filter: "הבדלה" },
         ]
       },
       {
         title: "חגים",
         items: [
-          { label: "חנוכה", cat: "חגים ומועדים" },
-          { label: "פורים", cat: "חגים ומועדים" },
-          { label: "פסח", cat: "חגים ומועדים" },
-          { label: "סוכות", cat: "חגים ומועדים" },
-          { label: "ראש השנה", cat: "חגים ומועדים" },
-          { label: "יום כיפור", cat: "חגים ומועדים" },
-          { label: "שבועות", cat: "חגים ומועדים" },
+          { label: "חנוכה", cat: "חגים ומועדים", filter: "חנוכה" },
+          { label: "פורים", cat: "חגים ומועדים", filter: "פורים" },
+          { label: "פסח", cat: "חגים ומועדים", filter: "פסח" },
+          { label: "סוכות", cat: "חגים ומועדים", filter: "סוכות" },
+          { label: "ראש השנה", cat: "חגים ומועדים", filter: "ראש השנה" },
+          { label: "יום כיפור", cat: "חגים ומועדים", filter: "יום כיפור" },
+          { label: "שבועות", cat: "חגים ומועדים", filter: "שבועות" },
         ]
       },
     ],
@@ -154,20 +171,20 @@ const MEGA_MENU_DATA = [
       {
         title: "מתנות לפי אדם",
         items: [
-          { label: "מתנות לחתן", cat: "מתנות" },
-          { label: "מתנות לגבר", cat: "מתנות" },
-          { label: "מתנות לאישה", cat: "מתנות" },
-          { label: "מתנות לכלה", cat: "מתנות" },
-          { label: "מתנות ליולדת", cat: "מתנות" },
+          { label: "מתנות לחתן", cat: "מתנות", filter: "לחתן" },
+          { label: "מתנות לגבר", cat: "מתנות", filter: "לגבר" },
+          { label: "מתנות לאישה", cat: "מתנות", filter: "לאישה" },
+          { label: "מתנות לכלה", cat: "מתנות", filter: "לכלה" },
+          { label: "מתנות ליולדת", cat: "מתנות", filter: "ליולדת" },
         ]
       },
       {
         title: "מתנות לאירוע",
         items: [
           { label: "בר / בת מצווה", cat: "בר מצווה" },
-          { label: "חנוכת בית", cat: "מתנות" },
+          { label: "חנוכת בית", cat: "מתנות", filter: "חנוכת בית" },
           { label: "חגים", cat: "חגים ומועדים" },
-          { label: "מארזים מיוחדים", cat: "מתנות" },
+          { label: "מארזים מיוחדים", cat: "מתנות", filter: "מארז" },
         ]
       },
     ],
@@ -179,9 +196,9 @@ const MEGA_MENU_DATA = [
         title: "יודאיקה",
         items: [
           { label: "כל היודאיקה", cat: "יודאיקה" },
-          { label: "פיו — תיקי טלית", cat: "יודאיקה" },
-          { label: "כסף", cat: "יודאיקה" },
-          { label: "זכוכית", cat: "יודאיקה" },
+          { label: "פיו — תיקי טלית", cat: "יודאיקה", filter: "פיו" },
+          { label: "כסף", cat: "יודאיקה", filter: "כסף" },
+          { label: "זכוכית", cat: "יודאיקה", filter: "זכוכית" },
         ]
       },
       {
@@ -225,7 +242,7 @@ const accordionVariants: Variants = {
   exit: { height: 0, opacity: 0, transition: { duration: 0.18, ease: "easeIn" } },
 };
 
-function MegaPanel({ item, onSelect }: { item: typeof MEGA_MENU_DATA[0]; onSelect: (cat: string) => void }) {
+function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
   return (
     <motion.div variants={menuVariants} initial="hidden" animate="visible" exit="exit"
       style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 520, maxWidth: 860 }}
@@ -240,7 +257,7 @@ function MegaPanel({ item, onSelect }: { item: typeof MEGA_MENU_DATA[0]; onSelec
               <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                 {col.items.map((sub, si) => (
                   <motion.li key={si} variants={itemVariants}>
-                    <button onClick={() => onSelect(sub.cat)}
+                    <button onClick={() => onSelect(sub.cat, sub.filter)}
                       style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, width: "100%", padding: "7px 8px", borderRadius: 7, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "right", fontFamily: "inherit", transition: "all 0.15s" }}
                       onMouseEnter={e => { e.currentTarget.style.background = "rgba(184,151,42,0.12)"; e.currentTarget.style.color = "#fff"; }}
                       onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}
@@ -262,7 +279,7 @@ function MegaPanel({ item, onSelect }: { item: typeof MEGA_MENU_DATA[0]; onSelec
   );
 }
 
-function MobileAccordion({ item, onSelect }: { item: typeof MEGA_MENU_DATA[0]; onSelect: (cat: string) => void }) {
+function MobileAccordion({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
@@ -278,7 +295,7 @@ function MobileAccordion({ item, onSelect }: { item: typeof MEGA_MENU_DATA[0]; o
                 <div key={ci} style={{ paddingTop: 10 }}>
                   <div style={{ padding: "0 28px 6px", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "#b8972a", textTransform: "uppercase", textAlign: "right" }}>{col.title}</div>
                   {col.items.map((sub, si) => (
-                    <button key={si} onClick={() => onSelect(sub.cat)} style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, width: "100%", padding: "9px 28px", background: "none", border: "none", cursor: "pointer", fontSize: 13.5, color: "rgba(255,255,255,0.7)", fontFamily: "inherit" }}>
+                    <button key={si} onClick={() => onSelect(sub.cat, sub.filter)} style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, width: "100%", padding: "9px 28px", background: "none", border: "none", cursor: "pointer", fontSize: 13.5, color: "rgba(255,255,255,0.7)", fontFamily: "inherit" }}>
                       {sub.label}
                       <span style={{ width: 3, height: 3, borderRadius: "50%", background: "#b8972a", flexShrink: 0 }} />
                     </button>
@@ -340,10 +357,12 @@ export default function NavBar() {
     closeTimer.current = setTimeout(() => setActiveId(null), 150);
   }, []);
 
-  function handleSelect(cat: string) {
+  function handleSelect(cat: string, filter?: string) {
     setActiveId(null);
     setMobileOpen(false);
-    router.push(`/?cat=${encodeURIComponent(cat)}`);
+    let url = `/?cat=${encodeURIComponent(cat)}`;
+    if (filter) url += `&filter=${encodeURIComponent(filter)}`;
+    router.push(url);
   }
 
   function handleAction(action: string) {
