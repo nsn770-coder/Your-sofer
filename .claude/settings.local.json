@@ -7,7 +7,9 @@
       "Bash(node:*)",
       "Bash(ls *.tsbuildinfo)",
       "Bash(ls .next/cache/typescript*)",
-      "Bash(del tsconfig.tsbuildinfo)"
+      "Bash(del tsconfig.tsbuildinfo)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(curl -s \"https://firestore.googleapis.com/v1/projects/your-sofer/databases/\\(default\\)/documents/products?pageSize=300&key=AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I\")"
     ]
   }
 }

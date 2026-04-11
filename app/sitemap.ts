@@ -6,15 +6,19 @@ const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
 
 async function getAllProductIds(): Promise<string[]> {
   try {
-    const res = await fetch(
-      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/products?pageSize=300&key=${FIREBASE_API_KEY}`,
-      { next: { revalidate: 3600 } },
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.documents ?? []).map(
-      (doc: { name: string }) => doc.name.split('/').pop() as string,
-    );
+    const ids: string[] = [];
+    let pageToken: string | undefined;
+    do {
+      const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/products?pageSize=300&key=${FIREBASE_API_KEY}${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ''}`;
+      const res = await fetch(url, { next: { revalidate: 3600 } });
+      if (!res.ok) break;
+      const data = await res.json();
+      (data.documents ?? []).forEach((doc: { name: string }) => {
+        ids.push(doc.name.split('/').pop() as string);
+      });
+      pageToken = data.nextPageToken;
+    } while (pageToken);
+    return ids;
   } catch {
     return [];
   }
@@ -56,9 +60,9 @@ async function getActiveSoferIds(): Promise<string[]> {
 }
 
 const CATEGORIES = [
-  'מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות',
-  'ספרי תורה', 'יודאיקה', 'מתנות', 'בר מצווה', 'חגים ומועדים',
-  'קלפים', 'קלפי מזוזה', 'קלפי תפילין',
+  'סט טלית תפילין', 'מזוזות', 'יודאיקה', 'כיסוי תפילין',
+  'מתנות', 'מגילות', 'תפילין קומפלט', 'קלפי מזוזה',
+  'קלפי תפילין', 'ספרי תורה',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
