@@ -32,18 +32,6 @@ interface PromoCat {
   sub: string;
 }
 
-const PROMO_CATS_DEFAULT: PromoCat[] = [
-  { name: 'מזוזות',          img: 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=400&q=80', sub: 'מכל הסוגים והגדלים' },
-  { name: 'כיסוי תפילין',    img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', sub: 'אשכנז, ספרד, חב״ד' },
-  { name: 'תפילין קומפלט',   img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'סט קומפלט — קלף, בתים, רצועות' },
-  { name: 'טליתות',          img: 'https://images.unsplash.com/photo-1519974719765-e6559eac2575?w=400&q=80', sub: 'טלית קטן, טלית צמר' },
-  { name: 'מגילות',          img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&q=80', sub: 'מגילת אסתר ועוד' },
-  { name: 'יודאיקה',         img: 'https://images.unsplash.com/photo-1519974719765-e6559eac2575?w=400&q=80', sub: 'חנוכיות, כוסות ועוד' },
-  { name: 'ספרי תורה',       img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80', sub: 'ספרי תורה מהודרים' },
-  { name: 'בר מצווה',        img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'סטים וחבילות מיוחדות' },
-  { name: 'מתנות',           img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80', sub: 'לכל אירוע ומועד' },
-  { name: 'קלפים',           img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=400&q=80', sub: 'קלפי מזוזה מסופרים' },
-];
 
 const FILTER_NUSACH = ['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'];
 const FILTER_HIDUR = ['הכל', 'מהודר', 'מהודר מן המובחר', 'רגיל'];
@@ -176,7 +164,7 @@ function HomeContent() {
   const [filterNusach, setFilterNusach] = useState('הכל');
   const [filterHidur, setFilterHidur] = useState('הכל');
   const [minRating, setMinRating] = useState(0);
-  const [promoCats, setPromoCats] = useState<PromoCat[]>(PROMO_CATS_DEFAULT);
+  const [promoCats, setPromoCats] = useState<PromoCat[]>([]);
   const [soferIdFilter, setSoferIdFilter] = useState<string | null>(null);
   const [catFilters, setCatFilters] = useState<Record<string, string>>({});
 
@@ -301,25 +289,47 @@ function HomeContent() {
               <button onClick={() => scrollCats('left')} style={{ background: '#f0f0f0', border: '1px solid #ddd', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>‹</button>
             </div>
           </div>
+          <style>{`
+            @keyframes shimmer {
+              0% { background-position: -400px 0; }
+              100% { background-position: 400px 0; }
+            }
+            .cat-skeleton {
+              background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+              background-size: 800px 100%;
+              animation: shimmer 1.4s infinite linear;
+            }
+          `}</style>
           <div ref={catsScrollRef} style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 4 }}>
-            {promoCats.map(c => (
-              <div key={c.name} onClick={() => { setActiveCat(c.name); setActiveFilter(''); setCatFilters({}); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
-                style={{ cursor: 'pointer', borderRadius: 12, overflow: 'hidden', border: '1px solid #ddd', transition: 'box-shadow 0.2s', flexShrink: 0, width: isMobile ? 130 : 180 }}
-                onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)')}
-                onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
-                <div style={{ height: isMobile ? 100 : 140, overflow: 'hidden', position: 'relative' }}>
-                  <img src={c.img} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }} />
-                  <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '8px 10px' }}>
-                    <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 15, color: '#fff' }}>{c.name}</div>
-                    {c.sub && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>{c.sub}</div>}
+            {loading && promoCats.length === 0
+              ? Array.from({ length: isMobile ? 4 : 7 }).map((_, i) => (
+                  <div key={i} style={{ flexShrink: 0, width: isMobile ? 130 : 180, borderRadius: 12, overflow: 'hidden', border: '1px solid #e8e8e8' }}>
+                    <div className="cat-skeleton" style={{ height: isMobile ? 100 : 140 }} />
+                    <div style={{ padding: '8px 10px', background: '#fff' }}>
+                      <div className="cat-skeleton" style={{ height: 14, borderRadius: 4, marginBottom: 6 }} />
+                      <div className="cat-skeleton" style={{ height: 10, borderRadius: 4, width: '60%' }} />
+                    </div>
                   </div>
-                </div>
-                <div style={{ padding: '8px 10px', background: '#fff' }}>
-                  <div style={{ fontSize: 11, color: '#0e6ba8' }}>לכל המבחר ←</div>
-                </div>
-              </div>
-            ))}
+                ))
+              : promoCats.map(c => (
+                  <div key={c.name} onClick={() => { setActiveCat(c.name); setActiveFilter(''); setCatFilters({}); mainRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+                    style={{ cursor: 'pointer', borderRadius: 12, overflow: 'hidden', border: '1px solid #ddd', transition: 'box-shadow 0.2s', flexShrink: 0, width: isMobile ? 130 : 180 }}
+                    onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)')}
+                    onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
+                    <div style={{ height: isMobile ? 100 : 140, overflow: 'hidden', position: 'relative' }}>
+                      <img src={c.img} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }} />
+                      <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '8px 10px' }}>
+                        <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 15, color: '#fff' }}>{c.name}</div>
+                        {c.sub && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>{c.sub}</div>}
+                      </div>
+                    </div>
+                    <div style={{ padding: '8px 10px', background: '#fff' }}>
+                      <div style={{ fontSize: 11, color: '#0e6ba8' }}>לכל המבחר ←</div>
+                    </div>
+                  </div>
+                ))
+            }
           </div>
         </div>
       </div>
