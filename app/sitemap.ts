@@ -20,8 +20,21 @@ async function getAllProductIds(): Promise<string[]> {
   }
 }
 
+const CATEGORIES = [
+  'מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות',
+  'ספרי תורה', 'יודאיקה', 'מתנות', 'בר מצווה', 'חגים ומועדים',
+  'קלפים', 'קלפי מזוזה', 'קלפי תפילין',
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const productIds = await getAllProductIds();
+
+  const categoryRoutes: MetadataRoute.Sitemap = CATEGORIES.map(cat => ({
+    url: `${BASE_URL}/category/${encodeURIComponent(cat)}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.85,
+  }));
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: BASE_URL,                              lastModified: new Date(), changeFrequency: 'daily',   priority: 1.0 },
@@ -44,5 +57,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...productRoutes];
+  return [...categoryRoutes, ...staticRoutes, ...productRoutes];
 }
