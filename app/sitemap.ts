@@ -20,6 +20,41 @@ async function getAllProductIds(): Promise<string[]> {
   }
 }
 
+async function getActiveSoferIds(): Promise<string[]> {
+  try {
+    const body = {
+      structuredQuery: {
+        from: [{ collectionId: 'soferim' }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: 'status' },
+            op: 'EQUAL',
+            value: { stringValue: 'active' },
+          },
+        },
+        select: { fields: [{ fieldPath: 'name' }] },
+        limit: 200,
+      },
+    };
+    const res = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runQuery?key=${FIREBASE_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        next: { revalidate: 3600 },
+      },
+    );
+    if (!res.ok) return [];
+    const results = await res.json();
+    return (results as Array<{ document?: { name: string } }>)
+      .filter(r => r.document)
+      .map(r => r.document!.name.split('/').pop() as string);
+  } catch {
+    return [];
+  }
+}
+
 const CATEGORIES = [
   'מזוזות', 'כיסוי תפילין', 'תפילין קומפלט', 'טליתות', 'מגילות',
   'ספרי תורה', 'יודאיקה', 'מתנות', 'בר מצווה', 'חגים ומועדים',
@@ -27,7 +62,7 @@ const CATEGORIES = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const productIds = await getAllProductIds();
+  const [productIds, soferIds] = await Promise.all([getAllProductIds(), getActiveSoferIds()]);
 
   const categoryRoutes: MetadataRoute.Sitemap = CATEGORIES.map(cat => ({
     url: `${BASE_URL}/category/${encodeURIComponent(cat)}`,
@@ -46,7 +81,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/madrich/mezuza-zola`,     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/madrich/shuk`,            lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/madrich/soferim`,         lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/soferim`,                 lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.5 },
+    { url: `${BASE_URL}/soferim`,                 lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.75 },
     { url: `${BASE_URL}/join`,                    lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
   ];
 
@@ -57,5 +92,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...categoryRoutes, ...staticRoutes, ...productRoutes];
+  const soferRoutes: MetadataRoute.Sitemap = soferIds.map((id) => ({
+    url: `${BASE_URL}/soferim/${id}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.7,
+  }));
+
+  return [...categoryRoutes, ...staticRoutes, ...productRoutes, ...soferRoutes];
 }
