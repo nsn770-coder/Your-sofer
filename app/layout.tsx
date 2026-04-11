@@ -11,6 +11,9 @@ const geist = Geist({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Your Sofer — חנות סת\"מ",
   description: "רכישת סת\"מ מסופרים מוסמכים",
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({
