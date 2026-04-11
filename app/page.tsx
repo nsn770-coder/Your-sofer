@@ -508,7 +508,7 @@ function HomeContent() {
         </div>
       </footer>
 
-      <a href="https://wa.me/972584877770" target="_blank" rel="noopener noreferrer"
+      <a href="https://wa.me/972552722228?text=שלום אני מעוניין בעזרה ופרטים נוספים"
         style={{ position: 'fixed', bottom: 24, left: 24, zIndex: 999, background: '#25D366', color: '#fff', borderRadius: 50, padding: isMobile ? '10px 16px' : '12px 20px', fontSize: isMobile ? 13 : 14, fontWeight: 900, cursor: 'pointer', boxShadow: '0 4px 20px rgba(37,211,102,0.5)', display: 'flex', alignItems: 'center', gap: 8, direction: 'rtl', textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
         onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.05)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 6px 28px rgba(37,211,102,0.7)'; }}
         onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 4px 20px rgba(37,211,102,0.5)'; }}

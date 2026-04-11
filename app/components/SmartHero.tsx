@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 type HeroState = 'main' | 'mezuzah' | 'tefillin' | 'unsure' | 'klaf';
 
-const WA_LINK = 'https://wa.me/972584877770';
+const WA_LINK = 'https://wa.me/972552722228?text=שלום אני מעוניין בעזרה ופרטים נוספים';
 
 export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }: {
   isMobile: boolean;
