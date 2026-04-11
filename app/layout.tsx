@@ -8,12 +8,43 @@ import NavBar from "@/app/components/navigation/NavBar";
 
 const geist = Geist({ subsets: ["latin"] });
 
+const BASE_URL = 'https://yoursofer.com';
+
 export const metadata: Metadata = {
-  title: "Your Sofer — חנות סת\"מ",
-  description: "רכישת סת\"מ מסופרים מוסמכים",
-  icons: {
-    icon: '/favicon.png',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: 'Your Sofer — חנות סת"מ | מזוזות, תפילין וספרי תורה',
+    template: '%s | Your Sofer',
   },
+  description:
+    'רכישת סת"מ מסופרים מוסמכים — מזוזות, תפילין, מגילות וספרי תורה עם שקיפות מלאה. כל קלף מצולם, נבדק ומקושר לסופר שכתב אותו.',
+  keywords: [
+    'מזוזה', 'מזוזות', 'סת"מ', 'קלף', 'תפילין', 'מגילה', 'ספר תורה',
+    'סופר סת"מ', 'yoursofer', 'your sofer', 'קניית מזוזה',
+    'מזוזה מהודרת', 'מזוזה כשרה',
+  ],
+  authors: [{ name: 'Your Sofer', url: BASE_URL }],
+  creator: 'Your Sofer',
+  publisher: 'Your Sofer',
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  openGraph: {
+    type: 'website',
+    locale: 'he_IL',
+    url: BASE_URL,
+    siteName: 'Your Sofer',
+    title: 'Your Sofer — חנות סת"מ | מזוזות, תפילין וספרי תורה',
+    description:
+      'רכישת סת"מ מסופרים מוסמכים — מזוזות, תפילין, מגילות וספרי תורה עם שקיפות מלאה.',
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'Your Sofer' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Your Sofer — חנות סת"מ',
+    description: 'רכישת סת"מ מסופרים מוסמכים — מזוזות, תפילין ועוד.',
+    images: ['/og-default.png'],
+  },
+  alternates: { canonical: BASE_URL },
+  icons: { icon: '/favicon.png' },
 };
 
 export default function RootLayout({

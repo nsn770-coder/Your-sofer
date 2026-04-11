@@ -1,10 +1,41 @@
-'use client';
+import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard, Step } from '../InfoComponents';
 
+const BASE_URL = 'https://yoursofer.com';
 const C = { navy: '#0c1a35', gold: '#b8972a', muted: '#666', border: '#e0e0e0', white: '#fff' };
+
+export const metadata: Metadata = {
+  title: 'מזוזה זולה יכולה לעלות לך ביוקר',
+  description:
+    'למה לא לקנות מזוזה זולה — ההבדל האמיתי בין מזוזה ב-150₪ למזוזה ב-400₪ ומה זה אומר על הכשרות.',
+  alternates: { canonical: `${BASE_URL}/madrich/mezuza-zola` },
+  openGraph: {
+    type: 'article',
+    locale: 'he_IL',
+    url: `${BASE_URL}/madrich/mezuza-zola`,
+    siteName: 'Your Sofer',
+    title: 'מזוזה זולה יכולה לעלות לך ביוקר | Your Sofer',
+    description: 'למה לא לקנות מזוזה זולה — ההבדל האמיתי בין מחירים ומה זה אומר על הכשרות.',
+  },
+};
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'מזוזה זולה יכולה לעלות לך ביוקר',
+  description: 'למה לא לקנות מזוזה זולה — ההבדל האמיתי בין מזוזה ב-150₪ למזוזה ב-400₪.',
+  url: `${BASE_URL}/madrich/mezuza-zola`,
+  publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
+  inLanguage: 'he',
+};
 
 export default function MezuzaZolaPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
     <ArticleLayout>
       <PageHero
         badge="חשוב לדעת"
@@ -100,5 +131,6 @@ export default function MezuzaZolaPage() {
         />
       </div>
     </ArticleLayout>
+    </>
   );
 }

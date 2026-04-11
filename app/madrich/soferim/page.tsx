@@ -1,10 +1,41 @@
-'use client';
+import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard } from '../InfoComponents';
 
+const BASE_URL = 'https://yoursofer.com';
 const C = { navy: '#0c1a35', gold: '#b8972a', border: '#e0e0e0', white: '#fff' };
+
+export const metadata: Metadata = {
+  title: 'מי הסופרים שלנו — הקריטריונים לבחירת סופר סת"מ',
+  description:
+    'איך אנחנו בוחרים עם מי לעבוד — ומה מייחד כל סופר סת"מ שעובד עם Your Sofer. הקריטריונים, תהליך הכניסה, והמחויבות לאיכות.',
+  alternates: { canonical: `${BASE_URL}/madrich/soferim` },
+  openGraph: {
+    type: 'article',
+    locale: 'he_IL',
+    url: `${BASE_URL}/madrich/soferim`,
+    siteName: 'Your Sofer',
+    title: 'מי הסופרים שלנו | Your Sofer',
+    description: 'הקריטריונים שלנו לבחירת סופר סת"מ ותהליך העבודה המשותפת.',
+  },
+};
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'מי הסופרים שלנו',
+  description: 'איך אנחנו בוחרים עם מי לעבוד — ומה מייחד כל סופר שעובד איתנו.',
+  url: `${BASE_URL}/madrich/soferim`,
+  publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
+  inLanguage: 'he',
+};
 
 export default function SoferimPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
     <ArticleLayout>
       <PageHero
         badge="הסופרים שלנו"
@@ -90,5 +121,6 @@ export default function SoferimPage() {
         />
       </div>
     </ArticleLayout>
+    </>
   );
 }

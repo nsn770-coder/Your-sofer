@@ -1,8 +1,40 @@
-'use client';
+import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard } from '../InfoComponents';
+
+const BASE_URL = 'https://yoursofer.com';
+
+export const metadata: Metadata = {
+  title: 'מה זה מזוזה מהודרת באמת? ההבדל בין כשר למהודר',
+  description:
+    'לא כל מזוזה כשרה היא מהודרת — מה ההבדל בין כשר למהודר, מה בודקים במזוזה מהודרת, ולמה זה משנה.',
+  alternates: { canonical: `${BASE_URL}/madrich/mehudar` },
+  openGraph: {
+    type: 'article',
+    locale: 'he_IL',
+    url: `${BASE_URL}/madrich/mehudar`,
+    siteName: 'Your Sofer',
+    title: 'מה זה מזוזה מהודרת באמת? | Your Sofer',
+    description: 'ההבדל בין כשר למהודר — מה מוסיף ה"הידור" ולמה זה חשוב.',
+  },
+};
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'מה זה מזוזה מהודרת באמת?',
+  description: 'לא כל מזוזה כשרה היא מהודרת — הנה ההבדלים שחשוב להכיר.',
+  url: `${BASE_URL}/madrich/mehudar`,
+  publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
+  inLanguage: 'he',
+};
 
 export default function MehudarPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
     <ArticleLayout>
       <PageHero
         badge="מדריך איכות"
@@ -119,5 +151,6 @@ export default function MehudarPage() {
         />
       </div>
     </ArticleLayout>
+    </>
   );
 }

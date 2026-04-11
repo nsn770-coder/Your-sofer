@@ -1,5 +1,22 @@
-'use client';
+import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, FAQItem, CTAStrip, RelatedCard } from '../InfoComponents';
+
+const BASE_URL = 'https://yoursofer.com';
+
+export const metadata: Metadata = {
+  title: 'שאלות נפוצות על מזוזות — תשובות ברורות',
+  description:
+    'תשובות לשאלות הנפוצות ביותר: כמה עולה מזוזה, איך יודעים שהיא כשרה, מה ההבדל בין כשר למהודר, ועוד.',
+  alternates: { canonical: `${BASE_URL}/madrich/faq` },
+  openGraph: {
+    type: 'article',
+    locale: 'he_IL',
+    url: `${BASE_URL}/madrich/faq`,
+    siteName: 'Your Sofer',
+    title: 'שאלות נפוצות על מזוזות | Your Sofer',
+    description: 'תשובות ברורות לשאלות הנפוצות ביותר על מזוזות, בדיקות ורכישה.',
+  },
+};
 
 const FAQS = [
   {
@@ -52,8 +69,23 @@ const FAQS = [
   },
 ];
 
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQS.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+};
+
 export default function FAQPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
     <ArticleLayout>
       <PageHero
         badge="שאלות ותשובות"
@@ -85,5 +117,6 @@ export default function FAQPage() {
         />
       </div>
     </ArticleLayout>
+    </>
   );
 }

@@ -1,8 +1,40 @@
-'use client';
+import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard, Step } from '../InfoComponents';
+
+const BASE_URL = 'https://yoursofer.com';
+
+export const metadata: Metadata = {
+  title: 'איך לבחור מזוזה נכון — מדריך מעשי',
+  description:
+    'מדריך שלב-אחר-שלב לבחירת מזוזה — גם אם אין לך מושג בסת"מ. 6 שאלות שחייבים לשאול לפני הקנייה.',
+  alternates: { canonical: `${BASE_URL}/madrich/bechira` },
+  openGraph: {
+    type: 'article',
+    locale: 'he_IL',
+    url: `${BASE_URL}/madrich/bechira`,
+    siteName: 'Your Sofer',
+    title: 'איך לבחור מזוזה נכון | Your Sofer',
+    description: 'מדריך מעשי לבחירת מזוזה — 6 שלבים וכל השאלות שצריך לשאול.',
+  },
+};
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'איך לבחור מזוזה נכון',
+  description: 'מדריך שלב-אחר-שלב לבחירת מזוזה — גם אם אין לך מושג בסת"מ.',
+  url: `${BASE_URL}/madrich/bechira`,
+  publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
+  inLanguage: 'he',
+};
 
 export default function BechiraPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
     <ArticleLayout>
       <PageHero
         badge="מדריך מעשי"
@@ -67,5 +99,6 @@ export default function BechiraPage() {
         />
       </div>
     </ArticleLayout>
+    </>
   );
 }

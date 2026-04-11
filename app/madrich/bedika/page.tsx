@@ -1,8 +1,40 @@
-'use client';
+import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard, Step } from '../InfoComponents';
+
+const BASE_URL = 'https://yoursofer.com';
+
+export const metadata: Metadata = {
+  title: 'איך אנחנו בודקים מזוזות — תהליך הבדיקה המלא',
+  description:
+    'כל מזוזה עוברת בדיקה מקצועית לפני שמגיעה אליך — בדיקה ידנית מוסמכת, בדיקת מחשב, וצילום הקלף. הנה התהליך המלא.',
+  alternates: { canonical: `${BASE_URL}/madrich/bedika` },
+  openGraph: {
+    type: 'article',
+    locale: 'he_IL',
+    url: `${BASE_URL}/madrich/bedika`,
+    siteName: 'Your Sofer',
+    title: 'איך אנחנו בודקים מזוזות | Your Sofer',
+    description: 'תהליך בדיקת המזוזות שלנו — 6 שלבים מהסופר ועד אליך.',
+  },
+};
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'איך אנחנו בודקים מזוזות',
+  description: 'כל מזוזה עוברת בדיקה מקצועית לפני שמגיעה אליך — הנה התהליך המלא.',
+  url: `${BASE_URL}/madrich/bedika`,
+  publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
+  inLanguage: 'he',
+};
 
 export default function BedikaPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
     <ArticleLayout>
       <PageHero
         badge="תהליך הבדיקה"
@@ -65,5 +97,6 @@ export default function BedikaPage() {
         />
       </div>
     </ArticleLayout>
+    </>
   );
 }

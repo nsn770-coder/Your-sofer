@@ -1,8 +1,40 @@
-'use client';
+import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard } from '../InfoComponents';
+
+const BASE_URL = 'https://yoursofer.com';
+
+export const metadata: Metadata = {
+  title: 'האמת על שוק המזוזות — למה קשה לדעת מה קונים',
+  description:
+    'למה כל כך קשה לדעת מה באמת קונים בשוק המזוזות — הבעיות המבניות בשוק וכיצד המודל של Your Sofer שונה.',
+  alternates: { canonical: `${BASE_URL}/madrich/shuk` },
+  openGraph: {
+    type: 'article',
+    locale: 'he_IL',
+    url: `${BASE_URL}/madrich/shuk`,
+    siteName: 'Your Sofer',
+    title: 'האמת על שוק המזוזות | Your Sofer',
+    description: 'שרשרת הסיטונאים, חוסר השקיפות, וכיצד אנחנו עושים אחרת.',
+  },
+};
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'האמת על שוק המזוזות',
+  description: 'למה כל כך קשה לדעת מה באמת קונים — וכיצד המודל שלנו שונה.',
+  url: `${BASE_URL}/madrich/shuk`,
+  publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
+  inLanguage: 'he',
+};
 
 export default function ShukPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
     <ArticleLayout>
       <PageHero
         badge="שקיפות מלאה"
@@ -89,5 +121,6 @@ export default function ShukPage() {
         />
       </div>
     </ArticleLayout>
+    </>
   );
 }
