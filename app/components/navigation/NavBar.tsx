@@ -317,6 +317,7 @@ export default function NavBar() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
@@ -363,6 +364,12 @@ export default function NavBar() {
     let url = `/?cat=${encodeURIComponent(cat)}`;
     if (filter) url += `&filter=${encodeURIComponent(filter)}`;
     router.push(url);
+  }
+
+  function handleSearch() {
+    const q = searchQuery.trim();
+    if (!q) return;
+    router.push(`/?q=${encodeURIComponent(q)}`);
   }
 
   function handleAction(action: string) {
@@ -416,9 +423,13 @@ export default function NavBar() {
                 <option>כל הקטגוריות</option>
               </select>
             )}
-            <input placeholder={isMobile ? "חיפוש..." : "חיפוש סת״מ ויודאיקה מאומתים..."}
-              style={{ flex: 1, border: "none", padding: "10px", fontSize: isMobile ? 13 : 14, color: "#333", outline: "none", minWidth: 0 }} />
-            <button style={{ background: "#b8972a", border: "none", padding: "0 14px", cursor: "pointer" }}>
+            <input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && handleSearch()}
+              placeholder={isMobile ? "חיפוש..." : "חיפוש סת״מ ויודאיקה מאומתים..."}
+              style={{ flex: 1, border: "none", padding: "10px", fontSize: isMobile ? 13 : 14, color: "#fff", background: "rgba(255,255,255,0.12)", outline: "none", minWidth: 0 }} />
+            <button onClick={handleSearch} style={{ background: "#b8972a", border: "none", padding: "0 14px", cursor: "pointer" }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
             </button>
           </div>

@@ -198,6 +198,9 @@ function HomeContent() {
     const soferId = searchParams.get('soferId');
     if (soferId) setSoferIdFilter(soferId);
 
+    const q = searchParams.get('q');
+    if (q) setSearch(decodeURIComponent(q));
+
     const cat = searchParams.get('cat');
     if (cat) {
       setActiveCat(decodeURIComponent(cat));
