@@ -90,11 +90,7 @@ interface Category {
   order: number;
 }
 
-<<<<<<< HEAD
-type TabType = 'orders' | 'commissions' | 'soferim' | 'users' | 'products' | 'content' | 'categories';
-=======
 type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories';
->>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: '👑 מנהל',
@@ -110,7 +106,6 @@ const ROLE_COLORS: Record<UserRole, string> = {
   customer: 'bg-gray-100 text-gray-600',
 };
 
-// ══ מודל הוספת מוצר ══
 function AddProductModal({ soferim, onClose, onSave }: {
   soferim: Sofer[];
   onClose: () => void;
@@ -286,6 +281,119 @@ function AddProductModal({ soferim, onClose, onSave }: {
   );
 }
 
+function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () => void }) {
+  const [form, setForm] = useState({
+    name: '', city: '', phone: '', whatsapp: '', email: '',
+    description: '', style: '', imageUrl: '',
+  });
+  const [categories, setCategories] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState(false);
+
+  const SOFER_CATS = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין'];
+
+  function toggleCat(cat: string) {
+    setCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+  }
+
+  async function uploadToCloudinary(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'yoursofer_upload');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error('שגיאה בהעלאה');
+    return data.secure_url;
+  }
+
+  async function handleSave() {
+    if (!form.name || !form.phone) { alert('שם וטלפון הם שדות חובה'); return; }
+    setSaving(true);
+    try {
+      await addDoc(collection(db, 'soferim'), {
+        ...form, categories, status: 'active', createdAt: serverTimestamp(),
+      });
+      onSave();
+      onClose();
+    } catch (e) {
+      alert('שגיאה בשמירה');
+      console.error(e);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = { width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' };
+  const labelStyle: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      onClick={onClose}>
+      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>➕ הוספת סופר חדש</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+        </div>
+        <div style={{ display: 'grid', gap: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div><label style={labelStyle}>שם מלא *</label><input value={form.name} onChange={e => setForm(p => ({...p, name: e.target.value}))} placeholder="הרב ישראל ישראלי" style={inputStyle} /></div>
+            <div><label style={labelStyle}>עיר</label><input value={form.city} onChange={e => setForm(p => ({...p, city: e.target.value}))} placeholder="ירושלים" style={inputStyle} /></div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div><label style={labelStyle}>טלפון *</label><input value={form.phone} onChange={e => setForm(p => ({...p, phone: e.target.value}))} placeholder="050-0000000" style={inputStyle} /></div>
+            <div><label style={labelStyle}>וואטסאפ</label><input value={form.whatsapp} onChange={e => setForm(p => ({...p, whatsapp: e.target.value}))} placeholder="050-0000000" style={inputStyle} /></div>
+          </div>
+          <div><label style={labelStyle}>אימייל</label><input value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} placeholder="sofer@example.com" type="email" style={inputStyle} /></div>
+          <div><label style={labelStyle}>סגנון כתיבה</label><input value={form.style} onChange={e => setForm(p => ({...p, style: e.target.value}))} placeholder='חב"ד / אשכנז / ספרד' style={inputStyle} /></div>
+          <div>
+            <label style={labelStyle}>תיאור</label>
+            <textarea value={form.description} onChange={e => setForm(p => ({...p, description: e.target.value}))} rows={3}
+              placeholder="סופר מוסמך עם ניסיון של 10 שנים..." style={{ ...inputStyle, resize: 'vertical' }} />
+          </div>
+          <div>
+            <label style={labelStyle}>קטגוריות</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {SOFER_CATS.map(cat => (
+                <button key={cat} type="button" onClick={() => toggleCat(cat)}
+                  style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer', background: categories.includes(cat) ? '#0c1a35' : '#f5f5f5', color: categories.includes(cat) ? '#fff' : '#333', border: categories.includes(cat) ? '1px solid #0c1a35' : '1px solid #ddd', fontWeight: categories.includes(cat) ? 700 : 400 }}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>תמונה</label>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              {form.imageUrl && <img src={form.imageUrl} alt="" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ddd' }} />}
+              <label style={{ background: '#0c1a35', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                {uploadingImg ? '⏳ מעלה...' : '📷 העלה תמונה'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async e => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploadingImg(true);
+                  try { const url = await uploadToCloudinary(file); setForm(p => ({...p, imageUrl: url})); }
+                  catch { alert('שגיאה בהעלאה'); }
+                  finally { setUploadingImg(false); }
+                }} />
+              </label>
+              <input value={form.imageUrl} onChange={e => setForm(p => ({...p, imageUrl: e.target.value}))} placeholder="או הדבק URL"
+                style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12 }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
+          <button onClick={handleSave} disabled={saving}
+            style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            {saving ? '⏳ שומר...' : '✅ הוסף סופר'}
+          </button>
+          <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -294,6 +402,8 @@ export default function AdminPage() {
   const [users, setUsers] = useState<AppUser[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
+  const [soferimFull, setSoferimFull] = useState<SoferFull[]>([]);
+  const [soferimLoading, setSoferimLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [content, setContent] = useState<HomeContent>({ heroTitle: '', heroSubtitle: '', heroText: '' });
   const [contentSaving, setContentSaving] = useState(false);
@@ -309,12 +419,7 @@ export default function AdminPage() {
   const [roleFilter, setRoleFilter] = useState<string>('הכל');
   const [productSearch, setProductSearch] = useState('');
   const [showAddProduct, setShowAddProduct] = useState(false);
-<<<<<<< HEAD
-=======
-  const [soferimFull, setSoferimFull] = useState<SoferFull[]>([]);
-  const [soferimLoading, setSoferimLoading] = useState(false);
   const [showAddSofer, setShowAddSofer] = useState(false);
->>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
   const [importStatus, setImportStatus] = useState('');
 
   useEffect(() => {
@@ -324,11 +429,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (user?.role === 'admin') {
       loadOrders(); loadApplications(); loadUsers();
-<<<<<<< HEAD
-      loadProducts(); loadSoferim(); loadContent(); loadCategories();
-=======
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
->>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
     }
   }, [user]);
 
@@ -483,7 +584,6 @@ export default function AdminPage() {
     finally { setActionLoading(null); }
   }
 
-  // ══ ייצוא ══
   function exportToExcel() {
     const rows = [
       ['id', 'name', 'cat', 'price', 'was', 'desc', 'badge', 'days', 'imgUrl', 'imgUrl2', 'imgUrl3', 'soferId'],
@@ -504,12 +604,10 @@ export default function AdminPage() {
     a.click();
   }
 
-  // ══ הורד תבנית ריקה ══
   function downloadTemplate() {
     const headers = ['id', 'name', 'cat', 'price', 'was', 'desc', 'badge', 'days', 'imgUrl', 'imgUrl2', 'imgUrl3', 'soferId'];
     const example = ['', 'בית מזוזה כסף 10 ס"מ', 'מזוזות', '89.90', '', 'תיאור המוצר כאן', 'חדש', '7-14', 'https://example.com/image.jpg', '', '', ''];
-    const notes = ['# הסבר:', '# id — ריק למוצר חדש', '# cat — חייב להתאים לקטגוריה באתר', '# badge — חדש / מבצע / פופולרי / ריק', '# imgUrl — URL לתמונה ראשית', '', ''];
-    const csv = [headers.join(','), example.map(v => `"${v}"`).join(','), ...notes].join('\n');
+    const csv = [headers.join(','), example.map(v => `"${v}"`).join(',')].join('\n');
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -517,116 +615,49 @@ export default function AdminPage() {
     a.click();
   }
 
-  // ══ ייבוא CSV משופר ══
   async function importFromCSV(file: File) {
     setImportStatus('⏳ מייבא מוצרים...');
     try {
       const text = await file.text();
       const lines = text.split('\n').filter(r => r.trim() && !r.trim().startsWith('#'));
-
       const firstLine = lines[0].replace(/^\uFEFF/, '');
       const headers = firstLine.split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
-
-      const getIdx = (...names: string[]) => {
-        for (const n of names) {
-          const i = headers.indexOf(n);
-          if (i >= 0) return i;
-        }
-        return -1;
-      };
-
-      const idIdx    = getIdx('id');
-      const nameIdx  = getIdx('name', 'שם');
-      const catIdx   = getIdx('cat', 'category', 'קטגוריה');
-      const priceIdx = getIdx('price', 'מחיר');
-      const wasIdx   = getIdx('was', 'מחיר מקורי');
-      const descIdx  = getIdx('desc', 'description', 'תיאור');
-      const badgeIdx = getIdx('badge', 'תווית');
-      const daysIdx  = getIdx('days', 'ימי אספקה');
-      const imgIdx   = getIdx('imgurl', 'image_url', 'img_url', 'תמונה');
-      const img2Idx  = getIdx('imgurl2', 'image_url2');
-      const img3Idx  = getIdx('imgurl3', 'image_url3');
-      const soferIdx = getIdx('soferid', 'sofer_id');
-
-      if (nameIdx === -1) {
-        setImportStatus('❌ לא נמצאה עמודת שם — בדוק שהכותרות בעברית או באנגלית');
-        return;
-      }
-
+      const getIdx = (...names: string[]) => { for (const n of names) { const i = headers.indexOf(n); if (i >= 0) return i; } return -1; };
+      const idIdx = getIdx('id'); const nameIdx = getIdx('name', 'שם'); const catIdx = getIdx('cat', 'category', 'קטגוריה');
+      const priceIdx = getIdx('price', 'מחיר'); const wasIdx = getIdx('was'); const descIdx = getIdx('desc', 'description');
+      const badgeIdx = getIdx('badge'); const daysIdx = getIdx('days'); const imgIdx = getIdx('imgurl', 'image_url');
+      const img2Idx = getIdx('imgurl2'); const img3Idx = getIdx('imgurl3'); const soferIdx = getIdx('soferid');
+      if (nameIdx === -1) { setImportStatus('❌ לא נמצאה עמודת שם'); return; }
       let added = 0, updated = 0, skipped = 0;
-
       for (let i = 1; i < lines.length; i++) {
-        // פרסר CSV עם תמיכה בגרשיים
-        const cols: string[] = [];
-        let cur = ''; let inQ = false;
-        for (const ch of lines[i]) {
-          if (ch === '"') { inQ = !inQ; }
-          else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-          else cur += ch;
-        }
+        const cols: string[] = []; let cur = ''; let inQ = false;
+        for (const ch of lines[i]) { if (ch === '"') { inQ = !inQ; } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; } else cur += ch; }
         cols.push(cur.trim());
-
         const get = (idx: number) => idx >= 0 ? (cols[idx] || '').replace(/^"|"$/g, '').trim() : '';
-
-        const name  = get(nameIdx);
-        const price = parseFloat(get(priceIdx));
+        const name = get(nameIdx); const price = parseFloat(get(priceIdx));
         if (!name || isNaN(price) || price <= 0) { skipped++; continue; }
-
-        const productData: any = {
-          name,
-          cat: get(catIdx) || 'כללי',
-          price,
-          status: 'active',
-        };
-        const wasVal = get(wasIdx);
-        if (wasVal) productData.was = parseFloat(wasVal);
-        const descVal = get(descIdx);
-        if (descVal) productData.desc = descVal;
-        const badgeVal = get(badgeIdx);
-        if (badgeVal) productData.badge = badgeVal;
-        const daysVal = get(daysIdx);
-        if (daysVal) productData.days = daysVal;
-        const imgVal = get(imgIdx);
-        if (imgVal) productData.imgUrl = imgVal;
-        const img2Val = get(img2Idx);
-        if (img2Val) productData.imgUrl2 = img2Val;
-        const img3Val = get(img3Idx);
-        if (img3Val) productData.imgUrl3 = img3Val;
-        const soferVal = get(soferIdx);
-        if (soferVal) productData.soferId = soferVal;
-
+        const productData: any = { name, cat: get(catIdx) || 'כללי', price, status: 'active' };
+        const wasVal = get(wasIdx); if (wasVal) productData.was = parseFloat(wasVal);
+        const descVal = get(descIdx); if (descVal) productData.desc = descVal;
+        const badgeVal = get(badgeIdx); if (badgeVal) productData.badge = badgeVal;
+        const daysVal = get(daysIdx); if (daysVal) productData.days = daysVal;
+        const imgVal = get(imgIdx); if (imgVal) productData.imgUrl = imgVal;
+        const img2Val = get(img2Idx); if (img2Val) productData.imgUrl2 = img2Val;
+        const img3Val = get(img3Idx); if (img3Val) productData.imgUrl3 = img3Val;
+        const soferVal = get(soferIdx); if (soferVal) productData.soferId = soferVal;
         const existingId = get(idIdx);
-
         try {
-          if (existingId) {
-            await updateDoc(doc(db, 'products', existingId), productData);
-            updated++;
-          } else {
-            productData.createdAt = serverTimestamp();
-            await addDoc(collection(db, 'products'), productData);
-            added++;
-          }
-        } catch (e) {
-          console.error('שגיאה במוצר', name, e);
-          skipped++;
-        }
+          if (existingId) { await updateDoc(doc(db, 'products', existingId), productData); updated++; }
+          else { productData.createdAt = serverTimestamp(); await addDoc(collection(db, 'products'), productData); added++; }
+        } catch (e) { console.error('שגיאה במוצר', name, e); skipped++; }
       }
-
       setImportStatus(`✅ הושלם! נוספו: ${added} | עודכנו: ${updated} | דולגו: ${skipped}`);
       setTimeout(() => setImportStatus(''), 6000);
       loadProducts();
-    } catch (e) {
-      console.error(e);
-      setImportStatus('❌ שגיאה בייבוא — בדוק שהקובץ תקין');
-    }
+    } catch (e) { console.error(e); setImportStatus('❌ שגיאה בייבוא'); }
   }
 
-  if (loading || ordersLoading) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-2xl">טוען...</div>
-    </div>
-  );
-
+  if (loading || ordersLoading) return <div className="flex items-center justify-center min-h-screen"><div className="text-2xl">טוען...</div></div>;
   if (!user || user.role !== 'admin') return null;
 
   const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
@@ -643,38 +674,20 @@ export default function AdminPage() {
         <button onClick={() => router.push('/')} className="text-green-700 font-bold hover:underline">← חזרה לחנות</button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-green-700">₪{totalRevenue.toFixed(0)}</div>
-          <div className="text-sm text-gray-500 mt-1">סה"כ הכנסות</div>
-        </div>
-        <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-blue-600">{products.length}</div>
-          <div className="text-sm text-gray-500 mt-1">מוצרים</div>
-        </div>
-        <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-purple-600">{users.length}</div>
-          <div className="text-sm text-gray-500 mt-1">משתמשים</div>
-        </div>
-        <div className="bg-white rounded-xl shadow p-4 text-center">
-          <div className="text-3xl font-black text-orange-500">{pendingApps.length}</div>
-          <div className="text-sm text-gray-500 mt-1">בקשות סופרים</div>
-        </div>
+        <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-green-700">₪{totalRevenue.toFixed(0)}</div><div className="text-sm text-gray-500 mt-1">סה"כ הכנסות</div></div>
+        <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-blue-600">{products.length}</div><div className="text-sm text-gray-500 mt-1">מוצרים</div></div>
+        <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-purple-600">{users.length}</div><div className="text-sm text-gray-500 mt-1">משתמשים</div></div>
+        <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-orange-500">{pendingApps.length}</div><div className="text-sm text-gray-500 mt-1">בקשות סופרים</div></div>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {[
           { key: 'orders', label: '📦 הזמנות', color: 'bg-green-700' },
           { key: 'products', label: '📜 מוצרים', color: 'bg-teal-600', badge: unassignedProducts },
           { key: 'commissions', label: '🤝 עמלות', color: 'bg-blue-600' },
-<<<<<<< HEAD
-          { key: 'soferim', label: '✍️ בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
-=======
           { key: 'soferim_list', label: '✍️ סופרים', color: 'bg-amber-700' },
           { key: 'soferim', label: '📋 בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
->>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
           { key: 'users', label: '👥 משתמשים', color: 'bg-purple-600' },
           { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
           { key: 'categories', label: '🖼️ קטגוריות', color: 'bg-indigo-600' },
@@ -682,104 +695,39 @@ export default function AdminPage() {
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
             {t.label}
-            {t.badge && t.badge > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{t.badge}</span>
-            )}
+            {(t as any).badge > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{(t as any).badge}</span>}
           </button>
         ))}
       </div>
 
-      {/* ══ PRODUCTS TAB ══ */}
       {activeTab === 'products' && (
         <div>
           <div className="flex gap-2 mb-4 items-center flex-wrap">
-            <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
-              placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
+            <input value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder="חיפוש מוצר..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm flex-1 max-w-xs" />
             <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
             {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
-
-            {/* ➕ הוסף מוצר */}
-            <button onClick={() => setShowAddProduct(true)}
-              style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-              ➕ הוסף מוצר
-            </button>
-
-            {/* 📥 ייצוא */}
-            <button onClick={exportToExcel}
-              style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-              📥 ייצוא ל-Excel
-            </button>
-
-            {/* 📋 הורד תבנית */}
-            <button onClick={downloadTemplate}
-              style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-              📋 הורד תבנית
-            </button>
-
-            {/* 📤 ייבוא CSV */}
+            <button onClick={() => setShowAddProduct(true)} style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר</button>
+            <button onClick={exportToExcel} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📥 ייצוא ל-Excel</button>
+            <button onClick={downloadTemplate} style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📋 הורד תבנית</button>
             <label style={{ background: '#0284c7', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
               📤 ייבוא CSV
-              <input type="file" accept=".csv" style={{ display: 'none' }}
-                onChange={e => { if (e.target.files?.[0]) { importFromCSV(e.target.files[0]); e.target.value = ''; } }} />
+              <input type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { if (e.target.files?.[0]) { importFromCSV(e.target.files[0]); e.target.value = ''; } }} />
             </label>
           </div>
-
-          {/* סטטוס ייבוא */}
-          {importStatus && (
-            <div style={{
-              marginBottom: 16, padding: '12px 16px', borderRadius: 10, fontSize: 14, fontWeight: 700,
-              background: importStatus.startsWith('✅') ? '#f0fdf4' : importStatus.startsWith('❌') ? '#fef2f2' : '#eff6ff',
-              color: importStatus.startsWith('✅') ? '#15803d' : importStatus.startsWith('❌') ? '#dc2626' : '#1d4ed8',
-            }}>
-              {importStatus}
-            </div>
-          )}
-
-          {productsLoading ? (
-            <div className="p-10 text-center text-gray-400">טוען מוצרים...</div>
-          ) : (
+          {importStatus && <div style={{ marginBottom: 16, padding: '12px 16px', borderRadius: 10, fontSize: 14, fontWeight: 700, background: importStatus.startsWith('✅') ? '#f0fdf4' : importStatus.startsWith('❌') ? '#fef2f2' : '#eff6ff', color: importStatus.startsWith('✅') ? '#15803d' : importStatus.startsWith('❌') ? '#dc2626' : '#1d4ed8' }}>{importStatus}</div>}
+          {productsLoading ? <div className="p-10 text-center text-gray-400">טוען מוצרים...</div> : (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="p-3 text-right">מוצר</th>
-                    <th className="p-3 text-right">קטגוריה</th>
-                    <th className="p-3 text-right">מחיר</th>
-                    <th className="p-3 text-right">סטטוס</th>
-                    <th className="p-3 text-right">שיוך לסופר</th>
-                  </tr>
-                </thead>
+                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th></tr></thead>
                 <tbody>
-                  {filteredProducts.length === 0 ? (
-                    <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
-                  ) : filteredProducts.map(p => (
+                  {filteredProducts.length === 0 ? <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
+                  : filteredProducts.map(p => (
                     <tr key={p.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          {(p.imgUrl || p.image_url) && (
-                            <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover"
-                              onError={e => (e.currentTarget.style.display = 'none')} />
-                          )}
-                          <span className="font-bold text-xs">{p.name}</span>
-                        </div>
-                      </td>
+                      <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
                       <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
                       <td className="p-3 font-bold text-green-700">₪{p.price}</td>
-                      <td className="p-3">
-                        <button onClick={() => toggleProductStatus(p.id, p.status || 'active')}
-                          disabled={actionLoading === p.id + '_status'}
-                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
-                          {p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}
-                        </button>
-                      </td>
-                      <td className="p-3">
-                        <select value={p.soferId || ''} disabled={actionLoading === p.id}
-                          onChange={e => assignSoferToProduct(p.id, e.target.value)}
-                          className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}>
-                          <option value="">⚠️ ללא סופר</option>
-                          {soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                        </select>
-                      </td>
+                      <td className="p-3"><button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'} className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>{p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}</button></td>
+                      <td className="p-3"><select value={p.soferId || ''} disabled={actionLoading === p.id} onChange={e => assignSoferToProduct(p.id, e.target.value)} className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}><option value="">⚠️ ללא סופר</option>{soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></td>
                     </tr>
                   ))}
                 </tbody>
@@ -789,23 +737,18 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ CATEGORIES TAB ══ */}
       {activeTab === 'categories' && (
         <div className="grid gap-6">
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-xl font-black mb-2">🖼️ ניהול תמונות קטגוריות</h2>
-            <p className="text-sm text-gray-500 mb-6">עדכן תמונה וכיתוב לכל קטגוריה. התמונות מופיעות בדף הבית.</p>
+            <p className="text-sm text-gray-500 mb-6">עדכן תמונה וכיתוב לכל קטגוריה.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {categories.map(cat => (
-                <CategoryCard key={cat.id} cat={cat} saving={catSaving === cat.id} saved={catSaved === cat.id}
-                  onSave={(imgUrl, sub) => saveCategoryImg(cat.id, imgUrl, sub)} />
-              ))}
+              {categories.map(cat => <CategoryCard key={cat.id} cat={cat} saving={catSaving === cat.id} saved={catSaved === cat.id} onSave={(imgUrl, sub) => saveCategoryImg(cat.id, imgUrl, sub)} />)}
             </div>
           </div>
         </div>
       )}
 
-      {/* ══ CONTENT TAB ══ */}
       {activeTab === 'content' && (
         <div className="bg-white rounded-xl shadow p-6">
           <h2 className="text-xl font-black mb-6 text-gray-800">✏️ עריכת תוכן דף הבית</h2>
@@ -813,70 +756,32 @@ export default function AdminPage() {
             <div className="border border-gray-100 rounded-xl p-5 bg-gray-50">
               <h3 className="font-bold text-gray-700 mb-4">🏠 אזור Hero</h3>
               <div className="grid gap-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-600 mb-1">כותרת ראשית</label>
-                  <input value={content.heroTitle} onChange={e => setContent(prev => ({ ...prev, heroTitle: e.target.value }))}
-                    placeholder='רכישת סת"מ' className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-600 mb-1">כותרת משנה (בזהב)</label>
-                  <input value={content.heroSubtitle} onChange={e => setContent(prev => ({ ...prev, heroSubtitle: e.target.value }))}
-                    placeholder="ישירות מהסופר" className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-600 mb-1">טקסט תיאור</label>
-                  <textarea value={content.heroText} onChange={e => setContent(prev => ({ ...prev, heroText: e.target.value }))}
-                    placeholder="בחר את הסופר שלך..." rows={3}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-green-500 resize-none" />
-                </div>
-              </div>
-            </div>
-            <div className="border border-gray-100 rounded-xl p-5">
-              <h3 className="font-bold text-gray-700 mb-4">👁️ תצוגה מקדימה</h3>
-              <div style={{ background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', borderRadius: 12, padding: '24px 32px', direction: 'rtl' }}>
-                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', marginBottom: 6 }}>{content.heroTitle || 'רכישת סת"מ'}</div>
-                <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a', marginBottom: 10 }}>{content.heroSubtitle || 'ישירות מהסופר'}</div>
-                <div style={{ fontSize: 13, color: '#a8c8b4', lineHeight: 1.6 }}>{content.heroText || 'בחר את הסופר שלך...'}</div>
+                <div><label className="block text-sm font-bold text-gray-600 mb-1">כותרת ראשית</label><input value={content.heroTitle} onChange={e => setContent(prev => ({ ...prev, heroTitle: e.target.value }))} placeholder='רכישת סת"מ' className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" /></div>
+                <div><label className="block text-sm font-bold text-gray-600 mb-1">כותרת משנה</label><input value={content.heroSubtitle} onChange={e => setContent(prev => ({ ...prev, heroSubtitle: e.target.value }))} placeholder="ישירות מהסופר" className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm" /></div>
+                <div><label className="block text-sm font-bold text-gray-600 mb-1">טקסט תיאור</label><textarea value={content.heroText} onChange={e => setContent(prev => ({ ...prev, heroText: e.target.value }))} rows={3} className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm resize-none" /></div>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <button onClick={saveContent} disabled={contentSaving}
-                className="bg-green-700 text-white px-8 py-3 rounded-xl font-bold text-base hover:bg-green-600 disabled:opacity-50 transition">
-                {contentSaving ? '⏳ שומר...' : '💾 שמור שינויים'}
-              </button>
+              <button onClick={saveContent} disabled={contentSaving} className="bg-green-700 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 disabled:opacity-50">{contentSaving ? '⏳ שומר...' : '💾 שמור שינויים'}</button>
               {contentSaved && <span className="text-green-600 font-bold text-sm">✅ נשמר!</span>}
             </div>
           </div>
         </div>
       )}
 
-      {/* ══ ORDERS TAB ══ */}
       {activeTab === 'orders' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-3 text-right">מספר הזמנה</th>
-                <th className="p-3 text-right">לקוח</th>
-                <th className="p-3 text-right">סכום</th>
-                <th className="p-3 text-right">שליח</th>
-                <th className="p-3 text-right">סטטוס</th>
-              </tr>
-            </thead>
+            <thead className="bg-gray-50"><tr><th className="p-3 text-right">מספר הזמנה</th><th className="p-3 text-right">לקוח</th><th className="p-3 text-right">סכום</th><th className="p-3 text-right">שליח</th><th className="p-3 text-right">סטטוס</th></tr></thead>
             <tbody>
-              {orders.length === 0 ? (
-                <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין הזמנות עדיין</td></tr>
-              ) : orders.map(o => (
+              {orders.length === 0 ? <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין הזמנות עדיין</td></tr>
+              : orders.map(o => (
                 <tr key={o.id} className="border-t hover:bg-gray-50">
                   <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
                   <td className="p-3 font-bold">{o.customerName}</td>
                   <td className="p-3 text-green-700 font-bold">₪{o.total}</td>
                   <td className="p-3 text-blue-600">{o.shaliachName || '—'}</td>
-                  <td className="p-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${o.status === 'new' ? 'bg-yellow-100 text-yellow-700' : o.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                      {o.status === 'new' ? '⏳ חדש' : o.status === 'processing' ? '🔄 בעיבוד' : o.status === 'delivered' ? '✅ נמסר' : o.status}
-                    </span>
-                  </td>
+                  <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-bold ${o.status === 'new' ? 'bg-yellow-100 text-yellow-700' : o.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{o.status === 'new' ? '⏳ חדש' : o.status === 'processing' ? '🔄 בעיבוד' : o.status === 'delivered' ? '✅ נמסר' : o.status}</span></td>
                 </tr>
               ))}
             </tbody>
@@ -884,50 +789,22 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ COMMISSIONS TAB ══ */}
       {activeTab === 'commissions' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
-          {shaliachOrders.length === 0 ? (
-            <div className="p-10 text-center text-gray-400">אין הזמנות שליחים עדיין</div>
-          ) : (
+          {shaliachOrders.length === 0 ? <div className="p-10 text-center text-gray-400">אין הזמנות שליחים עדיין</div> : (
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="p-3 text-right">מספר הזמנה</th>
-                  <th className="p-3 text-right">שליח</th>
-                  <th className="p-3 text-right">סכום</th>
-                  <th className="p-3 text-right">אחוז</th>
-                  <th className="p-3 text-right">עמלה</th>
-                </tr>
-              </thead>
-              <tbody>
-                {shaliachOrders.map(o => (
-                  <tr key={o.id} className="border-t hover:bg-gray-50">
-                    <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
-                    <td className="p-3 font-bold text-blue-600">{o.shaliachName}</td>
-                    <td className="p-3">₪{o.total}</td>
-                    <td className="p-3">{(o as any).commissionPercent}%</td>
-                    <td className="p-3 font-bold text-orange-500">₪{o.commissionAmount?.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
+              <thead className="bg-gray-50"><tr><th className="p-3 text-right">מספר הזמנה</th><th className="p-3 text-right">שליח</th><th className="p-3 text-right">סכום</th><th className="p-3 text-right">אחוז</th><th className="p-3 text-right">עמלה</th></tr></thead>
+              <tbody>{shaliachOrders.map(o => <tr key={o.id} className="border-t hover:bg-gray-50"><td className="p-3 font-mono text-xs">{o.orderNumber}</td><td className="p-3 font-bold text-blue-600">{o.shaliachName}</td><td className="p-3">₪{o.total}</td><td className="p-3">{(o as any).commissionPercent}%</td><td className="p-3 font-bold text-orange-500">₪{o.commissionAmount?.toFixed(2)}</td></tr>)}</tbody>
             </table>
           )}
         </div>
       )}
 
-      {/* ══ SOFERIM APPLICATIONS TAB ══ */}
-<<<<<<< HEAD
-=======
-
       {activeTab === 'soferim_list' && (
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-black">✍️ סופרים פעילים ({soferimFull.length})</h2>
-            <button onClick={() => setShowAddSofer(true)}
-              style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-              ➕ הוסף סופר
-            </button>
+            <button onClick={() => setShowAddSofer(true)} style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף סופר</button>
           </div>
           {soferimLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
           : soferimFull.length === 0 ? <div className="p-10 text-center text-gray-400">אין סופרים עדיין</div>
@@ -936,37 +813,19 @@ export default function AdminPage() {
               {soferimFull.map(s => (
                 <div key={s.id} className="bg-white rounded-xl shadow p-5">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0">
-                      {s.imageUrl
-                        ? <img src={s.imageUrl} alt={s.name} className="w-16 h-16 rounded-full object-cover border-2 border-amber-200" />
-                        : <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-2xl">✍️</div>}
-                    </div>
+                    <div className="flex-shrink-0">{s.imageUrl ? <img src={s.imageUrl} alt={s.name} className="w-16 h-16 rounded-full object-cover border-2 border-amber-200" /> : <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-2xl">✍️</div>}</div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-black">{s.name}</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                          {s.status === 'active' ? '✅ פעיל' : '⏸️ לא פעיל'}
-                        </span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{s.status === 'active' ? '✅ פעיל' : '⏸️ לא פעיל'}</span>
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-2">
-                        {s.city && <span>📍 {s.city}</span>}
-                        {s.phone && <span>📞 {s.phone}</span>}
-                        {s.email && <span>✉️ {s.email}</span>}
-                        {s.style && <span>✍️ {s.style}</span>}
+                        {s.city && <span>📍 {s.city}</span>}{s.phone && <span>📞 {s.phone}</span>}{s.email && <span>✉️ {s.email}</span>}{s.style && <span>✍️ {s.style}</span>}
                       </div>
-                      {s.categories && s.categories.length > 0 && (
-                        <div className="flex gap-2 flex-wrap">
-                          {s.categories.map((cat: string) => (
-                            <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">{cat}</span>
-                          ))}
-                        </div>
-                      )}
+                      {s.categories && s.categories.length > 0 && <div className="flex gap-2 flex-wrap">{s.categories.map((cat: string) => <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">{cat}</span>)}</div>}
                     </div>
                     <div className="flex flex-col gap-2 flex-shrink-0">
-                      <button onClick={() => router.push(`/?soferId=${s.id}`)}
-                        className="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-700">
-                        📜 המוצרים שלו
-                      </button>
+                      <button onClick={() => router.push(`/?soferId=${s.id}`)} className="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-700">📜 המוצרים שלו</button>
                     </div>
                   </div>
                 </div>
@@ -976,7 +835,6 @@ export default function AdminPage() {
         </div>
       )}
 
->>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
       {activeTab === 'soferim' && (
         <div>
           {appsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
@@ -986,40 +844,20 @@ export default function AdminPage() {
               {applications.map(app => (
                 <div key={app.id} className="bg-white rounded-xl shadow p-5">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex-shrink-0">
-                      {app.imageUrl ? <img src={app.imageUrl} alt={app.name} className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
-                      : <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-2xl">✍️</div>}
-                    </div>
+                    <div className="flex-shrink-0">{app.imageUrl ? <img src={app.imageUrl} alt={app.name} className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" /> : <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-2xl">✍️</div>}</div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-black">{app.name}</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
-                          {app.status === 'pending' ? '⏳ ממתין' : app.status === 'approved' ? '✅ מאושר' : '❌ נדחה'}
-                        </span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>{app.status === 'pending' ? '⏳ ממתין' : app.status === 'approved' ? '✅ מאושר' : '❌ נדחה'}</span>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-3">
-                        {app.city && <span>📍 {app.city}</span>}
-                        {app.phone && <span>📞 {app.phone}</span>}
-                        {app.email && <span>✉️ {app.email}</span>}
-                        {app.style && <span>✍️ {app.style}</span>}
-                      </div>
-                      {app.categories?.length > 0 && (
-                        <div className="flex gap-2 flex-wrap mb-3">
-                          {app.categories.map(cat => <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">{cat}</span>)}
-                        </div>
-                      )}
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-3">{app.city && <span>📍 {app.city}</span>}{app.phone && <span>📞 {app.phone}</span>}{app.email && <span>✉️ {app.email}</span>}{app.style && <span>✍️ {app.style}</span>}</div>
+                      {app.categories?.length > 0 && <div className="flex gap-2 flex-wrap mb-3">{app.categories.map(cat => <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">{cat}</span>)}</div>}
                       {app.description && <p className="text-sm text-gray-500 mb-3 line-clamp-2">{app.description}</p>}
                     </div>
                     {app.status === 'pending' && (
                       <div className="flex flex-col gap-2 flex-shrink-0">
-                        <button onClick={() => approveApplication(app)} disabled={actionLoading === app.id}
-                          className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">
-                          {actionLoading === app.id ? '...' : '✅ אשר'}
-                        </button>
-                        <button onClick={() => rejectApplication(app.id)} disabled={actionLoading === app.id}
-                          className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">
-                          ❌ דחה
-                        </button>
+                        <button onClick={() => approveApplication(app)} disabled={actionLoading === app.id} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">{actionLoading === app.id ? '...' : '✅ אשר'}</button>
+                        <button onClick={() => rejectApplication(app.id)} disabled={actionLoading === app.id} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">❌ דחה</button>
                       </div>
                     )}
                   </div>
@@ -1030,15 +868,11 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ══ USERS TAB ══ */}
       {activeTab === 'users' && (
         <div>
           <div className="flex gap-2 mb-4 flex-wrap">
             {['הכל', 'admin', 'sofer', 'shaliach', 'customer'].map(r => (
-              <button key={r} onClick={() => setRoleFilter(r)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-bold transition ${roleFilter === r ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>
-                {r === 'הכל' ? 'הכל' : ROLE_LABELS[r as UserRole]}
-              </button>
+              <button key={r} onClick={() => setRoleFilter(r)} className={`px-3 py-1.5 rounded-lg text-sm font-bold transition ${roleFilter === r ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>{r === 'הכל' ? 'הכל' : ROLE_LABELS[r as UserRole]}</button>
             ))}
           </div>
           {usersLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
@@ -1046,30 +880,16 @@ export default function AdminPage() {
           : (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="p-3 text-right">משתמש</th>
-                    <th className="p-3 text-right">אימייל</th>
-                    <th className="p-3 text-right">תפקיד נוכחי</th>
-                    <th className="p-3 text-right">שנה תפקיד</th>
-                  </tr>
-                </thead>
+                <thead className="bg-gray-50"><tr><th className="p-3 text-right">משתמש</th><th className="p-3 text-right">אימייל</th><th className="p-3 text-right">תפקיד נוכחי</th><th className="p-3 text-right">שנה תפקיד</th></tr></thead>
                 <tbody>
                   {filteredUsers.map(u => (
                     <tr key={u.id} className="border-t hover:bg-gray-50">
                       <td className="p-3 font-bold">{u.displayName || '—'}</td>
                       <td className="p-3 text-gray-500 text-xs">{u.email}</td>
+                      <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span></td>
                       <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span>
-                      </td>
-                      <td className="p-3">
-                        <select value={u.role} disabled={actionLoading === u.id}
-                          onChange={e => changeUserRole(u.id, e.target.value as UserRole)}
-                          className="border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer">
-                          <option value="customer">👤 לקוח</option>
-                          <option value="sofer">✍️ סופר</option>
-                          <option value="shaliach">🟦 שליח</option>
-                          <option value="admin">👑 מנהל</option>
+                        <select value={u.role} disabled={actionLoading === u.id} onChange={e => changeUserRole(u.id, e.target.value as UserRole)} className="border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer">
+                          <option value="customer">👤 לקוח</option><option value="sofer">✍️ סופר</option><option value="shaliach">🟦 שליח</option><option value="admin">👑 מנהל</option>
                         </select>
                         {actionLoading === u.id && <span className="text-xs text-gray-400 mr-2">שומר...</span>}
                       </td>
@@ -1082,199 +902,13 @@ export default function AdminPage() {
         </div>
       )}
 
-<<<<<<< HEAD
-      {/* ══ מודל הוספת מוצר ══ */}
-      {showAddProduct && (
-        <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />
-=======
-
-      {/* ══ מודל הוספת סופר ══ */}
-      {showAddSofer && (
-        <AddSoferModal
-          onClose={() => setShowAddSofer(false)}
-          onSave={() => { loadSoferimFull(); loadSoferim(); }}
-        />
->>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
-      )}
-      {/* ══ מודל הוספת מוצר ══ */}
-      {showAddProduct && (
-        <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />
-      )}
+      {showAddSofer && <AddSoferModal onClose={() => setShowAddSofer(false)} onSave={() => { loadSoferimFull(); loadSoferim(); }} />}
+      {showAddProduct && <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />}
     </main>
   );
 }
 
-<<<<<<< HEAD
-=======
-function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () => void }) {
-  const [form, setForm] = useState({
-    name: '', city: '', phone: '', whatsapp: '', email: '',
-    description: '', style: '', imageUrl: '',
-  });
-  const [categories, setCategories] = useState<string[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [uploadingImg, setUploadingImg] = useState(false);
-
-  const SOFER_CATS = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין'];
-
-  function toggleCat(cat: string) {
-    setCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
-  }
-
-  async function uploadToCloudinary(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'yoursofer_upload');
-    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
-    const data = await res.json();
-    if (!data.secure_url) throw new Error('שגיאה בהעלאה');
-    return data.secure_url;
-  }
-
-  async function handleSave() {
-    if (!form.name || !form.phone) { alert('שם וטלפון הם שדות חובה'); return; }
-    setSaving(true);
-    try {
-      const { addDoc, collection, serverTimestamp } = await import('firebase/firestore');
-      const { db } = await import('../firebase');
-      await addDoc(collection(db, 'soferim'), {
-        ...form,
-        categories,
-        status: 'active',
-        createdAt: serverTimestamp(),
-      });
-      onSave();
-      onClose();
-    } catch (e) {
-      alert('שגיאה בשמירה');
-      console.error(e);
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  const inputStyle: React.CSSProperties = {
-    width: '100%', border: '1px solid #ddd', borderRadius: 8,
-    padding: '10px 12px', fontSize: 14, boxSizing: 'border-box',
-  };
-  const labelStyle: React.CSSProperties = {
-    fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4,
-  };
-
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
-      onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
-        onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>➕ הוספת סופר חדש</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
-        </div>
-
-        <div style={{ display: 'grid', gap: 14 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div>
-              <label style={labelStyle}>שם מלא *</label>
-              <input value={form.name} onChange={e => setForm(p => ({...p, name: e.target.value}))} placeholder="הרב ישראל ישראלי" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>עיר</label>
-              <input value={form.city} onChange={e => setForm(p => ({...p, city: e.target.value}))} placeholder="ירושלים" style={inputStyle} />
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div>
-              <label style={labelStyle}>טלפון *</label>
-              <input value={form.phone} onChange={e => setForm(p => ({...p, phone: e.target.value}))} placeholder="050-0000000" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>וואטסאפ</label>
-              <input value={form.whatsapp} onChange={e => setForm(p => ({...p, whatsapp: e.target.value}))} placeholder="050-0000000" style={inputStyle} />
-            </div>
-          </div>
-
-          <div>
-            <label style={labelStyle}>אימייל</label>
-            <input value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} placeholder="sofer@example.com" type="email" style={inputStyle} />
-          </div>
-
-          <div>
-            <label style={labelStyle}>סגנון כתיבה</label>
-            <input value={form.style} onChange={e => setForm(p => ({...p, style: e.target.value}))} placeholder="חב״ד / אשכנז / ספרד" style={inputStyle} />
-          </div>
-
-          <div>
-            <label style={labelStyle}>תיאור</label>
-            <textarea value={form.description} onChange={e => setForm(p => ({...p, description: e.target.value}))} rows={3}
-              placeholder="סופר מוסמך עם ניסיון של 10 שנים..."
-              style={{ ...inputStyle, resize: 'vertical' }} />
-          </div>
-
-          <div>
-            <label style={labelStyle}>קטגוריות</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {SOFER_CATS.map(cat => (
-                <button key={cat} type="button" onClick={() => toggleCat(cat)}
-                  style={{
-                    padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer',
-                    background: categories.includes(cat) ? '#0c1a35' : '#f5f5f5',
-                    color: categories.includes(cat) ? '#fff' : '#333',
-                    border: categories.includes(cat) ? '1px solid #0c1a35' : '1px solid #ddd',
-                    fontWeight: categories.includes(cat) ? 700 : 400,
-                  }}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label style={labelStyle}>תמונה</label>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              {form.imageUrl && <img src={form.imageUrl} alt="" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ddd' }} />}
-              <label style={{ background: '#0c1a35', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                {uploadingImg ? '⏳ מעלה...' : '📷 העלה תמונה'}
-                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async e => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  setUploadingImg(true);
-                  try {
-                    const url = await uploadToCloudinary(file);
-                    setForm(p => ({...p, imageUrl: url}));
-                  } catch { alert('שגיאה בהעלאה'); }
-                  finally { setUploadingImg(false); }
-                }} />
-              </label>
-              <input value={form.imageUrl} onChange={e => setForm(p => ({...p, imageUrl: e.target.value}))}
-                placeholder="או הדבק URL"
-                style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12 }} />
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
-          <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-            {saving ? '⏳ שומר...' : '✅ הוסף סופר'}
-          </button>
-          <button onClick={onClose}
-            style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>
-            ביטול
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
->>>>>>> 6a1c5712b2bdf92ce2b5b46b9f825d0c288778b2
-// ══ קומפוננט כרטיס קטגוריה ══
-function CategoryCard({ cat, saving, saved, onSave }: {
-  cat: Category; saving: boolean; saved: boolean;
-  onSave: (imgUrl: string, sub: string) => void;
-}) {
+function CategoryCard({ cat, saving, saved, onSave }: { cat: Category; saving: boolean; saved: boolean; onSave: (imgUrl: string, sub: string) => void; }) {
   const [imgUrl, setImgUrl] = useState(cat.imgUrl || '');
   const [sub, setSub] = useState(cat.sub || '');
   const [preview, setPreview] = useState(cat.imgUrl || '');
@@ -1282,32 +916,16 @@ function CategoryCard({ cat, saving, saved, onSave }: {
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden">
       <div style={{ height: 120, background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', position: 'relative', overflow: 'hidden' }}>
-        {preview ? (
-          <img src={preview} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            onError={e => (e.currentTarget.style.display = 'none')} />
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 40 }}>🖼️</div>
-        )}
+        {preview ? <img src={preview} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} /> : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 40 }}>🖼️</div>}
         <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)', padding: '8px 12px' }}>
           <div style={{ color: '#fff', fontWeight: 900, fontSize: 15 }}>{cat.name}</div>
         </div>
       </div>
       <div className="p-4 bg-white">
-        <div className="mb-3">
-          <label className="block text-xs font-bold text-gray-500 mb-1">כיתוב</label>
-          <input value={sub} onChange={e => setSub(e.target.value)} placeholder="מכל הסוגים והגדלים"
-            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-400" />
-        </div>
-        <div className="mb-3">
-          <label className="block text-xs font-bold text-gray-500 mb-1">קישור תמונה (URL)</label>
-          <input value={imgUrl} onChange={e => { setImgUrl(e.target.value); setPreview(e.target.value); }} placeholder="https://..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-400" />
-        </div>
+        <div className="mb-3"><label className="block text-xs font-bold text-gray-500 mb-1">כיתוב</label><input value={sub} onChange={e => setSub(e.target.value)} placeholder="מכל הסוגים והגדלים" className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm" /></div>
+        <div className="mb-3"><label className="block text-xs font-bold text-gray-500 mb-1">קישור תמונה (URL)</label><input value={imgUrl} onChange={e => { setImgUrl(e.target.value); setPreview(e.target.value); }} placeholder="https://..." className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm" /></div>
         <div className="flex items-center gap-3">
-          <button onClick={() => onSave(imgUrl, sub)} disabled={saving}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition">
-            {saving ? '⏳ שומר...' : '💾 שמור'}
-          </button>
+          <button onClick={() => onSave(imgUrl, sub)} disabled={saving} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50">{saving ? '⏳ שומר...' : '💾 שמור'}</button>
           {saved && <span className="text-green-600 text-sm font-bold">✅ נשמר!</span>}
         </div>
       </div>
