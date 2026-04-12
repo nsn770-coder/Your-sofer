@@ -1,19 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-
-function getAdminDb() {
-  if (!getApps().length) {
-    initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID || 'your-sofer',
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      }),
-    });
-  }
-  return getFirestore();
-}
+import { FieldValue } from 'firebase-admin/firestore';
+import { getAdminDb } from '@/app/lib/firebase-admin';
 
 function detectOrderType(items: any[]): 'judaica' | 'stam' | 'mixed' {
   const STAM_CATEGORIES = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'ספר תורה'];
@@ -76,7 +63,6 @@ export async function POST(req: NextRequest) {
 
     const orderType = detectOrderType(items || []);
 
-    // Parse address
     const shippingAddress = typeof address === 'string'
       ? { street: address, city: '', zip: '' }
       : {
@@ -127,7 +113,7 @@ export async function POST(req: NextRequest) {
       timestamp: now,
     });
 
-    // Notify team
+    // Notify team (non-fatal)
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://your-sofer.com';
       await fetch(`${baseUrl}/api/ops/notify-team`, {
