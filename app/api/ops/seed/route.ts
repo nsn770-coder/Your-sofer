@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb } from '@/app/lib/firebase-admin';
+import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
+import { db } from '@/app/firebase';
 
 const OPS_USERS = [
   { email: 'nsn770@gmail.com', name: 'נסים', role: 'owner', active: true },
@@ -14,26 +15,26 @@ async function runSeed(req: NextRequest) {
   }
 
   try {
-    const adminDb = getAdminDb();
-    const col = adminDb.collection('opsUsers');
-    const snap = await col.get();
-
-    const existingEmails = new Set(snap.docs.map((d) => d.data().email));
+    const col = collection(db, 'opsUsers');
     const added: string[] = [];
+    const skipped: string[] = [];
 
     for (const user of OPS_USERS) {
-      if (!existingEmails.has(user.email)) {
-        await col.add({
-          ...user,
-          uid: '',
-          createdAt: new Date(),
-          lastLogin: null,
-        });
-        added.push(user.email);
+      const existing = await getDocs(query(col, where('email', '==', user.email)));
+      if (!existing.empty) {
+        skipped.push(user.email);
+        continue;
       }
+      await addDoc(col, {
+        ...user,
+        uid: '',
+        createdAt: new Date(),
+        lastLogin: null,
+      });
+      added.push(user.email);
     }
 
-    return NextResponse.json({ success: true, added, skipped: OPS_USERS.length - added.length });
+    return NextResponse.json({ success: true, added, skipped });
   } catch (err: any) {
     console.error('Seed error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
