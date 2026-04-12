@@ -166,6 +166,37 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
     ],
   },
   {
+    id: "bar-mitzvah", label: "🎉 בר מצווה", cat: "בר מצווה",
+    columns: [
+      {
+        title: "סטים לבר מצווה",
+        items: [
+          { label: "כל הסטים", cat: "בר מצווה" },
+          { label: "ברכת כהנים לבן", cat: "בר מצווה", filter: "ברכת כהנים לבן" },
+          { label: "ברכת כהנים כחול נייבי", cat: "בר מצווה", filter: "כחול נייבי" },
+          { label: "ברכת כהנים צבע אבן", cat: "בר מצווה", filter: "אבן" },
+          { label: "מעויינים שחור", cat: "בר מצווה", filter: "מעויינים" },
+        ]
+      },
+      {
+        title: "לפי תפילין",
+        items: [
+          { label: "תפילין בהמה דקה", cat: "בר מצווה", filter: "בהמה דקה" },
+          { label: "תפילין בהמה גסה", cat: "בר מצווה", filter: "בהמה גסה" },
+        ]
+      },
+      {
+        title: "לפי עיצוב",
+        items: [
+          { label: "חיתוך לייזר", cat: "בר מצווה", filter: "חיתוך לייזר" },
+          { label: "הבלטה", cat: "בר מצווה", filter: "הבלטה" },
+          { label: "עם תיק", cat: "בר מצווה", filter: "תיק" },
+          { label: "לבן כסף", cat: "בר מצווה", filter: "לבן כסף" },
+        ]
+      },
+    ],
+  },
+  {
     id: "gifts", label: "🎁 מתנות", cat: "מתנות",
     columns: [
       {
