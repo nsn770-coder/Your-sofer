@@ -21,12 +21,19 @@ const ORDER_TYPE_LABELS: Record<string, string> = {
 };
 
 async function sendWhatsApp(payload: NotifyPayload) {
+  console.log('[WhatsApp] sendWhatsApp called, type:', payload.type);
+
   const sid = process.env.TWILIO_ACCOUNT_SID;
   const token = process.env.TWILIO_AUTH_TOKEN;
   const from = process.env.TWILIO_WHATSAPP_FROM || 'whatsapp:+14155238886';
 
+  console.log('[WhatsApp] TWILIO_ACCOUNT_SID present:', !!sid, sid ? `(${sid.slice(0, 6)}...)` : 'MISSING');
+  console.log('[WhatsApp] TWILIO_AUTH_TOKEN present:', !!token, token ? '(set)' : 'MISSING');
+  console.log('[WhatsApp] from:', from);
+  console.log('[WhatsApp] to numbers:', WHATSAPP_NUMBERS);
+
   if (!sid || !token) {
-    console.warn('Twilio credentials not set — skipping WhatsApp');
+    console.warn('[WhatsApp] Twilio credentials not set — skipping WhatsApp');
     return;
   }
 
@@ -49,13 +56,23 @@ async function sendWhatsApp(payload: NotifyPayload) {
     `🔗 לטיפול: ${link}`,
   ].filter(Boolean).join('\n');
 
+  console.log('[WhatsApp] message body:', body);
+
   const client = twilio(sid, token);
 
-  await Promise.allSettled(
+  const results = await Promise.allSettled(
     WHATSAPP_NUMBERS.map((to) =>
       client.messages.create({ from, to, body })
     )
   );
+
+  results.forEach((result, i) => {
+    if (result.status === 'fulfilled') {
+      console.log(`[WhatsApp] ✓ sent to ${WHATSAPP_NUMBERS[i]}, SID: ${result.value.sid}`);
+    } else {
+      console.error(`[WhatsApp] ✗ failed to ${WHATSAPP_NUMBERS[i]}:`, result.reason);
+    }
+  });
 }
 
 type NotifyType = 'new_order' | 'delayed' | 'blocked' | 'completed';
@@ -207,10 +224,12 @@ export async function POST(req: NextRequest) {
     if (!res.ok) throw new Error(data.message || 'Resend error');
 
     // WhatsApp (non-fatal — don't block email success if WA fails)
+    console.log('[WhatsApp] About to call sendWhatsApp, payload type:', payload.type);
     try {
       await sendWhatsApp(payload);
+      console.log('[WhatsApp] sendWhatsApp completed');
     } catch (waErr) {
-      console.error('WhatsApp notify error (non-fatal):', waErr);
+      console.error('[WhatsApp] sendWhatsApp threw (non-fatal):', waErr);
     }
 
     return NextResponse.json({ success: true, id: data.id });
