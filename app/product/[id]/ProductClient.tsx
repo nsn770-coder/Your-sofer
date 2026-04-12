@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
-import { doc, getDoc, updateDoc, collection, getDocs, query, where, limit } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, addDoc, collection, getDocs, query, where, limit, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams, useRouter } from 'next/navigation';
 import { useCart } from '../../contexts/CartContext';
@@ -216,6 +216,253 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
           <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+interface ReviewItem {
+  id: string;
+  productId: string;
+  productName: string;
+  reviewerName: string;
+  stars: number;
+  text: string;
+  mediaUrl?: string;
+  mediaType?: 'image' | 'video';
+  approved: boolean;
+  createdAt?: { seconds: number };
+}
+
+function ReviewStars({ value, onChange, hover, onHover }: { value: number; onChange?: (n: number) => void; hover?: number; onHover?: (n: number) => void }) {
+  return (
+    <span style={{ fontSize: 24, letterSpacing: 2, cursor: onChange ? 'pointer' : 'default', userSelect: 'none' }}>
+      {[1,2,3,4,5].map(n => (
+        <span key={n}
+          style={{ color: n <= (hover || value) ? '#e6a817' : '#ddd', transition: 'color 0.1s' }}
+          onClick={() => onChange?.(n)}
+          onMouseEnter={() => onHover?.(n)}
+          onMouseLeave={() => onHover?.(0)}>
+          ★
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function ReviewsSection({ productId, productName }: { productId: string; productName: string }) {
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [submitted, setSubmitted] = useState<'no_media' | 'with_coupon' | null>(null);
+  const [earnedCoupon, setEarnedCoupon] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [name, setName] = useState('');
+  const [stars, setStars] = useState(5);
+  const [hoverStar, setHoverStar] = useState(0);
+  const [text, setText] = useState('');
+  const [mediaUrl, setMediaUrl] = useState('');
+  const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const snap = await getDocs(query(collection(db, 'reviews'), where('productId', '==', productId)));
+        const data: ReviewItem[] = [];
+        snap.forEach(d => data.push({ id: d.id, ...d.data() } as ReviewItem));
+        setReviews(data.filter(r => r.approved).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
+      } catch (e) { console.error(e); }
+      finally { setLoadingReviews(false); }
+    }
+    load();
+  }, [productId]);
+
+  async function handleMediaUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const isVideo = file.type.startsWith('video/');
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'yoursofer_upload');
+      const res = await fetch(`https://api.cloudinary.com/v1_1/dyxzq3ucy/${isVideo ? 'video' : 'image'}/upload`, { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error('שגיאה בהעלאה');
+      setMediaUrl(data.secure_url);
+      setMediaType(isVideo ? 'video' : 'image');
+    } catch { alert('שגיאה בהעלאת הקובץ'); }
+    finally { setUploading(false); }
+  }
+
+  async function handleSubmit() {
+    if (!name.trim() || !text.trim()) { alert('נא למלא שם וטקסט ביקורת'); return; }
+    setSubmitting(true);
+    try {
+      const hasMedia = !!mediaUrl;
+      await addDoc(collection(db, 'reviews'), {
+        productId,
+        productName,
+        reviewerName: name.trim(),
+        stars,
+        text: text.trim(),
+        mediaUrl: mediaUrl || null,
+        mediaType: mediaType || null,
+        approved: false,
+        createdAt: serverTimestamp(),
+      });
+      if (hasMedia) {
+        const code = 'REVIEW-' + Math.random().toString(36).toUpperCase().slice(2, 7);
+        await setDoc(doc(db, 'coupons', code), {
+          code,
+          discount: 5,
+          type: 'percent',
+          active: true,
+          usedBy: null,
+          createdAt: serverTimestamp(),
+        });
+        setEarnedCoupon(code);
+        setSubmitted('with_coupon');
+      } else {
+        setSubmitted('no_media');
+      }
+      setShowForm(false);
+      setName(''); setStars(5); setText(''); setMediaUrl(''); setMediaType(null);
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בשליחת הביקורת');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function formatDate(ts?: { seconds: number }) {
+    if (!ts) return '';
+    return new Date(ts.seconds * 1000).toLocaleDateString('he-IL');
+  }
+
+  const avgStars = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.stars, 0) / reviews.length) : 0;
+
+  return (
+    <div style={{ marginTop: 28, background: '#fff', borderRadius: 10, border: '1px solid #e8e8e8', padding: '20px 20px', borderTop: undefined }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+        <div>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f1111', marginBottom: 4 }}>ביקורות לקוחות</h2>
+          {reviews.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <ReviewStars value={Math.round(avgStars)} />
+              <span style={{ fontSize: 14, color: '#555' }}>{avgStars.toFixed(1)} מתוך 5 · {reviews.length} ביקורות</span>
+            </div>
+          )}
+        </div>
+        <button onClick={() => setShowForm(true)} style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 20, padding: '10px 20px', fontSize: 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+          ✍️ הוסף ביקורת
+        </button>
+      </div>
+
+      {/* Success banners */}
+      {submitted === 'no_media' && (
+        <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '14px 18px', marginBottom: 16, fontSize: 14, color: '#15803d', fontWeight: 600 }}>
+          ✅ תודה! הביקורת ממתינה לאישור.
+        </div>
+      )}
+      {submitted === 'with_coupon' && (
+        <div style={{ background: '#fffbeb', border: '2px solid #b8972a', borderRadius: 10, padding: '16px 20px', marginBottom: 16 }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: '#0c1a35', marginBottom: 6 }}>✅ תודה על הביקורת! קיבלת קוד הנחה:</div>
+          <div style={{ background: '#0c1a35', color: '#b8972a', fontFamily: 'monospace', fontSize: 22, fontWeight: 900, letterSpacing: 3, padding: '10px 16px', borderRadius: 8, display: 'inline-block', marginBottom: 8 }}>{earnedCoupon}</div>
+          <div style={{ fontSize: 13, color: '#555' }}>5% הנחה על הזמנה הבאה · הזן את הקוד בעמוד התשלום</div>
+        </div>
+      )}
+
+      {/* Reviews list */}
+      {loadingReviews ? (
+        <div style={{ color: '#888', fontSize: 13, padding: '12px 0' }}>⏳ טוען ביקורות...</div>
+      ) : reviews.length === 0 ? (
+        <div style={{ color: '#aaa', fontSize: 13, textAlign: 'center', padding: '24px 0' }}>עדיין אין ביקורות — היה הראשון!</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {reviews.map(r => (
+            <div key={r.id} style={{ borderBottom: '1px solid #f0f0f0', paddingBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#0c1a35', color: '#b8972a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, flexShrink: 0 }}>
+                  {r.reviewerName.charAt(0)}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: '#0f1111' }}>{r.reviewerName}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <ReviewStars value={r.stars} />
+                    {r.createdAt && <span style={{ fontSize: 11, color: '#aaa' }}>{formatDate(r.createdAt)}</span>}
+                  </div>
+                </div>
+              </div>
+              <div style={{ fontSize: 13, color: '#333', lineHeight: 1.7, marginBottom: r.mediaUrl ? 10 : 0 }}>{r.text}</div>
+              {r.mediaUrl && (
+                r.mediaType === 'video' ? (
+                  <video controls style={{ maxWidth: '100%', maxHeight: 240, borderRadius: 8, border: '1px solid #eee' }}>
+                    <source src={r.mediaUrl} />
+                  </video>
+                ) : (
+                  <img src={r.mediaUrl} alt="ביקורת" style={{ maxWidth: '100%', maxHeight: 240, borderRadius: 8, objectFit: 'cover', border: '1px solid #eee' }} />
+                )
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Review form modal */}
+      {showForm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setShowForm(false)}>
+          <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 480, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>✍️ כתוב ביקורת</h2>
+              <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+            </div>
+            <div style={{ display: 'grid', gap: 16 }}>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>שמך *</label>
+                <input value={name} onChange={e => setName(e.target.value)} placeholder="ישראל ישראלי"
+                  style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>דירוג *</label>
+                <ReviewStars value={stars} onChange={setStars} hover={hoverStar} onHover={setHoverStar} />
+                <span style={{ fontSize: 12, color: '#888', marginRight: 8 }}>{['', 'גרוע', 'לא טוב', 'סביר', 'טוב', 'מצוין'][stars]}</span>
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>הביקורת שלך *</label>
+                <textarea value={text} onChange={e => setText(e.target.value)} rows={4} placeholder="שתף את חוויתך עם המוצר..."
+                  style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>
+                  📷 תמונה או סרטון <span style={{ fontSize: 11, color: '#b8972a', fontWeight: 600 }}>(אופציונלי — מקבלים קוד הנחה 5%!)</span>
+                </label>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#f0f0f0', border: '1px dashed #ccc', borderRadius: 8, padding: '10px 14px', cursor: 'pointer', fontSize: 13 }}>
+                  {uploading ? '⏳ מעלה...' : mediaUrl ? '✅ הועלה בהצלחה' : '📎 בחר קובץ'}
+                  <input type="file" accept="image/*,video/*" style={{ display: 'none' }} onChange={handleMediaUpload} disabled={uploading} />
+                </label>
+                {mediaUrl && (
+                  <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {mediaType === 'image' && <img src={mediaUrl} alt="" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd' }} />}
+                    {mediaType === 'video' && <div style={{ width: 60, height: 60, background: '#111', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>▶️</div>}
+                    <button onClick={() => { setMediaUrl(''); setMediaType(null); }} style={{ background: 'none', border: 'none', color: '#c0392b', cursor: 'pointer', fontSize: 12 }}>✕ הסר</button>
+                  </div>
+                )}
+                {mediaUrl && (
+                  <div style={{ marginTop: 8, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, padding: '6px 10px', fontSize: 12, color: '#92400e' }}>
+                    🎁 שלח ביקורת עם מדיה וקבל קוד הנחה 5% לקנייה הבאה!
+                  </div>
+                )}
+              </div>
+            </div>
+            <button onClick={handleSubmit} disabled={submitting || uploading}
+              style={{ width: '100%', background: submitting ? '#aaa' : '#0c1a35', color: '#fff', border: 'none', borderRadius: 24, padding: '13px', fontSize: 15, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', marginTop: 20 }}>
+              {submitting ? '⏳ שולח...' : '📨 שלח ביקורת'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -537,6 +784,9 @@ export default function ProductClient() {
           </div>
         )}
       </div>
+
+      {/* ── Reviews ── */}
+      <ReviewsSection productId={product.id} productName={product.name} />
 
       {/* ── Zoom Modal ── */}
       {zoomVisible && allMedia.length > 0 && (

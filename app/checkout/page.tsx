@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
-import { collection, addDoc, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export default function CheckoutPage() {
@@ -13,6 +13,10 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'shipping' | 'review'>('shipping');
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', notes: '' });
+  const [couponInput, setCouponInput] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
 
   if (items.length === 0) {
     return (
@@ -31,6 +35,25 @@ export default function CheckoutPage() {
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   }
+
+  async function applyCoupon() {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const snap = await getDoc(doc(db, 'coupons', code));
+      if (!snap.exists()) { setCouponError('קוד קופון לא נמצא'); return; }
+      const data = snap.data();
+      if (!data.active || data.usedBy) { setCouponError('קוד הקופון כבר שומש או אינו פעיל'); return; }
+      setAppliedCoupon({ code, discount: data.discount });
+      setCouponInput('');
+    } catch { setCouponError('שגיאה בבדיקת הקופון'); }
+    finally { setCouponLoading(false); }
+  }
+
+  const discountAmount = appliedCoupon ? Math.round(total * appliedCoupon.discount / 100 * 100) / 100 : 0;
+  const finalTotal = total - discountAmount;
 
   async function handleSubmit() {
     if (!form.name || !form.email || !form.phone || !form.address || !form.city) {
@@ -59,7 +82,9 @@ export default function CheckoutPage() {
           selectedKlafId: i.selectedKlafId || null,
           selectedKlafName: i.selectedKlafName || null,
         })),
-        total,
+        total: finalTotal,
+        couponCode: appliedCoupon?.code || null,
+        couponDiscount: appliedCoupon ? discountAmount : null,
         status: 'pending_payment',
         createdAt: serverTimestamp(),
         shaliachRef: refCode || null,
@@ -68,6 +93,15 @@ export default function CheckoutPage() {
         commissionPercent,
         commissionAmount,
       });
+
+      // Mark coupon as used
+      if (appliedCoupon) {
+        await updateDoc(doc(db, 'coupons', appliedCoupon.code), {
+          active: false,
+          usedBy: form.email || form.name,
+          usedAt: serverTimestamp(),
+        });
+      }
 
       // סמן קלפים כ-reserved
       const klafUpdates = items
@@ -88,7 +122,7 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
-          total,
+          total: finalTotal,
           customer: { name: form.name, email: form.email, phone: form.phone },
           orderNumber,
           orderId: orderRef.id,
@@ -295,8 +329,44 @@ export default function CheckoutPage() {
               <span>סה"כ:</span>
               <span style={{ color: '#0c1a35' }}>₪{total.toFixed(2)}</span>
             </div>
+            {appliedCoupon && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#15803d', fontWeight: 700, marginTop: 4 }}>
+                <span>🎁 קופון {appliedCoupon.code} ({appliedCoupon.discount}%):</span>
+                <span>-₪{discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+            {appliedCoupon && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 900, paddingTop: 8, borderTop: '1px solid #eee', marginTop: 6 }}>
+                <span>לתשלום:</span>
+                <span style={{ color: '#0c1a35' }}>₪{finalTotal.toFixed(2)}</span>
+              </div>
+            )}
             <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע"מ</div>
           </div>
+
+          {/* Coupon code input */}
+          <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #eee' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: '#333' }}>🎟️ קוד קופון</div>
+            {appliedCoupon ? (
+              <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: '#15803d', fontWeight: 700 }}>✅ {appliedCoupon.code} — {appliedCoupon.discount}% הנחה</span>
+                <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input value={couponInput} onChange={e => { setCouponInput(e.target.value.toUpperCase()); setCouponError(''); }}
+                  onKeyDown={e => e.key === 'Enter' && applyCoupon()}
+                  placeholder="הזן קוד קופון"
+                  style={{ flex: 1, border: '1px solid #ddd', borderRadius: 6, padding: '8px 10px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1 }} />
+                <button onClick={applyCoupon} disabled={couponLoading || !couponInput.trim()}
+                  style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: couponLoading || !couponInput.trim() ? 'not-allowed' : 'pointer', opacity: couponLoading || !couponInput.trim() ? 0.6 : 1, whiteSpace: 'nowrap' }}>
+                  {couponLoading ? '...' : 'החל'}
+                </button>
+              </div>
+            )}
+            {couponError && <div style={{ fontSize: 12, color: '#dc2626', marginTop: 6 }}>{couponError}</div>}
+          </div>
+
           {shaliach && (
             <div style={{ marginTop: 12, padding: '10px 12px', background: '#f0f7ff', borderRadius: 6, fontSize: 12 }}>
               <div style={{ color: '#0e6ba8', fontWeight: 700 }}>🤝 דרך עמותה: {shaliach.chabadName || shaliach.name}</div>

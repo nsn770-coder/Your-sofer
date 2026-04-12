@@ -90,7 +90,20 @@ interface Category {
   order: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews';
+
+interface Review {
+  id: string;
+  productId: string;
+  productName: string;
+  reviewerName: string;
+  stars: number;
+  text: string;
+  mediaUrl?: string;
+  mediaType?: 'image' | 'video';
+  approved: boolean;
+  createdAt?: { seconds: number };
+}
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: '👑 מנהל',
@@ -531,6 +544,8 @@ export default function AdminPage() {
   const [contentSaved, setContentSaved] = useState(false);
   const [catSaving, setCatSaving] = useState<string | null>(null);
   const [catSaved, setCatSaved] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [appsLoading, setAppsLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -553,8 +568,19 @@ export default function AdminPage() {
     if (user?.role === 'admin') {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
+      loadReviews();
     }
   }, [user]);
+
+  async function loadReviews() {
+    try {
+      const snap = await getDocs(query(collection(db, 'reviews'), orderBy('createdAt', 'desc')));
+      const data: Review[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Review));
+      setReviews(data);
+    } catch (e) { console.error(e); }
+    finally { setReviewsLoading(false); }
+  }
 
   async function loadOrders() {
     try {
@@ -833,6 +859,7 @@ export default function AdminPage() {
           { key: 'users', label: '👥 משתמשים', color: 'bg-purple-600' },
           { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
           { key: 'categories', label: '🖼️ קטגוריות', color: 'bg-indigo-600' },
+          { key: 'reviews', label: '⭐ ביקורות', color: 'bg-yellow-600', badge: reviews.filter(r => !r.approved).length },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -1047,6 +1074,87 @@ export default function AdminPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'reviews' && (
+        <div>
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+            <h2 className="text-xl font-black">⭐ ביקורות לקוחות</h2>
+            <div className="flex gap-3 text-sm">
+              <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full font-bold">{reviews.filter(r => !r.approved).length} ממתינות לאישור</span>
+              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">{reviews.filter(r => r.approved).length} מאושרות</span>
+            </div>
+          </div>
+          {reviewsLoading ? <div className="p-10 text-center text-gray-400">טוען ביקורות...</div> : reviews.length === 0 ? (
+            <div className="p-10 text-center text-gray-400">אין ביקורות עדיין</div>
+          ) : (
+            <div className="grid gap-4">
+              {reviews.map(r => (
+                <div key={r.id} style={{ background: r.approved ? '#fff' : '#f9f9f9', border: `1px solid ${r.approved ? '#e8e8e8' : '#ddd'}`, opacity: r.approved ? 1 : 0.7, borderRadius: 12, padding: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 800, fontSize: 14 }}>{r.reviewerName}</span>
+                        <span style={{ color: '#e6a817', fontSize: 14 }}>{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</span>
+                        <span style={{ fontSize: 11, color: '#888' }}>{r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleDateString('he-IL') : ''}</span>
+                        <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: r.approved ? '#dcfce7' : '#fef9c3', color: r.approved ? '#15803d' : '#854d0e' }}>
+                          {r.approved ? '✅ מאושרת' : '⏳ ממתינה'}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: '#0e6ba8', marginBottom: 6 }}>📦 {r.productName}</div>
+                      <div style={{ fontSize: 13, color: '#333', lineHeight: 1.6 }}>{r.text}</div>
+                      {r.mediaUrl && (
+                        <div style={{ marginTop: 8 }}>
+                          {r.mediaType === 'video' ? (
+                            <video controls style={{ maxHeight: 140, borderRadius: 6, border: '1px solid #eee' }}>
+                              <source src={r.mediaUrl} />
+                            </video>
+                          ) : (
+                            <img src={r.mediaUrl} alt="מדיה" style={{ maxHeight: 140, borderRadius: 6, border: '1px solid #eee', objectFit: 'cover' }} />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      {!r.approved && (
+                        <button onClick={async () => {
+                          await updateDoc(doc(db, 'reviews', r.id), { approved: true });
+                          const updatedReviews = reviews.map(x => x.id === r.id ? { ...x, approved: true } : x);
+                          setReviews(updatedReviews);
+                          // recalculate product average
+                          const productReviews = updatedReviews.filter(x => x.productId === r.productId && x.approved);
+                          const avg = productReviews.reduce((s, x) => s + x.stars, 0) / productReviews.length;
+                          await updateDoc(doc(db, 'products', r.productId), {
+                            stars: Math.round(avg * 10) / 10,
+                            reviews: productReviews.length,
+                          });
+                        }} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                          ✅ אשר
+                        </button>
+                      )}
+                      <button onClick={async () => {
+                        const newText = prompt('ערוך את טקסט הביקורת:', r.text);
+                        if (newText === null) return;
+                        await updateDoc(doc(db, 'reviews', r.id), { text: newText });
+                        setReviews(reviews.map(x => x.id === r.id ? { ...x, text: newText } : x));
+                      }} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                        ✏️ ערוך
+                      </button>
+                      <button onClick={async () => {
+                        if (!confirm('למחוק את הביקורת?')) return;
+                        const { deleteDoc } = await import('firebase/firestore');
+                        await deleteDoc(doc(db, 'reviews', r.id));
+                        setReviews(reviews.filter(x => x.id !== r.id));
+                      }} style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                        🗑️ מחק
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
