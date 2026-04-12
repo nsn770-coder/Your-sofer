@@ -21,7 +21,7 @@ const OPS_USERS = [
   { email: 'tosef21me@gmail.com', name: 'יוסף חיים', role: 'fulfillment', active: true },
 ];
 
-export async function POST(req: NextRequest) {
+async function runSeed(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get('secret');
   if (secret !== (process.env.OPS_SEED_SECRET || 'seed-ops-2025')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -52,4 +52,12 @@ export async function POST(req: NextRequest) {
     console.error('Seed error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
+}
+
+export async function GET(req: NextRequest) {
+  return runSeed(req);
+}
+
+export async function POST(req: NextRequest) {
+  return runSeed(req);
 }
