@@ -1,10 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
+import twilio from 'twilio';
 
 const TEAM = [
   { email: 'nsn770@gmail.com', name: 'נסים' },
   { email: 'bnsymwlydn2@gmail.com', name: 'עידן' },
   { email: 'tosef21me@gmail.com', name: 'יוסף חיים' },
 ];
+
+const WHATSAPP_NUMBERS = [
+  'whatsapp:+972584877770', // נסים
+  'whatsapp:+972549101771', // עידן
+  'whatsapp:+972525175536', // יוסף חיים
+  'whatsapp:+972552722228', // החנות
+];
+
+const ORDER_TYPE_LABELS: Record<string, string> = {
+  judaica: 'יודאיקה',
+  stam: 'סת"מ',
+  mixed: 'מעורב',
+};
+
+async function sendWhatsApp(payload: NotifyPayload) {
+  const sid = process.env.TWILIO_ACCOUNT_SID;
+  const token = process.env.TWILIO_AUTH_TOKEN;
+  const from = process.env.TWILIO_WHATSAPP_FROM || 'whatsapp:+14155238886';
+
+  if (!sid || !token) {
+    console.warn('Twilio credentials not set — skipping WhatsApp');
+    return;
+  }
+
+  const { type, customerName, total, orderType, orderId } = payload;
+
+  let emoji = '🛍️';
+  let title = 'הזמנה חדשה!';
+  if (type === 'delayed') { emoji = '⚠️'; title = 'הזמנה מאוחרת!'; }
+  if (type === 'blocked')  { emoji = '🚨'; title = 'הזמנה חסומה!'; }
+  if (type === 'completed') { emoji = '✅'; title = 'הזמנה הושלמה!'; }
+
+  const typeLabel = ORDER_TYPE_LABELS[orderType || ''] || orderType || '—';
+  const link = `https://your-sofer.com/ops/orders/${orderId}`;
+
+  const body = [
+    `${emoji} ${title}`,
+    `👤 לקוח: ${customerName}`,
+    total !== undefined ? `💰 סכום: ₪${total}` : null,
+    `📦 סוג: ${typeLabel}`,
+    `🔗 לטיפול: ${link}`,
+  ].filter(Boolean).join('\n');
+
+  const client = twilio(sid, token);
+
+  await Promise.allSettled(
+    WHATSAPP_NUMBERS.map((to) =>
+      client.messages.create({ from, to, body })
+    )
+  );
+}
 
 type NotifyType = 'new_order' | 'delayed' | 'blocked' | 'completed';
 
@@ -153,6 +205,13 @@ export async function POST(req: NextRequest) {
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Resend error');
+
+    // WhatsApp (non-fatal — don't block email success if WA fails)
+    try {
+      await sendWhatsApp(payload);
+    } catch (waErr) {
+      console.error('WhatsApp notify error (non-fatal):', waErr);
+    }
 
     return NextResponse.json({ success: true, id: data.id });
   } catch (err: any) {
