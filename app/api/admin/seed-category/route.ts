@@ -2,14 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 
-export async function POST(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get('secret');
+async function runSeed(params: URLSearchParams, body?: Record<string, any>) {
+  const secret = params.get('secret');
   if (secret !== (process.env.OPS_SEED_SECRET || 'seed-ops-2025')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const { name, sub = '', imgUrl = '', order = 99 } = await req.json();
+    const name    = body?.name    ?? params.get('name')    ?? 'בר מצווה';
+    const sub     = body?.sub     ?? params.get('sub')     ?? 'סטים לבר מצווה';
+    const imgUrl  = body?.imgUrl  ?? params.get('imgUrl')  ?? '';
+    const order   = body?.order   ?? Number(params.get('order') ?? 8);
+
     if (!name) return NextResponse.json({ error: 'name required' }, { status: 400 });
 
     const col = collection(db, 'categories');
@@ -24,4 +28,13 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
+}
+
+export async function GET(req: NextRequest) {
+  return runSeed(req.nextUrl.searchParams);
+}
+
+export async function POST(req: NextRequest) {
+  const body = await req.json().catch(() => ({}));
+  return runSeed(req.nextUrl.searchParams, body);
 }
