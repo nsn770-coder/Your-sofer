@@ -28,7 +28,7 @@ function ThankYouContent() {
           paidAt: new Date().toISOString(),
         });
 
-        // שלח מייל
+        // שלח מייל ללקוח
         await fetch('/api/send-order-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -41,6 +41,22 @@ function ThankYouContent() {
             address: order.address,
           }),
         });
+
+        // סנכרן לתוך מערכת הניהול הפנימית
+        fetch('/api/ops/sync-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: orderId,
+            orderNumber: order.orderNumber,
+            customerName: order.customerName,
+            customerEmail: order.email,
+            customerPhone: order.phone || '',
+            items: order.items,
+            total: order.total,
+            address: order.address,
+          }),
+        }).catch((e) => console.error('Ops sync error (non-fatal):', e));
 
         setEmailSent(true);
       } catch (e) {

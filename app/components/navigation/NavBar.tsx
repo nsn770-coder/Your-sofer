@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -313,7 +313,7 @@ function MobileAccordion({ item, onSelect }: { item: NavMenuItem; onSelect: (cat
   );
 }
 
-export default function NavBar() {
+function NavBarContent() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -536,4 +536,10 @@ export default function NavBar() {
       </AnimatePresence>
     </div>
   );
+}
+
+export default function NavBar() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/ops')) return null;
+  return <NavBarContent />;
 }

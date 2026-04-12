@@ -18,7 +18,8 @@
       "Bash(curl -s -L -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/120.0.0.0 Safari/537.36\" \"https://paldinox.co.il/product-category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94/\")",
       "Bash(npm install:*)",
       "Bash(tasklist /FI \"IMAGENAME eq node.exe\")",
-      "Bash(curl -s \"https://firestore.googleapis.com/v1/projects/your-sofer/databases/\\(default\\)/documents/reviews?key=AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I&pageSize=1\")"
+      "Bash(curl -s \"https://firestore.googleapis.com/v1/projects/your-sofer/databases/\\(default\\)/documents/reviews?key=AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I&pageSize=1\")",
+      "Bash(npm run:*)"
     ]
   }
 }
