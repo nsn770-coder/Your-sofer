@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FieldValue } from 'firebase-admin/firestore';
-import { getAdminDb } from '@/app/lib/firebase-admin';
+import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/app/firebase';
 
 function detectOrderType(items: any[]): 'judaica' | 'stam' | 'mixed' {
   const STAM_CATEGORIES = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'ספר תורה'];
@@ -24,30 +24,16 @@ function detectOrderType(items: any[]): 'judaica' | 'stam' | 'mixed' {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {
-      orderId,
-      orderNumber,
-      customerName,
-      customerEmail,
-      customerPhone,
-      items,
-      total,
-      address,
-    } = body;
+    const { orderId, orderNumber, customerName, customerEmail, customerPhone, items, total, address } = body;
 
     if (!orderId) {
       return NextResponse.json({ error: 'orderId required' }, { status: 400 });
     }
 
-    const adminDb = getAdminDb();
-
     // Check if already synced
-    const existing = await adminDb
-      .collection('internalOrders')
-      .where('orderId', '==', orderId)
-      .limit(1)
-      .get();
-
+    const existing = await getDocs(
+      query(collection(db, 'internalOrders'), where('orderId', '==', orderId))
+    );
     if (!existing.empty) {
       return NextResponse.json({ success: true, alreadySynced: true });
     }
@@ -70,8 +56,6 @@ export async function POST(req: NextRequest) {
           city: address?.city || '',
           zip: address?.zip || address?.postal || '',
         };
-
-    const now = FieldValue.serverTimestamp();
 
     const internalOrder = {
       orderId,
@@ -97,20 +81,19 @@ export async function POST(req: NextRequest) {
       blockReason: '',
       internalNotes: [],
       customerCommunicationLog: [],
-      createdAt: now,
-      updatedAt: now,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     };
 
-    const docRef = await adminDb.collection('internalOrders').add(internalOrder);
+    const docRef = await addDoc(collection(db, 'internalOrders'), internalOrder);
 
-    // Write audit log
-    await adminDb.collection('auditLog').add({
+    await addDoc(collection(db, 'auditLog'), {
       orderId: docRef.id,
       userId: 'system',
       userName: 'מערכת',
       action: 'הזמנה נוצרה',
       newValue: { status: 'new_order', orderId },
-      timestamp: now,
+      timestamp: serverTimestamp(),
     });
 
     // Notify team (non-fatal)
