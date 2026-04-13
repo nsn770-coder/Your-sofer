@@ -46,7 +46,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       body: 'רוב האנשים בוחרים לפי מחיר —\nאבל ההבדל האמיתי הוא באיכות הכתיבה, בבדיקה, ובמי שכתב אותה.\n\nאצלנו אתה לא קונה "סתם מזוזה" —\nאתה רואה את הקלף ובוחר מתוך הבנה.',
       support: 'אפשר לראות את הקלף לפני הקנייה ולבחור מתוך גלריה אמיתית',
       buttons: [
-        { label: '🔍 ראה בתי מזוזה', action: () => { onSelectCat('מזוזות'); onScrollToProducts(); }, style: 'gold' },
+        { label: '🔍 ראה בתי מזוזה', action: () => router.push('/category/מזוזות'), style: 'gold' },
         { label: '✍️ בחר לפי סופר', action: () => router.push('/soferim'), style: 'outline' },
         { label: '📘 למד איך לבחור נכון', action: () => router.push('/madrich'), style: 'ghost' },
       ],
@@ -56,7 +56,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       body: 'יש הבדל גדול בין תפילין כשרות לבין תפילין מהודרות —\nוהוא לא תמיד נראה לעין.\n\nאנחנו עוזרים לך להבין בדיוק מה אתה מקבל\nולבחור מתוך ביטחון אמיתי.',
       support: 'הבחירה הנכונה מתחילה בהבנה — לא במחיר',
       buttons: [
-        { label: '🔍 ראה תפילין', action: () => { onSelectCat('תפילין קומפלט'); onScrollToProducts(); }, style: 'gold' },
+        { label: '🔍 ראה תפילין', action: () => router.push('/category/תפילין קומפלט'), style: 'gold' },
         { label: '📘 מדריך לבחירה נכונה', action: () => router.push('/madrich'), style: 'outline' },
         { label: '💬 שאל סופר', action: () => window.open(WA_LINK, '_blank'), style: 'ghost' },
       ],
@@ -66,8 +66,8 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       body: 'אצלנו אתה לא קונה "סתם מזוזה" —\nאתה בוחר קלף ספציפי מתוך גלריה אמיתית.\n\nכל קלף מצולם, נבדק ומוצג לפני מכירה.\nאתה רואה בדיוק מה מגיע אליך.',
       support: 'ניתן לשלוח את תמונת הקלף לרב שלך לפני הקנייה',
       buttons: [
-        { label: '🔍 קלפי מזוזה', action: () => { onSelectCat('קלפי מזוזה'); onScrollToProducts(); }, style: 'gold' },
-        { label: '📦 קלפי תפילין', action: () => { onSelectCat('קלפי תפילין'); onScrollToProducts(); }, style: 'outline' },
+        { label: '🔍 קלפי מזוזה', action: () => router.push('/category/קלפי מזוזה'), style: 'gold' },
+        { label: '📦 קלפי תפילין', action: () => router.push('/category/קלפי תפילין'), style: 'outline' },
         { label: '📘 למד על קלפים', action: () => router.push('/madrich'), style: 'ghost' },
       ],
     },
