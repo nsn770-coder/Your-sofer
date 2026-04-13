@@ -35,21 +35,21 @@ export const navigationData: NavItem[] = [
       {
         title: "מזוזות",
         items: [
-          { label: "בתי מזוזה", href: "/category/mezuzah-cases" },
-          { label: "קלף מזוזה", href: "/category/klaf-mezuzah" },
+          { label: "בתי מזוזה", href: "/category/מזוזות" },
+          { label: "קלפי מזוזה", href: "/category/קלפי מזוזה" },
         ],
       },
       {
         title: "תפילין",
         items: [
-          { label: "תפילין", href: "/category/tefillin" },
-          { label: "כיסויים לטלית ותפילין", href: "/category/tefillin-covers" },
+          { label: "תפילין קומפלט", href: "/category/תפילין קומפלט" },
+          { label: "כיסוי תפילין", href: "/category/כיסוי תפילין" },
         ],
       },
       {
         title: "טלית וציצית",
         items: [
-          { label: "ציציות וטליתות", href: "/category/tallit" },
+          { label: "סט טלית תפילין", href: "/category/סט טלית תפילין" },
         ],
       },
     ],
@@ -58,7 +58,7 @@ export const navigationData: NavItem[] = [
       title: "קלפים מוסמכים",
       description: "קלפי מזוזה ותפילין בכתב יד סופר מומחה",
       ctaLabel: "לכל הקלפים",
-      ctaHref: "/category/klafim",
+      ctaHref: "/category/קלפי מזוזה",
     },
   },
   {
@@ -164,7 +164,7 @@ export const navigationData: NavItem[] = [
       title: "מארזי מתנה מיוחדים",
       description: "מארזים מעוצבים לכל אירוע — מוכנים לשליחה",
       ctaLabel: "לכל המארזים",
-      ctaHref: "/category/gift-sets",
+      ctaHref: "/category/מתנות",
     },
   },
   {
@@ -177,7 +177,7 @@ export const navigationData: NavItem[] = [
           { label: "מתנות לתינוק / לידה", href: "/category/baby-gifts" },
           { label: "מתנות לילדים", href: "/category/kids-gifts" },
           { label: `יודאיקה לבית ספר / גן`, href: "/category/school-judaica" },
-          { label: "מתנות לבר מצווה / בת מצווה", href: "/category/bar-mitzvah" },
+          { label: "מתנות לבר מצווה / בת מצווה", href: "/category/בר מצווה" },
         ],
       },
     ],
