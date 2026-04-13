@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import CategoryClient from './CategoryClient';
 
@@ -185,7 +186,9 @@ export default async function CategoryPage(
   return (
     <>
       <CategoryItemListJsonLd category={decoded} />
-      <CategoryClient category={decoded} />
+      <Suspense fallback={<div dir="rtl" className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-400">טוען...</div>}>
+        <CategoryClient category={decoded} />
+      </Suspense>
     </>
   );
 }
