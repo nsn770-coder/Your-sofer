@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   collection, query, where, orderBy, limit, startAfter,
@@ -22,54 +22,62 @@ interface Product {
   isBestSeller?: boolean;
   badge?: string | null;
   filterAttributes?: Record<string, string>;
+  stars?: number;
+  status?: string;
+  days?: string;
+  sofer?: string;
+  vendor?: string;
 }
 
-// ─── Filter config ────────────────────────────────────────────────────────────
+interface FilterState {
+  minPrice: string;
+  maxPrice: string;
+  minRating: number;       // 0 | 3 | 4
+  freeShipping: boolean;
+  attrFilters: Record<string, string>;
+  seller: string;
+}
+
+const EMPTY_FILTERS: FilterState = {
+  minPrice: '',
+  maxPrice: '',
+  minRating: 0,
+  freeShipping: false,
+  attrFilters: {},
+  seller: '',
+};
 
 const PAGE_SIZE = 12;
 
-interface FilterSpec { key: string; label: string }
+// Attribute keys to surface (shown only when data exists)
+const ATTR_KEYS = ['חומר', 'גודל', 'כתב', 'כשרות', 'נוסח', 'צבע'];
 
-function getFilterSpecs(category: string): FilterSpec[] {
-  if (category === 'קלפי מזוזה' || category === 'קלפי תפילין') {
-    return [
-      { key: 'גודל',    label: 'גודל'    },
-      { key: 'כתב',     label: 'כתב'     },
-      { key: 'כשרות',   label: 'כשרות'   },
-    ];
-  }
-  if (category === 'כיסוי תפילין') {
-    return [
-      { key: 'חומר', label: 'חומר' },
-      { key: 'צבע',  label: 'צבע'  },
-    ];
-  }
-  return [];
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function hasActiveFilters(f: FilterState) {
+  return (
+    f.minPrice !== '' ||
+    f.maxPrice !== '' ||
+    f.minRating > 0 ||
+    f.freeShipping ||
+    f.seller !== '' ||
+    Object.values(f.attrFilters).some(v => v && v !== 'הכל')
+  );
 }
 
-const PRICE_RANGES = [
-  { label: 'הכל',          min: 0,    max: Infinity },
-  { label: 'עד ₪200',      min: 0,    max: 200      },
-  { label: '₪200–₪500',    min: 200,  max: 500      },
-  { label: '₪500–₪1,000',  min: 500,  max: 1000     },
-  { label: '₪1,000+',      min: 1000, max: Infinity },
-];
-
-// ─── Pill button ──────────────────────────────────────────────────────────────
-
-function Pill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors whitespace-nowrap ${
-        active
-          ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
-          : 'bg-white text-gray-600 border-gray-300 hover:border-[#0c1a35] hover:text-[#0c1a35]'
-      }`}
-    >
-      {label}
-    </button>
-  );
+function applyFilters(products: Product[], f: FilterState): Product[] {
+  return products.filter(p => {
+    if (f.minPrice !== '' && p.price < Number(f.minPrice)) return false;
+    if (f.maxPrice !== '' && p.price > Number(f.maxPrice)) return false;
+    if (f.minRating > 0 && (p.stars ?? 0) < f.minRating) return false;
+    if (f.freeShipping && p.days && !p.days.toLowerCase().includes('חינם')) return false;
+    if (f.seller && p.sofer !== f.seller && p.vendor !== f.seller) return false;
+    for (const key of ATTR_KEYS) {
+      const chosen = f.attrFilters[key];
+      if (chosen && chosen !== 'הכל' && p.filterAttributes?.[key] !== chosen) return false;
+    }
+    return true;
+  });
 }
 
 // ─── Skeleton card ────────────────────────────────────────────────────────────
@@ -87,6 +95,178 @@ function SkeletonCard() {
   );
 }
 
+// ─── Section wrapper ──────────────────────────────────────────────────────────
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="border-b border-gray-100 pb-4 mb-4 last:border-0 last:mb-0 last:pb-0">
+      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+// ─── FilterSidebar ────────────────────────────────────────────────────────────
+
+interface SidebarProps {
+  filters: FilterState;
+  onChange: (f: FilterState) => void;
+  products: Product[];        // all loaded products (for dynamic options)
+}
+
+function FilterSidebar({ filters, onChange, products }: SidebarProps) {
+  function set(partial: Partial<FilterState>) {
+    onChange({ ...filters, ...partial });
+  }
+
+  function setAttr(key: string, val: string) {
+    onChange({ ...filters, attrFilters: { ...filters.attrFilters, [key]: val } });
+  }
+
+  // Dynamic unique values per attribute key
+  function uniqueAttrValues(key: string): string[] {
+    const seen = new Set<string>();
+    for (const p of products) {
+      const v = p.filterAttributes?.[key];
+      if (v) seen.add(v);
+    }
+    return Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'));
+  }
+
+  // Dynamic sellers
+  const sellers = useMemo(() => {
+    const seen = new Set<string>();
+    for (const p of products) {
+      if (p.sofer) seen.add(p.sofer);
+      else if (p.vendor) seen.add(p.vendor);
+    }
+    return Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'));
+  }, [products]);
+
+  const active = hasActiveFilters(filters);
+
+  return (
+    <div dir="rtl" className="bg-white rounded-2xl border border-gray-200 p-4 text-sm">
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <span className="font-bold text-gray-800 text-base">סינון</span>
+        {active && (
+          <button
+            onClick={() => onChange(EMPTY_FILTERS)}
+            className="text-xs text-red-500 hover:text-red-700 font-semibold transition-colors"
+          >
+            נקה הכל
+          </button>
+        )}
+      </div>
+
+      {/* ── Price range ── */}
+      <Section title="טווח מחיר">
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min={0}
+            placeholder="מינ׳"
+            value={filters.minPrice}
+            onChange={e => set({ minPrice: e.target.value })}
+            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#0c1a35]"
+          />
+          <span className="text-gray-400 flex-shrink-0">–</span>
+          <input
+            type="number"
+            min={0}
+            placeholder="מקס׳"
+            value={filters.maxPrice}
+            onChange={e => set({ maxPrice: e.target.value })}
+            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#0c1a35]"
+          />
+        </div>
+      </Section>
+
+      {/* ── Rating ── */}
+      <Section title="דירוג לקוחות">
+        {[
+          { label: 'הכל', value: 0 },
+          { label: '3 ★ ומעלה', value: 3 },
+          { label: '4 ★ ומעלה', value: 4 },
+        ].map(opt => (
+          <label key={opt.value} className="flex items-center gap-2 py-1 cursor-pointer group">
+            <input
+              type="radio"
+              name="rating"
+              checked={filters.minRating === opt.value}
+              onChange={() => set({ minRating: opt.value })}
+              className="accent-[#0c1a35]"
+            />
+            <span className={`text-xs ${filters.minRating === opt.value ? 'font-bold text-[#0c1a35]' : 'text-gray-600 group-hover:text-gray-900'}`}>
+              {opt.label}
+            </span>
+          </label>
+        ))}
+      </Section>
+
+      {/* ── Shipping ── */}
+      <Section title="משלוח">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={filters.freeShipping}
+            onChange={e => set({ freeShipping: e.target.checked })}
+            className="accent-[#0c1a35]"
+          />
+          <span className="text-xs text-gray-600">משלוח חינם</span>
+        </label>
+      </Section>
+
+      {/* ── Dynamic attribute filters ── */}
+      {ATTR_KEYS.map(key => {
+        const vals = uniqueAttrValues(key);
+        if (vals.length === 0) return null;
+        const current = filters.attrFilters[key] ?? 'הכל';
+        return (
+          <Section key={key} title={key}>
+            {['הכל', ...vals].map(opt => (
+              <label key={opt} className="flex items-center gap-2 py-0.5 cursor-pointer group">
+                <input
+                  type="radio"
+                  name={`attr-${key}`}
+                  checked={current === opt}
+                  onChange={() => setAttr(key, opt)}
+                  className="accent-[#0c1a35]"
+                />
+                <span className={`text-xs ${current === opt ? 'font-bold text-[#0c1a35]' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                  {opt}
+                </span>
+              </label>
+            ))}
+          </Section>
+        );
+      })}
+
+      {/* ── Seller ── */}
+      {sellers.length > 0 && (
+        <Section title="מוכר / סופר">
+          {['', ...sellers].map(s => (
+            <label key={s || '__all'} className="flex items-center gap-2 py-0.5 cursor-pointer group">
+              <input
+                type="radio"
+                name="seller"
+                checked={filters.seller === s}
+                onChange={() => set({ seller: s })}
+                className="accent-[#0c1a35]"
+              />
+              <span className={`text-xs ${filters.seller === s ? 'font-bold text-[#0c1a35]' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                {s || 'הכל'}
+              </span>
+            </label>
+          ))}
+        </Section>
+      )}
+    </div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function CategoryClient({ category }: { category: string }) {
@@ -98,12 +278,8 @@ export default function CategoryClient({ category }: { category: string }) {
   const [hasMore, setHasMore]         = useState(true);
   const [loading, setLoading]         = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-
-  // Filters
-  const [priceIdx, setPriceIdx]       = useState(0);
-  const [attrFilters, setAttrFilters] = useState<Record<string, string>>({});
-
-  const filterSpecs = getFilterSpecs(category);
+  const [filters, setFilters]         = useState<FilterState>(EMPTY_FILTERS);
+  const [drawerOpen, setDrawerOpen]   = useState(false);
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
@@ -114,46 +290,30 @@ export default function CategoryClient({ category }: { category: string }) {
       limit(PAGE_SIZE),
     ];
     if (after) constraints.push(startAfter(after));
-
     const snap = await getDocs(query(collection(db, 'products'), ...constraints));
     const docs = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
-
     setAllLoaded(prev => after ? [...prev, ...docs] : docs);
     setCursor(snap.docs[snap.docs.length - 1] ?? null);
     setHasMore(snap.docs.length === PAGE_SIZE);
   }
 
-  // Reset and load on category change
   useEffect(() => {
     setAllLoaded([]);
     setCursor(null);
     setHasMore(true);
     setLoading(true);
-    setPriceIdx(0);
-    setAttrFilters({});
-
+    setFilters(EMPTY_FILTERS);
     fetchPage(null).finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
-  // Apply URL filter param once data is loaded
+  // Apply URL filter once data loads
   useEffect(() => {
     if (!urlFilter || loading || allLoaded.length === 0) return;
-
-    // Try to match urlFilter to a price range label
-    const priceMatch = PRICE_RANGES.findIndex(r => r.label === urlFilter);
-    if (priceMatch !== -1) {
-      setPriceIdx(priceMatch);
-      return;
-    }
-
-    // Try to match urlFilter to a value in any filterSpec key
-    for (const spec of filterSpecs) {
-      const vals = new Set(
-        allLoaded.map(p => p.filterAttributes?.[spec.key]).filter(Boolean)
-      );
+    for (const key of ATTR_KEYS) {
+      const vals = new Set(allLoaded.map(p => p.filterAttributes?.[key]).filter(Boolean));
       if (vals.has(urlFilter)) {
-        setAttrFilters(prev => ({ ...prev, [spec.key]: urlFilter }));
+        setFilters(prev => ({ ...prev, attrFilters: { ...prev.attrFilters, [key]: urlFilter } }));
         return;
       }
     }
@@ -163,56 +323,21 @@ export default function CategoryClient({ category }: { category: string }) {
   async function handleLoadMore() {
     if (!cursor || loadingMore) return;
     setLoadingMore(true);
-    try {
-      await fetchPage(cursor);
-    } finally {
-      setLoadingMore(false);
-    }
+    try { await fetchPage(cursor); }
+    finally { setLoadingMore(false); }
   }
 
-  // ── Dynamic filter options (built from loaded data) ───────────────────────
-
-  function uniqueValues(key: string): string[] {
-    const seen = new Set<string>();
-    for (const p of allLoaded) {
-      const v = p.filterAttributes?.[key];
-      if (v) seen.add(v);
-    }
-    return ['הכל', ...Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'))];
-  }
-
-  function setAttr(key: string, val: string) {
-    setAttrFilters(prev => ({ ...prev, [key]: val }));
-  }
-
-  // ── Client-side filtering ──────────────────────────────────────────────────
-
-  const pr = PRICE_RANGES[priceIdx];
-  const filtered = allLoaded.filter(p => {
-    if (p.price < pr.min || p.price > pr.max) return false;
-    for (const spec of filterSpecs) {
-      const chosen = attrFilters[spec.key];
-      if (chosen && chosen !== 'הכל' && p.filterAttributes?.[spec.key] !== chosen) return false;
-    }
-    return true;
-  });
-
-  const hasActiveFilters =
-    priceIdx !== 0 ||
-    filterSpecs.some(s => attrFilters[s.key] && attrFilters[s.key] !== 'הכל');
-
-  function resetFilters() {
-    setPriceIdx(0);
-    setAttrFilters({});
-  }
+  // ── Filtered products ──────────────────────────────────────────────────────
+  const filtered = useMemo(() => applyFilters(allLoaded, filters), [allLoaded, filters]);
+  const active   = hasActiveFilters(filters);
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50 font-[Heebo,Arial,sans-serif]">
+    <div dir="rtl" className="min-h-screen bg-gray-50">
 
       {/* ── Header ── */}
-      <div className="bg-[#0c1a35] px-6 py-10 text-center">
+      <div className="bg-[#0c1a35] px-6 py-8 text-center">
         <h1 className="text-3xl font-black text-white mb-1">{category}</h1>
         {!loading && (
           <p className="text-sm text-white/60">
@@ -222,130 +347,128 @@ export default function CategoryClient({ category }: { category: string }) {
         )}
       </div>
 
-      {/* ── Filter bar ── */}
-      {!loading && (
-        <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-x-6 gap-y-3 items-start">
+      {/* ── Mobile filter button ── */}
+      <div className="lg:hidden sticky top-0 z-20 bg-white border-b border-gray-200 px-4 py-2.5 flex items-center justify-between shadow-sm">
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 text-sm font-semibold text-gray-700 hover:border-[#0c1a35] transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M6 8h12M9 12h6M12 16h0" />
+          </svg>
+          סינון
+          {active && <span className="w-2 h-2 rounded-full bg-[#b8972a]" />}
+        </button>
+        {!loading && <span className="text-xs text-gray-400">{filtered.length} תוצאות</span>}
+      </div>
 
-            {/* Attribute filters */}
-            {filterSpecs.map(spec => {
-              const opts = uniqueValues(spec.key);
-              if (opts.length <= 1) return null;
-              const current = attrFilters[spec.key] ?? 'הכל';
-              return (
-                <div key={spec.key} className="flex flex-col gap-1.5">
-                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">
-                    {spec.label}
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {opts.map(opt => (
-                      <Pill
-                        key={opt}
-                        label={opt}
-                        active={current === opt}
-                        onClick={() => setAttr(spec.key, opt)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Price filter */}
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">
-                מחיר
-              </span>
-              <div className="flex flex-wrap gap-1">
-                {PRICE_RANGES.map((range, i) => (
-                  <Pill
-                    key={range.label}
-                    label={range.label}
-                    active={priceIdx === i}
-                    onClick={() => setPriceIdx(i)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Reset */}
-            {hasActiveFilters && (
+      {/* ── Mobile drawer ── */}
+      {drawerOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setDrawerOpen(false)}
+          />
+          {/* Sheet */}
+          <div className="relative bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto p-4 pb-8">
+            <div className="flex items-center justify-between mb-4">
+              <span className="font-bold text-gray-800">סינון</span>
               <button
-                onClick={resetFilters}
-                className="self-end mb-0.5 text-xs font-semibold text-red-500 hover:text-red-700 transition-colors"
+                onClick={() => setDrawerOpen(false)}
+                className="p-1 text-gray-400 hover:text-gray-700"
               >
-                ✕ נקה פילטרים
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
-            )}
+            </div>
+            <FilterSidebar
+              filters={filters}
+              onChange={setFilters}
+              products={allLoaded}
+            />
+            <button
+              onClick={() => setDrawerOpen(false)}
+              className="mt-4 w-full py-3 bg-[#0c1a35] text-white rounded-full font-bold text-sm"
+            >
+              הצג {filtered.length} תוצאות
+            </button>
           </div>
         </div>
       )}
 
-      {/* ── Grid ── */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-5xl mb-4">🔍</div>
-            <p className="text-gray-500 text-lg mb-6">
-              {hasActiveFilters ? 'לא נמצאו מוצרים עם הפילטרים שנבחרו' : 'אין מוצרים בקטגוריה זו כרגע'}
-            </p>
-            {hasActiveFilters && (
-              <button
-                onClick={resetFilters}
-                className="px-6 py-2.5 bg-[#0c1a35] text-white rounded-full font-bold text-sm hover:bg-[#1a3060] transition-colors"
-              >
-                נקה פילטרים
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filtered.map(p => (
-                <ProductCard
-                  key={p.id}
-                  id={p.id}
-                  name={p.name}
-                  price={p.price}
-                  images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                  priority={p.priority}
-                  isBestSeller={p.isBestSeller}
-                  badge={p.badge}
-                />
-              ))}
-            </div>
+      {/* ── Main layout ── */}
+      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6 items-start">
 
-            {/* Load more */}
-            {hasMore && (
-              <div className="mt-10 flex justify-center">
+        {/* ── Desktop sidebar ── */}
+        <aside className="hidden lg:block w-60 flex-shrink-0 sticky top-4">
+          {!loading && (
+            <FilterSidebar
+              filters={filters}
+              onChange={setFilters}
+              products={allLoaded}
+            />
+          )}
+        </aside>
+
+        {/* ── Products area ── */}
+        <div className="flex-1 min-w-0">
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-5xl mb-4">🔍</div>
+              <p className="text-gray-500 text-lg mb-6">
+                {active ? 'לא נמצאו מוצרים עם הסינון שנבחר' : 'אין מוצרים בקטגוריה זו כרגע'}
+              </p>
+              {active && (
                 <button
-                  onClick={handleLoadMore}
-                  disabled={loadingMore}
-                  className="
-                    px-10 py-3 rounded-full font-bold text-sm border-2
-                    border-[#0c1a35] text-[#0c1a35]
-                    hover:bg-[#0c1a35] hover:text-white
-                    disabled:opacity-40 disabled:cursor-not-allowed
-                    transition-all duration-200
-                  "
+                  onClick={() => setFilters(EMPTY_FILTERS)}
+                  className="px-6 py-2.5 bg-[#0c1a35] text-white rounded-full font-bold text-sm hover:bg-[#1a3060] transition-colors"
                 >
-                  {loadingMore ? (
-                    <span className="flex items-center gap-2">
-                      <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      טוען...
-                    </span>
-                  ) : (
-                    'טען עוד מוצרים'
-                  )}
+                  נקה סינון
                 </button>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filtered.map(p => (
+                  <ProductCard
+                    key={p.id}
+                    id={p.id}
+                    name={p.name}
+                    price={p.price}
+                    images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                    priority={p.priority}
+                    isBestSeller={p.isBestSeller}
+                    badge={p.badge}
+                  />
+                ))}
               </div>
-            )}
-          </>
-        )}
+
+              {hasMore && (
+                <div className="mt-10 flex justify-center">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="px-10 py-3 rounded-full font-bold text-sm border-2 border-[#0c1a35] text-[#0c1a35] hover:bg-[#0c1a35] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+                  >
+                    {loadingMore ? (
+                      <span className="flex items-center gap-2">
+                        <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        טוען...
+                      </span>
+                    ) : 'טען עוד מוצרים'}
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
