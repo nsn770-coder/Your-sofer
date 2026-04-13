@@ -47,7 +47,7 @@ async function fetchActiveSoferim(): Promise<SoferStub[]> {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
-        next: { revalidate: 3600 },
+        next: { revalidate: 0 },
       },
     );
     if (!res.ok) return [];
