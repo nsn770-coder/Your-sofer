@@ -172,7 +172,10 @@ function AddProductModal({ soferim, onClose, onSave }: {
         name, price: Number(price),
         was: was ? Number(was) : null,
         desc, cat,
+        category: cat,
         badge: badge || null,
+        priority: 50,
+        isBestSeller: false,
         days,
         soferId: soferId || null,
         imgUrl: imgUrl || null,
@@ -804,7 +807,8 @@ export default function AdminPage() {
         const get = (idx: number) => idx >= 0 ? (cols[idx] || '').replace(/^"|"$/g, '').trim() : '';
         const name = get(nameIdx); const price = parseFloat(get(priceIdx));
         if (!name || isNaN(price) || price <= 0) { skipped++; continue; }
-        const productData: any = { name, cat: get(catIdx) || 'כללי', price, status: 'active' };
+        const catVal = get(catIdx) || 'כללי';
+        const productData: any = { name, cat: catVal, category: catVal, price, status: 'active', priority: 50, isBestSeller: false, badge: null };
         const wasVal = get(wasIdx); if (wasVal) productData.was = parseFloat(wasVal);
         const descVal = get(descIdx); if (descVal) productData.desc = descVal;
         const badgeVal = get(badgeIdx); if (badgeVal) productData.badge = badgeVal;
