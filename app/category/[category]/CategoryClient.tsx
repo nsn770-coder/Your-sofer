@@ -34,7 +34,8 @@ interface FilterState {
   maxPrice: string;
   minRating: number;       // 0 | 3 | 4
   freeShipping: boolean;
-  attrFilters: Record<string, string>;
+  attrFilters: Record<string, string>;  // from filterAttributes field
+  nameFilters: Record<string, string>;  // category-specific, match against product.name
   seller: string;
 }
 
@@ -44,13 +45,120 @@ const EMPTY_FILTERS: FilterState = {
   minRating: 0,
   freeShipping: false,
   attrFilters: {},
+  nameFilters: {},
   seller: '',
 };
 
 const PAGE_SIZE = 12;
 
-// Attribute keys to surface (shown only when data exists)
+// Attribute keys to surface from filterAttributes field (shown only when data exists)
 const ATTR_KEYS = ['חומר', 'גודל', 'כתב', 'כשרות', 'נוסח', 'צבע'];
+
+// ─── Category-specific name-based filters ────────────────────────────────────
+// Filtering is done by checking product.name.includes(value)
+
+interface NameFilterSpec {
+  key: string;
+  label: string;
+  options: string[];
+}
+
+const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
+  'מזוזות': [
+    {
+      key: 'גודל',
+      label: 'גודל',
+      options: ['7 ס"מ', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ', '25 ס"מ', '30 ס"מ'],
+    },
+    {
+      key: 'צבע',
+      label: 'צבע',
+      options: ['לבן', 'כסף', 'זהב', 'שחור', 'חום', 'צבעוני'],
+    },
+  ],
+  'קלפי מזוזה': [
+    {
+      key: 'גודל',
+      label: 'גודל',
+      options: ['7 ס"מ', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ', '25 ס"מ', '30 ס"מ'],
+    },
+    {
+      key: 'כתב',
+      label: 'כתב',
+      options: ['אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'],
+    },
+    {
+      key: 'כשרות',
+      label: 'כשרות',
+      options: ['מהודר', 'מהדרין', 'רגיל'],
+    },
+  ],
+  'כיסוי תפילין': [
+    {
+      key: 'חומר',
+      label: 'חומר',
+      options: ['עור', 'דמוי עור', 'קטיפה', 'בד', 'פיו', 'פשתן', 'משי'],
+    },
+    {
+      key: 'צבע',
+      label: 'צבע',
+      options: ['לבן', 'כסף', 'זהב', 'שחור', 'חום', 'צבעוני'],
+    },
+  ],
+  'בר מצווה': [
+    {
+      key: 'סוג סט',
+      label: 'סוג סט',
+      options: ['עם תפילין', 'עם טלית', 'קומפלט'],
+    },
+    {
+      key: 'רמת הידור',
+      label: 'רמת הידור',
+      options: ['רגיל', 'מהודר', 'מהדרין'],
+    },
+  ],
+  'סט טלית תפילין': [
+    {
+      key: 'נוסח',
+      label: 'נוסח',
+      options: ['אשכנז', 'ספרד', 'ספרדי', 'חב"ד', 'תימני'],
+    },
+    {
+      key: 'גודל טלית',
+      label: 'גודל טלית',
+      options: ['36x29', '45x36', '55x40'],
+    },
+    {
+      key: 'רמת הידור',
+      label: 'רמת הידור',
+      options: ['רגיל', 'מהודר', 'מהדרין'],
+    },
+  ],
+  'יודאיקה': [
+    {
+      key: 'חומר',
+      label: 'חומר',
+      options: ['מתכת', 'עץ', 'זכוכית', 'קרמיקה', 'כסף'],
+    },
+    {
+      key: 'צבע',
+      label: 'צבע',
+      options: ['זהב', 'כסף', 'לבן', 'צבעוני'],
+    },
+  ],
+  'מתנות': [
+    {
+      key: 'חומר',
+      label: 'חומר',
+      options: ['מתכת', 'עץ', 'זכוכית', 'קרמיקה', 'כסף'],
+    },
+    {
+      key: 'צבע',
+      label: 'צבע',
+      options: ['זהב', 'כסף', 'לבן', 'צבעוני'],
+    },
+  ],
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -61,7 +169,8 @@ function hasActiveFilters(f: FilterState) {
     f.minRating > 0 ||
     f.freeShipping ||
     f.seller !== '' ||
-    Object.values(f.attrFilters).some(v => v && v !== 'הכל')
+    Object.values(f.attrFilters).some(v => v && v !== 'הכל') ||
+    Object.values(f.nameFilters).some(v => v && v !== 'הכל')
   );
 }
 
@@ -72,9 +181,14 @@ function applyFilters(products: Product[], f: FilterState): Product[] {
     if (f.minRating > 0 && (p.stars ?? 0) < f.minRating) return false;
     if (f.freeShipping && p.days && !p.days.toLowerCase().includes('חינם')) return false;
     if (f.seller && p.sofer !== f.seller && p.vendor !== f.seller) return false;
+    // filterAttributes-based filters
     for (const key of ATTR_KEYS) {
       const chosen = f.attrFilters[key];
       if (chosen && chosen !== 'הכל' && p.filterAttributes?.[key] !== chosen) return false;
+    }
+    // name-based filters: check product.name includes the chosen value
+    for (const [, val] of Object.entries(f.nameFilters)) {
+      if (val && val !== 'הכל' && !p.name.includes(val)) return false;
     }
     return true;
   });
@@ -111,10 +225,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 interface SidebarProps {
   filters: FilterState;
   onChange: (f: FilterState) => void;
-  products: Product[];        // all loaded products (for dynamic options)
+  products: Product[];
+  category: string;
 }
 
-function FilterSidebar({ filters, onChange, products }: SidebarProps) {
+function FilterSidebar({ filters, onChange, products, category }: SidebarProps) {
   function set(partial: Partial<FilterState>) {
     onChange({ ...filters, ...partial });
   }
@@ -122,6 +237,12 @@ function FilterSidebar({ filters, onChange, products }: SidebarProps) {
   function setAttr(key: string, val: string) {
     onChange({ ...filters, attrFilters: { ...filters.attrFilters, [key]: val } });
   }
+
+  function setNameFilter(key: string, val: string) {
+    onChange({ ...filters, nameFilters: { ...filters.nameFilters, [key]: val } });
+  }
+
+  const catNameFilters = CAT_NAME_FILTERS[category] ?? [];
 
   // Dynamic unique values per attribute key
   function uniqueAttrValues(key: string): string[] {
@@ -219,7 +340,30 @@ function FilterSidebar({ filters, onChange, products }: SidebarProps) {
         </label>
       </Section>
 
-      {/* ── Dynamic attribute filters ── */}
+      {/* ── Category-specific name-based filters ── */}
+      {catNameFilters.map(spec => {
+        const current = filters.nameFilters[spec.key] ?? 'הכל';
+        return (
+          <Section key={`name-${spec.key}`} title={spec.label}>
+            {['הכל', ...spec.options].map(opt => (
+              <label key={opt} className="flex items-center gap-2 py-0.5 cursor-pointer group">
+                <input
+                  type="radio"
+                  name={`name-${spec.key}`}
+                  checked={current === opt}
+                  onChange={() => setNameFilter(spec.key, opt)}
+                  className="accent-[#0c1a35]"
+                />
+                <span className={`text-xs ${current === opt ? 'font-bold text-[#0c1a35]' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                  {opt}
+                </span>
+              </label>
+            ))}
+          </Section>
+        );
+      })}
+
+      {/* ── Dynamic attribute filters (from filterAttributes field) ── */}
       {ATTR_KEYS.map(key => {
         const vals = uniqueAttrValues(key);
         if (vals.length === 0) return null;
@@ -387,6 +531,7 @@ export default function CategoryClient({ category }: { category: string }) {
               filters={filters}
               onChange={setFilters}
               products={allLoaded}
+              category={category}
             />
             <button
               onClick={() => setDrawerOpen(false)}
@@ -408,6 +553,7 @@ export default function CategoryClient({ category }: { category: string }) {
               filters={filters}
               onChange={setFilters}
               products={allLoaded}
+              category={category}
             />
           )}
         </aside>
