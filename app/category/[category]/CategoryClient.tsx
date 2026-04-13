@@ -36,7 +36,6 @@ interface FilterState {
   freeShipping: boolean;
   attrFilters: Record<string, string>;  // from filterAttributes field
   nameFilters: Record<string, string>;  // category-specific, match against product.name
-  seller: string;
 }
 
 const EMPTY_FILTERS: FilterState = {
@@ -46,7 +45,6 @@ const EMPTY_FILTERS: FilterState = {
   freeShipping: false,
   attrFilters: {},
   nameFilters: {},
-  seller: '',
 };
 
 const PAGE_SIZE = 12;
@@ -168,7 +166,6 @@ function hasActiveFilters(f: FilterState) {
     f.maxPrice !== '' ||
     f.minRating > 0 ||
     f.freeShipping ||
-    f.seller !== '' ||
     Object.values(f.attrFilters).some(v => v && v !== 'הכל') ||
     Object.values(f.nameFilters).some(v => v && v !== 'הכל')
   );
@@ -180,7 +177,6 @@ function applyFilters(products: Product[], f: FilterState): Product[] {
     if (f.maxPrice !== '' && p.price > Number(f.maxPrice)) return false;
     if (f.minRating > 0 && (p.stars ?? 0) < f.minRating) return false;
     if (f.freeShipping && p.days && !p.days.toLowerCase().includes('חינם')) return false;
-    if (f.seller && p.sofer !== f.seller && p.vendor !== f.seller) return false;
     // filterAttributes-based filters
     for (const key of ATTR_KEYS) {
       const chosen = f.attrFilters[key];
@@ -254,15 +250,6 @@ function FilterSidebar({ filters, onChange, products, category }: SidebarProps) 
     return Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'));
   }
 
-  // Dynamic sellers
-  const sellers = useMemo(() => {
-    const seen = new Set<string>();
-    for (const p of products) {
-      if (p.sofer) seen.add(p.sofer);
-      else if (p.vendor) seen.add(p.vendor);
-    }
-    return Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'));
-  }, [products]);
 
   const active = hasActiveFilters(filters);
 
@@ -388,25 +375,6 @@ function FilterSidebar({ filters, onChange, products, category }: SidebarProps) 
         );
       })}
 
-      {/* ── Seller ── */}
-      {sellers.length > 0 && (
-        <Section title="מוכר / סופר">
-          {['', ...sellers].map(s => (
-            <label key={s || '__all'} className="flex items-center gap-2 py-0.5 cursor-pointer group">
-              <input
-                type="radio"
-                name="seller"
-                checked={filters.seller === s}
-                onChange={() => set({ seller: s })}
-                className="accent-[#0c1a35]"
-              />
-              <span className={`text-xs ${filters.seller === s ? 'font-bold text-[#0c1a35]' : 'text-gray-600 group-hover:text-gray-900'}`}>
-                {s || 'הכל'}
-              </span>
-            </label>
-          ))}
-        </Section>
-      )}
     </div>
   );
 }
