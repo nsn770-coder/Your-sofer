@@ -392,8 +392,8 @@ function NavBarContent() {
   function handleSelect(cat: string, filter?: string) {
     setActiveId(null);
     setMobileOpen(false);
-    let url = `/?cat=${encodeURIComponent(cat)}`;
-    if (filter) url += `&filter=${encodeURIComponent(filter)}`;
+    let url = `/category/${encodeURIComponent(cat)}`;
+    if (filter) url += `?filter=${encodeURIComponent(filter)}`;
     router.push(url);
   }
 
