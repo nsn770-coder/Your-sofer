@@ -259,8 +259,24 @@ export default function HomePageClient() {
       } catch { return {}; }
     }
 
-    // 2. One limit(1) query per unique cat for automatic fallback images
+    // 2. Read category images from the `categories` collection (admin-managed),
+    //    falling back to a product-based query if the collection is empty.
     async function fetchCatImages() {
+      try {
+        const snap = await getDocs(collection(db, 'categories'));
+        if (!snap.empty) {
+          const map: Record<string, string> = {};
+          snap.forEach(d => {
+            const r = d.data();
+            const key = (r.slug || r.name || '') as string;
+            const img = (r.imageUrl || r.imgUrl || '') as string;
+            if (key) map[key] = img;
+          });
+          setCatImages(map);
+          return;
+        }
+      } catch { /* fall through to product-based fallback */ }
+      // Fallback: grab first product image per category
       const pairs = await Promise.all(
         ALL_CATS.map(async cat => {
           try {
@@ -271,7 +287,7 @@ export default function HomePageClient() {
               const d = snap.docs[0].data();
               return [cat, (d.imgUrl || d.image_url || '') as string] as const;
             }
-          } catch { /* ignore — placeholder shown */ }
+          } catch { /* ignore */ }
           return [cat, ''] as const;
         }),
       );

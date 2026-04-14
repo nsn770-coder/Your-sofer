@@ -100,10 +100,15 @@ interface HomeContent {
 
 interface Category {
   id: string;
-  name: string;
-  imgUrl: string;
-  sub: string;
-  order: number;
+  slug: string;        // matches product.cat
+  displayName: string; // human label
+  imageUrl: string;    // Cloudinary URL
+  priority: number;    // sort order
+  // legacy fields (may exist in old Firestore docs)
+  name?: string;
+  imgUrl?: string;
+  sub?: string;
+  order?: number;
 }
 
 type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage';
@@ -885,8 +890,18 @@ export default function AdminPage() {
     try {
       const snap = await getDocs(collection(db, 'categories'));
       const data: Category[] = [];
-      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Category));
-      data.sort((a, b) => (a.order || 0) - (b.order || 0));
+      snap.forEach(d => {
+        const r = d.data();
+        data.push({
+          id: d.id,
+          slug:        r.slug        || r.name        || '',
+          displayName: r.displayName || r.name        || '',
+          imageUrl:    r.imageUrl    || r.imgUrl       || '',
+          priority:    r.priority    ?? r.order        ?? 0,
+          name: r.name, imgUrl: r.imgUrl, sub: r.sub, order: r.order,
+        });
+      });
+      data.sort((a, b) => a.priority - b.priority);
       setCategories(data);
     } catch (e) { console.error(e); }
   }
@@ -901,11 +916,14 @@ export default function AdminPage() {
     finally { setContentSaving(false); }
   }
 
-  async function saveCategoryImg(catId: string, imgUrl: string, sub: string) {
+  async function saveCategory(catId: string, data: { displayName: string; imageUrl: string; priority: number }) {
     setCatSaving(catId);
     try {
-      await updateDoc(doc(db, 'categories', catId), { imgUrl, sub });
-      setCategories(prev => prev.map(c => c.id === catId ? { ...c, imgUrl, sub } : c));
+      await updateDoc(doc(db, 'categories', catId), data);
+      setCategories(prev =>
+        prev.map(c => c.id === catId ? { ...c, ...data } : c)
+            .sort((a, b) => a.priority - b.priority)
+      );
       setCatSaved(catId);
       setTimeout(() => setCatSaved(null), 2500);
     } catch (e) { console.error(e); alert('שגיאה בשמירה'); }
@@ -1203,10 +1221,21 @@ export default function AdminPage() {
       {activeTab === 'categories' && (
         <div className="grid gap-6">
           <div className="bg-white rounded-xl shadow p-6">
-            <h2 className="text-xl font-black mb-2">🖼️ ניהול תמונות קטגוריות</h2>
-            <p className="text-sm text-gray-500 mb-6">עדכן תמונה וכיתוב לכל קטגוריה.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {categories.map(cat => <CategoryCard key={cat.id} cat={cat} saving={catSaving === cat.id} saved={catSaved === cat.id} onSave={(imgUrl, sub) => saveCategoryImg(cat.id, imgUrl, sub)} />)}
+            <h2 className="text-xl font-black mb-1">🖼️ ניהול קטגוריות</h2>
+            <p className="text-sm text-gray-500 mb-6">
+              ערוך שם תצוגה, העלה תמונה (Cloudinary) וקבע עדיפות לכל קטגוריה.<br/>
+              <span className="font-mono text-xs text-gray-400">slug</span> = מזהה הקטגוריה (לפי שדה cat במוצרים) — לא ניתן לשינוי מכאן.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {categories.map(cat => (
+                <CategoryCard
+                  key={cat.id}
+                  cat={cat}
+                  saving={catSaving === cat.id}
+                  saved={catSaved === cat.id}
+                  onSave={data => saveCategory(cat.id, data)}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -1692,24 +1721,101 @@ export default function AdminPage() {
   );
 }
 
-function CategoryCard({ cat, saving, saved, onSave }: { cat: Category; saving: boolean; saved: boolean; onSave: (imgUrl: string, sub: string) => void; }) {
-  const [imgUrl, setImgUrl] = useState(cat.imgUrl || '');
-  const [sub, setSub] = useState(cat.sub || '');
-  const [preview, setPreview] = useState(cat.imgUrl || '');
+function CategoryCard({
+  cat, saving, saved, onSave,
+}: {
+  cat: Category;
+  saving: boolean;
+  saved: boolean;
+  onSave: (data: { displayName: string; imageUrl: string; priority: number }) => void;
+}) {
+  const [displayName, setDisplayName] = useState(cat.displayName || cat.name || '');
+  const [imageUrl, setImageUrl]       = useState(cat.imageUrl || cat.imgUrl || '');
+  const [priority, setPriority]       = useState(cat.priority ?? cat.order ?? 0);
+  const [uploading, setUploading]     = useState(false);
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'yoursofer_upload');
+      const res  = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error('upload failed');
+      setImageUrl(data.secure_url);
+    } catch { alert('שגיאה בהעלאת תמונה'); }
+    finally { setUploading(false); }
+  }
 
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden">
-      <div style={{ height: 120, background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', position: 'relative', overflow: 'hidden' }}>
-        {preview ? <img src={preview} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} /> : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 40 }}>🖼️</div>}
-        <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)', padding: '8px 12px' }}>
-          <div style={{ color: '#fff', fontWeight: 900, fontSize: 15 }}>{cat.name}</div>
+    <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
+      {/* Preview */}
+      <div style={{ height: 140, background: '#f3f4f4', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+        {imageUrl
+          ? <img src={imageUrl} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+          : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 44, color: '#ccc' }}>🖼️</div>}
+        {/* Gradient overlay */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)' }} />
+        {/* Display name over image */}
+        <div style={{ position: 'absolute', bottom: 8, right: 10, left: 10 }}>
+          <span style={{ color: '#fff', fontWeight: 900, fontSize: 15 }}>{displayName}</span>
+        </div>
+        {/* Slug badge */}
+        <div style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.5)', borderRadius: 4, padding: '2px 7px', fontSize: 11, color: '#ddd', fontFamily: 'monospace' }}>
+          {cat.slug || cat.name}
         </div>
       </div>
-      <div className="p-4 bg-white">
-        <div className="mb-3"><label className="block text-xs font-bold text-gray-500 mb-1">כיתוב</label><input value={sub} onChange={e => setSub(e.target.value)} placeholder="מכל הסוגים והגדלים" className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm" /></div>
-        <div className="mb-3"><label className="block text-xs font-bold text-gray-500 mb-1">קישור תמונה (URL)</label><input value={imgUrl} onChange={e => { setImgUrl(e.target.value); setPreview(e.target.value); }} placeholder="https://..." className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm" /></div>
-        <div className="flex items-center gap-3">
-          <button onClick={() => onSave(imgUrl, sub)} disabled={saving} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50">{saving ? '⏳ שומר...' : '💾 שמור'}</button>
+
+      <div className="p-4 bg-white flex flex-col gap-3 flex-1">
+        {/* displayName */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 mb-1">שם תצוגה</label>
+          <input
+            value={displayName}
+            onChange={e => setDisplayName(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
+          />
+        </div>
+
+        {/* Cloudinary upload + URL */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 mb-1">תמונה</label>
+          <div className="flex gap-2 items-center">
+            <label className="flex-shrink-0 cursor-pointer bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg px-3 py-1.5 hover:bg-indigo-100">
+              {uploading ? '⏳...' : '📷 העלה'}
+              <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
+            </label>
+            <input
+              value={imageUrl}
+              onChange={e => setImageUrl(e.target.value)}
+              placeholder="URL ידני"
+              className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-xs min-w-0"
+            />
+          </div>
+        </div>
+
+        {/* Priority */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 mb-1">עדיפות (סדר הצגה — מספר נמוך = ראשון)</label>
+          <input
+            type="number"
+            value={priority}
+            onChange={e => setPriority(Number(e.target.value))}
+            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
+          />
+        </div>
+
+        <div className="flex items-center gap-3 mt-auto">
+          <button
+            onClick={() => onSave({ displayName, imageUrl, priority })}
+            disabled={saving || uploading}
+            className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {saving ? '⏳ שומר...' : '💾 שמור'}
+          </button>
           {saved && <span className="text-green-600 text-sm font-bold">✅ נשמר!</span>}
         </div>
       </div>
