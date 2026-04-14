@@ -57,6 +57,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             shaliachId = data.shaliachId;
           } else {
             // משתמש חדש — צור רשומה
+            // אם הגיע דרך קישור הפניה (?ref=...) — שמור את המזהה של השליח
+            const referredByShaliach = typeof window !== 'undefined'
+              ? localStorage.getItem('shaliachRef')
+              : null;
             await setDoc(userRef, {
               email: firebaseUser.email,
               displayName: firebaseUser.displayName,
@@ -64,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               role: 'customer',
               status: 'active',
               createdAt: new Date(),
+              ...(referredByShaliach ? { shaliachId: referredByShaliach } : {}),
             });
           }
         }

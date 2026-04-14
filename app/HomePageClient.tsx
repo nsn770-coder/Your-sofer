@@ -309,6 +309,34 @@ export default function HomePageClient() {
         fontFamily: "'Heebo', Arial, sans-serif",
       }}
     >
+      {/* ── Shliach referral banner ── */}
+      {shaliach && (
+        <div style={{
+          background: 'linear-gradient(90deg, #0c2d6b 0%, #1a4a9e 100%)',
+          color: '#fff',
+          padding: isMobile ? '10px 16px' : '10px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 14,
+          flexWrap: 'wrap',
+          direction: 'rtl',
+        }}>
+          {shaliach.logoUrl && (
+            <img
+              src={shaliach.logoUrl}
+              alt={shaliach.chabadName || shaliach.name}
+              style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.4)' }}
+            />
+          )}
+          <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 700 }}>
+            🤝 חנות זו מוגשת בשיתוף{' '}
+            <span style={{ color: '#f0c84a' }}>{shaliach.chabadName || shaliach.name}</span>
+            {shaliach.city && <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.8)' }}> · {shaliach.city}</span>}
+          </span>
+        </div>
+      )}
+
       {/* ── 1. SmartHero — unchanged ── */}
       <SmartHero
         isMobile={isMobile}
@@ -455,11 +483,6 @@ export default function HomePageClient() {
           }}
         >
           <span style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>Your Sofer</span>
-          {shaliach && (
-            <span style={{ fontSize: 11, color: '#888' }}>
-              מוגש על ידי {shaliach.chabadName || shaliach.name}
-            </span>
-          )}
           <span style={{ fontSize: 11, color: '#555' }}>© 2025 Your Sofer — כל הזכויות שמורות</span>
         </div>
       </footer>

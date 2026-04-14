@@ -1087,17 +1087,21 @@ export default function AdminPage() {
                       </td>
                       <td className="p-3">
                         {u.role === 'shaliach' && (
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(`https://your-sofer.com/?ref=${u.id}`);
-                              setCopiedUserId(u.id);
-                              setTimeout(() => setCopiedUserId(null), 2000);
-                            }}
-                            title={`https://your-sofer.com/?ref=${u.id}`}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
-                          >
-                            {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
-                          </button>
+                          u.shaliachId ? (
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(`https://your-sofer.com/?ref=${u.shaliachId}`);
+                                setCopiedUserId(u.id);
+                                setTimeout(() => setCopiedUserId(null), 2000);
+                              }}
+                              title={`https://your-sofer.com/?ref=${u.shaliachId}`}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
+                            >
+                              {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
+                            </button>
+                          ) : (
+                            <span className="text-xs text-gray-400">אין מזהה שליח</span>
+                          )
                         )}
                       </td>
                     </tr>
