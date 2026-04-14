@@ -442,7 +442,7 @@ export default function HomePageClient() {
               maxWidth: 1200,
               margin: '0 auto',
               display: 'grid',
-              gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+              gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
               gap: isMobile ? 16 : 32,
             }}
           >
@@ -476,6 +476,27 @@ export default function HomePageClient() {
                 </div>
               ))}
             </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>מסמכים משפטיים</div>
+              {[
+                { label: 'תקנון האתר',      path: '/legal/takanon' },
+                { label: 'מדיניות החזרים', path: '/legal/returns' },
+                { label: 'מדיניות פרטיות', path: '/legal/privacy' },
+                { label: 'משלוחים',         path: '/legal/shipping' },
+                { label: 'נגישות',          path: '/legal/accessibility' },
+                { label: 'שאלות נפוצות',   path: '/legal/faq' },
+              ].map(link => (
+                <div
+                  key={link.path}
+                  onClick={() => router.push(link.path)}
+                  style={{ fontSize: 12, color: '#999', marginBottom: 6, cursor: 'pointer' }}
+                  onMouseEnter={e => ((e.currentTarget as HTMLDivElement).style.color = '#fff')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLDivElement).style.color = '#999')}
+                >
+                  {link.label}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div
@@ -490,28 +511,6 @@ export default function HomePageClient() {
         >
           <span style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>Your Sofer</span>
           <span style={{ fontSize: 11, color: '#555' }}>© 2025 Your Sofer — כל הזכויות שמורות</span>
-        </div>
-        <div style={{ borderTop: '1px solid #222', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: isMobile ? '6px 12px' : '6px 20px' }}>
-          {[
-            { label: 'תקנון האתר',      path: '/legal/takanon' },
-            { label: 'מדיניות החזרים', path: '/legal/returns' },
-            { label: 'מדיניות פרטיות', path: '/legal/privacy' },
-            { label: 'משלוחים',         path: '/legal/shipping' },
-            { label: 'נגישות',          path: '/legal/accessibility' },
-            { label: 'שאלות נפוצות',   path: '/legal/faq' },
-          ].map((link, i, arr) => (
-            <span key={link.path} style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 20 }}>
-              <span
-                onClick={() => router.push(link.path)}
-                style={{ fontSize: 11, color: '#666', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLSpanElement).style.color = '#aaa')}
-                onMouseLeave={e => ((e.currentTarget as HTMLSpanElement).style.color = '#666')}
-              >
-                {link.label}
-              </span>
-              {i < arr.length - 1 && <span style={{ color: '#333', fontSize: 11 }}>|</span>}
-            </span>
-          ))}
         </div>
       </footer>
 
