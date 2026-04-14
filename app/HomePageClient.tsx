@@ -252,7 +252,7 @@ export default function HomePageClient() {
     async function fetchNewProducts() {
       try {
         const snap = await getDocs(
-          query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(8)),
+          query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(16)),
         );
         setNewProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)));
       } catch { /* silently empty */ }
@@ -337,7 +337,7 @@ export default function HomePageClient() {
                     <CategoryCard card={card} catImages={catImages} slotImages={slotImages} />
                   </div>
                 ))
-              : Array.from({ length: 8 }).map((_, i) => (
+              : Array.from({ length: 16 }).map((_, i) => (
                   <div
                     key={i}
                     style={{
@@ -457,7 +457,7 @@ export default function HomePageClient() {
               gap: isMobile ? 10 : 16,
             }}
           >
-            {Array.from({ length: 8 }).map((_, i) => (
+            {Array.from({ length: 16 }).map((_, i) => (
               <div
                 key={i}
                 style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1px solid #f0f0f0' }}
