@@ -9,6 +9,7 @@ import { db, auth } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
 import { CATS } from '../constants/categories';
+import HomepageConfigTab from './components/HomepageConfigTab';
 
 interface Order {
   id: string;
@@ -90,7 +91,7 @@ interface Category {
   order: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'homepage';
 
 interface Review {
   id: string;
@@ -875,6 +876,7 @@ export default function AdminPage() {
           { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
           { key: 'categories', label: '🖼️ קטגוריות', color: 'bg-indigo-600' },
           { key: 'reviews', label: '⭐ ביקורות', color: 'bg-yellow-600', badge: reviews.filter(r => !r.approved).length },
+          { key: 'homepage', label: '🏠 דף הבית', color: 'bg-slate-700' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -1192,6 +1194,10 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+      )}
+
+      {activeTab === 'homepage' && (
+        <HomepageConfigTab products={products} />
       )}
 
       {showAddSofer && <AddSoferModal onClose={() => setShowAddSofer(false)} onSave={() => { loadSoferimFull(); loadSoferim(); }} />}

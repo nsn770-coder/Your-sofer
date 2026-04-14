@@ -5,11 +5,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   collection, query, where, orderBy, limit, getDocs,
+  doc, getDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import SmartHero from './components/SmartHero';
 import ProductCard from '@/components/ui/ProductCard';
 import { useShaliach } from './contexts/ShaliachContext';
+import {
+  CARDS, ALL_CATS, CONFIG_COLLECTION, CONFIG_DOC, slotKey,
+} from './constants/homepageCards';
+import type { CardDef, SubItem } from './constants/homepageCards';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -25,115 +30,6 @@ interface Product {
   isBestSeller?: boolean;
   badge?: string | null;
 }
-
-interface SubItem {
-  label: string;
-  href: string;
-  cat: string; // Firestore `cat` field value — used to look up an image
-}
-
-interface CardDef {
-  title: string;
-  href: string;
-  ctaLabel: string;
-  items: SubItem[];
-}
-
-// ── 8 Amazon-style category card definitions ──────────────────────────────────
-
-const CARDS: CardDef[] = [
-  {
-    title: 'מזוזות',
-    href: '/category/מזוזות',
-    ctaLabel: 'לכל המזוזות ←',
-    items: [
-      { label: 'מזוזה אלומיניום', href: '/category/מזוזות?filter=אלומיניום', cat: 'מזוזות' },
-      { label: 'מזוזה עץ',        href: '/category/מזוזות?filter=עץ',        cat: 'מזוזות' },
-      { label: 'מזוזה כסף',       href: '/category/מזוזות?filter=כסף',       cat: 'מזוזות' },
-      { label: 'מזוזה פולימר',    href: '/category/מזוזות?filter=פולימר',    cat: 'מזוזות' },
-    ],
-  },
-  {
-    title: 'תפילין',
-    href: '/category/תפילין קומפלט',
-    ctaLabel: 'לכל התפילין ←',
-    items: [
-      { label: 'תפילין אשכנז', href: '/category/תפילין קומפלט?filter=אשכנז', cat: 'תפילין קומפלט' },
-      { label: 'תפילין ספרד',  href: '/category/תפילין קומפלט?filter=ספרד',  cat: 'תפילין קומפלט' },
-      { label: 'תפילין חב"ד',  href: '/category/תפילין קומפלט?filter=חב"ד',  cat: 'תפילין קומפלט' },
-      { label: 'כיסוי תפילין', href: '/category/כיסוי תפילין',              cat: 'כיסוי תפילין'  },
-    ],
-  },
-  {
-    title: 'בר מצווה',
-    href: '/category/בר מצווה',
-    ctaLabel: 'לכל מוצרי בר מצווה ←',
-    items: [
-      { label: 'סט בר מצווה',     href: '/category/בר מצווה?filter=סט', cat: 'בר מצווה'       },
-      { label: 'טלית',            href: '/category/טליתות',              cat: 'טליתות'          },
-      { label: 'תפילין',          href: '/category/תפילין קומפלט',      cat: 'תפילין קומפלט'  },
-      { label: 'מתנה לבר מצווה', href: '/category/מתנות',               cat: 'מתנות'           },
-    ],
-  },
-  {
-    title: 'מתנות',
-    href: '/category/מתנות',
-    ctaLabel: 'לכל המתנות ←',
-    items: [
-      { label: 'מתנה לחתן',     href: '/category/מתנות?filter=לחתן',  cat: 'מתנות' },
-      { label: 'מתנה לאישה',    href: '/category/מתנות?filter=לאישה', cat: 'מתנות' },
-      { label: 'מתנה לגבר',     href: '/category/מתנות?filter=לגבר',  cat: 'מתנות' },
-      { label: 'מתנה לבית חדש', href: '/category/מתנות?filter=בית',   cat: 'מתנות' },
-    ],
-  },
-  {
-    title: 'קלפים',
-    href: '/category/קלפי מזוזה',
-    ctaLabel: 'לכל הקלפים ←',
-    items: [
-      { label: 'קלפי מזוזה 10 ס"מ', href: '/category/קלפי מזוזה?filter=10', cat: 'קלפי מזוזה' },
-      { label: 'קלפי מזוזה 12 ס"מ', href: '/category/קלפי מזוזה?filter=12', cat: 'קלפי מזוזה' },
-      { label: 'קלפי תפילין',       href: '/category/קלפי תפילין',          cat: 'קלפי תפילין' },
-      { label: 'קלפי מזוזה 15 ס"מ', href: '/category/קלפי מזוזה?filter=15', cat: 'קלפי מזוזה' },
-    ],
-  },
-  {
-    title: 'ספרי תורה ומגילות',
-    href: '/category/ספרי תורה',
-    ctaLabel: 'לכל הספרים ←',
-    items: [
-      { label: 'ספר תורה',    href: '/category/ספרי תורה', cat: 'ספרי תורה' },
-      { label: 'מגילת אסתר', href: '/category/מגילות',    cat: 'מגילות'    },
-      { label: 'מגילות',     href: '/category/מגילות',    cat: 'מגילות'    },
-      { label: 'יודאיקה',    href: '/category/יודאיקה',   cat: 'יודאיקה'   },
-    ],
-  },
-  {
-    title: 'חגים ומועדים',
-    href: '/category/חגים ומועדים',
-    ctaLabel: 'לכל החגים ←',
-    items: [
-      { label: 'חנוכה',    href: '/category/חגים ומועדים?filter=חנוכה',    cat: 'חגים ומועדים' },
-      { label: 'פסח',      href: '/category/חגים ומועדים?filter=פסח',      cat: 'חגים ומועדים' },
-      { label: 'ראש השנה', href: '/category/חגים ומועדים?filter=ראש השנה', cat: 'חגים ומועדים' },
-      { label: 'פורים',    href: '/category/חגים ומועדים?filter=פורים',    cat: 'חגים ומועדים' },
-    ],
-  },
-  {
-    title: 'טליתות וציצית',
-    href: '/category/טליתות',
-    ctaLabel: 'לכל הטליתות ←',
-    items: [
-      { label: 'סט טלית ותפילין', href: '/category/סט טלית תפילין', cat: 'סט טלית תפילין' },
-      { label: 'טלית',            href: '/category/טליתות',          cat: 'טליתות'          },
-      { label: 'ציצית',           href: '/category/טליתות',          cat: 'טליתות'          },
-      { label: 'יודאיקה',         href: '/category/יודאיקה',         cat: 'יודאיקה'         },
-    ],
-  },
-];
-
-// Deduplicated list of Firestore `cat` values we need one image for
-const ALL_CATS = [...new Set(CARDS.flatMap(c => c.items.map(i => i.cat)))];
 
 // ── Sub-image slot ─────────────────────────────────────────────────────────────
 
@@ -172,7 +68,15 @@ function SubSlot({ imgUrl, label, href }: { imgUrl: string; label: string; href:
 
 // ── Single category card ───────────────────────────────────────────────────────
 
-function CategoryCard({ card, catImages }: { card: CardDef; catImages: Record<string, string> }) {
+function CategoryCard({
+  card,
+  catImages,
+  slotImages,
+}: {
+  card: CardDef;
+  catImages: Record<string, string>;
+  slotImages: Record<string, string>;
+}) {
   return (
     <div
       dir="rtl"
@@ -198,7 +102,7 @@ function CategoryCard({ card, catImages }: { card: CardDef; catImages: Record<st
         {card.items.map(item => (
           <SubSlot
             key={item.href + item.label}
-            imgUrl={catImages[item.cat] ?? ''}
+            imgUrl={slotImages[slotKey(card.title, item.label)] ?? catImages[item.cat] ?? ''}
             label={item.label}
             href={item.href}
           />
@@ -248,6 +152,7 @@ function SkeletonCategoryCard() {
 export default function HomePageClient() {
   const [isMobile, setIsMobile]       = useState(false);
   const [catImages, setCatImages]     = useState<Record<string, string>>({});
+  const [slotImages, setSlotImages]   = useState<Record<string, string>>({});
   const [imagesReady, setImagesReady] = useState(false);
   const [newProducts, setNewProducts] = useState<Product[]>([]);
   const [newLoading, setNewLoading]   = useState(true);
@@ -264,9 +169,47 @@ export default function HomePageClient() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Fetch data: one product image per unique cat + 8 newest products
+  // Fetch data: homepage config + cat fallback images + 8 newest products
   useEffect(() => {
-    // One limit(1) query per unique cat — all fired in parallel
+    // 1. Load admin-pinned product images from Firestore config
+    async function fetchPinnedImages(): Promise<Record<string, string>> {
+      try {
+        const snap = await getDoc(doc(db, CONFIG_COLLECTION, CONFIG_DOC));
+        if (!snap.exists()) return {};
+        const configMap = snap.data() as Record<string, Record<string, string>>;
+
+        // Collect all unique productIds that are pinned
+        const idToSlots: Record<string, string[]> = {};
+        for (const card of CARDS) {
+          const cardConf = configMap[card.title] ?? {};
+          for (const item of card.items) {
+            const pid = cardConf[item.label];
+            if (pid) {
+              if (!idToSlots[pid]) idToSlots[pid] = [];
+              idToSlots[pid].push(slotKey(card.title, item.label));
+            }
+          }
+        }
+
+        // Fetch each unique product doc in parallel
+        const result: Record<string, string> = {};
+        await Promise.all(
+          Object.entries(idToSlots).map(async ([pid, keys]) => {
+            try {
+              const pSnap = await getDoc(doc(db, 'products', pid));
+              if (pSnap.exists()) {
+                const d = pSnap.data();
+                const img = (d.imgUrl || d.image_url || '') as string;
+                for (const k of keys) result[k] = img;
+              }
+            } catch { /* skip — slot falls back to catImages */ }
+          }),
+        );
+        return result;
+      } catch { return {}; }
+    }
+
+    // 2. One limit(1) query per unique cat for automatic fallback images
     async function fetchCatImages() {
       const pairs = await Promise.all(
         ALL_CATS.map(async cat => {
@@ -283,7 +226,6 @@ export default function HomePageClient() {
         }),
       );
       setCatImages(Object.fromEntries(pairs));
-      setImagesReady(true);
     }
 
     async function fetchNewProducts() {
@@ -296,7 +238,12 @@ export default function HomePageClient() {
       finally { setNewLoading(false); }
     }
 
-    fetchCatImages();
+    // Run all in parallel; mark images ready once both image fetches complete
+    Promise.all([
+      fetchPinnedImages().then(pinned => setSlotImages(pinned)),
+      fetchCatImages(),
+    ]).finally(() => setImagesReady(true));
+
     fetchNewProducts();
   }, []);
 
@@ -356,7 +303,7 @@ export default function HomePageClient() {
         >
           {imagesReady
             ? CARDS.map(card => (
-                <CategoryCard key={card.href} card={card} catImages={catImages} />
+                <CategoryCard key={card.href} card={card} catImages={catImages} slotImages={slotImages} />
               ))
             : Array.from({ length: 8 }).map((_, i) => <SkeletonCategoryCard key={i} />)
           }
