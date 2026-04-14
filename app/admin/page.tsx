@@ -33,6 +33,7 @@ interface SoferApplication {
   style?: string;
   categories: string[];
   imageUrl?: string;
+  writingSamples?: string[];
   status: 'pending' | 'approved' | 'rejected';
   createdAt?: { seconds: number };
 }
@@ -74,6 +75,7 @@ interface SoferFull {
   style?: string;
   categories?: string[];
   imageUrl?: string;
+  writingSamples?: string[];
   status?: string;
 }
 
@@ -563,6 +565,7 @@ export default function AdminPage() {
   const [showAddSofer, setShowAddSofer] = useState(false);
   const [editingSofer, setEditingSofer] = useState<SoferFull | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [importStatus, setImportStatus] = useState('');
 
   useEffect(() => {
@@ -751,6 +754,7 @@ export default function AdminPage() {
         whatsapp: app.whatsapp || '', email: app.email || '',
         description: app.description || '', style: app.style || '',
         categories: app.categories, imageUrl: app.imageUrl || '',
+        writingSamples: app.writingSamples || [],
         status: 'active', createdAt: serverTimestamp(),
       });
       setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
@@ -1009,6 +1013,17 @@ export default function AdminPage() {
                         {s.city && <span>📍 {s.city}</span>}{s.phone && <span>📞 {s.phone}</span>}{s.email && <span>✉️ {s.email}</span>}{s.style && <span>✍️ {s.style}</span>}
                       </div>
                       {s.categories && s.categories.length > 0 && <div className="flex gap-2 flex-wrap">{s.categories.map((cat: string) => <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">{cat}</span>)}</div>}
+                      {s.writingSamples && s.writingSamples.length > 0 && (
+                        <div className="mt-3">
+                          <p className="text-xs font-bold text-gray-500 mb-1">🖊️ דוגמאות כתיבה</p>
+                          <div className="flex gap-2 flex-wrap">
+                            {s.writingSamples.map((url, i) => (
+                              <img key={i} src={url} alt={`דוגמת כתיבה ${i + 1}`} onClick={() => setLightboxImage(url)}
+                                className="w-16 h-16 object-cover rounded-lg border border-amber-200 cursor-zoom-in hover:opacity-80 transition-opacity" />
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-col gap-2 flex-shrink-0">
                       <button onClick={() => router.push(`/soferim/${s.id}`)} className="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-700">📜 פרופיל</button>
@@ -1047,6 +1062,17 @@ export default function AdminPage() {
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-3">{app.city && <span>📍 {app.city}</span>}{app.phone && <span>📞 {app.phone}</span>}{app.email && <span>✉️ {app.email}</span>}{app.style && <span>✍️ {app.style}</span>}</div>
                       {app.categories?.length > 0 && <div className="flex gap-2 flex-wrap mb-3">{app.categories.map(cat => <span key={cat} className="bg-amber-50 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">{cat}</span>)}</div>}
                       {app.description && <p className="text-sm text-gray-500 mb-3 line-clamp-2">{app.description}</p>}
+                      {app.writingSamples && app.writingSamples.length > 0 && (
+                        <div className="mt-1">
+                          <p className="text-xs font-bold text-gray-500 mb-1">🖊️ דוגמאות כתיבה</p>
+                          <div className="flex gap-2 flex-wrap">
+                            {app.writingSamples.map((url, i) => (
+                              <img key={i} src={url} alt={`דוגמת כתיבה ${i + 1}`} onClick={() => setLightboxImage(url)}
+                                className="w-16 h-16 object-cover rounded-lg border border-gray-200 cursor-zoom-in hover:opacity-80 transition-opacity" />
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {app.status === 'pending' && (
                       <div className="flex flex-col gap-2 flex-shrink-0">
@@ -1234,6 +1260,15 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {lightboxImage && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }}
+          onClick={() => setLightboxImage(null)}>
+          <img src={lightboxImage} alt="דוגמת כתיבה" style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 8, objectFit: 'contain', boxShadow: '0 8px 40px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()} />
+          <button onClick={() => setLightboxImage(null)} style={{ position: 'absolute', top: 16, left: 16, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%', width: 36, height: 36, color: '#fff', fontSize: 20, cursor: 'pointer', lineHeight: '36px' }}>✕</button>
         </div>
       )}
     </main>
