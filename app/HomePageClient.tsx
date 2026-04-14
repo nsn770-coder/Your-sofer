@@ -295,15 +295,16 @@ export default function HomePageClient() {
     fetchNewProducts();
   }, []);
 
-  // Fetch active testimonials
+  // Fetch active testimonials — filter client-side to avoid composite index requirement
   useEffect(() => {
     async function fetchTestimonials() {
       try {
         const snap = await getDocs(
-          query(collection(db, 'testimonials'), where('active', '==', true), orderBy('createdAt', 'desc')),
+          query(collection(db, 'testimonials'), orderBy('createdAt', 'desc')),
         );
-        setTestimonials(snap.docs.map(d => ({ id: d.id, ...d.data() } as Testimonial)));
-      } catch { /* silently empty */ }
+        const all = snap.docs.map(d => ({ id: d.id, ...d.data() } as Testimonial));
+        setTestimonials(all.filter(t => t.active === true));
+      } catch (e) { console.error('testimonials fetch error:', e); }
     }
     fetchTestimonials();
   }, []);
@@ -856,100 +857,104 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 4. Testimonials carousel ── */}
-      {testimonials.length > 0 && (
-        <div style={{ background: '#f8f4ec', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
-          <div style={{ maxWidth: 900, margin: '0 auto' }}>
-            {/* Heading */}
-            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 28, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>
-              מה הלקוחות אומרים
-            </h2>
-            <p style={{ textAlign: 'center', fontSize: 14, color: '#888', marginBottom: 36 }}>
-              אלפי לקוחות מרוצים ברחבי הארץ
-            </p>
+      {testimonials.length > 0 && (() => {
+        const t = testimonials[testIdx];
+        return (
+          <div style={{ background: '#f8f4ec', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
+            <div style={{ maxWidth: 860, margin: '0 auto' }}>
+              {/* Heading */}
+              <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 28, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>
+                מה הלקוחות אומרים
+              </h2>
+              <p style={{ textAlign: 'center', fontSize: 14, color: '#888', marginBottom: 36 }}>
+                אלפי לקוחות מרוצים ברחבי הארץ
+              </p>
 
-            {/* Card */}
-            <div style={{ position: 'relative', minHeight: 200 }}>
-              {testimonials.map((t, i) => (
-                <div
-                  key={t.id}
-                  style={{
-                    position: i === 0 ? 'relative' : 'absolute',
-                    top: 0, left: 0, right: 0,
-                    opacity: i === testIdx ? 1 : 0,
-                    transform: i === testIdx ? 'translateY(0)' : 'translateY(12px)',
-                    transition: 'opacity 0.6s ease, transform 0.6s ease',
-                    pointerEvents: i === testIdx ? 'auto' : 'none',
-                    background: '#fff',
-                    borderRadius: 16,
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-                    padding: isMobile ? '24px 20px' : '32px 40px',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 24,
-                    flexDirection: isMobile ? 'column' : 'row',
-                  }}
-                >
-                  {/* Avatar */}
-                  <div style={{ flexShrink: 0, alignSelf: isMobile ? 'center' : 'flex-start' }}>
-                    {t.imageUrl ? (
-                      <img
-                        src={t.imageUrl}
-                        alt={t.name}
-                        style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #b8972a' }}
-                      />
-                    ) : (
-                      <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #b8972a' }}>
-                        <span style={{ fontSize: 32, color: '#fff', fontWeight: 900 }}>{t.name.charAt(0)}</span>
-                      </div>
-                    )}
+              {/* Card — re-keyed on testIdx so CSS animation fires on every change */}
+              <div
+                key={testIdx}
+                style={{
+                  background: '#fff',
+                  borderRadius: 16,
+                  boxShadow: '0 4px 28px rgba(0,0,0,0.09)',
+                  padding: isMobile ? '24px 20px' : '36px 44px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 28,
+                  flexDirection: isMobile ? 'column' : 'row',
+                  animation: 'testFadeIn 0.55s ease',
+                }}
+              >
+                {/* Avatar */}
+                <div style={{ flexShrink: 0, alignSelf: isMobile ? 'center' : 'flex-start' }}>
+                  {t.imageUrl ? (
+                    <img
+                      src={t.imageUrl}
+                      alt={t.name}
+                      style={{ width: 84, height: 84, borderRadius: '50%', objectFit: 'cover', border: '3px solid #b8972a' }}
+                    />
+                  ) : (
+                    <div style={{ width: 84, height: 84, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #b8972a' }}>
+                      <span style={{ fontSize: 34, color: '#fff', fontWeight: 900 }}>{t.name.charAt(0)}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div style={{ flex: 1, textAlign: 'right' }}>
+                  {/* Stars */}
+                  <div style={{ marginBottom: 10 }}>
+                    {Array.from({ length: 5 }).map((_, si) => (
+                      <span key={si} style={{ color: si < (t.rating ?? 5) ? '#f5c518' : '#ddd', fontSize: 22 }}>★</span>
+                    ))}
                   </div>
-
-                  {/* Content */}
-                  <div style={{ flex: 1, textAlign: 'right' }}>
-                    {/* Stars */}
-                    <div style={{ marginBottom: 8 }}>
-                      {Array.from({ length: 5 }).map((_, si) => (
-                        <span key={si} style={{ color: si < t.rating ? '#f5c518' : '#ddd', fontSize: 20 }}>★</span>
-                      ))}
-                    </div>
-                    {/* Quote text */}
-                    <p style={{ fontSize: isMobile ? 15 : 17, color: '#333', lineHeight: 1.7, marginBottom: 14, fontStyle: 'italic' }}>
-                      &ldquo;{t.text}&rdquo;
-                    </p>
-                    {/* Name + city */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
-                      <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35' }}>{t.name}</span>
-                      {t.city && <span style={{ fontSize: 13, color: '#888' }}>· {t.city}</span>}
-                    </div>
+                  {/* Quote text */}
+                  <p style={{ fontSize: isMobile ? 15 : 17, color: '#444', lineHeight: 1.75, marginBottom: 16, fontStyle: 'italic' }}>
+                    &ldquo;{t.text}&rdquo;
+                  </p>
+                  {/* Name + city */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
+                    <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35' }}>{t.name}</span>
+                    {t.city && <span style={{ fontSize: 13, color: '#999' }}>· {t.city}</span>}
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Dots */}
-            {testimonials.length > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 24 }}>
-                {testimonials.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setTestIdx(i)}
-                    style={{
-                      width: i === testIdx ? 24 : 10,
-                      height: 10,
-                      borderRadius: 5,
-                      border: 'none',
-                      cursor: 'pointer',
-                      background: i === testIdx ? '#b8972a' : '#ccc',
-                      padding: 0,
-                      transition: 'width 0.3s, background 0.3s',
-                    }}
-                  />
-                ))}
               </div>
-            )}
+
+              {/* Dots + arrows */}
+              {testimonials.length > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 20 }}>
+                  <button
+                    onClick={() => setTestIdx(i => (i - 1 + testimonials.length) % testimonials.length)}
+                    style={{ background: 'none', border: 'none', fontSize: 20, color: '#b8972a', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }}
+                    aria-label="הקודם"
+                  >‹</button>
+                  {testimonials.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setTestIdx(i)}
+                      style={{
+                        width: i === testIdx ? 24 : 10,
+                        height: 10,
+                        borderRadius: 5,
+                        border: 'none',
+                        cursor: 'pointer',
+                        background: i === testIdx ? '#b8972a' : '#ccc',
+                        padding: 0,
+                        transition: 'width 0.3s, background 0.3s',
+                      }}
+                    />
+                  ))}
+                  <button
+                    onClick={() => setTestIdx(i => (i + 1) % testimonials.length)}
+                    style={{ background: 'none', border: 'none', fontSize: 20, color: '#b8972a', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }}
+                    aria-label="הבא"
+                  >›</button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ── 5. Footer ── */}
       <footer style={{ background: '#0f1111', color: '#fff' }}>

@@ -28,6 +28,12 @@ body {
 .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 
+/* Testimonials carousel fade-in */
+@keyframes testFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* Push Tidio chat widget up on mobile so it doesn't cover pagination */
 @media (max-width: 768px) {
   #tidio-chat-iframe,
