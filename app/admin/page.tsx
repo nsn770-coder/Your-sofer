@@ -578,9 +578,10 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
         ...form, status: 'approved', approvedAt: serverTimestamp(), approvedDocId: newId, createdAt: serverTimestamp(),
       });
 
-      // 3. If a matching user exists by email, promote to shaliach
+      // 3. If a matching user exists by email, update THAT document — never create a new one
       if (form.email) {
-        const userSnap = await getDocs(query(collection(db, 'users'), where('email', '==', form.email)));
+        const normalizedEmail = form.email.trim().toLowerCase();
+        const userSnap = await getDocs(query(collection(db, 'users'), where('email', '==', normalizedEmail)));
         if (!userSnap.empty) {
           await updateDoc(doc(db, 'users', userSnap.docs[0].id), { role: 'shaliach', shaliachId: newId });
         }
@@ -764,10 +765,11 @@ export default function AdminPage() {
   async function approveShluchimApplication(app: ShluchimApplication) {
     setActionLoading(app.id);
     try {
-      // Find the user by email to get their Firebase Auth UID
+      // Find the user by email to get their Firebase Auth UID — normalize to match Firebase Auth storage
       let uid: string | null = null;
       if (app.email) {
-        const userSnap = await getDocs(query(collection(db, 'users'), where('email', '==', app.email)));
+        const normalizedEmail = app.email.trim().toLowerCase();
+        const userSnap = await getDocs(query(collection(db, 'users'), where('email', '==', normalizedEmail)));
         if (!userSnap.empty) uid = userSnap.docs[0].id;
       }
       const docId = uid || app.id; // fall back to application ID if no matching user
