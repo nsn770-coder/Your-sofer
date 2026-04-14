@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ────────────────────────────────────────────────────
+
+    // Check that the caller is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Check that the caller has role "admin" in their users document
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Check that the caller has role "shaliach" in their users document
+    function isShaliach() {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'shaliach';
+    }
+
+    // ── Public shop data ────────────────────────────────────────────────────
+
+    match /products/{id} {
+      allow read: if true;                // anyone can browse products
+      allow write: if isAdmin();
+    }
+
+    match /soferim/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /shluchim/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if isSignedIn();      // logged-in users can submit reviews
+      allow update, delete: if isAdmin();
+    }
+
+    // ── Homepage configuration (admin-only writes) ──────────────────────────
+
+    match /homepageConfig/{id} {
+      allow read: if true;               // homepage reads config publicly
+      allow write: if isAdmin();         // only admins can pin products
+    }
+
+    // ── User accounts ───────────────────────────────────────────────────────
+
+    match /users/{userId} {
+      allow read:   if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Admins collection (uid → exists check used for role bootstrap)
+    match /admins/{userId} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ── Orders ──────────────────────────────────────────────────────────────
+
+    match /orders/{orderId} {
+      allow create: if isSignedIn();
+      allow read:   if isAdmin()
+                    || (isShaliach()
+                        && resource.data.shaliachId ==
+                           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shaliachId);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Soferim applications ────────────────────────────────────────────────
+
+    match /soferim_applications/{id} {
+      allow create: if true;             // public application form
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── Ops users (internal team) ───────────────────────────────────────────
+
+    match /opsUsers/{id} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
