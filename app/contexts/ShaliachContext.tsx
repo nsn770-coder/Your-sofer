@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -26,9 +27,15 @@ export function ShaliachProvider({ children }: { children: React.ReactNode }) {
   const [shaliach, setShaliach] = useState<Shaliach | null>(null);
   const [refCode, setRefCode] = useState<string | null>(null);
 
+  // useSearchParams is the correct Next.js App Router way to read ?ref=
+  // (window.location.search misses client-side navigations and can be stale)
+  const searchParams = useSearchParams();
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
+    const ref = searchParams.get('ref');
+
+    console.log('[ShaliachContext] searchParams ref:', ref);
+    console.log('[ShaliachContext] localStorage shaliachRef:', localStorage.getItem('shaliachRef'));
 
     if (ref) {
       localStorage.setItem('shaliachRef', ref);
@@ -37,20 +44,27 @@ export function ShaliachProvider({ children }: { children: React.ReactNode }) {
     } else {
       const saved = localStorage.getItem('shaliachRef');
       if (saved) {
+        console.log('[ShaliachContext] Using saved ref from localStorage:', saved);
         setRefCode(saved);
         loadShaliach(saved);
       }
     }
-  }, []);
+  }, [searchParams]); // re-runs on every URL change, not just mount
 
   async function loadShaliach(code: string) {
+    console.log('[ShaliachContext] Fetching shluchim/' + code);
     try {
       const snap = await getDoc(doc(db, 'shluchim', code));
+      console.log('[ShaliachContext] Doc exists:', snap.exists(), snap.data());
       if (snap.exists()) {
         setShaliach({ id: snap.id, ...snap.data() } as Shaliach);
+        console.log('[ShaliachContext] Shaliach set:', snap.data());
+      } else {
+        console.warn('[ShaliachContext] No document found at shluchim/' + code);
+        setShaliach(null);
       }
     } catch (e) {
-      console.error(e);
+      console.error('[ShaliachContext] Firestore error:', e);
     }
   }
 

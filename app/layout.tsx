@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -56,12 +57,16 @@ export default function RootLayout({
     <html lang="he" dir="rtl">
       <body className={geist.className}>
         <AuthProvider>
-          <ShaliachProvider>
-            <CartProvider>
-              <NavBar />
-              {children}
-            </CartProvider>
-          </ShaliachProvider>
+          {/* Suspense is required by Next.js when useSearchParams() is used
+              inside a component rendered from the root layout */}
+          <Suspense fallback={null}>
+            <ShaliachProvider>
+              <CartProvider>
+                <NavBar />
+                {children}
+              </CartProvider>
+            </ShaliachProvider>
+          </Suspense>
         </AuthProvider>
         <script src="//code.tidio.co/i6evth9lfvxovmfpvcftjeb25pw4psme.js" async></script>
       </body>
