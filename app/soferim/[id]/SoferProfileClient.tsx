@@ -85,6 +85,11 @@ export default function SoferProfileClient({ id }: { id: string }) {
 
   function handleAddToCart(p: Product) {
     addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl || p.image_url, quantity: 1 });
+    window.gtag?.('event', 'add_to_cart', {
+      currency: 'ILS',
+      value: p.price,
+      items: [{ item_id: p.id, item_name: p.name, price: p.price, quantity: 1 }],
+    });
     setAdded(p.id);
     setTimeout(() => setAdded(null), 2000);
   }

@@ -552,6 +552,11 @@ export default function ProductClient() {
     for (let i = 0; i < qty; i++) {
       addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafId || undefined, selectedKlafName: selectedKlafName || undefined });
     }
+    window.gtag?.('event', 'add_to_cart', {
+      currency: 'ILS',
+      value: product!.price * qty,
+      items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }],
+    });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
   }

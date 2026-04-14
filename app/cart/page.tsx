@@ -140,7 +140,14 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <button onClick={() => router.push('/checkout')}
+              <button onClick={() => {
+                window.gtag?.('event', 'begin_checkout', {
+                  currency: 'ILS',
+                  value: total,
+                  items: items.map(i => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.quantity })),
+                });
+                router.push('/checkout');
+              }}
                 style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 20, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 10 }}>
                 המשך לתשלום →
               </button>

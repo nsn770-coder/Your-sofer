@@ -28,6 +28,19 @@ function ThankYouContent() {
           paidAt: new Date().toISOString(),
         });
 
+        // GA4 purchase event
+        window.gtag?.('event', 'purchase', {
+          transaction_id: order.orderNumber,
+          value: order.total,
+          currency: 'ILS',
+          items: (order.items || []).map((i: { id: string; name: string; price: number; quantity: number }) => ({
+            item_id: i.id,
+            item_name: i.name,
+            price: i.price,
+            quantity: i.quantity,
+          })),
+        });
+
         // שלח מייל ללקוח
         await fetch('/api/send-order-email', {
           method: 'POST',
