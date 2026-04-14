@@ -156,18 +156,37 @@ export default function HomePageClient() {
   const [imagesReady, setImagesReady] = useState(false);
   const [newProducts, setNewProducts] = useState<Product[]>([]);
   const [newLoading, setNewLoading]   = useState(true);
-  const cardsRef = useRef<HTMLDivElement>(null);
-  const newRef   = useRef<HTMLDivElement>(null);
-  const router   = useRouter();
-  const { shaliach } = useShaliach();
+  const [cardWidth, setCardWidth]     = useState(0);
+  const cardsRef       = useRef<HTMLDivElement>(null); // outer wrap — for scrollIntoView
+  const carouselTrack  = useRef<HTMLDivElement>(null); // scrollable track
+  const newRef         = useRef<HTMLDivElement>(null);
+  const router         = useRouter();
+  const { shaliach }   = useShaliach();
 
-  // Mobile detection
+  // Mobile detection + carousel card-width computation
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
+    function update() {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (cardsRef.current) {
+        const w = cardsRef.current.clientWidth;
+        const gap = 16;
+        // Desktop: 3 cards exactly. Mobile: 1.5 cards (shows half of next).
+        const visible = mobile ? 1.5 : 3;
+        setCardWidth((w - gap * (Math.ceil(visible) - 1)) / visible);
+      }
+    }
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
   }, []);
+
+  function scrollCarousel(dir: 'prev' | 'next') {
+    const track = carouselTrack.current;
+    if (!track || cardWidth === 0) return;
+    const amount = cardWidth + 16;
+    track.scrollBy({ left: dir === 'next' ? amount : -amount, behavior: 'smooth' });
+  }
 
   // Fetch data: homepage config + cat fallback images + 8 newest products
   useEffect(() => {
@@ -291,22 +310,90 @@ export default function HomePageClient() {
         onSelectCat={(cat: string) => router.push(`/category/${encodeURIComponent(cat)}`)}
       />
 
-      {/* ── 2. Category cards — 4 per row desktop, 2 mobile ── */}
-      <div ref={cardsRef} style={{ maxWidth: 1280, margin: '0 auto', padding: isMobile ? '20px 12px' : '28px 16px' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-            gap: 16,
-            alignItems: 'stretch',
-          }}
-        >
-          {imagesReady
-            ? CARDS.map(card => (
-                <CategoryCard key={card.href} card={card} catImages={catImages} slotImages={slotImages} />
-              ))
-            : Array.from({ length: 8 }).map((_, i) => <SkeletonCategoryCard key={i} />)
-          }
+      {/* ── 2. Category cards — horizontal carousel ── */}
+      <div
+        ref={cardsRef}
+        style={{ maxWidth: 1280, margin: '0 auto', padding: isMobile ? '20px 0' : '28px 0' }}
+      >
+        {/* Outer wrapper: clips overflow, positions arrows */}
+        <div style={{ position: 'relative' }}>
+
+          {/* ← prev arrow */}
+          <button
+            onClick={() => scrollCarousel('prev')}
+            aria-label="הקודם"
+            style={{
+              position: 'absolute', left: 0, top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 10, width: 40, height: 40, borderRadius: '50%',
+              background: '#0c1a35', color: '#fff',
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 22, lineHeight: 1,
+              boxShadow: '0 2px 10px rgba(0,0,0,0.22)',
+              flexShrink: 0,
+            }}
+          >‹</button>
+
+          {/* Scrollable track — LTR internally so scrollLeft math is simple */}
+          <div
+            ref={carouselTrack}
+            className="hide-scrollbar"
+            style={{
+              display: 'flex',
+              gap: 16,
+              overflowX: 'auto',
+              overflowY: 'visible',
+              scrollSnapType: 'x mandatory',
+              direction: 'ltr',           // avoid RTL scroll-direction quirks
+              padding: `4px ${isMobile ? 12 : 52}px`, // lateral space for arrows on desktop
+            }}
+          >
+            {imagesReady
+              ? CARDS.map(card => (
+                  <div
+                    key={card.href}
+                    style={{
+                      flex: `0 0 ${cardWidth > 0 ? cardWidth : 320}px`,
+                      width: cardWidth > 0 ? cardWidth : 320,
+                      scrollSnapAlign: 'start',
+                      direction: 'rtl',   // restore RTL inside each card
+                    }}
+                  >
+                    <CategoryCard card={card} catImages={catImages} slotImages={slotImages} />
+                  </div>
+                ))
+              : Array.from({ length: 8 }).map((_, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      flex: `0 0 ${cardWidth > 0 ? cardWidth : 320}px`,
+                      width: cardWidth > 0 ? cardWidth : 320,
+                    }}
+                  >
+                    <SkeletonCategoryCard />
+                  </div>
+                ))
+            }
+          </div>
+
+          {/* → next arrow */}
+          <button
+            onClick={() => scrollCarousel('next')}
+            aria-label="הבא"
+            style={{
+              position: 'absolute', right: 0, top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 10, width: 40, height: 40, borderRadius: '50%',
+              background: '#0c1a35', color: '#fff',
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 22, lineHeight: 1,
+              boxShadow: '0 2px 10px rgba(0,0,0,0.22)',
+              flexShrink: 0,
+            }}
+          >›</button>
+
         </div>
       </div>
 

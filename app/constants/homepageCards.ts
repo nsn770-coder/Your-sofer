@@ -15,26 +15,16 @@ export interface CardDef {
 }
 
 export const CARDS: CardDef[] = [
+  // ── First 3 are the default-visible cards in the carousel ──────────────────
   {
-    title: 'מזוזות',
-    href: '/category/מזוזות',
-    ctaLabel: 'לכל המזוזות ←',
+    title: 'קלפים',
+    href: '/category/קלפי מזוזה',
+    ctaLabel: 'לכל הקלפים ←',
     items: [
-      { label: 'מזוזה אלומיניום', href: '/category/מזוזות?filter=אלומיניום', cat: 'מזוזות' },
-      { label: 'מזוזה עץ',        href: '/category/מזוזות?filter=עץ',        cat: 'מזוזות' },
-      { label: 'מזוזה כסף',       href: '/category/מזוזות?filter=כסף',       cat: 'מזוזות' },
-      { label: 'מזוזה פולימר',    href: '/category/מזוזות?filter=פולימר',    cat: 'מזוזות' },
-    ],
-  },
-  {
-    title: 'תפילין',
-    href: '/category/תפילין קומפלט',
-    ctaLabel: 'לכל התפילין ←',
-    items: [
-      { label: 'תפילין אשכנז', href: '/category/תפילין קומפלט?filter=אשכנז', cat: 'תפילין קומפלט' },
-      { label: 'תפילין ספרד',  href: '/category/תפילין קומפלט?filter=ספרד',  cat: 'תפילין קומפלט' },
-      { label: 'תפילין חב"ד',  href: '/category/תפילין קומפלט?filter=חב"ד',  cat: 'תפילין קומפלט' },
-      { label: 'כיסוי תפילין', href: '/category/כיסוי תפילין',              cat: 'כיסוי תפילין'  },
+      { label: 'קלפי מזוזה 10 ס"מ', href: '/category/קלפי מזוזה?filter=10', cat: 'קלפי מזוזה' },
+      { label: 'קלפי מזוזה 12 ס"מ', href: '/category/קלפי מזוזה?filter=12', cat: 'קלפי מזוזה' },
+      { label: 'קלפי תפילין',       href: '/category/קלפי תפילין',          cat: 'קלפי תפילין' },
+      { label: 'קלפי מזוזה 15 ס"מ', href: '/category/קלפי מזוזה?filter=15', cat: 'קלפי מזוזה' },
     ],
   },
   {
@@ -59,15 +49,38 @@ export const CARDS: CardDef[] = [
       { label: 'מתנה לבית חדש', href: '/category/מתנות?filter=בית',   cat: 'מתנות' },
     ],
   },
+  // ── Remaining 5 revealed by scrolling ─────────────────────────────────────
   {
-    title: 'קלפים',
-    href: '/category/קלפי מזוזה',
-    ctaLabel: 'לכל הקלפים ←',
+    title: 'מזוזות',
+    href: '/category/מזוזות',
+    ctaLabel: 'לכל המזוזות ←',
     items: [
-      { label: 'קלפי מזוזה 10 ס"מ', href: '/category/קלפי מזוזה?filter=10', cat: 'קלפי מזוזה' },
-      { label: 'קלפי מזוזה 12 ס"מ', href: '/category/קלפי מזוזה?filter=12', cat: 'קלפי מזוזה' },
-      { label: 'קלפי תפילין',       href: '/category/קלפי תפילין',          cat: 'קלפי תפילין' },
-      { label: 'קלפי מזוזה 15 ס"מ', href: '/category/קלפי מזוזה?filter=15', cat: 'קלפי מזוזה' },
+      { label: 'מזוזה אלומיניום', href: '/category/מזוזות?filter=אלומיניום', cat: 'מזוזות' },
+      { label: 'מזוזה עץ',        href: '/category/מזוזות?filter=עץ',        cat: 'מזוזות' },
+      { label: 'מזוזה כסף',       href: '/category/מזוזות?filter=כסף',       cat: 'מזוזות' },
+      { label: 'מזוזה פולימר',    href: '/category/מזוזות?filter=פולימר',    cat: 'מזוזות' },
+    ],
+  },
+  {
+    title: 'תפילין',
+    href: '/category/תפילין קומפלט',
+    ctaLabel: 'לכל התפילין ←',
+    items: [
+      { label: 'תפילין אשכנז', href: '/category/תפילין קומפלט?filter=אשכנז', cat: 'תפילין קומפלט' },
+      { label: 'תפילין ספרד',  href: '/category/תפילין קומפלט?filter=ספרד',  cat: 'תפילין קומפלט' },
+      { label: 'תפילין חב"ד',  href: '/category/תפילין קומפלט?filter=חב"ד',  cat: 'תפילין קומפלט' },
+      { label: 'כיסוי תפילין', href: '/category/כיסוי תפילין',              cat: 'כיסוי תפילין'  },
+    ],
+  },
+  {
+    title: 'טליתות וציצית',
+    href: '/category/טליתות',
+    ctaLabel: 'לכל הטליתות ←',
+    items: [
+      { label: 'סט טלית ותפילין', href: '/category/סט טלית תפילין', cat: 'סט טלית תפילין' },
+      { label: 'טלית',            href: '/category/טליתות',          cat: 'טליתות'          },
+      { label: 'ציצית',           href: '/category/טליתות',          cat: 'טליתות'          },
+      { label: 'יודאיקה',         href: '/category/יודאיקה',         cat: 'יודאיקה'         },
     ],
   },
   {
@@ -90,17 +103,6 @@ export const CARDS: CardDef[] = [
       { label: 'פסח',      href: '/category/חגים ומועדים?filter=פסח',      cat: 'חגים ומועדים' },
       { label: 'ראש השנה', href: '/category/חגים ומועדים?filter=ראש השנה', cat: 'חגים ומועדים' },
       { label: 'פורים',    href: '/category/חגים ומועדים?filter=פורים',    cat: 'חגים ומועדים' },
-    ],
-  },
-  {
-    title: 'טליתות וציצית',
-    href: '/category/טליתות',
-    ctaLabel: 'לכל הטליתות ←',
-    items: [
-      { label: 'סט טלית ותפילין', href: '/category/סט טלית תפילין', cat: 'סט טלית תפילין' },
-      { label: 'טלית',            href: '/category/טליתות',          cat: 'טליתות'          },
-      { label: 'ציצית',           href: '/category/טליתות',          cat: 'טליתות'          },
-      { label: 'יודאיקה',         href: '/category/יודאיקה',         cat: 'יודאיקה'         },
     ],
   },
 ];
