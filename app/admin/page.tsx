@@ -1068,7 +1068,10 @@ export default function AdminPage() {
     <main className="max-w-6xl mx-auto p-6" dir="rtl">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">👑 דשבורד מנהל</h1>
-        <button onClick={() => router.push('/')} className="text-green-700 font-bold hover:underline">← חזרה לחנות</button>
+        <div className="flex items-center gap-4">
+          <button onClick={() => router.push('/admin/analytics')} className="text-blue-600 font-bold hover:underline text-sm">📊 Analytics</button>
+          <button onClick={() => router.push('/')} className="text-green-700 font-bold hover:underline">← חזרה לחנות</button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
