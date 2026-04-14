@@ -27,3 +27,11 @@ body {
 
 .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Push Tidio chat widget up on mobile so it doesn't cover pagination */
+@media (max-width: 768px) {
+  #tidio-chat-iframe,
+  #tidio-chat {
+    bottom: 70px !important;
+  }
+}

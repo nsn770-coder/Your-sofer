@@ -566,19 +566,36 @@ export default function CategoryClient({ category }: { category: string }) {
                     הקודם
                   </button>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                    <button
-                      key={p}
-                      onClick={() => setCurrentPage(p)}
-                      className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all ${
-                        currentPage === p
-                          ? 'bg-[#0c1a35] text-white'
-                          : 'border border-gray-200 text-gray-600 hover:border-[#0c1a35] hover:text-[#0c1a35]'
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  ))}
+                  {(() => {
+                    const pages: (number | '...')[] = [];
+                    const add = (p: number) => { if (!pages.includes(p)) pages.push(p); };
+                    // Always show first 2
+                    for (let p = 1; p <= Math.min(2, totalPages); p++) add(p);
+                    // Window around current page
+                    for (let p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) add(p);
+                    // Always show last 2
+                    for (let p = Math.max(1, totalPages - 1); p <= totalPages; p++) add(p);
+                    // Sort and insert ellipses
+                    const sorted = (pages.filter(p => p !== '...') as number[]).sort((a, b) => a - b);
+                    const withDots: (number | '...')[] = [];
+                    sorted.forEach((p, i) => {
+                      if (i > 0 && p - sorted[i - 1] > 1) withDots.push('...');
+                      withDots.push(p);
+                    });
+                    return withDots.map((p, i) =>
+                      p === '...'
+                        ? <span key={`dots-${i}`} className="w-9 h-9 flex items-center justify-center text-gray-400 text-sm select-none">…</span>
+                        : <button
+                            key={p}
+                            onClick={() => setCurrentPage(p)}
+                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all ${
+                              currentPage === p
+                                ? 'bg-[#0c1a35] text-white'
+                                : 'border border-gray-200 text-gray-600 hover:border-[#0c1a35] hover:text-[#0c1a35]'
+                            }`}
+                          >{p}</button>
+                    );
+                  })()}
 
                   <button
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
