@@ -2,8 +2,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
-  collection, query, where, orderBy, limit, startAfter,
-  getDocs, QueryDocumentSnapshot,
+  collection, query, where, orderBy, limit,
+  getDocs,
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import ProductCard from '@/components/ui/ProductCard';
@@ -390,37 +390,33 @@ export default function CategoryClient({ category }: { category: string }) {
   const searchParams = useSearchParams();
   const urlFilter    = searchParams.get('filter') ?? null;
 
-  const [allLoaded, setAllLoaded]     = useState<Product[]>([]);
-  const [cursor, setCursor]           = useState<QueryDocumentSnapshot | null>(null);
-  const [hasMore, setHasMore]         = useState(true);
-  const [loading, setLoading]         = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [filters, setFilters]         = useState<FilterState>(EMPTY_FILTERS);
-  const [drawerOpen, setDrawerOpen]   = useState(false);
+  const [allLoaded, setAllLoaded] = useState<Product[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [filters, setFilters]     = useState<FilterState>(EMPTY_FILTERS);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // ── Fetch ──────────────────────────────────────────────────────────────────
+  // ── Fetch ALL products for this category at once ───────────────────────────
+  // Client-side pagination is used so filters always apply across the full set.
 
-  async function fetchPage(after: QueryDocumentSnapshot | null) {
-    const constraints: Parameters<typeof query>[1][] = [
-      where('cat', '==', category),
-      orderBy('priority', 'desc'),
-      limit(PAGE_SIZE),
-    ];
-    if (after) constraints.push(startAfter(after));
-    const snap = await getDocs(query(collection(db, 'products'), ...constraints));
-    const docs = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
-    setAllLoaded(prev => after ? [...prev, ...docs] : docs);
-    setCursor(snap.docs[snap.docs.length - 1] ?? null);
-    setHasMore(snap.docs.length === PAGE_SIZE);
+  async function fetchAll() {
+    const snap = await getDocs(
+      query(
+        collection(db, 'products'),
+        where('cat', '==', category),
+        orderBy('priority', 'desc'),
+        limit(200),
+      ),
+    );
+    setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)));
   }
 
   useEffect(() => {
     setAllLoaded([]);
-    setCursor(null);
-    setHasMore(true);
     setLoading(true);
     setFilters(EMPTY_FILTERS);
-    fetchPage(null).finally(() => setLoading(false));
+    setCurrentPage(1);
+    fetchAll().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
@@ -448,16 +444,16 @@ export default function CategoryClient({ category }: { category: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlFilter, loading, allLoaded.length]);
 
-  async function handleLoadMore() {
-    if (!cursor || loadingMore) return;
-    setLoadingMore(true);
-    try { await fetchPage(cursor); }
-    finally { setLoadingMore(false); }
-  }
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
 
-  // ── Filtered products ──────────────────────────────────────────────────────
-  const filtered = useMemo(() => applyFilters(allLoaded, filters), [allLoaded, filters]);
-  const active   = hasActiveFilters(filters);
+  // ── Filtered + paginated products ─────────────────────────────────────────
+  const filtered   = useMemo(() => applyFilters(allLoaded, filters), [allLoaded, filters]);
+  const active     = hasActiveFilters(filters);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated  = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -468,10 +464,7 @@ export default function CategoryClient({ category }: { category: string }) {
       <div className="bg-[#0c1a35] px-6 py-8 text-center">
         <h1 className="text-3xl font-black text-white mb-1">{category}</h1>
         {!loading && (
-          <p className="text-sm text-white/60">
-            {filtered.length} מוצרים
-            {allLoaded.length > filtered.length ? ` (מתוך ${allLoaded.length} שנטענו)` : ''}
-          </p>
+          <p className="text-sm text-white/60">{filtered.length} מוצרים</p>
         )}
       </div>
 
@@ -493,34 +486,18 @@ export default function CategoryClient({ category }: { category: string }) {
       {/* ── Mobile drawer ── */}
       {drawerOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setDrawerOpen(false)}
-          />
-          {/* Sheet */}
+          <div className="absolute inset-0 bg-black/40" onClick={() => setDrawerOpen(false)} />
           <div className="relative bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto p-4 pb-8">
             <div className="flex items-center justify-between mb-4">
               <span className="font-bold text-gray-800">סינון</span>
-              <button
-                onClick={() => setDrawerOpen(false)}
-                className="p-1 text-gray-400 hover:text-gray-700"
-              >
+              <button onClick={() => setDrawerOpen(false)} className="p-1 text-gray-400 hover:text-gray-700">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <FilterSidebar
-              filters={filters}
-              onChange={setFilters}
-              products={allLoaded}
-              category={category}
-            />
-            <button
-              onClick={() => setDrawerOpen(false)}
-              className="mt-4 w-full py-3 bg-[#0c1a35] text-white rounded-full font-bold text-sm"
-            >
+            <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} />
+            <button onClick={() => setDrawerOpen(false)} className="mt-4 w-full py-3 bg-[#0c1a35] text-white rounded-full font-bold text-sm">
               הצג {filtered.length} תוצאות
             </button>
           </div>
@@ -530,23 +507,21 @@ export default function CategoryClient({ category }: { category: string }) {
       {/* ── Main layout ── */}
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6 items-start">
 
-        {/* ── Desktop sidebar ── */}
+        {/* ── Desktop sidebar — always visible, no loading gate ── */}
         <aside className="hidden lg:block w-60 flex-shrink-0 sticky top-4">
-          {!loading && (
-            <FilterSidebar
-              filters={filters}
-              onChange={setFilters}
-              products={allLoaded}
-              category={category}
-            />
-          )}
+          <FilterSidebar
+            filters={filters}
+            onChange={setFilters}
+            products={allLoaded}
+            category={category}
+          />
         </aside>
 
         {/* ── Products area ── */}
         <div className="flex-1 min-w-0">
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-              {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+              {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-20">
@@ -566,7 +541,7 @@ export default function CategoryClient({ category }: { category: string }) {
           ) : (
             <>
               <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filtered.map(p => (
+                {paginated.map(p => (
                   <ProductCard
                     key={p.id}
                     id={p.id}
@@ -580,19 +555,37 @@ export default function CategoryClient({ category }: { category: string }) {
                 ))}
               </div>
 
-              {hasMore && (
-                <div className="mt-10 flex justify-center">
+              {/* ── Page navigation ── */}
+              {totalPages > 1 && (
+                <div className="mt-10 flex items-center justify-center gap-1.5">
                   <button
-                    onClick={handleLoadMore}
-                    disabled={loadingMore}
-                    className="px-10 py-3 rounded-full font-bold text-sm border-2 border-[#0c1a35] text-[#0c1a35] hover:bg-[#0c1a35] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-2 rounded-lg text-sm font-semibold border border-gray-200 text-gray-600 hover:border-[#0c1a35] hover:text-[#0c1a35] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   >
-                    {loadingMore ? (
-                      <span className="flex items-center gap-2">
-                        <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        טוען...
-                      </span>
-                    ) : 'טען עוד מוצרים'}
+                    הקודם
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                    <button
+                      key={p}
+                      onClick={() => setCurrentPage(p)}
+                      className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-all ${
+                        currentPage === p
+                          ? 'bg-[#0c1a35] text-white'
+                          : 'border border-gray-200 text-gray-600 hover:border-[#0c1a35] hover:text-[#0c1a35]'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-2 rounded-lg text-sm font-semibold border border-gray-200 text-gray-600 hover:border-[#0c1a35] hover:text-[#0c1a35] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    הבא
                   </button>
                 </div>
               )}
