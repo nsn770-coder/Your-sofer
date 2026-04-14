@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  collection, getDocs, orderBy, query,
+  collection, getDocs, orderBy, query, where,
   doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
@@ -34,6 +34,19 @@ interface SoferApplication {
   categories: string[];
   imageUrl?: string;
   writingSamples?: string[];
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt?: { seconds: number };
+}
+
+interface ShluchimApplication {
+  id: string;
+  name: string;
+  chabadName?: string;
+  city: string;
+  phone: string;
+  email?: string;
+  rabbiName?: string;
+  logoUrl?: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt?: { seconds: number };
 }
@@ -567,6 +580,8 @@ export default function AdminPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [importStatus, setImportStatus] = useState('');
+  const [shluchimApps, setShluchimApps] = useState<ShluchimApplication[]>([]);
+  const [shluchimAppsLoading, setShluchimAppsLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
@@ -576,7 +591,7 @@ export default function AdminPage() {
     if (user?.role === 'admin') {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
-      loadReviews();
+      loadReviews(); loadShluchimApplications();
     }
   }, [user]);
 
@@ -608,6 +623,71 @@ export default function AdminPage() {
       setApplications(data);
     } catch (e) { console.error(e); }
     finally { setAppsLoading(false); }
+  }
+
+  async function loadShluchimApplications() {
+    try {
+      const snap = await getDocs(query(collection(db, 'shluchim_applications'), orderBy('createdAt', 'desc')));
+      const data: ShluchimApplication[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as ShluchimApplication));
+      setShluchimApps(data);
+    } catch (e) { console.error(e); }
+    finally { setShluchimAppsLoading(false); }
+  }
+
+  async function approveShluchimApplication(app: ShluchimApplication) {
+    setActionLoading(app.id);
+    try {
+      // Find the user by email to get their Firebase Auth UID
+      let uid: string | null = null;
+      if (app.email) {
+        const userSnap = await getDocs(query(collection(db, 'users'), where('email', '==', app.email)));
+        if (!userSnap.empty) uid = userSnap.docs[0].id;
+      }
+      const docId = uid || app.id; // fall back to application ID if no matching user
+
+      // Write to shluchim collection
+      await setDoc(doc(db, 'shluchim', docId), {
+        name: app.name,
+        chabadName: app.chabadName || '',
+        city: app.city,
+        phone: app.phone,
+        email: app.email || '',
+        rabbiName: app.rabbiName || '',
+        logoUrl: app.logoUrl || '',
+        status: 'active',
+        createdAt: serverTimestamp(),
+      });
+
+      // If we found a matching user, promote them to shaliach role
+      if (uid) {
+        await updateDoc(doc(db, 'users', uid), {
+          role: 'shaliach',
+          shaliachId: uid,
+        });
+      }
+
+      // Mark application as approved
+      await updateDoc(doc(db, 'shluchim_applications', app.id), {
+        status: 'approved',
+        approvedAt: serverTimestamp(),
+        approvedDocId: docId,
+      });
+
+      setShluchimApps(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
+      // Refresh users list so role change is reflected
+      loadUsers();
+    } catch (e) { console.error(e); alert('שגיאה באישור'); }
+    finally { setActionLoading(null); }
+  }
+
+  async function rejectShluchimApplication(id: string) {
+    setActionLoading(id);
+    try {
+      await updateDoc(doc(db, 'shluchim_applications', id), { status: 'rejected', rejectedAt: serverTimestamp() });
+      setShluchimApps(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' } : a));
+    } catch (e) { console.error(e); alert('שגיאה בדחייה'); }
+    finally { setActionLoading(null); }
   }
 
   async function loadUsers() {
@@ -851,6 +931,7 @@ export default function AdminPage() {
   const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
   const shaliachOrders = orders.filter(o => o.shaliachName);
   const pendingApps = applications.filter(a => a.status === 'pending');
+  const pendingShluchimApps = shluchimApps.filter(a => a.status === 'pending');
   const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
   const filteredProducts = products.filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()));
   const unassignedProducts = products.filter(p => !p.soferId).length;
@@ -867,6 +948,7 @@ export default function AdminPage() {
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-blue-600">{products.length}</div><div className="text-sm text-gray-500 mt-1">מוצרים</div></div>
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-purple-600">{users.length}</div><div className="text-sm text-gray-500 mt-1">משתמשים</div></div>
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-orange-500">{pendingApps.length}</div><div className="text-sm text-gray-500 mt-1">בקשות סופרים</div></div>
+        <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-blue-500">{pendingShluchimApps.length}</div><div className="text-sm text-gray-500 mt-1">בקשות שלוחים</div></div>
       </div>
 
       <div className="flex gap-2 mb-6 flex-wrap">
@@ -876,6 +958,7 @@ export default function AdminPage() {
           { key: 'commissions', label: '🤝 עמלות', color: 'bg-blue-600' },
           { key: 'soferim_list', label: '✍️ סופרים', color: 'bg-amber-700' },
           { key: 'soferim', label: '📋 בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
+          { key: 'shluchim', label: '🟦 בקשות שלוחים', color: 'bg-blue-700', badge: pendingShluchimApps.length },
           { key: 'users', label: '👥 משתמשים', color: 'bg-purple-600' },
           { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
           { key: 'categories', label: '🖼️ קטגוריות', color: 'bg-indigo-600' },
@@ -1078,6 +1161,58 @@ export default function AdminPage() {
                       <div className="flex flex-col gap-2 flex-shrink-0">
                         <button onClick={() => approveApplication(app)} disabled={actionLoading === app.id} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">{actionLoading === app.id ? '...' : '✅ אשר'}</button>
                         <button onClick={() => rejectApplication(app.id)} disabled={actionLoading === app.id} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">❌ דחה</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'shluchim' && (
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-black">🟦 בקשות שלוחים ({shluchimApps.length})</h2>
+          </div>
+          {shluchimAppsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
+          : shluchimApps.length === 0 ? <div className="p-10 text-center text-gray-400">אין בקשות עדיין</div>
+          : (
+            <div className="grid gap-4">
+              {shluchimApps.map(app => (
+                <div key={app.id} className="bg-white rounded-xl shadow p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-shrink-0">
+                      {app.logoUrl
+                        ? <img src={app.logoUrl} alt={app.name} className="w-16 h-16 rounded-full object-cover border-2 border-blue-200" />
+                        : <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-2xl">🟦</div>
+                      }
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-black">{app.name}</h3>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                          {app.status === 'pending' ? '⏳ ממתין' : app.status === 'approved' ? '✅ מאושר' : '❌ נדחה'}
+                        </span>
+                      </div>
+                      {app.chabadName && <p className="text-sm font-bold text-blue-700 mb-1">{app.chabadName}</p>}
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-2">
+                        {app.city && <span>📍 {app.city}</span>}
+                        {app.phone && <span>📞 {app.phone}</span>}
+                        {app.email && <span>✉️ {app.email}</span>}
+                        {app.rabbiName && <span>👤 {app.rabbiName}</span>}
+                      </div>
+                      {app.createdAt && <p className="text-xs text-gray-400">נשלח: {new Date(app.createdAt.seconds * 1000).toLocaleDateString('he-IL')}</p>}
+                    </div>
+                    {app.status === 'pending' && (
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <button onClick={() => approveShluchimApplication(app)} disabled={actionLoading === app.id} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">
+                          {actionLoading === app.id ? '...' : '✅ אשר'}
+                        </button>
+                        <button onClick={() => rejectShluchimApplication(app.id)} disabled={actionLoading === app.id} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">
+                          ❌ דחה
+                        </button>
                       </div>
                     )}
                   </div>
