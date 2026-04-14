@@ -91,6 +91,13 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // ── Shluchim applications ───────────────────────────────────────────────
+
+    match /shluchim_applications/{id} {
+      allow create: if true;             // public application form
+      allow read, update, delete: if isAdmin();
+    }
+
     // ── Ops users (internal team) ───────────────────────────────────────────
 
     match /opsUsers/{id} {
