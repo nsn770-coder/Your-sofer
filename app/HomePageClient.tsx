@@ -339,10 +339,19 @@ export default function HomePageClient() {
     fetchCounts();
   }, []);
 
-  // Activity bar rotation every 4 s
+  // Activity bar rotation every 4 s + reset when user returns to tab/page
   useEffect(() => {
+    setActivityIdx(0); // reset to first message on every mount
     const id = setInterval(() => setActivityIdx(i => i + 1), 4000);
-    return () => clearInterval(id);
+    // Also reset when tab becomes visible again (user switched tabs then returned)
+    function onVisible() {
+      if (!document.hidden) setActivityIdx(0);
+    }
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, []);
 
   // Count-up animation when counters enter viewport
@@ -596,6 +605,64 @@ export default function HomePageClient() {
         onScrollToProducts={() => cardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
         onSelectCat={(cat: string) => router.push(`/category/${encodeURIComponent(cat)}`)}
       />
+
+      {/* ── Benefits bar ── */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #f0ece4', borderTop: '1px solid #f0ece4' }}>
+        <div
+          style={{
+            maxWidth: 1100,
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+            gap: 0,
+          }}
+        >
+          {[
+            {
+              icon: '✅',
+              title: 'כשרות מוסמכת',
+              desc: 'כל מוצרי סת"מ נבדקים ע"י מגיה מוסמך',
+            },
+            {
+              icon: '🚚',
+              title: 'משלוח והחזרות',
+              desc: 'משלוח לכל הארץ תוך 7-14 ימי עסקים. ניתן להחזיר תוך 14 יום בהתאם למדיניות ההחזרים שלנו.',
+            },
+            {
+              icon: '🔒',
+              title: 'תשלום מאובטח',
+              desc: 'עסקאות מוצפנות ומאובטחות לחלוטין',
+            },
+            {
+              icon: '💬',
+              title: 'שירות אישי',
+              desc: 'צוות מומחים זמין לענות על כל שאלה',
+            },
+          ].map((b, i, arr) => (
+            <div
+              key={b.title}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 12,
+                padding: isMobile ? '14px 16px' : '18px 24px',
+                borderRight: i < arr.length - 1 ? '1px solid #f0ece4' : 'none',
+                direction: 'rtl',
+              }}
+            >
+              <span style={{ fontSize: isMobile ? 22 : 26, flexShrink: 0, marginTop: 1 }}>{b.icon}</span>
+              <div>
+                <div style={{ fontSize: isMobile ? 13 : 14, fontWeight: 800, color: '#0c1a35', marginBottom: 3 }}>
+                  {b.title}
+                </div>
+                <div style={{ fontSize: isMobile ? 11 : 12, color: '#777', lineHeight: 1.5 }}>
+                  {b.desc}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ── Live Activity Bar ── */}
       {(() => {
