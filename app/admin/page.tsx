@@ -547,6 +547,131 @@ function EditSoferModal({ sofer, onClose, onSave }: {
   );
 }
 
+function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () => void }) {
+  const [form, setForm] = useState({ name: '', chabadName: '', city: '', phone: '', email: '', rabbiName: '', logoUrl: '' });
+  const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [createdLink, setCreatedLink] = useState<string | null>(null);
+
+  async function uploadToCloudinary(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'yoursofer_upload');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error('שגיאה בהעלאה');
+    return data.secure_url;
+  }
+
+  async function handleSave() {
+    if (!form.name || !form.phone) { alert('שם וטלפון הם שדות חובה'); return; }
+    setSaving(true);
+    try {
+      // 1. Create shliach doc (auto-generated ID)
+      const shliachRef = await addDoc(collection(db, 'shluchim'), {
+        ...form, status: 'active', createdAt: serverTimestamp(),
+      });
+      const newId = shliachRef.id;
+
+      // 2. Create corresponding approved application record
+      await addDoc(collection(db, 'shluchim_applications'), {
+        ...form, status: 'approved', approvedAt: serverTimestamp(), approvedDocId: newId, createdAt: serverTimestamp(),
+      });
+
+      // 3. If a matching user exists by email, promote to shaliach
+      if (form.email) {
+        const userSnap = await getDocs(query(collection(db, 'users'), where('email', '==', form.email)));
+        if (!userSnap.empty) {
+          await updateDoc(doc(db, 'users', userSnap.docs[0].id), { role: 'shaliach', shaliachId: newId });
+        }
+      }
+
+      setCreatedLink(`https://your-sofer.com/?ref=${newId}`);
+      onSave();
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בשמירה');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = { width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' };
+  const labelStyle: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      onClick={createdLink ? undefined : onClose}>
+      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>➕ הוספת שליח ידנית</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+        </div>
+
+        {createdLink ? (
+          <div style={{ textAlign: 'center', padding: '16px 0' }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
+            <h3 style={{ fontSize: 17, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>השליח נוצר בהצלחה!</h3>
+            <p style={{ fontSize: 13, color: '#555', marginBottom: 16 }}>קישור ההפניה האישי:</p>
+            <div style={{ background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 8, padding: '12px 16px', fontFamily: 'monospace', fontSize: 13, wordBreak: 'break-all', marginBottom: 16 }}>
+              {createdLink}
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              <button onClick={() => { navigator.clipboard.writeText(createdLink); }}
+                style={{ background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                📋 העתק קישור
+              </button>
+              <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, cursor: 'pointer' }}>סגור</button>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div><label style={labelStyle}>שם מלא *</label><input value={form.name} onChange={e => setForm(p => ({...p, name: e.target.value}))} placeholder="הרב ישראל ישראלי" style={inputStyle} /></div>
+              <div><label style={labelStyle}>שם ארגון / בית כנסת</label><input value={form.chabadName} onChange={e => setForm(p => ({...p, chabadName: e.target.value}))} placeholder="קהילת ישראל תל אביב" style={inputStyle} /></div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div><label style={labelStyle}>עיר</label><input value={form.city} onChange={e => setForm(p => ({...p, city: e.target.value}))} placeholder="תל אביב" style={inputStyle} /></div>
+              <div><label style={labelStyle}>טלפון *</label><input value={form.phone} onChange={e => setForm(p => ({...p, phone: e.target.value}))} placeholder="050-0000000" style={inputStyle} /></div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div><label style={labelStyle}>אימייל</label><input value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} placeholder="rabbi@example.com" type="email" style={inputStyle} /></div>
+              <div><label style={labelStyle}>שם רב (רב ממונה)</label><input value={form.rabbiName} onChange={e => setForm(p => ({...p, rabbiName: e.target.value}))} placeholder="הרב כהן" style={inputStyle} /></div>
+            </div>
+            <div>
+              <label style={labelStyle}>לוגו</label>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                {form.logoUrl && <img src={form.logoUrl} alt="לוגו" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', border: '2px solid #ddd', flexShrink: 0 }} />}
+                <label style={{ background: '#1d4ed8', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                  {uploadingLogo ? '⏳ מעלה...' : '📷 העלה לוגו'}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setUploadingLogo(true);
+                    try { const url = await uploadToCloudinary(file); setForm(p => ({...p, logoUrl: url})); }
+                    catch { alert('שגיאה בהעלאה'); }
+                    finally { setUploadingLogo(false); }
+                  }} />
+                </label>
+                <input value={form.logoUrl} onChange={e => setForm(p => ({...p, logoUrl: e.target.value}))} placeholder="או הדבק URL"
+                  style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12, minWidth: 0 }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+              <button onClick={handleSave} disabled={saving}
+                style={{ flex: 1, background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
+                {saving ? '⏳ שומר...' : '✅ צור שליח'}
+              </button>
+              <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -582,6 +707,7 @@ export default function AdminPage() {
   const [importStatus, setImportStatus] = useState('');
   const [shluchimApps, setShluchimApps] = useState<ShluchimApplication[]>([]);
   const [shluchimAppsLoading, setShluchimAppsLoading] = useState(true);
+  const [showAddShliach, setShowAddShliach] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
@@ -1175,6 +1301,7 @@ export default function AdminPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-black">🟦 בקשות שלוחים ({shluchimApps.length})</h2>
+            <button onClick={() => setShowAddShliach(true)} style={{ background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף שליח ידנית</button>
           </div>
           {shluchimAppsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
           : shluchimApps.length === 0 ? <div className="p-10 text-center text-gray-400">אין בקשות עדיין</div>
@@ -1362,6 +1489,7 @@ export default function AdminPage() {
       )}
 
       {showAddSofer && <AddSoferModal onClose={() => setShowAddSofer(false)} onSave={() => { loadSoferimFull(); loadSoferim(); }} />}
+      {showAddShliach && <AddShliachModal onClose={() => setShowAddShliach(false)} onSave={() => { loadShluchimApplications(); loadUsers(); }} />}
       {showAddProduct && <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />}
       {editingSofer && (
         <EditSoferModal
