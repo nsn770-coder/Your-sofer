@@ -156,6 +156,8 @@ export default function HomePageClient() {
   const [imagesReady, setImagesReady] = useState(false);
   const [newProducts, setNewProducts] = useState<Product[]>([]);
   const [newLoading, setNewLoading]   = useState(true);
+  const [sortBy, setSortBy]           = useState<'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'popular'>('newest');
+  const [drawerOpen, setDrawerOpen]   = useState(false);
   const [cardWidth, setCardWidth]     = useState(0);
   const cardsRef       = useRef<HTMLDivElement>(null); // outer wrap — for scrollIntoView
   const carouselTrack  = useRef<HTMLDivElement>(null); // scrollable track
@@ -369,21 +371,81 @@ export default function HomePageClient() {
         </div>
       </div>
 
+      {/* ── Category drawer overlay ── */}
+      {drawerOpen && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 400, display: 'flex' }}
+          onClick={() => setDrawerOpen(false)}
+        >
+          {/* Dark backdrop */}
+          <div style={{ flex: 1, background: 'rgba(0,0,0,0.5)' }} />
+          {/* Drawer panel — slides in from the right */}
+          <div
+            style={{ width: 280, background: '#fff', height: '100%', overflowY: 'auto', boxShadow: '-4px 0 24px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: '1px solid #eee', background: '#0c1a35' }}>
+              <span style={{ fontSize: 16, fontWeight: 900, color: '#fff' }}>סינון קטגוריות</span>
+              <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', color: '#b8972a', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>✕</button>
+            </div>
+            <div style={{ padding: '12px 0', flex: 1 }}>
+              {[
+                'מזוזות', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט',
+                'כיסוי תפילין', 'סט טלית תפילין', 'יודאיקה',
+                'בר מצוה', 'מתנות', 'מגילות',
+              ].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => { setDrawerOpen(false); router.push(`/category/${encodeURIComponent(cat)}`); }}
+                  style={{ width: '100%', background: 'none', border: 'none', padding: '13px 20px', textAlign: 'right', fontSize: 15, fontWeight: 600, color: '#0c1a35', cursor: 'pointer', borderBottom: '1px solid #f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#f8f4ec'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'none'; }}
+                >
+                  {cat}
+                  <span style={{ color: '#b8972a', fontSize: 13 }}>←</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── 3. New products section ── */}
       <div ref={newRef} style={{ maxWidth: 1280, margin: '0 auto', padding: isMobile ? '0 12px 40px' : '0 16px 48px' }}>
         {/* Section header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, flexWrap: 'wrap', gap: 10 }}>
           <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 900, color: '#0c1a35', margin: 0 }}>
             המוצרים החדשים שלנו
           </h2>
-          <Link
-            href="/category/מזוזות"
-            style={{ fontSize: 13, fontWeight: 700, color: '#b8972a', textDecoration: 'none' }}
-            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = 'underline')}
-            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = 'none')}
-          >
-            לכל המוצרים ←
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Sort dropdown */}
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as typeof sortBy)}
+              style={{ border: '1px solid #ddd', borderRadius: 8, padding: '7px 10px', fontSize: 13, color: '#333', background: '#fff', cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif' }}
+            >
+              <option value="newest">חדש לישן</option>
+              <option value="oldest">ישן לחדש</option>
+              <option value="price_asc">מחיר: נמוך לגבוה</option>
+              <option value="price_desc">מחיר: גבוה לנמוך</option>
+              <option value="popular">הכי נמכר</option>
+            </select>
+            {/* Category filter button */}
+            <button
+              onClick={() => setDrawerOpen(true)}
+              style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
+            >
+              סינון קטגוריות ☰
+            </button>
+            <Link
+              href="/category/מזוזות"
+              style={{ fontSize: 13, fontWeight: 700, color: '#b8972a', textDecoration: 'none', whiteSpace: 'nowrap' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = 'underline')}
+              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = 'none')}
+            >
+              לכל המוצרים ←
+            </Link>
+          </div>
         </div>
 
         {/* Product grid */}
@@ -418,7 +480,13 @@ export default function HomePageClient() {
               gap: isMobile ? 10 : 16,
             }}
           >
-            {newProducts.map(p => (
+            {[...newProducts].sort((a, b) => {
+              if (sortBy === 'price_asc')  return (a.price ?? 0) - (b.price ?? 0);
+              if (sortBy === 'price_desc') return (b.price ?? 0) - (a.price ?? 0);
+              if (sortBy === 'popular')    return (b.priority ?? 0) - (a.priority ?? 0);
+              if (sortBy === 'oldest')     return 1; // reverse: Firestore gave newest-first, so flip
+              return -1; // 'newest' = keep Firestore order
+            }).map(p => (
               <ProductCard
                 key={p.id}
                 id={p.id}
