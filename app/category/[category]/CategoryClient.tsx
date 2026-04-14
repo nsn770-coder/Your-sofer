@@ -64,6 +64,11 @@ interface NameFilterSpec {
 const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
   'מזוזות': [
     {
+      key: 'חומר',
+      label: 'חומר',
+      options: ['אלומיניום', 'עץ', 'כסף', 'פלסטיק', 'מתכת', 'זכוכית', 'קרמיקה'],
+    },
+    {
       key: 'גודל',
       label: 'גודל',
       options: ['7 ס"מ', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ', '25 ס"מ', '30 ס"מ'],
@@ -422,10 +427,21 @@ export default function CategoryClient({ category }: { category: string }) {
   // Apply URL filter once data loads
   useEffect(() => {
     if (!urlFilter || loading || allLoaded.length === 0) return;
+
+    // 1. Try filterAttributes-based match
     for (const key of ATTR_KEYS) {
       const vals = new Set(allLoaded.map(p => p.filterAttributes?.[key]).filter(Boolean));
       if (vals.has(urlFilter)) {
         setFilters(prev => ({ ...prev, attrFilters: { ...prev.attrFilters, [key]: urlFilter } }));
+        return;
+      }
+    }
+
+    // 2. Try category-specific name-based match (e.g. ?filter=אלומיניום for מזוזות)
+    const catFilters = CAT_NAME_FILTERS[category] ?? [];
+    for (const spec of catFilters) {
+      if (spec.options.includes(urlFilter)) {
+        setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, [spec.key]: urlFilter } }));
         return;
       }
     }

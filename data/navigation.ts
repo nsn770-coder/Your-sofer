@@ -35,7 +35,11 @@ export const navigationData: NavItem[] = [
       {
         title: "מזוזות",
         items: [
-          { label: "בתי מזוזה", href: "/category/מזוזות" },
+          { label: "בתי מזוזה — כל הסוגים", href: "/category/מזוזות" },
+          { label: "מזוזות אלומיניום", href: "/category/מזוזות?filter=אלומיניום" },
+          { label: "מזוזות עץ", href: "/category/מזוזות?filter=עץ" },
+          { label: "מזוזות כסף", href: "/category/מזוזות?filter=כסף" },
+          { label: "מזוזות פלסטיק", href: "/category/מזוזות?filter=פלסטיק" },
           { label: "קלפי מזוזה", href: "/category/קלפי מזוזה" },
         ],
       },
