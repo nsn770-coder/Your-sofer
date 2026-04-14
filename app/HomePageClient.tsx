@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   collection, query, where, orderBy, limit, getDocs,
-  doc, getDoc,
+  doc, getDoc, addDoc, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import SmartHero from './components/SmartHero';
@@ -186,6 +186,8 @@ export default function HomePageClient() {
   const [cardWidth, setCardWidth]     = useState(0);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [testIdx, setTestIdx]         = useState(0);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const cardsRef       = useRef<HTMLDivElement>(null); // outer wrap — for scrollIntoView
   const carouselTrack  = useRef<HTMLDivElement>(null); // scrollable track
   const newRef         = useRef<HTMLDivElement>(null);
@@ -432,6 +434,20 @@ export default function HomePageClient() {
     } finally {
       setWizardLoading(false);
     }
+  }
+
+  async function handleNewsletter(e: React.FormEvent) {
+    e.preventDefault();
+    const email = newsletterEmail.trim().toLowerCase();
+    if (!email || !email.includes('@')) return;
+    setNewsletterStatus('loading');
+    try {
+      const existing = await getDocs(query(collection(db, 'newsletter'), where('email', '==', email)));
+      if (!existing.empty) { setNewsletterStatus('duplicate'); return; }
+      await addDoc(collection(db, 'newsletter'), { email, createdAt: serverTimestamp() });
+      setNewsletterStatus('success');
+      setNewsletterEmail('');
+    } catch { setNewsletterStatus('error'); }
   }
 
   function closeWizard() {
@@ -705,6 +721,53 @@ export default function HomePageClient() {
         </div>
       </div>
 
+      {/* ── Newsletter VIP ── */}
+      <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2d50 100%)', padding: isMobile ? '28px 16px' : '36px 16px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', marginBottom: 6 }}>🏆 הצטרפו למועדון הלקוחות שלנו</div>
+          <div style={{ fontSize: isMobile ? 13 : 14, color: 'rgba(255,255,255,0.75)', marginBottom: 20 }}>
+            קבלו עדכונים על מוצרים חדשים ומבצעים לפני כולם
+          </div>
+          {newsletterStatus === 'success' ? (
+            <div style={{ background: 'rgba(39,174,96,0.18)', border: '1px solid #27ae60', borderRadius: 10, padding: '14px 20px', color: '#7dfca4', fontWeight: 700, fontSize: 15 }}>
+              ✅ נרשמתם בהצלחה! נעדכן אתכם ראשונים.
+            </div>
+          ) : (
+            <form onSubmit={handleNewsletter} style={{ display: 'flex', gap: 8, flexDirection: isMobile ? 'column' : 'row', alignItems: 'stretch' }}>
+              <input
+                type="email"
+                value={newsletterEmail}
+                onChange={e => { setNewsletterEmail(e.target.value); setNewsletterStatus('idle'); }}
+                placeholder="הכניסו את כתובת המייל שלכם"
+                required
+                style={{
+                  flex: 1, border: '2px solid rgba(184,151,42,0.5)', borderRadius: 10, padding: '12px 16px',
+                  fontSize: 14, background: 'rgba(255,255,255,0.08)', color: '#fff',
+                  outline: 'none', direction: 'rtl',
+                }}
+              />
+              <button
+                type="submit"
+                disabled={newsletterStatus === 'loading'}
+                style={{
+                  background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10,
+                  padding: '12px 24px', fontSize: 14, fontWeight: 900, cursor: newsletterStatus === 'loading' ? 'not-allowed' : 'pointer',
+                  whiteSpace: 'nowrap', opacity: newsletterStatus === 'loading' ? 0.7 : 1,
+                }}
+              >
+                {newsletterStatus === 'loading' ? '⏳...' : 'הצטרפו ←'}
+              </button>
+            </form>
+          )}
+          {newsletterStatus === 'duplicate' && (
+            <div style={{ marginTop: 8, fontSize: 13, color: '#f5c518' }}>כתובת המייל הזו כבר רשומה 😊</div>
+          )}
+          {newsletterStatus === 'error' && (
+            <div style={{ marginTop: 8, fontSize: 13, color: '#ff7675' }}>שגיאה בהרשמה, נסו שוב.</div>
+          )}
+        </div>
+      </div>
+
       {/* ── 2. Category cards — horizontal carousel ── */}
       <div
         ref={cardsRef}
@@ -923,7 +986,67 @@ export default function HomePageClient() {
         ) : null}
       </div>
 
-      {/* ── 4. Testimonials carousel ── */}
+      {/* ── 4. Category grid ── */}
+      {Object.keys(catImages).length > 0 && (
+        <div style={{ background: '#fff', padding: isMobile ? '32px 16px' : '48px 16px', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>
+              קטגוריות נבחרות
+            </h2>
+            <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 28 }}>גלו את מגוון מוצרי הסת&quot;מ שלנו</p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+              gap: isMobile ? 12 : 18,
+            }}>
+              {([
+                { name: 'מזוזות',         emoji: '📜' },
+                { name: 'תפילין קומפלט', emoji: '🖊️' },
+                { name: 'מגילות',         emoji: '📖' },
+                { name: 'יודאיקה',        emoji: '✡️' },
+                { name: 'מתנות',          emoji: '🎁' },
+                { name: 'בר מצוה',        emoji: '🎉' },
+              ] as { name: string; emoji: string }[]).map(cat => (
+                <div
+                  key={cat.name}
+                  onClick={() => router.push(`/category/${encodeURIComponent(cat.name)}`)}
+                  style={{
+                    position: 'relative', borderRadius: 14, overflow: 'hidden',
+                    cursor: 'pointer', aspectRatio: '4/3', background: '#f3f4f4',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.14)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 10px rgba(0,0,0,0.07)'; }}
+                >
+                  {catImages[cat.name] ? (
+                    <img
+                      src={catImages[cat.name]}
+                      alt={cat.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>
+                      {cat.emoji}
+                    </div>
+                  )}
+                  {/* Overlay */}
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(to top, rgba(12,26,53,0.82) 0%, rgba(12,26,53,0.1) 55%)',
+                  }} />
+                  <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: isMobile ? '12px 14px' : '16px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: isMobile ? 14 : 16, fontWeight: 900, color: '#fff' }}>{cat.name}</span>
+                    <span style={{ fontSize: 20 }}>{cat.emoji}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 5. Testimonials carousel ── */}
       {testimonials.length > 0 && (() => {
         const t = testimonials[testIdx];
         return (
@@ -1023,7 +1146,7 @@ export default function HomePageClient() {
         );
       })()}
 
-      {/* ── 5. Footer ── */}
+      {/* ── 6. Footer ── */}
       <footer style={{ background: '#0f1111', color: '#fff' }}>
         <div style={{ borderBottom: '1px solid #333', padding: '28px 16px' }}>
           <div
