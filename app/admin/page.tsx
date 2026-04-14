@@ -106,7 +106,7 @@ interface Category {
   order: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'homepage';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage';
 
 interface Review {
   id: string;
@@ -118,6 +118,17 @@ interface Review {
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
   approved: boolean;
+  createdAt?: { seconds: number };
+}
+
+interface Testimonial {
+  id: string;
+  name: string;
+  city: string;
+  text: string;
+  rating: number;
+  imageUrl: string;
+  active: boolean;
   createdAt?: { seconds: number };
 }
 
@@ -709,6 +720,11 @@ export default function AdminPage() {
   const [shluchimApps, setShluchimApps] = useState<ShluchimApplication[]>([]);
   const [shluchimAppsLoading, setShluchimAppsLoading] = useState(true);
   const [showAddShliach, setShowAddShliach] = useState(false);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [testimonialsLoading, setTestimonialsLoading] = useState(true);
+  const [testForm, setTestForm] = useState({ name: '', city: '', text: '', rating: 5, imageUrl: '' });
+  const [testSaving, setTestSaving] = useState(false);
+  const [testUploadingImg, setTestUploadingImg] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
@@ -718,7 +734,7 @@ export default function AdminPage() {
     if (user?.role === 'admin') {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
-      loadReviews(); loadShluchimApplications();
+      loadReviews(); loadShluchimApplications(); loadTestimonials();
     }
   }, [user]);
 
@@ -979,6 +995,48 @@ export default function AdminPage() {
     finally { setActionLoading(null); }
   }
 
+  async function loadTestimonials() {
+    try {
+      const snap = await getDocs(query(collection(db, 'testimonials'), orderBy('createdAt', 'desc')));
+      setTestimonials(snap.docs.map(d => ({ id: d.id, ...d.data() } as Testimonial)));
+    } catch (e) { console.error(e); }
+    finally { setTestimonialsLoading(false); }
+  }
+
+  async function uploadTestimonialImg(file: File): Promise<string> {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', 'yoursofer_upload');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error('שגיאה בהעלאה');
+    return data.secure_url;
+  }
+
+  async function addTestimonial() {
+    if (!testForm.name || !testForm.text) { alert('שם וטקסט ביקורת הם שדות חובה'); return; }
+    setTestSaving(true);
+    try {
+      const ref = await addDoc(collection(db, 'testimonials'), {
+        ...testForm, active: true, createdAt: serverTimestamp(),
+      });
+      setTestimonials(prev => [{ id: ref.id, ...testForm, active: true }, ...prev]);
+      setTestForm({ name: '', city: '', text: '', rating: 5, imageUrl: '' });
+    } catch (e) { console.error(e); alert('שגיאה בשמירה'); }
+    finally { setTestSaving(false); }
+  }
+
+  async function deleteTestimonial(id: string) {
+    if (!confirm('למחוק ביקורת זו?')) return;
+    await deleteDoc(doc(db, 'testimonials', id));
+    setTestimonials(prev => prev.filter(t => t.id !== id));
+  }
+
+  async function toggleTestimonialActive(id: string, current: boolean) {
+    await updateDoc(doc(db, 'testimonials', id), { active: !current });
+    setTestimonials(prev => prev.map(t => t.id === id ? { ...t, active: !current } : t));
+  }
+
   function exportToExcel() {
     const rows = [
       ['id', 'name', 'cat', 'price', 'was', 'desc', 'badge', 'days', 'imgUrl', 'imgUrl2', 'imgUrl3', 'soferId'],
@@ -1094,6 +1152,7 @@ export default function AdminPage() {
           { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
           { key: 'categories', label: '🖼️ קטגוריות', color: 'bg-indigo-600' },
           { key: 'reviews', label: '⭐ ביקורות', color: 'bg-yellow-600', badge: reviews.filter(r => !r.approved).length },
+          { key: 'testimonials', label: '💬 עדויות לקוחות', color: 'bg-rose-600' },
           { key: 'homepage', label: '🏠 דף הבית', color: 'bg-slate-700' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
@@ -1486,6 +1545,96 @@ export default function AdminPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === 'testimonials' && (
+        <div className="grid gap-6">
+          {/* ── Add form ── */}
+          <div className="bg-white rounded-xl shadow p-6">
+            <h2 className="text-lg font-black mb-4">➕ הוסף ביקורת</h2>
+            <div className="grid gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-gray-500 block mb-1">שם לקוח *</label>
+                  <input value={testForm.name} onChange={e => setTestForm(p => ({ ...p, name: e.target.value }))} placeholder="ישראל ישראלי" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-500 block mb-1">עיר</label>
+                  <input value={testForm.city} onChange={e => setTestForm(p => ({ ...p, city: e.target.value }))} placeholder="תל אביב" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1">טקסט ביקורת *</label>
+                <textarea value={testForm.text} onChange={e => setTestForm(p => ({ ...p, text: e.target.value }))} rows={3} placeholder="חוויה נהדרת..." className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-vertical" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1">דירוג</label>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map(s => (
+                    <button key={s} type="button" onClick={() => setTestForm(p => ({ ...p, rating: s }))}
+                      className={`text-2xl transition-transform hover:scale-110 ${s <= testForm.rating ? 'text-yellow-400' : 'text-gray-300'}`}>★</button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1">תמונת לקוח</label>
+                <div className="flex gap-3 items-center">
+                  {testForm.imageUrl && <img src={testForm.imageUrl} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 flex-shrink-0" />}
+                  <label className="bg-gray-800 text-white rounded-lg px-3 py-2 text-xs font-bold cursor-pointer flex-shrink-0">
+                    {testUploadingImg ? '⏳ מעלה...' : '📷 העלה תמונה'}
+                    <input type="file" accept="image/*" className="hidden" onChange={async e => {
+                      const file = e.target.files?.[0]; if (!file) return;
+                      setTestUploadingImg(true);
+                      try { const url = await uploadTestimonialImg(file); setTestForm(p => ({ ...p, imageUrl: url })); }
+                      catch { alert('שגיאה בהעלאה'); } finally { setTestUploadingImg(false); }
+                    }} />
+                  </label>
+                  <input value={testForm.imageUrl} onChange={e => setTestForm(p => ({ ...p, imageUrl: e.target.value }))} placeholder="או הדבק URL" className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs min-w-0" />
+                </div>
+              </div>
+              <button onClick={addTestimonial} disabled={testSaving}
+                className="bg-rose-600 text-white rounded-lg py-2 px-6 text-sm font-bold hover:bg-rose-700 disabled:opacity-50 self-start">
+                {testSaving ? '⏳ שומר...' : '✅ הוסף ביקורת'}
+              </button>
+            </div>
+          </div>
+
+          {/* ── List ── */}
+          <div className="bg-white rounded-xl shadow p-6">
+            <h2 className="text-lg font-black mb-4">💬 ביקורות קיימות ({testimonials.length})</h2>
+            {testimonialsLoading ? <div className="text-center text-gray-400 py-8">טוען...</div>
+            : testimonials.length === 0 ? <div className="text-center text-gray-400 py-8">אין ביקורות עדיין</div>
+            : (
+              <div className="grid gap-4">
+                {testimonials.map(t => (
+                  <div key={t.id} className={`rounded-xl border p-4 flex gap-4 items-start ${t.active ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
+                    <div className="flex-shrink-0">
+                      {t.imageUrl
+                        ? <img src={t.imageUrl} alt={t.name} className="w-14 h-14 rounded-full object-cover border-2 border-white shadow" />
+                        : <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center text-2xl">👤</div>
+                      }
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-black text-sm">{t.name}</span>
+                        {t.city && <span className="text-xs text-gray-500">📍 {t.city}</span>}
+                        <span className="text-yellow-400 text-sm">{'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 line-clamp-2">{t.text}</p>
+                    </div>
+                    <div className="flex flex-col gap-2 flex-shrink-0">
+                      <button onClick={() => toggleTestimonialActive(t.id, t.active)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold ${t.active ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                        {t.active ? '● פעיל' : '● לא פעיל'}
+                      </button>
+                      <button onClick={() => deleteTestimonial(t.id)} className="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-100 text-red-600 hover:bg-red-200">🗑️ מחק</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

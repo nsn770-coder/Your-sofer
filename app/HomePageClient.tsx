@@ -18,6 +18,16 @@ import type { CardDef, SubItem } from './constants/homepageCards';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+interface Testimonial {
+  id: string;
+  name: string;
+  city: string;
+  text: string;
+  rating: number;
+  imageUrl: string;
+  active: boolean;
+}
+
 interface Product {
   id: string;
   name: string;
@@ -174,6 +184,8 @@ export default function HomePageClient() {
   const [wizardResults, setWizardResults] = useState<Product[]>([]);
   const [wizardLoading, setWizardLoading] = useState(false);
   const [cardWidth, setCardWidth]     = useState(0);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [testIdx, setTestIdx]         = useState(0);
   const cardsRef       = useRef<HTMLDivElement>(null); // outer wrap — for scrollIntoView
   const carouselTrack  = useRef<HTMLDivElement>(null); // scrollable track
   const newRef         = useRef<HTMLDivElement>(null);
@@ -282,6 +294,28 @@ export default function HomePageClient() {
 
     fetchNewProducts();
   }, []);
+
+  // Fetch active testimonials
+  useEffect(() => {
+    async function fetchTestimonials() {
+      try {
+        const snap = await getDocs(
+          query(collection(db, 'testimonials'), where('active', '==', true), orderBy('createdAt', 'desc')),
+        );
+        setTestimonials(snap.docs.map(d => ({ id: d.id, ...d.data() } as Testimonial)));
+      } catch { /* silently empty */ }
+    }
+    fetchTestimonials();
+  }, []);
+
+  // Auto-rotate testimonials every 4 seconds
+  useEffect(() => {
+    if (testimonials.length < 2) return;
+    const timer = setInterval(() => {
+      setTestIdx(prev => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [testimonials.length]);
 
   // Fetch live counter data
   useEffect(() => {
@@ -821,7 +855,103 @@ export default function HomePageClient() {
         ) : null}
       </div>
 
-      {/* ── 4. Footer ── */}
+      {/* ── 4. Testimonials carousel ── */}
+      {testimonials.length > 0 && (
+        <div style={{ background: '#f8f4ec', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
+          <div style={{ maxWidth: 900, margin: '0 auto' }}>
+            {/* Heading */}
+            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 28, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>
+              מה הלקוחות אומרים
+            </h2>
+            <p style={{ textAlign: 'center', fontSize: 14, color: '#888', marginBottom: 36 }}>
+              אלפי לקוחות מרוצים ברחבי הארץ
+            </p>
+
+            {/* Card */}
+            <div style={{ position: 'relative', minHeight: 200 }}>
+              {testimonials.map((t, i) => (
+                <div
+                  key={t.id}
+                  style={{
+                    position: i === 0 ? 'relative' : 'absolute',
+                    top: 0, left: 0, right: 0,
+                    opacity: i === testIdx ? 1 : 0,
+                    transform: i === testIdx ? 'translateY(0)' : 'translateY(12px)',
+                    transition: 'opacity 0.6s ease, transform 0.6s ease',
+                    pointerEvents: i === testIdx ? 'auto' : 'none',
+                    background: '#fff',
+                    borderRadius: 16,
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+                    padding: isMobile ? '24px 20px' : '32px 40px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 24,
+                    flexDirection: isMobile ? 'column' : 'row',
+                  }}
+                >
+                  {/* Avatar */}
+                  <div style={{ flexShrink: 0, alignSelf: isMobile ? 'center' : 'flex-start' }}>
+                    {t.imageUrl ? (
+                      <img
+                        src={t.imageUrl}
+                        alt={t.name}
+                        style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #b8972a' }}
+                      />
+                    ) : (
+                      <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #b8972a' }}>
+                        <span style={{ fontSize: 32, color: '#fff', fontWeight: 900 }}>{t.name.charAt(0)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div style={{ flex: 1, textAlign: 'right' }}>
+                    {/* Stars */}
+                    <div style={{ marginBottom: 8 }}>
+                      {Array.from({ length: 5 }).map((_, si) => (
+                        <span key={si} style={{ color: si < t.rating ? '#f5c518' : '#ddd', fontSize: 20 }}>★</span>
+                      ))}
+                    </div>
+                    {/* Quote text */}
+                    <p style={{ fontSize: isMobile ? 15 : 17, color: '#333', lineHeight: 1.7, marginBottom: 14, fontStyle: 'italic' }}>
+                      &ldquo;{t.text}&rdquo;
+                    </p>
+                    {/* Name + city */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
+                      <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35' }}>{t.name}</span>
+                      {t.city && <span style={{ fontSize: 13, color: '#888' }}>· {t.city}</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Dots */}
+            {testimonials.length > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 24 }}>
+                {testimonials.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setTestIdx(i)}
+                    style={{
+                      width: i === testIdx ? 24 : 10,
+                      height: 10,
+                      borderRadius: 5,
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: i === testIdx ? '#b8972a' : '#ccc',
+                      padding: 0,
+                      transition: 'width 0.3s, background 0.3s',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── 5. Footer ── */}
       <footer style={{ background: '#0f1111', color: '#fff' }}>
         <div style={{ borderBottom: '1px solid #333', padding: '28px 16px' }}>
           <div
