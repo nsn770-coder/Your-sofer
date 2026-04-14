@@ -158,6 +158,13 @@ export default function HomePageClient() {
   const [newLoading, setNewLoading]   = useState(true);
   const [sortBy, setSortBy]           = useState<'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'popular'>('newest');
   const [drawerOpen, setDrawerOpen]   = useState(false);
+  const [wizardOpen, setWizardOpen]   = useState(false);
+  const [wizardStep, setWizardStep]   = useState(0);
+  const [wizardFor, setWizardFor]     = useState<'self' | 'gift' | null>(null);
+  const [wizardBudget, setWizardBudget] = useState<'low' | 'mid' | 'high' | null>(null);
+  const [wizardKashrut, setWizardKashrut] = useState<'regular' | 'mehudar' | 'mehudar_plus' | null>(null);
+  const [wizardResults, setWizardResults] = useState<Product[]>([]);
+  const [wizardLoading, setWizardLoading] = useState(false);
   const [cardWidth, setCardWidth]     = useState(0);
   const cardsRef       = useRef<HTMLDivElement>(null); // outer wrap — for scrollIntoView
   const carouselTrack  = useRef<HTMLDivElement>(null); // scrollable track
@@ -268,6 +275,66 @@ export default function HomePageClient() {
     fetchNewProducts();
   }, []);
 
+  // 30-second wizard trigger — once per user (localStorage guard)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (localStorage.getItem('wizard_shown')) return;
+    const timer = setTimeout(() => {
+      setWizardOpen(true);
+      localStorage.setItem('wizard_shown', '1');
+    }, 30000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  async function fetchWizardResults(budget: typeof wizardBudget, kashrut: typeof wizardKashrut) {
+    setWizardLoading(true);
+    try {
+      const priceRanges = { low: [0, 400], mid: [400, 1000], high: [1000, 99999] };
+      const [minPrice, maxPrice] = priceRanges[budget!] ?? [0, 99999];
+      const kashrutKeywords: Record<string, string[]> = {
+        regular:       ['רגיל', 'כשר'],
+        mehudar:       ['מהודר'],
+        mehudar_plus:  ['מהדרין', 'מהודר בתכלית'],
+      };
+      const keywords = kashrutKeywords[kashrut!] ?? [];
+
+      const snap = await getDocs(
+        query(
+          collection(db, 'products'),
+          where('price', '>=', minPrice),
+          where('price', '<=', maxPrice),
+          orderBy('price'),
+          limit(20),
+        )
+      );
+      const candidates: Product[] = [];
+      snap.forEach(d => candidates.push({ id: d.id, ...d.data() } as Product));
+
+      // Prefer products whose name/badge matches kashrut keywords
+      const scored = candidates.map(p => {
+        const text = `${p.name ?? ''} ${(p as any).badge ?? ''} ${(p as any).kashrut ?? ''}`.toLowerCase();
+        const score = keywords.reduce((s, kw) => s + (text.includes(kw.toLowerCase()) ? 1 : 0), 0);
+        return { p, score };
+      }).sort((a, b) => b.score - a.score || (b.p.priority ?? 0) - (a.p.priority ?? 0));
+
+      setWizardResults(scored.slice(0, 3).map(s => s.p));
+    } catch (e) {
+      console.error(e);
+      setWizardResults([]);
+    } finally {
+      setWizardLoading(false);
+    }
+  }
+
+  function closeWizard() {
+    setWizardOpen(false);
+    setWizardStep(0);
+    setWizardFor(null);
+    setWizardBudget(null);
+    setWizardKashrut(null);
+    setWizardResults([]);
+  }
+
   return (
     <div
       dir="rtl"
@@ -277,6 +344,153 @@ export default function HomePageClient() {
         fontFamily: "'Heebo', Arial, sans-serif",
       }}
     >
+      {/* ── Selection Wizard modal ── */}
+      {wizardOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, backdropFilter: 'blur(4px)', background: 'rgba(0,0,0,0.55)' }}
+          onClick={closeWizard}>
+          <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 480, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden' }}
+            onClick={e => e.stopPropagation()}>
+
+            {/* Header */}
+            <div style={{ background: '#0c1a35', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontSize: 11, color: '#b8972a', fontWeight: 700, marginBottom: 2 }}>
+                  {wizardStep < 3 ? `שאלה ${wizardStep + 1} מתוך 3` : '✨ ההמלצות שלנו'}
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>
+                  {wizardStep === 0 && 'עזרה בבחירה'}
+                  {wizardStep === 1 && 'מה התקציב?'}
+                  {wizardStep === 2 && 'רמת כשרות?'}
+                  {wizardStep === 3 && 'מצאנו בשבילך!'}
+                </div>
+              </div>
+              <button onClick={closeWizard} style={{ background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', width: 34, height: 34, borderRadius: '50%', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
+
+            {/* Progress bar */}
+            {wizardStep < 3 && (
+              <div style={{ height: 3, background: '#f0f0f0' }}>
+                <div style={{ height: '100%', width: `${((wizardStep + 1) / 3) * 100}%`, background: '#b8972a', transition: 'width 0.4s ease' }} />
+              </div>
+            )}
+
+            <div style={{ padding: 24 }}>
+
+              {/* Step 0 — למי זה מיועד */}
+              {wizardStep === 0 && (
+                <>
+                  <p style={{ fontSize: 15, color: '#555', marginBottom: 20, textAlign: 'center' }}>למי זה מיועד?</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    {[{ val: 'self' as const, label: '👤 לי עצמי' }, { val: 'gift' as const, label: '🎁 מתנה לאחר' }].map(opt => (
+                      <button key={opt.val} onClick={() => { setWizardFor(opt.val); setWizardStep(1); }}
+                        style={{ padding: '18px 12px', borderRadius: 14, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Step 1 — תקציב */}
+              {wizardStep === 1 && (
+                <>
+                  <p style={{ fontSize: 15, color: '#555', marginBottom: 20, textAlign: 'center' }}>מה התקציב?</p>
+                  <div style={{ display: 'grid', gap: 10 }}>
+                    {[
+                      { val: 'low'  as const, label: 'עד 400 ₪',     sub: 'מוצרים בסיסיים כשרים' },
+                      { val: 'mid'  as const, label: '400 – 1,000 ₪', sub: 'מוצרים מהודרים' },
+                      { val: 'high' as const, label: 'מעל 1,000 ₪',  sub: 'מוצרים מהדרין מובחרים' },
+                    ].map(opt => (
+                      <button key={opt.val} onClick={() => { setWizardBudget(opt.val); setWizardStep(2); }}
+                        style={{ padding: '14px 18px', borderRadius: 14, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
+                        <span>{opt.label}</span>
+                        <span style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>{opt.sub}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Step 2 — כשרות */}
+              {wizardStep === 2 && (
+                <>
+                  <p style={{ fontSize: 15, color: '#555', marginBottom: 20, textAlign: 'center' }}>רמת כשרות?</p>
+                  <div style={{ display: 'grid', gap: 10 }}>
+                    {[
+                      { val: 'regular'      as const, label: 'רגיל',              sub: 'כשר לכתחילה לפי כל הדעות' },
+                      { val: 'mehudar'      as const, label: 'מהודר',             sub: 'רמה גבוהה מעל הרגיל' },
+                      { val: 'mehudar_plus' as const, label: 'מהודר בתכלית',      sub: 'רמת הכשרות הגבוהה ביותר' },
+                    ].map(opt => (
+                      <button key={opt.val} onClick={() => {
+                          setWizardKashrut(opt.val);
+                          setWizardStep(3);
+                          fetchWizardResults(wizardBudget, opt.val);
+                        }}
+                        style={{ padding: '14px 18px', borderRadius: 14, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
+                        <span>{opt.label}</span>
+                        <span style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>{opt.sub}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Step 3 — Results */}
+              {wizardStep === 3 && (
+                wizardLoading ? (
+                  <div style={{ textAlign: 'center', padding: '32px 0', color: '#888', fontSize: 15 }}>מחפש עבורך את הכי מתאים...</div>
+                ) : wizardResults.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0', color: '#888' }}>
+                    <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+                    לא נמצאו מוצרים מתאימים לפי הסינון.
+                    <br />
+                    <button onClick={() => router.push('/')} style={{ marginTop: 16, background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ display: 'grid', gap: 12, marginBottom: 20 }}>
+                      {wizardResults.map(p => (
+                        <div key={p.id} onClick={() => { closeWizard(); router.push(`/product/${p.id}`); }}
+                          style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 14px', borderRadius: 12, border: '1px solid #eee', cursor: 'pointer', background: '#fafafa', transition: 'all 0.15s' }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLDivElement).style.background = '#fffbf0'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#eee'; (e.currentTarget as HTMLDivElement).style.background = '#fafafa'; }}>
+                          {(p.imgUrl || p.image_url) && (
+                            <img src={p.imgUrl || p.image_url} alt={p.name} style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: '#b8972a' }}>₪{p.price?.toLocaleString('he-IL')}</div>
+                          </div>
+                          <span style={{ color: '#b8972a', fontSize: 18, flexShrink: 0 }}>←</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button onClick={closeWizard}
+                      style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 12, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                      המשך לגלישה
+                    </button>
+                  </>
+                )
+              )}
+
+              {/* Back button for steps 1+ */}
+              {wizardStep > 0 && wizardStep < 3 && (
+                <button onClick={() => setWizardStep(s => s - 1)}
+                  style={{ marginTop: 16, background: 'none', border: 'none', color: '#888', fontSize: 13, cursor: 'pointer', display: 'block', width: '100%', textAlign: 'center' }}>
+                  ← חזרה
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── 1. SmartHero — unchanged ── */}
       <SmartHero
         isMobile={isMobile}
