@@ -491,6 +491,28 @@ export default function HomePageClient() {
           <span style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>Your Sofer</span>
           <span style={{ fontSize: 11, color: '#555' }}>© 2025 Your Sofer — כל הזכויות שמורות</span>
         </div>
+        <div style={{ borderTop: '1px solid #222', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: isMobile ? '6px 12px' : '6px 20px' }}>
+          {[
+            { label: 'תקנון האתר',      path: '/legal/takanon' },
+            { label: 'מדיניות החזרים', path: '/legal/returns' },
+            { label: 'מדיניות פרטיות', path: '/legal/privacy' },
+            { label: 'משלוחים',         path: '/legal/shipping' },
+            { label: 'נגישות',          path: '/legal/accessibility' },
+            { label: 'שאלות נפוצות',   path: '/legal/faq' },
+          ].map((link, i, arr) => (
+            <span key={link.path} style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 20 }}>
+              <span
+                onClick={() => router.push(link.path)}
+                style={{ fontSize: 11, color: '#666', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                onMouseEnter={e => ((e.currentTarget as HTMLSpanElement).style.color = '#aaa')}
+                onMouseLeave={e => ((e.currentTarget as HTMLSpanElement).style.color = '#666')}
+              >
+                {link.label}
+              </span>
+              {i < arr.length - 1 && <span style={{ color: '#333', fontSize: 11 }}>|</span>}
+            </span>
+          ))}
+        </div>
       </footer>
 
       {/* ── WhatsApp floating button ── */}
