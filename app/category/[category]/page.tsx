@@ -2,6 +2,10 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import CategoryClient from './CategoryClient';
 
+// Force dynamic rendering — prevents the client-side router cache from serving
+// a stale RSC payload from a previous visit with the old layout.
+export const dynamic = 'force-dynamic';
+
 const BASE_URL = 'https://yoursofer.com';
 const FIREBASE_PROJECT = 'your-sofer';
 const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
