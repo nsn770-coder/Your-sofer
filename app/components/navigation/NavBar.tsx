@@ -421,9 +421,9 @@ function NavBarContent() {
               : <div style={{ width: 48, height: 48, borderRadius: 10, background: "#b8972a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🟦</div>
             }
             <div>
-              <div style={{ fontSize: 10, color: "#b8972a", fontWeight: 700 }}>ברוכים הבאים — האתר הוגש על ידי</div>
-              <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: "#fff" }}>{shaliach.chabadName || shaliach.name}</div>
-              <div style={{ fontSize: 11, color: "#a8c0d8" }}>{shaliach.rabbiName}{shaliach.city && ` · ${shaliach.city}`}</div>
+              <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: "#fff" }}>
+                {shaliach.chabadName || shaliach.name}{shaliach.rabbiName && ` · ${shaliach.rabbiName}`}
+              </div>
             </div>
           </div>
           {shaliach.phone && (
