@@ -5,7 +5,7 @@ import {
   collection, getDocs, orderBy, query,
   doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc
 } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
 import { CATS } from '../constants/categories';
@@ -556,6 +556,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<TabType>('orders');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>('הכל');
+  const [copiedUserId, setCopiedUserId] = useState<string | null>(null);
   const [productSearch, setProductSearch] = useState('');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAddSofer, setShowAddSofer] = useState(false);
@@ -724,9 +725,19 @@ export default function AdminPage() {
   async function changeUserRole(userId: string, newRole: UserRole) {
     setActionLoading(userId);
     try {
-      await updateDoc(doc(db, 'users', userId), { role: newRole });
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) throw new Error('Not authenticated');
+      const res = await fetch('/api/admin/update-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ userId, role: newRole }),
+      });
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(error);
+      }
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
-    } catch (e) { console.error(e); alert('שגיאה בעדכון תפקיד'); }
+    } catch (e: any) { console.error(e); alert('שגיאה בעדכון תפקיד: ' + (e?.message ?? '')); }
     finally { setActionLoading(null); }
   }
 
@@ -1061,7 +1072,7 @@ export default function AdminPage() {
           : (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50"><tr><th className="p-3 text-right">משתמש</th><th className="p-3 text-right">אימייל</th><th className="p-3 text-right">תפקיד נוכחי</th><th className="p-3 text-right">שנה תפקיד</th></tr></thead>
+                <thead className="bg-gray-50"><tr><th className="p-3 text-right">משתמש</th><th className="p-3 text-right">אימייל</th><th className="p-3 text-right">תפקיד נוכחי</th><th className="p-3 text-right">שנה תפקיד</th><th className="p-3 text-right">קישור הפניה</th></tr></thead>
                 <tbody>
                   {filteredUsers.map(u => (
                     <tr key={u.id} className="border-t hover:bg-gray-50">
@@ -1073,6 +1084,21 @@ export default function AdminPage() {
                           <option value="customer">👤 לקוח</option><option value="sofer">✍️ סופר</option><option value="shaliach">🟦 שליח</option><option value="admin">👑 מנהל</option>
                         </select>
                         {actionLoading === u.id && <span className="text-xs text-gray-400 mr-2">שומר...</span>}
+                      </td>
+                      <td className="p-3">
+                        {u.role === 'shaliach' && (
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(`https://yoursofer.com/?ref=${u.id}`);
+                              setCopiedUserId(u.id);
+                              setTimeout(() => setCopiedUserId(null), 2000);
+                            }}
+                            title={`https://yoursofer.com/?ref=${u.id}`}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
+                          >
+                            {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
