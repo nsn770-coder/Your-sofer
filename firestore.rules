@@ -98,6 +98,13 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // ── Testimonials ────────────────────────────────────────────────────────
+
+    match /testimonials/{id} {
+      allow read: if true;               // homepage reads active testimonials publicly
+      allow write: if isAdmin();         // only admins can add/edit/delete
+    }
+
     // ── Ops users (internal team) ───────────────────────────────────────────
 
     match /opsUsers/{id} {
