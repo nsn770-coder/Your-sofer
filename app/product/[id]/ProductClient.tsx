@@ -488,7 +488,13 @@ export default function ProductClient() {
   const [activeTab, setActiveTab] = useState<'details' | 'kashrut' | 'shipping'>('details');
   const [currentViewers, setCurrentViewers] = useState(2);
   const [showLowStock, setShowLowStock] = useState(false);
-  const [stockCount] = useState(() => Math.floor(Math.random() * 4) + 2);
+  const [stockCount] = useState(() => {
+    // Deterministic 12-19 based on product id (same value on every render/refresh)
+    const pid = Array.isArray(id) ? id[0] : (id ?? '');
+    let hash = 0;
+    for (let i = 0; i < pid.length; i++) hash = (hash * 31 + pid.charCodeAt(i)) & 0xffffffff;
+    return (Math.abs(hash) % 8) + 12; // 12–19
+  });
   const buyBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -498,11 +504,19 @@ export default function ProductClient() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Viewers counter rotates every 30 s
+  // Viewers counter changes every 20-40 s (random interval so it looks live)
   useEffect(() => {
-    setCurrentViewers(Math.floor(Math.random() * 7) + 2);
-    const id = setInterval(() => setCurrentViewers(Math.floor(Math.random() * 7) + 2), 30000);
-    return () => clearInterval(id);
+    setCurrentViewers(Math.floor(Math.random() * 5) + 2); // initial: 2-6
+    let timer: ReturnType<typeof setTimeout>;
+    function scheduleNext() {
+      const delay = Math.floor(Math.random() * 20000) + 20000; // 20-40 s
+      timer = setTimeout(() => {
+        setCurrentViewers(Math.floor(Math.random() * 5) + 2);
+        scheduleNext();
+      }, delay);
+    }
+    scheduleNext();
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
