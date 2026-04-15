@@ -283,12 +283,18 @@ export default function HomePageClient() {
 
     async function fetchNewProducts() {
       try {
-        // Note: adding where('hidden', '!=', true) here requires a Firestore composite index:
-        //   hidden ASC + createdAt DESC — filtering client-side instead for backward compatibility.
+        // Fetch 2× the target so filtering hidden products still leaves 16 visible.
+        // Note: where('hidden','!=',true) + orderBy('createdAt') requires a composite index —
+        //   filtering client-side instead for backward compatibility with legacy docs.
         const snap = await getDocs(
-          query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(16)),
+          query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(32)),
         );
-        setNewProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter((p: Product) => p.hidden !== true));
+        setNewProducts(
+          snap.docs
+            .map(d => ({ id: d.id, ...d.data() } as Product))
+            .filter((p: Product) => p.hidden !== true)
+            .slice(0, 16),
+        );
       } catch { /* silently empty */ }
       finally { setNewLoading(false); }
     }
@@ -430,7 +436,7 @@ export default function HomePageClient() {
           where('price', '>=', minPrice),
           where('price', '<=', maxPrice),
           orderBy('price'),
-          limit(20),
+          limit(40),  // fetch 2× so hidden products don't reduce the candidate pool below 3
         )
       );
       const candidates: Product[] = [];
