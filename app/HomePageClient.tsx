@@ -495,7 +495,7 @@ export default function HomePageClient() {
       dir="rtl"
       style={{
         minHeight: '100vh',
-        background: '#f3f4f6',
+        background: '#F5F0E8',
         fontFamily: "'Heebo', Arial, sans-serif",
       }}
     >
