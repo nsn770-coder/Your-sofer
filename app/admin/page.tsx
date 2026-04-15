@@ -11,6 +11,15 @@ import type { UserRole } from '../contexts/AuthContext';
 import { CATS } from '../constants/categories';
 import HomepageConfigTab from './components/HomepageConfigTab';
 
+interface OrderItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  embroideryText?: string | null;
+  selectedKlafName?: string | null;
+}
+
 interface Order {
   id: string;
   orderNumber: string;
@@ -20,6 +29,7 @@ interface Order {
   shaliachName?: string;
   commissionAmount?: number;
   createdAt?: { seconds: number };
+  items?: OrderItem[];
 }
 
 interface SoferApplication {
@@ -1313,13 +1323,26 @@ export default function AdminPage() {
             <tbody>
               {orders.length === 0 ? <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין הזמנות עדיין</td></tr>
               : orders.map(o => (
-                <tr key={o.id} className="border-t hover:bg-gray-50">
-                  <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
-                  <td className="p-3 font-bold">{o.customerName}</td>
-                  <td className="p-3 text-green-700 font-bold">₪{o.total}</td>
-                  <td className="p-3 text-blue-600">{o.shaliachName || '—'}</td>
-                  <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-bold ${o.status === 'new' ? 'bg-yellow-100 text-yellow-700' : o.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{o.status === 'new' ? '⏳ חדש' : o.status === 'processing' ? '🔄 בעיבוד' : o.status === 'delivered' ? '✅ נמסר' : o.status}</span></td>
-                </tr>
+                <>
+                  <tr key={o.id} className="border-t hover:bg-gray-50">
+                    <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
+                    <td className="p-3 font-bold">{o.customerName}</td>
+                    <td className="p-3 text-green-700 font-bold">₪{o.total}</td>
+                    <td className="p-3 text-blue-600">{o.shaliachName || '—'}</td>
+                    <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-bold ${o.status === 'new' ? 'bg-yellow-100 text-yellow-700' : o.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{o.status === 'new' ? '⏳ חדש' : o.status === 'processing' ? '🔄 בעיבוד' : o.status === 'delivered' ? '✅ נמסר' : o.status}</span></td>
+                  </tr>
+                  {o.items && o.items.some(i => i.embroideryText) && (
+                    <tr key={`${o.id}-emb`} className="bg-yellow-50 border-t border-yellow-100">
+                      <td colSpan={5} className="px-4 py-2">
+                        {o.items.filter(i => i.embroideryText).map((i, idx) => (
+                          <span key={idx} className="inline-flex items-center gap-1 text-xs text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5 mr-2">
+                            ✍️ {i.name} — ריקמה: <strong>{i.embroideryText}</strong>
+                          </span>
+                        ))}
+                      </td>
+                    </tr>
+                  )}
+                </>
               ))}
             </tbody>
           </table>

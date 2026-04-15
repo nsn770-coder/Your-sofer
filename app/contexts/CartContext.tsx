@@ -10,6 +10,7 @@ interface CartItem {
   quantity: number;
   selectedKlafId?: string;   // ← חדש: ID של קלף נבחר מ-Google Drive
   selectedKlafName?: string; // ← חדש: שם הקלף לתצוגה
+  embroideryText?: string;   // ← טקסט לריקמה אישית
 }
 
 interface CartContextType {

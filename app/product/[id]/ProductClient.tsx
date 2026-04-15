@@ -474,6 +474,7 @@ export default function ProductClient() {
   const { user } = useAuth();
   const [product, setProduct] = useState<Product | null>(null);
   const [related, setRelated] = useState<Product[]>([]);
+  const [embroideryText, setEmbroideryText] = useState('');
   const [loading, setLoading] = useState(true);
   const [activeImg, setActiveImg] = useState(0);
   const [added, setAdded] = useState(false);
@@ -572,9 +573,14 @@ export default function ProductClient() {
   const hasVideo = !!product.videoUrl;
   const discount = product.was ? Math.round((1 - product.price / product.was) * 100) : 0;
 
+  const EMBROIDERY_CATEGORIES = [
+    'כיסוי תפילין', 'כיסוי טלית', 'סט טלית תפילין',
+    'בר מצוה', 'סט לבר מצוה', 'סט לחתן',
+  ];
+
   function handleAddToCart() {
     for (let i = 0; i < qty; i++) {
-      addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafId || undefined, selectedKlafName: selectedKlafName || undefined });
+      addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafId || undefined, selectedKlafName: selectedKlafName || undefined, embroideryText: embroideryText || undefined });
     }
     window.gtag?.('event', 'add_to_cart', {
       currency: 'ILS',
@@ -607,6 +613,27 @@ export default function ProductClient() {
           <select value={qty} onChange={e => setQty(Number(e.target.value))} style={{ width: '100%', border: '1px solid #ddd', borderRadius: 6, padding: '8px 10px', fontSize: 13, background: '#f8f9fa', cursor: 'pointer' }}>
             {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
           </select>
+        </div>
+      )}
+      {/* ── Embroidery text field — shown only for relevant categories ── */}
+      {product.cat && EMBROIDERY_CATEGORIES.includes(product.cat) && (
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 4, textAlign: 'right' }}>
+            ✍️ טקסט לריקמה אישית
+          </label>
+          <input
+            type="text"
+            value={embroideryText}
+            onChange={e => setEmbroideryText(e.target.value)}
+            placeholder="לדוגמה: אליהו בן יוסף"
+            maxLength={30}
+            style={{ width: '100%', border: '1px solid #ddd', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
+            onFocus={e => (e.target.style.borderColor = '#b8972a')}
+            onBlur={e => (e.target.style.borderColor = '#ddd')}
+          />
+          <p style={{ fontSize: 11, color: '#999', marginTop: 3, textAlign: 'right' }}>
+            הטקסט יירקם על המוצר — עד 30 תווים
+          </p>
         </div>
       )}
       <button onClick={handleAddToCart} style={{ width: '100%', background: added ? '#27ae60' : '#b8972a', color: added ? '#fff' : '#0c1a35', border: 'none', borderRadius: 24, padding: compact ? '10px' : '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 8, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>

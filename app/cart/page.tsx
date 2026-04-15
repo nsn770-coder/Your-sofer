@@ -104,7 +104,10 @@ export default function CartPage() {
                               style={{ fontSize: 14, fontWeight: 600, color: '#0f1111', lineHeight: 1.4, cursor: 'pointer', marginBottom: 4 }}>
                               {item.name}
                             </div>
-                            <div style={{ fontSize: 11, color: '#1a6b3c', marginBottom: 6 }}>✓ במלאי · משלוח חינם</div>
+                            <div style={{ fontSize: 11, color: '#1a6b3c', marginBottom: 2 }}>✓ במלאי · משלוח חינם</div>
+                          {item.embroideryText && (
+                            <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ ריקמה: {item.embroideryText}</div>
+                          )}
                             <div style={{ fontSize: 17, fontWeight: 900, color: '#0c1a35' }}>
                               ₪{(item.price * item.quantity).toFixed(2)}
                             </div>
@@ -162,7 +165,10 @@ export default function CartPage() {
                             onMouseLeave={e => (e.currentTarget.style.color = '#0f1111')}>
                             {item.name}
                           </div>
-                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: 10 }}>✓ במלאי · משלוח חינם</div>
+                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText ? 4 : 10 }}>✓ במלאי · משלוח חינם</div>
+                          {item.embroideryText && (
+                            <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6 }}>✍️ ריקמה: {item.embroideryText}</div>
+                          )}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                             <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 6, overflow: 'hidden' }}>
                               <button onClick={() => updateQty(item.id, item.quantity - 1)}

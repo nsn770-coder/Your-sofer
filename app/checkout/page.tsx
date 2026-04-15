@@ -81,6 +81,7 @@ export default function CheckoutPage() {
           quantity: i.quantity,
           selectedKlafId: i.selectedKlafId || null,
           selectedKlafName: i.selectedKlafName || null,
+          embroideryText: i.embroideryText || null,
         })),
         total: finalTotal,
         couponCode: appliedCoupon?.code || null,
