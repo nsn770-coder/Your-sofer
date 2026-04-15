@@ -10,6 +10,8 @@ import ProductCard from '@/components/ui/ProductCard';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+type SortBy = 'popular' | 'price_asc' | 'price_desc' | 'newest' | 'oldest';
+
 interface Product {
   id: string;
   name: string;
@@ -27,6 +29,7 @@ interface Product {
   days?: string;
   sofer?: string;
   vendor?: string;
+  createdAt?: { seconds: number };
 }
 
 interface FilterState {
@@ -182,16 +185,27 @@ function applyFilters(products: Product[], f: FilterState): Product[] {
     if (f.maxPrice !== '' && p.price > Number(f.maxPrice)) return false;
     if (f.minRating > 0 && (p.stars ?? 0) < f.minRating) return false;
     if (f.freeShipping && p.days && !p.days.toLowerCase().includes('חינם')) return false;
-    // filterAttributes-based filters
     for (const key of ATTR_KEYS) {
       const chosen = f.attrFilters[key];
       if (chosen && chosen !== 'הכל' && p.filterAttributes?.[key] !== chosen) return false;
     }
-    // name-based filters: check product.name includes the chosen value
     for (const [, val] of Object.entries(f.nameFilters)) {
       if (val && val !== 'הכל' && !p.name.includes(val)) return false;
     }
     return true;
+  });
+}
+
+function applySort(products: Product[], sort: SortBy): Product[] {
+  return [...products].sort((a, b) => {
+    switch (sort) {
+      case 'price_asc':  return (a.price ?? 0) - (b.price ?? 0);
+      case 'price_desc': return (b.price ?? 0) - (a.price ?? 0);
+      case 'newest':     return (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0);
+      case 'oldest':     return (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0);
+      case 'popular':
+      default:           return (b.priority ?? 0) - (a.priority ?? 0);
+    }
   });
 }
 
@@ -393,6 +407,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [allLoaded, setAllLoaded] = useState<Product[]>([]);
   const [loading, setLoading]     = useState(true);
   const [filters, setFilters]     = useState<FilterState>(EMPTY_FILTERS);
+  const [sortBy, setSortBy]       = useState<SortBy>('popular');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -450,7 +465,7 @@ export default function CategoryClient({ category }: { category: string }) {
   }, [filters]);
 
   // ── Filtered + paginated products ─────────────────────────────────────────
-  const filtered   = useMemo(() => applyFilters(allLoaded, filters), [allLoaded, filters]);
+  const filtered   = useMemo(() => applySort(applyFilters(allLoaded, filters), sortBy), [allLoaded, filters, sortBy]);
   const active     = hasActiveFilters(filters);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated  = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -468,19 +483,36 @@ export default function CategoryClient({ category }: { category: string }) {
         )}
       </div>
 
-      {/* ── Mobile filter button ── */}
-      <div className="lg:hidden sticky top-0 z-20 bg-white border-b border-gray-200 px-4 py-2.5 flex items-center justify-between shadow-sm">
+      {/* ── Toolbar: filter + sort (mobile = sticky, shown below header; desktop = hidden here, shown above products) ── */}
+      <div className="lg:hidden sticky top-0 z-20 bg-[#0c1a35] px-3 py-2 flex items-center gap-2 shadow-md">
+        {/* Filter button */}
         <button
           onClick={() => setDrawerOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 text-sm font-semibold text-gray-700 hover:border-[#0c1a35] transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-sm flex-shrink-0 transition-colors"
+          style={{ background: active ? '#b8972a' : 'rgba(255,255,255,0.12)', color: '#fff', border: active ? '1.5px solid #b8972a' : '1.5px solid rgba(255,255,255,0.25)' }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M6 8h12M9 12h6M12 16h0" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M6 8h12M9 12h6" />
           </svg>
-          סינון
-          {active && <span className="w-2 h-2 rounded-full bg-[#b8972a]" />}
+          סינון ☰
+          {active && <span className="w-2 h-2 rounded-full bg-white" />}
         </button>
-        {!loading && <span className="text-xs text-gray-400">{filtered.length} תוצאות</span>}
+
+        {/* Sort dropdown */}
+        <select
+          value={sortBy}
+          onChange={e => setSortBy(e.target.value as SortBy)}
+          className="flex-1 rounded-full text-sm font-semibold px-3 py-2 focus:outline-none cursor-pointer"
+          style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.25)', direction: 'rtl' }}
+        >
+          <option value="popular"    style={{ color: '#000', background: '#fff' }}>הכי נמכר</option>
+          <option value="newest"     style={{ color: '#000', background: '#fff' }}>חדש לישן</option>
+          <option value="oldest"     style={{ color: '#000', background: '#fff' }}>ישן לחדש</option>
+          <option value="price_asc"  style={{ color: '#000', background: '#fff' }}>מחיר: נמוך לגבוה</option>
+          <option value="price_desc" style={{ color: '#000', background: '#fff' }}>מחיר: גבוה לנמוך</option>
+        </select>
+
+        {!loading && <span className="text-xs text-white/60 flex-shrink-0">{filtered.length}</span>}
       </div>
 
       {/* ── Mobile drawer ── */}
@@ -519,6 +551,26 @@ export default function CategoryClient({ category }: { category: string }) {
 
         {/* ── Products area ── */}
         <div className="flex-1 min-w-0">
+
+          {/* Desktop sort bar (hidden on mobile — mobile toolbar above handles it) */}
+          <div className="hidden lg:flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+            <span className="text-sm text-gray-500">
+              {loading ? 'טוען...' : `${filtered.length} מוצרים`}
+            </span>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as SortBy)}
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 bg-white cursor-pointer focus:outline-none focus:border-[#0c1a35]"
+              style={{ direction: 'rtl' }}
+            >
+              <option value="popular">הכי נמכר</option>
+              <option value="newest">חדש לישן</option>
+              <option value="oldest">ישן לחדש</option>
+              <option value="price_asc">מחיר: נמוך לגבוה</option>
+              <option value="price_desc">מחיר: גבוה לנמוך</option>
+            </select>
+          </div>
+
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
