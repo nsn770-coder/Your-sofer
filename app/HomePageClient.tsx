@@ -287,7 +287,7 @@ export default function HomePageClient() {
         // Note: where('hidden','!=',true) + orderBy('createdAt') requires a composite index —
         //   filtering client-side instead for backward compatibility with legacy docs.
         const snap = await getDocs(
-          query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(32)),
+          query(collection(db, 'products'), orderBy('priority', 'desc'), limit(32)),
         );
         setNewProducts(
           snap.docs
