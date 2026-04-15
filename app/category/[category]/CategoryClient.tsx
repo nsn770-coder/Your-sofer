@@ -426,7 +426,8 @@ export default function CategoryClient({ category }: { category: string }) {
   ];
   // Virtual group pages: map category → subCategory values to fetch
   const SUBCATEGORY_GROUPS: Record<string, string[]> = {
-    'חגים': ['חנוכה', 'פסח'],
+    'חגים':        ['חנוכה', 'פסח'],
+    'חגים ומועדים': ['חנוכה', 'פסח'],  // legacy slug alias
   };
 
   async function fetchAll() {
