@@ -494,6 +494,9 @@ export default function CategoryClient({ category }: { category: string }) {
         return;
       }
     }
+
+    // 3. Fallback: apply as a name-contains filter (catches ?filter=מגש, ?filter=פמוט, etc.)
+    setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, _url: urlFilter } }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlFilter, loading, allLoaded.length]);
 

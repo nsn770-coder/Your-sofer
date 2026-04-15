@@ -48,9 +48,9 @@ export const navigationData: NavItem[] = [
         title: "קלפי מזוזה",
         items: [
           { label: "קלפי מזוזה — כל הגדלים", href: "/category/קלפי מזוזה" },
-          { label: 'קלף 10 ס"מ',               href: '/category/קלפי מזוזה?filter=10' },
-          { label: 'קלף 12 ס"מ',               href: '/category/קלפי מזוזה?filter=12' },
-          { label: 'קלף 15 ס"מ',               href: '/category/קלפי מזוזה?filter=15' },
+          { label: 'קלף 10 ס"מ',               href: '/category/קלפי מזוזה?filter=10 ס"מ' },
+          { label: 'קלף 12 ס"מ',               href: '/category/קלפי מזוזה?filter=12 ס"מ' },
+          { label: 'קלף 15 ס"מ',               href: '/category/קלפי מזוזה?filter=15 ס"מ' },
         ],
       },
     ],
@@ -226,7 +226,7 @@ export const navigationData: NavItem[] = [
         items: [
           { label: "כל עיצוב הבית",     href: "/category/עיצוב הבית" },
           { label: "פמוטים ונרות",      href: "/category/עיצוב הבית?filter=פמוט" },
-          { label: "קופסאות ומסגרות",   href: "/category/עיצוב הבית?filter=קופסה" },
+          { label: "קופסאות ומסגרות",   href: "/category/עיצוב הבית?filter=קופסת" },
           { label: "שעונים ועיצוב",     href: "/category/עיצוב הבית?filter=שעון" },
           { label: "קישוטים ודקור",     href: "/category/עיצוב הבית?filter=קישוט" },
         ],
