@@ -188,6 +188,7 @@ export default function HomePageClient() {
   const [testIdx, setTestIdx]         = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
+  const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
   const cardsRef       = useRef<HTMLDivElement>(null); // outer wrap — for scrollIntoView
   const carouselTrack  = useRef<HTMLDivElement>(null); // scrollable track
   const newRef         = useRef<HTMLDivElement>(null);
@@ -412,6 +413,17 @@ export default function HomePageClient() {
     return () => clearTimeout(timer);
   }, []);
 
+  // 45-second newsletter popup — once per session (sessionStorage guard)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (sessionStorage.getItem('newsletter_popup_shown')) return;
+    const timer = setTimeout(() => {
+      setNewsletterPopupOpen(true);
+      sessionStorage.setItem('newsletter_popup_shown', '1');
+    }, 45000);
+    return () => clearTimeout(timer);
+  }, []);
+
   async function fetchWizardResults(budget: typeof wizardBudget, kashrut: typeof wizardKashrut) {
     setWizardLoading(true);
     try {
@@ -484,6 +496,74 @@ export default function HomePageClient() {
         fontFamily: "'Heebo', Arial, sans-serif",
       }}
     >
+      {/* ── Newsletter popup (45 s trigger) ── */}
+      {newsletterPopupOpen && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 850, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, backdropFilter: 'blur(4px)', background: 'rgba(0,0,0,0.55)' }}
+          onClick={() => setNewsletterPopupOpen(false)}
+        >
+          <div
+            style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 440, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden', direction: 'rtl' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a2d50)', padding: '22px 24px', position: 'relative', textAlign: 'center' }}>
+              <button
+                onClick={() => setNewsletterPopupOpen(false)}
+                style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >✕</button>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>🏆</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>הצטרפו למועדון הלקוחות</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>קבלו מבצעים ומוצרים חדשים לפני כולם</div>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '24px 24px 28px' }}>
+              {newsletterStatus === 'success' ? (
+                <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                  <div style={{ fontSize: 40, marginBottom: 10 }}>🎉</div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>נרשמתם בהצלחה!</div>
+                  <div style={{ fontSize: 13, color: '#666' }}>נעדכן אתכם ראשונים על מוצרים חדשים ומבצעים.</div>
+                  <button
+                    onClick={() => setNewsletterPopupOpen(false)}
+                    style={{ marginTop: 18, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 14, fontWeight: 900, cursor: 'pointer' }}
+                  >סגור</button>
+                </div>
+              ) : (
+                <form onSubmit={async e => { await handleNewsletter(e); }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <input
+                    type="email"
+                    value={newsletterEmail}
+                    onChange={e => { setNewsletterEmail(e.target.value); setNewsletterStatus('idle'); }}
+                    placeholder="כתובת המייל שלכם"
+                    required
+                    style={{ border: '2px solid #e0e0e0', borderRadius: 10, padding: '12px 16px', fontSize: 14, outline: 'none', direction: 'rtl', width: '100%', boxSizing: 'border-box' }}
+                  />
+                  {newsletterStatus === 'duplicate' && (
+                    <div style={{ fontSize: 12, color: '#b8972a', fontWeight: 600 }}>כתובת המייל הזו כבר רשומה 😊</div>
+                  )}
+                  {newsletterStatus === 'error' && (
+                    <div style={{ fontSize: 12, color: '#e74c3c', fontWeight: 600 }}>שגיאה בהרשמה, נסו שוב.</div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={newsletterStatus === 'loading'}
+                    style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 900, cursor: newsletterStatus === 'loading' ? 'not-allowed' : 'pointer', opacity: newsletterStatus === 'loading' ? 0.7 : 1 }}
+                  >
+                    {newsletterStatus === 'loading' ? '⏳ שולח...' : '✉️ הצטרפו עכשיו ←'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewsletterPopupOpen(false)}
+                    style={{ background: 'none', border: 'none', color: '#aaa', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}
+                  >לא תודה</button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Selection Wizard modal ── */}
       {wizardOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, backdropFilter: 'blur(4px)', background: 'rgba(0,0,0,0.55)' }}
@@ -717,70 +797,23 @@ export default function HomePageClient() {
         );
       })()}
 
-      {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#0c1a35', padding: isMobile ? '20px 16px' : '24px 16px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: isMobile ? 16 : 24 }}>
+      {/* ── Live Counters — single compact row ── */}
+      <div ref={countersRef} style={{ background: '#0c1a35', padding: '10px 16px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
           {[
-            { icon: '🖊️', value: countedValues.soferim,   suffix: '',   label: 'סופרים מאושרים' },
-            { icon: '📦', value: countedValues.products,  suffix: '+',  label: 'מוצרים באתר' },
-            { icon: '✅', value: countedValues.customers, suffix: '+',  label: 'לקוחות מרוצים' },
-            { icon: '⭐', value: null,                    suffix: '',   label: 'דירוג ממוצע', fixed: '4.8' },
+            { icon: '🖊️', value: countedValues.soferim,   suffix: '',  label: 'סופרים מאושרים' },
+            { icon: '📦', value: countedValues.products,  suffix: '+', label: 'מוצרים באתר' },
+            { icon: '✅', value: countedValues.customers, suffix: '+', label: 'לקוחות מרוצים' },
+            { icon: '⭐', value: null,                    suffix: '',  label: 'דירוג ממוצע', fixed: '4.8' },
           ].map(c => (
-            <div key={c.label} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: isMobile ? 26 : 32, marginBottom: 4 }}>{c.icon}</div>
-              <div style={{ fontSize: isMobile ? 24 : 30, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>
+            <div key={c.label} style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <span style={{ fontSize: isMobile ? 16 : 18 }}>{c.icon}</span>
+              <span style={{ fontSize: isMobile ? 15 : 17, fontWeight: 900, color: '#b8972a' }}>
                 {c.fixed ?? (c.value + c.suffix)}
-              </div>
-              <div style={{ fontSize: 12, color: '#a8c0d8', marginTop: 4, fontWeight: 600 }}>{c.label}</div>
+              </span>
+              <span style={{ fontSize: isMobile ? 10 : 11, color: '#a8c0d8', fontWeight: 600 }}>{c.label}</span>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* ── Newsletter VIP ── */}
-      <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2d50 100%)', padding: isMobile ? '28px 16px' : '36px 16px', direction: 'rtl' }}>
-        <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', marginBottom: 6 }}>🏆 הצטרפו למועדון הלקוחות שלנו</div>
-          <div style={{ fontSize: isMobile ? 13 : 14, color: 'rgba(255,255,255,0.75)', marginBottom: 20 }}>
-            קבלו עדכונים על מוצרים חדשים ומבצעים לפני כולם
-          </div>
-          {newsletterStatus === 'success' ? (
-            <div style={{ background: 'rgba(39,174,96,0.18)', border: '1px solid #27ae60', borderRadius: 10, padding: '14px 20px', color: '#7dfca4', fontWeight: 700, fontSize: 15 }}>
-              ✅ נרשמתם בהצלחה! נעדכן אתכם ראשונים.
-            </div>
-          ) : (
-            <form onSubmit={handleNewsletter} style={{ display: 'flex', gap: 8, flexDirection: isMobile ? 'column' : 'row', alignItems: 'stretch' }}>
-              <input
-                type="email"
-                value={newsletterEmail}
-                onChange={e => { setNewsletterEmail(e.target.value); setNewsletterStatus('idle'); }}
-                placeholder="הכניסו את כתובת המייל שלכם"
-                required
-                style={{
-                  flex: 1, border: '2px solid rgba(184,151,42,0.5)', borderRadius: 10, padding: '12px 16px',
-                  fontSize: 14, background: 'rgba(255,255,255,0.08)', color: '#fff',
-                  outline: 'none', direction: 'rtl',
-                }}
-              />
-              <button
-                type="submit"
-                disabled={newsletterStatus === 'loading'}
-                style={{
-                  background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10,
-                  padding: '12px 24px', fontSize: 14, fontWeight: 900, cursor: newsletterStatus === 'loading' ? 'not-allowed' : 'pointer',
-                  whiteSpace: 'nowrap', opacity: newsletterStatus === 'loading' ? 0.7 : 1,
-                }}
-              >
-                {newsletterStatus === 'loading' ? '⏳...' : 'הצטרפו ←'}
-              </button>
-            </form>
-          )}
-          {newsletterStatus === 'duplicate' && (
-            <div style={{ marginTop: 8, fontSize: 13, color: '#f5c518' }}>כתובת המייל הזו כבר רשומה 😊</div>
-          )}
-          {newsletterStatus === 'error' && (
-            <div style={{ marginTop: 8, fontSize: 13, color: '#ff7675' }}>שגיאה בהרשמה, נסו שוב.</div>
-          )}
         </div>
       </div>
 
