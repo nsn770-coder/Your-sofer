@@ -415,16 +415,51 @@ export default function CategoryClient({ category }: { category: string }) {
 
   // ── Fetch ALL products for this category at once ───────────────────────────
   // Client-side pagination is used so filters always apply across the full set.
+  //
+  // Some pages (יודאיקה sub-pages) don't have their own `cat` value — products
+  // keep cat:"יודאיקה" and store the subcategory in `subCategory`.
+  // "חגים" is a virtual group covering subCategory חנוכה + פסח.
+
+  // Categories stored as subCategory (products keep cat:"יודאיקה")
+  const SUBCATEGORY_PAGES = [
+    'נטילת ידיים', 'שבת', 'חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי',
+  ];
+  // Virtual group pages: map category → subCategory values to fetch
+  const SUBCATEGORY_GROUPS: Record<string, string[]> = {
+    'חגים': ['חנוכה', 'פסח'],
+  };
 
   async function fetchAll() {
-    const snap = await getDocs(
-      query(
-        collection(db, 'products'),
-        where('cat', '==', category),
-        orderBy('priority', 'desc'),
-        limit(200),
-      ),
-    );
+    let snap;
+    if (SUBCATEGORY_GROUPS[category]) {
+      // e.g. /category/חגים → fetch subCategory in ['חנוכה','פסח']
+      snap = await getDocs(
+        query(
+          collection(db, 'products'),
+          where('subCategory', 'in', SUBCATEGORY_GROUPS[category]),
+          limit(500),
+        ),
+      );
+    } else if (SUBCATEGORY_PAGES.includes(category)) {
+      // e.g. /category/חנוכה → fetch subCategory == 'חנוכה'
+      snap = await getDocs(
+        query(
+          collection(db, 'products'),
+          where('subCategory', '==', category),
+          limit(500),
+        ),
+      );
+    } else {
+      // Default: query by cat field
+      snap = await getDocs(
+        query(
+          collection(db, 'products'),
+          where('cat', '==', category),
+          orderBy('priority', 'desc'),
+          limit(200),
+        ),
+      );
+    }
     setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)));
   }
 
