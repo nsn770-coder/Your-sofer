@@ -86,25 +86,17 @@ service cloud.firestore {
 
     // ── Sofer profile edit requests ─────────────────────────────────────────
 
-    // Helper: caller is a sofer whose soferId matches the document
-    function isSofer() {
-      return isSignedIn()
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'sofer';
-    }
+    match /sofer_edit_requests/{requestId} {
+      // סופר יכול ליצור בקשה עבור עצמו בלבד
+      // soferId בבקשה חייב להיות ה-uid של המשתמש המחובר
+      allow create: if request.auth != null
+                    && request.resource.data.soferId == request.auth.uid;
 
-    match /sofer_edit_requests/{reqId} {
-      // Sofer can create only for themselves
-      allow create: if isSofer()
-                    && request.resource.data.soferId ==
-                       get(/databases/$(database)/documents/users/$(request.auth.uid)).data.soferId;
+      // סופר יכול לקרוא את הבקשות שלו בלבד; אדמין קורא הכל
+      allow read: if request.auth != null
+                  && (resource.data.soferId == request.auth.uid || isAdmin());
 
-      // Sofer can read only their own requests; admin can read all
-      allow read: if isAdmin()
-                  || (isSofer()
-                      && resource.data.soferId ==
-                         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.soferId);
-
-      // Only admin can approve / reject (update status)
+      // רק אדמין יכול לעדכן/לאשר/לדחות
       allow update, delete: if isAdmin();
     }
 
