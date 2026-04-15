@@ -88,6 +88,11 @@ interface Sofer {
   name: string;
 }
 
+interface WritingSample {
+  type: 'image' | 'video';
+  url: string;
+}
+
 interface SoferFull {
   id: string;
   name: string;
@@ -98,8 +103,23 @@ interface SoferFull {
   style?: string;
   categories?: string[];
   imageUrl?: string;
-  writingSamples?: string[];
+  writingSamples?: (string | WritingSample)[];
   status?: string;
+}
+
+interface SoferEditRequest {
+  id: string;
+  soferId: string;
+  soferName: string;
+  status: 'pending' | 'approved' | 'rejected';
+  changes: Partial<{
+    name: string; city: string; style: string;
+    description: string; imageUrl: string;
+    writingSamples: WritingSample[];
+  }>;
+  currentData?: Partial<SoferFull>;
+  createdAt?: { seconds: number };
+  adminNote?: string;
 }
 
 interface HomeContent {
@@ -121,7 +141,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests';
 
 interface Review {
   id: string;
@@ -740,6 +760,9 @@ export default function AdminPage() {
   const [testForm, setTestForm] = useState({ name: '', city: '', text: '', rating: 5, imageUrl: '' });
   const [testSaving, setTestSaving] = useState(false);
   const [testUploadingImg, setTestUploadingImg] = useState(false);
+  const [editRequests, setEditRequests] = useState<SoferEditRequest[]>([]);
+  const [editRequestsLoading, setEditRequestsLoading] = useState(true);
+  const [rejectNoteMap, setRejectNoteMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
@@ -749,7 +772,7 @@ export default function AdminPage() {
     if (user?.role === 'admin') {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
-      loadReviews(); loadShluchimApplications(); loadTestimonials();
+      loadReviews(); loadShluchimApplications(); loadTestimonials(); loadEditRequests();
     }
   }, [user]);
 
@@ -1076,6 +1099,44 @@ export default function AdminPage() {
     finally { setTestimonialsLoading(false); }
   }
 
+  async function loadEditRequests() {
+    try {
+      const snap = await getDocs(query(collection(db, 'sofer_edit_requests'), orderBy('createdAt', 'desc')));
+      setEditRequests(snap.docs.map(d => ({ id: d.id, ...d.data() } as SoferEditRequest)));
+    } catch (e) { console.error(e); }
+    finally { setEditRequestsLoading(false); }
+  }
+
+  async function approveEditRequest(req: SoferEditRequest) {
+    setActionLoading(req.id);
+    try {
+      // Apply the changes to soferim/{soferId}
+      await updateDoc(doc(db, 'soferim', req.soferId), req.changes);
+      // Mark request as approved
+      await updateDoc(doc(db, 'sofer_edit_requests', req.id), {
+        status: 'approved',
+        approvedAt: serverTimestamp(),
+      });
+      setEditRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'approved' } : r));
+      // Refresh soferim lists so changes are visible
+      loadSoferimFull();
+    } catch (e) { console.error(e); alert('שגיאה באישור'); }
+    finally { setActionLoading(null); }
+  }
+
+  async function rejectEditRequest(req: SoferEditRequest, note: string) {
+    setActionLoading(req.id + '_reject');
+    try {
+      await updateDoc(doc(db, 'sofer_edit_requests', req.id), {
+        status: 'rejected',
+        rejectedAt: serverTimestamp(),
+        adminNote: note,
+      });
+      setEditRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'rejected', adminNote: note } : r));
+    } catch (e) { console.error(e); alert('שגיאה בדחייה'); }
+    finally { setActionLoading(null); }
+  }
+
   async function uploadTestimonialImg(file: File): Promise<string> {
     const fd = new FormData();
     fd.append('file', file);
@@ -1227,6 +1288,7 @@ export default function AdminPage() {
           { key: 'reviews', label: '⭐ ביקורות', color: 'bg-yellow-600', badge: reviews.filter(r => !r.approved).length },
           { key: 'testimonials', label: '💬 עדויות לקוחות', color: 'bg-rose-600' },
           { key: 'homepage', label: '🏠 דף הבית', color: 'bg-slate-700' },
+          { key: 'edit_requests', label: '✏️ בקשות עריכה', color: 'bg-emerald-700', badge: editRequests.filter(r => r.status === 'pending').length },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -1387,10 +1449,13 @@ export default function AdminPage() {
                         <div className="mt-3">
                           <p className="text-xs font-bold text-gray-500 mb-1">🖊️ דוגמאות כתיבה</p>
                           <div className="flex gap-2 flex-wrap">
-                            {s.writingSamples.map((url, i) => (
-                              <img key={i} src={url} alt={`דוגמת כתיבה ${i + 1}`} onClick={() => setLightboxImage(url)}
-                                className="w-16 h-16 object-cover rounded-lg border border-amber-200 cursor-zoom-in hover:opacity-80 transition-opacity" />
-                            ))}
+                            {s.writingSamples.map((sample, i) => {
+                              const url = typeof sample === 'string' ? sample : (sample as WritingSample).url;
+                              return (
+                                <img key={i} src={url} alt={`דוגמת כתיבה ${i + 1}`} onClick={() => setLightboxImage(url)}
+                                  className="w-16 h-16 object-cover rounded-lg border border-amber-200 cursor-zoom-in hover:opacity-80 transition-opacity" />
+                              );
+                            })}
                           </div>
                         </div>
                       )}
@@ -1737,6 +1802,192 @@ export default function AdminPage() {
 
       {activeTab === 'homepage' && (
         <HomepageConfigTab products={products} />
+      )}
+
+      {activeTab === 'edit_requests' && (
+        <div style={{ direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0c1a35', margin: 0 }}>✏️ בקשות עריכת פרופיל סופר</h2>
+            <button onClick={loadEditRequests}
+              style={{ background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, padding: '7px 14px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
+              🔄 רענן
+            </button>
+          </div>
+
+          {editRequestsLoading ? (
+            <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>טוען...</div>
+          ) : editRequests.length === 0 ? (
+            <div style={{ background: '#fff', borderRadius: 12, padding: 40, textAlign: 'center', color: '#9ca3af' }}>
+              <div style={{ fontSize: 40, marginBottom: 8 }}>📭</div>
+              <div style={{ fontSize: 15 }}>אין בקשות עריכה</div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {editRequests.map(req => {
+                const isPending  = req.status === 'pending';
+                const isApproved = req.status === 'approved';
+                const date = req.createdAt ? new Date(req.createdAt.seconds * 1000).toLocaleDateString('he-IL') : '';
+                const statusBadge = isPending
+                  ? { label: '⏳ ממתין', bg: '#fef3c7', color: '#92400e' }
+                  : isApproved
+                  ? { label: '✅ אושר',  bg: '#d1fae5', color: '#065f46' }
+                  : { label: '❌ נדחה',  bg: '#fee2e2', color: '#991b1b' };
+
+                return (
+                  <div key={req.id} style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 6px rgba(0,0,0,0.08)', overflow: 'hidden', border: isPending ? '2px solid #fbbf24' : '1px solid #e5e7eb' }}>
+
+                    {/* Card header */}
+                    <div style={{ background: isPending ? '#fffbeb' : '#f9fafb', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ fontSize: 26 }}>✍️</div>
+                        <div>
+                          <div style={{ fontWeight: 900, fontSize: 16, color: '#0c1a35' }}>{req.soferName}</div>
+                          <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>soferId: {req.soferId} · {date}</div>
+                        </div>
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 12px', borderRadius: 20, background: statusBadge.bg, color: statusBadge.color }}>
+                        {statusBadge.label}
+                      </span>
+                    </div>
+
+                    <div style={{ padding: '20px' }}>
+
+                      {/* Profile image before/after */}
+                      {req.changes.imageUrl && (
+                        <div style={{ marginBottom: 20 }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: '#374151', marginBottom: 10 }}>תמונת פרופיל</div>
+                          <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 4 }}>לפני</div>
+                              {req.currentData?.imageUrl ? (
+                                <img src={req.currentData.imageUrl} alt="לפני"
+                                  style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb' }} />
+                              ) : (
+                                <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f3f4f6', border: '2px dashed #d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>👤</div>
+                              )}
+                            </div>
+                            <div style={{ fontSize: 22, color: '#9ca3af' }}>→</div>
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 700, marginBottom: 4 }}>אחרי</div>
+                              <img src={req.changes.imageUrl} alt="אחרי"
+                                style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid #86efac' }}
+                                onError={e => (e.currentTarget.style.display = 'none')} />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Text field changes */}
+                      {(['name', 'city', 'style', 'description'] as const).map(field => {
+                        if (!(field in req.changes)) return null;
+                        const fieldLabels = { name: 'שם', city: 'עיר', style: 'סגנון', description: 'תיאור' };
+                        const before = String(req.currentData?.[field] ?? '');
+                        const after  = String(req.changes[field] ?? '');
+                        return (
+                          <div key={field} style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f3f4f6' }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: '#374151', marginBottom: 8 }}>{fieldLabels[field]}</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 8, alignItems: 'start' }}>
+                              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '8px 12px', fontSize: 13, color: '#991b1b', minHeight: 36 }}>
+                                <div style={{ fontSize: 10, color: '#f87171', fontWeight: 700, marginBottom: 3 }}>לפני</div>
+                                {before || <span style={{ color: '#d1d5db', fontStyle: 'italic' }}>ריק</span>}
+                              </div>
+                              <div style={{ fontSize: 20, color: '#9ca3af', marginTop: 10 }}>→</div>
+                              <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '8px 12px', fontSize: 13, color: '#166534', minHeight: 36 }}>
+                                <div style={{ fontSize: 10, color: '#4ade80', fontWeight: 700, marginBottom: 3 }}>אחרי</div>
+                                {after || <span style={{ color: '#d1d5db', fontStyle: 'italic' }}>ריק</span>}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Writing samples */}
+                      {req.changes.writingSamples && (
+                        <div style={{ marginBottom: 14 }}>
+                          <div style={{ fontSize: 12, fontWeight: 800, color: '#374151', marginBottom: 10 }}>דוגמאות כתב</div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'start' }}>
+                            {/* Before */}
+                            <div>
+                              <div style={{ fontSize: 10, color: '#f87171', fontWeight: 700, marginBottom: 6 }}>לפני</div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                                {(req.currentData?.writingSamples ?? []).length === 0
+                                  ? <span style={{ fontSize: 12, color: '#d1d5db', fontStyle: 'italic' }}>אין</span>
+                                  : (req.currentData?.writingSamples ?? []).map((s, i) => {
+                                      const url = typeof s === 'string' ? s : s.url;
+                                      const isVid = typeof s !== 'string' && s.type === 'video';
+                                      return isVid ? (
+                                        <div key={i} style={{ width: 60, height: 60, borderRadius: 6, background: '#1a3a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>▶️</div>
+                                      ) : (
+                                        <img key={i} src={url} alt="" style={{ width: 60, height: 60, borderRadius: 6, objectFit: 'cover', border: '1px solid #fecaca' }}
+                                          onClick={() => setLightboxImage(url)} />
+                                      );
+                                    })
+                                }
+                              </div>
+                            </div>
+                            <div style={{ fontSize: 20, color: '#9ca3af', marginTop: 28 }}>→</div>
+                            {/* After */}
+                            <div>
+                              <div style={{ fontSize: 10, color: '#4ade80', fontWeight: 700, marginBottom: 6 }}>אחרי</div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                                {req.changes.writingSamples.length === 0
+                                  ? <span style={{ fontSize: 12, color: '#d1d5db', fontStyle: 'italic' }}>ריק</span>
+                                  : req.changes.writingSamples.map((s, i) => {
+                                      const isVid = s.type === 'video';
+                                      return isVid ? (
+                                        <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+                                          style={{ width: 60, height: 60, borderRadius: 6, background: '#1a3a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, textDecoration: 'none' }}>▶️</a>
+                                      ) : (
+                                        <img key={i} src={s.url} alt="" style={{ width: 60, height: 60, borderRadius: 6, objectFit: 'cover', border: '1px solid #86efac', cursor: 'zoom-in' }}
+                                          onClick={() => setLightboxImage(s.url)} />
+                                      );
+                                    })
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Admin note on rejected */}
+                      {req.adminNote && (
+                        <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#4b5563', marginTop: 8 }}>
+                          💬 הערת מנהל: {req.adminNote}
+                        </div>
+                      )}
+
+                      {/* Action buttons — pending only */}
+                      {isPending && (
+                        <div style={{ marginTop: 18, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                          <button
+                            disabled={actionLoading === req.id}
+                            onClick={() => approveEditRequest(req)}
+                            style={{ background: actionLoading === req.id ? '#9ca3af' : '#16a34a', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 22px', fontSize: 14, fontWeight: 700, cursor: actionLoading === req.id ? 'not-allowed' : 'pointer' }}>
+                            {actionLoading === req.id ? '⏳ מאשר...' : 'אשר ✅'}
+                          </button>
+                          <div style={{ display: 'flex', gap: 8, flex: 1, flexWrap: 'wrap' }}>
+                            <input
+                              value={rejectNoteMap[req.id] ?? ''}
+                              onChange={e => setRejectNoteMap(prev => ({ ...prev, [req.id]: e.target.value }))}
+                              placeholder="הערת דחייה (אופציונלי)..."
+                              style={{ flex: 1, minWidth: 180, border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', fontSize: 13, direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}
+                            />
+                            <button
+                              disabled={actionLoading === req.id + '_reject'}
+                              onClick={() => rejectEditRequest(req, rejectNoteMap[req.id] ?? '')}
+                              style={{ background: actionLoading === req.id + '_reject' ? '#9ca3af' : '#dc2626', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 14, fontWeight: 700, cursor: actionLoading === req.id + '_reject' ? 'not-allowed' : 'pointer' }}>
+                              {actionLoading === req.id + '_reject' ? '⏳...' : 'דחה ❌'}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       )}
 
       {showAddSofer && <AddSoferModal onClose={() => setShowAddSofer(false)} onSave={() => { loadSoferimFull(); loadSoferim(); }} />}
