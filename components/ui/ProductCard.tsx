@@ -1,7 +1,11 @@
 'use client';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/app/contexts/CartContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 import ProductBadge from '@/components/ui/ProductBadge';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/app/firebase';
 
 interface Props {
   id: string;
@@ -13,6 +17,7 @@ interface Props {
   badge?: string | null;
   was?: number | null;
   createdAt?: { seconds: number } | null;
+  hidden?: boolean;
 }
 
 export default function ProductCard({
@@ -25,9 +30,51 @@ export default function ProductCard({
   badge,
   was,
   createdAt,
+  hidden,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
+  // ── Admin quick-edit state ──────────────────────────────────────────────────
+  const [localHidden, setLocalHidden]     = useState(hidden ?? false);
+  const [localPriority, setLocalPriority] = useState(priority ?? 50);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [prioritySaved, setPrioritySaved] = useState(false);
+  const [removing, setRemoving]           = useState(false);
+  const [removed, setRemoved]             = useState(false);
+  const priorityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  async function handleToggleHidden(e: React.MouseEvent) {
+    e.stopPropagation();
+    const newHidden = !localHidden;
+    setLocalHidden(newHidden);
+    await updateDoc(doc(db, 'products', id), { hidden: newHidden });
+    if (newHidden) {
+      // Fade out the card after hiding
+      setRemoving(true);
+      setTimeout(() => setRemoved(true), 300);
+    }
+  }
+
+  function handlePriorityChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = Math.max(1, Math.min(99, Number(e.target.value)));
+    setLocalPriority(val);
+    if (priorityTimer.current) clearTimeout(priorityTimer.current);
+    priorityTimer.current = setTimeout(async () => {
+      await updateDoc(doc(db, 'products', id), { priority: val });
+      setPrioritySaved(true);
+      setTimeout(() => setPrioritySaved(false), 1500);
+    }, 300);
+  }
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation();
+    await deleteDoc(doc(db, 'products', id));
+    setRemoving(true);
+    setTimeout(() => setRemoved(true), 300);
+  }
 
   const imgSrc = images?.[0] ?? null;
 
@@ -53,17 +100,75 @@ export default function ProductCard({
     updateQty(id, qty - 1);
   }
 
+  if (removed) return null;
+
   return (
     <div
       dir="rtl"
       onClick={() => router.push(`/product/${id}`)}
-      className="
+      className={`
         group relative flex flex-col bg-white rounded-2xl
         shadow-sm border border-gray-100 overflow-hidden cursor-pointer
-        transition-all duration-200
+        transition-all duration-300
         hover:shadow-md hover:-translate-y-0.5
-      "
+        ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''}
+      `}
     >
+      {/* ─── Admin quick-edit toolbar ───────────────────────────── */}
+      {isAdmin && (
+        <div
+          className="absolute top-0 left-0 right-0 z-20 flex items-center gap-1.5 px-2 py-1 bg-black/75"
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Hide / Show */}
+          <button
+            onClick={handleToggleHidden}
+            title={localHidden ? 'הצג מוצר' : 'הסתר מוצר'}
+            className={`text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors ${
+              localHidden
+                ? 'bg-green-500 text-white hover:bg-green-600'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            {localHidden ? '👁️ הצג' : '🙈 הסתר'}
+          </button>
+
+          {/* Priority input */}
+          <input
+            type="number" min={1} max={99}
+            value={localPriority}
+            onChange={handlePriorityChange}
+            onClick={e => e.stopPropagation()}
+            className="w-10 text-[10px] text-center font-bold rounded bg-white/20 text-white border border-white/30 px-1 py-0.5 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          {prioritySaved && (
+            <span className="text-[9px] font-bold text-green-400">✓ נשמר</span>
+          )}
+
+          {/* Delete */}
+          <div className="mr-auto flex gap-1">
+            {deleteConfirm ? (
+              <>
+                <button
+                  onClick={handleDelete}
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500 text-white hover:bg-red-600 transition-colors"
+                >אשר</button>
+                <button
+                  onClick={e => { e.stopPropagation(); setDeleteConfirm(false); }}
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/20 text-white hover:bg-white/30 transition-colors"
+                >בטל</button>
+              </>
+            ) : (
+              <button
+                onClick={e => { e.stopPropagation(); setDeleteConfirm(true); }}
+                title="מחק מוצר"
+                className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white hover:bg-red-500/60 transition-colors"
+              >🗑️</button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ─── Image ─────────────────────────────────────────────── */}
       {/* Mobile: fixed h-36 so the card stays compact; desktop: aspect-square */}
       <div className="relative w-full h-36 sm:h-auto sm:aspect-square bg-gray-50 overflow-hidden">
