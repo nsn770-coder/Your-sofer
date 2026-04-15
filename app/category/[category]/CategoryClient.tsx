@@ -32,6 +32,7 @@ interface Product {
   sofer?: string;
   vendor?: string;
   createdAt?: { seconds: number };
+  hidden?: boolean;
 }
 
 interface FilterState {
@@ -452,6 +453,10 @@ export default function CategoryClient({ category }: { category: string }) {
       );
     } else {
       // Default: query by cat field
+      // Note: adding where('hidden', '!=', true) here requires a composite Firestore index:
+      //   hidden ASC + priority DESC — create in Firebase Console if needed.
+      //   Filtering client-side instead to avoid index requirement and support legacy docs
+      //   (existing products without the hidden field should remain visible).
       snap = await getDocs(
         query(
           collection(db, 'products'),
@@ -461,7 +466,8 @@ export default function CategoryClient({ category }: { category: string }) {
         ),
       );
     }
-    setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)));
+    // Filter out hidden products client-side (handles docs without the hidden field correctly)
+    setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true));
   }
 
   useEffect(() => {

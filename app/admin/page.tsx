@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, orderBy, query, where,
@@ -81,6 +81,8 @@ interface Product {
   soferId?: string;
   imgUrl?: string;
   image_url?: string;
+  hidden?: boolean;
+  priority?: number;
 }
 
 interface Sofer {
@@ -142,7 +144,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products';
 
 interface Review {
   id: string;
@@ -764,6 +766,9 @@ export default function AdminPage() {
   const [editRequests, setEditRequests] = useState<SoferEditRequest[]>([]);
   const [editRequestsLoading, setEditRequestsLoading] = useState(true);
   const [rejectNoteMap, setRejectNoteMap] = useState<Record<string, string>>({});
+  const [productDeleteConfirm, setProductDeleteConfirm] = useState<string | null>(null);
+  const [priorityUpdating, setPriorityUpdating] = useState<string | null>(null);
+  const priorityTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
@@ -1047,6 +1052,36 @@ export default function AdminPage() {
     finally { setActionLoading(null); }
   }
 
+  async function deleteProduct(productId: string) {
+    try {
+      await deleteDoc(doc(db, 'products', productId));
+      setProducts(prev => prev.filter(p => p.id !== productId));
+      setProductDeleteConfirm(null);
+    } catch (e) { console.error(e); alert('שגיאה במחיקה'); }
+  }
+
+  async function toggleHidden(productId: string, currentHidden: boolean) {
+    setActionLoading(productId + '_hidden');
+    const newHidden = !currentHidden;
+    try {
+      await updateDoc(doc(db, 'products', productId), { hidden: newHidden });
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, hidden: newHidden } : p));
+    } catch (e) { console.error(e); alert('שגיאה בעדכון'); }
+    finally { setActionLoading(null); }
+  }
+
+  function updatePriorityDebounced(productId: string, value: number) {
+    setProducts(prev => prev.map(p => p.id === productId ? { ...p, priority: value } : p));
+    if (priorityTimers.current[productId]) clearTimeout(priorityTimers.current[productId]);
+    priorityTimers.current[productId] = setTimeout(async () => {
+      setPriorityUpdating(productId);
+      try {
+        await updateDoc(doc(db, 'products', productId), { priority: value });
+      } catch (e) { console.error(e); }
+      finally { setPriorityUpdating(null); }
+    }, 300);
+  }
+
   async function changeUserRole(userId: string, newRole: UserRole) {
     setActionLoading(userId);
     try {
@@ -1282,8 +1317,10 @@ export default function AdminPage() {
   const pendingApps = applications.filter(a => a.status === 'pending');
   const pendingShluchimApps = shluchimApps.filter(a => a.status === 'pending');
   const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
-  const filteredProducts = products.filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()));
-  const unassignedProducts = products.filter(p => !p.soferId).length;
+  const visibleProducts = products.filter(p => p.hidden !== true);
+  const hiddenProducts  = products.filter(p => p.hidden === true);
+  const filteredProducts = visibleProducts.filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()));
+  const unassignedProducts = visibleProducts.filter(p => !p.soferId).length;
 
   return (
     <main className="max-w-6xl mx-auto p-6" dir="rtl">
@@ -1318,6 +1355,7 @@ export default function AdminPage() {
           { key: 'testimonials', label: '💬 עדויות לקוחות', color: 'bg-rose-600' },
           { key: 'homepage', label: '🏠 דף הבית', color: 'bg-slate-700' },
           { key: 'edit_requests', label: '✏️ בקשות עריכה', color: 'bg-emerald-700', badge: editRequests.filter(r => r.status === 'pending').length },
+          { key: 'hidden_products', label: '👁️ מוסתרים', color: 'bg-gray-600', badge: hiddenProducts.length },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -1345,9 +1383,9 @@ export default function AdminPage() {
           {productsLoading ? <div className="p-10 text-center text-gray-400">טוען מוצרים...</div> : (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th></tr></thead>
+                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">הסתרה</th><th className="p-3 text-right">מחיקה</th></tr></thead>
                 <tbody>
-                  {filteredProducts.length === 0 ? <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
+                  {filteredProducts.length === 0 ? <tr><td colSpan={8} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
                   : filteredProducts.map(p => (
                     <tr key={p.id} className="border-t hover:bg-gray-50">
                       <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
@@ -1355,6 +1393,31 @@ export default function AdminPage() {
                       <td className="p-3 font-bold text-green-700">₪{p.price}</td>
                       <td className="p-3"><button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'} className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>{p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}</button></td>
                       <td className="p-3"><select value={p.soferId || ''} disabled={actionLoading === p.id} onChange={e => assignSoferToProduct(p.id, e.target.value)} className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}><option value="">⚠️ ללא סופר</option>{soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></td>
+                      <td className="p-3">
+                        <input
+                          type="number" min={1} max={99}
+                          value={p.priority ?? 50}
+                          onChange={e => updatePriorityDebounced(p.id, Number(e.target.value))}
+                          className={`w-14 border rounded-lg px-2 py-1 text-xs text-center font-bold ${priorityUpdating === p.id ? 'border-amber-400 bg-amber-50' : 'border-gray-200'}`}
+                        />
+                      </td>
+                      <td className="p-3">
+                        <button
+                          onClick={() => toggleHidden(p.id, p.hidden ?? false)}
+                          disabled={actionLoading === p.id + '_hidden'}
+                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.hidden ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        >{p.hidden ? '👁️ הצג' : '🙈 הסתר'}</button>
+                      </td>
+                      <td className="p-3">
+                        {productDeleteConfirm === p.id ? (
+                          <span className="flex gap-1">
+                            <button onClick={() => deleteProduct(p.id)} className="px-2 py-1 rounded-full text-xs font-bold bg-red-600 text-white hover:bg-red-700">אשר</button>
+                            <button onClick={() => setProductDeleteConfirm(null)} className="px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200">ביטול</button>
+                          </span>
+                        ) : (
+                          <button onClick={() => setProductDeleteConfirm(p.id)} className="px-2 py-1 rounded-full text-xs font-bold bg-red-50 text-red-500 hover:bg-red-100">🗑️ מחק</button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -2014,6 +2077,51 @@ export default function AdminPage() {
                   </div>
                 );
               })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'hidden_products' && (
+        <div>
+          <h2 className="text-xl font-black mb-4 text-gray-800">👁️ מוצרים מוסתרים ({hiddenProducts.length})</h2>
+          {hiddenProducts.length === 0 ? (
+            <div className="p-10 text-center text-gray-400 bg-white rounded-xl shadow">אין מוצרים מוסתרים</div>
+          ) : (
+            <div className="bg-white rounded-xl shadow overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-3 text-right">מוצר</th>
+                    <th className="p-3 text-right">קטגוריה</th>
+                    <th className="p-3 text-right">מחיר</th>
+                    <th className="p-3 text-right">עדיפות</th>
+                    <th className="p-3 text-right">פעולה</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {hiddenProducts.map(p => (
+                    <tr key={p.id} className="border-t hover:bg-gray-50 opacity-70">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          {(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}
+                          <span className="font-bold text-xs">{p.name}</span>
+                        </div>
+                      </td>
+                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
+                      <td className="p-3 font-bold text-green-700">₪{p.price}</td>
+                      <td className="p-3 text-xs text-gray-500">{p.priority ?? 50}</td>
+                      <td className="p-3">
+                        <button
+                          onClick={() => toggleHidden(p.id, true)}
+                          disabled={actionLoading === p.id + '_hidden'}
+                          className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 hover:bg-green-200 transition"
+                        >✅ החזר לאתר</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

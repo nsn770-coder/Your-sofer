@@ -41,6 +41,7 @@ interface Product {
   badge?: string | null;
   was?: number | null;
   createdAt?: { seconds: number } | null;
+  hidden?: boolean;
 }
 
 // ── Sub-image slot ─────────────────────────────────────────────────────────────
@@ -282,10 +283,12 @@ export default function HomePageClient() {
 
     async function fetchNewProducts() {
       try {
+        // Note: adding where('hidden', '!=', true) here requires a Firestore composite index:
+        //   hidden ASC + createdAt DESC — filtering client-side instead for backward compatibility.
         const snap = await getDocs(
           query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(16)),
         );
-        setNewProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)));
+        setNewProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter((p: Product) => p.hidden !== true));
       } catch { /* silently empty */ }
       finally { setNewLoading(false); }
     }
@@ -431,7 +434,7 @@ export default function HomePageClient() {
         )
       );
       const candidates: Product[] = [];
-      snap.forEach(d => candidates.push({ id: d.id, ...d.data() } as Product));
+      snap.forEach(d => { const p = { id: d.id, ...d.data() } as Product; if (p.hidden !== true) candidates.push(p); });
 
       // Prefer products whose name/badge matches kashrut keywords
       const scored = candidates.map(p => {
