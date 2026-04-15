@@ -189,6 +189,7 @@ export default function HomePageClient() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
+  const [benefitOpen, setBenefitOpen] = useState<number | null>(null);
   const cardsRef       = useRef<HTMLDivElement>(null); // outer wrap — for scrollIntoView
   const carouselTrack  = useRef<HTMLDivElement>(null); // scrollable track
   const newRef         = useRef<HTMLDivElement>(null);
@@ -718,64 +719,6 @@ export default function HomePageClient() {
         onSelectCat={(cat: string) => router.push(`/category/${encodeURIComponent(cat)}`)}
       />
 
-      {/* ── Benefits bar ── */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #f0ece4', borderTop: '1px solid #f0ece4' }}>
-        <div
-          style={{
-            maxWidth: 1100,
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-            gap: 0,
-          }}
-        >
-          {[
-            {
-              icon: '✅',
-              title: 'כשרות מוסמכת',
-              desc: 'כל מוצרי סת"מ נבדקים ע"י מגיה מוסמך',
-            },
-            {
-              icon: '🚚',
-              title: 'משלוח והחזרות',
-              desc: 'משלוח לכל הארץ תוך 7-14 ימי עסקים. ניתן להחזיר תוך 14 יום בהתאם למדיניות ההחזרים שלנו.',
-            },
-            {
-              icon: '🔒',
-              title: 'תשלום מאובטח',
-              desc: 'עסקאות מוצפנות ומאובטחות לחלוטין',
-            },
-            {
-              icon: '💬',
-              title: 'שירות אישי',
-              desc: 'צוות מומחים זמין לענות על כל שאלה',
-            },
-          ].map((b, i, arr) => (
-            <div
-              key={b.title}
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 12,
-                padding: isMobile ? '14px 16px' : '18px 24px',
-                borderRight: i < arr.length - 1 ? '1px solid #f0ece4' : 'none',
-                direction: 'rtl',
-              }}
-            >
-              <span style={{ fontSize: isMobile ? 22 : 26, flexShrink: 0, marginTop: 1 }}>{b.icon}</span>
-              <div>
-                <div style={{ fontSize: isMobile ? 13 : 14, fontWeight: 800, color: '#0c1a35', marginBottom: 3 }}>
-                  {b.title}
-                </div>
-                <div style={{ fontSize: isMobile ? 11 : 12, color: '#777', lineHeight: 1.5 }}>
-                  {b.desc}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ── Live Activity Bar ── */}
       {(() => {
         const weeklyVisitors = 134 + ((new Date().getDate() * 7) % 83); // stable-ish random
@@ -1197,6 +1140,99 @@ export default function HomePageClient() {
 
       {/* ── 6. Footer ── */}
       <footer style={{ background: '#0f1111', color: '#fff' }}>
+
+        {/* ── Benefits accordion ── */}
+        {(() => {
+          const BENEFITS = [
+            {
+              title: 'כשרות מוסמכת',
+              desc: 'כל מוצרי סת"מ נבדקים על ידי מגיה מוסמך. כל יחידה מגיעה עם תעודת כשרות ופיקוח רבני.',
+              svg: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2l7 4v5c0 5-3.5 9.7-7 11-3.5-1.3-7-6-7-11V6l7-4z"/>
+                  <polyline points="9 12 11 14 15 10"/>
+                </svg>
+              ),
+            },
+            {
+              title: 'משלוח והחזרות',
+              desc: 'משלוח חינם לכל הארץ תוך 7–14 ימי עסקים. ניתן להחזיר מוצר תוך 14 יום ממועד הקבלה בהתאם למדיניות ההחזרים.',
+              svg: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="1" y="3" width="15" height="13" rx="1"/>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                  <circle cx="5.5" cy="18.5" r="2.5"/>
+                  <circle cx="18.5" cy="18.5" r="2.5"/>
+                </svg>
+              ),
+            },
+            {
+              title: 'תשלום מאובטח',
+              desc: 'כל העסקאות מוצפנות בתקן SSL. אנו תומכים בכרטיסי אשראי, ביט ופייפאל — בצורה בטוחה לחלוטין.',
+              svg: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              ),
+            },
+            {
+              title: 'שירות לקוחות אישי',
+              desc: 'צוות מומחי סת"מ זמין בוואטסאפ ובמייל לענות על כל שאלה — לפני ואחרי הרכישה.',
+              svg: (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              ),
+            },
+          ];
+          return (
+            <div style={{ borderBottom: '1px solid #222', direction: 'rtl' }}>
+              <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4,1fr)' }}>
+                {BENEFITS.map((b, i) => {
+                  const open = benefitOpen === i;
+                  return (
+                    <div
+                      key={b.title}
+                      style={{ borderRight: !isMobile && i < BENEFITS.length - 1 ? '1px solid #222' : 'none', borderBottom: isMobile && i < BENEFITS.length - 1 ? '1px solid #222' : 'none' }}
+                    >
+                      <button
+                        onClick={() => setBenefitOpen(open ? null : i)}
+                        style={{
+                          width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', gap: 12,
+                          padding: '16px 20px', color: '#fff', direction: 'rtl', textAlign: 'right',
+                        }}
+                      >
+                        <span style={{ flexShrink: 0 }}>{b.svg}</span>
+                        <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: '#e0e0e0' }}>{b.title}</span>
+                        {/* Chevron */}
+                        <svg
+                          width="14" height="14" viewBox="0 0 24 24" fill="none"
+                          stroke="#666" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                          style={{ flexShrink: 0, transition: 'transform 0.25s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                        >
+                          <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                      </button>
+                      {/* Accordion body */}
+                      <div style={{
+                        overflow: 'hidden',
+                        maxHeight: open ? 120 : 0,
+                        transition: 'max-height 0.3s ease',
+                      }}>
+                        <div style={{ padding: '0 20px 16px 20px', fontSize: 12, color: '#888', lineHeight: 1.65 }}>
+                          {b.desc}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
         <div style={{ borderBottom: '1px solid #333', padding: '28px 16px' }}>
           <div
             style={{
