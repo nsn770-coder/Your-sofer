@@ -933,6 +933,7 @@ export default function HomePageClient() {
               display: 'grid',
               gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
               gap: isMobile ? 8 : 16,
+              padding: isMobile ? '0 12px' : 0,
             }}
           >
             {Array.from({ length: 16 }).map((_, i) => (
@@ -956,6 +957,7 @@ export default function HomePageClient() {
               display: 'grid',
               gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
               gap: isMobile ? 8 : 16,
+              padding: isMobile ? '0 12px' : 0,
             }}
           >
             {[...newProducts].sort((a, b) => {
