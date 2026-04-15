@@ -28,32 +28,29 @@ export interface NavItem {
 }
 
 export const navigationData: NavItem[] = [
+  // ── מזוזות ────────────────────────────────────────────────────────────────
   {
-    id: "stam",
-    label: "מזוזות, תפילין וטלית",
+    id: "mezuzot",
+    label: "מזוזות",
+    href: "/category/מזוזות",
     columns: [
       {
-        title: "מזוזות",
+        title: "בתי מזוזה",
         items: [
-          { label: "בתי מזוזה — כל הסוגים", href: "/category/מזוזות" },
-          { label: "מזוזות אלומיניום", href: "/category/מזוזות?filter=אלומיניום" },
-          { label: "מזוזות עץ", href: "/category/מזוזות?filter=עץ" },
-          { label: "מזוזות כסף", href: "/category/מזוזות?filter=כסף" },
-          { label: "מזוזות פלסטיק", href: "/category/מזוזות?filter=פלסטיק" },
-          { label: "קלפי מזוזה", href: "/category/קלפי מזוזה" },
+          { label: "כל המזוזות",        href: "/category/מזוזות" },
+          { label: "מזוזות אלומיניום",  href: "/category/מזוזות?filter=אלומיניום" },
+          { label: "מזוזות עץ",         href: "/category/מזוזות?filter=עץ" },
+          { label: "מזוזות כסף",        href: "/category/מזוזות?filter=כסף" },
+          { label: "מזוזות פלסטיק",     href: "/category/מזוזות?filter=פלסטיק" },
         ],
       },
       {
-        title: "תפילין",
+        title: "קלפי מזוזה",
         items: [
-          { label: "תפילין קומפלט", href: "/category/תפילין קומפלט" },
-          { label: "כיסוי תפילין", href: "/category/כיסוי תפילין" },
-        ],
-      },
-      {
-        title: "טלית וציצית",
-        items: [
-          { label: "סט טלית תפילין", href: "/category/סט טלית תפילין" },
+          { label: "קלפי מזוזה — כל הגדלים", href: "/category/קלפי מזוזה" },
+          { label: 'קלף 10 ס"מ',               href: '/category/קלפי מזוזה?filter=10' },
+          { label: 'קלף 12 ס"מ',               href: '/category/קלפי מזוזה?filter=12' },
+          { label: 'קלף 15 ס"מ',               href: '/category/קלפי מזוזה?filter=15' },
         ],
       },
     ],
@@ -65,119 +62,41 @@ export const navigationData: NavItem[] = [
       ctaHref: "/category/קלפי מזוזה",
     },
   },
+
+  // ── קלפים ─────────────────────────────────────────────────────────────────
   {
-    id: "shabbat",
-    label: "שבת וחגים",
+    id: "klafim",
+    label: "קלפים",
+    href: "/category/קלפי מזוזה",
     columns: [
       {
-        title: "שבת",
+        title: "קלפים",
         items: [
-          { label: "פמוטים", href: "/category/candlesticks" },
-          { label: "מגשי חלה וכיסויי חלה", href: "/category/challah" },
-          { label: "גביעי קידוש", href: "/category/kiddush-cups" },
-          { label: "סטים לקידוש והבדלה", href: "/category/kiddush-sets" },
-          { label: "הבדלה", href: "/category/havdalah" },
-        ],
-      },
-      {
-        title: "שולחן שבת",
-        items: [
-          { label: "ברכונים, זמירות וברכות", href: "/category/brachot" },
-          { label: "נטלה / כוס נטילה", href: "/category/netilah" },
-          { label: "חלות ואירוח שבת", href: "/category/shabbat-hosting" },
-          { label: "מפות שולחן ורנרים", href: "/category/tablecloths" },
-        ],
-      },
-      {
-        title: "חגים",
-        items: [
-          { label: "חנוכה", href: "/category/chanukah" },
-          { label: "פורים", href: "/category/purim" },
-          { label: "פסח", href: "/category/pesach" },
-          { label: "סוכות", href: "/category/sukkot" },
-          { label: "ראש השנה", href: "/category/rosh-hashana" },
-          { label: "שבועות", href: "/category/shavuot" },
-          { label: "יום כיפור", href: "/category/yom-kippur" },
-          { label: `ט"ו בשבט`, href: "/category/tu-bishvat" },
+          { label: "קלפי מזוזה",  href: "/category/קלפי מזוזה" },
+          { label: "קלפי תפילין", href: "/category/קלפי תפילין" },
         ],
       },
     ],
   },
+
+  // ── תפילין ────────────────────────────────────────────────────────────────
   {
-    id: "home",
-    label: "לבית ולאירוח",
+    id: "tefillin",
+    label: "תפילין",
+    href: "/category/תפילין קומפלט",
     columns: [
       {
-        title: "לבית",
+        title: "תפילין",
         items: [
-          { label: "ברכות הבית", href: "/category/home-blessings" },
-          { label: "סידורים וברכונים לבית", href: "/category/siddurim" },
-          { label: "תמונות / פסוקים לקיר", href: "/category/wall-art" },
-          { label: "קופות צדקה", href: "/category/tzedakah" },
-        ],
-      },
-      {
-        title: "אירוח ושולחן",
-        items: [
-          { label: "כלי הגשה", href: "/category/serving" },
-          { label: "מגשים", href: "/category/trays" },
-          { label: "סטים לאירוח ושולחן", href: "/category/hosting-sets" },
-          { label: "כוסות, בקבוקים וקנקנים", href: "/category/glasses" },
-          { label: "קערות וקעריות", href: "/category/bowls" },
-          { label: `סכו"ם והגשה`, href: "/category/cutlery" },
-        ],
-      },
-      {
-        title: "פריטי בית",
-        items: [
-          { label: "נטילת ידיים ומים אחרונים", href: "/category/handwashing" },
-          { label: "שלטים לדלת בעיצוב אישי", href: "/category/door-signs" },
-          { label: "מוצרי כניסה לבית", href: "/category/entrance" },
-          { label: "ריח / אווירה לבית", href: "/category/home-scent" },
+          { label: "תפילין קומפלט",    href: "/category/תפילין קומפלט" },
+          { label: "כיסוי תפילין",     href: "/category/כיסוי תפילין" },
+          { label: "סט טלית תפילין",   href: "/category/סט טלית תפילין" },
         ],
       },
     ],
   },
-  {
-    id: "gifts",
-    label: "מתנות ומארזים",
-    columns: [
-      {
-        title: "מתנות לפי אדם",
-        items: [
-          { label: "מתנות לאישה", href: "/category/gifts-women" },
-          { label: "מתנות לגבר", href: "/category/gifts-men" },
-          { label: "מתנות לחתן", href: "/category/gifts-groom" },
-          { label: "מתנות לכלה", href: "/category/gifts-bride" },
-          { label: "מתנות ליולדת", href: "/category/gifts-newborn" },
-        ],
-      },
-      {
-        title: "מתנות לפי צורך",
-        items: [
-          { label: "מתנות לבית חדש", href: "/category/gifts-new-home" },
-          { label: "מתנות לאירוח", href: "/category/gifts-hosting" },
-          { label: "מתנות לחגים", href: "/category/gifts-holidays" },
-          { label: "מתנות בהתאמה אישית", href: "/category/gifts-custom" },
-          { label: "מארז סט לטלית ותפילין", href: "/category/tallit-set" },
-        ],
-      },
-      {
-        title: "עיצוב ואירוח",
-        items: [
-          { label: "הגשה ואירוח 🍽️", href: "/category/הגשה ואירוח" },
-          { label: "עיצוב הבית 🏠", href: "/category/עיצוב הבית" },
-        ],
-      },
-    ],
-    promo: {
-      image: "/images/promo-gifts.jpg",
-      title: "מארזי מתנה מיוחדים",
-      description: "מארזים מעוצבים לכל אירוע — מוכנים לשליחה",
-      ctaLabel: "לכל המארזים",
-      ctaHref: "/category/מתנות",
-    },
-  },
+
+  // ── יודאיקה ───────────────────────────────────────────────────────────────
   {
     id: "judaica",
     label: "יודאיקה",
@@ -186,8 +105,8 @@ export const navigationData: NavItem[] = [
       {
         title: "יודאיקה",
         items: [
-          { label: "נטילת ידיים 🤲", href: "/category/נטילת ידיים" },
-          { label: "שבת ✨",          href: "/category/שבת" },
+          { label: "נטילת ידיים 🤲",  href: "/category/נטילת ידיים" },
+          { label: "שבת ✨",           href: "/category/שבת" },
           { label: "סטים ומארזים 🎁", href: "/category/סטים ומארזים" },
           { label: "יודאיקה כללי ✡️", href: "/category/יודאיקה כללי" },
         ],
@@ -196,8 +115,8 @@ export const navigationData: NavItem[] = [
         title: "חגים 🕍",
         items: [
           { label: "כל החגים",  href: "/category/חגים" },
-          { label: "חנוכה 🕎", href: "/category/חנוכה" },
-          { label: "פסח 🍷",   href: "/category/פסח" },
+          { label: "חנוכה 🕎",  href: "/category/חנוכה" },
+          { label: "פסח 🍷",    href: "/category/פסח" },
         ],
       },
     ],
@@ -209,34 +128,107 @@ export const navigationData: NavItem[] = [
       ctaHref: "/category/יודאיקה",
     },
   },
+
+  // ── מתנות ─────────────────────────────────────────────────────────────────
   {
-    id: "kids",
-    label: "ילדים ותינוקות",
+    id: "gifts",
+    label: "מתנות",
+    href: "/category/מתנות",
     columns: [
       {
-        title: "ילדים ותינוקות",
+        title: "מתנות לפי אדם",
         items: [
-          { label: "מתנות לתינוק / לידה", href: "/category/baby-gifts" },
-          { label: "מתנות לילדים", href: "/category/kids-gifts" },
-          { label: `יודאיקה לבית ספר / גן`, href: "/category/school-judaica" },
-          { label: "מתנות לבר מצווה / בת מצווה", href: "/category/בר מצווה" },
+          { label: "מתנות לאישה",    href: "/category/מתנות?filter=לאישה" },
+          { label: "מתנות לגבר",     href: "/category/מתנות?filter=לגבר" },
+          { label: "מתנות לחתן",     href: "/category/מתנות?filter=לחתן" },
+          { label: "מתנות לבית חדש", href: "/category/מתנות?filter=בית" },
+        ],
+      },
+      {
+        title: "עיצוב ואירוח",
+        items: [
+          { label: "הגשה ואירוח 🍽️", href: "/category/הגשה ואירוח" },
+          { label: "עיצוב הבית 🏠",  href: "/category/עיצוב הבית" },
+        ],
+      },
+    ],
+    promo: {
+      image: "/images/promo-gifts.jpg",
+      title: "מארזי מתנה מיוחדים",
+      description: "מארזים מעוצבים לכל אירוע — מוכנים לשליחה",
+      ctaLabel: "לכל המארזים",
+      ctaHref: "/category/מתנות",
+    },
+  },
+
+  // ── בר מצוה ───────────────────────────────────────────────────────────────
+  {
+    id: "bar-mitzva",
+    label: "בר מצוה",
+    href: "/category/בר מצווה",
+    columns: [
+      {
+        title: "בר מצוה",
+        items: [
+          { label: "כל מוצרי בר מצוה",    href: "/category/בר מצווה" },
+          { label: "סט בר מצוה",           href: "/category/בר מצווה?filter=סט" },
+          { label: "תפילין לבר מצוה",      href: "/category/תפילין קומפלט" },
+          { label: "סט טלית ותפילין",      href: "/category/סט טלית תפילין" },
         ],
       },
     ],
   },
+
+  // ── מגילות ────────────────────────────────────────────────────────────────
   {
-    id: "art",
-    label: "אומנות ואקססוריז",
+    id: "megilot",
+    label: "מגילות",
+    href: "/category/מגילות",
     columns: [
       {
-        title: "אומנות ואקססוריז",
+        title: "מגילות",
         items: [
-          { label: "תמונות ואמנות קיר", href: "/category/wall-art-gallery" },
-          { label: "פסלים ודקורציה", href: "/category/sculptures" },
-          { label: "פריטי נוי לבית", href: "/category/decor" },
-          { label: "אומנות שולחנית", href: "/category/table-art" },
-          { label: "פריטי השראה / פסוקים מעוצבים", href: "/category/inspirational" },
-          { label: "יצירות בעבודת יד", href: "/category/handmade" },
+          { label: "כל המגילות",     href: "/category/מגילות" },
+          { label: "מגילת אסתר",    href: "/category/מגילות?filter=אסתר" },
+          { label: "ספרי תורה",     href: "/category/ספרי תורה" },
+        ],
+      },
+    ],
+  },
+
+  // ── הגשה ואירוח ───────────────────────────────────────────────────────────
+  {
+    id: "hosting",
+    label: "הגשה ואירוח",
+    href: "/category/הגשה ואירוח",
+    columns: [
+      {
+        title: "הגשה ואירוח",
+        items: [
+          { label: "כל כלי ההגשה",     href: "/category/הגשה ואירוח" },
+          { label: "מגשים",             href: "/category/הגשה ואירוח?filter=מגש" },
+          { label: "כוסות וגביעים",    href: "/category/הגשה ואירוח?filter=כוס" },
+          { label: "קערות",             href: "/category/הגשה ואירוח?filter=קערה" },
+          { label: "בקבוקים וקנקנים",  href: "/category/הגשה ואירוח?filter=קנקן" },
+        ],
+      },
+    ],
+  },
+
+  // ── עיצוב הבית ────────────────────────────────────────────────────────────
+  {
+    id: "decor",
+    label: "עיצוב הבית",
+    href: "/category/עיצוב הבית",
+    columns: [
+      {
+        title: "עיצוב הבית",
+        items: [
+          { label: "כל עיצוב הבית",     href: "/category/עיצוב הבית" },
+          { label: "פמוטים ונרות",      href: "/category/עיצוב הבית?filter=פמוט" },
+          { label: "קופסאות ומסגרות",   href: "/category/עיצוב הבית?filter=קופסה" },
+          { label: "שעונים ועיצוב",     href: "/category/עיצוב הבית?filter=שעון" },
+          { label: "קישוטים ודקור",     href: "/category/עיצוב הבית?filter=קישוט" },
         ],
       },
     ],
