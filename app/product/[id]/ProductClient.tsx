@@ -487,7 +487,6 @@ export default function ProductClient() {
   const [showVideo, setShowVideo] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'kashrut' | 'shipping'>('details');
   const [currentViewers, setCurrentViewers] = useState(2);
-  const [showLowStock, setShowLowStock] = useState(false);
   const [stockCount] = useState(() => {
     // Deterministic 12-19 based on product id (same value on every render/refresh)
     const pid = Array.isArray(id) ? id[0] : (id ?? '');
@@ -526,10 +525,6 @@ export default function ProductClient() {
         if (snap.exists()) {
           const p = { id: snap.id, ...snap.data() } as Product;
           setProduct(p);
-          // ~30% of products show low-stock badge (deterministic per product id)
-          let hash = 0;
-          for (let i = 0; i < p.id.length; i++) hash = (hash * 31 + p.id.charCodeAt(i)) & 0xffffffff;
-          setShowLowStock(Math.abs(hash) % 10 < 3);
           if (p.cat) {
             const relSnap = await getDocs(query(collection(db, 'products'), where('cat', '==', p.cat), orderBy('priority', 'desc'), limit(5)));
             const relData: Product[] = [];
@@ -720,11 +715,9 @@ export default function ProductClient() {
                 <span>👁️</span>
                 <span key={currentViewers}>{currentViewers} אנשים צופים עכשיו</span>
               </div>
-              {showLowStock && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#fff4f4', border: '1px solid #ffc0c0', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#c0392b', fontWeight: 700 }}>
-                  ⚡ נשארו רק {stockCount} פריטים במלאי!
-                </div>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#fff4f4', border: '1px solid #ffc0c0', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#c0392b', fontWeight: 700 }}>
+                ⚡ נשארו רק {stockCount} פריטים במלאי!
+              </div>
             </div>
 
             {/* Price (mobile only — shows here) */}
