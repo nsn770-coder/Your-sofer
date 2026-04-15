@@ -112,11 +112,11 @@ export default function SoferEditPage() {
             typeof s === 'string' ? { type: 'image', url: s } : s as WritingSample
           ));
         }
-        // Past requests
+        // Past requests — query by auth uid (soferId field = uid per rules)
         const reqSnap = await getDocs(
           query(
             collection(db, 'sofer_edit_requests'),
-            where('soferId', '==', user.soferId),
+            where('soferId', '==', user.uid),
             orderBy('createdAt', 'desc'),
           ),
         );
@@ -222,7 +222,8 @@ export default function SoferEditPage() {
     setSaving(true);
     try {
       const newReq = {
-        soferId:     user.soferId,
+        soferId:     user.uid,          // Firebase Auth UID — matches firestore.rules
+        soferDocId:  user.soferId,      // soferim/{soferDocId} — used by admin to apply changes
         soferName:   user.displayName ?? current?.name ?? '',
         status:      'pending',
         changes,

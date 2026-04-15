@@ -109,7 +109,8 @@ interface SoferFull {
 
 interface SoferEditRequest {
   id: string;
-  soferId: string;
+  soferId: string;     // Firebase Auth UID (matches firestore.rules)
+  soferDocId?: string; // soferim/{soferDocId} — used to apply changes
   soferName: string;
   status: 'pending' | 'approved' | 'rejected';
   changes: Partial<{
@@ -1135,9 +1136,11 @@ export default function AdminPage() {
 
   async function approveEditRequest(req: SoferEditRequest) {
     setActionLoading(req.id);
+    // soferDocId = ID of soferim document; soferId = Firebase Auth UID
+    const soferDocId = req.soferDocId ?? req.soferId;
     try {
-      // Apply the changes to soferim/{soferId}
-      await updateDoc(doc(db, 'soferim', req.soferId), req.changes);
+      // Apply the changes to soferim/{soferDocId}
+      await updateDoc(doc(db, 'soferim', soferDocId), req.changes);
       // Mark request as approved
       await updateDoc(doc(db, 'sofer_edit_requests', req.id), {
         status: 'approved',
