@@ -185,7 +185,6 @@ export default function HomePageClient() {
   const [wizardKashrut, setWizardKashrut] = useState<'regular' | 'mehudar' | 'mehudar_plus' | null>(null);
   const [wizardResults, setWizardResults] = useState<Product[]>([]);
   const [wizardLoading, setWizardLoading] = useState(false);
-  const [cardWidth, setCardWidth]     = useState(0);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [testIdx, setTestIdx]         = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -193,35 +192,18 @@ export default function HomePageClient() {
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
   const [benefitOpen, setBenefitOpen] = useState<number | null>(null);
   const cardsRef       = useRef<HTMLDivElement>(null); // outer wrap — for scrollIntoView
-  const carouselTrack  = useRef<HTMLDivElement>(null); // scrollable track
   const newRef         = useRef<HTMLDivElement>(null);
   const router         = useRouter();
   const { shaliach }   = useShaliach();
 
-  // Mobile detection + carousel card-width computation
+  // Mobile detection
   useEffect(() => {
-    function update() {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      if (cardsRef.current) {
-        const w = cardsRef.current.clientWidth;
-        const gap = 16;
-        // Desktop: 3 cards exactly. Mobile: 1.5 cards (shows half of next).
-        const visible = mobile ? 1.5 : 3;
-        setCardWidth((w - gap * (Math.ceil(visible) - 1)) / visible);
-      }
-    }
+    function update() { setIsMobile(window.innerWidth < 768); }
     update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  function scrollCarousel(dir: 'prev' | 'next') {
-    const track = carouselTrack.current;
-    if (!track || cardWidth === 0) return;
-    const amount = cardWidth + 16;
-    track.scrollBy({ left: dir === 'next' ? amount : -amount, behavior: 'smooth' });
-  }
 
   // Fetch data: homepage config + cat fallback images + 8 newest products
   useEffect(() => {
@@ -762,90 +744,84 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── 2. Category cards — horizontal carousel ── */}
-      <div
-        ref={cardsRef}
-        style={{ maxWidth: 1280, margin: '0 auto', padding: isMobile ? '20px 0' : '28px 0' }}
-      >
-        {/* Outer wrapper: clips overflow, positions arrows */}
-        <div style={{ position: 'relative' }}>
-
-          {/* ← prev arrow */}
-          <button
-            onClick={() => scrollCarousel('prev')}
-            aria-label="הקודם"
-            style={{
-              position: 'absolute', left: 0, top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10, width: 40, height: 40, borderRadius: '50%',
-              background: '#0c1a35', color: '#fff',
-              border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22, lineHeight: 1,
-              boxShadow: '0 2px 10px rgba(0,0,0,0.22)',
-              flexShrink: 0,
-            }}
-          >‹</button>
-
-          {/* Scrollable track — LTR internally so scrollLeft math is simple */}
-          <div
-            ref={carouselTrack}
-            className="hide-scrollbar"
-            style={{
-              display: 'flex',
-              gap: 16,
-              overflowX: 'auto',
-              overflowY: 'visible',
-              scrollSnapType: 'x mandatory',
-              direction: 'ltr',           // avoid RTL scroll-direction quirks
-              padding: `4px ${isMobile ? 12 : 52}px`, // lateral space for arrows on desktop
-            }}
-          >
-            {imagesReady
-              ? CARDS.map(card => (
-                  <div
-                    key={card.href}
-                    style={{
-                      flex: `0 0 ${cardWidth > 0 ? cardWidth : 320}px`,
-                      width: cardWidth > 0 ? cardWidth : 320,
-                      scrollSnapAlign: 'start',
-                      direction: 'rtl',   // restore RTL inside each card
-                    }}
-                  >
-                    <CategoryCard card={card} catImages={catImages} slotImages={slotImages} />
-                  </div>
-                ))
-              : Array.from({ length: 16 }).map((_, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      flex: `0 0 ${cardWidth > 0 ? cardWidth : 320}px`,
-                      width: cardWidth > 0 ? cardWidth : 320,
-                    }}
-                  >
-                    <SkeletonCategoryCard />
-                  </div>
-                ))
-            }
-          </div>
-
-          {/* → next arrow */}
-          <button
-            onClick={() => scrollCarousel('next')}
-            aria-label="הבא"
-            style={{
-              position: 'absolute', right: 0, top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10, width: 40, height: 40, borderRadius: '50%',
-              background: '#0c1a35', color: '#fff',
-              border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22, lineHeight: 1,
-              boxShadow: '0 2px 10px rgba(0,0,0,0.22)',
-              flexShrink: 0,
-            }}
-          >›</button>
-
+      {/* ── 2. Category cards — horizontal scroll ── */}
+      <div ref={cardsRef} style={{ padding: isMobile ? '20px 0' : '28px 0' }}>
+        <div
+          className="hide-scrollbar"
+          style={{
+            display: 'flex',
+            gap: 12,
+            overflowX: 'auto',
+            overflowY: 'visible',
+            padding: '4px 16px 8px',
+            direction: 'rtl',
+          }}
+        >
+          {([
+            'מזוזות', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט',
+            'כיסוי תפילין', 'סט טלית תפילין', 'יודאיקה',
+            'בר מצוה', 'מתנות', 'מגילות',
+          ] as const).map(cat => {
+            const img = catImages[cat] ?? '';
+            return (
+              <Link
+                key={cat}
+                href={`/category/${encodeURIComponent(cat)}`}
+                style={{
+                  flexShrink: 0,
+                  width: 112,   // w-28
+                  height: 144,  // h-36
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  display: 'block',
+                  textDecoration: 'none',
+                  background: img ? '#000' : '#0c1a35',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+                }}
+              >
+                {/* Category image */}
+                {img && (
+                  <img
+                    src={img}
+                    alt={cat}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                )}
+                {/* Dark gradient overlay */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)',
+                }} />
+                {/* Hebrew name */}
+                <div style={{
+                  position: 'absolute', bottom: 0, right: 0, left: 0,
+                  padding: '10px 6px 8px',
+                  textAlign: 'center',
+                }}>
+                  <span style={{
+                    color: '#fff',
+                    fontSize: 11,
+                    fontWeight: 800,
+                    lineHeight: 1.3,
+                    display: 'block',
+                    textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+                  }}>
+                    {cat}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
