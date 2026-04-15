@@ -1,18 +1,38 @@
-// updateFilterAttributes.mjs
-// מעדכן filterAttributes לכל המוצרים לפי שם המוצר
-// הרצה: node app/scripts/updateFilterAttributes.mjs
+/**
+ * updateFilterAttributes.mjs
+ *
+ * 1. RECATEGORIZES products by name keywords
+ * 2. ADDS filterAttributes (חומר, צבע, גודל, נוסח, כשרות) from name
+ * 3. DRY RUN first — prints summary + 10 samples, then asks y/n
+ * 4. Writes in batches of 400, progress every 500 products
+ *
+ * Run: node scripts/updateFilterAttributes.mjs
+ */
 
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createInterface } from 'readline';
+import { initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = resolve(__dirname, '..');
 
-function loadEnvLocal() {
+// ── Firebase init: serviceAccountKey.json first, fallback to .env.local ───────
+
+function initFirebase() {
+  const keyPath = resolve(ROOT, 'serviceAccountKey.json');
+  if (existsSync(keyPath)) {
+    console.log('🔑 Using serviceAccountKey.json');
+    const sa = JSON.parse(readFileSync(keyPath, 'utf8'));
+    initializeApp({ credential: cert(sa) });
+    return;
+  }
+
+  console.log('🔑 serviceAccountKey.json not found — falling back to .env.local');
   try {
-    const raw = readFileSync(resolve(__dirname, '../.env.local'), 'utf8');
+    const raw = readFileSync(resolve(ROOT, '.env.local'), 'utf8');
     const lines = raw.split('\n');
     let key = null, val = '';
     for (const line of lines) {
@@ -23,151 +43,263 @@ function loadEnvLocal() {
       } else if (key) { val += '\n' + line; }
     }
     if (key && !process.env[key]) process.env[key] = val.trim();
-  } catch {}
+  } catch { throw new Error('.env.local also not found — cannot authenticate'); }
+
+  const clientEmail = (process.env.FIREBASE_CLIENT_EMAIL ?? '').replace(/^Value:\s*/i, '').trim();
+  const privateKey  = (process.env.FIREBASE_PRIVATE_KEY  ?? '').replace(/\\n/g, '\n');
+  const projectId   = process.env.FIREBASE_PROJECT_ID ?? 'your-sofer';
+  initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
 }
-loadEnvLocal();
 
-const clientEmail = (process.env.FIREBASE_CLIENT_EMAIL ?? '').replace(/^Value:\s*/i, '').trim();
-const privateKey  = (process.env.FIREBASE_PRIVATE_KEY  ?? '').replace(/\\n/g, '\n');
-const projectId   = process.env.FIREBASE_PROJECT_ID ?? 'your-sofer';
-
-initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
+initFirebase();
 const db = getFirestore();
 
-// ====== מיפוי מילות מפתח → filterAttributes ======
+// ── Constants ──────────────────────────────────────────────────────────────────
 
-const RULES = {
-  // נוסח
-  נוסח: [
-    { keywords: ['אשכנזי', 'אשכנז'], value: 'אשכנזי' },
-    { keywords: ['ספרדי', 'ספרד'], value: 'ספרדי' },
-    { keywords: ['ימני', 'תימני', 'תימן'], value: 'תימני' },
-    { keywords: ['חסידי', 'חסיד'], value: 'חסידי' },
-    { keywords: ['איטלקי', 'איטליה'], value: 'איטלקי' },
-  ],
+const KEEP_CATS = new Set([
+  'מזוזות', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט',
+  'כיסוי תפילין', 'סט טלית תפילין', 'יודאיקה', 'בר מצווה',
+  'מתנות', 'מגילות', 'ספרי תורה', 'בר מצוה',
+]);
 
-  // כתב
-  כתב: [
-    { keywords: ['בית יוסף', 'ב"י', 'בי"ס'], value: 'בית יוסף' },
-    { keywords: ['וועלישׁ', 'וועליש', 'ולוויש'], value: 'וועליש' },
-    { keywords: ['אר"י', 'אריז"ל', 'ארי'], value: 'אר"י' },
-    { keywords: ['משה"ת', 'משה תם'], value: 'משה תם' },
-  ],
+const STAM_CATS = new Set([
+  'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט טלית תפילין',
+  'כיסוי תפילין', 'מגילות', 'ספרי תורה',
+]);
 
-  // חומר
-  חומר: [
-    { keywords: ['עור', 'עורי'], value: 'עור' },
-    { keywords: ['קלף', 'קלפים'], value: 'קלף' },
-    { keywords: ['בד', 'אריג', 'ברוקד'], value: 'בד' },
-    { keywords: ['כסף'], value: 'כסף' },
-    { keywords: ['עץ'], value: 'עץ' },
-    { keywords: ['אלומיניום', 'מתכת'], value: 'אלומיניום' },
-    { keywords: ['פלסטיק', 'אקרילי', 'אקריל'], value: 'פלסטיק' },
-    { keywords: ['קרמיקה', 'חרס'], value: 'קרמיקה' },
-  ],
+// ── Recategorization keyword rules ────────────────────────────────────────────
 
-  // גודל (בס"מ)
-  גודל: [
-    { keywords: ['10 ס"מ', '10 סמ', '10ס"מ', "10 סנ'מ"], value: '10' },
-    { keywords: ['12 ס"מ', '12 סמ', '12ס"מ'], value: '12' },
-    { keywords: ['15 ס"מ', '15 סמ', '15ס"מ'], value: '15' },
-    { keywords: ['20 ס"מ', '20 סמ', '20ס"מ'], value: '20' },
-    { keywords: ['25 ס"מ', '25 סמ', '25ס"מ'], value: '25' },
-    { keywords: ['30 ס"מ', '30 סמ', '30ס"מ'], value: '30' },
-    { keywords: ['קטן', 'מיני'], value: 'קטן' },
-    { keywords: ['גדול', 'XL', 'ענק'], value: 'גדול' },
-    { keywords: ['בינוני', 'סטנדרט'], value: 'בינוני' },
-  ],
+// Patterns that indicate כלי שולחן והגשה
+const HOSTING_KW = [
+  'כוס', 'ספל', 'צלחת', 'קערה', 'מגש', 'מזלג', 'כף', 'סכין', 'סכום',
+  'קפה', 'תה', 'China', 'פורצלן', 'חרסינה', 'דקנטר', 'Bone China',
+  'קנקן', 'בקבוק', 'כוסות', 'ספלים', 'קערות', 'מרק', 'New Bone',
+  'אספרסו', 'קפסולה', 'שייקר', 'מאג', 'צלחות', 'סט כוסות', 'סט צלחות',
+  'קרש חיתוך', 'חבק', 'מפית', 'מגבת מטבח',
+];
 
-  // כשרות
-  כשרות: [
-    { keywords: ['מהודר', 'מהודרת', 'הידור'], value: 'מהודר' },
-    { keywords: ['מהדרין'], value: 'מהדרין' },
-    { keywords: ['כשר', 'כשרה', 'כשרות'], value: 'כשר' },
-    { keywords: ['לכתחילה'], value: 'לכתחילה' },
-    { keywords: ['בדיעבד'], value: 'בדיעבד' },
-  ],
+// Patterns that indicate עיצוב הבית
+const DECOR_KW = [
+  'מנורה', 'פמוט', 'אגרטל', 'מראה', 'שעון', 'תמונה', 'עציץ',
+  'מדף', 'וילון', 'שטיח', 'כרית', 'שמיכה', 'מסגרת', 'פסל',
+  'קישוט', 'דקורציה', 'נר', 'מתלה', 'מעמד לכוסות', 'מעמד לסכ',
+  'פח ', 'סל כביסה', 'ארגנייזר', 'קופסת', 'קופסא', 'תיבת',
+];
 
-  // צבע
-  צבע: [
-    { keywords: ['שחור', 'שחורה'], value: 'שחור' },
-    { keywords: ['לבן', 'לבנה', 'לבן כסף', 'לבן זהב'], value: 'לבן' },
-    { keywords: ['חום', 'חומה', 'קאמל'], value: 'חום' },
-    { keywords: ['כחול', 'כחולה', 'תכלת'], value: 'כחול' },
-    { keywords: ['אפור', 'אפורה'], value: 'אפור' },
-    { keywords: ['זהב', 'זהבה', 'גולד'], value: 'זהב' },
-    { keywords: ['כסף', 'סילבר'], value: 'כסף' },
-    { keywords: ['אדום', 'אדומה', 'בורדו'], value: 'אדום' },
-    { keywords: ['ירוק', 'ירוקה'], value: 'ירוק' },
-    { keywords: ['ורוד', 'ורודה', 'פינק'], value: 'ורוד' },
-    { keywords: ['סגול', 'סגולה'], value: 'סגול' },
-    { keywords: ['בז\'', 'בז', 'קרם'], value: 'בז\'' },
-  ],
-};
+// Regex patterns for עיצוב הבית (height/diameter format like h38, D24)
+const DECOR_PATTERN = /\bh\d+\b|\bH\d+\b|\bD\d+\b/;
 
-function extractAttributes(name, description = '') {
-  const text = `${name} ${description}`.toLowerCase();
+function recategorize(name, currentCat) {
+  if (KEEP_CATS.has(currentCat)) return currentCat;
+
+  const n = name;
+
+  // Explicit decor patterns first
+  if (DECOR_KW.some(kw => n.includes(kw)) || DECOR_PATTERN.test(n)) {
+    // But if it also strongly matches hosting, let hosting win
+    const hostingScore = HOSTING_KW.filter(kw => n.includes(kw)).length;
+    if (hostingScore >= 2) return 'כלי שולחן והגשה';
+    return 'עיצוב הבית';
+  }
+
+  if (HOSTING_KW.some(kw => n.includes(kw))) return 'כלי שולחן והגשה';
+
+  // If current cat was one of the two source cats, use a smart default
+  if (currentCat === 'הגשה ואירוח') return 'כלי שולחן והגשה';
+  if (currentCat === 'עיצוב הבית')  return 'עיצוב הבית';
+
+  return 'יודאיקה';
+}
+
+// ── filterAttributes extraction ────────────────────────────────────────────────
+
+function firstMatch(text, rules) {
+  for (const { kw, v } of rules) {
+    if (kw.some(k => text.includes(k))) return v;
+  }
+  return null;
+}
+
+const MATERIAL_RULES = [
+  { v: 'עור מדומה', kw: ['עור מדומה', 'עור מד', 'דמוי עור', 'PU '] },
+  { v: 'עור',       kw: ['עור '] },
+  { v: 'בד',        kw: ['בד ', 'קורדרוי', 'ברוקד', 'פשתן', 'קטיפה', 'ישמ', 'משי'] },
+  { v: 'מתכת',      kw: ['מתכת', 'נירוסטה', 'אלומיניום', 'פלדה', 'ברזל', 'נחושת', 'פליז'] },
+  { v: 'זכוכית',    kw: ['זכוכית', 'קריסטל', 'crystal'] },
+  { v: 'עץ',        kw: ['עץ '] },
+  { v: 'קרמיקה',    kw: ['קרמיקה', 'חרסינה', 'China', 'פורצלן', 'New Bone'] },
+  { v: 'אקריל',     kw: ['אקריל', 'אקרילי', 'PMMA'] },
+  { v: 'פלסטיק',    kw: ['פלסטיק', 'PVC', 'ABS'] },
+  { v: 'כסף',       kw: ['כסף 925', 'סטרלינג'] },
+];
+
+const COLOR_RULES = [
+  { v: 'שחור',   kw: ['שחור', 'שחורה'] },
+  { v: 'לבן',    kw: ['לבן', 'לבנה', 'לבן '] },
+  { v: 'זהב',    kw: ['זהב', 'זהובה', 'מוזהב', 'גולד'] },
+  { v: 'כסף',    kw: ['כסוף', 'מוכסף', 'סילבר'] },
+  { v: 'חום',    kw: ['חום ', 'חומה', 'חום כ', 'חום ע'] },
+  { v: 'אפור',   kw: ['אפור', 'אפורה', 'גרניט'] },
+  { v: 'ירוק',   kw: ['ירוק', 'ירוקה', 'זית'] },
+  { v: 'ורוד',   kw: ['ורוד', 'ורודה', 'פינק', 'רוז'] },
+  { v: 'כחול',   kw: ['כחול', 'כחולה', 'נייבי', 'ינשוף'] },
+  { v: 'תכלת',   kw: ['תכלת', 'טורקיז'] },
+  { v: "בז'",    kw: ["בז'", 'בז ', 'קאמל', 'חאקי', 'בז-'] },
+  { v: 'אדום',   kw: ['אדום', 'אדומה'] },
+  { v: 'בורדו',  kw: ['בורדו', 'וינו', 'יין'] },
+  { v: 'סגול',   kw: ['סגול', 'סגולה', 'לילך'] },
+  { v: 'צבעוני', kw: ['צבעוני', 'רב צבעי', 'מולטי'] },
+];
+
+const NOSACH_RULES = [
+  { v: 'אשכנזי', kw: ['אשכנזי', 'אשכנז'] },
+  { v: 'ספרדי',  kw: ['ספרדי', 'ספרד'] },
+  { v: 'תימני',  kw: ['תימני', 'תימן'] },
+  { v: 'חסידי',  kw: ['חסידי', 'חסיד', "חב\"ד", "חב'ד", 'חבד'] },
+];
+
+const KASHRUT_RULES = [
+  { v: 'מהדרין', kw: ['מהדרין'] },
+  { v: 'מהודר',  kw: ['מהודר', 'מהודרת'] },
+];
+
+// Extract first number followed by ס"מ / סמ / מ"מ
+function extractSize(name) {
+  const m = name.match(/(\d+(?:\.\d+)?)\s*(?:ס[""״]מ|סמ|מ[""״]מ)/);
+  return m ? m[1] : null;
+}
+
+function buildFilterAttributes(name, cat) {
   const attrs = {};
 
-  for (const [attrKey, rules] of Object.entries(RULES)) {
-    for (const rule of rules) {
-      const matched = rule.keywords.some(kw => text.includes(kw.toLowerCase()));
-      if (matched) {
-        attrs[attrKey] = rule.value;
-        break; // רק ערך אחד לכל attribute
-      }
-    }
+  const mat = firstMatch(name, MATERIAL_RULES);
+  if (mat) attrs['חומר'] = mat;
+
+  const col = firstMatch(name, COLOR_RULES);
+  if (col) attrs['צבע'] = col;
+
+  const sz = extractSize(name);
+  if (sz) attrs['גודל'] = sz;
+
+  if (STAM_CATS.has(cat)) {
+    const nos = firstMatch(name, NOSACH_RULES);
+    if (nos) attrs['נוסח'] = nos;
+
+    const ks = firstMatch(name, KASHRUT_RULES);
+    if (ks) attrs['כשרות'] = ks;
   }
 
   return attrs;
 }
 
-async function run() {
-  console.log('🔍 טוען מוצרים מ-Firestore...');
-  
-  const snapshot = await db.collection('products').get();
-  const total = snapshot.size;
-  console.log(`📦 נמצאו ${total} מוצרים`);
+// ── Prompt helper ──────────────────────────────────────────────────────────────
 
-  let updated = 0;
-  let skipped = 0;
-  let batch = db.batch();
-  let batchCount = 0;
-  const BATCH_SIZE = 400;
-
-  for (const doc of snapshot.docs) {
-    const data = doc.data();
-    const name = data.name || data.title || '';
-    const description = data.description || '';
-
-    const newAttrs = extractAttributes(name, description);
-
-    // דלג אם אין שום attribute שנמצא
-    if (Object.keys(newAttrs).length === 0) {
-      skipped++;
-      continue;
-    }
-
-    batch.update(doc.ref, { filterAttributes: newAttrs });
-    updated++;
-    batchCount++;
-
-    if (batchCount >= BATCH_SIZE) {
-      await batch.commit();
-      console.log(`✅ עדכן ${updated} מוצרים עד כה...`);
-      batch = db.batch();
-      batchCount = 0;
-    }
-  }
-
-  if (batchCount > 0) {
-    await batch.commit();
-  }
-
-  console.log(`\n🎉 סיום!`);
-  console.log(`✅ עודכנו: ${updated} מוצרים`);
-  console.log(`⏭️  דולגו (ללא attributes): ${skipped} מוצרים`);
-  console.log(`📊 סה"כ: ${total} מוצרים`);
+function prompt(question) {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise(resolve => rl.question(question, ans => { rl.close(); resolve(ans.trim()); }));
 }
 
-run().catch(console.error);
+// ── Main ───────────────────────────────────────────────────────────────────────
+
+async function main() {
+  console.log('\n🔍 updateFilterAttributes — DRY RUN\n');
+
+  const snap = await db.collection('products').get();
+  console.log(`סה"כ מוצרים: ${snap.size}\n`);
+
+  // ── Dry run: compute all changes ──
+  const changes = [];   // { ref, id, name, oldCat, newCat, attrs }
+  const catChangeSummary = {};   // "oldCat → newCat": count
+  const attrKeySummary   = {};   // key: count
+
+  for (const doc of snap.docs) {
+    const d    = doc.data();
+    const name = d.name ?? '';
+    const cat  = d.cat  ?? '';
+
+    const newCat  = recategorize(name, cat);
+    const attrs   = buildFilterAttributes(name, newCat);
+    const catChanged = newCat !== cat;
+    const hasAttrs   = Object.keys(attrs).length > 0;
+
+    if (!catChanged && !hasAttrs) continue;
+
+    changes.push({ ref: doc.ref, id: doc.id, name, oldCat: cat, newCat, attrs, catChanged });
+
+    if (catChanged) {
+      const key = `${cat || '—'} → ${newCat}`;
+      catChangeSummary[key] = (catChangeSummary[key] ?? 0) + 1;
+    }
+    for (const k of Object.keys(attrs)) {
+      attrKeySummary[k] = (attrKeySummary[k] ?? 0) + 1;
+    }
+  }
+
+  // ── Print dry-run summary ──
+  console.log('═'.repeat(56));
+  console.log(`שינויי קטגוריה:`);
+  for (const [key, cnt] of Object.entries(catChangeSummary).sort((a, b) => b[1] - a[1])) {
+    console.log(`  ${key.padEnd(40)} ${cnt}`);
+  }
+
+  console.log(`\nשינויי filterAttributes:`);
+  for (const [key, cnt] of Object.entries(attrKeySummary).sort((a, b) => b[1] - a[1])) {
+    console.log(`  ${key.padEnd(14)} ${cnt}`);
+  }
+
+  console.log(`\nסה"כ מוצרים שישתנו: ${changes.length}`);
+  console.log('═'.repeat(56));
+
+  // ── 10 sample changes ──
+  console.log('\n── 10 דוגמאות ────────────────────────────────────────────');
+  const catChanges = changes.filter(c => c.catChanged);
+  catChanges.slice(0, 10).forEach((c, i) => {
+    console.log(`${i + 1}. "${c.name.slice(0, 55)}"`);
+    if (c.catChanged) console.log(`   cat:   ${c.oldCat} → ${c.newCat}`);
+    if (Object.keys(c.attrs).length)
+      console.log(`   attrs: ${JSON.stringify(c.attrs)}`);
+  });
+
+  console.log('\n' + '─'.repeat(56));
+  const answer = await prompt('להמשיך ולכתוב ל-Firestore? (y/n): ');
+  if (answer.toLowerCase() !== 'y') {
+    console.log('❌ בוטל.');
+    process.exit(0);
+  }
+
+  // ── Write to Firestore ──
+  console.log('\n🚀 כותב ל-Firestore...\n');
+
+  const BATCH_SIZE = 400;
+  let batch      = db.batch();
+  let batchCount = 0;
+  let written    = 0;
+
+  for (const c of changes) {
+    const update = { filterAttributes: c.attrs };
+    if (c.catChanged) {
+      update.cat      = c.newCat;
+      update.category = c.newCat;
+    }
+    batch.update(c.ref, update);
+    batchCount++;
+    written++;
+
+    if (batchCount === BATCH_SIZE) {
+      await batch.commit();
+      batch      = db.batch();
+      batchCount = 0;
+    }
+
+    if (written % 500 === 0) {
+      console.log(`   📊 ${written}/${changes.length} עודכנו`);
+    }
+  }
+
+  if (batchCount > 0) await batch.commit();
+
+  console.log(`\n✅ סיום! עודכנו ${written} מוצרים.\n`);
+  process.exit(0);
+}
+
+main().catch(err => { console.error('❌', err.message); process.exit(1); });

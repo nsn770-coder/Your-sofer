@@ -536,9 +536,9 @@ export default function CategoryClient({ category }: { category: string }) {
           <div className="max-w-7xl mx-auto">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 text-right">קטגוריות בתוך מתנות</p>
             <div className="flex gap-3 justify-end">
-              <Link href="/category/הגשה ואירוח" className="group flex items-center gap-3 bg-amber-50 hover:bg-amber-100 border border-amber-100 hover:border-amber-300 rounded-xl px-5 py-3 transition-all duration-200">
+              <Link href="/category/כלי שולחן והגשה" className="group flex items-center gap-3 bg-amber-50 hover:bg-amber-100 border border-amber-100 hover:border-amber-300 rounded-xl px-5 py-3 transition-all duration-200">
                 <div className="text-right">
-                  <p className="font-bold text-gray-800 text-sm group-hover:text-amber-800">הגשה ואירוח 🍽️</p>
+                  <p className="font-bold text-gray-800 text-sm group-hover:text-amber-800">כלי שולחן והגשה 🍽️</p>
                   <p className="text-xs text-amber-700 font-medium mt-0.5">לצפייה ←</p>
                 </div>
               </Link>

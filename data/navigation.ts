@@ -147,7 +147,7 @@ export const navigationData: NavItem[] = [
       {
         title: "עיצוב ואירוח",
         items: [
-          { label: "הגשה ואירוח 🍽️", href: "/category/הגשה ואירוח" },
+          { label: "כלי שולחן והגשה 🍽️", href: "/category/כלי שולחן והגשה" },
           { label: "עיצוב הבית 🏠",  href: "/category/עיצוב הבית" },
         ],
       },
@@ -196,20 +196,20 @@ export const navigationData: NavItem[] = [
     ],
   },
 
-  // ── הגשה ואירוח ───────────────────────────────────────────────────────────
+  // ── כלי שולחן והגשה ──────────────────────────────────────────────────────
   {
     id: "hosting",
-    label: "הגשה ואירוח",
-    href: "/category/הגשה ואירוח",
+    label: "כלי שולחן והגשה",
+    href: "/category/כלי שולחן והגשה",
     columns: [
       {
-        title: "הגשה ואירוח",
+        title: "כלי שולחן והגשה",
         items: [
-          { label: "כל כלי ההגשה",     href: "/category/הגשה ואירוח" },
-          { label: "מגשים",             href: "/category/הגשה ואירוח?filter=מגש" },
-          { label: "כוסות וגביעים",    href: "/category/הגשה ואירוח?filter=כוס" },
-          { label: "קערות",             href: "/category/הגשה ואירוח?filter=קערה" },
-          { label: "בקבוקים וקנקנים",  href: "/category/הגשה ואירוח?filter=קנקן" },
+          { label: "כל כלי ההגשה",     href: "/category/כלי שולחן והגשה" },
+          { label: "מגשים",             href: "/category/כלי שולחן והגשה?filter=מגש" },
+          { label: "כוסות וגביעים",    href: "/category/כלי שולחן והגשה?filter=כוס" },
+          { label: "קערות",             href: "/category/כלי שולחן והגשה?filter=קערה" },
+          { label: "בקבוקים וקנקנים",  href: "/category/כלי שולחן והגשה?filter=קנקן" },
         ],
       },
     ],
