@@ -552,23 +552,114 @@ export default function CategoryClient({ category }: { category: string }) {
         {/* ── Products area ── */}
         <div className="flex-1 min-w-0">
 
-          {/* Desktop sort bar (hidden on mobile — mobile toolbar above handles it) */}
-          <div className="hidden lg:flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-            <span className="text-sm text-gray-500">
-              {loading ? 'טוען...' : `${filtered.length} מוצרים`}
-            </span>
-            <select
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value as SortBy)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 bg-white cursor-pointer focus:outline-none focus:border-[#0c1a35]"
-              style={{ direction: 'rtl' }}
-            >
-              <option value="popular">הכי נמכר</option>
-              <option value="newest">חדש לישן</option>
-              <option value="oldest">ישן לחדש</option>
-              <option value="price_asc">מחיר: נמוך לגבוה</option>
-              <option value="price_desc">מחיר: גבוה לנמוך</option>
-            </select>
+          {/* Desktop filter+sort bar (hidden on mobile — mobile toolbar above handles it) */}
+          <div className="hidden lg:block mb-4 pb-3 border-b border-gray-200">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ direction: 'rtl' }}>
+
+              {/* Result count */}
+              <span className="text-sm text-gray-500 flex-shrink-0 ml-1">
+                {loading ? 'טוען...' : `${filtered.length} מוצרים`}
+              </span>
+
+              {/* Category-specific name filters */}
+              {(CAT_NAME_FILTERS[category] ?? []).map(spec => {
+                const current = filters.nameFilters[spec.key] ?? 'הכל';
+                return (
+                  <select
+                    key={`toolbar-name-${spec.key}`}
+                    value={current}
+                    onChange={e => setFilters(prev => ({
+                      ...prev,
+                      nameFilters: { ...prev.nameFilters, [spec.key]: e.target.value },
+                    }))}
+                    className="flex-shrink-0 border rounded-lg px-3 py-1.5 text-sm font-semibold cursor-pointer focus:outline-none transition-colors"
+                    style={{
+                      direction: 'rtl',
+                      borderColor: current && current !== 'הכל' ? '#0c1a35' : '#e5e7eb',
+                      color:       current && current !== 'הכל' ? '#0c1a35' : '#374151',
+                      background: '#fff',
+                    }}
+                  >
+                    <option value="הכל">{spec.label}: הכל</option>
+                    {spec.options.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                );
+              })}
+
+              {/* Rating filter */}
+              <select
+                value={filters.minRating}
+                onChange={e => setFilters(prev => ({ ...prev, minRating: Number(e.target.value) }))}
+                className="flex-shrink-0 border rounded-lg px-3 py-1.5 text-sm font-semibold cursor-pointer focus:outline-none transition-colors"
+                style={{
+                  direction: 'rtl',
+                  borderColor: filters.minRating > 0 ? '#0c1a35' : '#e5e7eb',
+                  color:       filters.minRating > 0 ? '#0c1a35' : '#374151',
+                  background: '#fff',
+                }}
+              >
+                <option value={0}>דירוג: הכל</option>
+                <option value={3}>3 ★ ומעלה</option>
+                <option value={4}>4 ★ ומעלה</option>
+              </select>
+
+              {/* Dynamic attribute filters (only keys with actual data) */}
+              {ATTR_KEYS.map(key => {
+                const seen = new Set<string>();
+                for (const p of allLoaded) { const v = p.filterAttributes?.[key]; if (v) seen.add(v); }
+                const vals = Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'));
+                if (vals.length === 0) return null;
+                const current = filters.attrFilters[key] ?? 'הכל';
+                return (
+                  <select
+                    key={`toolbar-attr-${key}`}
+                    value={current}
+                    onChange={e => setFilters(prev => ({
+                      ...prev,
+                      attrFilters: { ...prev.attrFilters, [key]: e.target.value },
+                    }))}
+                    className="flex-shrink-0 border rounded-lg px-3 py-1.5 text-sm font-semibold cursor-pointer focus:outline-none transition-colors"
+                    style={{
+                      direction: 'rtl',
+                      borderColor: current && current !== 'הכל' ? '#0c1a35' : '#e5e7eb',
+                      color:       current && current !== 'הכל' ? '#0c1a35' : '#374151',
+                      background: '#fff',
+                    }}
+                  >
+                    <option value="הכל">{key}: הכל</option>
+                    {vals.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                );
+              })}
+
+              {/* Spacer */}
+              <div className="flex-1" />
+
+              {/* Clear all — only when filters are active */}
+              {active && (
+                <button
+                  onClick={() => setFilters(EMPTY_FILTERS)}
+                  className="flex-shrink-0 text-xs text-red-500 hover:text-red-700 font-semibold px-2 transition-colors"
+                >
+                  נקה הכל ✕
+                </button>
+              )}
+
+              {/* Sort */}
+              <select
+                value={sortBy}
+                onChange={e => setSortBy(e.target.value as SortBy)}
+                className="flex-shrink-0 border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-700 bg-white cursor-pointer focus:outline-none focus:border-[#0c1a35]"
+                style={{ direction: 'rtl' }}
+              >
+                <option value="popular">הכי נמכר</option>
+                <option value="newest">חדש לישן</option>
+                <option value="oldest">ישן לחדש</option>
+                <option value="price_asc">מחיר: נמוך לגבוה</option>
+                <option value="price_desc">מחיר: גבוה לנמוך</option>
+              </select>
+
+            </div>
           </div>
 
           {loading ? (
