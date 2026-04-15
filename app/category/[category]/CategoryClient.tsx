@@ -6,6 +6,7 @@ import {
   getDocs,
 } from 'firebase/firestore';
 import { db } from '../../firebase';
+import Link from 'next/link';
 import ProductCard from '@/components/ui/ProductCard';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -477,15 +478,12 @@ export default function CategoryClient({ category }: { category: string }) {
     <div dir="rtl" className="min-h-screen bg-gray-50">
 
       {/* ── Breadcrumb bar ── */}
-      <div className="bg-gray-100 border-b border-gray-200 px-4 py-2 flex items-center justify-between" dir="rtl">
-        <nav className="flex items-center gap-1 text-xs text-gray-500">
-          <a href="/" className="hover:text-gray-800 transition-colors">דף הבית</a>
-          <span className="text-gray-300">›</span>
-          <span className="text-gray-700 font-semibold">{category}</span>
-        </nav>
-        <a href="/" className="text-xs text-gray-500 hover:text-gray-800 transition-colors flex items-center gap-1">
-          ← חזרה לדף הבית
-        </a>
+      <div className="bg-white px-4 py-2 flex items-center gap-2 text-sm text-gray-500" dir="rtl">
+        <Link href="/" className="hover:text-gray-800 flex items-center gap-1">
+          ← דף הבית
+        </Link>
+        <span>/</span>
+        <span className="text-gray-800 font-medium">{category}</span>
       </div>
 
       {/* ── Header ── */}
