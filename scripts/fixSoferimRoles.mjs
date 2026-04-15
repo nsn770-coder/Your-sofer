@@ -80,7 +80,14 @@ async function main() {
       continue;
     }
 
-    // 3. Update user
+    // 3. Never downgrade an admin
+    if (userData.role === 'admin') {
+      console.log(`⚠️  ${sofer.name} (${email}) — role=admin, מדלג (לא מוריד לסופר)`);
+      skipped++;
+      continue;
+    }
+
+    // 4. Update user
     await userDoc.ref.update({ role: 'sofer', soferId: soferDoc.id });
     console.log(`🔧  ${sofer.name} (${email})`);
     console.log(`    uid: ${userDoc.id}`);
