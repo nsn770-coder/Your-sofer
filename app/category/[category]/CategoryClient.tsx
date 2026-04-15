@@ -494,6 +494,29 @@ export default function CategoryClient({ category }: { category: string }) {
         )}
       </div>
 
+      {/* ── Subcategory banner — shown only on מתנות page ── */}
+      {category === 'מתנות' && (
+        <div className="bg-white border-b border-gray-100 px-4 py-5" dir="rtl">
+          <div className="max-w-7xl mx-auto">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 text-right">קטגוריות בתוך מתנות</p>
+            <div className="flex gap-3 justify-end">
+              <Link href="/category/הגשה ואירוח" className="group flex items-center gap-3 bg-amber-50 hover:bg-amber-100 border border-amber-100 hover:border-amber-300 rounded-xl px-5 py-3 transition-all duration-200">
+                <div className="text-right">
+                  <p className="font-bold text-gray-800 text-sm group-hover:text-amber-800">הגשה ואירוח 🍽️</p>
+                  <p className="text-xs text-amber-700 font-medium mt-0.5">לצפייה ←</p>
+                </div>
+              </Link>
+              <Link href="/category/עיצוב הבית" className="group flex items-center gap-3 bg-blue-50 hover:bg-blue-100 border border-blue-100 hover:border-blue-300 rounded-xl px-5 py-3 transition-all duration-200">
+                <div className="text-right">
+                  <p className="font-bold text-gray-800 text-sm group-hover:text-blue-800">עיצוב הבית 🏠</p>
+                  <p className="text-xs text-blue-700 font-medium mt-0.5">לצפייה ←</p>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Toolbar: filter + sort (mobile = sticky, shown below header; desktop = hidden here, shown above products) ── */}
       <div className="lg:hidden sticky top-0 z-20 bg-[#0c1a35] px-3 py-2 flex items-center gap-2 shadow-md">
         {/* Filter button */}

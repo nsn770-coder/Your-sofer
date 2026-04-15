@@ -105,6 +105,28 @@ export const CARDS: CardDef[] = [
       { label: 'פורים',    href: '/category/חגים ומועדים?filter=פורים',    cat: 'חגים ומועדים' },
     ],
   },
+  {
+    title: 'הגשה ואירוח',
+    href: '/category/הגשה ואירוח',
+    ctaLabel: 'לכל כלי ההגשה ←',
+    items: [
+      { label: 'מגשים',          href: '/category/הגשה ואירוח?filter=מגש',  cat: 'הגשה ואירוח' },
+      { label: 'כוסות וגביעים',  href: '/category/הגשה ואירוח?filter=כוס',  cat: 'הגשה ואירוח' },
+      { label: 'קערות',          href: '/category/הגשה ואירוח?filter=קערה', cat: 'הגשה ואירוח' },
+      { label: 'בקבוקים וקנקנים', href: '/category/הגשה ואירוח?filter=קנקן', cat: 'הגשה ואירוח' },
+    ],
+  },
+  {
+    title: 'עיצוב הבית',
+    href: '/category/עיצוב הבית',
+    ctaLabel: 'לכל עיצוב הבית ←',
+    items: [
+      { label: 'פמוטים ונרות',   href: '/category/עיצוב הבית?filter=פמוט',   cat: 'עיצוב הבית' },
+      { label: 'קופסאות ומסגרות', href: '/category/עיצוב הבית?filter=קופסה',  cat: 'עיצוב הבית' },
+      { label: 'שעונים ועיצוב',  href: '/category/עיצוב הבית?filter=שעון',   cat: 'עיצוב הבית' },
+      { label: 'קישוטים ודקור',  href: '/category/עיצוב הבית?filter=קישוט',  cat: 'עיצוב הבית' },
+    ],
+  },
 ];
 
 // Deduplicated list of Firestore `cat` values needed for image lookups

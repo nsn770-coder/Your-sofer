@@ -162,6 +162,13 @@ export const navigationData: NavItem[] = [
           { label: "מארז סט לטלית ותפילין", href: "/category/tallit-set" },
         ],
       },
+      {
+        title: "עיצוב ואירוח",
+        items: [
+          { label: "הגשה ואירוח 🍽️", href: "/category/הגשה ואירוח" },
+          { label: "עיצוב הבית 🏠", href: "/category/עיצוב הבית" },
+        ],
+      },
     ],
     promo: {
       image: "/images/promo-gifts.jpg",
