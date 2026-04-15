@@ -179,6 +179,37 @@ export const navigationData: NavItem[] = [
     },
   },
   {
+    id: "judaica",
+    label: "יודאיקה",
+    href: "/category/יודאיקה",
+    columns: [
+      {
+        title: "יודאיקה",
+        items: [
+          { label: "נטילת ידיים 🤲", href: "/category/נטילת ידיים" },
+          { label: "שבת ✨",          href: "/category/שבת" },
+          { label: "סטים ומארזים 🎁", href: "/category/סטים ומארזים" },
+          { label: "יודאיקה כללי ✡️", href: "/category/יודאיקה כללי" },
+        ],
+      },
+      {
+        title: "חגים 🕍",
+        items: [
+          { label: "כל החגים",  href: "/category/חגים" },
+          { label: "חנוכה 🕎", href: "/category/חנוכה" },
+          { label: "פסח 🍷",   href: "/category/פסח" },
+        ],
+      },
+    ],
+    promo: {
+      image: "/images/promo-judaica.jpg",
+      title: "יודאיקה מעוצבת",
+      description: "נטלות, חנוכיות, פמוטים וכלי שבת באיכות גבוהה",
+      ctaLabel: "לכל היודאיקה",
+      ctaHref: "/category/יודאיקה",
+    },
+  },
+  {
     id: "kids",
     label: "ילדים ותינוקות",
     columns: [
