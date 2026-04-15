@@ -28,12 +28,12 @@ interface EditRequest {
 }
 
 const STYLE_OPTIONS = [
-  'בית יוסף',
-  'אר"י',
+  'אשכנז',
+  'ספרד',
   'ספרדי',
+  'חב"ד',
   'תימני',
-  'חסידי',
-  'אשכנזי',
+  'פרדי',
   'אחר',
 ];
 
@@ -75,7 +75,8 @@ export default function SoferEditPage() {
   const [requests, setRequests]     = useState<EditRequest[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [photoUploading, setPhotoUploading] = useState(false);
-  const [samplesUploading, setSamplesUploading] = useState(false);
+  // progress: 0 = idle, 1-100 = uploading, -1 = done
+  const [samplesProgress, setSamplesProgress] = useState(0);
   const [saving, setSaving]         = useState(false);
   const [saved, setSaved]           = useState(false);
   const [error, setError]           = useState('');
@@ -146,18 +147,23 @@ export default function SoferEditPage() {
     }
   }
 
-  // ── Writing samples — multiple image upload ───────────────────────────────
+  // ── Writing samples — multiple image upload with progress ────────────────
   async function handleSamplesChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
-    setSamplesUploading(true);
+    setSamplesProgress(1);
+    const uploaded: WritingSample[] = [];
     try {
-      const urls = await Promise.all(files.map(uploadToCloudinary));
-      setSamples(prev => [...prev, ...urls.map(url => ({ type: 'image' as const, url }))]);
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadToCloudinary(files[i]);
+        uploaded.push({ type: 'image', url });
+        setSamplesProgress(Math.round(((i + 1) / files.length) * 100));
+      }
+      setSamples(prev => [...prev, ...uploaded]);
     } catch {
       setError('שגיאה בהעלאת דוגמאות הכתב. נסה שוב.');
     } finally {
-      setSamplesUploading(false);
+      setSamplesProgress(0);
       e.target.value = '';
     }
   }
@@ -394,12 +400,19 @@ export default function SoferEditPage() {
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <button type="button"
                 onClick={() => samplesInputRef.current?.click()}
-                disabled={samplesUploading}
-                style={{ background: samplesUploading ? '#9ca3af' : '#f0fdf4', color: samplesUploading ? '#fff' : '#1a3a2a', border: '1px solid #86efac', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: samplesUploading ? 'not-allowed' : 'pointer' }}>
-                {samplesUploading ? '⏳ מעלה...' : '🖼️ הוסף תמונה +'}
+                disabled={samplesProgress > 0}
+                style={{ background: samplesProgress > 0 ? '#9ca3af' : '#f0fdf4', color: samplesProgress > 0 ? '#fff' : '#1a3a2a', border: '1px solid #86efac', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: samplesProgress > 0 ? 'not-allowed' : 'pointer' }}>
+                {samplesProgress > 0 ? `⏳ מעלה ${samplesProgress}%` : '🖼️ הוסף תמונה +'}
               </button>
             </div>
             <input ref={samplesInputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handleSamplesChange} />
+
+            {/* Progress bar */}
+            {samplesProgress > 0 && (
+              <div style={{ marginTop: 8, background: '#e5e7eb', borderRadius: 99, height: 6, overflow: 'hidden' }}>
+                <div style={{ height: '100%', borderRadius: 99, background: '#1a3a2a', width: `${samplesProgress}%`, transition: 'width 0.2s ease' }} />
+              </div>
+            )}
 
             {/* Video URL input */}
             <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -433,12 +446,12 @@ export default function SoferEditPage() {
             </div>
           )}
 
-          <button type="submit" disabled={saving || photoUploading || samplesUploading}
+          <button type="submit" disabled={saving || photoUploading || samplesProgress > 0}
             style={{
-              background: (saving || photoUploading || samplesUploading) ? '#9ca3af' : '#1a3a2a',
+              background: (saving || photoUploading || samplesProgress > 0) ? '#9ca3af' : '#1a3a2a',
               color: '#fff', border: 'none', borderRadius: 10,
               padding: '13px', fontSize: 15, fontWeight: 700,
-              cursor: (saving || photoUploading || samplesUploading) ? 'not-allowed' : 'pointer',
+              cursor: (saving || photoUploading || samplesProgress > 0) ? 'not-allowed' : 'pointer',
               transition: 'background 0.2s',
             }}>
             {saving ? 'שולח...' : '📨 שלח לאישור'}
