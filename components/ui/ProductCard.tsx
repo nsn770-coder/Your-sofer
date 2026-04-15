@@ -31,15 +31,12 @@ export default function ProductCard({
 
   const imgSrc = images?.[0] ?? null;
 
-  // Quantity from cart — synced with CartContext, persisted via localStorage
   const itemInCart = items.find(i => i.id === id);
   const qty = itemInCart?.quantity ?? 0;
 
-  // Sale: original price exists and is higher than current
   const hasSale = typeof was === 'number' && was > price;
   const savePct = hasSale ? Math.round((1 - price / was!) * 100) : 0;
 
-  // New: added within the last 7 days
   const isNew = (() => {
     if (!createdAt?.seconds) return false;
     const sevenDaysAgo = Date.now() / 1000 - 7 * 24 * 60 * 60;
@@ -53,7 +50,7 @@ export default function ProductCard({
 
   function handleDecrement(e: React.MouseEvent) {
     e.stopPropagation();
-    updateQty(id, qty - 1); // updateQty calls removeItem when qty reaches 0
+    updateQty(id, qty - 1);
   }
 
   return (
@@ -68,7 +65,8 @@ export default function ProductCard({
       "
     >
       {/* ─── Image ─────────────────────────────────────────────── */}
-      <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
+      {/* Mobile: fixed h-36 so the card stays compact; desktop: aspect-square */}
+      <div className="relative w-full h-36 sm:h-auto sm:aspect-square bg-gray-50 overflow-hidden">
         {imgSrc ? (
           <img
             src={imgSrc}
@@ -82,7 +80,7 @@ export default function ProductCard({
           </div>
         )}
 
-        {/* Top-right: existing badge (best seller / priority) */}
+        {/* Top-right: best-seller / priority badge */}
         <div className="absolute top-2 right-2">
           <ProductBadge
             isBestSeller={isBestSeller}
@@ -113,16 +111,18 @@ export default function ProductCard({
       </div>
 
       {/* ─── Content ───────────────────────────────────────────── */}
-      <div className="flex flex-col flex-1 p-3 gap-2">
-        {/* Name — max 2 lines */}
-        <p className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2 min-h-[2.5rem]">
+      {/* Tighter padding + gap on mobile */}
+      <div className="flex flex-col flex-1 px-2 py-2 sm:p-3 gap-1 sm:gap-2">
+
+        {/* Name — smaller on mobile, 2-line clamp */}
+        <p className="text-xs sm:text-sm font-semibold text-gray-800 leading-snug line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
           {name}
         </p>
 
         {/* Price block */}
         <div className="flex flex-col gap-0.5">
           {hasSale && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <span className="text-xs text-red-500 line-through font-medium">
                 ₪{was!.toLocaleString('he-IL')}
               </span>
@@ -131,17 +131,17 @@ export default function ProductCard({
               </span>
             </div>
           )}
-          <p className="text-lg font-black text-[#0c1a35]">
+          <p className="text-base sm:text-lg font-black text-[#0c1a35]">
             ₪{price.toLocaleString('he-IL')}
           </p>
         </div>
 
-        {/* Cart button — "הוסף לסל" or quantity control [ − | qty | + ] */}
+        {/* Cart button — smaller on mobile */}
         <div className="mt-auto" onClick={e => e.stopPropagation()}>
           {qty === 0 ? (
             <button
               onClick={handleAdd}
-              className="w-full rounded-full py-2 text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#0c1a35] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
+              className="w-full rounded-full py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#0c1a35] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
             >
               הוסף לסל
             </button>
@@ -149,14 +149,14 @@ export default function ProductCard({
             <div className="flex items-center justify-between bg-green-500 rounded-full overflow-hidden w-full">
               <button
                 onClick={handleDecrement}
-                className="px-4 py-2 text-white text-xl font-bold hover:bg-green-600 transition-colors leading-none"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 text-white text-lg sm:text-xl font-bold hover:bg-green-600 transition-colors leading-none"
               >
                 −
               </button>
-              <span className="text-white font-bold text-base">{qty}</span>
+              <span className="text-white font-bold text-sm sm:text-base">{qty}</span>
               <button
                 onClick={handleAdd}
-                className="px-4 py-2 text-white text-xl font-bold hover:bg-green-600 transition-colors leading-none"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 text-white text-lg sm:text-xl font-bold hover:bg-green-600 transition-colors leading-none"
               >
                 +
               </button>
