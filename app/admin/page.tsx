@@ -886,21 +886,66 @@ export default function AdminPage() {
     } catch (e) { console.error(e); }
   }
 
+  // Canonical list: slug → default display name + priority
+  const REQUIRED_CATS: { slug: string; displayName: string; priority: number }[] = [
+    { slug: 'מזוזות',          displayName: 'מזוזות',          priority: 1  },
+    { slug: 'קלפי מזוזה',      displayName: 'קלפי מזוזה',      priority: 2  },
+    { slug: 'קלפי תפילין',     displayName: 'קלפי תפילין',     priority: 3  },
+    { slug: 'תפילין קומפלט',   displayName: 'תפילין קומפלט',   priority: 4  },
+    { slug: 'כיסוי תפילין',    displayName: 'כיסוי תפילין',    priority: 5  },
+    { slug: 'סט טלית תפילין',  displayName: 'סט טלית תפילין',  priority: 6  },
+    { slug: 'יודאיקה',         displayName: 'יודאיקה',         priority: 7  },
+    { slug: 'בר מצוה',         displayName: 'בר מצוה',         priority: 8  },
+    { slug: 'מתנות',           displayName: 'מתנות',           priority: 9  },
+    { slug: 'מגילות',          displayName: 'מגילות',          priority: 10 },
+  ];
+
   async function loadCategories() {
     try {
       const snap = await getDocs(collection(db, 'categories'));
+      const existingSlugs = new Set<string>();
       const data: Category[] = [];
       snap.forEach(d => {
         const r = d.data();
+        const slug = (r.slug || r.name || '') as string;
+        existingSlugs.add(slug);
         data.push({
           id: d.id,
-          slug:        r.slug        || r.name        || '',
+          slug,
           displayName: r.displayName || r.name        || '',
           imageUrl:    r.imageUrl    || r.imgUrl       || '',
           priority:    r.priority    ?? r.order        ?? 0,
           name: r.name, imgUrl: r.imgUrl, sub: r.sub, order: r.order,
         });
       });
+
+      // Auto-seed any missing canonical categories
+      await Promise.all(
+        REQUIRED_CATS
+          .filter(c => !existingSlugs.has(c.slug))
+          .map(c => setDoc(doc(db, 'categories', c.slug), {
+            slug: c.slug, displayName: c.displayName,
+            imageUrl: '', priority: c.priority,
+          }, { merge: true }))
+      );
+
+      // If we seeded anything, reload
+      if (REQUIRED_CATS.some(c => !existingSlugs.has(c.slug))) {
+        const fresh = await getDocs(collection(db, 'categories'));
+        data.length = 0;
+        fresh.forEach(d => {
+          const r = d.data();
+          data.push({
+            id: d.id,
+            slug:        r.slug        || r.name        || '',
+            displayName: r.displayName || r.name        || '',
+            imageUrl:    r.imageUrl    || r.imgUrl       || '',
+            priority:    r.priority    ?? r.order        ?? 0,
+            name: r.name, imgUrl: r.imgUrl, sub: r.sub, order: r.order,
+          });
+        });
+      }
+
       data.sort((a, b) => a.priority - b.priority);
       setCategories(data);
     } catch (e) { console.error(e); }
