@@ -1068,8 +1068,13 @@ export default function AdminPage() {
   async function approveApplication(app: SoferApplication) {
     setActionLoading(app.id);
     try {
-      await updateDoc(doc(db, 'soferim_applications', app.id), { status: 'approved', approvedAt: serverTimestamp() });
-      await addDoc(collection(db, 'soferim'), {
+      // 1. Mark application approved
+      await updateDoc(doc(db, 'soferim_applications', app.id), {
+        status: 'approved', approvedAt: serverTimestamp(),
+      });
+
+      // 2. Create soferim document
+      const soferRef = await addDoc(collection(db, 'soferim'), {
         name: app.name, city: app.city, phone: app.phone,
         whatsapp: app.whatsapp || '', email: app.email || '',
         description: app.description || '', style: app.style || '',
@@ -1077,7 +1082,28 @@ export default function AdminPage() {
         writingSamples: app.writingSamples || [],
         status: 'active', createdAt: serverTimestamp(),
       });
+
+      // 3. Find user by email and grant sofer role + soferId
+      if (app.email) {
+        const normalizedEmail = app.email.trim().toLowerCase();
+        const usersSnap = await getDocs(
+          query(collection(db, 'users'), where('email', '==', normalizedEmail))
+        );
+        if (!usersSnap.empty) {
+          await updateDoc(usersSnap.docs[0].ref, {
+            role: 'sofer',
+            soferId: soferRef.id,
+          });
+          // Reflect in local users list
+          setUsers(prev => prev.map(u =>
+            u.id === usersSnap.docs[0].id ? { ...u, role: 'sofer', soferId: soferRef.id } : u
+          ));
+        }
+      }
+
       setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
+      // Refresh soferim lists
+      loadSoferim(); loadSoferimFull();
     } catch (e) { console.error(e); alert('שגיאה באישור'); }
     finally { setActionLoading(null); }
   }
