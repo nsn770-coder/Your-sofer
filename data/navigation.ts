@@ -114,7 +114,7 @@ export const navigationData: NavItem[] = [
       {
         title: "חגים 🕍",
         items: [
-          { label: "כל החגים",  href: "/category/חגים" },
+          { label: "שבת וחגים", href: "/category/שבת" },
           { label: "חנוכה 🕎",  href: "/category/חנוכה" },
           { label: "פסח 🍷",    href: "/category/פסח" },
         ],
@@ -191,6 +191,34 @@ export const navigationData: NavItem[] = [
           { label: "כל המגילות",     href: "/category/מגילות" },
           { label: "מגילת אסתר",    href: "/category/מגילות?filter=אסתר" },
           { label: "ספרי תורה",     href: "/category/ספרי תורה" },
+        ],
+      },
+    ],
+  },
+
+  // ── שבת וחגים ────────────────────────────────────────────────────────────
+  {
+    id: "shabbat-chagim",
+    label: "שבת וחגים",
+    href: "/category/שבת",
+    columns: [
+      {
+        title: "שבת ✨",
+        items: [
+          { label: "כל מוצרי שבת",      href: "/category/שבת" },
+          { label: "גביעי קידוש",        href: "/category/כלי שולחן והגשה?filter=קידוש" },
+          { label: "פמוטים ונרות",       href: "/category/עיצוב הבית?filter=פמוט" },
+          { label: "הבדלה",              href: "/category/יודאיקה?filter=הבדלה" },
+          { label: "לחמניות וחלות",      href: "/category/יודאיקה?filter=חלה" },
+        ],
+      },
+      {
+        title: "חנוכה 🕎",
+        items: [
+          { label: "כל מוצרי חנוכה",    href: "/category/חנוכה" },
+          { label: "חנוכיות",            href: "/category/יודאיקה?filter=חנוכי" },
+          { label: "עיצוב חנוכה",        href: "/category/עיצוב הבית?filter=חנוכי" },
+          { label: "פסח 🍷",             href: "/category/פסח" },
         ],
       },
     ],
