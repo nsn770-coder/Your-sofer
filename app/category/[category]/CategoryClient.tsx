@@ -23,6 +23,7 @@ interface Product {
   priority?: number;
   isBestSeller?: boolean;
   badge?: string | null;
+  was?: number | null;
   filterAttributes?: Record<string, string>;
   stars?: number;
   status?: string;
@@ -694,6 +695,8 @@ export default function CategoryClient({ category }: { category: string }) {
                     priority={p.priority}
                     isBestSeller={p.isBestSeller}
                     badge={p.badge}
+                    was={p.was}
+                    createdAt={p.createdAt}
                   />
                 ))}
               </div>

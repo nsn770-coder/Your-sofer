@@ -517,7 +517,7 @@ export default function ProductClient() {
           for (let i = 0; i < p.id.length; i++) hash = (hash * 31 + p.id.charCodeAt(i)) & 0xffffffff;
           setShowLowStock(Math.abs(hash) % 10 < 3);
           if (p.cat) {
-            const relSnap = await getDocs(query(collection(db, 'products'), where('cat', '==', p.cat), limit(6)));
+            const relSnap = await getDocs(query(collection(db, 'products'), where('cat', '==', p.cat), orderBy('priority', 'desc'), limit(5)));
             const relData: Product[] = [];
             relSnap.forEach(d => { if (d.id !== p.id) relData.push({ id: d.id, ...d.data() } as Product); });
             setRelated(relData.slice(0, 4));
@@ -846,30 +846,46 @@ export default function ProductClient() {
           )}
         </div>
 
-        {/* ── Related Products ── */}
+        {/* ── Cross-sell: לקוחות שקנו זאת קנו גם ── */}
         {related.length > 0 && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 10, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '20px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
-            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 14 }}>אולי יעניין אותך גם 🛍️</h2>
+            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 14 }}>לקוחות שקנו זאת קנו גם 🛒</h2>
             <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: isMobile ? 10 : 14 }}>
-              {related.map(r => (
-                <div key={r.id} onClick={() => router.push(`/product/${r.id}`)}
-                  style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
-                  onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)')}
-                  onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}>
-                  <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
-                    {(r.imgUrl || r.image_url) ? (
-                      <img src={r.imgUrl || r.image_url} alt={r.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
-                    ) : (
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>📦</div>
-                    )}
+              {related.map(r => {
+                const rImg = r.imgUrl || r.image_url;
+                return (
+                  <div key={r.id}
+                    onClick={() => router.push(`/product/${r.id}`)}
+                    style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}
+                    onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)')}
+                    onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}>
+                    {/* Image */}
+                    <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
+                      {rImg ? (
+                        <img src={rImg} alt={r.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
+                      ) : (
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>📦</div>
+                      )}
+                    </div>
+                    {/* Info */}
+                    <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.name}</div>
+                      <Stars n={r.stars || 4.5} size={11} />
+                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>₪{r.price}</div>
+                      {/* Add to cart */}
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 });
+                        }}
+                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
+                      >
+                        הוסף לסל
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ padding: isMobile ? '8px' : '10px 10px 12px' }}>
-                    <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', marginBottom: 4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.name}</div>
-                    <Stars n={r.stars || 4.5} size={11} />
-                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35', marginTop: 3 }}>₪{r.price}</div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

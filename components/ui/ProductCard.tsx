@@ -12,6 +12,8 @@ interface Props {
   priority?: number;
   isBestSeller?: boolean;
   badge?: string | null;
+  was?: number | null;
+  createdAt?: { seconds: number } | null;
 }
 
 export default function ProductCard({
@@ -22,12 +24,25 @@ export default function ProductCard({
   priority,
   isBestSeller,
   badge,
+  was,
+  createdAt,
 }: Props) {
   const router = useRouter();
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
 
   const imgSrc = images?.[0] ?? null;
+
+  // Sale: original price exists and is higher than current
+  const hasSale = typeof was === 'number' && was > price;
+  const savePct = hasSale ? Math.round((1 - price / was!) * 100) : 0;
+
+  // New: added within the last 7 days
+  const isNew = (() => {
+    if (!createdAt?.seconds) return false;
+    const sevenDaysAgo = Date.now() / 1000 - 7 * 24 * 60 * 60;
+    return createdAt.seconds > sevenDaysAgo;
+  })();
 
   function handleAddToCart(e: React.MouseEvent) {
     e.stopPropagation();
@@ -62,13 +77,33 @@ export default function ProductCard({
           </div>
         )}
 
-        {/* Badge — top-right corner (RTL) */}
+        {/* Top-right: existing badge (best seller / priority) */}
         <div className="absolute top-2 right-2">
           <ProductBadge
             isBestSeller={isBestSeller}
             priority={priority}
             badge={badge}
           />
+        </div>
+
+        {/* Top-left: sale or new badge */}
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {hasSale && (
+            <span
+              className="text-white text-[10px] font-bold px-2 py-0.5 rounded-full leading-tight"
+              style={{ background: '#e53e3e' }}
+            >
+              🔥 מבצע
+            </span>
+          )}
+          {isNew && (
+            <span
+              className="text-white text-[10px] font-bold px-2 py-0.5 rounded-full leading-tight"
+              style={{ background: '#3182ce' }}
+            >
+              ✨ חדש
+            </span>
+          )}
         </div>
       </div>
 
@@ -79,10 +114,22 @@ export default function ProductCard({
           {name}
         </p>
 
-        {/* Price */}
-        <p className="text-lg font-black text-[#0c1a35]">
-          ₪{price.toLocaleString('he-IL')}
-        </p>
+        {/* Price block */}
+        <div className="flex flex-col gap-0.5">
+          {hasSale && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-red-500 line-through font-medium">
+                ₪{was!.toLocaleString('he-IL')}
+              </span>
+              <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full">
+                חסכת {savePct}%
+              </span>
+            </div>
+          )}
+          <p className="text-lg font-black text-[#0c1a35]">
+            ₪{price.toLocaleString('he-IL')}
+          </p>
+        </div>
 
         {/* Add to cart button */}
         <button

@@ -39,6 +39,8 @@ interface Product {
   priority?: number;
   isBestSeller?: boolean;
   badge?: string | null;
+  was?: number | null;
+  createdAt?: { seconds: number } | null;
 }
 
 // ── Sub-image slot ─────────────────────────────────────────────────────────────
@@ -972,6 +974,8 @@ export default function HomePageClient() {
                 priority={p.priority}
                 isBestSeller={p.isBestSeller}
                 badge={p.badge}
+                was={p.was}
+                createdAt={p.createdAt}
               />
             ))}
           </div>

@@ -12,7 +12,14 @@ const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
 
 // ── Category copy ───────────────────────────────────────────────────────────
 
-const CATEGORY_META: Record<string, { title: string; description: string }> = {
+interface CategoryMetaEntry {
+  title: string;
+  description: string;
+  /** Optional Cloudinary/static image for OG */
+  ogImage?: string;
+}
+
+const CATEGORY_META: Record<string, CategoryMetaEntry> = {
   'סט טלית תפילין': {
     title: 'סט טלית ותפילין — סטים מושלמים לבר מצווה ולכל יום',
     description: 'סטי טלית ותפילין מסופרים מוסמכים — לבר מצווה, לנישואין ולכל אירוע. קלף כתוב ביד, בתים ורצועות באריזה מהודרת. Your Sofer.',
@@ -55,11 +62,11 @@ const CATEGORY_META: Record<string, { title: string; description: string }> = {
   },
 };
 
-function getCategoryMeta(category: string) {
+function getCategoryMeta(category: string): CategoryMetaEntry {
   return (
     CATEGORY_META[category] ?? {
-      title: `${category} | Your Sofer`,
-      description: `מוצרי ${category} מסופרים מוסמכים — בדיקה ושקיפות מלאה. Your Sofer.`,
+      title: `קנה ${category} כשר ומאומת | YourSofer`,
+      description: `מבחר ${category} מסופרים מוסמכים. כל מוצר נבדק ע"י מגיה מוסמך. משלוח לכל הארץ.`,
     }
   );
 }
@@ -78,20 +85,39 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { category } = await params;
   const decoded = decodeURIComponent(category);
-  const { title, description } = getCategoryMeta(decoded);
+  const meta = getCategoryMeta(decoded);
   const pageUrl = `${BASE_URL}/category/${encodeURIComponent(decoded)}`;
 
+  const keywords = [decoded, 'כשר', 'מאומת', 'סת"מ', 'סופר מוסמך', 'משלוח לכל הארץ'];
+
+  const ogImage = meta.ogImage ?? `${BASE_URL}/og-default.jpg`;
+
   return {
-    title,
-    description,
+    title: meta.title,
+    description: meta.description,
+    keywords,
     alternates: { canonical: pageUrl },
     openGraph: {
-      type: 'website',
-      locale: 'he_IL',
-      url: pageUrl,
-      siteName: 'Your Sofer',
-      title: `${title} | Your Sofer`,
-      description,
+      type:        'website',
+      locale:      'he_IL',
+      url:         pageUrl,
+      siteName:    'YourSofer',
+      title:       meta.title,
+      description: meta.description,
+      images: [
+        {
+          url:   ogImage,
+          width: 1200,
+          height: 630,
+          alt:   meta.title,
+        },
+      ],
+    },
+    twitter: {
+      card:        'summary_large_image',
+      title:       meta.title,
+      description: meta.description,
+      images:      [ogImage],
     },
   };
 }
