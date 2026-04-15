@@ -116,10 +116,16 @@ export default function SoferDashboard() {
             שלום, {user.displayName?.split(' ')[0]} ✍️
           </div>
         </div>
-        <button onClick={() => router.push('/')}
-          style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-          ← לחנות
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => router.push('/sofer-dashboard/edit')}
+            style={{ background: 'rgba(255,255,255,0.22)', color: '#fff', border: '1px solid rgba(255,255,255,0.35)', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+            ✏️ ערוך פרופיל
+          </button>
+          <button onClick={() => router.push('/')}
+            style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+            ← לחנות
+          </button>
+        </div>
       </div>
 
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 16px' }}>
