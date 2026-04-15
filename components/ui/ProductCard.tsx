@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/app/contexts/CartContext';
 import ProductBadge from '@/components/ui/ProductBadge';
@@ -28,10 +27,13 @@ export default function ProductCard({
   createdAt,
 }: Props) {
   const router = useRouter();
-  const { addItem } = useCart();
-  const [added, setAdded] = useState(false);
+  const { items, addItem, updateQty } = useCart();
 
   const imgSrc = images?.[0] ?? null;
+
+  // Quantity from cart — synced with CartContext, persisted via localStorage
+  const itemInCart = items.find(i => i.id === id);
+  const qty = itemInCart?.quantity ?? 0;
 
   // Sale: original price exists and is higher than current
   const hasSale = typeof was === 'number' && was > price;
@@ -44,11 +46,14 @@ export default function ProductCard({
     return createdAt.seconds > sevenDaysAgo;
   })();
 
-  function handleAddToCart(e: React.MouseEvent) {
+  function handleAdd(e: React.MouseEvent) {
     e.stopPropagation();
     addItem({ id, name, price, imgUrl: imgSrc ?? undefined, quantity: 1 });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+  }
+
+  function handleDecrement(e: React.MouseEvent) {
+    e.stopPropagation();
+    updateQty(id, qty - 1); // updateQty calls removeItem when qty reaches 0
   }
 
   return (
@@ -131,20 +136,33 @@ export default function ProductCard({
           </p>
         </div>
 
-        {/* Add to cart button */}
-        <button
-          onClick={handleAddToCart}
-          className={`
-            mt-auto w-full rounded-full py-2 text-sm font-bold
-            transition-all duration-200 border
-            ${added
-              ? 'bg-green-500 text-white border-green-500'
-              : 'bg-[#b8972a] text-[#0c1a35] border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]'
-            }
-          `}
-        >
-          {added ? '✓ נוסף לסל' : 'הוסף לסל'}
-        </button>
+        {/* Cart button — "הוסף לסל" or quantity control [ − | qty | + ] */}
+        <div className="mt-auto" onClick={e => e.stopPropagation()}>
+          {qty === 0 ? (
+            <button
+              onClick={handleAdd}
+              className="w-full rounded-full py-2 text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#0c1a35] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
+            >
+              הוסף לסל
+            </button>
+          ) : (
+            <div className="flex items-center justify-between bg-green-500 rounded-full overflow-hidden w-full">
+              <button
+                onClick={handleDecrement}
+                className="px-4 py-2 text-white text-xl font-bold hover:bg-green-600 transition-colors leading-none"
+              >
+                −
+              </button>
+              <span className="text-white font-bold text-base">{qty}</span>
+              <button
+                onClick={handleAdd}
+                className="px-4 py-2 text-white text-xl font-bold hover:bg-green-600 transition-colors leading-none"
+              >
+                +
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
