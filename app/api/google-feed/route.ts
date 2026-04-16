@@ -60,6 +60,15 @@ export async function GET() {
       <g:google_product_category>${googleCat}</g:google_product_category>
       <g:product_type>${esc(cat)}</g:product_type>
       ${badge ? `<g:custom_label_0>${esc(badge)}</g:custom_label_0>` : ''}
+      <g:shipping>
+        <g:country>IL</g:country>
+        <g:service>משלוח רגיל</g:service>
+        <g:price>0 ILS</g:price>
+        <g:min_handling_time>1</g:min_handling_time>
+        <g:max_handling_time>3</g:max_handling_time>
+        <g:min_transit_time>3</g:min_transit_time>
+        <g:max_transit_time>11</g:max_transit_time>
+      </g:shipping>
     </item>`);
     });
 
