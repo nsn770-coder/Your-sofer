@@ -23,15 +23,39 @@ export default function ReturnsPage() {
           </Section>
 
           <Section title="מוצרים שניתן להחזיר">
-            מוצרים שלא נפתחה אריזתם ולא נעשה בהם שימוש ניתן להחזיר תוך 14 יום. עלות המשלוח החוזר חלה על הלקוח. ההחזר הכספי יינתן תוך 5 ימי עסקים ממועד קבלת המוצר בחזרה.
+            מוצרים שלא נפתחה אריזתם ולא נעשה בהם שימוש ניתן להחזיר תוך 14 יום. עלות המשלוח החוזר חלה על הלקוח.
+            {' '}ההחזר הכספי יבוצע לאמצעי התשלום שבו בוצעה העסקה, תוך עד 14 ימי עסקים ממועד קבלת המוצר ובדיקתו.
           </Section>
 
-          <Section title="מוצר פגום">
-            התקבל מוצר פגום או שנפגע בדרכו? צרו קשר תוך 48 שעות מקבלת החבילה. נשלח מוצר חלופי ללא עלות ונסדר את האיסוף.
+          <Section title="מוצר פגום או טעות בהזמנה">
+            אם התקבל מוצר פגום, שגוי או שניזוק במהלך המשלוח, יש ליצור קשר תוך 48 שעות מקבלת החבילה.
+            {' '}במקרה כזה העסק ידאג להחלפת המוצר או להחזר כספי מלא, כולל עלויות משלוח, בהתאם למקרה.
           </Section>
 
-          <Section title="איך מבטלים?">
-            שלחו אימייל ל-nsn770@gmail.com עם מספר ההזמנה, שם המוצר וסיבת הביטול, או התקשרו לטלפון 055-272-2228 בימים א׳–ה׳ בין 9:00 ל-18:00.
+          <div style={{ marginBottom: 24 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0c1a35', marginBottom: 8, borderRight: '3px solid #b8972a', paddingRight: 10 }}>
+              איך מבטלים עסקה?
+            </h2>
+            <p style={{ fontSize: 14, color: '#444', lineHeight: 1.8, margin: '0 0 10px' }}>
+              לביטול עסקה ניתן לפנות באחת מהדרכים הבאות:
+            </p>
+            <ul style={{ fontSize: 14, color: '#444', lineHeight: 2, margin: '0 0 14px', paddingRight: 20, listStyle: 'disc' }}>
+              <li>אימייל: <a href="mailto:shop@your-sofer.com" style={{ color: '#0c1a35', fontWeight: 700 }}>shop@your-sofer.com</a></li>
+              <li>טלפון: <a href="tel:0552722228" style={{ color: '#0c1a35', fontWeight: 700 }}>055-272-2228</a></li>
+              <li>ימים ושעות פעילות: א׳–ה׳ בין 09:00–18:00</li>
+            </ul>
+            <p style={{ fontSize: 14, color: '#444', lineHeight: 1.8, margin: '0 0 8px', fontWeight: 700 }}>יש לציין:</p>
+            <ul style={{ fontSize: 14, color: '#444', lineHeight: 2, margin: 0, paddingRight: 20, listStyle: 'disc' }}>
+              <li>מספר הזמנה</li>
+              <li>שם מלא</li>
+              <li>מספר טלפון</li>
+              <li>שם המוצר</li>
+              <li>סיבת הביטול</li>
+            </ul>
+          </div>
+
+          <Section title="כתובת להחזרת מוצרים">
+            פרופ׳ עדה יונת 19/2, דימונה.
           </Section>
         </div>
       </div>
