@@ -297,17 +297,23 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
       {/* ── Category filter (מתנות page only) ── */}
       {category === 'מתנות' && onCatFilter && (
         <Section title="קטגוריה">
-          {['הכל', 'מתנות', 'כלי שולחן והגשה', 'עיצוב הבית', 'יודאיקה'].map(opt => (
-            <label key={opt} className="flex items-center gap-2 py-0.5 cursor-pointer group">
+          {([
+            { value: 'הכל',              label: 'הכל' },
+            { value: 'מתנות',            label: 'מתנות לחתן ובר מצוה' },
+            { value: 'כלי שולחן והגשה', label: 'כלי שולחן והגשה' },
+            { value: 'עיצוב הבית',       label: 'עיצוב הבית' },
+            { value: 'יודאיקה',          label: 'יודאיקה' },
+          ] as { value: string; label: string }[]).map(({ value, label }) => (
+            <label key={value} className="flex items-center gap-2 py-0.5 cursor-pointer group">
               <input
                 type="radio"
                 name="cat-filter"
-                checked={(catFilter ?? 'הכל') === opt}
-                onChange={() => onCatFilter(opt)}
+                checked={(catFilter ?? 'הכל') === value}
+                onChange={() => onCatFilter(value)}
                 className="accent-[#0c1a35]"
               />
-              <span className={`text-xs ${(catFilter ?? 'הכל') === opt ? 'font-bold text-[#0c1a35]' : 'text-gray-600 group-hover:text-gray-900'}`}>
-                {opt}
+              <span className={`text-xs ${(catFilter ?? 'הכל') === value ? 'font-bold text-[#0c1a35]' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                {label}
               </span>
             </label>
           ))}
