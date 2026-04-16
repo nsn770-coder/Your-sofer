@@ -462,7 +462,7 @@ export default function CategoryClient({ category }: { category: string }) {
           collection(db, 'products'),
           where('cat', '==', category),
           orderBy('priority', 'desc'),
-          limit(200),
+          limit(500),
         ),
       );
     }
