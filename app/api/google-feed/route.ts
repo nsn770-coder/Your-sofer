@@ -69,6 +69,15 @@ export async function GET() {
         <g:min_transit_time>3</g:min_transit_time>
         <g:max_transit_time>11</g:max_transit_time>
       </g:shipping>
+      <g:shipping>
+        <g:country>US</g:country>
+        <g:service>International Shipping</g:service>
+        <g:price>50 ILS</g:price>
+        <g:min_handling_time>1</g:min_handling_time>
+        <g:max_handling_time>3</g:max_handling_time>
+        <g:min_transit_time>7</g:min_transit_time>
+        <g:max_transit_time>21</g:max_transit_time>
+      </g:shipping>
     </item>`);
     });
 
