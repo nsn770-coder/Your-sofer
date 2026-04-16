@@ -400,7 +400,7 @@ function NavBarContent() {
   function handleSearch() {
     const q = searchQuery.trim();
     if (!q) return;
-    router.push(`/?q=${encodeURIComponent(q)}`);
+    router.push(`/search?q=${encodeURIComponent(q)}`);
   }
 
   function handleAction(action: string) {

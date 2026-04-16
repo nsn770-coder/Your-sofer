@@ -769,7 +769,7 @@ export default function HomePageClient() {
           {([
             'מזוזות', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט',
             'כיסוי תפילין', 'סט טלית תפילין', 'יודאיקה',
-            'בר מצוה', 'מתנות', 'מגילות',
+            'בר מצווה', 'מתנות', 'מגילות',
           ] as const).map(cat => {
             const img = catImages[cat] ?? '';
             return (
@@ -855,7 +855,7 @@ export default function HomePageClient() {
               {[
                 'מזוזות', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט',
                 'כיסוי תפילין', 'סט טלית תפילין', 'יודאיקה',
-                'בר מצוה', 'מתנות', 'מגילות',
+                'בר מצווה', 'מתנות', 'מגילות',
                 'כלי שולחן והגשה', 'עיצוב הבית',
               ].map(cat => (
                 <button
@@ -989,7 +989,7 @@ export default function HomePageClient() {
                 { name: 'מגילות',         emoji: '📖' },
                 { name: 'יודאיקה',        emoji: '✡️' },
                 { name: 'מתנות',          emoji: '🎁' },
-                { name: 'בר מצוה',        emoji: '🎉' },
+                { name: 'בר מצווה',        emoji: '🎉' },
               ] as { name: string; emoji: string }[]).map(cat => (
                 <div
                   key={cat.name}

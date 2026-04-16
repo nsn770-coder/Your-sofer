@@ -575,7 +575,7 @@ export default function ProductClient() {
 
   const EMBROIDERY_CATEGORIES = [
     'כיסוי תפילין', 'כיסוי טלית', 'סט טלית תפילין',
-    'בר מצוה', 'סט לבר מצוה', 'סט לחתן',
+    'בר מצווה', 'סט לבר מצוה', 'סט לחתן',
   ];
 
   function handleAddToCart() {

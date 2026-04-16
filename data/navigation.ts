@@ -164,7 +164,7 @@ export const navigationData: NavItem[] = [
   // ── בר מצוה ───────────────────────────────────────────────────────────────
   {
     id: "bar-mitzva",
-    label: "בר מצוה",
+    label: "בר מצווה",
     href: "/category/בר מצווה",
     columns: [
       {
@@ -207,17 +207,17 @@ export const navigationData: NavItem[] = [
         items: [
           { label: "כל מוצרי שבת",      href: "/category/שבת" },
           { label: "גביעי קידוש",        href: "/category/כלי שולחן והגשה?filter=קידוש" },
-          { label: "פמוטים ונרות",       href: "/category/עיצוב הבית?filter=פמוט" },
-          { label: "הבדלה",              href: "/category/יודאיקה?filter=הבדלה" },
-          { label: "לחמניות וחלות",      href: "/category/יודאיקה?filter=חלה" },
+          { label: "פמוטים ונרות",       href: "/category/כלי שולחן והגשה?filter=פמוט" },
+          { label: "הבדלה",              href: "/category/יודאיקה?filter=הבדל" },
+          { label: "חלות ולחמניות",      href: "/category/יודאיקה?filter=חלה" },
         ],
       },
       {
         title: "חנוכה 🕎",
         items: [
           { label: "כל מוצרי חנוכה",    href: "/category/חנוכה" },
-          { label: "חנוכיות",            href: "/category/יודאיקה?filter=חנוכי" },
-          { label: "עיצוב חנוכה",        href: "/category/עיצוב הבית?filter=חנוכי" },
+          { label: "חנוכיות",            href: "/category/יודאיקה?filter=חנוכ" },
+          { label: "עיצוב חנוכה",        href: "/category/עיצוב הבית?filter=חנוכ" },
           { label: "פסח 🍷",             href: "/category/פסח" },
         ],
       },

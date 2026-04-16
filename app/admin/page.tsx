@@ -934,7 +934,7 @@ export default function AdminPage() {
     { slug: 'כיסוי תפילין',    displayName: 'כיסוי תפילין',    priority: 5  },
     { slug: 'סט טלית תפילין',  displayName: 'סט טלית תפילין',  priority: 6  },
     { slug: 'יודאיקה',         displayName: 'יודאיקה',         priority: 7  },
-    { slug: 'בר מצוה',         displayName: 'בר מצוה',         priority: 8  },
+    { slug: 'בר מצווה',         displayName: 'בר מצווה',         priority: 8  },
     { slug: 'מתנות',           displayName: 'מתנות',           priority: 9  },
     { slug: 'מגילות',          displayName: 'מגילות',          priority: 10 },
   ];
