@@ -55,8 +55,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl">
-      <body className={`${geist.className} overflow-x-hidden`}>
+    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className="overflow-x-hidden">
+      <body className={`${geist.className} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100vw' }}>
         <AuthProvider>
           {/* Suspense is required by Next.js when useSearchParams() is used
               inside a component rendered from the root layout */}
