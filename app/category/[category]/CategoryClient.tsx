@@ -457,12 +457,15 @@ export default function CategoryClient({ category }: { category: string }) {
       //   hidden ASC + priority DESC — create in Firebase Console if needed.
       //   Filtering client-side instead to avoid index requirement and support legacy docs
       //   (existing products without the hidden field should remain visible).
+      // Large categories (כלי שולחן והגשה ~1887, עיצוב הבית) need a higher cap.
+      const LARGE_CATS = new Set(['כלי שולחן והגשה', 'עיצוב הבית']);
+      const fetchLimit = LARGE_CATS.has(category) ? 2000 : 1000;
       snap = await getDocs(
         query(
           collection(db, 'products'),
           where('cat', '==', category),
           orderBy('priority', 'desc'),
-          limit(500),
+          limit(fetchLimit),
         ),
       );
     }
