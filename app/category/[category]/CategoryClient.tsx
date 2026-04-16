@@ -33,6 +33,7 @@ interface Product {
   vendor?: string;
   createdAt?: { seconds: number };
   hidden?: boolean;
+  cat?: string;
 }
 
 interface FilterState {
@@ -245,9 +246,11 @@ interface SidebarProps {
   onChange: (f: FilterState) => void;
   products: Product[];
   category: string;
+  catFilter?: string;
+  onCatFilter?: (v: string) => void;
 }
 
-function FilterSidebar({ filters, onChange, products, category }: SidebarProps) {
+function FilterSidebar({ filters, onChange, products, category, catFilter, onCatFilter }: SidebarProps) {
   function set(partial: Partial<FilterState>) {
     onChange({ ...filters, ...partial });
   }
@@ -290,6 +293,26 @@ function FilterSidebar({ filters, onChange, products, category }: SidebarProps) 
           </button>
         )}
       </div>
+
+      {/* ── Category filter (מתנות page only) ── */}
+      {category === 'מתנות' && onCatFilter && (
+        <Section title="קטגוריה">
+          {['הכל', 'מתנות', 'כלי שולחן והגשה', 'עיצוב הבית', 'יודאיקה'].map(opt => (
+            <label key={opt} className="flex items-center gap-2 py-0.5 cursor-pointer group">
+              <input
+                type="radio"
+                name="cat-filter"
+                checked={(catFilter ?? 'הכל') === opt}
+                onChange={() => onCatFilter(opt)}
+                className="accent-[#0c1a35]"
+              />
+              <span className={`text-xs ${(catFilter ?? 'הכל') === opt ? 'font-bold text-[#0c1a35]' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                {opt}
+              </span>
+            </label>
+          ))}
+        </Section>
+      )}
 
       {/* ── Price range ── */}
       <Section title="טווח מחיר">
@@ -413,6 +436,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [sortBy, setSortBy]       = useState<SortBy>('popular');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [catFilter, setCatFilter] = useState('הכל');
 
   // ── Fetch ALL products for this category at once ───────────────────────────
   // Client-side pagination is used so filters always apply across the full set.
@@ -432,6 +456,28 @@ export default function CategoryClient({ category }: { category: string }) {
   };
 
   async function fetchAll() {
+    // ── מתנות: merge products from 4 categories in parallel ──────────────────
+    if (category === 'מתנות') {
+      const MATANOT_CATS = ['מתנות', 'כלי שולחן והגשה', 'עיצוב הבית', 'יודאיקה'];
+      const snaps = await Promise.all(
+        MATANOT_CATS.map(cat =>
+          getDocs(query(collection(db, 'products'), where('cat', '==', cat), orderBy('priority', 'desc'), limit(500)))
+        )
+      );
+      const seen = new Set<string>();
+      const merged: Product[] = [];
+      for (const snap of snaps) {
+        for (const d of snap.docs) {
+          if (!seen.has(d.id)) {
+            seen.add(d.id);
+            merged.push({ id: d.id, ...d.data() } as Product);
+          }
+        }
+      }
+      setAllLoaded(merged.filter(p => p.hidden !== true));
+      return;
+    }
+
     let snap;
     if (SUBCATEGORY_GROUPS[category]) {
       // e.g. /category/חגים → fetch subCategory in ['חנוכה','פסח']
@@ -478,6 +524,7 @@ export default function CategoryClient({ category }: { category: string }) {
     setLoading(true);
     setFilters(EMPTY_FILTERS);
     setCurrentPage(1);
+    setCatFilter('הכל');
     fetchAll().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
@@ -515,7 +562,13 @@ export default function CategoryClient({ category }: { category: string }) {
   }, [filters]);
 
   // ── Filtered + paginated products ─────────────────────────────────────────
-  const filtered   = useMemo(() => applySort(applyFilters(allLoaded, filters), sortBy), [allLoaded, filters, sortBy]);
+  const filtered   = useMemo(() => {
+    let result = applyFilters(allLoaded, filters);
+    if (category === 'מתנות' && catFilter !== 'הכל') {
+      result = result.filter(p => p.cat === catFilter);
+    }
+    return applySort(result, sortBy);
+  }, [allLoaded, filters, sortBy, catFilter, category]);
   const active     = hasActiveFilters(filters);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated  = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -536,7 +589,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
       {/* ── Header ── */}
       <div className="bg-[#0c1a35] px-6 py-8 text-center">
-        <h1 className="text-3xl font-black text-white mb-1">{category}</h1>
+        <h1 className="text-3xl font-black text-white mb-1">{category === 'מתנות' ? 'מתנות ומוצרי בית' : category}</h1>
         {!loading && (
           <p className="text-sm text-white/60">{filtered.length} מוצרים</p>
         )}
@@ -610,7 +663,7 @@ export default function CategoryClient({ category }: { category: string }) {
                 </svg>
               </button>
             </div>
-            <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} />
+            <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} />
             <button onClick={() => setDrawerOpen(false)} className="mt-4 w-full py-3 bg-[#0c1a35] text-white rounded-full font-bold text-sm">
               הצג {filtered.length} תוצאות
             </button>
@@ -628,6 +681,8 @@ export default function CategoryClient({ category }: { category: string }) {
             onChange={setFilters}
             products={allLoaded}
             category={category}
+            catFilter={catFilter}
+            onCatFilter={setCatFilter}
           />
         </aside>
 
