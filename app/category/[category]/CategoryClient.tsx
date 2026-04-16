@@ -43,6 +43,8 @@ interface FilterState {
   freeShipping: boolean;
   attrFilters: Record<string, string>;  // from filterAttributes field
   nameFilters: Record<string, string>;  // category-specific, match against product.name
+  sizeMin: number;         // cm — 0 means no lower bound
+  sizeMax: number;         // cm — 100 means no upper bound
 }
 
 const EMPTY_FILTERS: FilterState = {
@@ -52,12 +54,14 @@ const EMPTY_FILTERS: FilterState = {
   freeShipping: false,
   attrFilters: {},
   nameFilters: {},
+  sizeMin: 0,
+  sizeMax: 100,
 };
 
 const PAGE_SIZE = 12;
 
 // Attribute keys to surface from filterAttributes field (shown only when data exists)
-const ATTR_KEYS = ['חומר', 'גודל', 'כתב', 'כשרות', 'נוסח', 'צבע'];
+const ATTR_KEYS = ['חומר', 'כתב', 'כשרות', 'נוסח', 'צבע']; // 'גודל' handled by SizeRangeSlider
 
 // ─── Category-specific name-based filters ────────────────────────────────────
 // Filtering is done by checking product.name.includes(value)
@@ -178,6 +182,8 @@ function hasActiveFilters(f: FilterState) {
     f.maxPrice !== '' ||
     f.minRating > 0 ||
     f.freeShipping ||
+    f.sizeMin > 0 ||
+    f.sizeMax < 100 ||
     Object.values(f.attrFilters).some(v => v && v !== 'הכל') ||
     Object.values(f.nameFilters).some(v => v && v !== 'הכל')
   );
@@ -189,6 +195,14 @@ function applyFilters(products: Product[], f: FilterState): Product[] {
     if (f.maxPrice !== '' && p.price > Number(f.maxPrice)) return false;
     if (f.minRating > 0 && (p.stars ?? 0) < f.minRating) return false;
     if (f.freeShipping && p.days && !p.days.toLowerCase().includes('חינם')) return false;
+    // Size range filter — parse numeric cm value from filterAttributes.גודל (e.g. "10 ס\"מ" → 10)
+    if (f.sizeMin > 0 || f.sizeMax < 100) {
+      const sizeStr = p.filterAttributes?.['גודל'] ?? '';
+      const sizeNum = parseInt(sizeStr, 10);
+      if (!isNaN(sizeNum)) {
+        if (sizeNum < f.sizeMin || sizeNum > f.sizeMax) return false;
+      }
+    }
     for (const key of ATTR_KEYS) {
       const chosen = f.attrFilters[key];
       if (chosen && chosen !== 'הכל' && p.filterAttributes?.[key] !== chosen) return false;
@@ -236,6 +250,84 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{title}</h3>
       {children}
     </div>
+  );
+}
+
+// ─── SizeRangeSlider ──────────────────────────────────────────────────────────
+
+function SizeRangeSlider({
+  sizeMin, sizeMax, onChange,
+}: {
+  sizeMin: number; sizeMax: number;
+  onChange: (min: number, max: number) => void;
+}) {
+  const MIN = 0, MAX = 100;
+  const isActive = sizeMin > MIN || sizeMax < MAX;
+  const leftPct  = (sizeMin / MAX) * 100;
+  const rightPct = (sizeMax / MAX) * 100;
+
+  return (
+    <>
+      {/* Inject thumb styles once */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .size-range { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; margin:0; }
+        .size-range::-webkit-slider-thumb { appearance:none; width:18px; height:18px; }
+        .size-range::-moz-range-thumb { width:18px; height:18px; border:none; background:transparent; }
+      `}} />
+
+      {/* Label row */}
+      <div className="flex justify-between items-center mb-2" dir="rtl">
+        <span className="text-xs font-semibold text-[#0c1a35]">
+          {isActive ? `${sizeMin} ס״מ — ${sizeMax} ס״מ` : 'כל הגדלים'}
+        </span>
+        {isActive && (
+          <button
+            onClick={() => onChange(MIN, MAX)}
+            className="text-[10px] text-red-400 hover:text-red-600 transition-colors"
+          >
+            איפוס
+          </button>
+        )}
+      </div>
+
+      {/* Slider track */}
+      <div className="relative h-6 flex items-center mx-1" style={{ direction: 'ltr' }}>
+        {/* Full track */}
+        <div className="absolute w-full h-1.5 rounded-full bg-gray-200" />
+        {/* Active range */}
+        <div
+          className="absolute h-1.5 rounded-full pointer-events-none"
+          style={{ background: '#b45309', left: `${leftPct}%`, right: `${100 - rightPct}%` }}
+        />
+        {/* Invisible range inputs — handle pointer events */}
+        <input
+          type="range" min={MIN} max={MAX} step={1} value={sizeMin}
+          onChange={e => onChange(Math.min(Number(e.target.value), sizeMax - 1), sizeMax)}
+          className="size-range"
+          style={{ zIndex: sizeMin > MAX - 10 ? 5 : 3 }}
+        />
+        <input
+          type="range" min={MIN} max={MAX} step={1} value={sizeMax}
+          onChange={e => onChange(sizeMin, Math.max(Number(e.target.value), sizeMin + 1))}
+          className="size-range"
+          style={{ zIndex: 4 }}
+        />
+        {/* Visual thumbs */}
+        <div
+          className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none"
+          style={{ background: '#b45309', left: `calc(${leftPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }}
+        />
+        <div
+          className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none"
+          style={{ background: '#b45309', left: `calc(${rightPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }}
+        />
+      </div>
+
+      {/* Tick labels */}
+      <div className="flex justify-between text-[9px] text-gray-400 mt-1 mx-1" style={{ direction: 'ltr' }}>
+        {[0, 25, 50, 75, 100].map(v => <span key={v}>{v}</span>)}
+      </div>
+    </>
   );
 }
 
@@ -317,6 +409,17 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
               </span>
             </label>
           ))}
+        </Section>
+      )}
+
+      {/* ── Size range slider (shown when any product has filterAttributes.גודל) ── */}
+      {products.some(p => p.filterAttributes?.['גודל']) && (
+        <Section title="גודל (ס״מ)">
+          <SizeRangeSlider
+            sizeMin={filters.sizeMin}
+            sizeMax={filters.sizeMax}
+            onChange={(min, max) => onChange({ ...filters, sizeMin: min, sizeMax: max })}
+          />
         </Section>
       )}
 
