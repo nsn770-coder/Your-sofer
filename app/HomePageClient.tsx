@@ -770,6 +770,7 @@ export default function HomePageClient() {
             'מזוזות', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט',
             'כיסוי תפילין', 'סט טלית תפילין', 'יודאיקה',
             'בר מצווה', 'מתנות', 'מגילות',
+            'כלי שולחן והגשה', 'עיצוב הבית',
           ] as const).map(cat => {
             const img = catImages[cat] ?? '';
             return (
@@ -785,7 +786,7 @@ export default function HomePageClient() {
                   position: 'relative',
                   display: 'block',
                   textDecoration: 'none',
-                  background: img ? '#000' : '#0c1a35',
+                  background: img ? '#000' : 'linear-gradient(to bottom right, #92400e, #b45309)',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                   transition: 'transform 0.18s ease, box-shadow 0.18s ease',
                 }}
