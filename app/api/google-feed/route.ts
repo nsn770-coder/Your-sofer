@@ -3,7 +3,7 @@ import { getAdminDb } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
-const SITE = 'https://yoursofer.com';
+const SITE = 'https://your-sofer.com';
 
 function esc(s: string) {
   return s
