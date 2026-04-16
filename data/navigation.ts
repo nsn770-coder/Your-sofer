@@ -106,7 +106,7 @@ export const navigationData: NavItem[] = [
         title: "יודאיקה",
         items: [
           { label: "נטילת ידיים 🤲",  href: "/category/נטילת ידיים" },
-          { label: "שבת ✨",           href: "/category/שבת" },
+          { label: "שבת ✨",           href: "/category/כלי שולחן והגשה?filter=שבת" },
           { label: "סטים ומארזים 🎁", href: "/category/סטים ומארזים" },
           { label: "יודאיקה כללי ✡️", href: "/category/יודאיקה כללי" },
         ],
@@ -114,9 +114,9 @@ export const navigationData: NavItem[] = [
       {
         title: "חגים 🕍",
         items: [
-          { label: "שבת וחגים", href: "/category/שבת" },
-          { label: "חנוכה 🕎",  href: "/category/חנוכה" },
-          { label: "פסח 🍷",    href: "/category/פסח" },
+          { label: "שבת וחגים", href: "/category/כלי שולחן והגשה?filter=שבת" },
+          { label: "חנוכה 🕎",  href: "/category/יודאיקה?filter=חנוכ" },
+          { label: "פסח 🍷",    href: "/category/כלי שולחן והגשה?filter=פסח" },
         ],
       },
     ],
@@ -200,12 +200,12 @@ export const navigationData: NavItem[] = [
   {
     id: "shabbat-chagim",
     label: "שבת וחגים",
-    href: "/category/שבת",
+    href: "/category/כלי שולחן והגשה?filter=שבת",
     columns: [
       {
         title: "שבת ✨",
         items: [
-          { label: "כל מוצרי שבת",      href: "/category/שבת" },
+          { label: "כל מוצרי שבת",      href: "/category/כלי שולחן והגשה?filter=שבת" },
           { label: "גביעי קידוש",        href: "/category/כלי שולחן והגשה?filter=קידוש" },
           { label: "פמוטים ונרות",       href: "/category/כלי שולחן והגשה?filter=פמוט" },
           { label: "הבדלה",              href: "/category/יודאיקה?filter=הבדל" },
@@ -215,10 +215,10 @@ export const navigationData: NavItem[] = [
       {
         title: "חנוכה 🕎",
         items: [
-          { label: "כל מוצרי חנוכה",    href: "/category/חנוכה" },
+          { label: "כל מוצרי חנוכה",    href: "/category/יודאיקה?filter=חנוכ" },
           { label: "חנוכיות",            href: "/category/יודאיקה?filter=חנוכ" },
           { label: "עיצוב חנוכה",        href: "/category/עיצוב הבית?filter=חנוכ" },
-          { label: "פסח 🍷",             href: "/category/פסח" },
+          { label: "פסח 🍷",             href: "/category/כלי שולחן והגשה?filter=פסח" },
         ],
       },
     ],
