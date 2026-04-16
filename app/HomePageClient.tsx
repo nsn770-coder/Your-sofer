@@ -767,16 +767,25 @@ export default function HomePageClient() {
           }}
         >
           {([
-            'מזוזות', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט',
-            'כיסוי תפילין', 'סט טלית תפילין', 'יודאיקה',
-            'בר מצווה', 'מתנות', 'מגילות',
-            'כלי שולחן והגשה', 'עיצוב הבית',
-          ] as const).map(cat => {
-            const img = catImages[cat] ?? '';
+            { label: 'מזוזות' },
+            { label: 'קלפי מזוזה' },
+            { label: 'קלפי תפילין' },
+            { label: 'תפילין קומפלט' },
+            { label: 'כיסוי תפילין' },
+            { label: 'סט טלית תפילין' },
+            { label: 'יודאיקה' },
+            { label: 'בר מצווה' },
+            { label: 'מתנות' },
+            { label: 'מגילות' },
+            { label: 'כלי שולחן והגשה' },
+            { label: 'עיצוב הבית' },
+            { label: 'שבת וחגים', href: `/category/${encodeURIComponent('כלי שולחן והגשה')}?filter=${encodeURIComponent('שבת')}`, imgKey: 'כלי שולחן והגשה' },
+          ] as { label: string; href?: string; imgKey?: string }[]).map(({ label, href, imgKey }) => {
+            const img = catImages[imgKey ?? label] ?? '';
             return (
               <Link
-                key={cat}
-                href={`/category/${encodeURIComponent(cat)}`}
+                key={label}
+                href={href ?? `/category/${encodeURIComponent(label)}`}
                 style={{
                   flexShrink: 0,
                   width: 112,   // w-28
@@ -803,7 +812,7 @@ export default function HomePageClient() {
                 {img && (
                   <img
                     src={img}
-                    alt={cat}
+                    alt={label}
                     style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 )}
@@ -826,7 +835,7 @@ export default function HomePageClient() {
                     display: 'block',
                     textShadow: '0 1px 3px rgba(0,0,0,0.6)',
                   }}>
-                    {cat}
+                    {label}
                   </span>
                 </div>
               </Link>
