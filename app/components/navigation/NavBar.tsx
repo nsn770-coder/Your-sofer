@@ -227,9 +227,14 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
         title: "יודאיקה",
         items: [
           { label: "כל היודאיקה", cat: "יודאיקה" },
+          { label: "נטלות", cat: "יודאיקה", filter: "נטל" },
           { label: "פיו — תיקי טלית", cat: "יודאיקה", filter: "פיו" },
           { label: "כסף", cat: "יודאיקה", filter: "כסף" },
-          { label: "זכוכית", cat: "יודאיקה", filter: "זכוכית" },
+          { label: "זכוכית", cat: "יודאיקה", filter: "זכוכ" },
+          { label: "הבדלה", cat: "יודאיקה", filter: "הבדל" },
+          { label: "חנוכיות", cat: "יודאיקה", filter: "חנוכי" },
+          { label: "כלי שולחן והגשה", cat: "כלי שולחן והגשה" },
+          { label: "עיצוב הבית", cat: "עיצוב הבית" },
         ]
       },
       {

@@ -488,6 +488,8 @@ export default function HomePageClient() {
         minHeight: '100vh',
         background: '#F5F0E8',
         fontFamily: "'Heebo', Arial, sans-serif",
+        overflowX: 'hidden',
+        maxWidth: '100vw',
       }}
     >
       {/* ── Newsletter popup (45 s trigger) ── */}
