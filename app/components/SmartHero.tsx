@@ -90,8 +90,10 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
     <div style={{
       position: 'relative',
       width: '100%',
+      maxWidth: '100%',
       minHeight: isMobile ? 360 : 480,
       overflow: 'hidden',
+      overflowX: 'hidden',
       display: 'flex',
       alignItems: 'center',
       direction: 'rtl',
@@ -179,7 +181,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
               {(c as any).sub}
             </p>
 
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28 }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28, width: '100%', maxWidth: '100%', overflow: 'hidden', flexDirection: isMobile ? 'column' : 'row' }}>
               {(c as any).buttons.map((btn: any, i: number) => (
                 <button key={i} onClick={btn.action}
                   style={{
@@ -196,6 +198,8 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
                     opacity: loaded ? 1 : 0,
                     transform: loaded ? 'translateY(0)' : 'translateY(12px)',
                     transitionDelay: `${0.2 + i * 0.08}s`,
+                    width: isMobile ? '100%' : 'auto',
+                    boxSizing: 'border-box',
                   }}
                   onMouseEnter={e => {
                     const el = e.currentTarget;
@@ -250,7 +254,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
               {(c as any).body}
             </p>
 
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20 }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20, width: '100%', maxWidth: '100%', overflow: 'hidden', flexDirection: isMobile ? 'column' : 'row' }}>
               {(c as any).buttons.map((btn: any, i: number) => (
                 <button key={i} onClick={btn.action}
                   style={{
@@ -264,6 +268,8 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
                       : btn.style === 'outline' ? 'rgba(255,255,255,0.08)' : 'transparent',
                     color: btn.style === 'gold' ? '#0c1a35' : '#fff',
                     backdropFilter: 'blur(4px)',
+                    width: isMobile ? '100%' : 'auto',
+                    boxSizing: 'border-box',
                   }}
                   onMouseEnter={e => {
                     const el = e.currentTarget;

@@ -56,7 +56,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="he" dir="rtl">
-      <body className={geist.className}>
+      <body className={`${geist.className} overflow-x-hidden`}>
         <AuthProvider>
           {/* Suspense is required by Next.js when useSearchParams() is used
               inside a component rendered from the root layout */}
