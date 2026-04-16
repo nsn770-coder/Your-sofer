@@ -115,7 +115,7 @@ export const navigationData: NavItem[] = [
         title: "חגים 🕍",
         items: [
           { label: "שבת וחגים", href: "/category/כלי שולחן והגשה?filter=שבת" },
-          { label: "חנוכה 🕎",  href: "/category/יודאיקה?filter=חנוכ" },
+          { label: "חנוכה 🕎",  href: "/category/יודאיקה?filter=חנוכי" },
           { label: "פסח 🍷",    href: "/category/כלי שולחן והגשה?filter=פסח" },
         ],
       },
@@ -215,9 +215,9 @@ export const navigationData: NavItem[] = [
       {
         title: "חנוכה 🕎",
         items: [
-          { label: "כל מוצרי חנוכה",    href: "/category/יודאיקה?filter=חנוכ" },
-          { label: "חנוכיות",            href: "/category/יודאיקה?filter=חנוכ" },
-          { label: "עיצוב חנוכה",        href: "/category/עיצוב הבית?filter=חנוכ" },
+          { label: "כל מוצרי חנוכה",    href: "/category/יודאיקה?filter=חנוכי" },
+          { label: "חנוכיות",            href: "/category/יודאיקה?filter=חנוכי" },
+          { label: "עיצוב חנוכה",        href: "/category/עיצוב הבית?filter=חנוכי" },
           { label: "פסח 🍷",             href: "/category/כלי שולחן והגשה?filter=פסח" },
         ],
       },
