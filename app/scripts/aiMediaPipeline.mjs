@@ -1,8 +1,10 @@
 // aiMediaPipeline.mjs
-// סוכן — עורך תמונות מוצר קיימות דרך gpt-image-1
-// הרצה: node app/scripts/aiMediaPipeline.mjs
-// אפשר להגביל: node app/scripts/aiMediaPipeline.mjs --limit=3
+// סוכן — עורך תמונות מוצר קיימות דרך Gemini 2.0 Flash (multimodal image generation)
+// הרצה:        node app/scripts/aiMediaPipeline.mjs
+// מצב בדיקה:   node app/scripts/aiMediaPipeline.mjs --test
+// הגבלת כמות:  node app/scripts/aiMediaPipeline.mjs --limit=3
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { fileURLToPath } from 'url';
@@ -19,11 +21,20 @@ const firebaseConfig = {
   messagingSenderId: "7710397068",
   appId: "1:7710397068:web:3c9880f24871efd4d661a9"
 };
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
+const firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const db = getFirestore(firebaseApp);
 
-// ══ הגדרות ══
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';const CLOUDINARY_PRESET = 'yoursofer_upload';
+// ══ Gemini ══
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+if (!GEMINI_API_KEY) {
+  console.error('❌ חסר GEMINI_API_KEY — הפסק את הריצה');
+  process.exit(1);
+}
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+// ══ Cloudinary ══
+const CLOUDINARY_CLOUD  = process.env.CLOUDINARY_CLOUD_NAME || 'yoursofer';
+const CLOUDINARY_PRESET = 'yoursofer_upload';
 
 const SATAM_CATEGORIES = ['מזוזות', 'תפילין', 'סת"ם', 'ספרי תורה', 'מגילות', 'קלפים'];
 
@@ -39,36 +50,33 @@ async function downloadImageAsBase64(url) {
   return { base64, contentType };
 }
 
-// ══ ערוך תמונה עם gpt-image-1 ══
-async function editImageWithGPT(imageBase64, contentType, prompt) {
-  const byteCharacters = atob(imageBase64);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: contentType });
+// ══ ערוך תמונה עם Gemini 2.0 Flash ══
+async function editImageWithGemini(imageBase64, contentType, prompt) {
+  const model = genAI.getGenerativeModel(
+    { model: 'gemini-2.0-flash-exp' },
+    { apiVersion: 'v1beta' }
+  );
 
-  const formData = new FormData();
-  formData.append('model', 'gpt-image-1');
-  formData.append('image', blob, 'product.jpg');
-  formData.append('prompt', prompt);
-  formData.append('n', '1');
-  formData.append('size', '1024x1024');
-
-  const response = await fetch('https://api.openai.com/v1/images/edits', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}` },
-    body: formData,
+  const result = await model.generateContent({
+    contents: [{
+      role: 'user',
+      parts: [
+        { inlineData: { data: imageBase64, mimeType: contentType } },
+        { text: prompt },
+      ],
+    }],
+    generationConfig: {
+      responseModalities: ['IMAGE', 'TEXT'],
+    },
   });
 
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error?.message || 'שגיאת gpt-image-1');
+  const parts = result.response.candidates?.[0]?.content?.parts ?? [];
+  for (const part of parts) {
+    if (part.inlineData?.data) {
+      return part.inlineData.data; // base64 PNG
+    }
   }
-
-  const data = await response.json();
-  return data.data[0].b64_json;
+  throw new Error('Gemini לא החזיר תמונה — בדוק שה-model תומך ב-image output');
 }
 
 // ══ העלה base64 ל-Cloudinary ══
@@ -90,12 +98,13 @@ async function uploadBase64ToCloudinary(base64, productId, type) {
 }
 
 // ══ עבד מוצר אחד ══
-async function processProduct(product) {
+async function processProduct(product, testMode = false) {
   const isSatam = SATAM_CATEGORIES.includes(product.cat);
   const imgUrl = product.imgUrl || product.image_url;
 
   console.log(`\n📦 ${product.name?.substring(0, 50)}`);
   console.log(`   קטגוריה: ${product.cat} ${isSatam ? '(safe mode)' : ''}`);
+  if (testMode) console.log('   🧪 מצב בדיקה — מעלה ל-Cloudinary (ללא עדכון Firestore)');
 
   let imageBase64, contentType;
   try {
@@ -110,7 +119,7 @@ async function processProduct(product) {
 
   // ══ תמונת סטודיו ══
   try {
-    console.log('   🎨 יוצר תמונת סטודיו...');
+    console.log('   🎨 יוצר תמונת סטודיו (Gemini)...');
     const studioPrompt = `Use the attached image as the exact product reference.
 
 OUTPUT FORMAT (CRITICAL):
@@ -189,10 +198,10 @@ CAMERA STYLE:
 
 FINAL GOAL: The exact product the customer will receive. True scale, material, and texture. Premium, trustworthy product photography.`;
 
-    const resultBase64 = await editImageWithGPT(imageBase64, contentType, studioPrompt);
+    const resultBase64 = await editImageWithGemini(imageBase64, contentType, studioPrompt);
     const cloudinaryUrl = await uploadBase64ToCloudinary(resultBase64, product.id, 'studio');
     updates.imgUrl2 = cloudinaryUrl;
-    console.log('   ✅ סטודיו הועלה');
+    console.log('   ✅ סטודיו הועלה:', cloudinaryUrl);
     await sleep(3000);
   } catch (e) {
     console.error('   ❌ שגיאה בסטודיו:', e.message);
@@ -200,7 +209,7 @@ FINAL GOAL: The exact product the customer will receive. True scale, material, a
 
   // ══ תמונת לייפסטייל ══
   try {
-    console.log('   🧑 יוצר תמונת לייפסטייל...');
+    console.log('   🧑 יוצר תמונת לייפסטייל (Gemini)...');
     const lifestylePrompt = isSatam
       ? `Use the attached image as the exact product reference. Create a realistic lifestyle image.
 
@@ -324,18 +333,21 @@ Real photography (NOT CGI). Shot as if with DSLR or high-end smartphone. Natural
 
 FINAL GOAL: Create an authentic, emotional, real-life moment while preserving absolute product accuracy for e-commerce.`;
 
-    const resultBase64 = await editImageWithGPT(imageBase64, contentType, lifestylePrompt);
+    const resultBase64 = await editImageWithGemini(imageBase64, contentType, lifestylePrompt);
     const cloudinaryUrl = await uploadBase64ToCloudinary(resultBase64, product.id, 'lifestyle');
     updates.imgUrl3 = cloudinaryUrl;
-    console.log('   ✅ לייפסטייל הועלה');
+    console.log('   ✅ לייפסטייל הועלה:', cloudinaryUrl);
     await sleep(3000);
   } catch (e) {
     console.error('   ❌ שגיאה בלייפסטייל:', e.message);
   }
 
-  if (Object.keys(updates).length > 0) {
+  // בצב בדיקה — אל תכתוב ל-Firestore
+  if (!testMode && Object.keys(updates).length > 0) {
     await updateDoc(doc(db, 'products', product.id), updates);
     console.log('   💾 מוצר עודכן ב-Firestore');
+  } else if (testMode && Object.keys(updates).length > 0) {
+    console.log('   🧪 (מצב בדיקה) דילגנו על עדכון Firestore');
   }
 
   return updates;
@@ -343,13 +355,16 @@ FINAL GOAL: Create an authentic, emotional, real-life moment while preserving ab
 
 // ══ תוכנית ראשית ══
 async function runPipeline() {
-  const limitArg = process.argv.find(a => a.startsWith('--limit='));
-  const limit = limitArg ? parseInt(limitArg.split('=')[1]) : null;
+  const args = process.argv.slice(2);
+  const testMode  = args.includes('--test');
+  const limitArg  = args.find(a => a.startsWith('--limit='));
+  const limit     = testMode ? 3 : (limitArg ? parseInt(limitArg.split('=')[1]) : null);
 
-  console.log('🚀 AI Media Pipeline (gpt-image-1) מתחיל...');
-  if (limit) console.log(`📊 מוגבל ל-${limit} מוצרים`);
+  console.log(`🚀 AI Media Pipeline (Gemini 2.0 Flash) מתחיל...`);
+  if (testMode) console.log('🧪 מצב בדיקה — 3 מוצרים ראשונים, ללא כתיבה ל-Firestore');
+  else if (limit) console.log(`📊 מוגבל ל-${limit} מוצרים`);
 
-const q = query(collection(db, 'products'), where('status', '==', 'active'), where('cat', '==', 'יודאיקה'));
+  const q = query(collection(db, 'products'), where('status', '==', 'active'), where('cat', '==', 'יודאיקה'));
   const snap = await getDocs(q);
 
   let products = [];
@@ -373,7 +388,7 @@ const q = query(collection(db, 'products'), where('status', '==', 'active'), whe
   for (let i = 0; i < products.length; i++) {
     console.log(`\n[${i + 1}/${products.length}]`);
     try {
-      await processProduct(products[i]);
+      await processProduct(products[i], testMode);
       success++;
     } catch (e) {
       console.error(`❌ שגיאה כללית:`, e.message);
@@ -386,6 +401,7 @@ const q = query(collection(db, 'products'), where('status', '==', 'active'), whe
   console.log('🎉 Pipeline הושלם!');
   console.log(`✅ הצליחו: ${success}`);
   console.log(`❌ נכשלו: ${failed}`);
+  if (testMode) console.log('🧪 זו הייתה ריצת בדיקה — הפעל ללא --test לריצה מלאה');
   process.exit(0);
 }
 
