@@ -96,13 +96,13 @@ export const CARDS: CardDef[] = [
   },
   {
     title: 'חגים ומועדים',
-    href: '/category/חגים ומועדים',
+    href: '/category/יודאיקה?filter=חנוכי',
     ctaLabel: 'לכל החגים ←',
     items: [
-      { label: 'חנוכה',    href: '/category/חגים ומועדים?filter=חנוכה',    cat: 'חגים ומועדים' },
-      { label: 'פסח',      href: '/category/חגים ומועדים?filter=פסח',      cat: 'חגים ומועדים' },
-      { label: 'ראש השנה', href: '/category/חגים ומועדים?filter=ראש השנה', cat: 'חגים ומועדים' },
-      { label: 'פורים',    href: '/category/חגים ומועדים?filter=פורים',    cat: 'חגים ומועדים' },
+      { label: 'חנוכה',    href: '/category/יודאיקה?filter=חנוכי',               cat: 'יודאיקה' },
+      { label: 'פסח',      href: '/category/כלי שולחן והגשה?filter=פסח',         cat: 'כלי שולחן והגשה' },
+      { label: 'ראש השנה', href: '/category/יודאיקה?filter=ראש השנה',            cat: 'יודאיקה' },
+      { label: 'פורים',    href: '/category/יודאיקה?filter=פורים',               cat: 'יודאיקה' },
     ],
   },
   {

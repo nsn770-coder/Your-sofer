@@ -140,27 +140,27 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
     ],
   },
   {
-    id: "hagim", label: "שבת וחגים", cat: "חגים ומועדים",
+    id: "hagim", label: "שבת וחגים", cat: "כלי שולחן והגשה",
     columns: [
       {
         title: "שבת",
         items: [
-          { label: "פמוטים", cat: "חגים ומועדים", filter: "פמוט" },
-          { label: "גביעי קידוש", cat: "חגים ומועדים", filter: "קידוש" },
-          { label: "כיסויי חלה", cat: "חגים ומועדים", filter: "חלה" },
-          { label: "הבדלה", cat: "חגים ומועדים", filter: "הבדלה" },
+          { label: "פמוטים", cat: "כלי שולחן והגשה", filter: "פמוט" },
+          { label: "גביעי קידוש", cat: "כלי שולחן והגשה", filter: "קידוש" },
+          { label: "כיסויי חלה", cat: "יודאיקה", filter: "חלה" },
+          { label: "הבדלה", cat: "יודאיקה", filter: "הבדל" },
         ]
       },
       {
         title: "חגים",
         items: [
-          { label: "חנוכה", cat: "חגים ומועדים", filter: "חנוכה" },
-          { label: "פורים", cat: "חגים ומועדים", filter: "פורים" },
-          { label: "פסח", cat: "חגים ומועדים", filter: "פסח" },
-          { label: "סוכות", cat: "חגים ומועדים", filter: "סוכות" },
-          { label: "ראש השנה", cat: "חגים ומועדים", filter: "ראש השנה" },
-          { label: "יום כיפור", cat: "חגים ומועדים", filter: "יום כיפור" },
-          { label: "שבועות", cat: "חגים ומועדים", filter: "שבועות" },
+          { label: "חנוכה", cat: "יודאיקה", filter: "חנוכי" },
+          { label: "פורים", cat: "יודאיקה", filter: "פורים" },
+          { label: "פסח", cat: "כלי שולחן והגשה", filter: "פסח" },
+          { label: "סוכות", cat: "יודאיקה", filter: "סוכות" },
+          { label: "ראש השנה", cat: "יודאיקה", filter: "ראש השנה" },
+          { label: "יום כיפור", cat: "יודאיקה", filter: "יום כיפור" },
+          { label: "שבועות", cat: "יודאיקה", filter: "שבועות" },
         ]
       },
     ],
@@ -214,7 +214,7 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
         items: [
           { label: "בר / בת מצווה", cat: "בר מצווה" },
           { label: "חנוכת בית", cat: "מתנות", filter: "חנוכת בית" },
-          { label: "חגים", cat: "חגים ומועדים" },
+          { label: "חגים", cat: "יודאיקה", filter: "חנוכי" },
           { label: "מארזים מיוחדים", cat: "מתנות", filter: "מארז" },
         ]
       },
