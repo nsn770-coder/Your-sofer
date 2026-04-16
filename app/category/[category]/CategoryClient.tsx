@@ -253,6 +253,106 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+// ─── Category scroll bar ─────────────────────────────────────────────────────
+
+const CAT_SCROLL_ITEMS: { label: string; href?: string; imgKey?: string }[] = [
+  { label: 'מזוזות' },
+  { label: 'קלפי מזוזה' },
+  { label: 'קלפי תפילין' },
+  { label: 'תפילין קומפלט' },
+  { label: 'כיסוי תפילין' },
+  { label: 'סט טלית תפילין' },
+  { label: 'יודאיקה' },
+  { label: 'בר מצווה' },
+  { label: 'מתנות' },
+  { label: 'מגילות' },
+  { label: 'כלי שולחן והגשה' },
+  { label: 'עיצוב הבית' },
+  { label: 'שבת וחגים', href: `/category/${encodeURIComponent('כלי שולחן והגשה')}?filter=${encodeURIComponent('שבת')}`, imgKey: 'כלי שולחן והגשה' },
+];
+
+function CategoryScrollBar({
+  catImages,
+  currentCategory,
+}: {
+  catImages: Record<string, string>;
+  currentCategory: string;
+}) {
+  return (
+    <div
+      className="hide-scrollbar"
+      style={{
+        display: 'flex',
+        gap: 10,
+        overflowX: 'auto',
+        overflowY: 'visible',
+        padding: '4px 4px 8px',
+        direction: 'rtl',
+      }}
+    >
+      {CAT_SCROLL_ITEMS.map(({ label, href, imgKey }) => {
+        const img  = catImages[imgKey ?? label] ?? '';
+        const dest = href ?? `/category/${encodeURIComponent(label)}`;
+        const isActive = label === currentCategory ||
+          (label === 'שבת וחגים' && currentCategory === 'כלי שולחן והגשה');
+        return (
+          <Link
+            key={label}
+            href={dest}
+            style={{
+              flexShrink: 0,
+              width: 88,
+              height: 114,
+              borderRadius: 10,
+              overflow: 'hidden',
+              position: 'relative',
+              display: 'block',
+              textDecoration: 'none',
+              background: img ? '#000' : 'linear-gradient(to bottom right, #92400e, #b45309)',
+              boxShadow: isActive
+                ? '0 0 0 2.5px #f59e0b, 0 2px 8px rgba(0,0,0,0.18)'
+                : '0 2px 8px rgba(0,0,0,0.13)',
+              transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+            }}
+          >
+            {img && (
+              <img
+                src={img}
+                alt={label}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            )}
+            {/* Dark gradient overlay */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)',
+            }} />
+            {/* Label */}
+            <div style={{
+              position: 'absolute', bottom: 0, right: 0, left: 0,
+              padding: '8px 4px 6px', textAlign: 'center',
+            }}>
+              <span style={{
+                color: '#fff', fontSize: 10, fontWeight: 800,
+                lineHeight: 1.3, display: 'block',
+                textShadow: '0 1px 3px rgba(0,0,0,0.6)',
+              }}>
+                {label}
+              </span>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── SizeRangeSlider ──────────────────────────────────────────────────────────
 
 function SizeRangeSlider({
@@ -545,7 +645,8 @@ export default function CategoryClient({ category }: { category: string }) {
   const [sortBy, setSortBy]       = useState<SortBy>('popular');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [catFilter, setCatFilter] = useState('הכל');
+  const [catFilter, setCatFilter]   = useState('הכל');
+  const [catImages, setCatImages]   = useState<Record<string, string>>({});
 
   // ── Fetch ALL products for this category at once ───────────────────────────
   // Client-side pagination is used so filters always apply across the full set.
@@ -637,6 +738,26 @@ export default function CategoryClient({ category }: { category: string }) {
     fetchAll().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
+
+  // Fetch category images for the scroll bar (once per mount)
+  useEffect(() => {
+    async function fetchCatImages() {
+      try {
+        const snap = await getDocs(collection(db, 'categories'));
+        if (!snap.empty) {
+          const map: Record<string, string> = {};
+          snap.forEach(d => {
+            const r = d.data();
+            const key = (r.slug || r.name || '') as string;
+            const img = (r.imageUrl || r.imgUrl || '') as string;
+            if (key) map[key] = img;
+          });
+          setCatImages(map);
+        }
+      } catch { /* ignore — scroll bar shows amber gradient fallback */ }
+    }
+    fetchCatImages();
+  }, []);
 
   // Apply URL filter once data loads
   useEffect(() => {
@@ -908,6 +1029,11 @@ export default function CategoryClient({ category }: { category: string }) {
             </div>
           </div>
 
+          {/* ── Category scroll bar — above products ── */}
+          <div className="mb-4">
+            <CategoryScrollBar catImages={catImages} currentCategory={category} />
+          </div>
+
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 px-3 sm:px-0">
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
@@ -944,6 +1070,11 @@ export default function CategoryClient({ category }: { category: string }) {
                     createdAt={p.createdAt}
                   />
                 ))}
+              </div>
+
+              {/* ── Category scroll bar — below products ── */}
+              <div className="mt-8 mb-2">
+                <CategoryScrollBar catImages={catImages} currentCategory={category} />
               </div>
 
               {/* ── Page navigation ── */}
