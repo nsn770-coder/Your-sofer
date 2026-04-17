@@ -47,6 +47,67 @@ function Stars({ n = 4.5, size = 16 }: { n?: number; size?: number }) {
   );
 }
 
+// ── תשלומים ──────────────────────────────────────────────────────────────────
+function InstallmentBadge({ price }: { price: number }) {
+  if (price <= 99) return null;
+  const monthly3 = Math.ceil(price / 3);
+  const showMore = price >= 400;
+  return (
+    <div style={{
+      background: '#f0f7ff',
+      border: '1px solid #bde0ff',
+      borderRadius: 10,
+      padding: '10px 14px',
+      marginBottom: 12,
+      fontSize: 13,
+      color: '#0c1a35',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      flexWrap: 'wrap',
+    }}>
+      <span style={{ fontSize: 18 }}>💳</span>
+      <span>
+        <strong>3 תשלומים של ₪{monthly3}</strong> ללא ריבית
+      </span>
+      {showMore && (
+        <span style={{ color: '#888', fontSize: 11, marginRight: 'auto' }}>
+          · עד 12 תשלומים בתוספת ריבית
+        </span>
+      )}
+    </div>
+  );
+}
+
+// ── אייקוני אמון ─────────────────────────────────────────────────────────────
+function TrustIcons({ hasSofer }: { hasSofer?: boolean }) {
+  const items = [
+    { icon: '🏅', text: 'איכות בינלאומית' },
+    { icon: '🔒', text: 'תשלום מאובטח' },
+    { icon: '🚚', text: 'משלוח מהיר' },
+  ];
+  if (hasSofer) items.push({ icon: '✍️', text: 'ישירות מהסופר' });
+
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: `repeat(${items.length}, 1fr)`,
+      gap: 6,
+      textAlign: 'center',
+      borderTop: '1px solid #eee',
+      paddingTop: 14,
+      marginTop: 10,
+    }}>
+      {items.map(item => (
+        <div key={item.text} style={{ fontSize: 11, color: '#555', lineHeight: 1.4 }}>
+          <div style={{ fontSize: 20, marginBottom: 3 }}>{item.icon}</div>
+          {item.text}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function KlafGallery({ productId, onSelect }: {
   productId: string;
   onSelect: (klafId: string | null, klafName: string | null) => void;
@@ -182,8 +243,6 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
             <div><label style={labelS}>זמן אספקה</label><input value={days} onChange={e => setDays(e.target.value)} placeholder="7-14" style={inputS} /></div>
           </div>
           <div><label style={labelS}>תיאור</label><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={4} style={{ ...inputS, resize: 'vertical' }} /></div>
-
-          {/* מדיה */}
           <div>
             <label style={labelS}>תמונות וסרטון</label>
             {(['main', 'img2', 'img3'] as const).map((field, idx) => {
@@ -200,7 +259,6 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
                 </div>
               );
             })}
-            {/* וידאו */}
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
               {videoUrl && <div style={{ width: 44, height: 44, background: '#111', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>▶️</div>}
               <label style={{ background: '#7c3aed', color: '#fff', borderRadius: 7, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}>
@@ -301,26 +359,12 @@ function ReviewsSection({ productId, productName }: { productId: string; product
     try {
       const hasMedia = !!mediaUrl;
       await addDoc(collection(db, 'reviews'), {
-        productId,
-        productName,
-        reviewerName: name.trim(),
-        stars,
-        text: text.trim(),
-        mediaUrl: mediaUrl || null,
-        mediaType: mediaType || null,
-        approved: false,
-        createdAt: serverTimestamp(),
+        productId, productName, reviewerName: name.trim(), stars, text: text.trim(),
+        mediaUrl: mediaUrl || null, mediaType: mediaType || null, approved: false, createdAt: serverTimestamp(),
       });
       if (hasMedia) {
         const code = 'REVIEW-' + Math.random().toString(36).toUpperCase().slice(2, 7);
-        await setDoc(doc(db, 'coupons', code), {
-          code,
-          discount: 5,
-          type: 'percent',
-          active: true,
-          usedBy: null,
-          createdAt: serverTimestamp(),
-        });
+        await setDoc(doc(db, 'coupons', code), { code, discount: 5, type: 'percent', active: true, usedBy: null, createdAt: serverTimestamp() });
         setEarnedCoupon(code);
         setSubmitted('with_coupon');
       } else {
@@ -328,12 +372,8 @@ function ReviewsSection({ productId, productName }: { productId: string; product
       }
       setShowForm(false);
       setName(''); setStars(5); setText(''); setMediaUrl(''); setMediaType(null);
-    } catch (e) {
-      console.error(e);
-      alert('שגיאה בשליחת הביקורת');
-    } finally {
-      setSubmitting(false);
-    }
+    } catch (e) { console.error(e); alert('שגיאה בשליחת הביקורת'); }
+    finally { setSubmitting(false); }
   }
 
   function formatDate(ts?: { seconds: number }) {
@@ -344,7 +384,7 @@ function ReviewsSection({ productId, productName }: { productId: string; product
   const avgStars = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.stars, 0) / reviews.length) : 0;
 
   return (
-    <div style={{ marginTop: 28, background: '#fff', borderRadius: 10, border: '1px solid #e8e8e8', padding: '20px 20px', borderTop: undefined }}>
+    <div style={{ marginTop: 28, background: '#fff', borderRadius: 10, border: '1px solid #e8e8e8', padding: '20px 20px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f1111', marginBottom: 4 }}>ביקורות לקוחות</h2>
@@ -360,7 +400,6 @@ function ReviewsSection({ productId, productName }: { productId: string; product
         </button>
       </div>
 
-      {/* Success banners */}
       {submitted === 'no_media' && (
         <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '14px 18px', marginBottom: 16, fontSize: 14, color: '#15803d', fontWeight: 600 }}>
           ✅ תודה! הביקורת ממתינה לאישור.
@@ -374,7 +413,6 @@ function ReviewsSection({ productId, productName }: { productId: string; product
         </div>
       )}
 
-      {/* Reviews list */}
       {loadingReviews ? (
         <div style={{ color: '#888', fontSize: 13, padding: '12px 0' }}>⏳ טוען ביקורות...</div>
       ) : reviews.length === 0 ? (
@@ -410,7 +448,6 @@ function ReviewsSection({ productId, productName }: { productId: string; product
         </div>
       )}
 
-      {/* Review form modal */}
       {showForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setShowForm(false)}>
           <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 480, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }} onClick={e => e.stopPropagation()}>
@@ -489,11 +526,10 @@ export default function ProductClient() {
   const [activeTab, setActiveTab] = useState<'details' | 'kashrut' | 'shipping'>('details');
   const [currentViewers, setCurrentViewers] = useState(2);
   const [stockCount] = useState(() => {
-    // Deterministic 12-19 based on product id (same value on every render/refresh)
     const pid = Array.isArray(id) ? id[0] : (id ?? '');
     let hash = 0;
     for (let i = 0; i < pid.length; i++) hash = (hash * 31 + pid.charCodeAt(i)) & 0xffffffff;
-    return (Math.abs(hash) % 8) + 12; // 12–19
+    return (Math.abs(hash) % 8) + 12;
   });
   const buyBoxRef = useRef<HTMLDivElement>(null);
 
@@ -504,12 +540,11 @@ export default function ProductClient() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Viewers counter changes every 20-40 s (random interval so it looks live)
   useEffect(() => {
-    setCurrentViewers(Math.floor(Math.random() * 5) + 2); // initial: 2-6
+    setCurrentViewers(Math.floor(Math.random() * 5) + 2);
     let timer: ReturnType<typeof setTimeout>;
     function scheduleNext() {
-      const delay = Math.floor(Math.random() * 20000) + 20000; // 20-40 s
+      const delay = Math.floor(Math.random() * 20000) + 20000;
       timer = setTimeout(() => {
         setCurrentViewers(Math.floor(Math.random() * 5) + 2);
         scheduleNext();
@@ -591,22 +626,27 @@ export default function ProductClient() {
     setTimeout(() => setAdded(false), 2500);
   }
 
-  // ── Buy Box (shared between desktop sidebar and mobile bottom) ──
+  // ── Buy Box ──────────────────────────────────────────────────────────────────
   const BuyBox = ({ compact = false }: { compact?: boolean }) => (
     <div style={{ background: '#fff', border: compact ? 'none' : '1px solid #ddd', borderRadius: compact ? 0 : 10, padding: compact ? '12px 16px' : '20px 18px' }}>
       {!compact && (
         <>
           <div style={{ fontSize: 26, fontWeight: 900, color: '#0c1a35', marginBottom: 2 }}>₪{product.price}</div>
-          {product.was && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 10, fontWeight: 600 }}>חסכת {discount}% — ₪{(product.was - product.price).toFixed(0)}</div>}
+          {product.was && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 6, fontWeight: 600 }}>חסכת {discount}% — ₪{(product.was - product.price).toFixed(0)}</div>}
+          {/* תשלומים */}
+          <InstallmentBadge price={product.price} />
         </>
       )}
+
       <div style={{ color: '#1a6b3c', fontWeight: 700, fontSize: 13, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
         <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#1a6b3c', display: 'inline-block' }} />
         במלאי — משלוח חינם לכל הארץ
       </div>
+
       {selectedKlafName && (
         <div style={{ fontSize: 11, color: '#1a6b3c', background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 6, padding: '6px 10px', marginBottom: 10 }}>📜 {selectedKlafName}</div>
       )}
+
       {!compact && (
         <div style={{ marginBottom: 12 }}>
           <label style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 4 }}>כמות:</label>
@@ -615,7 +655,7 @@ export default function ProductClient() {
           </select>
         </div>
       )}
-      {/* ── Embroidery text field — shown only for relevant categories ── */}
+
       {product.cat && EMBROIDERY_CATEGORIES.includes(product.cat) && (
         <div style={{ marginBottom: 12 }}>
           <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 4, textAlign: 'right' }}>
@@ -631,25 +671,22 @@ export default function ProductClient() {
             onFocus={e => (e.target.style.borderColor = '#b8972a')}
             onBlur={e => (e.target.style.borderColor = '#ddd')}
           />
-          <p style={{ fontSize: 11, color: '#999', marginTop: 3, textAlign: 'right' }}>
-            הטקסט יירקם על המוצר — עד 30 תווים
-          </p>
+          <p style={{ fontSize: 11, color: '#999', marginTop: 3, textAlign: 'right' }}>הטקסט יירקם על המוצר — עד 30 תווים</p>
         </div>
       )}
-      <button onClick={handleAddToCart} style={{ width: '100%', background: added ? '#27ae60' : '#b8972a', color: added ? '#fff' : '#0c1a35', border: 'none', borderRadius: 24, padding: compact ? '10px' : '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 8, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+
+      {/* כפתור הוסף לסל */}
+      <button onClick={handleAddToCart} style={{ width: '100%', background: added ? '#27ae60' : '#b8972a', color: added ? '#fff' : '#0c1a35', border: 'none', borderRadius: 24, padding: compact ? '10px' : '13px', fontSize: 15, fontWeight: 800, cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
         {added ? '✅ נוסף לסל!' : '🛒 הוסף לסל'}
       </button>
-      <button onClick={() => { handleAddToCart(); router.push('/cart'); }} style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 24, padding: compact ? '10px' : '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: compact ? 0 : 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+
+      {/* כפתור קנה עכשיו */}
+      <button onClick={() => { handleAddToCart(); router.push('/cart'); }} style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 24, padding: compact ? '10px' : '13px', fontSize: 15, fontWeight: 800, cursor: 'pointer', marginBottom: compact ? 0 : 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
         ⚡ קנה עכשיו
       </button>
-      {!compact && (
-        <div style={{ fontSize: 11, color: '#666', lineHeight: 2, borderTop: '1px solid #eee', paddingTop: 12, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-          <div>🔒 תשלום מאובטח</div>
-          <div>↩️ ביטול עד 24 שעות</div>
-          <div>🛡️ אחריות פלטפורמה</div>
-          {product.sofer && <div>✍️ ישירות מהסופר</div>}
-        </div>
-      )}
+
+      {/* אייקוני אמון */}
+      {!compact && <TrustIcons hasSofer={!!product.sofer} />}
     </div>
   );
 
@@ -662,7 +699,7 @@ export default function ProductClient() {
         </div>
       )}
 
-      {/* ── Breadcrumb ── */}
+      {/* Breadcrumb */}
       <div style={{ background: '#fff', borderBottom: '1px solid #e8e8e8', padding: isMobile ? '8px 14px' : '10px 20px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#555', flexWrap: 'wrap' }}>
@@ -679,13 +716,11 @@ export default function ProductClient() {
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '12px 0' : '20px 16px' }}>
 
-        {/* ── Main Grid ── */}
+        {/* Main Grid */}
         <div style={{ display: isMobile ? 'block' : 'grid', gridTemplateColumns: '1fr 1fr 300px', gap: 20, alignItems: 'start', background: isMobile ? '#fff' : 'transparent' }}>
 
-          {/* ── Column 1: Images ── */}
+          {/* Column 1: Images */}
           <div style={{ background: '#fff', borderRadius: isMobile ? 0 : 10, overflow: 'hidden', border: isMobile ? 'none' : '1px solid #e8e8e8' }}>
-
-            {/* Main Image / Video */}
             <div style={{ position: 'relative', background: '#fafafa', cursor: 'zoom-in' }}>
               {showVideo && hasVideo ? (
                 <video controls autoPlay style={{ width: '100%', aspectRatio: '1', objectFit: 'contain', background: '#000' }}>
@@ -707,8 +742,6 @@ export default function ProductClient() {
                 <div style={{ position: 'absolute', top: discount > 0 ? 44 : 12, right: 12, background: product.badge === 'מבצע' ? '#c0392b' : product.badge === 'חדש' ? '#2980b9' : '#27ae60', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 4 }}>{product.badge}</div>
               )}
             </div>
-
-            {/* Thumbnails */}
             <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', scrollbarWidth: 'none', borderTop: '1px solid #f0f0f0' }}>
               {allMedia.map((img, i) => (
                 <button key={i} onClick={() => { setActiveImg(i); setShowVideo(false); }}
@@ -725,7 +758,7 @@ export default function ProductClient() {
             </div>
           </div>
 
-          {/* ── Column 2: Details ── */}
+          {/* Column 2: Details */}
           <div style={{ background: '#fff', borderRadius: isMobile ? 0 : 10, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', marginTop: isMobile ? 8 : 0 }}>
 
             <h1 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: '#0f1111', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
@@ -736,7 +769,7 @@ export default function ProductClient() {
               {product.cat && <span style={{ fontSize: 12, color: '#888' }}>| <strong>{product.cat}</strong></span>}
             </div>
 
-            {/* ── Social proof badges ── */}
+            {/* Social proof badges */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#eff8ff', border: '1px solid #bde0ff', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#0e6ba8', fontWeight: 700 }}>
                 <span>👁️</span>
@@ -747,12 +780,13 @@ export default function ProductClient() {
               </div>
             </div>
 
-            {/* Price (mobile only — shows here) */}
+            {/* Price — mobile */}
             {isMobile && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f0f0f0' }}>
                 {product.was && <div style={{ fontSize: 12, color: '#888' }}>מחיר רגיל: <span style={{ textDecoration: 'line-through' }}>₪{product.was}</span> <span style={{ color: '#c0392b', fontWeight: 700 }}>({discount}% הנחה)</span></div>}
                 <div style={{ fontSize: 30, fontWeight: 900, color: '#0c1a35', marginTop: 2 }}>₪{product.price}</div>
                 <div style={{ fontSize: 12, color: '#c7511f' }}>כולל מע״מ · משלוח חינם</div>
+                <InstallmentBadge price={product.price} />
               </div>
             )}
 
@@ -768,37 +802,25 @@ export default function ProductClient() {
               </div>
             )}
 
-            {/* ── Info tabs ── */}
+            {/* Info tabs */}
             <div style={{ marginBottom: 16 }}>
-              {/* Tab bar */}
               <div style={{ display: 'flex', borderBottom: '2px solid #f0f0f0', marginBottom: 14, gap: 0 }}>
                 {([
                   { key: 'details',  label: 'פרטי המוצר' },
                   { key: 'kashrut',  label: 'כשרות ואיכות' },
                   { key: 'shipping', label: 'משלוח והחזרות' },
                 ] as { key: typeof activeTab; label: string }[]).map(tab => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    style={{
-                      flex: 1, background: 'none', border: 'none', padding: '9px 6px',
-                      fontSize: isMobile ? 12 : 13, fontWeight: activeTab === tab.key ? 800 : 600,
-                      color: activeTab === tab.key ? '#0c1a35' : '#888',
-                      borderBottom: `2px solid ${activeTab === tab.key ? '#b8972a' : 'transparent'}`,
-                      marginBottom: -2, cursor: 'pointer', transition: 'color 0.15s, border-color 0.15s',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >{tab.label}</button>
+                  <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                    style={{ flex: 1, background: 'none', border: 'none', padding: '9px 6px', fontSize: isMobile ? 12 : 13, fontWeight: activeTab === tab.key ? 800 : 600, color: activeTab === tab.key ? '#0c1a35' : '#888', borderBottom: `2px solid ${activeTab === tab.key ? '#b8972a' : 'transparent'}`, marginBottom: -2, cursor: 'pointer', transition: 'color 0.15s, border-color 0.15s', whiteSpace: 'nowrap' }}>
+                    {tab.label}
+                  </button>
                 ))}
               </div>
 
-              {/* Tab content */}
               {activeTab === 'details' && (
                 <div>
                   {(product.desc || product.description) ? (
-                    <div style={{ fontSize: 13, color: '#444', lineHeight: 1.8, marginBottom: 12 }}>
-                      {product.desc || product.description}
-                    </div>
+                    <div style={{ fontSize: 13, color: '#444', lineHeight: 1.8, marginBottom: 12 }}>{product.desc || product.description}</div>
                   ) : (
                     <div style={{ fontSize: 13, color: '#aaa', fontStyle: 'italic' }}>אין תיאור למוצר זה.</div>
                   )}
@@ -849,7 +871,6 @@ export default function ProductClient() {
               )}
             </div>
 
-            {/* Klaf gallery */}
             <KlafGallery productId={product.id} onSelect={(klafId, klafName) => { setSelectedKlafId(klafId); setSelectedKlafName(klafName); }} />
 
             {/* Mobile buy box */}
@@ -860,7 +881,7 @@ export default function ProductClient() {
             )}
           </div>
 
-          {/* ── Column 3: Buy Box (desktop only) ── */}
+          {/* Column 3: Buy Box (desktop) */}
           {!isMobile && (
             <div ref={buyBoxRef} style={{ position: 'sticky', top: 20 }}>
               {product.was && (
@@ -880,7 +901,7 @@ export default function ProductClient() {
           )}
         </div>
 
-        {/* ── Cross-sell: לקוחות שקנו זאת קנו גם ── */}
+        {/* Cross-sell */}
         {related.length > 0 && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 10, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '20px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
             <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 14 }}>לקוחות שקנו זאת קנו גם 🛒</h2>
@@ -893,7 +914,6 @@ export default function ProductClient() {
                     style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 8, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}
                     onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)')}
                     onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}>
-                    {/* Image */}
                     <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
                       {rImg ? (
                         <img src={rImg} alt={r.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
@@ -901,19 +921,13 @@ export default function ProductClient() {
                         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>📦</div>
                       )}
                     </div>
-                    {/* Info */}
                     <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.name}</div>
                       <Stars n={r.stars || 4.5} size={11} />
                       <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>₪{r.price}</div>
-                      {/* Add to cart */}
                       <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 });
-                        }}
-                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
-                      >
+                        onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 }); }}
+                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
                         הוסף לסל
                       </button>
                     </div>
@@ -925,10 +939,9 @@ export default function ProductClient() {
         )}
       </div>
 
-      {/* ── Reviews ── */}
       <ReviewsSection productId={product.id} productName={product.name} />
 
-      {/* ── Zoom Modal ── */}
+      {/* Zoom Modal */}
       {zoomVisible && allMedia.length > 0 && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setZoomVisible(false)}>
           <img src={allMedia[activeImg]} alt={product.name} style={{ maxWidth: '92vw', maxHeight: '92vh', objectFit: 'contain', borderRadius: 8 }} />

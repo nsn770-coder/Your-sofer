@@ -1,44 +1,76 @@
 // aiMediaPipeline.mjs
-// סוכן — עורך תמונות מוצר קיימות דרך Gemini 2.0 Flash (multimodal image generation)
-// הרצה:        node app/scripts/aiMediaPipeline.mjs
-// מצב בדיקה:   node app/scripts/aiMediaPipeline.mjs --test
-// הגבלת כמות:  node app/scripts/aiMediaPipeline.mjs --limit=3
+// סוכן — יוצר תמונת "customer review" למוצרים
+//
+// ══ אפשרות 1 — Gemini (OAuth token, יש rate limit) ══
+// GEMINI_API_KEY=ya29.xxx CLOUDINARY_CLOUD_NAME=dyxzq3ucy node app/scripts/aiMediaPipeline.mjs --provider=gemini --limit=50
+//
+// ══ אפשרות 2 — OpenAI (API key קבוע, אין rate limit) ══
+// CLOUDINARY_CLOUD_NAME=dyxzq3ucy node app/scripts/aiMediaPipeline.mjs --provider=openai --limit=50
+//
+// אפשרויות נוספות:
+// --test         מצב בדיקה (2 מוצרים, ללא כתיבה ל-Firestore)
+// --limit=N      הגבלת כמות מוצרים לכל קטגוריה
+// --cat=קטגוריה  קטגוריה ספציפית בלבד
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, resolve } from 'path';
+import { writeFileSync, readFileSync, unlinkSync, existsSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// ══ Firebase ══
-const firebaseConfig = {
-  apiKey: "AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I",
-  authDomain: "your-sofer.firebaseapp.com",
-  projectId: "your-sofer",
-  storageBucket: "your-sofer.firebasestorage.app",
-  messagingSenderId: "7710397068",
-  appId: "1:7710397068:web:3c9880f24871efd4d661a9"
-};
-const firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(firebaseApp);
+// ══ Firebase Admin SDK ══
+const serviceAccount = resolve(__dirname, '../../your-sofer-firebase-adminsdk-fbsvc-418544c2de.json');
+if (getApps().length === 0) initializeApp({ credential: cert(serviceAccount) });
+const db = getFirestore();
 
-// ══ Gemini ══
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-if (!GEMINI_API_KEY) {
-  console.error('❌ חסר GEMINI_API_KEY — הפסק את הריצה');
-  process.exit(1);
-}
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-
-// ══ Cloudinary ══
-const CLOUDINARY_CLOUD  = process.env.CLOUDINARY_CLOUD_NAME || 'yoursofer';
+// ══ הגדרות ══
+const OPENAI_API_KEY    = process.env.OPENAI_API_KEY || '';
+const CLOUDINARY_CLOUD  = process.env.CLOUDINARY_CLOUD_NAME || 'dyxzq3ucy';
 const CLOUDINARY_PRESET = 'yoursofer_upload';
 
-const SATAM_CATEGORIES = ['מזוזות', 'תפילין', 'סת"ם', 'ספרי תורה', 'מגילות', 'קלפים'];
+// ══ Gemini ══
+const GEMINI_MODEL   = 'gemini-2.5-flash-image';
+const GEMINI_API_URL = `https://us-central1-aiplatform.googleapis.com/v1/projects/your-sofer/locations/us-central1/publishers/google/models/${GEMINI_MODEL}:generateContent`;
+
+// ══ קטגוריות ══
+const CATEGORIES = ['יודאיקה', 'מתנות', 'שבת וחגים', 'סט טלית ותפילין', 'מזוזות'];
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ══ Lock file — מניעת ריצות מקביליות ══
+const LOCK_FILE = resolve(__dirname, '../../.pipeline.lock');
+
+function acquireLock() {
+  if (existsSync(LOCK_FILE)) {
+    const pid = (() => { try { return readFileSync(LOCK_FILE, 'utf8').trim(); } catch { return '?'; } })();
+    console.error(`❌ Pipeline כבר רץ (PID ${pid}). עצור אותו קודם או מחק את הקובץ: ${LOCK_FILE}`);
+    process.exit(1);
+  }
+  writeFileSync(LOCK_FILE, String(process.pid));
+  process.on('exit', releaseLock);
+  process.on('SIGINT', () => { releaseLock(); process.exit(130); });
+  process.on('SIGTERM', () => { releaseLock(); process.exit(143); });
+}
+
+function releaseLock() {
+  try { if (existsSync(LOCK_FILE)) unlinkSync(LOCK_FILE); } catch {}
+}
+
+// ══ פרומט ══
+const CUSTOMER_REVIEW_PROMPT = `Create a realistic customer review photo of the product placed naturally on a real table inside a home.
+Use the attached product image as the exact reference for the product itself, keeping all colors, materials, proportions, textures, shapes, engravings, and details completely identical.
+The product should be fully visible and already placed neatly on the table, not inside packaging and not being held.
+Photograph it from a different angle than the original product image — a more casual, slightly imperfect angle, as if a customer quickly took the photo with a smartphone after placing it on the table.
+The camera angle should be high and top-down, around 80 degrees from above, almost like someone is standing over the table and taking the photo directly downward with a phone.
+The setting should feel like a real home environment with natural lighting, soft shadows, and slight background blur.
+The table can be a dining table, kitchen counter, side table, or Shabbat table, with subtle home elements in the background like a chair, tablecloth, candles, kitchen, flowers, books, or part of a living room.
+The image should look authentic and user-generated, not like a professional studio advertisement.
+Do not redesign the product.
+Do not change proportions or materials.
+Do not add packaging.
+Do not make it look overly clean, perfect, symmetrical, or heavily styled.`;
 
 // ══ הורד תמונה כ-base64 ══
 async function downloadImageAsBase64(url) {
@@ -50,357 +82,245 @@ async function downloadImageAsBase64(url) {
   return { base64, contentType };
 }
 
-// ══ ערוך תמונה עם Gemini 2.0 Flash ══
-async function editImageWithGemini(imageBase64, contentType, prompt) {
-  const model = genAI.getGenerativeModel(
-    { model: 'gemini-2.0-flash-exp' },
-    { apiVersion: 'v1beta' }
-  );
-
-  const result = await model.generateContent({
+// ══ Gemini ══
+async function generateWithGemini(imageBase64, contentType, token) {
+  const body = {
     contents: [{
       role: 'user',
       parts: [
         { inlineData: { data: imageBase64, mimeType: contentType } },
-        { text: prompt },
+        { text: CUSTOMER_REVIEW_PROMPT },
       ],
     }],
-    generationConfig: {
-      responseModalities: ['IMAGE', 'TEXT'],
-    },
-  });
+    generationConfig: { responseModalities: ['IMAGE', 'TEXT'] },
+  };
 
-  const parts = result.response.candidates?.[0]?.content?.parts ?? [];
-  for (const part of parts) {
-    if (part.inlineData?.data) {
-      return part.inlineData.data; // base64 PNG
+  const RETRY_WAITS = [60000, 120000, 180000]; // 1min, 2min, 3min
+  for (let attempt = 0; attempt <= RETRY_WAITS.length; attempt++) {
+    const res = await fetch(GEMINI_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (res.status === 429) {
+      if (attempt < RETRY_WAITS.length) {
+        const wait = RETRY_WAITS[attempt];
+        console.log(`   ⏳ 429 rate limit — ממתין ${wait / 1000}s לפני ניסיון ${attempt + 2}/${RETRY_WAITS.length + 1}...`);
+        await sleep(wait);
+        continue;
+      }
+      throw new Error('Gemini: Rate limit — נכשל אחרי כל הניסיונות');
     }
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(`Gemini: ${err?.error?.message || `HTTP ${res.status}`}`);
+    }
+
+    const data = await res.json();
+    const parts = data.candidates?.[0]?.content?.parts ?? [];
+    for (const part of parts) {
+      if (part.inlineData?.data) return part.inlineData.data;
+    }
+    throw new Error('Gemini לא החזיר תמונה');
   }
-  throw new Error('Gemini לא החזיר תמונה — בדוק שה-model תומך ב-image output');
 }
 
-// ══ העלה base64 ל-Cloudinary ══
-async function uploadBase64ToCloudinary(base64, productId, type) {
+// ══ OpenAI ══
+async function generateWithOpenAI(imageBase64, contentType) {
+  const byteCharacters = atob(imageBase64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: contentType });
+
+  const formData = new FormData();
+  formData.append('model', 'gpt-image-1');
+  formData.append('image[]', blob, 'product.jpg');
+  formData.append('prompt', CUSTOMER_REVIEW_PROMPT);
+  formData.append('n', '1');
+  formData.append('size', '1024x1024');
+  formData.append('quality', 'medium');
+
+  const res = await fetch('https://api.openai.com/v1/images/edits', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}` },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`OpenAI: ${err?.error?.message || `HTTP ${res.status}`}`);
+  }
+
+  const data = await res.json();
+  console.log(`   🔍 OpenAI response: data.data.length=${data.data?.length ?? 'undefined'}`);
+  const b64 = data.data?.[0]?.b64_json;
+  if (!b64) throw new Error('OpenAI לא החזיר תמונה');
+  return b64;
+}
+
+// ══ העלה ל-Cloudinary ══
+async function uploadBase64ToCloudinary(base64, productId) {
+  const caller = new Error().stack.split('\n')[2]?.trim() ?? 'unknown';
+  console.log(`   📤 Cloudinary upload called for ${productId}`);
+  console.log(`      caller: ${caller}`);
   const formData = new FormData();
   formData.append('file', `data:image/png;base64,${base64}`);
   formData.append('upload_preset', CLOUDINARY_PRESET);
   formData.append('folder', `yoursofer/${productId}`);
-  formData.append('public_id', `${productId}_${type}_${Date.now()}`);
+  formData.append('public_id', `${productId}_review_${Date.now()}`);
 
   const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
     method: 'POST',
     body: formData,
   });
 
-  if (!res.ok) throw new Error(`שגיאת Cloudinary: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Cloudinary: ${await res.text()}`);
   const data = await res.json();
   return data.secure_url;
 }
 
 // ══ עבד מוצר אחד ══
-async function processProduct(product, testMode = false) {
-  const isSatam = SATAM_CATEGORIES.includes(product.cat);
+async function processProduct(product, provider, testMode, geminiToken) {
   const imgUrl = product.imgUrl || product.image_url;
-
   console.log(`\n📦 ${product.name?.substring(0, 50)}`);
-  console.log(`   קטגוריה: ${product.cat} ${isSatam ? '(safe mode)' : ''}`);
-  if (testMode) console.log('   🧪 מצב בדיקה — מעלה ל-Cloudinary (ללא עדכון Firestore)');
+  console.log(`   קטגוריה: ${product.cat} | ספק: ${provider.toUpperCase()}`);
+
+  // בדיקה רענונית — אולי עודכן ע"י ריצה מקבילת
+  if (!testMode) {
+    const fresh = await db.collection('products').doc(product.id).get();
+    if (fresh.exists && fresh.data()?.imgUrl2) {
+      console.log('   ⏭ כבר עודכן — דולג');
+      return {};
+    }
+  }
 
   let imageBase64, contentType;
   try {
     ({ base64: imageBase64, contentType } = await downloadImageAsBase64(imgUrl));
-    console.log('   📥 תמונה הורדה בהצלחה');
+    console.log('   📥 תמונה הורדה');
   } catch (e) {
-    console.error('   ❌ לא ניתן להוריד תמונה:', e.message);
+    console.error('   ❌ הורדה נכשלה:', e.message);
     return {};
   }
 
-  const updates = {};
-
-  // ══ תמונת סטודיו ══
+  let resultBase64;
   try {
-    console.log('   🎨 יוצר תמונת סטודיו (Gemini)...');
-    const studioPrompt = `Use the attached image as the exact product reference.
-
-OUTPUT FORMAT (CRITICAL):
-- Square aspect ratio (1:1)
-- The product must maintain its ORIGINAL aspect ratio (DO NOT stretch or squash)
-- Scale the product proportionally to fit within the frame
-- Add natural margins (padding) around the product if needed
-- Do NOT crop the product to fill the frame
-- The product must be fully visible from top to bottom
-- Center the product in the frame
-- Use empty background space if needed to preserve proportions
-- Optimized for e-commerce thumbnail display
-
-STRICT PRODUCT PRESERVATION (ABSOLUTE RULE):
-The product must remain 100% identical:
-- Same materials, colors, textures, finish (matte/glossy)
-- Same proportions, dimensions, and structure
-- Same edges, curves, and physical build
-- Preserve ALL details exactly as in the original image
-Do NOT: Redesign / Stylize / Enhance / Replace materials / Modify proportions in any way
-
-REAL-WORLD SCALE & PROPORTIONS (CRITICAL):
-- Maintain real-life dimensions exactly
-- Preserve correct thickness, length, and volume
-- No exaggeration or "AI improvement"
-- The product must feel physically accurate and manufacturable
-
-ENGRAVING / LETTERING (CRITICAL - TREAT AS VISUAL PATTERN):
-Treat all Hebrew letters as pure visual design elements - NOT as readable text.
-- The engraving must be replicated EXACTLY as a visual pattern
-- Preserve the exact shapes, curves, spacing, and layout
-- Maintain the same depth, shadows, and material integration
-IMPORTANT:
-- Do NOT attempt to read, interpret, or recreate the letters
-- Do NOT generate new Hebrew characters
-- Do NOT "fix" or "improve" the text
-Instead:
-- Copy the engraving as if it were abstract geometric artwork
-- Treat it like a texture or sculpted pattern on the surface
-- Focus on: Form / Depth (engraving relief) / Light interaction (shadows inside grooves)
-- Avoid: Any typographic reconstruction / Any language-based generation / Any change in structure
-- The engraving must look like a direct visual copy from the reference image
-- Preserve exact micro-details from the reference image
-
-PROFESSIONAL STUDIO LIGHTING (HIGH-END E-COMMERCE):
-- Strong directional key light from 45° angle
-- Soft fill light to gently balance shadows
-- Reveal material texture, highlight edges and depth, enhance engraving visibility
-- Avoid: flat front lighting / overexposed highlights / washed-out colors
-
-PHYSICAL REALISM:
-- Maintain natural structure and weight
-- Preserve micro-texture and surface detail
-- Keep realistic edges (not overly smooth)
-- Avoid: plastic AI look / over-smoothing / perfect symmetry
-
-COMPOSITION (E-COMMERCE OPTIMIZED):
-- Slight natural angle (not perfectly flat)
-- Centered composition with subtle depth
-- Clean spacing around the product
-- Product fully visible and dominant
-
-FOCUS & SHARPNESS:
-- Ultra-sharp focus on: engraving/surface pattern, material texture, edges and details
-- Background slightly soft (natural depth of field)
-
-BACKGROUND:
-- Clean white or soft light grey (#f5f5f5)
-- Minimal, premium look
-- Soft natural shadow under the product
-
-CAMERA STYLE:
-- Real photography (NOT CGI)
-- Shot as if with DSLR or iPhone 16 Pro Max
-- Natural depth, no artificial sharpening, no filters
-
-FINAL GOAL: The exact product the customer will receive. True scale, material, and texture. Premium, trustworthy product photography.`;
-
-    const resultBase64 = await editImageWithGemini(imageBase64, contentType, studioPrompt);
-    const cloudinaryUrl = await uploadBase64ToCloudinary(resultBase64, product.id, 'studio');
-    updates.imgUrl2 = cloudinaryUrl;
-    console.log('   ✅ סטודיו הועלה:', cloudinaryUrl);
-    await sleep(3000);
+    console.log(`   📸 יוצר תמונה (${provider})...`);
+    if (provider === 'gemini') {
+      resultBase64 = await generateWithGemini(imageBase64, contentType, geminiToken);
+    } else {
+      resultBase64 = await generateWithOpenAI(imageBase64, contentType);
+    }
   } catch (e) {
-    console.error('   ❌ שגיאה בסטודיו:', e.message);
+    console.error('   ❌ יצירת תמונה נכשלה:', e.message);
+    return {};
   }
 
-  // ══ תמונת לייפסטייל ══
   try {
-    console.log('   🧑 יוצר תמונת לייפסטייל (Gemini)...');
-    const lifestylePrompt = isSatam
-      ? `Use the attached image as the exact product reference. Create a realistic lifestyle image.
+    const cloudinaryUrl = await uploadBase64ToCloudinary(resultBase64, product.id);
+    console.log('   ✅ הועלה:', cloudinaryUrl);
 
-OUTPUT FORMAT (CRITICAL):
-- Square aspect ratio (1:1)
-- The product must maintain its ORIGINAL aspect ratio (DO NOT stretch or squash)
-- Scale the product proportionally to fit within the frame
-- Add natural margins (padding) if needed
-- Do NOT crop any part of the product
-- The product must be fully visible and centered
-- Optimized for e-commerce thumbnail display
+    if (!testMode) {
+      await db.collection('products').doc(product.id).update({ imgUrl2: cloudinaryUrl });
+      console.log('   💾 Firestore עודכן');
+    } else {
+      console.log('   🧪 (בדיקה) דילוג על Firestore');
+    }
 
-PRODUCT (ABSOLUTE PRESERVATION):
-The product must remain EXACTLY the same:
-- Same materials, colors, textures, finish
-- Same proportions, dimensions, and structure
-- Same edges, curves, and physical build
-- Preserve ALL details exactly as in the original image
-Do NOT: Redesign / Stylize / Enhance / Replace materials / Modify proportions in any way
-
-ENGRAVING / LETTERING (CRITICAL - TREAT AS VISUAL PATTERN):
-Treat all Hebrew letters as pure visual design elements - NOT as readable text.
-- The engraving must be replicated EXACTLY as a visual pattern
-- Preserve exact shapes, spacing, alignment, and layout
-- Maintain depth, shadows, and integration into the material
-IMPORTANT:
-- Do NOT read or interpret the text
-- Do NOT generate new Hebrew characters
-- Do NOT "fix" or improve letters
-Instead:
-- Copy the engraving as abstract geometric artwork
-- Treat it like a sculpted surface pattern
-- The engraving must look like a direct visual copy from the reference image
-- Preserve exact micro-details from the reference image
-
-SCENE:
-Show this mezuzah mounted on a wooden door frame of a Jewish home, slightly angled, at realistic scale.
-Warm indoor lighting. No people in the image.
-
-LIGHTING:
-Natural daylight, soft warm tone, realistic shadows. Sharp focus on the product, slight background blur.
-
-STYLE:
-Calm, meaningful, spiritual. Authentic moment. Premium, clean, minimal aesthetic. Real photography, NOT CGI.`
-
-      : `Use the attached image as the exact product reference. Create a realistic lifestyle image.
-
-OUTPUT FORMAT (CRITICAL):
-- Square aspect ratio (1:1)
-- The product must maintain its ORIGINAL aspect ratio (DO NOT stretch or squash)
-- Scale the product proportionally to fit within the frame
-- Add natural margins (padding) if needed
-- Do NOT crop any part of the product
-- The product must be fully visible and centered
-- Optimized for e-commerce thumbnail display
-
-PRODUCT (ABSOLUTE PRESERVATION):
-The product must remain EXACTLY the same:
-- Same materials, colors, textures, finish
-- Same proportions, dimensions, and structure
-- Same edges, curves, and physical build
-- Preserve ALL details exactly as in the original image
-Do NOT: Redesign / Stylize / Enhance / Replace materials / Modify proportions in any way
-
-ENGRAVING / LETTERING (CRITICAL - TREAT AS VISUAL PATTERN):
-Treat all Hebrew letters as pure visual design elements - NOT as readable text.
-- The engraving must be replicated EXACTLY as a visual pattern
-- Preserve exact shapes, spacing, alignment, and layout
-- Maintain depth, shadows, and integration into the material
-IMPORTANT:
-- Do NOT read or interpret the text
-- Do NOT generate new Hebrew characters
-- Do NOT "fix" or improve letters
-Instead:
-- Copy the engraving as abstract geometric artwork
-- Treat it like a sculpted surface pattern
-- The engraving must look like a direct visual copy from the reference image
-- Preserve exact micro-details from the reference image
-
-SIZE & HAND INTERACTION (EXTREMELY IMPORTANT):
-The interaction must reflect REAL-WORLD scale:
-- If the product is small (e.g. mezuzah): hold delicately between fingers (thumb + index or middle). Fingers must NOT wrap around it like a large object.
-- If medium: hold naturally with one hand
-- If large/heavy: use both hands or show natural tension
-Rules: Grip must match real size and weight. No oversized hands relative to product. No unnatural finger bending. No "floating" product.
-
-PERSON:
-Jewish male. Clean, elegant, authentic look. Wearing a white shirt. Optional subtle kippah.
-Natural skin texture (not overly smooth). Realistic proportions (no AI distortion).
-
-POSE (ANTI-AI STAGING RULE):
-- Natural, candid moment (NOT posed like an ad)
-- The person is interacting with the product naturally
-- Slight imperfection in pose is GOOD (more real)
-Avoid: Perfect symmetry / Overly centered hands / "Showing product to camera" pose
-
-COMPOSITION WITH PERSON:
-- Product must remain the PRIMARY focus
-- Face can be partially visible or softly out of focus
-- Hands + product are the visual center
-- Maintain correct scale between hand and product
-- Do NOT enlarge product artificially
-
-BACKGROUND (choose one):
-Soft neutral home interior OR subtle Jerusalem stone wall / Western Wall vibe (not touristy).
-Background must NOT distract from product.
-
-LIGHTING:
-Natural daylight. Soft, warm tone. Light should enhance material texture, engraving depth, natural skin tones.
-Avoid: harsh flash / flat lighting / overexposure
-
-FOCUS:
-Ultra-sharp focus on product and hand interaction. Slight background blur (depth of field).
-
-PHYSICAL REALISM:
-Real weight and gravity must be visible. Product must sit naturally in hand. Maintain micro-textures and imperfections.
-Avoid: plastic AI look / over-smoothing / unrealistic perfection
-
-CAMERA STYLE:
-Real photography (NOT CGI). Shot as if with DSLR or high-end smartphone. Natural depth. No filters. No artificial sharpening.
-
-FINAL GOAL: Create an authentic, emotional, real-life moment while preserving absolute product accuracy for e-commerce.`;
-
-    const resultBase64 = await editImageWithGemini(imageBase64, contentType, lifestylePrompt);
-    const cloudinaryUrl = await uploadBase64ToCloudinary(resultBase64, product.id, 'lifestyle');
-    updates.imgUrl3 = cloudinaryUrl;
-    console.log('   ✅ לייפסטייל הועלה:', cloudinaryUrl);
-    await sleep(3000);
+    return { imgUrl2: cloudinaryUrl };
   } catch (e) {
-    console.error('   ❌ שגיאה בלייפסטייל:', e.message);
+    console.error('   ❌ העלאה נכשלה:', e.message);
+    return {};
   }
-
-  // בצב בדיקה — אל תכתוב ל-Firestore
-  if (!testMode && Object.keys(updates).length > 0) {
-    await updateDoc(doc(db, 'products', product.id), updates);
-    console.log('   💾 מוצר עודכן ב-Firestore');
-  } else if (testMode && Object.keys(updates).length > 0) {
-    console.log('   🧪 (מצב בדיקה) דילגנו על עדכון Firestore');
-  }
-
-  return updates;
 }
 
 // ══ תוכנית ראשית ══
 async function runPipeline() {
+  acquireLock();
   const args = process.argv.slice(2);
-  const testMode  = args.includes('--test');
-  const limitArg  = args.find(a => a.startsWith('--limit='));
-  const limit     = testMode ? 3 : (limitArg ? parseInt(limitArg.split('=')[1]) : null);
+  const testMode    = args.includes('--test');
+  const providerArg = args.find(a => a.startsWith('--provider='));
+  const provider    = providerArg ? providerArg.split('=')[1] : 'openai';
+  const limitArg    = args.find(a => a.startsWith('--limit='));
+  const perCatLimit = testMode ? 2 : (limitArg ? parseInt(limitArg.split('=')[1]) : null);
+  const catArg      = args.find(a => a.startsWith('--cat='));
+  const categories  = catArg ? [catArg.split('=')[1]] : CATEGORIES;
+  const geminiToken = process.env.GEMINI_API_KEY || '';
 
-  console.log(`🚀 AI Media Pipeline (Gemini 2.0 Flash) מתחיל...`);
-  if (testMode) console.log('🧪 מצב בדיקה — 3 מוצרים ראשונים, ללא כתיבה ל-Firestore');
-  else if (limit) console.log(`📊 מוגבל ל-${limit} מוצרים`);
-
-  const q = query(collection(db, 'products'), where('status', '==', 'active'), where('cat', '==', 'יודאיקה'));
-  const snap = await getDocs(q);
-
-  let products = [];
-  snap.forEach(d => {
-    const p = { id: d.id, ...d.data() };
-    if ((p.imgUrl || p.image_url) && !p.imgUrl2) {
-      products.push(p);
-    }
-  });
-
-  if (limit) products = products.slice(0, limit);
-  console.log(`📦 ${products.length} מוצרים לעיבוד\n`);
-
-  if (products.length === 0) {
-    console.log('✅ אין מוצרים לעיבוד — כולם כבר עודכנו!');
-    process.exit(0);
+  if (provider === 'gemini' && !geminiToken) {
+    console.error('❌ חסר GEMINI_API_KEY — הפעל עם: GEMINI_API_KEY=ya29.xxx node ...');
+    process.exit(1);
   }
 
-  let success = 0, failed = 0;
+  console.log(`🚀 AI Media Pipeline מתחיל...`);
+  console.log(`🤖 ספק: ${provider.toUpperCase()}`);
+  if (testMode) console.log('🧪 מצב בדיקה — 2 מוצרים לקטגוריה, ללא כתיבה ל-Firestore');
+  else if (perCatLimit) console.log(`📊 מוגבל ל-${perCatLimit} מוצרים לקטגוריה`);
+  console.log(`📂 קטגוריות: ${categories.join(' → ')}\n`);
 
-  for (let i = 0; i < products.length; i++) {
-    console.log(`\n[${i + 1}/${products.length}]`);
-    try {
-      await processProduct(products[i], testMode);
-      success++;
-    } catch (e) {
-      console.error(`❌ שגיאה כללית:`, e.message);
-      failed++;
+  let totalSuccess = 0, totalFailed = 0;
+
+  for (const cat of categories) {
+    console.log(`\n${'═'.repeat(40)}`);
+    console.log(`📂 קטגוריה: ${cat}`);
+    console.log('═'.repeat(40));
+
+    const snap = await db.collection('products')
+      .where('status', '==', 'active')
+      .where('cat', '==', cat)
+      .get();
+
+    let products = [];
+    snap.forEach(d => {
+      const p = { ...d.data(), id: d.id };
+      if ((p.imgUrl || p.image_url) && !p.imgUrl2) products.push(p);
+    });
+
+    if (perCatLimit) products = products.slice(0, perCatLimit);
+    console.log(`📦 ${products.length} מוצרים לעיבוד`);
+
+    if (products.length === 0) {
+      console.log('✅ כולם כבר עודכנו!');
+      continue;
     }
-    if (i < products.length - 1) await sleep(4000);
+
+    let catSuccess = 0, catFailed = 0;
+
+    for (let i = 0; i < products.length; i++) {
+      console.log(`\n[${cat} — ${i + 1}/${products.length}]`);
+      try {
+        const result = await processProduct(products[i], provider, testMode, geminiToken);
+        if (result.imgUrl2) { catSuccess++; totalSuccess++; }
+        else { catFailed++; totalFailed++; }
+      } catch (e) {
+        console.error(`❌ שגיאה כללית:`, e.message);
+        catFailed++; totalFailed++;
+      }
+      // OpenAI: 5 שניות בין מוצרים | Gemini: 40 שניות
+      if (i < products.length - 1) await sleep(provider === 'gemini' ? 40000 : 5000);
+    }
+
+    console.log(`\n📊 ${cat}: ✅ ${catSuccess} הצליחו, ❌ ${catFailed} נכשלו`);
+
+    const catIdx = categories.indexOf(cat);
+    if (catIdx < categories.length - 1) {
+      console.log(`⏳ ממתין 10 שניות לקטגוריה הבאה...`);
+      await sleep(10000);
+    }
   }
 
-  console.log('\n══════════════════════');
-  console.log('🎉 Pipeline הושלם!');
-  console.log(`✅ הצליחו: ${success}`);
-  console.log(`❌ נכשלו: ${failed}`);
+  console.log('\n══════════════════════════════════════════');
+  console.log('🎉 Pipeline הושלם — כל הקטגוריות!');
+  console.log(`✅ סה״כ הצליחו: ${totalSuccess}`);
+  console.log(`❌ סה״כ נכשלו: ${totalFailed}`);
   if (testMode) console.log('🧪 זו הייתה ריצת בדיקה — הפעל ללא --test לריצה מלאה');
   process.exit(0);
 }
