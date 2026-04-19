@@ -6,14 +6,134 @@ type HeroState = 'main' | 'mezuzah' | 'tefillin' | 'unsure' | 'klaf';
 
 const WA_LINK = 'https://wa.me/972552722228?text=שלום אני מעוניין בעזרה ופרטים נוספים';
 
+// ── SVG Icons ─────────────────────────────────────────────────────────────────
+
+function IconHome({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
+      <path d="M9 21V12h6v9" />
+    </svg>
+  );
+}
+
+function IconScroll({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+      <path d="M14 2v6h6M8 13h8M8 17h5" />
+    </svg>
+  );
+}
+
+function IconBox({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+      <line x1="12" y1="22.08" x2="12" y2="12" />
+    </svg>
+  );
+}
+
+function IconQuestion({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+  );
+}
+
+function IconSearch({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  );
+}
+
+function IconPen({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+    </svg>
+  );
+}
+
+function IconBook({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+    </svg>
+  );
+}
+
+function IconWhatsApp({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.859L.057 23.286a.75.75 0 00.92.92l5.427-1.476A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.5-5.25-1.377l-.376-.217-3.898 1.059 1.059-3.898-.217-.376A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+    </svg>
+  );
+}
+
+function IconArrowLeft({ size = 13, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+    </svg>
+  );
+}
+
+function IconCheck({ size = 13, color = '#b8972a' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+function IconEye({ size = 13, color = '#b8972a' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function IconShield({ size = 13, color = '#b8972a' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2l7 4v5c0 5-3.5 9.7-7 11-3.5-1.3-7-6-7-11V6l7-4z" />
+    </svg>
+  );
+}
+
+// ── Button types ──────────────────────────────────────────────────────────────
+
+type BtnStyle = 'gold' | 'outline' | 'ghost';
+
+interface HeroButton {
+  label: string;
+  icon: React.ReactNode;
+  action: () => void;
+  style: BtnStyle;
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+
 export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }: {
   isMobile: boolean;
   onScrollToProducts: () => void;
   onSelectCat: (cat: string) => void;
 }) {
-  const [state, setState] = useState<HeroState>('main');
+  const [state, setState]       = useState<HeroState>('main');
   const [animating, setAnimating] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded]     = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -23,22 +143,26 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
 
   function switchState(next: HeroState) {
     setAnimating(true);
-    setTimeout(() => {
-      setState(next);
-      setAnimating(false);
-    }, 220);
+    setTimeout(() => { setState(next); setAnimating(false); }, 220);
   }
 
-  const content = {
+  const content: Record<HeroState, {
+    headline: string;
+    sub?: string;
+    body?: string;
+    support?: string;
+    trust?: string[];
+    buttons: HeroButton[];
+  }> = {
     main: {
       headline: 'לא קונים מזוזה בעיניים עצומות',
       sub: 'ראה את הקלף, הכר את הסופר, והבן בדיוק מה נכנס לבית שלך',
       trust: ['רואים את הקלף לפני קנייה', 'עובדים ישירות מול סופרי סת״מ', 'בוחרים מתוך שקיפות אמיתית'],
       buttons: [
-        { label: '📿 אני מחפש בית מזוזה', action: () => switchState('mezuzah'), style: 'gold' },
-        { label: '📦 אני מחפש תפילין', action: () => switchState('tefillin'), style: 'outline' },
-        { label: '📜 אני מחפש קלף מזוזה', action: () => switchState('klaf'), style: 'outline' },
-        { label: '❓ אני לא בטוח מה לבחור', action: () => switchState('unsure'), style: 'ghost' },
+        { label: 'אני מחפש בית מזוזה',     icon: <IconHome size={15} color="#0c1a35" />,    action: () => switchState('mezuzah'), style: 'gold' },
+        { label: 'אני מחפש תפילין',         icon: <IconBox size={15} color="#fff" />,         action: () => switchState('tefillin'), style: 'outline' },
+        { label: 'אני מחפש קלף מזוזה',      icon: <IconScroll size={15} color="#fff" />,      action: () => switchState('klaf'), style: 'outline' },
+        { label: 'אני לא בטוח מה לבחור',    icon: <IconQuestion size={15} color="#fff" />,    action: () => switchState('unsure'), style: 'ghost' },
       ],
     },
     mezuzah: {
@@ -46,9 +170,9 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       body: 'רוב האנשים בוחרים לפי מחיר —\nאבל ההבדל האמיתי הוא באיכות הכתיבה, בבדיקה, ובמי שכתב אותה.\n\nאצלנו אתה לא קונה "סתם מזוזה" —\nאתה רואה את הקלף ובוחר מתוך הבנה.',
       support: 'אפשר לראות את הקלף לפני הקנייה ולבחור מתוך גלריה אמיתית',
       buttons: [
-        { label: '🔍 ראה בתי מזוזה', action: () => router.push('/category/מזוזות'), style: 'gold' },
-        { label: '✍️ בחר לפי סופר', action: () => router.push('/soferim'), style: 'outline' },
-        { label: '📘 למד איך לבחור נכון', action: () => router.push('/madrich'), style: 'ghost' },
+        { label: 'ראה בתי מזוזה',         icon: <IconSearch size={15} color="#0c1a35" />,  action: () => router.push('/category/מזוזות'),  style: 'gold' },
+        { label: 'בחר לפי סופר',          icon: <IconPen size={15} color="#fff" />,         action: () => router.push('/soferim'),           style: 'outline' },
+        { label: 'למד איך לבחור נכון',    icon: <IconBook size={15} color="#fff" />,         action: () => router.push('/madrich'),           style: 'ghost' },
       ],
     },
     tefillin: {
@@ -56,9 +180,9 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       body: 'יש הבדל גדול בין תפילין כשרות לבין תפילין מהודרות —\nוהוא לא תמיד נראה לעין.\n\nאנחנו עוזרים לך להבין בדיוק מה אתה מקבל\nולבחור מתוך ביטחון אמיתי.',
       support: 'הבחירה הנכונה מתחילה בהבנה — לא במחיר',
       buttons: [
-        { label: '🔍 ראה תפילין', action: () => router.push('/category/תפילין קומפלט'), style: 'gold' },
-        { label: '📘 מדריך לבחירה נכונה', action: () => router.push('/madrich'), style: 'outline' },
-        { label: '💬 שאל סופר', action: () => window.open(WA_LINK, '_blank'), style: 'ghost' },
+        { label: 'ראה תפילין',             icon: <IconSearch size={15} color="#0c1a35" />, action: () => router.push('/category/תפילין קומפלט'), style: 'gold' },
+        { label: 'מדריך לבחירה נכונה',    icon: <IconBook size={15} color="#fff" />,       action: () => router.push('/madrich'),                  style: 'outline' },
+        { label: 'שאל סופר',              icon: <IconWhatsApp size={15} color="#fff" />,   action: () => window.open(WA_LINK, '_blank'),           style: 'ghost' },
       ],
     },
     klaf: {
@@ -66,19 +190,19 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       body: 'אצלנו אתה לא קונה "סתם מזוזה" —\nאתה בוחר קלף ספציפי מתוך גלריה אמיתית.\n\nכל קלף מצולם, נבדק ומוצג לפני מכירה.\nאתה רואה בדיוק מה מגיע אליך.',
       support: 'ניתן לשלוח את תמונת הקלף לרב שלך לפני הקנייה',
       buttons: [
-        { label: '🔍 קלפי מזוזה', action: () => router.push('/category/קלפי מזוזה'), style: 'gold' },
-        { label: '📦 קלפי תפילין', action: () => router.push('/category/קלפי תפילין'), style: 'outline' },
-        { label: '📘 למד על קלפים', action: () => router.push('/madrich'), style: 'ghost' },
+        { label: 'קלפי מזוזה',           icon: <IconSearch size={15} color="#0c1a35" />, action: () => router.push('/category/קלפי מזוזה'),   style: 'gold' },
+        { label: 'קלפי תפילין',          icon: <IconBox size={15} color="#fff" />,        action: () => router.push('/category/קלפי תפילין'),  style: 'outline' },
+        { label: 'למד על קלפים',         icon: <IconBook size={15} color="#fff" />,        action: () => router.push('/madrich'),               style: 'ghost' },
       ],
     },
     unsure: {
       headline: 'בוא נבחר יחד',
-      body: 'לא צריך להבין בסת״ם כדי לבחור נכון.\nתכתוב לנו מה אתה מחפש — ונכוון אותך בצורה פשוטה וברורה.',
+      body: 'לא צריך להבין בסת״מ כדי לבחור נכון.\nתכתוב לנו מה אתה מחפש — ונכוון אותך בצורה פשוטה וברורה.',
       support: 'אנחנו כאן כדי לעזור לך לבחור — לא סתם למכור',
       buttons: [
-        { label: '📱 דבר איתנו בוואטסאפ', action: () => window.open(WA_LINK, '_blank'), style: 'gold' },
-        { label: '📘 התחל מדריך קצר', action: () => router.push('/madrich'), style: 'outline' },
-        { label: '✍️ הכר את הסופרים', action: () => router.push('/soferim'), style: 'ghost' },
+        { label: 'דבר איתנו בוואטסאפ',   icon: <IconWhatsApp size={15} color="#0c1a35" />, action: () => window.open(WA_LINK, '_blank'),  style: 'gold' },
+        { label: 'התחל מדריך קצר',        icon: <IconBook size={15} color="#fff" />,         action: () => router.push('/madrich'),         style: 'outline' },
+        { label: 'הכר את הסופרים',        icon: <IconPen size={15} color="#fff" />,           action: () => router.push('/soferim'),         style: 'ghost' },
       ],
     },
   };
@@ -86,89 +210,81 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
   const c = content[state];
   const isMain = state === 'main';
 
+  const TRUST_ICONS = [
+    <IconEye key="eye" size={13} color="#b8972a" />,
+    <IconPen key="pen" size={13} color="#b8972a" />,
+    <IconShield key="shield" size={13} color="#b8972a" />,
+  ];
+
   return (
     <div style={{
-      position: 'relative',
-      width: '100%',
-      maxWidth: '100%',
+      position: 'relative', width: '100%', maxWidth: '100%',
       minHeight: isMobile ? 360 : 480,
-      overflow: 'hidden',
-      overflowX: 'hidden',
-      display: 'flex',
-      alignItems: 'center',
-      direction: 'rtl',
+      overflow: 'hidden', display: 'flex', alignItems: 'center', direction: 'rtl',
     }}>
 
-      {/* ══ וידאו ברקע ══ */}
-      <video
-        autoPlay muted loop playsInline
-        style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
-          objectFit: 'cover', zIndex: 0,
-        }}
-      >
+      {/* Video background */}
+      <video autoPlay muted loop playsInline style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
         <source src="/video/hero-stam.mp4" type="video/mp4" />
       </video>
 
-      {/* ══ Fallback רקע ══ */}
+      {/* Fallback bg */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 0,
         background: 'linear-gradient(160deg, #1a1008 0%, #2d1f0a 30%, #1a3a2a 70%, #0c1a10 100%)',
         backgroundImage: isMobile ? 'none' : 'url(/images/stam-hero.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundSize: 'cover', backgroundPosition: 'center',
       }} />
 
-      {/* ══ Overlay ══ */}
+      {/* Overlay */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 1,
         background: 'linear-gradient(to left, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.75) 100%)',
       }} />
 
-      {/* ══ תוכן ══ */}
+      {/* Content */}
       <div style={{
         position: 'relative', zIndex: 2,
-        width: '100%', maxWidth: 900,
-        margin: '0 auto',
+        width: '100%', maxWidth: 900, margin: '0 auto',
         padding: isMobile ? '40px 20px 48px' : '56px 48px',
         opacity: animating ? 0 : 1,
         transform: animating ? 'translateY(8px)' : 'translateY(0)',
         transition: 'opacity 0.22s ease, transform 0.22s ease',
       }}>
 
-        {/* כפתור חזרה */}
+        {/* Back button */}
         {!isMain && (
-          <button onClick={() => switchState('main')}
+          <button
+            onClick={() => switchState('main')}
             style={{
-              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
-              color: '#ccc', borderRadius: 20, padding: '5px 14px', fontSize: 12,
-              cursor: 'pointer', marginBottom: 20, display: 'inline-flex',
-              alignItems: 'center', gap: 6, transition: 'background 0.2s',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: '#ccc', borderRadius: 20,
+              padding: '6px 14px', fontSize: 12,
+              cursor: 'pointer', marginBottom: 20,
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              transition: 'background 0.2s',
             }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.18)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}>
-            ← חזרה
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+          >
+            <IconArrowLeft size={12} color="#ccc" />
+            חזרה
           </button>
         )}
 
-        {/* כותרת */}
+        {/* Headline */}
         <h1 style={{
-          fontSize: isMobile ? 26 : 44,
-          fontWeight: 900,
-          color: '#fff',
-          lineHeight: 1.2,
-          marginBottom: isMobile ? 14 : 18,
-          textShadow: '0 2px 30px rgba(0,0,0,0.7)',
-          letterSpacing: '-0.5px',
+          fontSize: isMobile ? 26 : 44, fontWeight: 900, color: '#fff',
+          lineHeight: 1.2, marginBottom: isMobile ? 14 : 18,
+          textShadow: '0 2px 30px rgba(0,0,0,0.7)', letterSpacing: '-0.5px',
           opacity: loaded ? 1 : 0,
           transform: loaded ? 'translateY(0)' : 'translateY(20px)',
           transition: 'opacity 0.7s ease, transform 0.7s ease',
         }}>
-          {(c as any).headline}
+          {c.headline}
         </h1>
 
-        {/* תוכן לפי state */}
         {isMain ? (
           <>
             <p style={{
@@ -178,71 +294,36 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
               transform: loaded ? 'translateY(0)' : 'translateY(16px)',
               transition: 'opacity 0.7s ease 0.12s, transform 0.7s ease 0.12s',
             }}>
-              {(c as any).sub}
+              {c.sub}
             </p>
 
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28, width: '100%', maxWidth: '100%', overflow: 'hidden', flexDirection: isMobile ? 'column' : 'row' }}>
-              {(c as any).buttons.map((btn: any, i: number) => (
-                <button key={i} onClick={btn.action}
-                  style={{
-                    padding: isMobile ? '11px 18px' : '12px 22px',
-                    fontSize: isMobile ? 13 : 14,
-                    fontWeight: 700, borderRadius: 10, cursor: 'pointer',
-                    transition: 'all 0.18s',
-                    border: btn.style === 'gold' ? 'none' : '1.5px solid rgba(255,255,255,0.35)',
-                    background: btn.style === 'gold'
-                      ? 'linear-gradient(135deg, #b8972a, #e6c84a)'
-                      : btn.style === 'outline' ? 'rgba(255,255,255,0.08)' : 'transparent',
-                    color: btn.style === 'gold' ? '#0c1a35' : '#fff',
-                    backdropFilter: 'blur(4px)',
-                    opacity: loaded ? 1 : 0,
-                    transform: loaded ? 'translateY(0)' : 'translateY(12px)',
-                    transitionDelay: `${0.2 + i * 0.08}s`,
-                    width: isMobile ? '100%' : 'auto',
-                    boxSizing: 'border-box',
-                  }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget;
-                    if (btn.style === 'gold') {
-                      el.style.background = 'linear-gradient(135deg, #d4a832, #f0d860)';
-                      el.style.transform = 'translateY(-2px)';
-                      el.style.boxShadow = '0 8px 20px rgba(184,151,42,0.35)';
-                    } else {
-                      el.style.background = 'rgba(255,255,255,0.18)';
-                      el.style.transform = 'translateY(-2px)';
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget;
-                    if (btn.style === 'gold') {
-                      el.style.background = 'linear-gradient(135deg, #b8972a, #e6c84a)';
-                      el.style.transform = 'translateY(0)';
-                      el.style.boxShadow = 'none';
-                    } else {
-                      el.style.background = btn.style === 'outline' ? 'rgba(255,255,255,0.08)' : 'transparent';
-                      el.style.transform = 'translateY(0)';
-                    }
-                  }}>
-                  {btn.label}
-                </button>
+            {/* Buttons */}
+            <div style={{
+              display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28,
+              width: '100%', maxWidth: '100%', overflow: 'hidden',
+              flexDirection: isMobile ? 'column' : 'row',
+            }}>
+              {c.buttons.map((btn, i) => (
+                <HeroBtn key={i} btn={btn} isMobile={isMobile} loaded={loaded} delay={0.2 + i * 0.08} />
               ))}
             </div>
 
             {/* Trust strip */}
             <div style={{ display: 'flex', gap: isMobile ? 12 : 24, flexWrap: 'wrap', marginBottom: 20 }}>
-              {(c as any).trust.map((t: string, i: number) => (
+              {(c.trust ?? []).map((t, i) => (
                 <span key={i} style={{ fontSize: 12, color: '#a8c8a0', display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <span style={{ color: '#b8972a', fontWeight: 900 }}>✔</span> {t}
+                  {TRUST_ICONS[i] ?? <IconCheck size={12} />}
+                  {t}
                 </span>
               ))}
             </div>
 
-            <button onClick={() => router.push('/madrich')}
-              style={{
-                background: 'none', border: 'none', color: 'rgba(180,210,175,0.7)',
-                fontSize: 12, cursor: 'pointer', textDecoration: 'underline', padding: 0,
-              }}>
-              חדש בעולם הסת״מ? התחל כאן ←
+            <button
+              onClick={() => router.push('/madrich')}
+              style={{ background: 'none', border: 'none', color: 'rgba(180,210,175,0.7)', fontSize: 12, cursor: 'pointer', textDecoration: 'underline', padding: 0, display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              <IconArrowLeft size={11} color="rgba(180,210,175,0.7)" />
+              חדש בעולם הסת״מ? התחל כאן
             </button>
           </>
         ) : (
@@ -251,62 +332,92 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
               fontSize: isMobile ? 13 : 15, color: 'rgba(210,228,205,0.9)',
               marginBottom: 24, maxWidth: 580, lineHeight: 1.85, whiteSpace: 'pre-line',
             }}>
-              {(c as any).body}
+              {c.body}
             </p>
 
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20, width: '100%', maxWidth: '100%', overflow: 'hidden', flexDirection: isMobile ? 'column' : 'row' }}>
-              {(c as any).buttons.map((btn: any, i: number) => (
-                <button key={i} onClick={btn.action}
-                  style={{
-                    padding: isMobile ? '10px 16px' : '11px 20px',
-                    fontSize: isMobile ? 13 : 14,
-                    fontWeight: 700, borderRadius: 10, cursor: 'pointer',
-                    transition: 'all 0.18s',
-                    border: btn.style === 'gold' ? 'none' : '1.5px solid rgba(255,255,255,0.3)',
-                    background: btn.style === 'gold'
-                      ? 'linear-gradient(135deg, #b8972a, #e6c84a)'
-                      : btn.style === 'outline' ? 'rgba(255,255,255,0.08)' : 'transparent',
-                    color: btn.style === 'gold' ? '#0c1a35' : '#fff',
-                    backdropFilter: 'blur(4px)',
-                    width: isMobile ? '100%' : 'auto',
-                    boxSizing: 'border-box',
-                  }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget;
-                    if (btn.style === 'gold') {
-                      el.style.background = 'linear-gradient(135deg, #d4a832, #f0d860)';
-                      el.style.transform = 'translateY(-2px)';
-                    } else {
-                      el.style.background = 'rgba(255,255,255,0.18)';
-                      el.style.transform = 'translateY(-2px)';
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget;
-                    if (btn.style === 'gold') {
-                      el.style.background = 'linear-gradient(135deg, #b8972a, #e6c84a)';
-                    } else {
-                      el.style.background = btn.style === 'outline' ? 'rgba(255,255,255,0.08)' : 'transparent';
-                    }
-                    el.style.transform = 'translateY(0)';
-                  }}>
-                  {btn.label}
-                </button>
+            <div style={{
+              display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20,
+              width: '100%', maxWidth: '100%', overflow: 'hidden',
+              flexDirection: isMobile ? 'column' : 'row',
+            }}>
+              {c.buttons.map((btn, i) => (
+                <HeroBtn key={i} btn={btn} isMobile={isMobile} loaded={true} delay={0} />
               ))}
             </div>
 
-            <p style={{ fontSize: 12, color: 'rgba(160,190,155,0.75)', fontStyle: 'italic' }}>
-              {(c as any).support}
+            <p style={{ fontSize: 12, color: 'rgba(160,190,155,0.75)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 5 }}>
+              <IconShield size={12} color="rgba(160,190,155,0.6)" />
+              {c.support}
             </p>
           </>
         )}
       </div>
 
-      {/* ══ קו זהב תחתון ══ */}
+      {/* Gold bottom line */}
       <div style={{
         position: 'absolute', bottom: 0, right: 0, left: 0, height: 3, zIndex: 3,
         background: 'linear-gradient(to left, transparent, #b8972a 30%, #e6c84a 50%, #b8972a 70%, transparent)',
       }} />
     </div>
+  );
+}
+
+// ── Hero Button component ─────────────────────────────────────────────────────
+
+function HeroBtn({ btn, isMobile, loaded, delay }: {
+  btn: { label: string; icon: React.ReactNode; action: () => void; style: BtnStyle };
+  isMobile: boolean;
+  loaded: boolean;
+  delay: number;
+}) {
+  const isGold = btn.style === 'gold';
+  const isOutline = btn.style === 'outline';
+
+  return (
+    <button
+      onClick={btn.action}
+      style={{
+        padding: isMobile ? '11px 18px' : '12px 22px',
+        fontSize: isMobile ? 13 : 14,
+        fontWeight: 700, borderRadius: 10, cursor: 'pointer',
+        transition: 'all 0.18s',
+        border: isGold ? 'none' : '1.5px solid rgba(255,255,255,0.35)',
+        background: isGold ? 'linear-gradient(135deg, #b8972a, #e6c84a)' : isOutline ? 'rgba(255,255,255,0.08)' : 'transparent',
+        color: isGold ? '#0c1a35' : '#fff',
+        backdropFilter: 'blur(4px)',
+        opacity: loaded ? 1 : 0,
+        transform: loaded ? 'translateY(0)' : 'translateY(12px)',
+        transitionDelay: `${delay}s`,
+        width: isMobile ? '100%' : 'auto',
+        boxSizing: 'border-box',
+        display: 'flex', alignItems: 'center', gap: 7,
+        justifyContent: isMobile ? 'flex-start' : 'center',
+      }}
+      onMouseEnter={e => {
+        const el = e.currentTarget;
+        if (isGold) {
+          el.style.background = 'linear-gradient(135deg, #d4a832, #f0d860)';
+          el.style.transform = 'translateY(-2px)';
+          el.style.boxShadow = '0 8px 20px rgba(184,151,42,0.35)';
+        } else {
+          el.style.background = 'rgba(255,255,255,0.18)';
+          el.style.transform = 'translateY(-2px)';
+        }
+      }}
+      onMouseLeave={e => {
+        const el = e.currentTarget;
+        if (isGold) {
+          el.style.background = 'linear-gradient(135deg, #b8972a, #e6c84a)';
+          el.style.transform = 'translateY(0)';
+          el.style.boxShadow = 'none';
+        } else {
+          el.style.background = isOutline ? 'rgba(255,255,255,0.08)' : 'transparent';
+          el.style.transform = 'translateY(0)';
+        }
+      }}
+    >
+      {btn.icon}
+      {btn.label}
+    </button>
   );
 }
