@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, query, where, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCart } from '../contexts/CartContext';
-
-// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface Product {
   id: string;
@@ -38,8 +36,6 @@ const SIZES_BY_LOCATION: Record<Location, string[]> = {
   entrance: ['15', '20'],
 };
 
-// ── Image URLs ────────────────────────────────────────────────────────────────
-
 const CDN = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/q_auto/f_auto';
 const IMAGES = {
   entrance: `${CDN}/knisarashut_tbfcgt`,
@@ -47,8 +43,6 @@ const IMAGES = {
   sfaradi:  `${CDN}/sfardi_me6dad`,
   ashkenazi:`${CDN}/ashkenazi_mquvst`,
 };
-
-// ── SVG Icons ─────────────────────────────────────────────────────────────────
 
 function IconSun({ size = 36, color = '#0c1a35' }: { size?: number; color?: string }) {
   return (
@@ -135,8 +129,6 @@ function IconStar({ size = 12, color = '#b8972a' }: { size?: number; color?: str
   );
 }
 
-// ── Step button ───────────────────────────────────────────────────────────────
-
 function StepButton({ children, onClick, selected = false }: { children: React.ReactNode; onClick: () => void; selected?: boolean }) {
   const [hovered, setHovered] = useState(false);
   const active = hovered || selected;
@@ -146,20 +138,12 @@ function StepButton({ children, onClick, selected = false }: { children: React.R
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        flex: '1 1 0',
-        padding: '0 0 14px',
-        borderRadius: 16,
+        flex: '1 1 0', padding: '0 0 14px', borderRadius: 16,
         border: `2px solid ${active ? '#b8972a' : '#e8e2d8'}`,
         background: active ? '#fffbf0' : '#fafaf8',
-        cursor: 'pointer',
-        transition: 'all 0.18s ease',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 8,
-        direction: 'rtl',
-        textAlign: 'center',
-        overflow: 'hidden',
+        cursor: 'pointer', transition: 'all 0.18s ease',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+        direction: 'rtl', textAlign: 'center', overflow: 'hidden',
         boxShadow: active ? '0 4px 20px rgba(184,151,42,0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
         transform: active ? 'translateY(-2px)' : 'translateY(0)',
       }}
@@ -171,7 +155,17 @@ function StepButton({ children, onClick, selected = false }: { children: React.R
 
 // ── Klaf product card ─────────────────────────────────────────────────────────
 
-function KlafCard({ product, onAdd, isMobile }: { product: Product; onAdd: (p: Product) => void; isMobile: boolean }) {
+function KlafCard({
+  product, onAdd, isMobile, quantity, onIncrease, onDecrease, onNavigate,
+}: {
+  product: Product;
+  onAdd: (p: Product) => void;
+  isMobile: boolean;
+  quantity: number;
+  onIncrease: (p: Product) => void;
+  onDecrease: (id: string) => void;
+  onNavigate: (id: string) => void;
+}) {
   const [hovered, setHovered] = useState(false);
   const [sofer, setSofer] = useState<SoferInfo | null>(null);
   const img = product.imgUrl || product.image_url || '';
@@ -201,7 +195,6 @@ function KlafCard({ product, onAdd, isMobile }: { product: Product; onAdd: (p: P
         transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
       }}
     >
-      {/* Sofer strip */}
       {sofer && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: '#f8f6f2', borderBottom: '1px solid #ede8df' }}>
           {sofer.imageUrl ? (
@@ -218,8 +211,11 @@ function KlafCard({ product, onAdd, isMobile }: { product: Product; onAdd: (p: P
         </div>
       )}
 
-      {/* Image */}
-      <div style={{ position: 'relative', paddingTop: '100%', background: '#f5f1ea', overflow: 'hidden' }}>
+      {/* Image — clickable → product page */}
+      <div
+        onClick={() => onNavigate(product.id)}
+        style={{ position: 'relative', paddingTop: '100%', background: '#f5f1ea', overflow: 'hidden', cursor: 'pointer' }}
+      >
         {img ? (
           <img src={img} alt={product.name}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.35s ease', transform: hovered ? 'scale(1.07)' : 'scale(1)' }} />
@@ -228,7 +224,6 @@ function KlafCard({ product, onAdd, isMobile }: { product: Product; onAdd: (p: P
             <IconScroll size={48} color="#c8b898" />
           </div>
         )}
-        {/* Sale badge */}
         {hasSale && (
           <div style={{ position: 'absolute', top: 8, right: 8, background: '#c0392b', color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 20 }}>
             -{savePct}%
@@ -236,22 +231,72 @@ function KlafCard({ product, onAdd, isMobile }: { product: Product; onAdd: (p: P
         )}
       </div>
 
-      {/* Content */}
       <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-        <div style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#0c1a35', lineHeight: 1.4 }}>{product.name}</div>
+        {/* Name — clickable → product page */}
+        <div
+          onClick={() => onNavigate(product.id)}
+          style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#0c1a35', lineHeight: 1.4, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'text-decoration-color 0.15s' }}
+          onMouseEnter={e => (e.currentTarget.style.textDecorationColor = '#0c1a35')}
+          onMouseLeave={e => (e.currentTarget.style.textDecorationColor = 'transparent')}
+        >
+          {product.name}
+        </div>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ fontSize: 17, fontWeight: 900, color: '#b8972a' }}>₪{product.price?.toLocaleString('he-IL')}</div>
           {hasSale && <div style={{ fontSize: 12, color: '#aaa', textDecoration: 'line-through' }}>₪{product.was?.toLocaleString('he-IL')}</div>}
         </div>
-        <button
-          onClick={() => onAdd(product)}
-          style={{ marginTop: 'auto', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'background 0.15s' }}
-          onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1a2d50')}
-          onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#0c1a35')}
-        >
-          <IconCart size={14} /> הוסף לסל
-        </button>
+
+        {/* Add / quantity control */}
+        {quantity === 0 ? (
+          <button
+            onClick={() => onAdd(product)}
+            style={{ marginTop: 'auto', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'background 0.15s' }}
+            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1a2d50')}
+            onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#0c1a35')}
+          >
+            <IconCart size={14} /> הוסף לסל
+          </button>
+        ) : (
+          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0ebe0', borderRadius: 10, padding: '4px 8px' }}>
+            <button
+              onClick={() => onIncrease(product)}
+              style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: '#0c1a35', color: '#fff', fontSize: 20, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
+            >+</button>
+            <span style={{ fontWeight: 900, fontSize: 15, color: '#0c1a35' }}>{quantity}</span>
+            <button
+              onClick={() => onDecrease(product.id)}
+              style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: '#0c1a35', color: '#fff', fontSize: 20, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
+            >−</button>
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+// ── "סיימת?" floating banner ──────────────────────────────────────────────────
+
+function FinishedBanner({ onYes, onNo }: { onYes: () => void; onNo: () => void }) {
+  return (
+    <div style={{
+      position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 800, background: '#0c1a35', color: '#fff',
+      borderRadius: 20, padding: '16px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
+      display: 'flex', alignItems: 'center', gap: 16, direction: 'rtl',
+      animation: 'slideUp 0.3s ease',
+      whiteSpace: 'nowrap',
+    }}>
+      <style>{`@keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`}</style>
+      <span style={{ fontSize: 15, fontWeight: 700 }}>סיימת לבחור קלפים?</span>
+      <button
+        onClick={onYes}
+        style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
+      >כן, סיימתי ✓</button>
+      <button
+        onClick={onNo}
+        style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+      >עוד לא סיימתי</button>
     </div>
   );
 }
@@ -338,8 +383,6 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
   );
 }
 
-// ── Tag chip ──────────────────────────────────────────────────────────────────
-
 function Tag({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
   return (
     <span style={{ background: '#f0ebe0', borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 700, color: '#0c1a35', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -360,6 +403,21 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
   const [klafim, setKlafim]     = useState<Product[]>([]);
   const [loading, setLoading]   = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
+  const [showFinished, setShowFinished] = useState(false);
+
+  // quantity per product id
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const finishedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // reset timer every time a quantity changes
+  useEffect(() => {
+    const totalInCart = Object.values(quantities).reduce((s, v) => s + v, 0);
+    if (totalInCart === 0) return;
+    setShowFinished(false);
+    if (finishedTimerRef.current) clearTimeout(finishedTimerRef.current);
+    finishedTimerRef.current = setTimeout(() => setShowFinished(true), 3000);
+    return () => { if (finishedTimerRef.current) clearTimeout(finishedTimerRef.current); };
+  }, [quantities]);
 
   async function fetchKlafim(loc: Location, nos: Nusach) {
     setLoading(true); setKlafim([]);
@@ -384,30 +442,47 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
 
   function handleSelectLocation(loc: Location) { setLocation(loc); setStep(1); }
   function handleSelectNusach(nos: Nusach) { setNusach(nos); setStep(2); fetchKlafim(location!, nos); }
-  function handleAddToCart(p: Product) { addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 }); setShowUpsell(true); }
-  function handleReset() { setStep(0); setLocation(null); setNusach('ספרדי'); setKlafim([]); }
+
+  function handleAddToCart(p: Product) {
+    addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
+    setQuantities(q => ({ ...q, [p.id]: (q[p.id] ?? 0) + 1 }));
+  }
+
+  function handleIncrease(p: Product) {
+    addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
+    setQuantities(q => ({ ...q, [p.id]: (q[p.id] ?? 0) + 1 }));
+  }
+
+  function handleDecrease(id: string) {
+    setQuantities(q => {
+      const next = Math.max(0, (q[id] ?? 0) - 1);
+      return { ...q, [id]: next };
+    });
+    // Note: removing from cart context depends on your CartContext API
+    // If removeItem exists: removeItem(id); otherwise just track locally
+  }
+
+  function handleReset() {
+    setStep(0); setLocation(null); setNusach('ספרדי'); setKlafim([]);
+    setQuantities({}); setShowFinished(false);
+  }
+
+  function handleFinishedYes() {
+    setShowFinished(false);
+    setShowUpsell(true);
+  }
+
+  function handleFinishedNo() {
+    setShowFinished(false);
+  }
 
   const sizes = location ? SIZES_BY_LOCATION[location] : [];
 
-  // ── Location config ──────────────────────────────────────────────────────────
   const locationConfig = [
-    {
-      key: 'room' as Location,
-      label: 'חדר / פתח משני',
-      sub: 'גדלים: 12 או 15 ס"מ',
-      img: IMAGES.room,
-      icon: <IconDoor size={14} color="#0c1a35" />,
-    },
-    {
-      key: 'entrance' as Location,
-      label: 'כניסה ראשית',
-      sub: 'גדלים: 15 או 20 ס"מ',
-      img: IMAGES.entrance,
-      icon: <IconHome size={14} color="#0c1a35" />,
-    },
+    { key: 'room' as Location, label: 'חדר / פתח משני', sub: 'גדלים: 12 או 15 ס"מ', img: IMAGES.room, icon: <IconDoor size={14} color="#0c1a35" /> },
+    { key: 'entrance' as Location, label: 'כניסה ראשית', sub: 'גדלים: 15 או 20 ס"מ', img: IMAGES.entrance, icon: <IconHome size={14} color="#0c1a35" /> },
   ];
 
-  // ── Nusach config ────────────────────────────────────────────────────────────
   const nusachConfig: { key: Nusach; img?: string; fallbackIcon?: React.ReactNode; popular?: boolean }[] = [
     { key: 'ספרדי',  img: IMAGES.sfaradi,  popular: true },
     { key: 'אשכנזי', img: IMAGES.ashkenazi },
@@ -420,10 +495,13 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
         <UpsellModal isMobile={isMobile} onClose={() => setShowUpsell(false)} onViewCart={() => { setShowUpsell(false); router.push('/cart'); }} />
       )}
 
+      {showFinished && !showUpsell && (
+        <FinishedBanner onYes={handleFinishedYes} onNo={handleFinishedNo} />
+      )}
+
       <div style={{ background: 'linear-gradient(180deg, #f8f4ec 0%, #fff 60%)', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
 
-          {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#0c1a35', color: '#b8972a', borderRadius: 20, padding: '5px 16px', fontSize: 12, fontWeight: 700, marginBottom: 14, letterSpacing: 0.5 }}>
               <IconStar size={12} color="#b8972a" /> המוצר הנמכר ביותר
@@ -434,7 +512,6 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
             <p style={{ fontSize: 14, color: '#999', margin: 0 }}>ענה על שתי שאלות פשוטות — נמצא את המתאים ביותר</p>
           </div>
 
-          {/* Progress */}
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginBottom: 32 }}>
             {(['מיקום', 'נוסח', 'קלפים'] as const).map((label, i) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -449,10 +526,8 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
             ))}
           </div>
 
-          {/* Card */}
           <div style={{ background: '#fff', borderRadius: 24, boxShadow: '0 4px 40px rgba(0,0,0,0.07)', padding: isMobile ? '24px 16px' : '40px 48px', border: '1.5px solid #f0ebe0' }}>
 
-            {/* ── Step 0: Location ── */}
             {step === 0 && (
               <>
                 <h3 style={{ textAlign: 'center', fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: '0 0 6px' }}>איפה תולים את המזוזה?</h3>
@@ -460,11 +535,9 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                 <div style={{ display: 'flex', gap: 16 }}>
                   {locationConfig.map(loc => (
                     <StepButton key={loc.key} onClick={() => handleSelectLocation(loc.key)}>
-                      {/* Image */}
                       <div style={{ width: '100%', height: isMobile ? 100 : 130, overflow: 'hidden', borderRadius: '14px 14px 0 0' }}>
                         <img src={loc.img} alt={loc.label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       </div>
-                      {/* Text */}
                       <div style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                         <span style={{ fontSize: 15, fontWeight: 900 }}>{loc.label}</span>
                         <span style={{ fontSize: 12, color: '#999', fontWeight: 500 }}>{loc.sub}</span>
@@ -475,7 +548,6 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
               </>
             )}
 
-            {/* ── Step 1: Nusach ── */}
             {step === 1 && (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22, flexWrap: 'wrap' }}>
@@ -491,19 +563,12 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                 <div style={{ display: 'flex', gap: 12 }}>
                   {nusachConfig.map(({ key, img, fallbackIcon, popular }) => (
                     <StepButton key={key} onClick={() => handleSelectNusach(key)}>
-                      {/* Image or fallback */}
                       <div style={{ width: '100%', height: isMobile ? 80 : 110, overflow: 'hidden', borderRadius: '14px 14px 0 0', background: '#f0ebe0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {img
-                          ? <img src={img} alt={key} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                          : fallbackIcon
-                        }
+                        {img ? <img src={img} alt={key} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : fallbackIcon}
                       </div>
-                      {/* Text */}
                       <div style={{ padding: '0 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                         <span style={{ fontSize: 14, fontWeight: 900 }}>{key}</span>
-                        {popular && (
-                          <span style={{ fontSize: 10, color: '#b8972a', fontWeight: 700, background: '#fffbf0', borderRadius: 10, padding: '2px 10px', border: '1px solid #e8d8a0' }}>נפוץ</span>
-                        )}
+                        {popular && <span style={{ fontSize: 10, color: '#b8972a', fontWeight: 700, background: '#fffbf0', borderRadius: 10, padding: '2px 10px', border: '1px solid #e8d8a0' }}>נפוץ</span>}
                       </div>
                     </StepButton>
                   ))}
@@ -511,7 +576,6 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
               </>
             )}
 
-            {/* ── Step 2: Results ── */}
             {step === 2 && (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 8 }}>
@@ -548,7 +612,18 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                 {!loading && klafim.length > 0 && (
                   <>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
-                      {klafim.map(p => <KlafCard key={p.id} product={p} onAdd={handleAddToCart} isMobile={isMobile} />)}
+                      {klafim.map(p => (
+                        <KlafCard
+                          key={p.id}
+                          product={p}
+                          onAdd={handleAddToCart}
+                          isMobile={isMobile}
+                          quantity={quantities[p.id] ?? 0}
+                          onIncrease={handleIncrease}
+                          onDecrease={handleDecrease}
+                          onNavigate={(id) => router.push(`/product/${id}`)}
+                        />
+                      ))}
                     </div>
                     <div style={{ textAlign: 'center' }}>
                       <button
