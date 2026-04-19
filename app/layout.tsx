@@ -7,6 +7,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ShaliachProvider } from "./contexts/ShaliachContext";
 import NavBar from "@/app/components/navigation/NavBar";
+import Footer from "@/app/components/Footer";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 
@@ -65,6 +66,7 @@ export default function RootLayout({
               <CartProvider>
                 <NavBar />
                 {children}
+                <Footer />
               </CartProvider>
             </ShaliachProvider>
           </Suspense>
