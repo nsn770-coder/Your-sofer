@@ -3,11 +3,12 @@ import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   collection, query, where, orderBy, limit,
-  getDocs,
+  getDocs, documentId,
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Link from 'next/link';
 import ProductCard from '@/components/ui/ProductCard';
+import SoferProductCard, { type SoferData } from '@/components/ui/SoferProductCard';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,8 @@ interface Product {
   status?: string;
   days?: string;
   sofer?: string;
+  soferId?: string;
+  soferName?: string;
   vendor?: string;
   createdAt?: { seconds: number };
   hidden?: boolean;
@@ -661,6 +664,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [catFilter, setCatFilter]     = useState('הכל');
   const [catImages, setCatImages]     = useState<Record<string, string>>({});
+  const [soferMap, setSoferMap]       = useState<Record<string, SoferData>>({});
 
   const SUBCATEGORY_PAGES = ['נטילת ידיים', 'שבת', 'חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
   const SUBCATEGORY_GROUPS: Record<string, string[]> = {
@@ -722,6 +726,23 @@ export default function CategoryClient({ category }: { category: string }) {
     }
     fetchCatImages();
   }, []);
+
+  useEffect(() => {
+    if (category !== 'קלפי מזוזה' || allLoaded.length === 0) return;
+    const ids = [...new Set(allLoaded.map(p => p.soferId).filter(Boolean) as string[])];
+    if (ids.length === 0) return;
+
+    async function fetchSoferim() {
+      const map: Record<string, SoferData> = {};
+      for (let i = 0; i < ids.length; i += 10) {
+        const chunk = ids.slice(i, i + 10);
+        const snap = await getDocs(query(collection(db, 'soferim'), where(documentId(), 'in', chunk)));
+        snap.forEach(d => { map[d.id] = d.data() as SoferData; });
+      }
+      setSoferMap(map);
+    }
+    fetchSoferim();
+  }, [allLoaded, category]);
 
   useEffect(() => {
     if (!urlFilter || loading || allLoaded.length === 0) return;
@@ -965,29 +986,47 @@ export default function CategoryClient({ category }: { category: string }) {
 
           {/* Products grid / loading / empty */}
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+            <div className={category === 'קלפי מזוזה' ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4'}>
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : filtered.length === 0 ? (
             <EmptyState active={active} onClear={() => setFilters(EMPTY_FILTERS)} />
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
-                {paginated.map(p => (
-                  <ProductCard
-                    key={p.id}
-                    id={p.id}
-                    name={p.name}
-                    price={p.price}
-                    images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                    priority={p.priority}
-                    isBestSeller={p.isBestSeller}
-                    badge={p.badge}
-                    was={p.was}
-                    createdAt={p.createdAt}
-                  />
-                ))}
-              </div>
+              {category === 'קלפי מזוזה' ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {paginated.map(p => (
+                    <SoferProductCard
+                      key={p.id}
+                      id={p.id}
+                      name={p.name}
+                      price={p.price}
+                      imgUrl={p.imgUrl || p.image_url}
+                      badge={p.badge}
+                      was={p.was}
+                      sofer={p.soferId ? soferMap[p.soferId] : undefined}
+                      soferName={p.soferName ?? p.sofer}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+                  {paginated.map(p => (
+                    <ProductCard
+                      key={p.id}
+                      id={p.id}
+                      name={p.name}
+                      price={p.price}
+                      images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                      priority={p.priority}
+                      isBestSeller={p.isBestSeller}
+                      badge={p.badge}
+                      was={p.was}
+                      createdAt={p.createdAt}
+                    />
+                  ))}
+                </div>
+              )}
 
               <div className="mt-8 mb-2">
                 <CategoryScrollBar catImages={catImages} currentCategory={category} />
