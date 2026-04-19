@@ -533,7 +533,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
         <FinishedBanner onYes={handleFinishedYes} onNo={handleFinishedNo} />
       )}
 
-      {showFinishedCases && !showUpsell && (
+      {showFinishedCases && (
         <FinishedCasesBanner
           onYes={() => { setShowFinishedCases(false); router.push('/cart'); }}
           onNo={() => { setShowFinishedCases(false); router.push('/category/מזוזות'); }}
