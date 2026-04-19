@@ -155,7 +155,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
     buttons: HeroButton[];
   }> = {
     main: {
-      headline: 'לא קונים מזוזה בעיניים עצומות',
+      headline: 'קנה מזוזה ישירות מהסופר',
       sub: 'ראה את הקלף, הכר את הסופר, והבן בדיוק מה נכנס לבית שלך',
       trust: ['רואים את הקלף לפני קנייה', 'עובדים ישירות מול סופרי סת״מ', 'בוחרים מתוך שקיפות אמיתית'],
       buttons: [
@@ -301,7 +301,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
             <div style={{
               display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28,
               width: '100%', maxWidth: '100%', overflow: 'hidden',
-              flexDirection: isMobile ? 'column' : 'row',
+              flexDirection: 'row',
             }}>
               {c.buttons.map((btn, i) => (
                 <HeroBtn key={i} btn={btn} isMobile={isMobile} loaded={loaded} delay={0.2 + i * 0.08} />
@@ -338,7 +338,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
             <div style={{
               display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20,
               width: '100%', maxWidth: '100%', overflow: 'hidden',
-              flexDirection: isMobile ? 'column' : 'row',
+              flexDirection: 'row',
             }}>
               {c.buttons.map((btn, i) => (
                 <HeroBtn key={i} btn={btn} isMobile={isMobile} loaded={true} delay={0} />
@@ -388,7 +388,7 @@ function HeroBtn({ btn, isMobile, loaded, delay }: {
         opacity: loaded ? 1 : 0,
         transform: loaded ? 'translateY(0)' : 'translateY(12px)',
         transitionDelay: `${delay}s`,
-        width: isMobile ? '100%' : 'auto',
+        width: isMobile ? 'calc(50% - 5px)' : 'auto',
         boxSizing: 'border-box',
         display: 'flex', alignItems: 'center', gap: 7,
         justifyContent: isMobile ? 'flex-start' : 'center',
