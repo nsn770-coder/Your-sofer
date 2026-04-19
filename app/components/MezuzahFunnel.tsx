@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCart } from '../contexts/CartContext';
 
@@ -19,6 +19,15 @@ interface Product {
   hidden?: boolean;
   size?: string | number;
   nusach?: string;
+  soferId?: string;
+  was?: number | null;
+  filterAttributes?: Record<string, string>;
+}
+
+interface SoferInfo {
+  name: string;
+  imageUrl: string;
+  style?: string;
 }
 
 type Location = 'room' | 'entrance';
@@ -164,7 +173,21 @@ function StepButton({ children, onClick, selected = false }: { children: React.R
 
 function KlafCard({ product, onAdd, isMobile }: { product: Product; onAdd: (p: Product) => void; isMobile: boolean }) {
   const [hovered, setHovered] = useState(false);
+  const [sofer, setSofer] = useState<SoferInfo | null>(null);
   const img = product.imgUrl || product.image_url || '';
+  const hasSale = typeof product.was === 'number' && product.was > product.price;
+  const savePct = hasSale ? Math.round((1 - product.price / product.was!) * 100) : 0;
+
+  useEffect(() => {
+    if (!product.soferId) return;
+    getDoc(doc(db, 'soferim', product.soferId)).then(snap => {
+      if (snap.exists()) {
+        const d = snap.data();
+        setSofer({ name: d.name || '', imageUrl: d.imageUrl || '', style: d.style || '' });
+      }
+    }).catch(() => {});
+  }, [product.soferId]);
+
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -178,6 +201,24 @@ function KlafCard({ product, onAdd, isMobile }: { product: Product; onAdd: (p: P
         transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
       }}
     >
+      {/* Sofer strip */}
+      {sofer && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: '#f8f6f2', borderBottom: '1px solid #ede8df' }}>
+          {sofer.imageUrl ? (
+            <img src={sofer.imageUrl} alt={sofer.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '2px solid #b8972a', flexShrink: 0 }} />
+          ) : (
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b8972a', fontWeight: 900, fontSize: 13, flexShrink: 0 }}>
+              {sofer.name.charAt(0)}
+            </div>
+          )}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#0c1a35', lineHeight: 1.3 }}>{sofer.name}</div>
+            {sofer.style && <div style={{ fontSize: 10, color: '#888' }}>{sofer.style}</div>}
+          </div>
+        </div>
+      )}
+
+      {/* Image */}
       <div style={{ position: 'relative', paddingTop: '100%', background: '#f5f1ea', overflow: 'hidden' }}>
         {img ? (
           <img src={img} alt={product.name}
@@ -187,10 +228,21 @@ function KlafCard({ product, onAdd, isMobile }: { product: Product; onAdd: (p: P
             <IconScroll size={48} color="#c8b898" />
           </div>
         )}
+        {/* Sale badge */}
+        {hasSale && (
+          <div style={{ position: 'absolute', top: 8, right: 8, background: '#c0392b', color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 20 }}>
+            -{savePct}%
+          </div>
+        )}
       </div>
-      <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+
+      {/* Content */}
+      <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
         <div style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#0c1a35', lineHeight: 1.4 }}>{product.name}</div>
-        <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>₪{product.price?.toLocaleString('he-IL')}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ fontSize: 17, fontWeight: 900, color: '#b8972a' }}>₪{product.price?.toLocaleString('he-IL')}</div>
+          {hasSale && <div style={{ fontSize: 12, color: '#aaa', textDecoration: 'line-through' }}>₪{product.was?.toLocaleString('he-IL')}</div>}
+        </div>
         <button
           onClick={() => onAdd(product)}
           style={{ marginTop: 'auto', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'background 0.15s' }}
