@@ -618,8 +618,7 @@ export default function ProductClient() {
   const discount = product.was ? Math.round((1 - product.price / product.was) * 100) : 0;
 
   const EMBROIDERY_CATEGORIES = ['כיסוי תפילין', 'כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן'];
-const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מזוזות', 'מגילות'];
-
+const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
   function handleAddToCart() {
     for (let i = 0; i < qty; i++) {
       addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafId || undefined, selectedKlafName: selectedKlafName || undefined, embroideryText: embroideryText || undefined });
