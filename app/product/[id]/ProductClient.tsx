@@ -618,6 +618,7 @@ export default function ProductClient() {
   const discount = product.was ? Math.round((1 - product.price / product.was) * 100) : 0;
 
   const EMBROIDERY_CATEGORIES = ['כיסוי תפילין', 'כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן'];
+const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מזוזות', 'מגילות'];
 
   function handleAddToCart() {
     for (let i = 0; i < qty; i++) {
@@ -822,7 +823,8 @@ export default function ProductClient() {
               <div style={{ display: 'flex', borderBottom: '2px solid #f0f0f0', marginBottom: 14 }}>
                 {([
                   { key: 'details',  label: 'פרטי המוצר' },
-                  { key: 'kashrut',  label: 'כשרות ואיכות' },
+                  ...(product.cat && KASHRUT_CATEGORIES.includes(product.cat) ? [{ key: 'kashrut' as const, label: 'כשרות ואיכות' }] : []),
+
                   { key: 'shipping', label: 'משלוח והחזרות' },
                 ] as { key: typeof activeTab; label: string }[]).map(tab => (
                   <button key={tab.key} onClick={() => setActiveTab(tab.key)}

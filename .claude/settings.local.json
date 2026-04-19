@@ -19,7 +19,14 @@
       "Bash(npm install:*)",
       "Bash(tasklist /FI \"IMAGENAME eq node.exe\")",
       "Bash(curl -s \"https://firestore.googleapis.com/v1/projects/your-sofer/databases/\\(default\\)/documents/reviews?key=AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I&pageSize=1\")",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(dir \"C:\\\\Users\\\\Nissan\\\\Downloads\\\\*.json\" /s)",
+      "Read(//mnt/c/Users/Nissan/**)",
+      "Read(//c/Users/Nissan/Downloads/**)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git restore *)"
     ]
   }
 }
