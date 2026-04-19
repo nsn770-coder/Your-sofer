@@ -1,0 +1,25 @@
+export const DEFAULT_THEME = {
+  colorPrimary: '#0c1a35',
+  colorSecondary: '#b8860b',
+  colorBackground: '#f9f7f4',
+  colorSurface: '#ffffff',
+  colorText: '#1a1a1a',
+  colorTextMuted: '#6b7280',
+  btnAddToCartBg: '#0c1a35',
+  btnAddToCartText: '#ffffff',
+  btnCheckoutBg: '#b8860b',
+  btnCheckoutText: '#ffffff',
+  btnRadius: 8,
+  btnCheckoutShape: 'rounded',
+  cardRadius: 12,
+  cardShadow: 'md',
+  cardPadding: 16,
+  cardGap: 24,
+  cardImgHeight: 220,
+  sectionPadding: 48,
+  containerMaxWidth: 1280,
+  fontFamily: 'inherit',
+  fontSizeBase: 16,
+};
+
+export type ThemeConfig = typeof DEFAULT_THEME;

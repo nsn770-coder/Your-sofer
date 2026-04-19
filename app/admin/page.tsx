@@ -111,8 +111,8 @@ interface SoferFull {
 
 interface SoferEditRequest {
   id: string;
-  soferId: string;     // Firebase Auth UID (matches firestore.rules)
-  soferDocId?: string; // soferim/{soferDocId} — used to apply changes
+  soferId: string;
+  soferDocId?: string;
   soferName: string;
   status: 'pending' | 'approved' | 'rejected';
   changes: Partial<{
@@ -133,18 +133,17 @@ interface HomeContent {
 
 interface Category {
   id: string;
-  slug: string;        // matches product.cat
-  displayName: string; // human label
-  imageUrl: string;    // Cloudinary URL
-  priority: number;    // sort order
-  // legacy fields (may exist in old Firestore docs)
+  slug: string;
+  displayName: string;
+  imageUrl: string;
+  priority: number;
   name?: string;
   imgUrl?: string;
   sub?: string;
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor';
 
 interface Review {
   id: string;
@@ -616,18 +615,13 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
     if (!form.name || !form.phone) { alert('שם וטלפון הם שדות חובה'); return; }
     setSaving(true);
     try {
-      // 1. Create shliach doc (auto-generated ID)
       const shliachRef = await addDoc(collection(db, 'shluchim'), {
         ...form, status: 'active', createdAt: serverTimestamp(),
       });
       const newId = shliachRef.id;
-
-      // 2. Create corresponding approved application record
       await addDoc(collection(db, 'shluchim_applications'), {
         ...form, status: 'approved', approvedAt: serverTimestamp(), approvedDocId: newId, createdAt: serverTimestamp(),
       });
-
-      // 3. If a matching user exists by email, update THAT document — never create a new one
       if (form.email) {
         const normalizedEmail = form.email.trim().toLowerCase();
         const userSnap = await getDocs(query(collection(db, 'users'), where('email', '==', normalizedEmail)));
@@ -635,7 +629,6 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
           await updateDoc(doc(db, 'users', userSnap.docs[0].id), { role: 'shaliach', shaliachId: newId });
         }
       }
-
       setCreatedLink(`https://your-sofer.com/?ref=${newId}`);
       onSave();
     } catch (e) {
@@ -658,7 +651,6 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
           <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>➕ הוספת שליח ידנית</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
         </div>
-
         {createdLink ? (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
@@ -687,7 +679,7 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <div><label style={labelStyle}>אימייל</label><input value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} placeholder="rabbi@example.com" type="email" style={inputStyle} /></div>
-              <div><label style={labelStyle}>שם רב (רב ממונה)</label><input value={form.rabbiName} onChange={e => setForm(p => ({...p, rabbiName: e.target.value}))} placeholder="הרב כהן" style={inputStyle} /></div>
+              <div><label style={labelStyle}>שם רב</label><input value={form.rabbiName} onChange={e => setForm(p => ({...p, rabbiName: e.target.value}))} placeholder="הרב כהן" style={inputStyle} /></div>
             </div>
             <div>
               <label style={labelStyle}>לוגו</label>
@@ -825,45 +817,25 @@ export default function AdminPage() {
   async function approveShluchimApplication(app: ShluchimApplication) {
     setActionLoading(app.id);
     try {
-      // Find the user by email to get their Firebase Auth UID — normalize to match Firebase Auth storage
       let uid: string | null = null;
       if (app.email) {
         const normalizedEmail = app.email.trim().toLowerCase();
         const userSnap = await getDocs(query(collection(db, 'users'), where('email', '==', normalizedEmail)));
         if (!userSnap.empty) uid = userSnap.docs[0].id;
       }
-      const docId = uid || app.id; // fall back to application ID if no matching user
-
-      // Write to shluchim collection
+      const docId = uid || app.id;
       await setDoc(doc(db, 'shluchim', docId), {
-        name: app.name,
-        chabadName: app.chabadName || '',
-        city: app.city,
-        phone: app.phone,
-        email: app.email || '',
-        rabbiName: app.rabbiName || '',
-        logoUrl: app.logoUrl || '',
-        status: 'active',
-        createdAt: serverTimestamp(),
+        name: app.name, chabadName: app.chabadName || '', city: app.city,
+        phone: app.phone, email: app.email || '', rabbiName: app.rabbiName || '',
+        logoUrl: app.logoUrl || '', status: 'active', createdAt: serverTimestamp(),
       });
-
-      // If we found a matching user, promote them to shaliach role
       if (uid) {
-        await updateDoc(doc(db, 'users', uid), {
-          role: 'shaliach',
-          shaliachId: uid,
-        });
+        await updateDoc(doc(db, 'users', uid), { role: 'shaliach', shaliachId: uid });
       }
-
-      // Mark application as approved
       await updateDoc(doc(db, 'shluchim_applications', app.id), {
-        status: 'approved',
-        approvedAt: serverTimestamp(),
-        approvedDocId: docId,
+        status: 'approved', approvedAt: serverTimestamp(), approvedDocId: docId,
       });
-
       setShluchimApps(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
-      // Refresh users list so role change is reflected
       loadUsers();
     } catch (e) { console.error(e); alert('שגיאה באישור'); }
     finally { setActionLoading(null); }
@@ -925,7 +897,6 @@ export default function AdminPage() {
     } catch (e) { console.error(e); }
   }
 
-  // Canonical list: slug → default display name + priority
   const REQUIRED_CATS: { slug: string; displayName: string; priority: number }[] = [
     { slug: 'מזוזות',          displayName: 'מזוזות',          priority: 1  },
     { slug: 'קלפי מזוזה',      displayName: 'קלפי מזוזה',      priority: 2  },
@@ -949,42 +920,34 @@ export default function AdminPage() {
         const slug = (r.slug || r.name || '') as string;
         existingSlugs.add(slug);
         data.push({
-          id: d.id,
-          slug,
-          displayName: r.displayName || r.name        || '',
-          imageUrl:    r.imageUrl    || r.imgUrl       || '',
-          priority:    r.priority    ?? r.order        ?? 0,
+          id: d.id, slug,
+          displayName: r.displayName || r.name || '',
+          imageUrl: r.imageUrl || r.imgUrl || '',
+          priority: r.priority ?? r.order ?? 0,
           name: r.name, imgUrl: r.imgUrl, sub: r.sub, order: r.order,
         });
       });
-
-      // Auto-seed any missing canonical categories
       await Promise.all(
         REQUIRED_CATS
           .filter(c => !existingSlugs.has(c.slug))
           .map(c => setDoc(doc(db, 'categories', c.slug), {
-            slug: c.slug, displayName: c.displayName,
-            imageUrl: '', priority: c.priority,
+            slug: c.slug, displayName: c.displayName, imageUrl: '', priority: c.priority,
           }, { merge: true }))
       );
-
-      // If we seeded anything, reload
       if (REQUIRED_CATS.some(c => !existingSlugs.has(c.slug))) {
         const fresh = await getDocs(collection(db, 'categories'));
         data.length = 0;
         fresh.forEach(d => {
           const r = d.data();
           data.push({
-            id: d.id,
-            slug:        r.slug        || r.name        || '',
-            displayName: r.displayName || r.name        || '',
-            imageUrl:    r.imageUrl    || r.imgUrl       || '',
-            priority:    r.priority    ?? r.order        ?? 0,
+            id: d.id, slug: r.slug || r.name || '',
+            displayName: r.displayName || r.name || '',
+            imageUrl: r.imageUrl || r.imgUrl || '',
+            priority: r.priority ?? r.order ?? 0,
             name: r.name, imgUrl: r.imgUrl, sub: r.sub, order: r.order,
           });
         });
       }
-
       data.sort((a, b) => a.priority - b.priority);
       setCategories(data);
     } catch (e) { console.error(e); }
@@ -1075,9 +1038,8 @@ export default function AdminPage() {
     if (priorityTimers.current[productId]) clearTimeout(priorityTimers.current[productId]);
     priorityTimers.current[productId] = setTimeout(async () => {
       setPriorityUpdating(productId);
-      try {
-        await updateDoc(doc(db, 'products', productId), { priority: value });
-      } catch (e) { console.error(e); }
+      try { await updateDoc(doc(db, 'products', productId), { priority: value }); }
+      catch (e) { console.error(e); }
       finally { setPriorityUpdating(null); }
     }, 300);
   }
@@ -1104,12 +1066,7 @@ export default function AdminPage() {
   async function approveApplication(app: SoferApplication) {
     setActionLoading(app.id);
     try {
-      // 1. Mark application approved
-      await updateDoc(doc(db, 'soferim_applications', app.id), {
-        status: 'approved', approvedAt: serverTimestamp(),
-      });
-
-      // 2. Create soferim document
+      await updateDoc(doc(db, 'soferim_applications', app.id), { status: 'approved', approvedAt: serverTimestamp() });
       const soferRef = await addDoc(collection(db, 'soferim'), {
         name: app.name, city: app.city, phone: app.phone,
         whatsapp: app.whatsapp || '', email: app.email || '',
@@ -1118,27 +1075,15 @@ export default function AdminPage() {
         writingSamples: app.writingSamples || [],
         status: 'active', createdAt: serverTimestamp(),
       });
-
-      // 3. Find user by email and grant sofer role + soferId
       if (app.email) {
         const normalizedEmail = app.email.trim().toLowerCase();
-        const usersSnap = await getDocs(
-          query(collection(db, 'users'), where('email', '==', normalizedEmail))
-        );
+        const usersSnap = await getDocs(query(collection(db, 'users'), where('email', '==', normalizedEmail)));
         if (!usersSnap.empty) {
-          await updateDoc(usersSnap.docs[0].ref, {
-            role: 'sofer',
-            soferId: soferRef.id,
-          });
-          // Reflect in local users list
-          setUsers(prev => prev.map(u =>
-            u.id === usersSnap.docs[0].id ? { ...u, role: 'sofer', soferId: soferRef.id } : u
-          ));
+          await updateDoc(usersSnap.docs[0].ref, { role: 'sofer', soferId: soferRef.id });
+          setUsers(prev => prev.map(u => u.id === usersSnap.docs[0].id ? { ...u, role: 'sofer', soferId: soferRef.id } : u));
         }
       }
-
       setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
-      // Refresh soferim lists
       loadSoferim(); loadSoferimFull();
     } catch (e) { console.error(e); alert('שגיאה באישור'); }
     finally { setActionLoading(null); }
@@ -1171,18 +1116,11 @@ export default function AdminPage() {
 
   async function approveEditRequest(req: SoferEditRequest) {
     setActionLoading(req.id);
-    // soferDocId = ID of soferim document; soferId = Firebase Auth UID
     const soferDocId = req.soferDocId ?? req.soferId;
     try {
-      // Apply the changes to soferim/{soferDocId}
       await updateDoc(doc(db, 'soferim', soferDocId), req.changes);
-      // Mark request as approved
-      await updateDoc(doc(db, 'sofer_edit_requests', req.id), {
-        status: 'approved',
-        approvedAt: serverTimestamp(),
-      });
+      await updateDoc(doc(db, 'sofer_edit_requests', req.id), { status: 'approved', approvedAt: serverTimestamp() });
       setEditRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'approved' } : r));
-      // Refresh soferim lists so changes are visible
       loadSoferimFull();
     } catch (e) { console.error(e); alert('שגיאה באישור'); }
     finally { setActionLoading(null); }
@@ -1192,9 +1130,7 @@ export default function AdminPage() {
     setActionLoading(req.id + '_reject');
     try {
       await updateDoc(doc(db, 'sofer_edit_requests', req.id), {
-        status: 'rejected',
-        rejectedAt: serverTimestamp(),
-        adminNote: note,
+        status: 'rejected', rejectedAt: serverTimestamp(), adminNote: note,
       });
       setEditRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'rejected', adminNote: note } : r));
     } catch (e) { console.error(e); alert('שגיאה בדחייה'); }
@@ -1215,9 +1151,7 @@ export default function AdminPage() {
     if (!testForm.name || !testForm.text) { alert('שם וטקסט ביקורת הם שדות חובה'); return; }
     setTestSaving(true);
     try {
-      const ref = await addDoc(collection(db, 'testimonials'), {
-        ...testForm, active: true, createdAt: serverTimestamp(),
-      });
+      const ref = await addDoc(collection(db, 'testimonials'), { ...testForm, active: true, createdAt: serverTimestamp() });
       setTestimonials(prev => [{ id: ref.id, ...testForm, active: true }, ...prev]);
       setTestForm({ name: '', city: '', text: '', rating: 5, imageUrl: '' });
     } catch (e) { console.error(e); alert('שגיאה בשמירה'); }
@@ -1340,22 +1274,24 @@ export default function AdminPage() {
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-blue-500">{pendingShluchimApps.length}</div><div className="text-sm text-gray-500 mt-1">בקשות שלוחים</div></div>
       </div>
 
+      {/* ── טאבים ── */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {[
-          { key: 'orders', label: '📦 הזמנות', color: 'bg-green-700' },
-          { key: 'products', label: '📜 מוצרים', color: 'bg-teal-600', badge: unassignedProducts },
-          { key: 'commissions', label: '🤝 עמלות', color: 'bg-blue-600' },
-          { key: 'soferim_list', label: '✍️ סופרים', color: 'bg-amber-700' },
-          { key: 'soferim', label: '📋 בקשות סופרים', color: 'bg-amber-600', badge: pendingApps.length },
-          { key: 'shluchim', label: '🟦 בקשות שלוחים', color: 'bg-blue-700', badge: pendingShluchimApps.length },
-          { key: 'users', label: '👥 משתמשים', color: 'bg-purple-600' },
-          { key: 'content', label: '✏️ תוכן', color: 'bg-pink-600' },
-          { key: 'categories', label: '🖼️ קטגוריות', color: 'bg-indigo-600' },
-          { key: 'reviews', label: '⭐ ביקורות', color: 'bg-yellow-600', badge: reviews.filter(r => !r.approved).length },
-          { key: 'testimonials', label: '💬 עדויות לקוחות', color: 'bg-rose-600' },
-          { key: 'homepage', label: '🏠 דף הבית', color: 'bg-slate-700' },
-          { key: 'edit_requests', label: '✏️ בקשות עריכה', color: 'bg-emerald-700', badge: editRequests.filter(r => r.status === 'pending').length },
-          { key: 'hidden_products', label: '👁️ מוסתרים', color: 'bg-gray-600', badge: hiddenProducts.length },
+          { key: 'orders',         label: '📦 הזמנות',           color: 'bg-green-700' },
+          { key: 'products',       label: '📜 מוצרים',           color: 'bg-teal-600',   badge: unassignedProducts },
+          { key: 'commissions',    label: '🤝 עמלות',            color: 'bg-blue-600' },
+          { key: 'soferim_list',   label: '✍️ סופרים',           color: 'bg-amber-700' },
+          { key: 'soferim',        label: '📋 בקשות סופרים',     color: 'bg-amber-600',  badge: pendingApps.length },
+          { key: 'shluchim',       label: '🟦 בקשות שלוחים',     color: 'bg-blue-700',   badge: pendingShluchimApps.length },
+          { key: 'users',          label: '👥 משתמשים',          color: 'bg-purple-600' },
+          { key: 'content',        label: '✏️ תוכן',             color: 'bg-pink-600' },
+          { key: 'categories',     label: '🖼️ קטגוריות',        color: 'bg-indigo-600' },
+          { key: 'reviews',        label: '⭐ ביקורות',          color: 'bg-yellow-600', badge: reviews.filter(r => !r.approved).length },
+          { key: 'testimonials',   label: '💬 עדויות לקוחות',   color: 'bg-rose-600' },
+          { key: 'homepage',       label: '🏠 דף הבית',          color: 'bg-slate-700' },
+          { key: 'edit_requests',  label: '✏️ בקשות עריכה',     color: 'bg-emerald-700', badge: editRequests.filter(r => r.status === 'pending').length },
+          { key: 'hidden_products',label: '👁️ מוסתרים',         color: 'bg-gray-600',   badge: hiddenProducts.length },
+          { key: 'theme_editor',   label: '🎨 עורך עיצוב',      color: 'bg-violet-600' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -1364,6 +1300,18 @@ export default function AdminPage() {
           </button>
         ))}
       </div>
+
+      {/* ── תוכן טאבים ── */}
+
+      {activeTab === 'theme_editor' && (
+        <div className="bg-white rounded-xl shadow overflow-hidden" style={{ height: 'calc(100vh - 280px)' }}>
+          <iframe
+            src="/admin/theme-editor"
+            className="w-full h-full border-0"
+            title="עורך עיצוב"
+          />
+        </div>
+      )}
 
       {activeTab === 'products' && (
         <div>
@@ -1394,19 +1342,15 @@ export default function AdminPage() {
                       <td className="p-3"><button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'} className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>{p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}</button></td>
                       <td className="p-3"><select value={p.soferId || ''} disabled={actionLoading === p.id} onChange={e => assignSoferToProduct(p.id, e.target.value)} className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}><option value="">⚠️ ללא סופר</option>{soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></td>
                       <td className="p-3">
-                        <input
-                          type="number" min={1} max={99}
-                          value={p.priority ?? 50}
+                        <input type="number" min={1} max={99} value={p.priority ?? 50}
                           onChange={e => updatePriorityDebounced(p.id, Number(e.target.value))}
-                          className={`w-14 border rounded-lg px-2 py-1 text-xs text-center font-bold ${priorityUpdating === p.id ? 'border-amber-400 bg-amber-50' : 'border-gray-200'}`}
-                        />
+                          className={`w-14 border rounded-lg px-2 py-1 text-xs text-center font-bold ${priorityUpdating === p.id ? 'border-amber-400 bg-amber-50' : 'border-gray-200'}`} />
                       </td>
                       <td className="p-3">
-                        <button
-                          onClick={() => toggleHidden(p.id, p.hidden ?? false)}
-                          disabled={actionLoading === p.id + '_hidden'}
-                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.hidden ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                        >{p.hidden ? '👁️ הצג' : '🙈 הסתר'}</button>
+                        <button onClick={() => toggleHidden(p.id, p.hidden ?? false)} disabled={actionLoading === p.id + '_hidden'}
+                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.hidden ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                          {p.hidden ? '👁️ הצג' : '🙈 הסתר'}
+                        </button>
                       </td>
                       <td className="p-3">
                         {productDeleteConfirm === p.id ? (
@@ -1433,17 +1377,11 @@ export default function AdminPage() {
             <h2 className="text-xl font-black mb-1">🖼️ ניהול קטגוריות</h2>
             <p className="text-sm text-gray-500 mb-6">
               ערוך שם תצוגה, העלה תמונה (Cloudinary) וקבע עדיפות לכל קטגוריה.<br/>
-              <span className="font-mono text-xs text-gray-400">slug</span> = מזהה הקטגוריה (לפי שדה cat במוצרים) — לא ניתן לשינוי מכאן.
+              <span className="font-mono text-xs text-gray-400">slug</span> = מזהה הקטגוריה — לא ניתן לשינוי מכאן.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {categories.map(cat => (
-                <CategoryCard
-                  key={cat.id}
-                  cat={cat}
-                  saving={catSaving === cat.id}
-                  saved={catSaved === cat.id}
-                  onSave={data => saveCategory(cat.id, data)}
-                />
+                <CategoryCard key={cat.id} cat={cat} saving={catSaving === cat.id} saved={catSaved === cat.id} onSave={data => saveCategory(cat.id, data)} />
               ))}
             </div>
           </div>
@@ -1543,10 +1481,7 @@ export default function AdminPage() {
                           <div className="flex gap-2 flex-wrap">
                             {s.writingSamples.map((sample, i) => {
                               const url = typeof sample === 'string' ? sample : (sample as WritingSample).url;
-                              return (
-                                <img key={i} src={url} alt={`דוגמת כתיבה ${i + 1}`} onClick={() => setLightboxImage(url)}
-                                  className="w-16 h-16 object-cover rounded-lg border border-amber-200 cursor-zoom-in hover:opacity-80 transition-opacity" />
-                              );
+                              return <img key={i} src={url} alt={`דוגמת כתיבה ${i + 1}`} onClick={() => setLightboxImage(url)} className="w-16 h-16 object-cover rounded-lg border border-amber-200 cursor-zoom-in hover:opacity-80 transition-opacity" />;
                             })}
                           </div>
                         </div>
@@ -1555,9 +1490,7 @@ export default function AdminPage() {
                     <div className="flex flex-col gap-2 flex-shrink-0">
                       <button onClick={() => router.push(`/soferim/${s.id}`)} className="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-700">📜 פרופיל</button>
                       <button onClick={() => setEditingSofer(s)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">✏️ ערוך</button>
-                      <button
-                        onClick={() => toggleSoferStatus(s.id, s.status)}
-                        disabled={actionLoading === s.id + '_status'}
+                      <button onClick={() => toggleSoferStatus(s.id, s.status)} disabled={actionLoading === s.id + '_status'}
                         className={`px-4 py-2 rounded-lg text-sm font-bold transition ${s.status === 'active' ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                         {actionLoading === s.id + '_status' ? '...' : s.status === 'active' ? '● פעיל' : '● לא פעיל'}
                       </button>
@@ -1594,8 +1527,7 @@ export default function AdminPage() {
                           <p className="text-xs font-bold text-gray-500 mb-1">🖊️ דוגמאות כתיבה</p>
                           <div className="flex gap-2 flex-wrap">
                             {app.writingSamples.map((url, i) => (
-                              <img key={i} src={url} alt={`דוגמת כתיבה ${i + 1}`} onClick={() => setLightboxImage(url)}
-                                className="w-16 h-16 object-cover rounded-lg border border-gray-200 cursor-zoom-in hover:opacity-80 transition-opacity" />
+                              <img key={i} src={url} alt={`דוגמת כתיבה ${i + 1}`} onClick={() => setLightboxImage(url)} className="w-16 h-16 object-cover rounded-lg border border-gray-200 cursor-zoom-in hover:opacity-80 transition-opacity" />
                             ))}
                           </div>
                         </div>
@@ -1629,10 +1561,7 @@ export default function AdminPage() {
                 <div key={app.id} className="bg-white rounded-xl shadow p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-shrink-0">
-                      {app.logoUrl
-                        ? <img src={app.logoUrl} alt={app.name} className="w-16 h-16 rounded-full object-cover border-2 border-blue-200" />
-                        : <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-2xl">🟦</div>
-                      }
+                      {app.logoUrl ? <img src={app.logoUrl} alt={app.name} className="w-16 h-16 rounded-full object-cover border-2 border-blue-200" /> : <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-2xl">🟦</div>}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
@@ -1643,21 +1572,14 @@ export default function AdminPage() {
                       </div>
                       {app.chabadName && <p className="text-sm font-bold text-blue-700 mb-1">{app.chabadName}</p>}
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-2">
-                        {app.city && <span>📍 {app.city}</span>}
-                        {app.phone && <span>📞 {app.phone}</span>}
-                        {app.email && <span>✉️ {app.email}</span>}
-                        {app.rabbiName && <span>👤 {app.rabbiName}</span>}
+                        {app.city && <span>📍 {app.city}</span>}{app.phone && <span>📞 {app.phone}</span>}{app.email && <span>✉️ {app.email}</span>}{app.rabbiName && <span>👤 {app.rabbiName}</span>}
                       </div>
                       {app.createdAt && <p className="text-xs text-gray-400">נשלח: {new Date(app.createdAt.seconds * 1000).toLocaleDateString('he-IL')}</p>}
                     </div>
                     {app.status === 'pending' && (
                       <div className="flex flex-col gap-2 flex-shrink-0">
-                        <button onClick={() => approveShluchimApplication(app)} disabled={actionLoading === app.id} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">
-                          {actionLoading === app.id ? '...' : '✅ אשר'}
-                        </button>
-                        <button onClick={() => rejectShluchimApplication(app.id)} disabled={actionLoading === app.id} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">
-                          ❌ דחה
-                        </button>
+                        <button onClick={() => approveShluchimApplication(app)} disabled={actionLoading === app.id} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">{actionLoading === app.id ? '...' : '✅ אשר'}</button>
+                        <button onClick={() => rejectShluchimApplication(app.id)} disabled={actionLoading === app.id} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">❌ דחה</button>
                       </div>
                     )}
                   </div>
@@ -1696,20 +1618,12 @@ export default function AdminPage() {
                       <td className="p-3">
                         {u.role === 'shaliach' && (
                           u.shaliachId ? (
-                            <button
-                              onClick={() => {
-                                navigator.clipboard.writeText(`https://your-sofer.com/?ref=${u.shaliachId}`);
-                                setCopiedUserId(u.id);
-                                setTimeout(() => setCopiedUserId(null), 2000);
-                              }}
+                            <button onClick={() => { navigator.clipboard.writeText(`https://your-sofer.com/?ref=${u.shaliachId}`); setCopiedUserId(u.id); setTimeout(() => setCopiedUserId(null), 2000); }}
                               title={`https://your-sofer.com/?ref=${u.shaliachId}`}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
-                            >
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition">
                               {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
                             </button>
-                          ) : (
-                            <span className="text-xs text-gray-400">אין מזהה שליח</span>
-                          )
+                          ) : <span className="text-xs text-gray-400">אין מזהה שליח</span>
                         )}
                       </td>
                     </tr>
@@ -1751,9 +1665,7 @@ export default function AdminPage() {
                       {r.mediaUrl && (
                         <div style={{ marginTop: 8 }}>
                           {r.mediaType === 'video' ? (
-                            <video controls style={{ maxHeight: 140, borderRadius: 6, border: '1px solid #eee' }}>
-                              <source src={r.mediaUrl} />
-                            </video>
+                            <video controls style={{ maxHeight: 140, borderRadius: 6, border: '1px solid #eee' }}><source src={r.mediaUrl} /></video>
                           ) : (
                             <img src={r.mediaUrl} alt="מדיה" style={{ maxHeight: 140, borderRadius: 6, border: '1px solid #eee', objectFit: 'cover' }} />
                           )}
@@ -1766,13 +1678,9 @@ export default function AdminPage() {
                           await updateDoc(doc(db, 'reviews', r.id), { approved: true });
                           const updatedReviews = reviews.map(x => x.id === r.id ? { ...x, approved: true } : x);
                           setReviews(updatedReviews);
-                          // recalculate product average
                           const productReviews = updatedReviews.filter(x => x.productId === r.productId && x.approved);
                           const avg = productReviews.reduce((s, x) => s + x.stars, 0) / productReviews.length;
-                          await updateDoc(doc(db, 'products', r.productId), {
-                            stars: Math.round(avg * 10) / 10,
-                            reviews: productReviews.length,
-                          });
+                          await updateDoc(doc(db, 'products', r.productId), { stars: Math.round(avg * 10) / 10, reviews: productReviews.length });
                         }} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                           ✅ אשר
                         </button>
@@ -1782,17 +1690,13 @@ export default function AdminPage() {
                         if (newText === null) return;
                         await updateDoc(doc(db, 'reviews', r.id), { text: newText });
                         setReviews(reviews.map(x => x.id === r.id ? { ...x, text: newText } : x));
-                      }} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                        ✏️ ערוך
-                      </button>
+                      }} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>✏️ ערוך</button>
                       <button onClick={async () => {
                         if (!confirm('למחוק את הביקורת?')) return;
                         const { deleteDoc } = await import('firebase/firestore');
                         await deleteDoc(doc(db, 'reviews', r.id));
                         setReviews(reviews.filter(x => x.id !== r.id));
-                      }} style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-                        🗑️ מחק
-                      </button>
+                      }} style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>🗑️ מחק</button>
                     </div>
                   </div>
                 </div>
@@ -1804,24 +1708,14 @@ export default function AdminPage() {
 
       {activeTab === 'testimonials' && (
         <div className="grid gap-6">
-          {/* ── Add form ── */}
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-lg font-black mb-4">➕ הוסף ביקורת</h2>
             <div className="grid gap-3">
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-bold text-gray-500 block mb-1">שם לקוח *</label>
-                  <input value={testForm.name} onChange={e => setTestForm(p => ({ ...p, name: e.target.value }))} placeholder="ישראל ישראלי" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-500 block mb-1">עיר</label>
-                  <input value={testForm.city} onChange={e => setTestForm(p => ({ ...p, city: e.target.value }))} placeholder="תל אביב" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
-                </div>
+                <div><label className="text-xs font-bold text-gray-500 block mb-1">שם לקוח *</label><input value={testForm.name} onChange={e => setTestForm(p => ({ ...p, name: e.target.value }))} placeholder="ישראל ישראלי" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" /></div>
+                <div><label className="text-xs font-bold text-gray-500 block mb-1">עיר</label><input value={testForm.city} onChange={e => setTestForm(p => ({ ...p, city: e.target.value }))} placeholder="תל אביב" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" /></div>
               </div>
-              <div>
-                <label className="text-xs font-bold text-gray-500 block mb-1">טקסט ביקורת *</label>
-                <textarea value={testForm.text} onChange={e => setTestForm(p => ({ ...p, text: e.target.value }))} rows={3} placeholder="חוויה נהדרת..." className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-vertical" />
-              </div>
+              <div><label className="text-xs font-bold text-gray-500 block mb-1">טקסט ביקורת *</label><textarea value={testForm.text} onChange={e => setTestForm(p => ({ ...p, text: e.target.value }))} rows={3} placeholder="חוויה נהדרת..." className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-vertical" /></div>
               <div>
                 <label className="text-xs font-bold text-gray-500 block mb-1">דירוג</label>
                 <div className="flex gap-1">
@@ -1847,14 +1741,11 @@ export default function AdminPage() {
                   <input value={testForm.imageUrl} onChange={e => setTestForm(p => ({ ...p, imageUrl: e.target.value }))} placeholder="או הדבק URL" className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs min-w-0" />
                 </div>
               </div>
-              <button onClick={addTestimonial} disabled={testSaving}
-                className="bg-rose-600 text-white rounded-lg py-2 px-6 text-sm font-bold hover:bg-rose-700 disabled:opacity-50 self-start">
+              <button onClick={addTestimonial} disabled={testSaving} className="bg-rose-600 text-white rounded-lg py-2 px-6 text-sm font-bold hover:bg-rose-700 disabled:opacity-50 self-start">
                 {testSaving ? '⏳ שומר...' : '✅ הוסף ביקורת'}
               </button>
             </div>
           </div>
-
-          {/* ── List ── */}
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-lg font-black mb-4">💬 ביקורות קיימות ({testimonials.length})</h2>
             {testimonialsLoading ? <div className="text-center text-gray-400 py-8">טוען...</div>
@@ -1864,10 +1755,7 @@ export default function AdminPage() {
                 {testimonials.map(t => (
                   <div key={t.id} className={`rounded-xl border p-4 flex gap-4 items-start ${t.active ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
                     <div className="flex-shrink-0">
-                      {t.imageUrl
-                        ? <img src={t.imageUrl} alt={t.name} className="w-14 h-14 rounded-full object-cover border-2 border-white shadow" />
-                        : <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center text-2xl">👤</div>
-                      }
+                      {t.imageUrl ? <img src={t.imageUrl} alt={t.name} className="w-14 h-14 rounded-full object-cover border-2 border-white shadow" /> : <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center text-2xl">👤</div>}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -1878,8 +1766,7 @@ export default function AdminPage() {
                       <p className="text-sm text-gray-600 line-clamp-2">{t.text}</p>
                     </div>
                     <div className="flex flex-col gap-2 flex-shrink-0">
-                      <button onClick={() => toggleTestimonialActive(t.id, t.active)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold ${t.active ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                      <button onClick={() => toggleTestimonialActive(t.id, t.active)} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${t.active ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                         {t.active ? '● פעיל' : '● לא פעיל'}
                       </button>
                       <button onClick={() => deleteTestimonial(t.id)} className="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-100 text-red-600 hover:bg-red-200">🗑️ מחק</button>
@@ -1900,12 +1787,8 @@ export default function AdminPage() {
         <div style={{ direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0c1a35', margin: 0 }}>✏️ בקשות עריכת פרופיל סופר</h2>
-            <button onClick={loadEditRequests}
-              style={{ background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, padding: '7px 14px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
-              🔄 רענן
-            </button>
+            <button onClick={loadEditRequests} style={{ background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, padding: '7px 14px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>🔄 רענן</button>
           </div>
-
           {editRequestsLoading ? (
             <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>טוען...</div>
           ) : editRequests.length === 0 ? (
@@ -1924,11 +1807,8 @@ export default function AdminPage() {
                   : isApproved
                   ? { label: '✅ אושר',  bg: '#d1fae5', color: '#065f46' }
                   : { label: '❌ נדחה',  bg: '#fee2e2', color: '#991b1b' };
-
                 return (
                   <div key={req.id} style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 6px rgba(0,0,0,0.08)', overflow: 'hidden', border: isPending ? '2px solid #fbbf24' : '1px solid #e5e7eb' }}>
-
-                    {/* Card header */}
                     <div style={{ background: isPending ? '#fffbeb' : '#f9fafb', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ fontSize: 26 }}>✍️</div>
@@ -1937,39 +1817,25 @@ export default function AdminPage() {
                           <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>soferId: {req.soferId} · {date}</div>
                         </div>
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 12px', borderRadius: 20, background: statusBadge.bg, color: statusBadge.color }}>
-                        {statusBadge.label}
-                      </span>
+                      <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 12px', borderRadius: 20, background: statusBadge.bg, color: statusBadge.color }}>{statusBadge.label}</span>
                     </div>
-
                     <div style={{ padding: '20px' }}>
-
-                      {/* Profile image before/after */}
                       {req.changes.imageUrl && (
                         <div style={{ marginBottom: 20 }}>
                           <div style={{ fontSize: 13, fontWeight: 800, color: '#374151', marginBottom: 10 }}>תמונת פרופיל</div>
                           <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
                             <div style={{ textAlign: 'center' }}>
                               <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 4 }}>לפני</div>
-                              {req.currentData?.imageUrl ? (
-                                <img src={req.currentData.imageUrl} alt="לפני"
-                                  style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb' }} />
-                              ) : (
-                                <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f3f4f6', border: '2px dashed #d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>👤</div>
-                              )}
+                              {req.currentData?.imageUrl ? <img src={req.currentData.imageUrl} alt="לפני" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb' }} /> : <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f3f4f6', border: '2px dashed #d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>👤</div>}
                             </div>
                             <div style={{ fontSize: 22, color: '#9ca3af' }}>→</div>
                             <div style={{ textAlign: 'center' }}>
                               <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 700, marginBottom: 4 }}>אחרי</div>
-                              <img src={req.changes.imageUrl} alt="אחרי"
-                                style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid #86efac' }}
-                                onError={e => (e.currentTarget.style.display = 'none')} />
+                              <img src={req.changes.imageUrl} alt="אחרי" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid #86efac' }} onError={e => (e.currentTarget.style.display = 'none')} />
                             </div>
                           </div>
                         </div>
                       )}
-
-                      {/* Text field changes */}
                       {(['name', 'city', 'style', 'description'] as const).map(field => {
                         if (!(field in req.changes)) return null;
                         const fieldLabels = { name: 'שם', city: 'עיר', style: 'סגנון', description: 'תיאור' };
@@ -1992,13 +1858,10 @@ export default function AdminPage() {
                           </div>
                         );
                       })}
-
-                      {/* Writing samples */}
                       {req.changes.writingSamples && (
                         <div style={{ marginBottom: 14 }}>
                           <div style={{ fontSize: 12, fontWeight: 800, color: '#374151', marginBottom: 10 }}>דוגמאות כתב</div>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'start' }}>
-                            {/* Before */}
                             <div>
                               <div style={{ fontSize: 10, color: '#f87171', fontWeight: 700, marginBottom: 6 }}>לפני</div>
                               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -2007,18 +1870,13 @@ export default function AdminPage() {
                                   : (req.currentData?.writingSamples ?? []).map((s, i) => {
                                       const url = typeof s === 'string' ? s : s.url;
                                       const isVid = typeof s !== 'string' && s.type === 'video';
-                                      return isVid ? (
-                                        <div key={i} style={{ width: 60, height: 60, borderRadius: 6, background: '#1a3a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>▶️</div>
-                                      ) : (
-                                        <img key={i} src={url} alt="" style={{ width: 60, height: 60, borderRadius: 6, objectFit: 'cover', border: '1px solid #fecaca' }}
-                                          onClick={() => setLightboxImage(url)} />
-                                      );
+                                      return isVid ? <div key={i} style={{ width: 60, height: 60, borderRadius: 6, background: '#1a3a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>▶️</div>
+                                        : <img key={i} src={url} alt="" style={{ width: 60, height: 60, borderRadius: 6, objectFit: 'cover', border: '1px solid #fecaca' }} onClick={() => setLightboxImage(url)} />;
                                     })
                                 }
                               </div>
                             </div>
                             <div style={{ fontSize: 20, color: '#9ca3af', marginTop: 28 }}>→</div>
-                            {/* After */}
                             <div>
                               <div style={{ fontSize: 10, color: '#4ade80', fontWeight: 700, marginBottom: 6 }}>אחרי</div>
                               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -2026,13 +1884,9 @@ export default function AdminPage() {
                                   ? <span style={{ fontSize: 12, color: '#d1d5db', fontStyle: 'italic' }}>ריק</span>
                                   : req.changes.writingSamples.map((s, i) => {
                                       const isVid = s.type === 'video';
-                                      return isVid ? (
-                                        <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
-                                          style={{ width: 60, height: 60, borderRadius: 6, background: '#1a3a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, textDecoration: 'none' }}>▶️</a>
-                                      ) : (
-                                        <img key={i} src={s.url} alt="" style={{ width: 60, height: 60, borderRadius: 6, objectFit: 'cover', border: '1px solid #86efac', cursor: 'zoom-in' }}
-                                          onClick={() => setLightboxImage(s.url)} />
-                                      );
+                                      return isVid
+                                        ? <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" style={{ width: 60, height: 60, borderRadius: 6, background: '#1a3a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, textDecoration: 'none' }}>▶️</a>
+                                        : <img key={i} src={s.url} alt="" style={{ width: 60, height: 60, borderRadius: 6, objectFit: 'cover', border: '1px solid #86efac', cursor: 'zoom-in' }} onClick={() => setLightboxImage(s.url)} />;
                                     })
                                 }
                               </div>
@@ -2040,33 +1894,22 @@ export default function AdminPage() {
                           </div>
                         </div>
                       )}
-
-                      {/* Admin note on rejected */}
                       {req.adminNote && (
                         <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#4b5563', marginTop: 8 }}>
                           💬 הערת מנהל: {req.adminNote}
                         </div>
                       )}
-
-                      {/* Action buttons — pending only */}
                       {isPending && (
                         <div style={{ marginTop: 18, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-                          <button
-                            disabled={actionLoading === req.id}
-                            onClick={() => approveEditRequest(req)}
+                          <button disabled={actionLoading === req.id} onClick={() => approveEditRequest(req)}
                             style={{ background: actionLoading === req.id ? '#9ca3af' : '#16a34a', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 22px', fontSize: 14, fontWeight: 700, cursor: actionLoading === req.id ? 'not-allowed' : 'pointer' }}>
                             {actionLoading === req.id ? '⏳ מאשר...' : 'אשר ✅'}
                           </button>
                           <div style={{ display: 'flex', gap: 8, flex: 1, flexWrap: 'wrap' }}>
-                            <input
-                              value={rejectNoteMap[req.id] ?? ''}
-                              onChange={e => setRejectNoteMap(prev => ({ ...prev, [req.id]: e.target.value }))}
+                            <input value={rejectNoteMap[req.id] ?? ''} onChange={e => setRejectNoteMap(prev => ({ ...prev, [req.id]: e.target.value }))}
                               placeholder="הערת דחייה (אופציונלי)..."
-                              style={{ flex: 1, minWidth: 180, border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', fontSize: 13, direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}
-                            />
-                            <button
-                              disabled={actionLoading === req.id + '_reject'}
-                              onClick={() => rejectEditRequest(req, rejectNoteMap[req.id] ?? '')}
+                              style={{ flex: 1, minWidth: 180, border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 12px', fontSize: 13, direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }} />
+                            <button disabled={actionLoading === req.id + '_reject'} onClick={() => rejectEditRequest(req, rejectNoteMap[req.id] ?? '')}
                               style={{ background: actionLoading === req.id + '_reject' ? '#9ca3af' : '#dc2626', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 18px', fontSize: 14, fontWeight: 700, cursor: actionLoading === req.id + '_reject' ? 'not-allowed' : 'pointer' }}>
                               {actionLoading === req.id + '_reject' ? '⏳...' : 'דחה ❌'}
                             </button>
@@ -2091,33 +1934,16 @@ export default function AdminPage() {
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
-                  <tr>
-                    <th className="p-3 text-right">מוצר</th>
-                    <th className="p-3 text-right">קטגוריה</th>
-                    <th className="p-3 text-right">מחיר</th>
-                    <th className="p-3 text-right">עדיפות</th>
-                    <th className="p-3 text-right">פעולה</th>
-                  </tr>
+                  <tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">פעולה</th></tr>
                 </thead>
                 <tbody>
                   {hiddenProducts.map(p => (
                     <tr key={p.id} className="border-t hover:bg-gray-50 opacity-70">
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          {(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}
-                          <span className="font-bold text-xs">{p.name}</span>
-                        </div>
-                      </td>
+                      <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
                       <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
                       <td className="p-3 font-bold text-green-700">₪{p.price}</td>
                       <td className="p-3 text-xs text-gray-500">{p.priority ?? 50}</td>
-                      <td className="p-3">
-                        <button
-                          onClick={() => toggleHidden(p.id, true)}
-                          disabled={actionLoading === p.id + '_hidden'}
-                          className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 hover:bg-green-200 transition"
-                        >✅ החזר לאתר</button>
-                      </td>
+                      <td className="p-3"><button onClick={() => toggleHidden(p.id, true)} disabled={actionLoading === p.id + '_hidden'} className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 hover:bg-green-200 transition">✅ החזר לאתר</button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -2131,20 +1957,12 @@ export default function AdminPage() {
       {showAddShliach && <AddShliachModal onClose={() => setShowAddShliach(false)} onSave={() => { loadShluchimApplications(); loadUsers(); }} />}
       {showAddProduct && <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />}
       {editingSofer && (
-        <EditSoferModal
-          sofer={editingSofer}
-          onClose={() => setEditingSofer(null)}
-          onSave={(updated) => {
-            setSoferimFull(prev => prev.map(s => s.id === updated.id ? updated : s));
-            setEditingSofer(null);
-          }}
-        />
+        <EditSoferModal sofer={editingSofer} onClose={() => setEditingSofer(null)}
+          onSave={(updated) => { setSoferimFull(prev => prev.map(s => s.id === updated.id ? updated : s)); setEditingSofer(null); }} />
       )}
       {deleteConfirm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
-          onClick={() => setDeleteConfirm(null)}>
-          <div style={{ background: '#fff', borderRadius: 14, padding: 28, maxWidth: 380, width: '100%', textAlign: 'center', direction: 'rtl' }}
-            onClick={e => e.stopPropagation()}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setDeleteConfirm(null)}>
+          <div style={{ background: '#fff', borderRadius: 14, padding: 28, maxWidth: 380, width: '100%', textAlign: 'center', direction: 'rtl' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🗑️</div>
             <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 8, color: '#0c1a35' }}>מחיקת סופר</h3>
             <p style={{ fontSize: 14, color: '#666', marginBottom: 24 }}>
@@ -2152,23 +1970,14 @@ export default function AdminPage() {
               <span style={{ color: '#c0392b' }}>פעולה זו בלתי הפיכה.</span>
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => deleteSofer(deleteConfirm)}
-                style={{ flex: 1, background: '#dc2626', color: '#fff', border: 'none', borderRadius: 8, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                כן, מחק
-              </button>
-              <button onClick={() => setDeleteConfirm(null)}
-                style={{ flex: 1, background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '11px', fontSize: 14, cursor: 'pointer' }}>
-                ביטול
-              </button>
+              <button onClick={() => deleteSofer(deleteConfirm)} style={{ flex: 1, background: '#dc2626', color: '#fff', border: 'none', borderRadius: 8, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>כן, מחק</button>
+              <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '11px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
             </div>
           </div>
         </div>
       )}
-
       {lightboxImage && (
-        <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }}
-          onClick={() => setLightboxImage(null)}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }} onClick={() => setLightboxImage(null)}>
           <img src={lightboxImage} alt="דוגמת כתיבה" style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 8, objectFit: 'contain', boxShadow: '0 8px 40px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()} />
           <button onClick={() => setLightboxImage(null)} style={{ position: 'absolute', top: 16, left: 16, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%', width: 36, height: 36, color: '#fff', fontSize: 20, cursor: 'pointer', lineHeight: '36px' }}>✕</button>
         </div>
@@ -2177,12 +1986,8 @@ export default function AdminPage() {
   );
 }
 
-function CategoryCard({
-  cat, saving, saved, onSave,
-}: {
-  cat: Category;
-  saving: boolean;
-  saved: boolean;
+function CategoryCard({ cat, saving, saved, onSave }: {
+  cat: Category; saving: boolean; saved: boolean;
   onSave: (data: { displayName: string; imageUrl: string; priority: number }) => void;
 }) {
   const [displayName, setDisplayName] = useState(cat.displayName || cat.name || '');
@@ -2208,35 +2013,17 @@ function CategoryCard({
 
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
-      {/* Preview */}
       <div style={{ height: 140, background: '#f3f4f4', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
-        {imageUrl
-          ? <img src={imageUrl} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-          : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 44, color: '#ccc' }}>🖼️</div>}
-        {/* Gradient overlay */}
+        {imageUrl ? <img src={imageUrl} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} /> : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 44, color: '#ccc' }}>🖼️</div>}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)' }} />
-        {/* Display name over image */}
-        <div style={{ position: 'absolute', bottom: 8, right: 10, left: 10 }}>
-          <span style={{ color: '#fff', fontWeight: 900, fontSize: 15 }}>{displayName}</span>
-        </div>
-        {/* Slug badge */}
-        <div style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.5)', borderRadius: 4, padding: '2px 7px', fontSize: 11, color: '#ddd', fontFamily: 'monospace' }}>
-          {cat.slug || cat.name}
-        </div>
+        <div style={{ position: 'absolute', bottom: 8, right: 10, left: 10 }}><span style={{ color: '#fff', fontWeight: 900, fontSize: 15 }}>{displayName}</span></div>
+        <div style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.5)', borderRadius: 4, padding: '2px 7px', fontSize: 11, color: '#ddd', fontFamily: 'monospace' }}>{cat.slug || cat.name}</div>
       </div>
-
       <div className="p-4 bg-white flex flex-col gap-3 flex-1">
-        {/* displayName */}
         <div>
           <label className="block text-xs font-bold text-gray-500 mb-1">שם תצוגה</label>
-          <input
-            value={displayName}
-            onChange={e => setDisplayName(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
-          />
+          <input value={displayName} onChange={e => setDisplayName(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm" />
         </div>
-
-        {/* Cloudinary upload + URL */}
         <div>
           <label className="block text-xs font-bold text-gray-500 mb-1">תמונה</label>
           <div className="flex gap-2 items-center">
@@ -2244,32 +2031,16 @@ function CategoryCard({
               {uploading ? '⏳...' : '📷 העלה'}
               <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
             </label>
-            <input
-              value={imageUrl}
-              onChange={e => setImageUrl(e.target.value)}
-              placeholder="URL ידני"
-              className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-xs min-w-0"
-            />
+            <input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="URL ידני" className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-xs min-w-0" />
           </div>
         </div>
-
-        {/* Priority */}
         <div>
-          <label className="block text-xs font-bold text-gray-500 mb-1">עדיפות (סדר הצגה — מספר נמוך = ראשון)</label>
-          <input
-            type="number"
-            value={priority}
-            onChange={e => setPriority(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
-          />
+          <label className="block text-xs font-bold text-gray-500 mb-1">עדיפות (מספר נמוך = ראשון)</label>
+          <input type="number" value={priority} onChange={e => setPriority(Number(e.target.value))} className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm" />
         </div>
-
         <div className="flex items-center gap-3 mt-auto">
-          <button
-            onClick={() => onSave({ displayName, imageUrl, priority })}
-            disabled={saving || uploading}
-            className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50"
-          >
+          <button onClick={() => onSave({ displayName, imageUrl, priority })} disabled={saving || uploading}
+            className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50">
             {saving ? '⏳ שומר...' : '💾 שמור'}
           </button>
           {saved && <span className="text-green-600 text-sm font-bold">✅ נשמר!</span>}
