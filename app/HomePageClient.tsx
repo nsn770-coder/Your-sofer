@@ -720,32 +720,33 @@ export default function HomePageClient() {
       {/* ── Live Activity Bar ── */}
       {(() => {
         const weeklyVisitors = 134 + ((new Date().getDate() * 7) % 83);
-        const messages = [
-          '✅ לקוח מתל אביב הוסיף מזוזה לסל לפני 5 דקות',
-          '🖊️ סופר חדש נרשם מירושלים השבוע',
-          `📦 ${weeklyProducts || '12'} מוצרים נוספו השבוע`,
-          `👁️ ${weeklyVisitors} לקוחות ביקרו השבוע`,
-          '⭐ מוצרי סת"ם נבדקים ע"י מגיה מוסמך',
-        ];
-        const msg = messages[activityIdx % messages.length];
-        return (
-          <div style={{ background: '#0c1a35', borderBottom: '1px solid rgba(184,151,42,0.3)', padding: '7px 16px', textAlign: 'center', overflow: 'hidden' }}>
-            <span key={activityIdx} style={{ fontSize: isMobile ? 12 : 13, color: '#e8d8a0', fontWeight: 600, display: 'inline-block', animation: 'fadeSlide 0.5s ease' }}>
-              {msg}
-            </span>
-            <style>{`@keyframes fadeSlide { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }`}</style>
-          </div>
-        );
+        const messages: { icon: React.ReactNode; text: string }[] = [
+  { icon: <IconActivityCheck />, text: 'לקוח מתל אביב הוסיף מזוזה לסל לפני 5 דקות' },
+  { icon: <IconActivityPen />,   text: 'סופר חדש נרשם מירושלים השבוע' },
+  { icon: <IconActivityBox />,   text: `${weeklyProducts || '12'} מוצרים נוספו השבוע` },
+  { icon: <IconActivityUsers />, text: `${weeklyVisitors} לקוחות ביקרו השבוע` },
+  { icon: <IconActivityShield />,text: 'מוצרי סת"מ נבדקים ע"י מגיה מוסמך' },
+];
+const msg = messages[activityIdx % messages.length];
+return (
+  <div style={{ background: '#0c1a35', borderBottom: '1px solid rgba(184,151,42,0.3)', padding: '7px 16px', textAlign: 'center', overflow: 'hidden' }}>
+    <span key={activityIdx} style={{ fontSize: isMobile ? 12 : 13, color: '#e8d8a0', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 7, animation: 'fadeSlide 0.5s ease' }}>
+      {msg.icon}
+      {msg.text}
+    </span>
+    <style>{`@keyframes fadeSlide { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }`}</style>
+  </div>
+);
       })()}
 
       {/* ── Live Counters ── */}
       <div ref={countersRef} style={{ background: '#0c1a35', padding: '10px 16px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
           {[
-            { icon: '🖊️', value: countedValues.soferim,   suffix: '',  label: 'סופרים מאושרים' },
-            { icon: '📦', value: countedValues.products,  suffix: '+', label: 'מוצרים באתר' },
-            { icon: '✅', value: countedValues.customers, suffix: '+', label: 'לקוחות מרוצים' },
-            { icon: '⭐', value: null,                    suffix: '',  label: 'דירוג ממוצע', fixed: '4.8' },
+           { icon: <IconCounterPen isMobile={isMobile} />,   value: countedValues.soferim,   suffix: '',  label: 'סופרים מאושרים' },
+{ icon: <IconCounterBox isMobile={isMobile} />,   value: countedValues.products,  suffix: '+', label: 'מוצרים באתר' },
+{ icon: <IconCounterCheck isMobile={isMobile} />, value: countedValues.customers, suffix: '+', label: 'לקוחות מרוצים' },
+{ icon: <IconCounterStar isMobile={isMobile} />,  value: null,                    suffix: '',  label: 'דירוג ממוצע', fixed: '4.8' },
           ].map(c => (
             <div key={c.label} style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
               <span style={{ fontSize: isMobile ? 16 : 18 }}>{c.icon}</span>
