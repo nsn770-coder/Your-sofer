@@ -301,6 +301,32 @@ function FinishedBanner({ onYes, onNo }: { onYes: () => void; onNo: () => void }
   );
 }
 
+// ── "סיימת לבחור בתי מזוזה?" floating banner ─────────────────────────────────
+
+function FinishedCasesBanner({ onYes, onNo }: { onYes: () => void; onNo: () => void }) {
+  return (
+    <div style={{
+      position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 800, background: '#0c1a35', color: '#fff',
+      borderRadius: 20, padding: '16px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
+      display: 'flex', alignItems: 'center', gap: 16, direction: 'rtl',
+      animation: 'slideUp 0.3s ease',
+      whiteSpace: 'nowrap',
+    }}>
+      <style>{`@keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`}</style>
+      <span style={{ fontSize: 15, fontWeight: 700 }}>סיימת לבחור בתי מזוזה?</span>
+      <button
+        onClick={onYes}
+        style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
+      >כן, לסל</button>
+      <button
+        onClick={onNo}
+        style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+      >עוד לא, אני רוצה לראות מבחר מלא</button>
+    </div>
+  );
+}
+
 // ── Upsell Modal ──────────────────────────────────────────────────────────────
 
 function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onClose: () => void; onViewCart: () => void }) {
@@ -404,10 +430,12 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
   const [loading, setLoading]   = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
+  const [showFinishedCases, setShowFinishedCases] = useState(false);
 
   // quantity per product id
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const finishedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const finishedCasesTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // reset timer every time a quantity changes
   useEffect(() => {
@@ -462,6 +490,12 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
     // If removeItem exists: removeItem(id); otherwise just track locally
   }
 
+  function handleUpsellClose() {
+    setShowUpsell(false);
+    if (finishedCasesTimerRef.current) clearTimeout(finishedCasesTimerRef.current);
+    finishedCasesTimerRef.current = setTimeout(() => setShowFinishedCases(true), 3000);
+  }
+
   function handleReset() {
     setStep(0); setLocation(null); setNusach('ספרדי'); setKlafim([]);
     setQuantities({}); setShowFinished(false);
@@ -492,11 +526,18 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
   return (
     <>
       {showUpsell && (
-        <UpsellModal isMobile={isMobile} onClose={() => setShowUpsell(false)} onViewCart={() => { setShowUpsell(false); router.push('/cart'); }} />
+        <UpsellModal isMobile={isMobile} onClose={handleUpsellClose} onViewCart={() => { setShowUpsell(false); router.push('/cart'); }} />
       )}
 
       {showFinished && !showUpsell && (
         <FinishedBanner onYes={handleFinishedYes} onNo={handleFinishedNo} />
+      )}
+
+      {showFinishedCases && !showUpsell && (
+        <FinishedCasesBanner
+          onYes={() => { setShowFinishedCases(false); router.push('/cart'); }}
+          onNo={() => { setShowFinishedCases(false); router.push('/category/מזוזות'); }}
+        />
       )}
 
       <div style={{ background: 'linear-gradient(180deg, #f8f4ec 0%, #fff 60%)', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
