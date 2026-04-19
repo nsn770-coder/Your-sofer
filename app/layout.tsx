@@ -8,7 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ShaliachProvider } from "./contexts/ShaliachContext";
 import NavBar from "@/app/components/navigation/NavBar";
 
-const geist = Geist({ subsets: ["latin"] });
+const geist = Geist({ subsets: ["latin"], display: "swap" });
 
 const BASE_URL = 'https://yoursofer.com';
 

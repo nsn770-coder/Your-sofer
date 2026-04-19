@@ -106,121 +106,6 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
     ],
   },
   {
-    id: "tallit", label: "טלית וציצית", cat: "סט טלית תפילין",
-    columns: [
-      {
-        title: "לפי חומר",
-        items: [
-          { label: "כל הסטים", cat: "סט טלית תפילין" },
-          { label: "דמוי עור", cat: "סט טלית תפילין", filter: "דמוי עור" },
-          { label: "עור", cat: "סט טלית תפילין", filter: "עור" },
-          { label: "פיו", cat: "סט טלית תפילין", filter: "פיו" },
-          { label: "פשתן", cat: "סט טלית תפילין", filter: "פשתן" },
-          { label: "קטיפה", cat: "סט טלית תפילין", filter: "קטיפה" },
-          { label: "בד", cat: "סט טלית תפילין", filter: "בד" },
-          { label: "משי", cat: "סט טלית תפילין", filter: "משי" },
-        ]
-      },
-      {
-        title: "לפי צבע",
-        items: [
-          { label: "שחור", cat: "סט טלית תפילין", filter: "שחור" },
-          { label: "לבן", cat: "סט טלית תפילין", filter: "לבן" },
-          { label: "אפור", cat: "סט טלית תפילין", filter: "אפור" },
-        ]
-      },
-      {
-        title: "עוד",
-        items: [
-          { label: "טליתות", cat: "טליתות" },
-          { label: "לבר מצווה", cat: "בר מצווה" },
-          { label: "מגילות", cat: "מגילות" },
-        ]
-      },
-    ],
-  },
-  {
-    id: "hagim", label: "שבת וחגים", cat: "כלי שולחן והגשה",
-    columns: [
-      {
-        title: "שבת",
-        items: [
-          { label: "פמוטים", cat: "כלי שולחן והגשה", filter: "פמוט" },
-          { label: "גביעי קידוש", cat: "כלי שולחן והגשה", filter: "קידוש" },
-          { label: "כיסויי חלה", cat: "יודאיקה", filter: "חלה" },
-          { label: "הבדלה", cat: "יודאיקה", filter: "הבדל" },
-        ]
-      },
-      {
-        title: "חגים",
-        items: [
-          { label: "חנוכה", cat: "יודאיקה", filter: "חנוכי" },
-          { label: "פורים", cat: "יודאיקה", filter: "פורים" },
-          { label: "פסח", cat: "כלי שולחן והגשה", filter: "פסח" },
-          { label: "סוכות", cat: "יודאיקה", filter: "סוכות" },
-          { label: "ראש השנה", cat: "יודאיקה", filter: "ראש השנה" },
-          { label: "יום כיפור", cat: "יודאיקה", filter: "יום כיפור" },
-          { label: "שבועות", cat: "יודאיקה", filter: "שבועות" },
-        ]
-      },
-    ],
-  },
-  {
-    id: "bar-mitzvah", label: "🎉 בר מצווה", cat: "בר מצווה",
-    columns: [
-      {
-        title: "סטים לבר מצווה",
-        items: [
-          { label: "כל הסטים", cat: "בר מצווה" },
-          { label: "ברכת כהנים לבן", cat: "בר מצווה", filter: "ברכת כהנים לבן" },
-          { label: "ברכת כהנים כחול נייבי", cat: "בר מצווה", filter: "כחול נייבי" },
-          { label: "ברכת כהנים צבע אבן", cat: "בר מצווה", filter: "אבן" },
-          { label: "מעויינים שחור", cat: "בר מצווה", filter: "מעויינים" },
-        ]
-      },
-      {
-        title: "לפי תפילין",
-        items: [
-          { label: "תפילין בהמה דקה", cat: "בר מצווה", filter: "בהמה דקה" },
-          { label: "תפילין בהמה גסה", cat: "בר מצווה", filter: "בהמה גסה" },
-        ]
-      },
-      {
-        title: "לפי עיצוב",
-        items: [
-          { label: "חיתוך לייזר", cat: "בר מצווה", filter: "חיתוך לייזר" },
-          { label: "הבלטה", cat: "בר מצווה", filter: "הבלטה" },
-          { label: "עם תיק", cat: "בר מצווה", filter: "תיק" },
-          { label: "לבן כסף", cat: "בר מצווה", filter: "לבן כסף" },
-        ]
-      },
-    ],
-  },
-  {
-    id: "gifts", label: "🎁 מתנות", cat: "מתנות",
-    columns: [
-      {
-        title: "מתנות לפי אדם",
-        items: [
-          { label: "מתנות לחתן", cat: "מתנות", filter: "לחתן" },
-          { label: "מתנות לגבר", cat: "מתנות", filter: "לגבר" },
-          { label: "מתנות לאישה", cat: "מתנות", filter: "לאישה" },
-          { label: "מתנות לכלה", cat: "מתנות", filter: "לכלה" },
-          { label: "מתנות ליולדת", cat: "מתנות", filter: "ליולדת" },
-        ]
-      },
-      {
-        title: "מתנות לאירוע",
-        items: [
-          { label: "בר / בת מצווה", cat: "בר מצווה" },
-          { label: "חנוכת בית", cat: "מתנות", filter: "חנוכת בית" },
-          { label: "חגים", cat: "יודאיקה", filter: "חנוכי" },
-          { label: "מארזים מיוחדים", cat: "מתנות", filter: "מארז" },
-        ]
-      },
-    ],
-  },
-  {
     id: "judaica", label: "יודאיקה", cat: "יודאיקה",
     columns: [
       {
@@ -249,9 +134,8 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
 ];
 
 const SIMPLE_NAV = [
-  { label: "✍️ הסופרים שלנו", action: "soferim" },
-  { label: "🌟 הצטרף", action: "join" },
-  { label: "🏛️ רבני קהילה", action: "shluchim" },
+  { label: "ספרי תורה", action: "sifrei-torah" },
+  { label: "מגילות", action: "megilot" },
 ];
 
 const menuVariants: Variants = {
@@ -410,9 +294,8 @@ function NavBarContent() {
 
   function handleAction(action: string) {
     setMobileOpen(false);
-    if (action === "soferim") router.push("/soferim");
-    else if (action === "join") router.push("/join");
-    else if (action === "shluchim") router.push("/shluchim");
+    if (action === "sifrei-torah") router.push("/category/ספרי תורה");
+    else if (action === "megilot") router.push("/category/מגילות");
   }
 
   return (

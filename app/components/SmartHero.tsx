@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { trackClickHeroMezuzot, trackClickHeroTefillin, trackClickWhatsApp } from '@/lib/analytics';
 
 type HeroState = 'main' | 'mezuzah' | 'tefillin' | 'unsure' | 'klaf';
 
@@ -63,14 +64,17 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
 
   const content: Record<HeroState, { headline: string; sub?: string; body?: string; support?: string; trust?: string[]; buttons: HeroButton[]; }> = {
     main: {
-      headline: 'קנה מזוזה ישירות מהסופר',
-      sub: 'ראה את הקלף, הכר את הסופר, והבן בדיוק מה נכנס לבית שלך',
-      trust: ['רואים את הקלף לפני קנייה', 'עובדים ישירות מול סופרי סת״מ', 'בוחרים מתוך שקיפות אמיתית'],
+      headline: 'ישירות מהסופר שלך',
+      sub: 'ללא פערי תיווך',
+      trust: [
+        'כל המזוזות נבדקות על ידי רב מוסמך',
+        'תעודת כשרות והסמכה לכל סופר',
+        'אפשרות להחזר כספי מלא',
+        'צילום קלף אמיתי לפני משלוח',
+      ],
       buttons: [
-        { label: 'אני מחפש בית מזוזה',   icon: <IconHome size={14} color="#0c1a35" />,    action: () => switchState('mezuzah'),  style: 'gold' },
-        { label: 'אני מחפש תפילין',       icon: <IconBox size={14} color="#fff" />,          action: () => switchState('tefillin'), style: 'outline' },
-        { label: 'אני מחפש קלף מזוזה',   icon: <IconScroll size={14} color="#fff" />,       action: () => switchState('klaf'),     style: 'outline' },
-        { label: 'אני לא בטוח מה לבחור', icon: <IconQuestion size={14} color="#fff" />,     action: () => switchState('unsure'),   style: 'ghost' },
+        { label: 'ראה קלפי מזוזה', icon: <IconScroll size={14} color="#0c1a35" />, action: () => { trackClickHeroMezuzot(); router.push('/category/קלפי מזוזה'); }, style: 'gold' },
+        { label: 'ראה תפילין',     icon: <IconBox size={14} color="#fff" />,        action: () => { trackClickHeroTefillin(); router.push('/category/תפילין קומפלט'); }, style: 'outline' },
       ],
     },
     mezuzah: {
@@ -90,7 +94,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       buttons: [
         { label: 'ראה תפילין',          icon: <IconSearch size={14} color="#0c1a35" />, action: () => router.push('/category/תפילין קומפלט'), style: 'gold' },
         { label: 'מדריך לבחירה נכונה', icon: <IconBook size={14} color="#fff" />,       action: () => router.push('/madrich'),                 style: 'outline' },
-        { label: 'שאל סופר',            icon: <IconWhatsApp size={14} color="#fff" />,  action: () => window.open(WA_LINK, '_blank'),          style: 'ghost' },
+        { label: 'שאל סופר',            icon: <IconWhatsApp size={14} color="#fff" />,  action: () => { trackClickWhatsApp('hero'); window.open(WA_LINK, '_blank'); },          style: 'ghost' },
       ],
     },
     klaf: {
@@ -108,7 +112,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
       body: 'לא צריך להבין בסת״מ כדי לבחור נכון.\nתכתוב לנו מה אתה מחפש — ונכוון אותך בצורה פשוטה וברורה.',
       support: 'אנחנו כאן כדי לעזור לך לבחור — לא סתם למכור',
       buttons: [
-        { label: 'דבר איתנו בוואטסאפ', icon: <IconWhatsApp size={14} color="#0c1a35" />, action: () => window.open(WA_LINK, '_blank'), style: 'gold' },
+        { label: 'דבר איתנו בוואטסאפ', icon: <IconWhatsApp size={14} color="#0c1a35" />, action: () => { trackClickWhatsApp('hero'); window.open(WA_LINK, '_blank'); }, style: 'gold' },
         { label: 'התחל מדריך קצר',      icon: <IconBook size={14} color="#fff" />,         action: () => router.push('/madrich'),         style: 'outline' },
         { label: 'הכר את הסופרים',      icon: <IconPen size={14} color="#fff" />,           action: () => router.push('/soferim'),         style: 'ghost' },
       ],
@@ -121,7 +125,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
 
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: isMobile ? 260 : 360, overflow: 'hidden', display: 'flex', alignItems: 'center', direction: 'rtl' }}>
-      <video autoPlay muted loop playsInline style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
+      <video autoPlay muted loop playsInline poster="/images/stam-hero.jpg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
         <source src="/video/hero-stam.mp4" type="video/mp4" />
       </video>
       <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: 'linear-gradient(160deg, #1a1008 0%, #2d1f0a 30%, #1a3a2a 70%, #0c1a10 100%)', backgroundImage: isMobile ? 'none' : 'url(/images/stam-hero.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
@@ -152,7 +156,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
             <div style={{ display: 'flex', gap: isMobile ? 10 : 20, flexWrap: 'wrap', marginBottom: 10 }}>
               {(c.trust ?? []).map((t, i) => (
                 <span key={i} style={{ fontSize: 11, color: '#a8c8a0', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  {TRUST_ICONS[i] ?? <IconCheck size={11} />} {t}
+                  <IconCheck size={11} color="#b8972a" /> {t}
                 </span>
               ))}
             </div>

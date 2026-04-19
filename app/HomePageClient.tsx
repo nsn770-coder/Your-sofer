@@ -1001,7 +1001,7 @@ return (
         })()}
 
         <div style={{ borderBottom: '1px solid #333', padding: '28px 16px' }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: isMobile ? 16 : 32 }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, 1fr)', gap: isMobile ? 16 : 28 }}>
             {[
               { title: 'קבלו מידע',     items: ['אודות Your Sofer', 'הצהרת נגישות', 'הצהרת פרטיות'] },
               { title: 'הרוויחו אתנו',  items: ['הצטרפו כסופר', 'הצטרפו כשליח'] },
@@ -1012,6 +1012,20 @@ return (
                 {col.items.map(item => <div key={item} style={{ fontSize: 12, color: '#999', marginBottom: 6 }}>{item}</div>)}
               </div>
             ))}
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>קהילה</div>
+              {[
+                { label: '✍️ הסופרים שלנו', path: '/soferim' },
+                { label: '🌟 הצטרף',         path: '/join' },
+                { label: '🏛️ רבני קהילה',   path: '/shluchim' },
+              ].map(link => (
+                <div key={link.label} onClick={() => router.push(link.path)} style={{ fontSize: 12, color: '#999', marginBottom: 6, cursor: 'pointer' }}
+                  onMouseEnter={e => ((e.currentTarget as HTMLDivElement).style.color = '#fff')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLDivElement).style.color = '#999')}>
+                  {link.label}
+                </div>
+              ))}
+            </div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>מידע ולמידה</div>
               {[

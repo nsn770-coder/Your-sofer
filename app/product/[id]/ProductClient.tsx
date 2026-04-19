@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
+import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -117,6 +118,88 @@ function TrustIcons({ hasSofer }: { hasSofer?: boolean }) {
           {item.text}
         </div>
       ))}
+    </div>
+  );
+}
+
+// ─── Trust Block ─────────────────────────────────────────────────────────────
+
+function TrustBlock() {
+  const items = [
+    'תעודת כשרות',
+    'תעודת הסמכה של הסופר',
+    'נבדק לפני מסירה',
+    'צילום קלף אמיתי',
+    'אפשרות להחזר כספי מלא',
+    'משלוח מאובטח',
+    'זמן אספקה ברור',
+  ];
+  return (
+    <div dir="rtl" style={{ borderRight: '3px solid #27ae60', background: '#f0fdf4', borderRadius: 8, padding: '10px 12px 6px 10px', marginTop: 14 }}>
+      {items.map(item => (
+        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#1a6b3c', marginBottom: 5 }}>
+          <Icon.Check size={12} color="#27ae60" /> {item}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Sofer Card ───────────────────────────────────────────────────────────────
+
+interface SoferProfile {
+  name?: string;
+  profileImage?: string;
+  yearsOfExperience?: number;
+  scriptType?: string;
+  certifications?: string[];
+}
+
+function SoferCard({ soferId }: { soferId: string }) {
+  const [sofer, setSofer] = useState<SoferProfile | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    getDoc(doc(db, 'soferim', soferId)).then(snap => {
+      if (snap.exists()) setSofer(snap.data() as SoferProfile);
+    });
+  }, [soferId]);
+
+  if (!sofer) return null;
+
+  return (
+    <div dir="rtl" style={{ marginTop: 20, background: 'linear-gradient(135deg, #f8f9ff, #eef2ff)', border: '1px solid #c7d2fe', borderRadius: 12, padding: '14px 16px' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>הסופר שכתב</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+        {sofer.profileImage
+          ? <img src={sofer.profileImage} alt={sofer.name} loading="lazy" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid #6366f1', flexShrink: 0 }} />
+          : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 22, flexShrink: 0 }}>✍️</div>
+        }
+        <div>
+          <div style={{ fontWeight: 800, fontSize: 15, color: '#0c1a35' }}>{sofer.name}</div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 3 }}>
+            {sofer.yearsOfExperience != null && (
+              <span style={{ fontSize: 11, color: '#555' }}>{sofer.yearsOfExperience} שנות ניסיון</span>
+            )}
+            {sofer.scriptType && (
+              <span style={{ fontSize: 11, color: '#555' }}>כתב {sofer.scriptType}</span>
+            )}
+          </div>
+        </div>
+      </div>
+      {sofer.certifications?.length ? (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+          {sofer.certifications.map(cert => (
+            <span key={cert} style={{ background: '#e0e7ff', color: '#4338ca', fontSize: 11, fontWeight: 600, borderRadius: 20, padding: '3px 9px' }}>{cert}</span>
+          ))}
+        </div>
+      ) : null}
+      <button
+        onClick={() => { trackOpenSoferProfile(soferId); router.push(`/soferim/${soferId}`); }}
+        style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 20, padding: '7px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+      >
+        ראה פרופיל מלא
+      </button>
     </div>
   );
 }
@@ -573,6 +656,7 @@ export default function ProductClient() {
         if (snap.exists()) {
           const p = { id: snap.id, ...snap.data() } as Product;
           setProduct(p);
+          trackViewItem({ item_id: p.id, item_name: p.name, price: p.price, item_category: p.cat });
           if (p.cat) {
             const relSnap = await getDocs(query(collection(db, 'products'), where('cat', '==', p.cat), orderBy('priority', 'desc'), limit(5)));
             const relData: Product[] = [];
@@ -682,7 +766,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         <Icon.Zap /> קנה עכשיו
       </button>
 
-      {!compact && <TrustIcons hasSofer={!!product.sofer} />}
+      {!compact && <TrustBlock />}
     </div>
   );
 
@@ -826,7 +910,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
                   { key: 'shipping', label: 'משלוח והחזרות' },
                 ] as { key: typeof activeTab; label: string }[]).map(tab => (
-                  <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                  <button key={tab.key} onClick={() => { setActiveTab(tab.key); if (tab.key === 'kashrut') trackOpenKashrutCertificate(product.id); }}
                     style={{ flex: 1, background: 'none', border: 'none', padding: '9px 6px', fontSize: isMobile ? 12 : 13, fontWeight: activeTab === tab.key ? 800 : 600, color: activeTab === tab.key ? '#0c1a35' : '#888', borderBottom: `2px solid ${activeTab === tab.key ? '#b8972a' : 'transparent'}`, marginBottom: -2, cursor: 'pointer', transition: 'color 0.15s', whiteSpace: 'nowrap' }}>
                     {tab.label}
                   </button>
@@ -877,6 +961,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             </div>
 
             <KlafGallery productId={product.id} onSelect={(klafId, klafName) => { setSelectedKlafId(klafId); setSelectedKlafName(klafName); }} />
+
+            {product.soferId && <SoferCard soferId={product.soferId} />}
 
             {isMobile && <div style={{ marginTop: 16 }}><BuyBox /></div>}
           </div>
