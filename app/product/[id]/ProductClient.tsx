@@ -662,7 +662,7 @@ export default function ProductClient() {
 
       {product.cat && EMBROIDERY_CATEGORIES.includes(product.cat) && (
         <div style={{ marginBottom: 12 }}>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 4, textAlign: 'right', display: 'flex', alignItems: 'center', gap: 5 }}>
+          <label style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
             <Icon.Pen /> טקסט לריקמה אישית
           </label>
           <input type="text" value={embroideryText} onChange={e => setEmbroideryText(e.target.value)} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
