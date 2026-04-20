@@ -6,6 +6,7 @@ import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useShaliach } from "@/app/contexts/ShaliachContext";
+import MobileDrawerMenu from "./MobileDrawerMenu";
 
 interface NavSubItem {
   label: string;
@@ -151,17 +152,6 @@ const itemVariants: Variants = {
   hidden: { opacity: 0, x: 3 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.15, ease: "easeOut" } },
 };
-const drawerVariants: Variants = {
-  hidden: { x: "100%" },
-  visible: { x: 0, transition: { type: "spring", stiffness: 300, damping: 35 } },
-  exit: { x: "100%", transition: { duration: 0.2, ease: "easeIn" } },
-};
-const accordionVariants: Variants = {
-  hidden: { height: 0, opacity: 0 },
-  visible: { height: "auto", opacity: 1, transition: { duration: 0.25, ease: "easeOut" } },
-  exit: { height: 0, opacity: 0, transition: { duration: 0.18, ease: "easeIn" } },
-};
-
 function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
   return (
     <motion.div variants={menuVariants} initial="hidden" animate="visible" exit="exit"
@@ -199,40 +189,6 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
   );
 }
 
-function MobileAccordion({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-      <button onClick={() => setOpen(!open)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "15px 20px", background: "none", border: "none", fontSize: 15, fontWeight: 500, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
-        <motion.span animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.22 }} style={{ color: "#b8972a", fontSize: 14 }}>‹</motion.span>
-        <span>{item.label}</span>
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div variants={accordionVariants} initial="hidden" animate="visible" exit="exit" style={{ overflow: "hidden" }}>
-            <div style={{ background: "rgba(0,0,0,0.2)", paddingBottom: 8 }}>
-              {item.columns.map((col, ci) => (
-                <div key={ci} style={{ paddingTop: 10 }}>
-                  <div style={{ padding: "0 28px 6px", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "#b8972a", textTransform: "uppercase", textAlign: "right" }}>{col.title}</div>
-                  {col.items.map((sub, si) => (
-                    <button key={si} onClick={() => onSelect(sub.cat, sub.filter)} style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, width: "100%", padding: "9px 28px", background: "none", border: "none", cursor: "pointer", fontSize: 13.5, color: "rgba(255,255,255,0.7)", fontFamily: "inherit" }}>
-                      {sub.label}
-                      <span style={{ width: 3, height: 3, borderRadius: "50%", background: "#b8972a", flexShrink: 0 }} />
-                    </button>
-                  ))}
-                </div>
-              ))}
-              <div style={{ padding: "10px 20px", display: "flex", justifyContent: "flex-end" }}>
-                <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "#b8972a", background: "none", border: "1px solid rgba(184,151,42,0.3)", borderRadius: 20, padding: "5px 14px", cursor: "pointer", fontFamily: "inherit" }}>לכל {item.label} ←</button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 function NavBarContent() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -257,11 +213,6 @@ function NavBarContent() {
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [mobileOpen]);
 
   const clearTimers = () => {
     if (openTimer.current) clearTimeout(openTimer.current);
@@ -411,48 +362,17 @@ function NavBarContent() {
         )}
       </header>
 
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)" }}
-              onClick={() => setMobileOpen(false)} />
-            <motion.div variants={drawerVariants} initial="hidden" animate="visible" exit="exit"
-              style={{ position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 310, width: "85vw", maxWidth: 360, background: "linear-gradient(180deg, #0c1a35 0%, #0f2040 100%)", display: "flex", flexDirection: "column", boxShadow: "-4px 0 30px rgba(0,0,0,0.4)" }}
-              dir="rtl"
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <img src="/logo.png" alt="" style={{ height: 28, width: "auto" }} onError={e => (e.currentTarget.style.display = "none")} />
-                  <span style={{ fontWeight: 900, fontSize: 16, color: "#fff" }}>Your Sofer</span>
-                </div>
-                <button onClick={() => setMobileOpen(false)} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: 14 }}>✕</button>
-              </div>
-              <div style={{ flex: 1, overflowY: "auto" }}>
-                {MEGA_MENU_DATA.map(item => <MobileAccordion key={item.id} item={item} onSelect={handleSelect} />)}
-                <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 8, padding: "8px 0" }}>
-                  {SIMPLE_NAV.map(nav => (
-                    <button key={nav.action} onClick={() => handleAction(nav.action)}
-                      style={{ display: "block", width: "100%", padding: "13px 20px", textAlign: "right", background: "none", border: "none", fontSize: 14, color: "rgba(255,255,255,0.7)", cursor: "pointer", fontFamily: "inherit" }}>
-                      {nav.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div style={{ padding: "16px 20px", borderTop: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.2)" }}>
-                {user ? (
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <button onClick={logout} style={{ background: "none", border: "1px solid rgba(255,255,255,0.2)", color: "#aaa", borderRadius: 6, padding: "6px 12px", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>יציאה</button>
-                    <span style={{ fontSize: 13, color: "#fff" }}>שלום, {user.displayName?.split(" ")[0]}</span>
-                  </div>
-                ) : (
-                  <button onClick={signInWithGoogle} style={{ width: "100%", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", borderRadius: 8, padding: "10px", fontSize: 14, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>התחבר עם Google</button>
-                )}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <MobileDrawerMenu
+        isOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        menuData={MEGA_MENU_DATA}
+        simpleNav={SIMPLE_NAV}
+        onSelect={handleSelect}
+        onAction={handleAction}
+        user={user}
+        signInWithGoogle={signInWithGoogle}
+        logout={logout}
+      />
     </div>
   );
 }
