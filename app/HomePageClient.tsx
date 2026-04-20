@@ -236,10 +236,6 @@ export default function HomePageClient() {
   const [catImages, setCatImages]     = useState<Record<string, string>>({});
   const [slotImages, setSlotImages]   = useState<Record<string, string>>({});
   const [imagesReady, setImagesReady] = useState(false);
-  const [newProducts, setNewProducts] = useState<Product[]>([]);
-  const [newLoading, setNewLoading]   = useState(true);
-  const [sortBy, setSortBy]           = useState<'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'popular'>('newest');
-  const [drawerOpen, setDrawerOpen]   = useState(false);
   const [wizardOpen, setWizardOpen]   = useState(false);
   const [activityIdx, setActivityIdx] = useState(0);
   const [weeklyProducts, setWeeklyProducts] = useState(0);
@@ -261,7 +257,6 @@ export default function HomePageClient() {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
   const cardsRef       = useRef<HTMLDivElement>(null);
-  const newRef         = useRef<HTMLDivElement>(null);
   const router         = useRouter();
   const { shaliach }   = useShaliach();
   const { addItem }    = useCart();
@@ -339,21 +334,6 @@ export default function HomePageClient() {
       setCatImages(Object.fromEntries(pairs));
     }
 
-    async function fetchNewProducts() {
-      try {
-        const snap = await getDocs(
-          query(collection(db, 'products'), orderBy('priority', 'desc'), limit(32)),
-        );
-        setNewProducts(
-          snap.docs
-            .map(d => ({ id: d.id, ...d.data() } as Product))
-            .filter((p: Product) => p.hidden !== true)
-            .slice(0, 16),
-        );
-      } catch { /* silently empty */ }
-      finally { setNewLoading(false); }
-    }
-
     async function fetchFeaturedProducts() {
       try {
         const snap = await getDocs(
@@ -371,7 +351,6 @@ export default function HomePageClient() {
       fetchCatImages(),
     ]).finally(() => setImagesReady(true));
 
-    fetchNewProducts();
     fetchFeaturedProducts();
   }, []);
 
@@ -778,130 +757,6 @@ return (
       {/* ── Mezuzah Funnel ── */}
       <MezuzahFunnel isMobile={isMobile} />
 
-      {/* ── 2. Category cards — horizontal scroll ── */}
-      <div ref={cardsRef} style={{ padding: isMobile ? '20px 0' : '28px 0' }}>
-        <div
-          className="hide-scrollbar"
-          style={{ display: 'flex', gap: 12, overflowX: 'auto', overflowY: 'visible', padding: '4px 16px 8px', direction: 'rtl' }}
-        >
-          {([
-            { label: 'מזוזות' },
-            { label: 'קלפי מזוזה' },
-            { label: 'קלפי תפילין' },
-            { label: 'תפילין קומפלט' },
-            { label: 'כיסוי תפילין' },
-            { label: 'סט טלית תפילין' },
-            { label: 'יודאיקה' },
-            { label: 'בר מצווה' },
-            { label: 'מתנות' },
-            { label: 'מגילות' },
-            { label: 'כלי שולחן והגשה' },
-            { label: 'עיצוב הבית' },
-            { label: 'שבת וחגים', href: `/category/${encodeURIComponent('כלי שולחן והגשה')}?filter=${encodeURIComponent('שבת')}`, imgKey: 'כלי שולחן והגשה' },
-          ] as { label: string; href?: string; imgKey?: string }[]).map(({ label, href, imgKey }) => {
-            const img = catImages[imgKey ?? label] ?? '';
-            return (
-              <Link
-                key={label}
-                href={href ?? `/category/${encodeURIComponent(label)}`}
-                style={{ flexShrink: 0, width: 112, height: 144, borderRadius: 12, overflow: 'hidden', position: 'relative', display: 'block', textDecoration: 'none', background: img ? '#000' : 'linear-gradient(to bottom right, #92400e, #b45309)', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', transition: 'transform 0.18s ease, box-shadow 0.18s ease' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)'; }}
-              >
-                {img && <img src={img} alt={label} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)' }} />
-                <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '10px 6px 8px', textAlign: 'center' }}>
-                  <span style={{ color: '#fff', fontSize: 11, fontWeight: 800, lineHeight: 1.3, display: 'block', textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}>{label}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── Category drawer overlay ── */}
-      {drawerOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 400, display: 'flex' }} onClick={() => setDrawerOpen(false)}>
-          <div style={{ flex: 1, background: 'rgba(0,0,0,0.5)' }} />
-          <div style={{ width: 280, background: '#fff', height: '100%', overflowY: 'auto', boxShadow: '-4px 0 24px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: '1px solid #eee', background: '#0c1a35' }}>
-              <span style={{ fontSize: 16, fontWeight: 900, color: '#fff' }}>סינון קטגוריות</span>
-              <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', color: '#b8972a', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>✕</button>
-            </div>
-            <div style={{ padding: '12px 0', flex: 1 }}>
-              {['מזוזות', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'כיסוי תפילין', 'סט טלית תפילין', 'יודאיקה', 'בר מצווה', 'מתנות', 'מגילות', 'כלי שולחן והגשה', 'עיצוב הבית'].map(cat => (
-                <button key={cat} onClick={() => { setDrawerOpen(false); router.push(`/category/${encodeURIComponent(cat)}`); }}
-                  style={{ width: '100%', background: 'none', border: 'none', padding: '13px 20px', textAlign: 'right', fontSize: 15, fontWeight: 600, color: '#0c1a35', cursor: 'pointer', borderBottom: '1px solid #f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#f8f4ec'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'none'; }}>
-                  {cat}
-                  <span style={{ color: '#b8972a', fontSize: 13 }}>←</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 3. New products section ── */}
-      <div ref={newRef} style={{ maxWidth: 1280, margin: '0 auto', padding: isMobile ? '0 12px 40px' : '0 16px 48px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, flexWrap: 'wrap', gap: 10 }}>
-          <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 900, color: '#0c1a35', margin: 0 }}>המוצרים החדשים שלנו</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value as typeof sortBy)} style={{ border: '1px solid #ddd', borderRadius: 8, padding: '7px 10px', fontSize: 13, color: '#333', background: '#fff', cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif' }}>
-              <option value="newest">חדש לישן</option>
-              <option value="oldest">ישן לחדש</option>
-              <option value="price_asc">מחיר: נמוך לגבוה</option>
-              <option value="price_desc">מחיר: גבוה לנמוך</option>
-              <option value="popular">הכי נמכר</option>
-            </select>
-            <button onClick={() => setDrawerOpen(true)} style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
-              סינון קטגוריות ☰
-            </button>
-            <Link href="/category/מזוזות" style={{ fontSize: 13, fontWeight: 700, color: '#b8972a', textDecoration: 'none', whiteSpace: 'nowrap' }}
-              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = 'underline')}
-              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.textDecoration = 'none')}>
-              לכל המוצרים ←
-            </Link>
-          </div>
-        </div>
-        {newLoading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 8 : 16, padding: isMobile ? '0 12px' : 0 }}>
-            {Array.from({ length: 16 }).map((_, i) => (
-              <div key={i} style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1px solid #f0f0f0' }}>
-                <div style={{ paddingTop: '100%', background: '#e8e8e8', animation: 'pulse 1.5s infinite' }} />
-                <div style={{ padding: '10px 12px' }}>
-                  <div style={{ height: 12, background: '#e8e8e8', borderRadius: 4, marginBottom: 8, width: '75%' }} />
-                  <div style={{ height: 12, background: '#e8e8e8', borderRadius: 4, width: '50%' }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : newProducts.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 8 : 16, padding: isMobile ? '0 12px' : 0 }}>
-            {[...newProducts].sort((a, b) => {
-              if (sortBy === 'price_asc')  return (a.price ?? 0) - (b.price ?? 0);
-              if (sortBy === 'price_desc') return (b.price ?? 0) - (a.price ?? 0);
-              if (sortBy === 'popular')    return (b.priority ?? 0) - (a.priority ?? 0);
-              if (sortBy === 'oldest')     return 1;
-              return -1;
-            }).map(p => (
-              <ProductCard
-                key={p.id}
-                id={p.id}
-                name={p.name}
-                price={p.price}
-                images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                priority={p.priority}
-                isBestSeller={p.isBestSeller}
-                badge={p.badge}
-                was={p.was}
-                createdAt={p.createdAt}
-              />
-            ))}
-          </div>
-        ) : null}
-      </div>
 
       {/* ── 4. Category grid (CHANGE 2) ── */}
       <div style={{ background: '#fff', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
