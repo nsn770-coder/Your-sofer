@@ -4,6 +4,9 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { CARDS, CONFIG_COLLECTION, CONFIG_DOC } from '../../constants/homepageCards';
 
+const CLOUDINARY_CLOUD = 'dyxzq3ucy';
+const CLOUDINARY_PRESET = 'yoursofer_upload';
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface AdminProduct {
@@ -181,16 +184,61 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
   const [saved, setSaved]           = useState(false);
   const [expanded, setExpanded]     = useState<Record<string, boolean>>({});
 
+  // Hero images state
+  const [soferimSlideUrl, setSoferimSlideUrl] = useState('');
+  const [heroSaving, setHeroSaving]           = useState(false);
+  const [heroSaved, setHeroSaved]             = useState(false);
+  const [heroUploading, setHeroUploading]     = useState(false);
+  const heroFileRef = useRef<HTMLInputElement>(null);
+
   // Load existing config from Firestore
   useEffect(() => {
     (async () => {
       try {
-        const snap = await getDoc(doc(db, CONFIG_COLLECTION, CONFIG_DOC));
-        if (snap.exists()) setConfig(snap.data() as ConfigMap);
+        const [configSnap, heroSnap] = await Promise.all([
+          getDoc(doc(db, CONFIG_COLLECTION, CONFIG_DOC)),
+          getDoc(doc(db, 'settings', 'heroImages')),
+        ]);
+        if (configSnap.exists()) setConfig(configSnap.data() as ConfigMap);
+        if (heroSnap.exists()) {
+          const d = heroSnap.data();
+          setSoferimSlideUrl(d.soferimSlide || '');
+        }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     })();
   }, []);
+
+  async function uploadHeroImage(file: File): Promise<string> {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUDINARY_PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error('Upload failed');
+    return data.secure_url as string;
+  }
+
+  async function handleHeroFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setHeroUploading(true);
+    try {
+      const url = await uploadHeroImage(file);
+      setSoferimSlideUrl(url);
+    } catch { alert('שגיאה בהעלאת התמונה'); }
+    finally { setHeroUploading(false); if (heroFileRef.current) heroFileRef.current.value = ''; }
+  }
+
+  async function saveHeroImages() {
+    setHeroSaving(true);
+    try {
+      await setDoc(doc(db, 'settings', 'heroImages'), { soferimSlide: soferimSlideUrl }, { merge: true });
+      setHeroSaved(true);
+      setTimeout(() => setHeroSaved(false), 2500);
+    } catch { alert('שגיאה בשמירה'); }
+    finally { setHeroSaving(false); }
+  }
 
   function toggleCard(title: string) {
     setExpanded(prev => ({ ...prev, [title]: !prev[title] }));
@@ -296,6 +344,103 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
         >
           {saving ? 'שומר...' : saved ? '✅ נשמר!' : '💾 שמור הכל'}
         </button>
+      </div>
+
+      {/* ── Hero Banner Images ─────────────────────────────────────────── */}
+      <div className="mt-8 bg-white rounded-xl shadow overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <div>
+            <h3 className="text-lg font-black text-gray-800">🖼️ תמונות באנר (Hero Swiper)</h3>
+            <p className="text-sm text-gray-500 mt-0.5">העלה תמונת רקע לשקופית "הסופרים שלנו" בבאנר הראשי</p>
+          </div>
+          <button
+            onClick={saveHeroImages}
+            disabled={heroSaving}
+            className="px-5 py-2 rounded-xl font-bold text-white transition"
+            style={{ background: heroSaved ? '#16a34a' : '#0c1a35', minWidth: 110 }}
+          >
+            {heroSaving ? '...' : heroSaved ? '✅ נשמר!' : '💾 שמור'}
+          </button>
+        </div>
+
+        <div className="p-5">
+          <div
+            style={{
+              display: 'flex', gap: 16, alignItems: 'flex-start',
+              background: '#f8f9fb', borderRadius: 12,
+              border: '1.5px solid #e5e7eb', padding: 16,
+            }}
+          >
+            {/* Preview */}
+            <div
+              style={{
+                width: 160, height: 100, flexShrink: 0, borderRadius: 10,
+                overflow: 'hidden', background: soferimSlideUrl ? '#000' : 'linear-gradient(135deg,#0c1a35,#1a3a2a)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '2px solid #e5e7eb', position: 'relative',
+              }}
+            >
+              {soferimSlideUrl ? (
+                <img src={soferimSlideUrl} alt="soferim slide" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, textAlign: 'center', padding: '0 8px' }}>
+                  ברירת מחדל<br />(גרדיאנט כהה)
+                </span>
+              )}
+            </div>
+
+            {/* Controls */}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 6 }}>
+                שקופית "הסופרים שלנו"
+              </div>
+              <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>
+                מומלץ: תמונה רחבה ביחס 16:9 או 3:1, לפחות 1200px רוחב
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <input
+                  ref={heroFileRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleHeroFileChange}
+                  style={{ display: 'none' }}
+                />
+                <button
+                  onClick={() => heroFileRef.current?.click()}
+                  disabled={heroUploading}
+                  style={{
+                    background: '#0c1a35', color: '#fff', border: 'none',
+                    borderRadius: 8, padding: '8px 16px', fontSize: 13,
+                    fontWeight: 700, cursor: heroUploading ? 'not-allowed' : 'pointer',
+                    opacity: heroUploading ? 0.7 : 1,
+                  }}
+                >
+                  {heroUploading ? '⏳ מעלה...' : '📁 בחר תמונה'}
+                </button>
+
+                {soferimSlideUrl && (
+                  <button
+                    onClick={() => setSoferimSlideUrl('')}
+                    style={{
+                      background: 'none', color: '#9ca3af', border: '1px solid #e5e7eb',
+                      borderRadius: 8, padding: '8px 12px', fontSize: 12,
+                      fontWeight: 600, cursor: 'pointer',
+                    }}
+                  >
+                    ✕ הסר תמונה
+                  </button>
+                )}
+              </div>
+
+              {soferimSlideUrl && (
+                <div style={{ marginTop: 10, fontSize: 11, color: '#9ca3af', wordBreak: 'break-all' }}>
+                  {soferimSlideUrl}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

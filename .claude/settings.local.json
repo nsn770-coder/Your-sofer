@@ -38,7 +38,15 @@
       "Read(//proc/**)",
       "Bash(C:\\\\Program Files\\\\nodejs\\\\npm.cmd run *)",
       "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" add -A)",
-      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" commit -m \"style: white background, hero frame, no dark overlay on categories, purple funnel\")"
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" commit -m \"style: white background, hero frame, no dark overlay on categories, purple funnel\")",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(cat .eslintrc* .eslintrc.json .eslintrc.js)",
+      "Bash(ls .eslint*)",
+      "Bash(ls eslint* next.config*)",
+      "Bash(npx next:*)",
+      "Bash(npx eslint:*)",
+      "Bash(echo \"TS Exit: $?\")",
+      "Bash(python -c ':*)"
     ]
   }
 }

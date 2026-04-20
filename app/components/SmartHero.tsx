@@ -7,17 +7,11 @@ type HeroState = 'main' | 'mezuzah' | 'tefillin' | 'unsure' | 'klaf';
 
 const WA_LINK = 'https://wa.me/972552722228?text=שלום אני מעוניין בעזרה ופרטים נוספים';
 
-function IconHome({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" /><path d="M9 21V12h6v9" /></svg>;
-}
 function IconScroll({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><path d="M14 2v6h6M8 13h8M8 17h5" /></svg>;
 }
 function IconBox({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg>;
-}
-function IconQuestion({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>;
 }
 function IconSearch({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>;
@@ -37,9 +31,6 @@ function IconArrowLeft({ size = 13, color = 'currentColor' }: { size?: number; c
 function IconCheck({ size = 13, color = '#b8972a' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>;
 }
-function IconEye({ size = 13, color = '#b8972a' }: { size?: number; color?: string }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>;
-}
 function IconShield({ size = 13, color = '#b8972a' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l7 4v5c0 5-3.5 9.7-7 11-3.5-1.3-7-6-7-11V6l7-4z" /></svg>;
 }
@@ -47,7 +38,7 @@ function IconShield({ size = 13, color = '#b8972a' }: { size?: number; color?: s
 type BtnStyle = 'gold' | 'outline' | 'ghost';
 interface HeroButton { label: string; icon: React.ReactNode; action: () => void; style: BtnStyle; }
 
-export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }: {
+export default function SmartHero({ isMobile }: {
   isMobile: boolean; onScrollToProducts: () => void; onSelectCat: (cat: string) => void;
 }) {
   const [state, setState]         = useState<HeroState>('main');
@@ -118,8 +109,6 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
 
   const c = content[state];
   const isMain = state === 'main';
-  const TRUST_ICONS = [<IconEye key="e" size={12} color="#b8972a" />, <IconPen key="p" size={12} color="#b8972a" />, <IconShield key="s" size={12} color="#b8972a" />];
-
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: isMobile ? 260 : 360, overflow: 'hidden', display: 'flex', alignItems: 'center', direction: 'rtl' }}>
       <video autoPlay muted loop playsInline poster="/images/stam-hero.jpg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>

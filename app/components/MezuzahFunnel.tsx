@@ -139,8 +139,8 @@ function StepButton({ children, onClick, selected = false }: { children: React.R
       onMouseLeave={() => setHovered(false)}
       style={{
         flex: '1 1 0', padding: '0 0 14px', borderRadius: 16,
-        border: `2px solid ${active ? '#b8972a' : '#e8e2d8'}`,
-        background: active ? '#fffbf0' : '#fafaf8',
+        border: `2px solid ${active ? '#b8972a' : 'rgba(255,255,255,0.25)'}`,
+        background: active ? '#f8f4ec' : '#ffffff',
         cursor: 'pointer', transition: 'all 0.18s ease',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
         direction: 'rtl', textAlign: 'center', overflow: 'hidden',
@@ -540,7 +540,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
         />
       )}
 
-      <div style={{ background: 'linear-gradient(180deg, #f8f4ec 0%, #fff 60%)', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
+      <div style={{ background: '#ffffff', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
 
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
@@ -550,7 +550,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
             <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: '#0c1a35', margin: '0 0 10px', lineHeight: 1.2 }}>
               מצא את קלף המזוזה המתאים לך
             </h2>
-            <p style={{ fontSize: 14, color: '#999', margin: 0 }}>ענה על שתי שאלות פשוטות — נמצא את המתאים ביותר</p>
+            <p style={{ fontSize: 14, color: '#888', margin: 0 }}>ענה על שתי שאלות פשוטות — נמצא את המתאים ביותר</p>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginBottom: 32 }}>
@@ -567,12 +567,12 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
             ))}
           </div>
 
-          <div style={{ background: '#fff', borderRadius: 24, boxShadow: '0 4px 40px rgba(0,0,0,0.07)', padding: isMobile ? '24px 16px' : '40px 48px', border: '1.5px solid #f0ebe0' }}>
+          <div style={{ background: '#0c1a35', borderRadius: 24, boxShadow: '0 4px 40px rgba(0,0,0,0.18)', padding: isMobile ? '24px 16px' : '40px 48px', border: '1.5px solid rgba(184,151,42,0.25)' }}>
 
             {step === 0 && (
               <>
-                <h3 style={{ textAlign: 'center', fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: '0 0 6px' }}>איפה תולים את המזוזה?</h3>
-                <p style={{ textAlign: 'center', fontSize: 13, color: '#999', margin: '0 0 24px' }}>הבחירה תשפיע על הגודל המומלץ</p>
+                <h3 style={{ textAlign: 'center', fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#ffffff', margin: '0 0 6px' }}>איפה תולים את המזוזה?</h3>
+                <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.65)', margin: '0 0 24px' }}>הבחירה תשפיע על הגודל המומלץ</p>
                 <div style={{ display: 'flex', gap: 16 }}>
                   {locationConfig.map(loc => (
                     <StepButton key={loc.key} onClick={() => handleSelectLocation(loc.key)}>
@@ -580,8 +580,8 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                         <img src={loc.img} alt={loc.label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       </div>
                       <div style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                        <span style={{ fontSize: 15, fontWeight: 900 }}>{loc.label}</span>
-                        <span style={{ fontSize: 12, color: '#999', fontWeight: 500 }}>{loc.sub}</span>
+                        <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35' }}>{loc.label}</span>
+                        <span style={{ fontSize: 12, color: '#666', fontWeight: 500 }}>{loc.sub}</span>
                       </div>
                     </StepButton>
                   ))}

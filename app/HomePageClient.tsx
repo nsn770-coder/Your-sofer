@@ -735,27 +735,35 @@ return (
       })()}
 
       {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#0c1a35', padding: '10px 16px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
+      <div ref={countersRef} style={{ background: '#ffffff', padding: isMobile ? '16px 12px' : '20px 24px', borderBottom: '1px solid #f0ece4' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 12 }}>
           {[
            { icon: <IconCounterPen isMobile={isMobile} />,   value: countedValues.soferim,   suffix: '',  label: 'סופרים מאושרים' },
 { icon: <IconCounterBox isMobile={isMobile} />,   value: countedValues.products,  suffix: '+', label: 'מוצרים באתר' },
 { icon: <IconCounterCheck isMobile={isMobile} />, value: countedValues.customers, suffix: '+', label: 'לקוחות מרוצים' },
 { icon: <IconCounterStar isMobile={isMobile} />,  value: null,                    suffix: '',  label: 'דירוג ממוצע', fixed: '4.8' },
           ].map(c => (
-            <div key={c.label} style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-              <span style={{ fontSize: isMobile ? 16 : 18 }}>{c.icon}</span>
-              <span style={{ fontSize: isMobile ? 15 : 17, fontWeight: 900, color: '#b8972a' }}>
-                {c.fixed ?? (c.value + c.suffix)}
-              </span>
-              <span style={{ fontSize: isMobile ? 10 : 11, color: '#a8c0d8', fontWeight: 600 }}>{c.label}</span>
+            <div key={c.label} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              gap: 4, padding: isMobile ? '14px 8px' : '16px 12px',
+              background: '#fafaf8', borderRadius: 14,
+              border: '1.5px solid #ede8df',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ color: '#b8972a', display: 'flex', alignItems: 'center' }}>{c.icon}</span>
+                <span style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>
+                  {c.fixed ?? (c.value + c.suffix)}
+                </span>
+              </div>
+              <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>{c.label}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* ── Mezuzah Funnel ── */}
-      <div style={{ background: '#6B21A8', padding: isMobile ? '24px 12px' : '32px 24px' }}>
+      <div style={{ background: '#ffffff' }}>
         <MezuzahFunnel isMobile={isMobile} />
       </div>
 

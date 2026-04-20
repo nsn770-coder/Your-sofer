@@ -88,10 +88,10 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
           { label: "דמוי עור", cat: "כיסוי תפילין", filter: "דמוי עור" },
           { label: "עור", cat: "כיסוי תפילין", filter: "עור" },
           { label: "טרמי", cat: "כיסוי תפילין", filter: "טרמי" },
-          { label: "פיו", cat: "כיסוי תפילין", filter: "פיו" },
+          { label: "פיוו", cat: "כיסוי תפילין", filter: "פיוו" },
           { label: "קטיפה", cat: "כיסוי תפילין", filter: "קטיפה" },
-          { label: "פשתן", cat: "כיסוי תפילין", filter: "פשתן" },
-          { label: "משי", cat: "כיסוי תפילין", filter: "משי" },
+          { label: "פשטן", cat: "כיסוי תפילין", filter: "פשטן" },
+          { label: "ורשי", cat: "כיסוי תפילין", filter: "ורשי" },
         ]
       },
       {
@@ -113,12 +113,12 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
         title: "יודאיקה",
         items: [
           { label: "כל היודאיקה", cat: "יודאיקה" },
-          { label: "נטלות", cat: "יודאיקה", filter: "נטל" },
-          { label: "פיו — תיקי טלית", cat: "יודאיקה", filter: "פיו" },
+          { label: "נטלות", cat: "יודאיקה", filter: "נטלות" },
+          { label: "פיוו – תיקי טלית", cat: "יודאיקה", filter: "פיוו" },
           { label: "כסף", cat: "יודאיקה", filter: "כסף" },
-          { label: "זכוכית", cat: "יודאיקה", filter: "זכוכ" },
-          { label: "הבדלה", cat: "יודאיקה", filter: "הבדל" },
-          { label: "חנוכיות", cat: "יודאיקה", filter: "חנוכי" },
+          { label: "זכוכית", cat: "יודאיקה", filter: "זכוכית" },
+          { label: "הבדלה", cat: "יודאיקה", filter: "הבדלה" },
+          { label: "חנוכיות", cat: "יודאיקה", filter: "חנוכיות" },
           { label: "כלי שולחן והגשה", cat: "כלי שולחן והגשה" },
           { label: "עיצוב הבית", cat: "עיצוב הבית" },
         ]
@@ -152,6 +152,7 @@ const itemVariants: Variants = {
   hidden: { opacity: 0, x: 3 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.15, ease: "easeOut" } },
 };
+
 function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
   return (
     <motion.div variants={menuVariants} initial="hidden" animate="visible" exit="exit"
@@ -182,7 +183,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
           ))}
         </div>
         <div style={{ padding: "10px 24px", background: "rgba(0,0,0,0.2)", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "#b8972a", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>לכל {item.label} ←</button>
+          <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "#b8972a", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>הכל {item.label} ←</button>
         </div>
       </div>
     </motion.div>
@@ -257,7 +258,7 @@ function NavBarContent() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {shaliach.logoUrl
               ? <img src={shaliach.logoUrl} alt="" style={{ width: isMobile ? 40 : 52, height: isMobile ? 40 : 52, borderRadius: 10, objectFit: "cover", border: "2px solid #b8972a" }} />
-              : <div style={{ width: 48, height: 48, borderRadius: 10, background: "#b8972a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🟦</div>
+              : <div style={{ width: 48, height: 48, borderRadius: 10, background: "#b8972a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>✡</div>
             }
             <div>
               <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: "#fff" }}>
@@ -268,7 +269,7 @@ function NavBarContent() {
           {shaliach.phone && (
             <a href={`https://wa.me/972${shaliach.phone.replace(/\D/g, "").slice(1)}`} target="_blank" rel="noopener noreferrer"
               style={{ background: "#25D366", color: "#fff", borderRadius: 8, padding: "8px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-              💬 צור קשר
+              📲 צור קשר
             </a>
           )}
         </div>
@@ -282,12 +283,12 @@ function NavBarContent() {
             <div style={{ width: 20, height: 2, background: "#fff", borderRadius: 2 }} />
           </button>
 
-          <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", gap: 8 }}>
-            <img src="/logo.png" alt="logo" style={{ height: isMobile ? 28 : 36, width: "auto", objectFit: "contain" }} onError={e => (e.currentTarget.style.display = "none")} />
-            <div style={{ fontSize: isMobile ? 15 : 20, fontWeight: 900, color: "#fff", letterSpacing: -1 }}>Your Sofer</div>
+          <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+            <img src="/logo.png" alt="logo" style={{ height: isMobile ? 26 : 32, width: "auto", objectFit: "contain" }} onError={e => (e.currentTarget.style.display = "none")} />
+            <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 
-          <div style={{ flex: 1, display: "flex", maxWidth: 800, borderRadius: 8, overflow: "hidden", minWidth: 0 }}>
+          <div style={{ flex: 1, display: "flex", borderRadius: 8, overflow: "hidden", minWidth: 0 }}>
             {!isMobile && (
               <select style={{ background: "#e8e8e8", border: "none", padding: "10px 8px", fontSize: 12, color: "#333", cursor: "pointer", borderRadius: "0 8px 8px 0", minWidth: 110 }}>
                 <option>כל הקטגוריות</option>
@@ -297,7 +298,7 @@ function NavBarContent() {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               onKeyDown={e => e.key === "Enter" && handleSearch()}
-              placeholder={isMobile ? "חיפוש..." : "חיפוש סת״מ ויודאיקה מאומתים..."}
+              placeholder={isMobile ? "חיפוש..." : "חיפוש סת\"מ ויודאיקה..."}
               style={{ flex: 1, border: "none", padding: "10px", fontSize: isMobile ? 13 : 14, color: "#fff", background: "rgba(255,255,255,0.12)", outline: "none", minWidth: 0 }} />
             <button onClick={handleSearch} style={{ background: "#b8972a", border: "none", padding: "0 14px", cursor: "pointer" }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
@@ -309,14 +310,14 @@ function NavBarContent() {
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 {user.photoURL && !isMobile && <img src={user.photoURL} alt="" style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid #b8972a" }} />}
                 {!isMobile && <div style={{ fontSize: 11 }}><div style={{ color: "#ccc", fontSize: 10 }}>שלום,</div><div style={{ fontWeight: 700 }}>{user.displayName?.split(" ")[0]}</div></div>}
-                {user.role === "admin" && <button onClick={() => router.push("/admin")} style={{ background: "#b8972a", color: "#fff", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>👑</button>}
-                {user.role === "sofer" && <button onClick={() => router.push("/sofer-dashboard")} style={{ background: "#1a3a2a", color: "#fff", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>✍️</button>}
-                {user.role === "shaliach" && <button onClick={() => router.push("/shaliach-dashboard")} style={{ background: "none", color: "#fff", border: "1px solid #b8972a", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>🟦</button>}
+                {user.role === "admin" && <button onClick={() => router.push("/admin")} style={{ background: "#b8972a", color: "#fff", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>ניהול</button>}
+                {user.role === "sofer" && <button onClick={() => router.push("/sofer-dashboard")} style={{ background: "#1a3a2a", color: "#fff", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>סופר</button>}
+                {user.role === "shaliach" && <button onClick={() => router.push("/shaliach-dashboard")} style={{ background: "none", color: "#fff", border: "1px solid #b8972a", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>שלוחה</button>}
                 {!isMobile && <button onClick={logout} style={{ background: "none", border: "none", color: "#aaa", fontSize: 11, cursor: "pointer" }}>יציאה</button>}
               </div>
             ) : (
-              <button onClick={signInWithGoogle} style={{ background: "none", border: "1px solid #555", borderRadius: 6, padding: "6px 10px", color: "#fff", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-                <svg width="13" height="13" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+              <button onClick={signInWithGoogle} style={{ background: "none", border: "1px solid #444", borderRadius: 6, padding: isMobile ? "4px 7px" : "5px 8px", color: "#fff", fontSize: isMobile ? 10 : 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
+                <svg width="11" height="11" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
                 {isMobile ? "כניסה" : "התחבר"}
               </button>
             )}

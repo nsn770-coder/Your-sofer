@@ -1,0 +1,5 @@
+FIREBASE_PROJECT_ID=your-sofer
+FIREBASE_CLIENT_EMAIL=הדבק-מ-vercel
+FIREBASE_PRIVATE_KEY=הדבק-מ-vercel
+NEXT_PUBLIC_FIREBASE_API_KEY=הדבק-מ-vercel
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-sofer.firebaseapp.com
