@@ -8,8 +8,14 @@ import {
   doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import SmartHero from './components/SmartHero';
-import MezuzahFunnel from './components/MezuzahFunnel';
+import HeroSlider from './components/HeroSlider';
+import TrustBar from './components/TrustBar';
+import MezuzahQuizSection from './components/homepage/MezuzahQuizSection';
+import ProductTabsSection from './components/homepage/ProductTabsSection';
+import TrendingSection from './components/homepage/TrendingSection';
+import BlogSection from './components/homepage/BlogSection';
+import WhyChooseUsSection from './components/homepage/WhyChooseUsSection';
+import NewsletterSection from './components/homepage/NewsletterSection';
 import ProductCard from '@/components/ui/ProductCard';
 import { useShaliach } from './contexts/ShaliachContext';
 import {
@@ -257,6 +263,7 @@ export default function HomePageClient() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
+  const funnelRef      = useRef<HTMLDivElement>(null);
   const cardsRef       = useRef<HTMLDivElement>(null);
   const newRef         = useRef<HTMLDivElement>(null);
   const router         = useRouter();
@@ -709,12 +716,8 @@ export default function HomePageClient() {
         </div>
       )}
 
-      {/* ── 1. SmartHero ── */}
-      <SmartHero
-        isMobile={isMobile}
-        onScrollToProducts={() => cardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
-        onSelectCat={(cat: string) => router.push(`/category/${encodeURIComponent(cat)}`)}
-      />
+      {/* ── 1. HeroSlider ── */}
+      <HeroSlider onScrollToQuiz={() => funnelRef.current?.scrollIntoView({ behavior: 'smooth' })} />
 
       {/* ── Live Activity Bar ── */}
       {(() => {
@@ -758,8 +761,19 @@ return (
         </div>
       </div>
 
-      {/* ── Mezuzah Funnel ── */}
-      <MezuzahFunnel isMobile={isMobile} />
+      {/* ── Trust Bar ── */}
+      <TrustBar />
+
+      {/* ── Product Tabs ── */}
+      <ProductTabsSection />
+
+      {/* ── Mezuzah Quiz ── */}
+      <div ref={funnelRef}>
+        <MezuzahQuizSection isMobile={isMobile} />
+      </div>
+
+      {/* ── Trending ── */}
+      <TrendingSection />
 
       {/* ── 2. Category cards — horizontal scroll ── */}
       <div ref={cardsRef} style={{ padding: isMobile ? '20px 0' : '28px 0' }}>
@@ -921,6 +935,15 @@ return (
           </div>
         </div>
       )}
+
+      {/* ── Why Choose Us ── */}
+      <WhyChooseUsSection />
+
+      {/* ── Blog / Guides ── */}
+      <BlogSection />
+
+      {/* ── Newsletter Section ── */}
+      <NewsletterSection />
 
       {/* ── 5. Testimonials carousel ── */}
       {testimonials.length > 0 && (() => {
