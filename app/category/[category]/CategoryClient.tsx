@@ -703,7 +703,7 @@ export default function CategoryClient({ category }: { category: string }) {
   }
 
   useEffect(() => {
-    setAllLoaded([]); setLoading(true); setFilters(EMPTY_FILTERS); setCurrentPage(1); setCatFilter('הכל');
+    setAllLoaded([]); setLoading(true); setFilters(EMPTY_FILTERS); setSortBy('popular'); setCurrentPage(1); setCatFilter('הכל');
     fetchAll().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
@@ -743,6 +743,11 @@ export default function CategoryClient({ category }: { category: string }) {
     }
     fetchSoferim();
   }, [allLoaded, category]);
+
+  useEffect(() => {
+    setFilters(EMPTY_FILTERS);
+    setCurrentPage(1);
+  }, [urlFilter]);
 
   useEffect(() => {
     if (!urlFilter || loading || allLoaded.length === 0) return;
