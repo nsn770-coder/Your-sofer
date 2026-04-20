@@ -11,6 +11,9 @@ import { db } from './firebase';
 import HeroSlider from './components/HeroSlider';
 import TrustBar from './components/TrustBar';
 import MezuzahQuizSection from './components/homepage/MezuzahQuizSection';
+import MainCategoriesSection from './components/homepage/MainCategoriesSection';
+import GiftCategoriesSection from './components/homepage/GiftCategoriesSection';
+import FeaturedCategoriesSection from './components/homepage/FeaturedCategoriesSection';
 import ProductTabsSection from './components/homepage/ProductTabsSection';
 import TrendingSection from './components/homepage/TrendingSection';
 import BlogSection from './components/homepage/BlogSection';
@@ -763,6 +766,15 @@ return (
 
       {/* ── Trust Bar ── */}
       <TrustBar />
+
+      {/* ── Main Categories ── */}
+      <MainCategoriesSection />
+
+      {/* ── Gift Categories ── */}
+      <GiftCategoriesSection />
+
+      {/* ── Featured Categories ── */}
+      <FeaturedCategoriesSection />
 
       {/* ── Product Tabs ── */}
       <ProductTabsSection />
