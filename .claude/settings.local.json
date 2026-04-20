@@ -28,7 +28,8 @@
       "Bash(git push *)",
       "Bash(git restore *)",
       "Bash(dir \"C:/Users/Nissan/your-sofer/app/\" /s /b)",
-      "Bash(findstr \"theme-editor\")"
+      "Bash(findstr \"theme-editor\")",
+      "Bash(claude *)"
     ]
   }
 }

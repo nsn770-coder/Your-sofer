@@ -8,10 +8,12 @@ import {
   doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import SmartHero from './components/SmartHero';
+import HeroSwiper from './components/HeroSwiper';
 import MezuzahFunnel from './components/MezuzahFunnel';
 import ProductCard from '@/components/ui/ProductCard';
 import { useShaliach } from './contexts/ShaliachContext';
+import { useCart } from './contexts/CartContext';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import {
   CARDS, ALL_CATS, CONFIG_COLLECTION, CONFIG_DOC, slotKey,
 } from './constants/homepageCards';
@@ -252,6 +254,7 @@ export default function HomePageClient() {
   const [wizardKashrut, setWizardKashrut] = useState<'regular' | 'mehudar' | 'mehudar_plus' | null>(null);
   const [wizardResults, setWizardResults] = useState<Product[]>([]);
   const [wizardLoading, setWizardLoading] = useState(false);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [testIdx, setTestIdx]         = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -261,6 +264,7 @@ export default function HomePageClient() {
   const newRef         = useRef<HTMLDivElement>(null);
   const router         = useRouter();
   const { shaliach }   = useShaliach();
+  const { addItem }    = useCart();
 
   useEffect(() => {
     function update() { setIsMobile(window.innerWidth < 768); }
@@ -350,12 +354,25 @@ export default function HomePageClient() {
       finally { setNewLoading(false); }
     }
 
+    async function fetchFeaturedProducts() {
+      try {
+        const snap = await getDocs(
+          query(collection(db, 'products'), orderBy('priority', 'desc'), limit(24)),
+        );
+        const all = snap.docs
+          .map(d => ({ id: d.id, ...d.data() } as Product))
+          .filter((p: Product) => p.hidden !== true && (p as any).status !== 'inactive');
+        setFeaturedProducts(all.slice(0, 8));
+      } catch { /* non-fatal */ }
+    }
+
     Promise.all([
       fetchPinnedImages().then(pinned => setSlotImages(pinned)),
       fetchCatImages(),
     ]).finally(() => setImagesReady(true));
 
     fetchNewProducts();
+    fetchFeaturedProducts();
   }, []);
 
   useEffect(() => {
@@ -709,8 +726,8 @@ export default function HomePageClient() {
         </div>
       )}
 
-      {/* ── 1. SmartHero ── */}
-      <SmartHero
+      {/* ── 1. HeroSwiper ── */}
+      <HeroSwiper
         isMobile={isMobile}
         onScrollToProducts={() => cardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
         onSelectCat={(cat: string) => router.push(`/category/${encodeURIComponent(cat)}`)}
@@ -886,41 +903,126 @@ return (
         ) : null}
       </div>
 
-      {/* ── 4. Category grid ── */}
-      {Object.keys(catImages).length > 0 && (
-        <div style={{ background: '#fff', padding: isMobile ? '32px 16px' : '48px 16px', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>קטגוריות נבחרות</h2>
-            <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 28 }}>גלו את מגוון מוצרי הסת&quot;מ שלנו</p>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: isMobile ? 12 : 18 }}>
-              {([
-                { name: 'מזוזות',         emoji: '📜' },
-                { name: 'תפילין קומפלט', emoji: '🖊️' },
-                { name: 'מגילות',         emoji: '📖' },
-                { name: 'יודאיקה',        emoji: '✡️' },
-                { name: 'מתנות',          emoji: '🎁' },
-                { name: 'בר מצווה',        emoji: '🎉' },
-              ] as { name: string; emoji: string }[]).map(cat => (
-                <div key={cat.name} onClick={() => router.push(`/category/${encodeURIComponent(cat.name)}`)}
-                  style={{ position: 'relative', borderRadius: 14, overflow: 'hidden', cursor: 'pointer', aspectRatio: '4/3', background: '#f3f4f4', boxShadow: '0 2px 10px rgba(0,0,0,0.07)', transition: 'transform 0.2s, box-shadow 0.2s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.14)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 10px rgba(0,0,0,0.07)'; }}>
-                  {catImages[cat.name] ? (
-                    <img src={catImages[cat.name]} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>{cat.emoji}</div>
-                  )}
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(12,26,53,0.82) 0%, rgba(12,26,53,0.1) 55%)' }} />
-                  <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: isMobile ? '12px 14px' : '16px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: isMobile ? 14 : 16, fontWeight: 900, color: '#fff' }}>{cat.name}</span>
-                    <span style={{ fontSize: 20 }}>{cat.emoji}</span>
+      {/* ── 4. Category grid (CHANGE 2) ── */}
+      <div style={{ background: '#fff', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>קטגוריות נבחרות</h2>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלו את מגוון מוצרי הסת&quot;מ שלנו</p>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 12 }}
+            className="md:grid-cols-3 lg:grid-cols-6">
+            {([
+              { name: 'מזוזות',         emoji: '📜', img: catImages['מזוזות'] || '' },
+              { name: 'תפילין קומפלט', emoji: '🖊️', img: catImages['תפילין קומפלט'] || '' },
+              { name: 'מגילות',         emoji: '📖', img: catImages['מגילות'] || '' },
+              { name: 'יודאיקה',        emoji: '✡️', img: catImages['יודאיקה'] || '' },
+              { name: 'נטלות וכלים',   emoji: '🫙', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776283325/eolm1mte2d2q1zjaijsn.png', 400) },
+              { name: 'שבתות וחגים',   emoji: '🕯️', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/q_auto/f_auto/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', 400) },
+            ]).map(cat => (
+              <div key={cat.name}
+                onClick={() => router.push(`/category/${encodeURIComponent(cat.name)}`)}
+                style={{
+                  position: 'relative', borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
+                  height: isMobile ? 180 : 220,
+                  background: cat.img ? '#000' : '#f3f4f4',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.14)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 10px rgba(0,0,0,0.07)'; }}
+              >
+                {cat.img ? (
+                  <img src={cat.img} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>{cat.emoji}</div>
+                )}
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)' }} />
+                <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: isMobile ? '10px 12px' : '14px 16px' }}>
+                  <span style={{ fontSize: isMobile ? 14 : 15, fontWeight: 900, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{cat.name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── 5. Featured products horizontal scroll (CHANGE 3) ── */}
+      {featuredProducts.length > 0 && (
+        <div style={{ background: '#F5F0E8', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
+            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 14 }}>מוצרים נבחרים</h2>
+          </div>
+          <div style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 16px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
+            {featuredProducts.map(p => {
+              const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
+              return (
+                <div key={p.id}
+                  style={{ width: 160, flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                  onClick={() => router.push(`/product/${p.id}`)}
+                >
+                  <div style={{ height: 140, overflow: 'hidden', position: 'relative' }}>
+                    {imgSrc ? (
+                      <img src={imgSrc} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '12px 12px 0 0' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', background: '#e8e8e8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: 32, color: '#ccc' }}>📦</span>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ padding: '8px 10px 10px' }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#0c1a35', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>{p.name}</p>
+                    <p style={{ fontSize: 14, fontWeight: 800, color: '#b8972a', marginBottom: 8 }}>₪{p.price?.toLocaleString('he-IL')}</p>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
+                      }}
+                      style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 99, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
+                    >
+                      הוסף לסל
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
       )}
+
+      {/* ── 6. More categories horizontal scroll (CHANGE 4) ── */}
+      <div style={{ background: '#fff', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
+          <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 14 }}>עוד קטגוריות</h2>
+        </div>
+        <div style={{ display: 'flex', overflowX: 'auto', gap: 10, padding: '0 12px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
+          {([
+            { slug: 'סט טלית תפילין', emoji: '🕍' },
+            { slug: 'ספרי תורה',       emoji: '📜' },
+            { slug: 'פסח',             emoji: '🍷' },
+            { slug: 'כיסוי תפילין',    emoji: '🖊️' },
+            { slug: 'חנוכה',           emoji: '🕎' },
+            { slug: 'קלפי תפילין',    emoji: '📄' },
+            { slug: 'תפילין קומפלט',  emoji: '⬛' },
+            { slug: 'בר מצווה',        emoji: '🎉' },
+          ]).map(cat => {
+            const img = catImages[cat.slug] ? optimizeCloudinaryUrl(catImages[cat.slug], 300) : '';
+            return (
+              <div key={cat.slug}
+                onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
+                style={{ width: 130, flexShrink: 0, cursor: 'pointer' }}
+              >
+                <div style={{ height: 100, width: '100%', borderRadius: 12, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
+                  {img ? (
+                    <img src={img} alt={cat.slug} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{cat.emoji}</div>
+                  )}
+                </div>
+                <p style={{ fontSize: 11, textAlign: 'center', color: '#0c1a35', fontWeight: 600, marginTop: 6 }}>{cat.slug}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* ── 5. Testimonials carousel ── */}
       {testimonials.length > 0 && (() => {
