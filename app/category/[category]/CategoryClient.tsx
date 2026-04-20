@@ -305,7 +305,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
           >
-            {img && <img src={img} alt={label} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
+            {img && <img src={img} alt={label} width={88} height={114} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
             {isActive && (
               <div style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: '50%', background: '#b8972a', boxShadow: '0 0 0 2px rgba(255,255,255,0.6)' }} />
@@ -368,11 +368,15 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
   function setNameFilter(key: string, val: string) { onChange({ ...filters, nameFilters: { ...filters.nameFilters, [key]: val } }); }
 
   const catNameFilters = CAT_NAME_FILTERS[category] ?? [];
-  function uniqueAttrValues(key: string): string[] {
-    const seen = new Set<string>();
-    for (const p of products) { const v = p.filterAttributes?.[key]; if (v) seen.add(v); }
-    return Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'));
-  }
+  const attrOptions = useMemo(() =>
+    ATTR_KEYS.reduce((acc, key) => {
+      const seen = new Set<string>();
+      for (const p of products) { const v = p.filterAttributes?.[key]; if (v) seen.add(v); }
+      acc[key] = Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'));
+      return acc;
+    }, {} as Record<string, string[]>),
+    [products]
+  );
   const active = hasActiveFilters(filters);
 
   return (
@@ -484,7 +488,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
 
       {/* Dynamic attribute filters */}
       {ATTR_KEYS.map(key => {
-        const vals = uniqueAttrValues(key);
+        const vals = attrOptions[key] ?? [];
         if (vals.length === 0) return null;
         const current = filters.attrFilters[key] ?? 'הכל';
         return (
@@ -771,6 +775,16 @@ export default function CategoryClient({ category }: { category: string }) {
     return applySort(result, sortBy);
   }, [allLoaded, filters, sortBy, catFilter, category]);
 
+  const attrOptionsDesktop = useMemo(() =>
+    ATTR_KEYS.reduce((acc, key) => {
+      const seen = new Set<string>();
+      for (const p of allLoaded) { const v = p.filterAttributes?.[key]; if (v) seen.add(v); }
+      acc[key] = Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'));
+      return acc;
+    }, {} as Record<string, string[]>),
+    [allLoaded]
+  );
+
   const active     = hasActiveFilters(filters);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated  = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -939,9 +953,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
               {/* Dynamic attribute filters */}
               {ATTR_KEYS.map(key => {
-                const seen = new Set<string>();
-                for (const p of allLoaded) { const v = p.filterAttributes?.[key]; if (v) seen.add(v); }
-                const vals = Array.from(seen).sort((a, b) => a.localeCompare(b, 'he'));
+                const vals = attrOptionsDesktop[key] ?? [];
                 if (vals.length === 0) return null;
                 const current = filters.attrFilters[key] ?? 'הכל';
                 const isActive = current && current !== 'הכל';
@@ -979,11 +991,6 @@ export default function CategoryClient({ category }: { category: string }) {
                 {Object.entries(SORT_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
-          </div>
-
-          {/* Category scroll bar */}
-          <div className="mb-5">
-            <CategoryScrollBar catImages={catImages} currentCategory={category} />
           </div>
 
           {/* Active filter pills */}

@@ -71,7 +71,7 @@ export default function RootLayout({
             </ShaliachProvider>
           </Suspense>
         </AuthProvider>
-        <script src="//code.tidio.co/i6evth9lfvxovmfpvcftjeb25pw4psme.js" async></script>
+        <Script src="//code.tidio.co/i6evth9lfvxovmfpvcftjeb25pw4psme.js" strategy="lazyOnload" />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-PM7GW4MWEJ" strategy="afterInteractive" />
         <Script id="gtag-init" strategy="afterInteractive">{`
           window.dataLayer = window.dataLayer || [];

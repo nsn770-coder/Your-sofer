@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   collection, query, where, orderBy, limit, getDocs,
-  doc, getDoc, addDoc, serverTimestamp,
+  doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import SmartHero from './components/SmartHero';
@@ -386,12 +386,12 @@ export default function HomePageClient() {
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         const weekTs = { seconds: Math.floor(oneWeekAgo.getTime() / 1000), nanoseconds: 0 };
         const [soferimSnap, productsSnap, weeklySnap] = await Promise.all([
-          getDocs(collection(db, 'soferim')),
-          getDocs(collection(db, 'products')),
+          getCountFromServer(collection(db, 'soferim')),
+          getCountFromServer(collection(db, 'products')),
           getDocs(query(collection(db, 'products'), where('createdAt', '>=', weekTs), limit(100))),
         ]);
-        setSoferimCount(soferimSnap.size);
-        setProductsCount(productsSnap.size);
+        setSoferimCount(soferimSnap.data().count);
+        setProductsCount(productsSnap.data().count);
         setWeeklyProducts(weeklySnap.size);
       } catch { /* non-fatal */ }
     }

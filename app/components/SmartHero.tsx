@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { trackClickHeroMezuzot, trackClickHeroTefillin, trackClickWhatsApp } from '@/lib/analytics';
 
@@ -52,10 +52,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
 }) {
   const [state, setState]         = useState<HeroState>('main');
   const [animating, setAnimating] = useState(false);
-  const [loaded, setLoaded]       = useState(false);
   const router = useRouter();
-
-  useEffect(() => { const t = setTimeout(() => setLoaded(true), 100); return () => clearTimeout(t); }, []);
 
   function switchState(next: HeroState) {
     setAnimating(true);
@@ -141,17 +138,17 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
           </button>
         )}
 
-        <h1 style={{ fontSize: isMobile ? 22 : 40, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: isMobile ? 10 : 14, textShadow: '0 2px 30px rgba(0,0,0,0.7)', letterSpacing: '-0.5px', opacity: loaded ? 1 : 0, transform: loaded ? 'translateY(0)' : 'translateY(20px)', transition: 'opacity 0.7s ease, transform 0.7s ease' }}>
+        <h1 style={{ fontSize: isMobile ? 22 : 40, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: isMobile ? 10 : 14, textShadow: '0 2px 30px rgba(0,0,0,0.7)', letterSpacing: '-0.5px' }}>
           {c.headline}
         </h1>
 
         {isMain ? (
           <>
-            <p style={{ fontSize: isMobile ? 12 : 15, color: 'rgba(220,235,215,0.9)', marginBottom: 16, maxWidth: 520, lineHeight: 1.6, opacity: loaded ? 1 : 0, transform: loaded ? 'translateY(0)' : 'translateY(16px)', transition: 'opacity 0.7s ease 0.12s, transform 0.7s ease 0.12s' }}>
+            <p style={{ fontSize: isMobile ? 12 : 15, color: 'rgba(220,235,215,0.9)', marginBottom: 16, maxWidth: 520, lineHeight: 1.6 }}>
               {c.sub}
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14, flexDirection: 'row' }}>
-              {c.buttons.map((btn, i) => <HeroBtn key={i} btn={btn} isMobile={isMobile} loaded={loaded} delay={0.2 + i * 0.08} />)}
+              {c.buttons.map((btn, i) => <HeroBtn key={i} btn={btn} isMobile={isMobile} />)}
             </div>
             <div style={{ display: 'flex', gap: isMobile ? 10 : 20, flexWrap: 'wrap', marginBottom: 10 }}>
               {(c.trust ?? []).map((t, i) => (
@@ -168,7 +165,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
           <>
             <p style={{ fontSize: isMobile ? 12 : 14, color: 'rgba(210,228,205,0.9)', marginBottom: 18, maxWidth: 560, lineHeight: 1.8, whiteSpace: 'pre-line' }}>{c.body}</p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14, flexDirection: 'row' }}>
-              {c.buttons.map((btn, i) => <HeroBtn key={i} btn={btn} isMobile={isMobile} loaded={true} delay={0} />)}
+              {c.buttons.map((btn, i) => <HeroBtn key={i} btn={btn} isMobile={isMobile} />)}
             </div>
             <p style={{ fontSize: 11, color: 'rgba(160,190,155,0.75)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 4 }}>
               <IconShield size={11} color="rgba(160,190,155,0.6)" /> {c.support}
@@ -182,9 +179,9 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat }:
   );
 }
 
-function HeroBtn({ btn, isMobile, loaded, delay }: {
+function HeroBtn({ btn, isMobile }: {
   btn: { label: string; icon: React.ReactNode; action: () => void; style: BtnStyle };
-  isMobile: boolean; loaded: boolean; delay: number;
+  isMobile: boolean;
 }) {
   const isGold = btn.style === 'gold';
   const isOutline = btn.style === 'outline';
@@ -197,9 +194,6 @@ function HeroBtn({ btn, isMobile, loaded, delay }: {
       background: isGold ? 'linear-gradient(135deg, #b8972a, #e6c84a)' : isOutline ? 'rgba(255,255,255,0.08)' : 'transparent',
       color: isGold ? '#0c1a35' : '#fff',
       backdropFilter: 'blur(4px)',
-      opacity: loaded ? 1 : 0,
-      transform: loaded ? 'translateY(0)' : 'translateY(12px)',
-      transitionDelay: `${delay}s`,
       width: isMobile ? 'calc(50% - 4px)' : 'auto',
       boxSizing: 'border-box',
       display: 'flex', alignItems: 'center', gap: 6,
