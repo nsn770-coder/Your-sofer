@@ -29,7 +29,16 @@
       "Bash(git restore *)",
       "Bash(dir \"C:/Users/Nissan/your-sofer/app/\" /s /b)",
       "Bash(findstr \"theme-editor\")",
-      "Bash(claude *)"
+      "Bash(claude *)",
+      "Read(//usr/local/lib/**)",
+      "Bash(find /usr -name \"npm\" -type f)",
+      "Read(//c/Users/Nissan/.nvm/versions/**)",
+      "Read(//usr/**)",
+      "Bash(cmd.exe *)",
+      "Read(//proc/**)",
+      "Bash(C:\\\\Program Files\\\\nodejs\\\\npm.cmd run *)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" add -A)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" commit -m \"style: white background, hero frame, no dark overlay on categories, purple funnel\")"
     ]
   }
 }

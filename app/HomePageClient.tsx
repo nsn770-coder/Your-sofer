@@ -519,7 +519,7 @@ export default function HomePageClient() {
       dir="rtl"
       style={{
         minHeight: '100vh',
-        background: '#F5F0E8',
+        background: '#ffffff',
         fontFamily: "'Heebo', Arial, sans-serif",
         overflowX: 'hidden',
         maxWidth: '100vw',
@@ -755,7 +755,9 @@ return (
       </div>
 
       {/* ── Mezuzah Funnel ── */}
-      <MezuzahFunnel isMobile={isMobile} />
+      <div style={{ background: '#6B21A8', padding: isMobile ? '24px 12px' : '32px 24px' }}>
+        <MezuzahFunnel isMobile={isMobile} />
+      </div>
 
 
       {/* ── 4. Category grid (CHANGE 2) ── */}
@@ -776,23 +778,23 @@ return (
               <div key={cat.name}
                 onClick={() => router.push(`/category/${encodeURIComponent(cat.name)}`)}
                 style={{
-                  position: 'relative', borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                  height: isMobile ? 180 : 220,
-                  background: cat.img ? '#000' : '#f3f4f4',
+                  borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
+                  background: '#fff',
                   boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.14)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 10px rgba(0,0,0,0.07)'; }}
               >
-                {cat.img ? (
-                  <img src={cat.img} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>{cat.emoji}</div>
-                )}
-                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)' }} />
-                <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: isMobile ? '10px 12px' : '14px 16px' }}>
-                  <span style={{ fontSize: isMobile ? 14 : 15, fontWeight: 900, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>{cat.name}</span>
+                <div style={{ height: isMobile ? 180 : 220, overflow: 'hidden', borderRadius: '16px 16px 0 0' }}>
+                  {cat.img ? (
+                    <img src={cat.img} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '16px 16px 0 0' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f4', borderRadius: '16px 16px 0 0' }}>{cat.emoji}</div>
+                  )}
+                </div>
+                <div style={{ padding: 10, background: '#fff', textAlign: 'center' }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>{cat.name}</span>
                 </div>
               </div>
             ))}
@@ -802,7 +804,7 @@ return (
 
       {/* ── 5. Featured products horizontal scroll (CHANGE 3) ── */}
       {featuredProducts.length > 0 && (
-        <div style={{ background: '#F5F0E8', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
+        <div style={{ background: '#ffffff', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
             <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 14 }}>מוצרים נבחרים</h2>
           </div>
@@ -883,7 +885,7 @@ return (
       {testimonials.length > 0 && (() => {
         const t = testimonials[testIdx];
         return (
-          <div style={{ background: '#f8f4ec', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
+          <div style={{ background: '#ffffff', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
             <div style={{ maxWidth: 860, margin: '0 auto' }}>
               <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 28, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>מה הלקוחות אומרים</h2>
               <p style={{ textAlign: 'center', fontSize: 14, color: '#888', marginBottom: 36 }}>אלפי לקוחות מרוצים ברחבי הארץ</p>
