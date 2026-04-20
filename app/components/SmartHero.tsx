@@ -38,8 +38,8 @@ function IconShield({ size = 13, color = '#b8972a' }: { size?: number; color?: s
 type BtnStyle = 'gold' | 'outline' | 'ghost';
 interface HeroButton { label: string; icon: React.ReactNode; action: () => void; style: BtnStyle; }
 
-export default function SmartHero({ isMobile }: {
-  isMobile: boolean; onScrollToProducts: () => void; onSelectCat: (cat: string) => void;
+export default function SmartHero({ isMobile, bgImage }: {
+  isMobile: boolean; onScrollToProducts: () => void; onSelectCat: (cat: string) => void; bgImage?: string;
 }) {
   const [state, setState]         = useState<HeroState>('main');
   const [animating, setAnimating] = useState(false);
@@ -111,10 +111,16 @@ export default function SmartHero({ isMobile }: {
   const isMain = state === 'main';
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: isMobile ? 260 : 360, overflow: 'hidden', display: 'flex', alignItems: 'center', direction: 'rtl' }}>
-      <video autoPlay muted loop playsInline poster="/images/stam-hero.jpg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
-        <source src="/video/hero-stam.mp4" type="video/mp4" />
-      </video>
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: 'linear-gradient(160deg, #1a1008 0%, #2d1f0a 30%, #1a3a2a 70%, #0c1a10 100%)', backgroundImage: isMobile ? 'none' : 'url(/images/stam-hero.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+      {bgImage ? (
+        <img src={bgImage} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
+      ) : (
+        <>
+          <video autoPlay muted loop playsInline poster="/images/stam-hero.jpg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
+            <source src="/video/hero-stam.mp4" type="video/mp4" />
+          </video>
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: 'linear-gradient(160deg, #1a1008 0%, #2d1f0a 30%, #1a3a2a 70%, #0c1a10 100%)', backgroundImage: isMobile ? 'none' : 'url(/images/stam-hero.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        </>
+      )}
       <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to left, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.75) 100%)' }} />
 
       <div style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: 900, margin: '0 auto', padding: isMobile ? '28px 16px 32px' : '48px 48px', opacity: animating ? 0 : 1, transform: animating ? 'translateY(8px)' : 'translateY(0)', transition: 'opacity 0.22s ease, transform 0.22s ease' }}>

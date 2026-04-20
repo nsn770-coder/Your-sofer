@@ -185,11 +185,18 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
   const [expanded, setExpanded]     = useState<Record<string, boolean>>({});
 
   // Hero images state
-  const [soferimSlideUrl, setSoferimSlideUrl] = useState('');
-  const [heroSaving, setHeroSaving]           = useState(false);
-  const [heroSaved, setHeroSaved]             = useState(false);
-  const [heroUploading, setHeroUploading]     = useState(false);
-  const heroFileRef = useRef<HTMLInputElement>(null);
+  const [heroImages, setHeroImages]       = useState<Record<string, string>>({});
+  const [heroSaving, setHeroSaving]       = useState(false);
+  const [heroSaved, setHeroSaved]         = useState(false);
+  const [heroUploading, setHeroUploading] = useState<string | null>(null); // key being uploaded
+  const heroFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  const HERO_SLIDES = [
+    { key: 'mainSlide',    label: 'שקופית ראשית (SmartHero)',    hint: 'רקע לבאנר הראשי — מוצג מאחורי הטקסט והכפתורים' },
+    { key: 'soferimSlide', label: 'שקופית הסופרים שלנו',          hint: 'מומלץ: תמונה רחבה ביחס 16:9 או 3:1, לפחות 1200px רוחב' },
+    { key: 'judaicaSlide', label: 'שקופית יודאיקה',               hint: 'מחליפה את תמונת הקטגוריה בשקופית יודאיקה' },
+    { key: 'giftsSlide',   label: 'שקופית מתנות',                 hint: 'מחליפה את תמונת הקטגוריה בשקופית מתנות' },
+  ];
 
   // Load existing config from Firestore
   useEffect(() => {
@@ -201,8 +208,7 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
         ]);
         if (configSnap.exists()) setConfig(configSnap.data() as ConfigMap);
         if (heroSnap.exists()) {
-          const d = heroSnap.data();
-          setSoferimSlideUrl(d.soferimSlide || '');
+          setHeroImages(heroSnap.data() as Record<string, string>);
         }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
@@ -219,21 +225,25 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
     return data.secure_url as string;
   }
 
-  async function handleHeroFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleHeroFileChange(slideKey: string, e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setHeroUploading(true);
+    setHeroUploading(slideKey);
     try {
       const url = await uploadHeroImage(file);
-      setSoferimSlideUrl(url);
+      setHeroImages(prev => ({ ...prev, [slideKey]: url }));
     } catch { alert('שגיאה בהעלאת התמונה'); }
-    finally { setHeroUploading(false); if (heroFileRef.current) heroFileRef.current.value = ''; }
+    finally {
+      setHeroUploading(null);
+      const ref = heroFileRefs.current[slideKey];
+      if (ref) ref.value = '';
+    }
   }
 
   async function saveHeroImages() {
     setHeroSaving(true);
     try {
-      await setDoc(doc(db, 'settings', 'heroImages'), { soferimSlide: soferimSlideUrl }, { merge: true });
+      await setDoc(doc(db, 'settings', 'heroImages'), heroImages, { merge: true });
       setHeroSaved(true);
       setTimeout(() => setHeroSaved(false), 2500);
     } catch { alert('שגיאה בשמירה'); }
@@ -351,7 +361,7 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div>
             <h3 className="text-lg font-black text-gray-800">🖼️ תמונות באנר (Hero Swiper)</h3>
-            <p className="text-sm text-gray-500 mt-0.5">העלה תמונת רקע לשקופית "הסופרים שלנו" בבאנר הראשי</p>
+            <p className="text-sm text-gray-500 mt-0.5">העלה תמונת רקע לכל שקופית בבאנר הראשי</p>
           </div>
           <button
             onClick={saveHeroImages}
@@ -363,83 +373,90 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
           </button>
         </div>
 
-        <div className="p-5">
-          <div
-            style={{
-              display: 'flex', gap: 16, alignItems: 'flex-start',
-              background: '#f8f9fb', borderRadius: 12,
-              border: '1.5px solid #e5e7eb', padding: 16,
-            }}
-          >
-            {/* Preview */}
-            <div
-              style={{
-                width: 160, height: 100, flexShrink: 0, borderRadius: 10,
-                overflow: 'hidden', background: soferimSlideUrl ? '#000' : 'linear-gradient(135deg,#0c1a35,#1a3a2a)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                border: '2px solid #e5e7eb', position: 'relative',
-              }}
-            >
-              {soferimSlideUrl ? (
-                <img src={soferimSlideUrl} alt="soferim slide" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, textAlign: 'center', padding: '0 8px' }}>
-                  ברירת מחדל<br />(גרדיאנט כהה)
-                </span>
-              )}
-            </div>
-
-            {/* Controls */}
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 6 }}>
-                שקופית "הסופרים שלנו"
-              </div>
-              <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>
-                מומלץ: תמונה רחבה ביחס 16:9 או 3:1, לפחות 1200px רוחב
-              </div>
-
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <input
-                  ref={heroFileRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleHeroFileChange}
-                  style={{ display: 'none' }}
-                />
-                <button
-                  onClick={() => heroFileRef.current?.click()}
-                  disabled={heroUploading}
+        <div className="p-5" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {HERO_SLIDES.map(slide => {
+            const url = heroImages[slide.key] || '';
+            const isUploading = heroUploading === slide.key;
+            return (
+              <div
+                key={slide.key}
+                style={{
+                  display: 'flex', gap: 16, alignItems: 'flex-start',
+                  background: '#f8f9fb', borderRadius: 12,
+                  border: '1.5px solid #e5e7eb', padding: 16,
+                }}
+              >
+                {/* Preview */}
+                <div
                   style={{
-                    background: '#0c1a35', color: '#fff', border: 'none',
-                    borderRadius: 8, padding: '8px 16px', fontSize: 13,
-                    fontWeight: 700, cursor: heroUploading ? 'not-allowed' : 'pointer',
-                    opacity: heroUploading ? 0.7 : 1,
+                    width: 160, height: 100, flexShrink: 0, borderRadius: 10,
+                    overflow: 'hidden', background: url ? '#000' : 'linear-gradient(135deg,#0c1a35,#1a3a2a)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: '2px solid #e5e7eb',
                   }}
                 >
-                  {heroUploading ? '⏳ מעלה...' : '📁 בחר תמונה'}
-                </button>
-
-                {soferimSlideUrl && (
-                  <button
-                    onClick={() => setSoferimSlideUrl('')}
-                    style={{
-                      background: 'none', color: '#9ca3af', border: '1px solid #e5e7eb',
-                      borderRadius: 8, padding: '8px 12px', fontSize: 12,
-                      fontWeight: 600, cursor: 'pointer',
-                    }}
-                  >
-                    ✕ הסר תמונה
-                  </button>
-                )}
-              </div>
-
-              {soferimSlideUrl && (
-                <div style={{ marginTop: 10, fontSize: 11, color: '#9ca3af', wordBreak: 'break-all' }}>
-                  {soferimSlideUrl}
+                  {url ? (
+                    <img src={url} alt={slide.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textAlign: 'center', padding: '0 8px' }}>
+                      ברירת מחדל
+                    </span>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+
+                {/* Controls */}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 4 }}>
+                    {slide.label}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 12 }}>
+                    {slide.hint}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <input
+                      ref={el => { heroFileRefs.current[slide.key] = el; }}
+                      type="file"
+                      accept="image/*"
+                      onChange={e => handleHeroFileChange(slide.key, e)}
+                      style={{ display: 'none' }}
+                    />
+                    <button
+                      onClick={() => heroFileRefs.current[slide.key]?.click()}
+                      disabled={isUploading}
+                      style={{
+                        background: '#0c1a35', color: '#fff', border: 'none',
+                        borderRadius: 8, padding: '8px 16px', fontSize: 13,
+                        fontWeight: 700, cursor: isUploading ? 'not-allowed' : 'pointer',
+                        opacity: isUploading ? 0.7 : 1,
+                      }}
+                    >
+                      {isUploading ? '⏳ מעלה...' : '📁 בחר תמונה'}
+                    </button>
+
+                    {url && (
+                      <button
+                        onClick={() => setHeroImages(prev => ({ ...prev, [slide.key]: '' }))}
+                        style={{
+                          background: 'none', color: '#9ca3af', border: '1px solid #e5e7eb',
+                          borderRadius: 8, padding: '8px 12px', fontSize: 12,
+                          fontWeight: 600, cursor: 'pointer',
+                        }}
+                      >
+                        ✕ הסר תמונה
+                      </button>
+                    )}
+                  </div>
+
+                  {url && (
+                    <div style={{ marginTop: 10, fontSize: 11, color: '#9ca3af', wordBreak: 'break-all' }}>
+                      {url}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

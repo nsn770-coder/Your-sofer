@@ -42,7 +42,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
   const swiperRef = useRef<SwiperType | null>(null);
   const [judaicaImg, setJudaicaImg] = useState('');
   const [giftsImg, setGiftsImg] = useState('');
-  const [soferimImg, setSoferimImg] = useState('');
+  const [heroImages, setHeroImages] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function fetchImages() {
@@ -61,7 +61,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
           setGiftsImg((d.imageUrl || d.imgUrl || '') as string);
         }
         if (heroSnap.exists()) {
-          setSoferimImg((heroSnap.data().soferimSlide || '') as string);
+          setHeroImages(heroSnap.data() as Record<string, string>);
         }
       } catch { /* non-fatal */ }
     }
@@ -96,6 +96,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             isMobile={isMobile}
             onScrollToProducts={onScrollToProducts}
             onSelectCat={onSelectCat}
+            bgImage={heroImages.mainSlide}
           />
         </SwiperSlide>
 
@@ -106,8 +107,8 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             display: 'flex', alignItems: 'center', justifyContent: 'center', direction: 'rtl',
           }}>
             {/* Background: uploaded image or fallback gradient */}
-            {soferimImg ? (
-              <img src={soferimImg} alt="הסופרים שלנו" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            {heroImages.soferimSlide ? (
+              <img src={heroImages.soferimSlide} alt="הסופרים שלנו" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a2a 100%)' }} />
             )}
@@ -141,8 +142,8 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             onClick={() => router.push('/category/יודאיקה')}
             style={{ position: 'relative', width: '100%', height: slideHeight, cursor: 'pointer', overflow: 'hidden' }}
           >
-            {judaicaImg ? (
-              <img src={judaicaImg} alt="יודאיקה" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            {(heroImages.judaicaSlide || judaicaImg) ? (
+              <img src={heroImages.judaicaSlide || judaicaImg} alt="יודאיקה" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: '#1a2d50' }} />
             )}
@@ -161,8 +162,8 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             onClick={() => router.push('/category/מתנות')}
             style={{ position: 'relative', width: '100%', height: slideHeight, cursor: 'pointer', overflow: 'hidden' }}
           >
-            {giftsImg ? (
-              <img src={giftsImg} alt="מתנות" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            {(heroImages.giftsSlide || giftsImg) ? (
+              <img src={heroImages.giftsSlide || giftsImg} alt="מתנות" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: '#2d1a50' }} />
             )}
