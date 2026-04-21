@@ -658,11 +658,14 @@ function Pagination({ currentPage, totalPages, onChange }: { currentPage: number
 
 export default function CategoryClient({ category }: { category: string }) {
   const searchParams = useSearchParams();
-  const urlFilter    = searchParams.get('filter') ?? null;
+  const urlFilter    = searchParams.get('filter')   ?? null;
+  const urlMinPrice  = searchParams.get('minPrice') ?? '';
+  const urlMaxPrice  = searchParams.get('maxPrice') ?? '';
+  const urlNusach    = searchParams.get('nusach')   ?? null;
 
   const [allLoaded, setAllLoaded]     = useState<Product[]>([]);
   const [loading, setLoading]         = useState(true);
-  const [filters, setFilters]         = useState<FilterState>(EMPTY_FILTERS);
+  const [filters, setFilters]         = useState<FilterState>({ ...EMPTY_FILTERS, minPrice: urlMinPrice, maxPrice: urlMaxPrice });
   const [sortBy, setSortBy]           = useState<SortBy>('popular');
   const [drawerOpen, setDrawerOpen]   = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -707,7 +710,7 @@ export default function CategoryClient({ category }: { category: string }) {
   }
 
   useEffect(() => {
-    setAllLoaded([]); setLoading(true); setFilters(EMPTY_FILTERS); setSortBy('popular'); setCurrentPage(1); setCatFilter('הכל');
+    setAllLoaded([]); setLoading(true); setFilters({ ...EMPTY_FILTERS, minPrice: urlMinPrice, maxPrice: urlMaxPrice }); setSortBy('popular'); setCurrentPage(1); setCatFilter('הכל');
     fetchAll().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
@@ -766,6 +769,21 @@ export default function CategoryClient({ category }: { category: string }) {
     setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, _url: urlFilter } }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlFilter, loading, allLoaded.length]);
+
+  // Apply nusach URL param after products load
+  useEffect(() => {
+    if (!urlNusach || loading || allLoaded.length === 0) return;
+    if (category === 'קלפי מזוזה') {
+      // Funnel sends 'ספרדי'/'אשכנזי'; the כתב name-filter uses 'ספרד'/'אשכנז'
+      const map: Record<string, string> = { 'ספרדי': 'ספרד', 'אשכנזי': 'אשכנז' };
+      const val = map[urlNusach] ?? urlNusach;
+      setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, כתב: val } }));
+    } else {
+      // For תפילין and others, nusach maps to the 'נוסח' attribute
+      setFilters(prev => ({ ...prev, attrFilters: { ...prev.attrFilters, נוסח: urlNusach } }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlNusach, loading, allLoaded.length]);
 
   useEffect(() => { setCurrentPage(1); }, [filters]);
 

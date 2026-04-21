@@ -53,14 +53,14 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   }
 
   function navigate(level: Level) {
-    const cat = path === 'mezuzah' ? 'קלפי-מזוזה' : 'תפילין-קומפלט';
+    const catName = path === 'mezuzah' ? 'קלפי מזוזה' : 'תפילין קומפלט';
     const ranges: Record<Level, string> = {
       'פשוט': 'minPrice=180&maxPrice=240',
       'מהודר': 'minPrice=241&maxPrice=280',
       'מהודר בתכלית': 'minPrice=281',
     };
     const nusachParam = nusach ? `nusach=${encodeURIComponent(nusach)}&` : '';
-    router.push(`/category/${cat}?${nusachParam}${ranges[level]}`);
+    router.push(`/category/${encodeURIComponent(catName)}?${nusachParam}${ranges[level]}`);
   }
 
   const btnStyle: React.CSSProperties = {
