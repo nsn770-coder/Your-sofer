@@ -44,3 +44,5 @@ next-env.d.ts
 
 app/scripts/serviceAccount.json
 serviceAccountKey*.json
+your-sofer-firebase-adminsdk-*.json
+*firebase-adminsdk*.json

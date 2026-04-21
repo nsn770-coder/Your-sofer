@@ -185,8 +185,8 @@ function HeroBtn({ btn, isMobile }: {
       padding: isMobile ? '9px 12px' : '11px 20px',
       fontSize: isMobile ? 12 : 13,
       fontWeight: 700, borderRadius: 10, cursor: 'pointer', transition: 'all 0.18s',
-      border: isGold ? 'none' : '1.5px solid rgba(255,255,255,0.35)',
-      background: isGold ? 'linear-gradient(135deg, #b8972a, #e6c84a)' : isOutline ? 'rgba(255,255,255,0.08)' : 'transparent',
+      border: isGold ? 'none' : isOutline ? '1.5px solid #b8972a' : '1px solid rgba(255,255,255,0.2)',
+      background: isGold ? 'linear-gradient(135deg, #b8972a, #e6c84a)' : isOutline ? 'rgba(184,151,42,0.12)' : 'transparent',
       color: isGold ? '#0c1a35' : '#fff',
       backdropFilter: 'blur(4px)',
       width: isMobile ? 'calc(50% - 4px)' : 'auto',
@@ -202,7 +202,7 @@ function HeroBtn({ btn, isMobile }: {
       onMouseLeave={e => {
         const el = e.currentTarget;
         if (isGold) { el.style.background = 'linear-gradient(135deg, #b8972a, #e6c84a)'; el.style.transform = 'translateY(0)'; el.style.boxShadow = 'none'; }
-        else { el.style.background = isOutline ? 'rgba(255,255,255,0.08)' : 'transparent'; el.style.transform = 'translateY(0)'; }
+        else { el.style.background = isOutline ? 'rgba(184,151,42,0.12)' : 'transparent'; el.style.transform = 'translateY(0)'; }
       }}>
       {btn.icon} {btn.label}
     </button>

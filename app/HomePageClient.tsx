@@ -736,12 +736,11 @@ return (
 
       {/* ── Live Counters ── */}
       <div ref={countersRef} style={{ background: '#ffffff', padding: isMobile ? '16px 12px' : '20px 24px', borderBottom: '1px solid #f0ece4' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 12 }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
           {[
-           { icon: <IconCounterPen isMobile={isMobile} />,   value: countedValues.soferim,   suffix: '',  label: 'סופרים מאושרים' },
-{ icon: <IconCounterBox isMobile={isMobile} />,   value: countedValues.products,  suffix: '+', label: 'מוצרים באתר' },
-{ icon: <IconCounterCheck isMobile={isMobile} />, value: countedValues.customers, suffix: '+', label: 'לקוחות מרוצים' },
-{ icon: <IconCounterStar isMobile={isMobile} />,  value: null,                    suffix: '',  label: 'דירוג ממוצע', fixed: '4.8' },
+            { icon: <IconCounterBox isMobile={isMobile} />,   value: countedValues.products,  suffix: '+', label: 'מוצרים באתר' },
+            { icon: <IconCounterPen isMobile={isMobile} />,   value: countedValues.soferim,   suffix: '',  label: 'סופרים מאושרים' },
+            { icon: <IconCounterCheck isMobile={isMobile} />, value: countedValues.customers, suffix: '+', label: 'לקוחות מרוצים' },
           ].map(c => (
             <div key={c.label} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -753,12 +752,18 @@ return (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ color: '#b8972a', display: 'flex', alignItems: 'center' }}>{c.icon}</span>
                 <span style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>
-                  {c.fixed ?? (c.value + c.suffix)}
+                  {c.value + c.suffix}
                 </span>
               </div>
               <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>{c.label}</span>
             </div>
           ))}
+        </div>
+        {/* Rating row */}
+        <div style={{ maxWidth: 900, margin: '10px auto 0', textAlign: 'center' }}>
+          <span style={{ fontSize: isMobile ? 15 : 17, color: '#c8962a', letterSpacing: 2 }}>★★★★★</span>
+          <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#c8962a', marginRight: 6 }}>4.8</span>
+          <span style={{ fontSize: isMobile ? 11 : 12, color: '#888', fontWeight: 500 }}>דירוג ממוצע</span>
         </div>
       </div>
 
