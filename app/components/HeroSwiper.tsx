@@ -112,10 +112,8 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a2a 100%)' }} />
             )}
-            {/* Dark overlay for text legibility */}
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)' }} />
             <div style={{ position: 'relative', textAlign: 'center', padding: '0 24px' }}>
-              <h2 style={{ fontSize: isMobile ? 28 : 44, fontWeight: 900, color: '#fff', marginBottom: 12, textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}>
+              <h2 style={{ fontSize: isMobile ? 28 : 44, fontWeight: 900, color: '#fff', marginBottom: 12, textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
                 הסופרים שלנו
               </h2>
               <p style={{ fontSize: isMobile ? 13 : 16, color: 'rgba(220,235,215,0.85)', marginBottom: 24 }}>
@@ -147,9 +145,8 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: '#1a2d50' }} />
             )}
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} />
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff', fontSize: isMobile ? 32 : 48, fontWeight: 900, textShadow: '0 2px 20px rgba(0,0,0,0.5)', direction: 'rtl' }}>
+              <span style={{ color: '#fff', fontSize: isMobile ? 32 : 48, fontWeight: 900, textShadow: '0 2px 8px rgba(0,0,0,0.7)', direction: 'rtl' }}>
                 יודאיקה
               </span>
             </div>

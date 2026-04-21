@@ -55,10 +55,9 @@ export default function SmartHero({ isMobile, bgImage }: {
       headline: 'ישירות מהסופר שלך',
       sub: 'ללא פערי תיווך',
       trust: [
-        'כל המזוזות נבדקות על ידי רב מוסמך',
+        'המזוזות נבדקות ע"י רב מוסמך · צילום קלף אמיתי לפני משלוח',
         'תעודת כשרות והסמכה לכל סופר',
         'אפשרות להחזר כספי מלא',
-        'צילום קלף אמיתי לפני משלוח',
       ],
       buttons: [
         { label: 'ראה קלפי מזוזה', icon: <IconScroll size={14} color="#0c1a35" />, action: () => { trackClickHeroMezuzot(); router.push('/category/קלפי מזוזה'); }, style: 'gold' },
@@ -152,9 +151,6 @@ export default function SmartHero({ isMobile, bgImage }: {
                 </span>
               ))}
             </div>
-            <button onClick={() => router.push('/madrich')} style={{ background: 'none', border: 'none', color: 'rgba(180,210,175,0.7)', fontSize: 11, cursor: 'pointer', textDecoration: 'underline', padding: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <IconArrowLeft size={10} color="rgba(180,210,175,0.7)" /> חדש בעולם הסת״מ? התחל כאן
-            </button>
           </>
         ) : (
           <>

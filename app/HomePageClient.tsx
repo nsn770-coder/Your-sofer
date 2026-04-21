@@ -781,15 +781,17 @@ return (
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 12 }}
             className="md:grid-cols-3 lg:grid-cols-6">
             {([
-              { name: 'מזוזות',         emoji: '📜', img: catImages['מזוזות'] || '' },
-              { name: 'תפילין קומפלט', emoji: '🖊️', img: catImages['תפילין קומפלט'] || '' },
-              { name: 'מגילות',         emoji: '📖', img: catImages['מגילות'] || '' },
-              { name: 'יודאיקה',        emoji: '✡️', img: catImages['יודאיקה'] || '' },
-              { name: 'נטלות וכלים',   emoji: '🫙', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776283325/eolm1mte2d2q1zjaijsn.png', 400) },
-              { name: 'שבתות וחגים',   emoji: '🕯️', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/q_auto/f_auto/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', 400) },
-            ]).map(cat => (
+              { name: 'מזוזות',          emoji: '📜', img: catImages['מזוזות'] || '',          href: '/category/%D7%9E%D7%96%D7%95%D7%96%D7%95%D7%AA' },
+              { name: 'תפילין קומפלט',  emoji: '🖊️', img: catImages['תפילין קומפלט'] || '',  href: '/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98' },
+              { name: 'מגילות',          emoji: '📖', img: catImages['מגילות'] || '',          href: '/category/%D7%9E%D7%92%D7%99%D7%9C%D7%95%D7%AA' },
+              { name: 'יודאיקה',         emoji: '✡️', img: catImages['יודאיקה'] || '',         href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94' },
+              { name: 'נטלות וכלים',    emoji: '🫙', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776283325/eolm1mte2d2q1zjaijsn.png', 400), href: '/category/%D7%A0%D7%98%D7%9C%D7%95%D7%AA%20%D7%95%D7%9B%D7%9C%D7%99%D7%9D' },
+              { name: 'שבתות וחגים',    emoji: '🕯️', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/q_auto/f_auto/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', 400), href: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA%20%D7%95%D7%97%D7%92%D7%99%D7%9D' },
+              { name: 'קלף מזוזה',       emoji: '📜', img: catImages['קלפי מזוזה'] || '',      href: '/category/קלפי-מזוזה',       fallback: '#1a2744' },
+              { name: 'סט טלית תפילין', emoji: '🕍', img: catImages['סט טלית תפילין'] || '', href: '/category/סט-טלית-תפילין', fallback: '#1a2744' },
+            ] as { name: string; emoji: string; img: string; href: string; fallback?: string }[]).map(cat => (
               <div key={cat.name}
-                onClick={() => router.push(`/category/${encodeURIComponent(cat.name)}`)}
+                onClick={() => router.push(cat.href)}
                 style={{
                   borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
                   background: '#fff',
@@ -803,7 +805,7 @@ return (
                   {cat.img ? (
                     <img src={cat.img} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '16px 16px 0 0' }} />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f4', borderRadius: '16px 16px 0 0' }}>{cat.emoji}</div>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4', borderRadius: '16px 16px 0 0' }}>{cat.emoji}</div>
                   )}
                 </div>
                 <div style={{ padding: 10, background: '#fff', textAlign: 'center' }}>
