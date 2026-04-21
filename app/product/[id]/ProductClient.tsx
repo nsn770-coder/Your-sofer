@@ -29,6 +29,7 @@ interface Product {
   stars?: number;
   reviews?: number;
   videoUrl?: string;
+  level?: string;
 }
 
 interface KlafItem { id: string; name: string; imageUrl: string; status: string; }
@@ -294,6 +295,7 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
   const [was, setWas]           = useState(String(product.was || ''));
   const [desc, setDesc]         = useState(product.desc || product.description || '');
   const [cat, setCat]           = useState(product.cat || '');
+  const [level, setLevel]       = useState(product.level || '');
   const [imgUrl, setImgUrl]     = useState(product.imgUrl || product.image_url || '');
   const [imgUrl2, setImgUrl2]   = useState(product.imgUrl2 || '');
   const [imgUrl3, setImgUrl3]   = useState(product.imgUrl3 || '');
@@ -328,7 +330,7 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
 
   async function handleSave() {
     setSaving(true);
-    try { onSave({ name, price: Number(price), was: was ? Number(was) : null, desc, cat, imgUrl, imgUrl2, imgUrl3, videoUrl, badge, days }); }
+    try { onSave({ name, price: Number(price), was: was ? Number(was) : null, desc, cat, level: ['קלפי מזוזה', 'תפילין קומפלט'].includes(cat) ? level : '', imgUrl, imgUrl2, imgUrl3, videoUrl, badge, days }); }
     finally { setSaving(false); }
   }
 
@@ -351,7 +353,10 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
             <div><label style={labelS}>מחיר ₪</label><input type="number" value={price} onChange={e => setPrice(e.target.value)} style={inputS} /></div>
             <div><label style={labelS}>מחיר מקורי ₪</label><input type="number" value={was} onChange={e => setWas(e.target.value)} placeholder="לא חובה" style={inputS} /></div>
           </div>
-          <div><label style={labelS}>קטגוריה</label><select value={cat} onChange={e => setCat(e.target.value)} style={{ ...inputS, background: '#fff' }}>{CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+          <div><label style={labelS}>קטגוריה</label><select value={cat} onChange={e => { setCat(e.target.value); if (!['קלפי מזוזה', 'תפילין קומפלט'].includes(e.target.value)) setLevel(''); }} style={{ ...inputS, background: '#fff' }}>{CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+          {['קלפי מזוזה', 'תפילין קומפלט'].includes(cat) && (
+            <div><label style={labelS}>רמת הידור</label><select value={level} onChange={e => setLevel(e.target.value)} style={{ ...inputS, background: '#fff' }}><option value="">לא מוגדר</option><option value="פשוט">פשוט</option><option value="מהודר">מהודר</option><option value="מהודר בתכלית">מהודר בתכלית</option></select></div>
+          )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div><label style={labelS}>תווית</label><select value={badge} onChange={e => setBadge(e.target.value)} style={{ ...inputS, background: '#fff' }}><option value="">ללא</option><option value="חדש">חדש</option><option value="מבצע">מבצע</option><option value="פופולרי">פופולרי</option></select></div>
             <div><label style={labelS}>זמן אספקה</label><input value={days} onChange={e => setDays(e.target.value)} placeholder="7-14" style={inputS} /></div>
