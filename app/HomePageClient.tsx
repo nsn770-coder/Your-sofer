@@ -10,6 +10,7 @@ import {
 import { db } from './firebase';
 import HeroSwiper from './components/HeroSwiper';
 import MezuzahFunnel from './components/MezuzahFunnel';
+import SmartFunnel from './components/SmartFunnel';
 import ProductCard from '@/components/ui/ProductCard';
 import { useShaliach } from './contexts/ShaliachContext';
 import { useCart } from './contexts/CartContext';
@@ -767,10 +768,8 @@ return (
         </div>
       </div>
 
-      {/* ── Mezuzah Funnel ── */}
-      <div style={{ background: '#ffffff' }}>
-        <MezuzahFunnel isMobile={isMobile} />
-      </div>
+      {/* ── Smart Funnel ── */}
+      <SmartFunnel isMobile={isMobile} />
 
 
       {/* ── 4. Category grid (CHANGE 2) ── */}
