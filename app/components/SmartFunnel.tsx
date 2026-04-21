@@ -18,7 +18,7 @@ const NUSACH_IMAGES: Record<string, string> = {
 // ── Shared image card ─────────────────────────────────────────────────────────
 
 function ImageCard({
-  img, label, desc, onClick, height, overlayOpacity = 0.4, isMobile, textCenter = false,
+  img, label, desc, onClick, height, overlayOpacity = 0.4, isMobile, textCenter = false, noOverlay = false,
 }: {
   img: string;
   label: string;
@@ -28,6 +28,7 @@ function ImageCard({
   overlayOpacity?: number;
   isMobile: boolean;
   textCenter?: boolean;
+  noOverlay?: boolean;
 }) {
   return (
     <div
@@ -54,7 +55,7 @@ function ImageCard({
         />
       )}
       {/* Dark overlay */}
-      <div style={{ position: 'absolute', inset: 0, background: `rgba(0,0,0,${overlayOpacity})` }} />
+      {!noOverlay && <div style={{ position: 'absolute', inset: 0, background: `rgba(0,0,0,${overlayOpacity})` }} />}
       {/* Text at bottom */}
       <div style={{
         position: 'absolute', bottom: 0, right: 0, left: 0,
@@ -63,7 +64,7 @@ function ImageCard({
       }}>
         <div style={{
           color: '#fff', fontSize: isMobile ? 15 : 17, fontWeight: 700,
-          textShadow: '0 2px 6px rgba(0,0,0,0.8)',
+          textShadow: '0 2px 8px rgba(0,0,0,0.8)',
         }}>
           {label}
         </div>
@@ -242,16 +243,16 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
                 label="צפה במזוזות"
                 onClick={() => { setPath('mezuzah'); go(1); }}
                 height={140}
-                overlayOpacity={0.4}
                 isMobile={isMobile}
+                noOverlay
               />
               <ImageCard
                 img="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776222894/vrknd4v6jp9z7fyrcbyf.jpg"
                 label="צפה בתפילין"
                 onClick={() => { setPath('tefillin'); go(2); }}
                 height={140}
-                overlayOpacity={0.4}
                 isMobile={isMobile}
+                noOverlay
               />
             </div>
           </>
