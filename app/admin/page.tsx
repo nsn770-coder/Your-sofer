@@ -83,6 +83,13 @@ interface Product {
   image_url?: string;
   hidden?: boolean;
   priority?: number;
+  level?: string;
+  was?: number | null;
+  desc?: string;
+  badge?: string | null;
+  days?: string;
+  imgUrl2?: string;
+  imgUrl3?: string;
 }
 
 interface Sofer {
@@ -365,6 +372,196 @@ function AddProductModal({ soferim, onClose, onSave }: {
           <button onClick={handleSave} disabled={saving}
             style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             {saving ? '⏳ שומר...' : '✅ הוסף מוצר'}
+          </button>
+          <button onClick={onClose}
+            style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>
+            ביטול
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const LEVEL_CATS_EDIT = ['קלפי מזוזה', 'תפילין קומפלט'];
+
+function EditProductModal({ product, soferim, onClose, onSave }: {
+  product: Product;
+  soferim: Sofer[];
+  onClose: () => void;
+  onSave: () => void;
+}) {
+  const [name, setName]       = useState(product.name || '');
+  const [price, setPrice]     = useState(String(product.price ?? ''));
+  const [was, setWas]         = useState(product.was != null ? String(product.was) : '');
+  const [desc, setDesc]       = useState(product.desc || '');
+  const [cat, setCat]         = useState(product.cat || product.category || '');
+  const [level, setLevel]     = useState(product.level || '');
+  const [badge, setBadge]     = useState(product.badge || '');
+  const [days, setDays]       = useState(product.days || '');
+  const [soferId, setSoferId] = useState(product.soferId || '');
+  const [imgUrl, setImgUrl]   = useState(product.imgUrl || '');
+  const [imgUrl2, setImgUrl2] = useState(product.imgUrl2 || '');
+  const [imgUrl3, setImgUrl3] = useState(product.imgUrl3 || '');
+  const [saving, setSaving]   = useState(false);
+  const [uploadingImg, setUploadingImg] = useState<string | null>(null);
+
+  async function uploadToCloudinary(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'yoursofer_upload');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error(data.error?.message || 'שגיאה');
+    return data.secure_url;
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>, field: 'main' | 'img2' | 'img3') {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImg(field);
+    try {
+      const url = await uploadToCloudinary(file);
+      if (field === 'main') setImgUrl(url);
+      else if (field === 'img2') setImgUrl2(url);
+      else setImgUrl3(url);
+    } catch (err: any) {
+      alert('שגיאה בהעלאת תמונה: ' + err.message);
+    } finally {
+      setUploadingImg(null);
+    }
+  }
+
+  async function handleSave() {
+    if (!name || !price) { alert('שם ומחיר הם שדות חובה'); return; }
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, 'products', product.id), {
+        name, price: Number(price),
+        was: was ? Number(was) : null,
+        desc, cat,
+        category: cat,
+        level: LEVEL_CATS_EDIT.includes(cat) ? level : '',
+        badge: badge || null,
+        days,
+        soferId: soferId || null,
+        imgUrl: imgUrl || null,
+        imgUrl2: imgUrl2 || null,
+        imgUrl3: imgUrl3 || null,
+      });
+      onSave();
+      onClose();
+    } catch {
+      alert('שגיאה בשמירה');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = { width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' };
+  const labelStyle: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      onClick={onClose}>
+      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>✏️ עריכת מוצר</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+        </div>
+        <div style={{ display: 'grid', gap: 14 }}>
+          <div>
+            <label style={labelStyle}>שם מוצר *</label>
+            <input value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={labelStyle}>מחיר ₪ *</label>
+              <input type="number" value={price} onChange={e => setPrice(e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>מחיר לפני הנחה ₪</label>
+              <input type="number" value={was} onChange={e => setWas(e.target.value)} placeholder="לא חובה" style={inputStyle} />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={labelStyle}>קטגוריה</label>
+              <select value={cat} onChange={e => { setCat(e.target.value); if (!LEVEL_CATS_EDIT.includes(e.target.value)) setLevel(''); }}
+                style={{ ...inputStyle, background: '#fff' }}>
+                {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>סופר</label>
+              <select value={soferId} onChange={e => setSoferId(e.target.value)}
+                style={{ ...inputStyle, background: '#fff' }}>
+                <option value="">ללא סופר</option>
+                {soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+          </div>
+          {LEVEL_CATS_EDIT.includes(cat) && (
+            <div>
+              <label style={labelStyle}>רמת הידור</label>
+              <select value={level} onChange={e => setLevel(e.target.value)}
+                style={{ ...inputStyle, background: '#fff' }}>
+                <option value="">לא מוגדר</option>
+                <option value="פשוט">פשוט</option>
+                <option value="מהודר">מהודר</option>
+                <option value="מהודר בתכלית">מהודר בתכלית</option>
+              </select>
+            </div>
+          )}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={labelStyle}>תווית</label>
+              <select value={badge} onChange={e => setBadge(e.target.value)}
+                style={{ ...inputStyle, background: '#fff' }}>
+                <option value="">ללא</option>
+                <option value="חדש">חדש</option>
+                <option value="מבצע">מבצע</option>
+                <option value="פופולרי">פופולרי</option>
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>זמן אספקה</label>
+              <input value={days} onChange={e => setDays(e.target.value)} placeholder="7-14" style={inputStyle} />
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>תיאור</label>
+            <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3}
+              style={{ ...inputStyle, resize: 'vertical' }} />
+          </div>
+          <div>
+            <label style={{ ...labelStyle, marginBottom: 8 }}>תמונות</label>
+            {(['main', 'img2', 'img3'] as const).map((field, idx) => {
+              const currentUrl = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : imgUrl3;
+              const setUrl = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : setImgUrl3;
+              const lbl = field === 'main' ? 'תמונה ראשית' : `תמונה ${idx + 1} (אופציונלי)`;
+              return (
+                <div key={field} style={{ marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>{lbl}</div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {currentUrl && <img src={currentUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
+                    <label style={{ background: field === 'main' ? '#0c1a35' : '#555', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                      {uploadingImg === field ? '⏳...' : '📷 העלה'}
+                      <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(e, field)} />
+                    </label>
+                    <input value={currentUrl} onChange={e => setUrl(e.target.value)} placeholder="או הדבק URL"
+                      style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12, minWidth: 0 }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
+          <button onClick={handleSave} disabled={saving}
+            style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            {saving ? '⏳ שומר...' : '✅ שמור שינויים'}
           </button>
           <button onClick={onClose}
             style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>
@@ -757,6 +954,7 @@ export default function AdminPage() {
   const [copiedUserId, setCopiedUserId] = useState<string | null>(null);
   const [productSearch, setProductSearch] = useState('');
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showAddSofer, setShowAddSofer] = useState(false);
   const [editingSofer, setEditingSofer] = useState<SoferFull | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -1346,7 +1544,7 @@ export default function AdminPage() {
           {productsLoading ? <div className="p-10 text-center text-gray-400">טוען מוצרים...</div> : (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">הסתרה</th><th className="p-3 text-right">מחיקה</th></tr></thead>
+                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">הסתרה</th><th className="p-3 text-right">עריכה</th><th className="p-3 text-right">מחיקה</th></tr></thead>
                 <tbody>
                   {filteredProducts.length === 0 ? <tr><td colSpan={8} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
                   : filteredProducts.map(p => (
@@ -1366,6 +1564,9 @@ export default function AdminPage() {
                           className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.hidden ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                           {p.hidden ? '👁️ הצג' : '🙈 הסתר'}
                         </button>
+                      </td>
+                      <td className="p-3">
+                        <button onClick={() => setEditingProduct(p)} className="px-2 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-600 hover:bg-blue-100">✏️ ערוך</button>
                       </td>
                       <td className="p-3">
                         {productDeleteConfirm === p.id ? (
@@ -1971,6 +2172,7 @@ export default function AdminPage() {
       {showAddSofer && <AddSoferModal onClose={() => setShowAddSofer(false)} onSave={() => { loadSoferimFull(); loadSoferim(); }} />}
       {showAddShliach && <AddShliachModal onClose={() => setShowAddShliach(false)} onSave={() => { loadShluchimApplications(); loadUsers(); }} />}
       {showAddProduct && <AddProductModal soferim={soferim} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />}
+      {editingProduct && <EditProductModal product={editingProduct} soferim={soferim} onClose={() => setEditingProduct(null)} onSave={() => { loadProducts(); }} />}
       {editingSofer && (
         <EditSoferModal sofer={editingSofer} onClose={() => setEditingSofer(null)}
           onSave={(updated) => { setSoferimFull(prev => prev.map(s => s.id === updated.id ? updated : s)); setEditingSofer(null); }} />
