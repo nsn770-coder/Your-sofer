@@ -1041,6 +1041,7 @@ export default function AdminPage() {
         name: app.name, chabadName: app.chabadName || '', city: app.city,
         phone: app.phone, email: app.email || '', rabbiName: app.rabbiName || '',
         logoUrl: app.logoUrl || '', status: 'active', createdAt: serverTimestamp(),
+        commissionPercent: 0,
       });
       if (uid) {
         await updateDoc(doc(db, 'users', uid), { role: 'shaliach', shaliachId: uid });

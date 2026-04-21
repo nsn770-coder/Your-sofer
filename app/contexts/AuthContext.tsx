@@ -6,7 +6,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, getDocs, query, collection, where } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 export type UserRole = 'customer' | 'shaliach' | 'sofer' | 'admin';
@@ -57,19 +57,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             shaliachId = data.shaliachId;
           } else {
             // משתמש חדש — צור רשומה
-            // אם הגיע דרך קישור הפניה (?ref=...) — שמור את המזהה של השליח
             const referredByShaliach = typeof window !== 'undefined'
               ? localStorage.getItem('shaliachRef')
               : null;
+
+            // בדוק אם האימייל אושר כשליח לפני ההרשמה
+            let newRole: UserRole = 'customer';
+            let approvedShaliachId: string | undefined;
+            if (firebaseUser.email) {
+              const appSnap = await getDocs(
+                query(
+                  collection(db, 'shluchim_applications'),
+                  where('email', '==', firebaseUser.email.trim().toLowerCase()),
+                  where('status', '==', 'approved'),
+                )
+              );
+              if (!appSnap.empty) {
+                const appData = appSnap.docs[0].data();
+                const approvedDocId: string = appData.approvedDocId || appSnap.docs[0].id;
+                newRole = 'shaliach';
+                approvedShaliachId = approvedDocId;
+                // קשר את מסמך השליח ל-uid האמיתי
+                await updateDoc(doc(db, 'shluchim', approvedDocId), { uid: firebaseUser.uid });
+              }
+            }
+
             await setDoc(userRef, {
               email: firebaseUser.email,
               displayName: firebaseUser.displayName,
               photoURL: firebaseUser.photoURL,
-              role: 'customer',
+              role: newRole,
               status: 'active',
               createdAt: new Date(),
-              ...(referredByShaliach ? { shaliachId: referredByShaliach } : {}),
+              ...(approvedShaliachId
+                ? { shaliachId: approvedShaliachId }
+                : referredByShaliach
+                ? { shaliachId: referredByShaliach }
+                : {}),
             });
+
+            role = newRole;
+            shaliachId = approvedShaliachId;
           }
         }
 
