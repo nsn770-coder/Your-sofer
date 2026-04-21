@@ -25,7 +25,7 @@ export async function GET() {
       const id: string = doc.id;
       const name: string = d.name ?? '';
       const price: number = d.price ?? 0;
-      const cat: string = d.cat ?? 'יודאיקה';
+      const cat: string = d.cat ?? d.category ?? '';
       const desc: string = d.desc ?? d.description ?? name;
       const imgUrl: string = d.imgUrl ?? d.image_url ?? d.img1 ?? '';
       const badge: string = d.badge ?? '';
@@ -33,18 +33,20 @@ export async function GET() {
       // Skip products with no name or price
       if (!name || !price) return;
 
-      const availability = 'in stock';
-      const condition = 'new';
-      const brand = 'Your Sofer';
+      const availability: string = d.availability ?? 'in_stock';
+      const condition: string = d.condition ?? 'new';
+      const brand: string = d.brand ?? 'YourSofer';
+      const identifierExists: string = d.identifier_exists ?? 'no';
+      const googleProductCategory: string = d.google_product_category ?? '';
+      const material: string = d.material ?? '';
+      const color: string = d.color ?? '';
+
       const link = `${SITE}/product/${id}`;
       const imageLink = imgUrl.startsWith('http') ? imgUrl : '';
 
-      // Map internal category to Google product category (best-effort)
-      const googleCat = cat.includes('תפילין')
-        ? 'Religious &amp; Ceremonial > Religious Items'
-        : cat.includes('מזוזה') || cat.includes('מזוזות')
-        ? 'Religious &amp; Ceremonial > Religious Items'
-        : 'Religious &amp; Ceremonial > Religious Items';
+      const additionalImages: string[] = (d.images ?? [])
+        .filter((u: string) => u.startsWith('http') && u !== imageLink)
+        .slice(0, 10);
 
       items.push(`    <item>
       <g:id>${esc(id)}</g:id>
@@ -52,13 +54,17 @@ export async function GET() {
       <g:description>${esc(desc.slice(0, 5000))}</g:description>
       <g:link>${esc(link)}</g:link>
       ${imageLink ? `<g:image_link>${esc(imageLink)}</g:image_link>` : ''}
-      <g:availability>${availability}</g:availability>
+      ${additionalImages.map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('\n      ')}
+      <g:availability>${esc(availability)}</g:availability>
       <g:price>${price.toFixed(2)} ILS</g:price>
       ${d.was ? `<g:sale_price>${price.toFixed(2)} ILS</g:sale_price>` : ''}
-      <g:brand>${brand}</g:brand>
-      <g:condition>${condition}</g:condition>
-      <g:google_product_category>${googleCat}</g:google_product_category>
-      <g:product_type>${esc(cat)}</g:product_type>
+      <g:brand>${esc(brand)}</g:brand>
+      <g:condition>${esc(condition)}</g:condition>
+      <g:identifier_exists>${esc(identifierExists)}</g:identifier_exists>
+      ${googleProductCategory ? `<g:google_product_category>${esc(googleProductCategory)}</g:google_product_category>` : ''}
+      ${cat ? `<g:product_type>${esc(cat)}</g:product_type>` : ''}
+      ${material ? `<g:material>${esc(material)}</g:material>` : ''}
+      ${color ? `<g:color>${esc(color)}</g:color>` : ''}
       ${badge ? `<g:custom_label_0>${esc(badge)}</g:custom_label_0>` : ''}
       <g:shipping>
         <g:country>IL</g:country>
