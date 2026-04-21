@@ -119,10 +119,13 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
               onClick={e => { e.stopPropagation(); router.push('/soferim'); }}
               style={{
                 position: 'absolute', bottom: 20, left: 20,
-                background: 'transparent', border: '2px solid #ffffff',
+                background: 'rgba(255, 252, 240, 0.55)', border: '2px solid #1a2744',
                 borderRadius: 8, padding: '10px 22px',
-                fontSize: isMobile ? 12 : 13, fontWeight: 600, color: '#ffffff', cursor: 'pointer',
+                fontSize: isMobile ? 12 : 13, fontWeight: 600, color: '#1a2744', cursor: 'pointer',
+                backdropFilter: 'blur(4px)',
               }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255, 252, 240, 0.75)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255, 252, 240, 0.55)'; }}
             >
               הכר את הסופרים ←
             </button>

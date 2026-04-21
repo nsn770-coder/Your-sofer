@@ -60,8 +60,8 @@ export default function SmartHero({ isMobile, bgImage }: {
         'אפשרות להחזר כספי מלא',
       ],
       buttons: [
-        { label: 'ראה קלפי מזוזה', icon: <IconScroll size={14} color="#0c1a35" />, action: () => { trackClickHeroMezuzot(); router.push('/category/קלפי מזוזה'); }, style: 'gold' },
-        { label: 'ראה תפילין',     icon: <IconBox size={14} color="#fff" />,        action: () => { trackClickHeroTefillin(); router.push('/category/תפילין קומפלט'); }, style: 'outline' },
+        { label: 'ראה קלפי מזוזה', icon: <IconScroll size={14} color="#1a2744" />, action: () => { trackClickHeroMezuzot(); router.push('/category/קלפי מזוזה'); }, style: 'gold' },
+        { label: 'ראה תפילין',     icon: <IconBox size={14} color="#1a2744" />,        action: () => { trackClickHeroTefillin(); router.push('/category/תפילין קומפלט'); }, style: 'outline' },
       ],
     },
     mezuzah: {
@@ -69,9 +69,9 @@ export default function SmartHero({ isMobile, bgImage }: {
       body: 'רוב האנשים בוחרים לפי מחיר —\nאבל ההבדל האמיתי הוא באיכות הכתיבה, בבדיקה, ובמי שכתב אותה.\n\nאצלנו אתה לא קונה "סתם מזוזה" —\nאתה רואה את הקלף ובוחר מתוך הבנה.',
       support: 'אפשר לראות את הקלף לפני הקנייה ולבחור מתוך גלריה אמיתית',
       buttons: [
-        { label: 'ראה בתי מזוזה',      icon: <IconSearch size={14} color="#0c1a35" />, action: () => router.push('/category/מזוזות'), style: 'gold' },
-        { label: 'בחר לפי סופר',       icon: <IconPen size={14} color="#fff" />,        action: () => router.push('/soferim'),         style: 'outline' },
-        { label: 'למד איך לבחור נכון', icon: <IconBook size={14} color="#fff" />,        action: () => router.push('/madrich'),         style: 'ghost' },
+        { label: 'ראה בתי מזוזה',      icon: <IconSearch size={14} color="#1a2744" />, action: () => router.push('/category/מזוזות'), style: 'gold' },
+        { label: 'בחר לפי סופר',       icon: <IconPen size={14} color="#1a2744" />,        action: () => router.push('/soferim'),         style: 'outline' },
+        { label: 'למד איך לבחור נכון', icon: <IconBook size={14} color="#1a2744" />,        action: () => router.push('/madrich'),         style: 'ghost' },
       ],
     },
     tefillin: {
@@ -79,9 +79,9 @@ export default function SmartHero({ isMobile, bgImage }: {
       body: 'יש הבדל גדול בין תפילין כשרות לבין תפילין מהודרות —\nוהוא לא תמיד נראה לעין.\n\nאנחנו עוזרים לך להבין בדיוק מה אתה מקבל\nולבחור מתוך ביטחון אמיתי.',
       support: 'הבחירה הנכונה מתחילה בהבנה — לא במחיר',
       buttons: [
-        { label: 'ראה תפילין',          icon: <IconSearch size={14} color="#0c1a35" />, action: () => router.push('/category/תפילין קומפלט'), style: 'gold' },
-        { label: 'מדריך לבחירה נכונה', icon: <IconBook size={14} color="#fff" />,       action: () => router.push('/madrich'),                 style: 'outline' },
-        { label: 'שאל סופר',            icon: <IconWhatsApp size={14} color="#fff" />,  action: () => { trackClickWhatsApp('hero'); window.open(WA_LINK, '_blank'); },          style: 'ghost' },
+        { label: 'ראה תפילין',          icon: <IconSearch size={14} color="#1a2744" />, action: () => router.push('/category/תפילין קומפלט'), style: 'gold' },
+        { label: 'מדריך לבחירה נכונה', icon: <IconBook size={14} color="#1a2744" />,       action: () => router.push('/madrich'),                 style: 'outline' },
+        { label: 'שאל סופר',            icon: <IconWhatsApp size={14} color="#1a2744" />,  action: () => { trackClickWhatsApp('hero'); window.open(WA_LINK, '_blank'); },          style: 'ghost' },
       ],
     },
     klaf: {
@@ -89,9 +89,9 @@ export default function SmartHero({ isMobile, bgImage }: {
       body: 'אצלנו אתה לא קונה "סתם מזוזה" —\nאתה בוחר קלף ספציפי מתוך גלריה אמיתית.\n\nכל קלף מצולם, נבדק ומוצג לפני מכירה.\nאתה רואה בדיוק מה מגיע אליך.',
       support: 'ניתן לשלוח את תמונת הקלף לרב שלך לפני הקנייה',
       buttons: [
-        { label: 'קלפי מזוזה',   icon: <IconSearch size={14} color="#0c1a35" />, action: () => router.push('/category/קלפי מזוזה'),  style: 'gold' },
-        { label: 'קלפי תפילין',  icon: <IconBox size={14} color="#fff" />,        action: () => router.push('/category/קלפי תפילין'), style: 'outline' },
-        { label: 'למד על קלפים', icon: <IconBook size={14} color="#fff" />,        action: () => router.push('/madrich'),              style: 'ghost' },
+        { label: 'קלפי מזוזה',   icon: <IconSearch size={14} color="#1a2744" />, action: () => router.push('/category/קלפי מזוזה'),  style: 'gold' },
+        { label: 'קלפי תפילין',  icon: <IconBox size={14} color="#1a2744" />,        action: () => router.push('/category/קלפי תפילין'), style: 'outline' },
+        { label: 'למד על קלפים', icon: <IconBook size={14} color="#1a2744" />,        action: () => router.push('/madrich'),              style: 'ghost' },
       ],
     },
     unsure: {
@@ -99,9 +99,9 @@ export default function SmartHero({ isMobile, bgImage }: {
       body: 'לא צריך להבין בסת״מ כדי לבחור נכון.\nתכתוב לנו מה אתה מחפש — ונכוון אותך בצורה פשוטה וברורה.',
       support: 'אנחנו כאן כדי לעזור לך לבחור — לא סתם למכור',
       buttons: [
-        { label: 'דבר איתנו בוואטסאפ', icon: <IconWhatsApp size={14} color="#0c1a35" />, action: () => { trackClickWhatsApp('hero'); window.open(WA_LINK, '_blank'); }, style: 'gold' },
-        { label: 'התחל מדריך קצר',      icon: <IconBook size={14} color="#fff" />,         action: () => router.push('/madrich'),         style: 'outline' },
-        { label: 'הכר את הסופרים',      icon: <IconPen size={14} color="#fff" />,           action: () => router.push('/soferim'),         style: 'ghost' },
+        { label: 'דבר איתנו בוואטסאפ', icon: <IconWhatsApp size={14} color="#1a2744" />, action: () => { trackClickWhatsApp('hero'); window.open(WA_LINK, '_blank'); }, style: 'gold' },
+        { label: 'התחל מדריך קצר',      icon: <IconBook size={14} color="#1a2744" />,         action: () => router.push('/madrich'),         style: 'outline' },
+        { label: 'הכר את הסופרים',      icon: <IconPen size={14} color="#1a2744" />,           action: () => router.push('/soferim'),         style: 'ghost' },
       ],
     },
   };
@@ -179,17 +179,17 @@ function HeroBtn({ btn, isMobile }: {
       padding: isMobile ? '10px 16px' : '10px 22px',
       fontSize: isMobile ? 12 : 13,
       fontWeight: 600, borderRadius: 8, cursor: 'pointer', transition: 'all 0.18s',
-      border: '2px solid #ffffff',
-      background: 'transparent',
-      color: '#ffffff',
+      border: '2px solid #1a2744',
+      background: 'rgba(255, 252, 240, 0.55)',
+      color: '#1a2744',
       backdropFilter: 'blur(4px)',
       width: isMobile ? 'calc(50% - 4px)' : 'auto',
       boxSizing: 'border-box',
       display: 'flex', alignItems: 'center', gap: 6,
       justifyContent: isMobile ? 'flex-start' : 'center',
     }}
-      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255, 252, 240, 0.75)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255, 252, 240, 0.55)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
       {btn.icon} {btn.label}
     </button>
   );
