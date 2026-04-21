@@ -724,8 +724,8 @@ export default function HomePageClient() {
 ];
 const msg = messages[activityIdx % messages.length];
 return (
-  <div style={{ background: '#0c1a35', borderBottom: '1px solid rgba(184,151,42,0.3)', padding: '7px 16px', textAlign: 'center', overflow: 'hidden' }}>
-    <span key={activityIdx} style={{ fontSize: isMobile ? 12 : 13, color: '#e8d8a0', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 7, animation: 'fadeSlide 0.5s ease' }}>
+  <div style={{ background: '#f5f5f7', borderBottom: '1px solid #e8e8ea', padding: '7px 16px', textAlign: 'center', overflow: 'hidden' }}>
+    <span key={activityIdx} style={{ fontSize: isMobile ? 12 : 13, color: '#1a2744', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 7, animation: 'fadeSlide 0.5s ease' }}>
       {msg.icon}
       {msg.text}
     </span>

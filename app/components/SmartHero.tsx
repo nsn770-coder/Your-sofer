@@ -174,32 +174,22 @@ function HeroBtn({ btn, isMobile }: {
   btn: { label: string; icon: React.ReactNode; action: () => void; style: BtnStyle };
   isMobile: boolean;
 }) {
-  const isGold = btn.style === 'gold';
-  const isOutline = btn.style === 'outline';
   return (
     <button onClick={btn.action} style={{
-      padding: isMobile ? '9px 12px' : '11px 20px',
+      padding: isMobile ? '10px 16px' : '10px 22px',
       fontSize: isMobile ? 12 : 13,
-      fontWeight: 700, borderRadius: 10, cursor: 'pointer', transition: 'all 0.18s',
-      border: isGold ? 'none' : isOutline ? '1.5px solid #b8972a' : '1px solid rgba(255,255,255,0.2)',
-      background: isGold ? 'linear-gradient(135deg, #b8972a, #e6c84a)' : isOutline ? 'rgba(184,151,42,0.12)' : 'transparent',
-      color: isGold ? '#0c1a35' : '#fff',
+      fontWeight: 600, borderRadius: 8, cursor: 'pointer', transition: 'all 0.18s',
+      border: '2px solid #ffffff',
+      background: 'transparent',
+      color: '#ffffff',
       backdropFilter: 'blur(4px)',
       width: isMobile ? 'calc(50% - 4px)' : 'auto',
       boxSizing: 'border-box',
       display: 'flex', alignItems: 'center', gap: 6,
       justifyContent: isMobile ? 'flex-start' : 'center',
     }}
-      onMouseEnter={e => {
-        const el = e.currentTarget;
-        if (isGold) { el.style.background = 'linear-gradient(135deg, #d4a832, #f0d860)'; el.style.transform = 'translateY(-2px)'; el.style.boxShadow = '0 8px 20px rgba(184,151,42,0.35)'; }
-        else { el.style.background = 'rgba(255,255,255,0.18)'; el.style.transform = 'translateY(-2px)'; }
-      }}
-      onMouseLeave={e => {
-        const el = e.currentTarget;
-        if (isGold) { el.style.background = 'linear-gradient(135deg, #b8972a, #e6c84a)'; el.style.transform = 'translateY(0)'; el.style.boxShadow = 'none'; }
-        else { el.style.background = isOutline ? 'rgba(184,151,42,0.12)' : 'transparent'; el.style.transform = 'translateY(0)'; }
-      }}>
+      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; }}>
       {btn.icon} {btn.label}
     </button>
   );

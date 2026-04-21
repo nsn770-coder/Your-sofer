@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Autoplay } from 'swiper/modules';
+import { Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -81,9 +81,9 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
       boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
     }}>
       <Swiper
-        modules={[Pagination, Autoplay]}
+        modules={[Pagination]}
         pagination={{ clickable: true }}
-        autoplay={{ delay: 4000, disableOnInteraction: false }}
+        autoplay={false}
         spaceBetween={0}
         slidesPerView={1}
         dir="ltr"
@@ -112,25 +112,20 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a2a 100%)' }} />
             )}
-            <div style={{ position: 'relative', textAlign: 'center', padding: '0 24px' }}>
-              <h2 style={{ fontSize: isMobile ? 28 : 44, fontWeight: 900, color: '#fff', marginBottom: 12, textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
-                הסופרים שלנו
-              </h2>
-              <p style={{ fontSize: isMobile ? 13 : 16, color: 'rgba(220,235,215,0.85)', marginBottom: 24 }}>
-                סופרים מוסמכים ומנוסים ברחבי הארץ
-              </p>
-              <button
-                onClick={() => router.push('/soferim')}
-                style={{
-                  background: 'linear-gradient(135deg, #b8972a, #e6c84a)',
-                  border: 'none', borderRadius: 10,
-                  padding: isMobile ? '10px 24px' : '13px 32px',
-                  fontSize: isMobile ? 14 : 16, fontWeight: 900, color: '#0c1a35', cursor: 'pointer',
-                }}
-              >
-                הכר את הסופרים ←
-              </button>
-            </div>
+            <span style={{ position: 'absolute', bottom: 20, right: 20, color: '#fff', fontSize: isMobile ? 18 : 22, fontWeight: 600, textShadow: '0 2px 8px rgba(0,0,0,0.8)', textAlign: 'right' }}>
+              הסופרים שלנו
+            </span>
+            <button
+              onClick={e => { e.stopPropagation(); router.push('/soferim'); }}
+              style={{
+                position: 'absolute', bottom: 20, left: 20,
+                background: 'transparent', border: '2px solid #ffffff',
+                borderRadius: 8, padding: '10px 22px',
+                fontSize: isMobile ? 12 : 13, fontWeight: 600, color: '#ffffff', cursor: 'pointer',
+              }}
+            >
+              הכר את הסופרים ←
+            </button>
           </div>
         </SwiperSlide>
 
@@ -145,11 +140,9 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: '#1a2d50' }} />
             )}
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff', fontSize: isMobile ? 32 : 48, fontWeight: 900, textShadow: '0 2px 8px rgba(0,0,0,0.7)', direction: 'rtl' }}>
-                יודאיקה
-              </span>
-            </div>
+            <span style={{ position: 'absolute', bottom: 20, right: 20, color: '#fff', fontSize: isMobile ? 18 : 22, fontWeight: 600, textShadow: '0 2px 8px rgba(0,0,0,0.8)', textAlign: 'right' }}>
+              יודאיקה
+            </span>
           </div>
         </SwiperSlide>
 
@@ -164,12 +157,9 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: '#2d1a50' }} />
             )}
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} />
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff', fontSize: isMobile ? 32 : 48, fontWeight: 900, textShadow: '0 2px 20px rgba(0,0,0,0.5)', direction: 'rtl' }}>
-                מתנות
-              </span>
-            </div>
+            <span style={{ position: 'absolute', bottom: 20, right: 20, color: '#fff', fontSize: isMobile ? 18 : 22, fontWeight: 600, textShadow: '0 2px 12px rgba(0,0,0,0.8)', textAlign: 'right' }}>
+              מתנות
+            </span>
           </div>
         </SwiperSlide>
       </Swiper>
