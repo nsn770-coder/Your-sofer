@@ -31,8 +31,18 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
         }
         if (!tefSnap.empty) {
           const d = tefSnap.docs[0].data();
-          setTefillinImg((d.imageUrl || d.imgUrl || '') as string);
+          const img = (d.imageUrl || d.imgUrl || '') as string;
+          if (img) { setTefillinImg(img); return; }
         }
+        // Fallback: try by slug
+        const tefSlugSnap = await getDocs(query(collection(db, 'categories'), where('slug', '==', 'תפילין-קומפלט'), limit(1)));
+        if (!tefSlugSnap.empty) {
+          const d = tefSlugSnap.docs[0].data();
+          const img = (d.imageUrl || d.imgUrl || '') as string;
+          if (img) { setTefillinImg(img); return; }
+        }
+        // Hardcoded Cloudinary fallback
+        setTefillinImg('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1/yoursofer_upload/tefillin-category');
       } catch { /* non-fatal */ }
     }
     fetchImages();
@@ -52,15 +62,33 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
     else if (step === 3) { setNusach(null); go(2); }
   }
 
+  function getLevelOptions(): { label: Level; desc: string }[] {
+    if (path === 'mezuzah') {
+      return [
+        { label: 'פשוט', desc: 'עד ₪280' },
+        { label: 'מהודר', desc: '₪281 – ₪399' },
+        { label: 'מהודר בתכלית', desc: '₪400+' },
+      ];
+    }
+    if (nusach === 'ספרדי') {
+      return [
+        { label: 'פשוט', desc: '₪2,700 – ₪3,200' },
+        { label: 'מהודר', desc: '₪3,201 – ₪3,699' },
+        { label: 'מהודר בתכלית', desc: '₪3,700+' },
+      ];
+    }
+    return [
+      { label: 'פשוט', desc: '₪3,000 – ₪3,500' },
+      { label: 'מהודר', desc: '₪3,501 – ₪3,999' },
+      { label: 'מהודר בתכלית', desc: '₪4,000+' },
+    ];
+  }
+
   function navigate(level: Level) {
     const catName = path === 'mezuzah' ? 'קלפי מזוזה' : 'תפילין קומפלט';
-    const ranges: Record<Level, string> = {
-      'פשוט': 'minPrice=180&maxPrice=240',
-      'מהודר': 'minPrice=241&maxPrice=280',
-      'מהודר בתכלית': 'minPrice=281',
-    };
+    const levelParam = level === 'מהודר בתכלית' ? 'מהודר-בתכלית' : level;
     const nusachParam = nusach ? `nusach=${encodeURIComponent(nusach)}&` : '';
-    router.push(`/category/${encodeURIComponent(catName)}?${nusachParam}${ranges[level]}`);
+    router.push(`/category/${encodeURIComponent(catName)}?${nusachParam}level=${encodeURIComponent(levelParam)}`);
   }
 
   const btnStyle: React.CSSProperties = {
@@ -206,11 +234,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
           <>
             <div style={titleStyle}>בחר רמת הידור</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {([
-                { label: 'פשוט', desc: '₪180 – ₪240' },
-                { label: 'מהודר', desc: '₪241 – ₪280' },
-                { label: 'מהודר בתכלית', desc: '₪281+' },
-              ] as { label: Level; desc: string }[]).map(opt => (
+              {getLevelOptions().map(opt => (
                 <button
                   key={opt.label}
                   style={{ ...btnStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}

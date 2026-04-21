@@ -37,11 +37,14 @@ interface Product {
   createdAt?: { seconds: number };
   hidden?: boolean;
   cat?: string;
+  nusach?: string;
 }
 
 interface FilterState {
   minPrice: string;
   maxPrice: string;
+  level: string;
+  nusachFilter: string;
   minRating: number;
   freeShipping: boolean;
   attrFilters: Record<string, string>;
@@ -53,6 +56,8 @@ interface FilterState {
 const EMPTY_FILTERS: FilterState = {
   minPrice: '',
   maxPrice: '',
+  level: '',
+  nusachFilter: '',
   minRating: 0,
   freeShipping: false,
   attrFilters: {},
@@ -191,7 +196,8 @@ function IconTruck({ size = 13 }: { size?: number }) {
 
 function hasActiveFilters(f: FilterState) {
   return (
-    f.minPrice !== '' || f.maxPrice !== '' || f.minRating > 0 || f.freeShipping ||
+    f.minPrice !== '' || f.maxPrice !== '' || f.level !== '' || f.nusachFilter !== '' ||
+    f.minRating > 0 || f.freeShipping ||
     f.sizeMin > 0 || f.sizeMax < 100 ||
     Object.values(f.attrFilters).some(v => v && v !== 'הכל') ||
     Object.values(f.nameFilters).some(v => v && v !== 'הכל')
@@ -202,6 +208,25 @@ function applyFilters(products: Product[], f: FilterState): Product[] {
   return products.filter(p => {
     if (f.minPrice !== '' && p.price < Number(f.minPrice)) return false;
     if (f.maxPrice !== '' && p.price > Number(f.maxPrice)) return false;
+    if (f.level) {
+      const name = p.name;
+      if (f.level === 'פשוט') {
+        if (!['פשוט', 'כשרות לכתחילה', 'כשרות טובה', 'לכתחילה'].some(kw => name.includes(kw))) return false;
+      } else if (f.level === 'מהודר') {
+        if (!name.includes('מהודר') || name.includes('בתכלית')) return false;
+      } else if (f.level === 'מהודר-בתכלית') {
+        if (!['מהודר בתכלית', 'הידור בתכלית'].some(kw => name.includes(kw))) return false;
+      }
+    }
+    if (f.nusachFilter) {
+      const sfarad = f.nusachFilter === 'ספרדי';
+      const keywords = sfarad ? ['ספרד', 'ספרדי'] : ['אשכנז', 'אשכנזי'];
+      const matches =
+        (p.nusach != null && keywords.some(kw => p.nusach!.includes(kw))) ||
+        keywords.some(kw => p.name.includes(kw)) ||
+        (p.filterAttributes?.['נוסח'] != null && keywords.some(kw => p.filterAttributes!['נוסח'].includes(kw)));
+      if (!matches) return false;
+    }
     if (f.minRating > 0 && (p.stars ?? 0) < f.minRating) return false;
     if (f.freeShipping && p.days && !p.days.toLowerCase().includes('חינם')) return false;
     if (f.sizeMin > 0 || f.sizeMax < 100) {
@@ -526,6 +551,13 @@ function ActiveFilterPills({ filters, onChange }: { filters: FilterState; onChan
       onRemove: () => onChange({ ...filters, minPrice: '', maxPrice: '' }),
     });
   }
+  if (filters.level) {
+    const levelLabel = filters.level === 'מהודר-בתכלית' ? 'מהודר בתכלית' : filters.level;
+    pills.push({ label: `רמה: ${levelLabel}`, onRemove: () => onChange({ ...filters, level: '' }) });
+  }
+  if (filters.nusachFilter) {
+    pills.push({ label: `נוסח: ${filters.nusachFilter}`, onRemove: () => onChange({ ...filters, nusachFilter: '' }) });
+  }
   if (filters.minRating > 0) {
     pills.push({ label: `${filters.minRating}★ ומעלה`, onRemove: () => onChange({ ...filters, minRating: 0 }) });
   }
@@ -658,14 +690,13 @@ function Pagination({ currentPage, totalPages, onChange }: { currentPage: number
 
 export default function CategoryClient({ category }: { category: string }) {
   const searchParams = useSearchParams();
-  const urlFilter    = searchParams.get('filter')   ?? null;
-  const urlMinPrice  = searchParams.get('minPrice') ?? '';
-  const urlMaxPrice  = searchParams.get('maxPrice') ?? '';
-  const urlNusach    = searchParams.get('nusach')   ?? null;
+  const urlFilter    = searchParams.get('filter') ?? null;
+  const urlLevel     = searchParams.get('level')  ?? null;
+  const urlNusach    = searchParams.get('nusach') ?? null;
 
   const [allLoaded, setAllLoaded]     = useState<Product[]>([]);
   const [loading, setLoading]         = useState(true);
-  const [filters, setFilters]         = useState<FilterState>({ ...EMPTY_FILTERS, minPrice: urlMinPrice, maxPrice: urlMaxPrice });
+  const [filters, setFilters]         = useState<FilterState>(EMPTY_FILTERS);
   const [sortBy, setSortBy]           = useState<SortBy>('popular');
   const [drawerOpen, setDrawerOpen]   = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -710,7 +741,7 @@ export default function CategoryClient({ category }: { category: string }) {
   }
 
   useEffect(() => {
-    setAllLoaded([]); setLoading(true); setFilters({ ...EMPTY_FILTERS, minPrice: urlMinPrice, maxPrice: urlMaxPrice }); setSortBy('popular'); setCurrentPage(1); setCatFilter('הכל');
+    setAllLoaded([]); setLoading(true); setFilters(EMPTY_FILTERS); setSortBy('popular'); setCurrentPage(1); setCatFilter('הכל');
     fetchAll().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
@@ -779,11 +810,18 @@ export default function CategoryClient({ category }: { category: string }) {
       const val = map[urlNusach] ?? urlNusach;
       setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, כתב: val } }));
     } else {
-      // For תפילין and others, nusach maps to the 'נוסח' attribute
-      setFilters(prev => ({ ...prev, attrFilters: { ...prev.attrFilters, נוסח: urlNusach } }));
+      // For תפילין and others: check product.nusach or name keywords
+      setFilters(prev => ({ ...prev, nusachFilter: urlNusach }));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlNusach, loading, allLoaded.length]);
+
+  // Apply level URL param after products load
+  useEffect(() => {
+    if (!urlLevel || loading || allLoaded.length === 0) return;
+    setFilters(prev => ({ ...prev, level: urlLevel }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlLevel, loading, allLoaded.length]);
 
   useEffect(() => { setCurrentPage(1); }, [filters]);
 
