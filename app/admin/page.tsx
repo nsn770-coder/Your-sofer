@@ -59,6 +59,7 @@ interface ShluchimApplication {
   logoUrl?: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt?: { seconds: number };
+  approvedDocId?: string;
 }
 
 interface AppUser {
@@ -1792,6 +1793,17 @@ export default function AdminPage() {
                         {app.city && <span>📍 {app.city}</span>}{app.phone && <span>📞 {app.phone}</span>}{app.email && <span>✉️ {app.email}</span>}{app.rabbiName && <span>👤 {app.rabbiName}</span>}
                       </div>
                       {app.createdAt && <p className="text-xs text-gray-400">נשלח: {new Date(app.createdAt.seconds * 1000).toLocaleDateString('he-IL')}</p>}
+                      {app.status === 'approved' && app.approvedDocId && (
+                        <div className="flex items-center gap-2 mt-2 p-2 bg-blue-50 rounded-lg">
+                          <span className="text-xs text-blue-700 font-mono truncate max-w-xs">https://your-sofer.com/?ref={app.approvedDocId}</span>
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(`https://your-sofer.com/?ref=${app.approvedDocId}`); }}
+                            className="flex-shrink-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-lg hover:bg-blue-700 transition"
+                          >
+                            העתק קישור
+                          </button>
+                        </div>
+                      )}
                     </div>
                     {app.status === 'pending' && (
                       <div className="flex flex-col gap-2 flex-shrink-0">
