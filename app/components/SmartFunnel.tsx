@@ -246,7 +246,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
                 isMobile={isMobile}
               />
               <ImageCard
-                img={tefillinImg}
+                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776222894/vrknd4v6jp9z7fyrcbyf.jpg"
                 label="צפה בתפילין"
                 onClick={() => { setPath('tefillin'); go(2); }}
                 height={140}
