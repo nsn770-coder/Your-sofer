@@ -38,6 +38,7 @@ interface Product {
   hidden?: boolean;
   cat?: string;
   nusach?: string;
+  level?: string;
 }
 
 interface FilterState {
@@ -209,20 +210,29 @@ function applyFilters(products: Product[], f: FilterState): Product[] {
     if (f.minPrice !== '' && p.price < Number(f.minPrice)) return false;
     if (f.maxPrice !== '' && p.price > Number(f.maxPrice)) return false;
     if (f.level) {
-      const name = p.name;
-      if (f.level === 'פשוט') {
-        if (!['פשוט', 'כשרות לכתחילה', 'כשרות טובה', 'לכתחילה'].some(kw => name.includes(kw))) return false;
-      } else if (f.level === 'מהודר') {
-        if (!name.includes('מהודר') || name.includes('בתכלית')) return false;
-      } else if (f.level === 'מהודר-בתכלית') {
-        if (!['מהודר בתכלית', 'הידור בתכלית'].some(kw => name.includes(kw))) return false;
+      // Normalise URL param: 'מהודר-בתכלית' → 'מהודר בתכלית'
+      const wantedLevel = f.level === 'מהודר-בתכלית' ? 'מהודר בתכלית' : f.level;
+      if (p.level && p.level !== '') {
+        // Product has a level field — use exact match
+        if (p.level !== wantedLevel) return false;
+      } else {
+        // Fallback: name-keyword matching for products without level field
+        const name = p.name;
+        if (wantedLevel === 'פשוט') {
+          if (!['פשוט', 'כשרות לכתחילה', 'כשרות טובה', 'לכתחילה'].some(kw => name.includes(kw))) return false;
+        } else if (wantedLevel === 'מהודר') {
+          if (!(name.includes('מהודר') || name.includes('מהודרת')) || name.includes('בתכלית')) return false;
+        } else if (wantedLevel === 'מהודר בתכלית') {
+          if (!['מהודר בתכלית', 'מהודרת בתכלית', 'הידור בתכלית'].some(kw => name.includes(kw))) return false;
+        }
       }
     }
     if (f.nusachFilter) {
       const sfarad = f.nusachFilter === 'ספרדי';
       const keywords = sfarad ? ['ספרד', 'ספרדי'] : ['אשכנז', 'אשכנזי'];
+      // Check product.nusach field first, then name keywords, then filterAttributes
       const matches =
-        (p.nusach != null && keywords.some(kw => p.nusach!.includes(kw))) ||
+        (p.nusach != null && p.nusach !== '' && keywords.some(kw => p.nusach!.includes(kw))) ||
         keywords.some(kw => p.name.includes(kw)) ||
         (p.filterAttributes?.['נוסח'] != null && keywords.some(kw => p.filterAttributes!['נוסח'].includes(kw)));
       if (!matches) return false;

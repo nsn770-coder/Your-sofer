@@ -193,6 +193,7 @@ function AddProductModal({ soferim, onClose, onSave }: {
   const [was, setWas] = useState('');
   const [desc, setDesc] = useState('');
   const [cat, setCat] = useState(CATS.filter(c => c !== 'הכל')[0] || '');
+  const [level, setLevel] = useState('');
   const [badge, setBadge] = useState('');
   const [days, setDays] = useState('7-14');
   const [soferId, setSoferId] = useState('');
@@ -201,6 +202,7 @@ function AddProductModal({ soferim, onClose, onSave }: {
   const [imgUrl3, setImgUrl3] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState<string | null>(null);
+  const LEVEL_CATS = ['קלפי מזוזה', 'תפילין קומפלט'];
 
   async function uploadToCloudinary(file: File): Promise<string> {
     const formData = new FormData();
@@ -237,6 +239,7 @@ function AddProductModal({ soferim, onClose, onSave }: {
         was: was ? Number(was) : null,
         desc, cat,
         category: cat,
+        level: LEVEL_CATS.includes(cat) ? level : '',
         badge: badge || null,
         priority: 50,
         isBestSeller: false,
@@ -301,6 +304,18 @@ function AddProductModal({ soferim, onClose, onSave }: {
               </select>
             </div>
           </div>
+          {LEVEL_CATS.includes(cat) && (
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>רמת הידור</label>
+              <select value={level} onChange={e => setLevel(e.target.value)}
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
+                <option value="">לא מוגדר</option>
+                <option value="פשוט">פשוט</option>
+                <option value="מהודר">מהודר</option>
+                <option value="מהודר בתכלית">מהודר בתכלית</option>
+              </select>
+            </div>
+          )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תווית</label>
