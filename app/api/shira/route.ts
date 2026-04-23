@@ -28,7 +28,15 @@ const SHIRA_SYSTEM = `את שירה — סוכנת מכירות של YourSofer, 
 - אל תמציאי פרטים שאינך יודעת עליהם
 - אם שואלים על מוצר ספציפי — הסבירי על הקטגוריה ועודדי לחפש באתר`;
 
+export async function GET() {
+  return NextResponse.json({ status: 'shira route ok' });
+}
+
 export async function POST(req: NextRequest) {
+  console.log('--- Shira POST called ---');
+  console.log('Key starts with:', process.env.ANTHROPIC_API_KEY?.substring(0, 8));
+  console.log('Key present:', !!process.env.ANTHROPIC_API_KEY);
+
   try {
     const { messages } = await req.json();
 
@@ -54,8 +62,6 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await response.json();
-    console.log('Shira API key present:', !!process.env.ANTHROPIC_API_KEY);
-    console.log('Key starts with:', process.env.ANTHROPIC_API_KEY?.substring(0, 8));
     console.log('Shira response:', JSON.stringify(data).slice(0, 200));
     const message = data.content?.[0]?.text || 'סליחה, לא הצלחתי להגיב כרגע.';
 
