@@ -37,6 +37,7 @@ interface Product {
   createdAt?: { seconds: number };
   hidden?: boolean;
   cat?: string;
+  subCategory?: string;
   nusach?: string;
   level?: string;
 }
@@ -829,6 +830,9 @@ export default function CategoryClient({ category }: { category: string }) {
 
   useEffect(() => {
     if (!urlFilter || loading || allLoaded.length === 0) return;
+    // Check subCategory match first
+    const subCatSet = new Set(allLoaded.map(p => p.subCategory).filter(Boolean) as string[]);
+    if (subCatSet.has(urlFilter)) { setSubCategoryFilter(urlFilter); return; }
     for (const key of ATTR_KEYS) {
       const vals = new Set(allLoaded.map(p => p.filterAttributes?.[key]).filter(Boolean));
       if (vals.has(urlFilter)) { setFilters(prev => ({ ...prev, attrFilters: { ...prev.attrFilters, [key]: urlFilter } })); return; }
