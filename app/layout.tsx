@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ShaliachProvider } from "./contexts/ShaliachContext";
 import NavBar from "@/app/components/navigation/NavBar";
 import Footer from "@/app/components/Footer";
+import ShiraChat from "@/components/chat/ShiraChat";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 
@@ -71,7 +72,7 @@ export default function RootLayout({
             </ShaliachProvider>
           </Suspense>
         </AuthProvider>
-        <Script src="//code.tidio.co/i6evth9lfvxovmfpvcftjeb25pw4psme.js" strategy="lazyOnload" />
+        <ShiraChat />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-PM7GW4MWEJ" strategy="afterInteractive" />
         <Script id="gtag-init" strategy="afterInteractive">{`
           window.dataLayer = window.dataLayer || [];
