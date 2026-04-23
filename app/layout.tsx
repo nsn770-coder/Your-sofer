@@ -8,7 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ShaliachProvider } from "./contexts/ShaliachContext";
 import NavBar from "@/app/components/navigation/NavBar";
 import Footer from "@/app/components/Footer";
-import ShiraChat from "@/components/chat/ShiraChat";
+import ShiraChat from "@/app/components/chat/ShiraChat";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 
