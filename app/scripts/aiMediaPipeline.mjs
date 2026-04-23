@@ -217,7 +217,7 @@ async function getPaldinoxCookies() {
 }
 
 // ══ הורד תמונה כ-base64 ══
-async function downloadImageAsBase64(url) {
+async function downloadImageAsBase64(url, _retry = false) {
   const isPaldinox = url.includes('paldinox.co.il');
   const headers = { 'User-Agent': 'Mozilla/5.0' };
 
@@ -225,8 +225,32 @@ async function downloadImageAsBase64(url) {
     headers['Cookie'] = await getPaldinoxCookies();
   }
 
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`לא ניתן להוריד תמונה: ${url}`);
+  let res;
+  try {
+    res = await fetch(url, { headers });
+  } catch (e) {
+    // שגיאת רשת — אם paldinox ננסה פעם אחת עם session חדש
+    if (isPaldinox && !_retry) {
+      console.log('   🔄 שגיאת רשת — מחדש session פלדינוקס...');
+      _paldinoxCookies = null;
+      await new Promise(r => setTimeout(r, 2000));
+      return downloadImageAsBase64(url, true);
+    }
+    throw e;
+  }
+
+  // session פג — paldinox מחזירה HTML של דף login
+  if (isPaldinox && res.headers.get('content-type')?.includes('text/html')) {
+    if (!_retry) {
+      console.log('   🔄 session פג — מתחבר מחדש לפלדינוקס...');
+      _paldinoxCookies = null;
+      await new Promise(r => setTimeout(r, 2000));
+      return downloadImageAsBase64(url, true);
+    }
+    throw new Error('פלדינוקס: session פג גם אחרי התחברות מחדש');
+  }
+
+  if (!res.ok) throw new Error(`לא ניתן להוריד תמונה (${res.status}): ${url}`);
   const buffer = await res.arrayBuffer();
   const base64 = Buffer.from(buffer).toString('base64');
   const contentType = res.headers.get('content-type') || 'image/jpeg';
