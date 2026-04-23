@@ -48,10 +48,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      const errBody = await response.text();
+      console.error('Shira Anthropic error:', response.status, errBody);
+      throw new Error(`API error: ${response.status} — ${errBody}`);
     }
 
     const data = await response.json();
+    console.log('Shira API key present:', !!process.env.ANTHROPIC_API_KEY);
+    console.log('Shira response:', JSON.stringify(data).slice(0, 200));
     const message = data.content?.[0]?.text || 'סליחה, לא הצלחתי להגיב כרגע.';
 
     return NextResponse.json({ message });
