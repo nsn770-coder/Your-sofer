@@ -229,11 +229,18 @@ async function downloadImageAsBase64(url, _retry = false) {
   try {
     res = await fetch(url, { headers });
   } catch (e) {
+    console.error('   ❌ fetch error:', e.message, '| cause:', e.cause?.message ?? e.cause ?? '—', '| url:', url.substring(0, 60));
     // שגיאת רשת — אם paldinox ננסה פעם אחת עם session חדש
     if (isPaldinox && !_retry) {
       console.log('   🔄 שגיאת רשת — מחדש session פלדינוקס...');
       _paldinoxCookies = null;
       await new Promise(r => setTimeout(r, 2000));
+      return downloadImageAsBase64(url, true);
+    }
+    // ננסה פעם נוספת אחרי המתנה קצרה גם עבור URLs אחרים
+    if (!_retry) {
+      console.log('   🔄 מנסה שוב אחרי 3 שניות...');
+      await new Promise(r => setTimeout(r, 3000));
       return downloadImageAsBase64(url, true);
     }
     throw e;
