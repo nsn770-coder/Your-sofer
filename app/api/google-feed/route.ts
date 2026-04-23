@@ -43,12 +43,17 @@ export async function GET() {
       const link = `${SITE}/product/${id}`;
 
       // Build ordered image list from all known image fields
+      const CDN = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/';
+      const normalizeImg = (u: unknown): string | null => {
+        if (!u || typeof u !== 'string' || !u.trim()) return null;
+        return u.startsWith('http') ? u : CDN + u;
+      };
       const allImages: string[] = [
-        d.imgUrl ?? d.image_url ?? d.img1,
-        d.imgUrl2 ?? d.img2,
-        d.imgUrl3 ?? d.img3,
-        d.imgUrl4,
-      ].filter((u): u is string => typeof u === 'string' && u.startsWith('http'));
+        normalizeImg(d.imgUrl ?? d.image_url ?? d.img1),
+        normalizeImg(d.imgUrl2 ?? d.img2),
+        normalizeImg(d.imgUrl3 ?? d.img3),
+        normalizeImg(d.imgUrl4),
+      ].filter((u): u is string => u !== null);
 
       const imageLink = allImages.length >= 2 ? allImages[1] : (allImages[0] ?? '');
       const additionalImages: string[] =
