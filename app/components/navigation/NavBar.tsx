@@ -386,7 +386,7 @@ function NavBarContent() {
                   onMouseEnter={() => handleEnter(item.id)}
                   onMouseLeave={handleLeave}
                 >
-                  <button style={{ background: "none", border: "none", color: activeId === item.id ? "#b8972a" : "#fff", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 400, borderBottom: activeId === item.id ? "2px solid #b8972a" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
+                  <button onClick={() => handleSelect(item.cat)} style={{ background: "none", border: "none", color: activeId === item.id ? "#b8972a" : "#fff", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 400, borderBottom: activeId === item.id ? "2px solid #b8972a" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
                     {item.label}
                     <motion.span animate={{ rotate: activeId === item.id ? 180 : 0 }} transition={{ duration: 0.2 }} style={{ fontSize: 9, color: "#b8972a" }}>▾</motion.span>
                   </button>
