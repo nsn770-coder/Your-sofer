@@ -61,7 +61,11 @@ async function callGemini(prompt) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 600,
+        thinkingConfig: { thinkingBudget: 256 },
+      },
     }),
   });
 
@@ -71,7 +75,11 @@ async function callGemini(prompt) {
   }
 
   const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+  // gemini-2.5-flash הוא thinking model — מחזיר parts עם thought:true (חשיבה פנימית)
+  // וpart נוסף ללא thought שהוא התוצאה בפועל. סננו רק את התוצאה.
+  const parts = data.candidates?.[0]?.content?.parts ?? [];
+  const textPart = parts.find(p => !p.thought && p.text != null);
+  return textPart?.text ?? null;
 }
 
 // ── Validation ────────────────────────────────────────────────────────────────
