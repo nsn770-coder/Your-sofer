@@ -277,8 +277,7 @@ async function fetchUrlViaCloudinary(url, productId) {
   formData.append('file', url);
   formData.append('upload_preset', CLOUDINARY_PRESET);
   formData.append('folder', `yoursofer/${productId}`);
-  formData.append('public_id', `${productId}_src_${Date.now()}`);
-  formData.append('return_delete_token', 'true'); // מבקש delete_token לניקוי אחר כך
+  formData.append('public_id', `${productId}_src`); // קבוע — לא מצטבר
 
   const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
     method: 'POST',
@@ -287,7 +286,7 @@ async function fetchUrlViaCloudinary(url, productId) {
 
   if (!res.ok) throw new Error(`Cloudinary fetch-upload: ${await res.text()}`);
   const data = await res.json();
-  return { secureUrl: data.secure_url, deleteToken: data.delete_token || null };
+  return data.secure_url;
 }
 
 // ══ מחק תמונת מקור זמנית מ-Cloudinary (באמצעות delete_token — ללא API credentials) ══
@@ -316,9 +315,7 @@ async function uploadBase64ToCloudinary(base64, productId) {
   formData.append('file', `data:image/png;base64,${base64}`);
   formData.append('upload_preset', CLOUDINARY_PRESET);
   formData.append('folder', `yoursofer/${productId}`);
-  formData.append('public_id', `${productId}_review`); // קבוע — דורס אם קיים
-  formData.append('overwrite', 'true');
-  formData.append('invalidate', 'true'); // מנקה CDN cache
+  formData.append('public_id', `${productId}_review`); // קבוע — אותה URL בכל ריצה
 
   const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
     method: 'POST',
@@ -354,9 +351,8 @@ async function processProduct(product, provider, testMode) {
     if (!imgUrl.includes('cloudinary.com')) {
       try {
         console.log('   🔄 מבקש מ-Cloudinary להוריד תמונה...');
-        const { secureUrl, deleteToken } = await fetchUrlViaCloudinary(imgUrl, product.id);
-        downloadUrl = secureUrl;
-        srcDeleteToken = deleteToken;
+        downloadUrl = await fetchUrlViaCloudinary(imgUrl, product.id);
+        srcDeleteToken = null; // unsigned preset אינו מחזיר delete_token
         console.log('   ✅ Cloudinary הוריד:', downloadUrl.substring(0, 60) + '...');
       } catch (cloudErr) {
         console.warn(`   ⚠️ Cloudinary upload נכשל (${cloudErr.message}) — מנסה ישירות...`);
