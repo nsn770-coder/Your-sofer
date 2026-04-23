@@ -271,13 +271,12 @@ async function generateWithOpenAI(imageBase64, contentType) {
 }
 
 // ══ בקש מ-Cloudinary להוריד URL (Cloudinary מוריד מהשרת שלו — עוקף חסימות IP) ══
-// מחזיר { secureUrl, deleteToken } — השתמש ב-deleteToken למחיקה מיידית אחרי עיבוד
 async function fetchUrlViaCloudinary(url, productId) {
   const formData = new FormData();
   formData.append('file', url);
   formData.append('upload_preset', CLOUDINARY_PRESET);
   formData.append('folder', `yoursofer/${productId}`);
-  formData.append('public_id', `${productId}_src`); // קבוע — לא מצטבר
+  formData.append('public_id', `${productId}_src_${Date.now()}`); // timestamp — ללא התנגשות
 
   const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
     method: 'POST',
@@ -309,13 +308,12 @@ async function deleteCloudinaryByToken(deleteToken) {
 }
 
 // ══ העלה ל-Cloudinary ══
-// public_id קבוע (ללא timestamp) + overwrite=true — מונע כפילויות אם מוצר מעובד פעמיים
 async function uploadBase64ToCloudinary(base64, productId) {
   const formData = new FormData();
   formData.append('file', `data:image/png;base64,${base64}`);
   formData.append('upload_preset', CLOUDINARY_PRESET);
   formData.append('folder', `yoursofer/${productId}`);
-  formData.append('public_id', `${productId}_review`); // קבוע — אותה URL בכל ריצה
+  formData.append('public_id', `${productId}_review_${Date.now()}`); // timestamp — ללא התנגשות
 
   const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
     method: 'POST',
@@ -380,6 +378,16 @@ async function processProduct(product, provider, testMode) {
     console.error('   ❌ יצירת תמונה נכשלה:', e.message);
     await deleteCloudinaryByToken(srcDeleteToken);
     return {};
+  }
+
+  // בדיקה שנייה לפני upload — מגינה אם הפייפליין הופעל מחדש בזמן שה-generation רץ
+  if (!testMode) {
+    const check2 = await db.collection('products').doc(product.id).get();
+    if (check2.exists && check2.data()?.imgUrl2) {
+      console.log('   ⏭ עודכן בינתיים — דולג (בדיקה שנייה)');
+      await deleteCloudinaryByToken(srcDeleteToken);
+      return {};
+    }
   }
 
   try {
