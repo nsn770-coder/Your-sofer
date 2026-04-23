@@ -140,7 +140,8 @@ export default function ProductCard({
     setTimeout(() => setRemoved(true), 300);
   }
 
-  const imgSrc       = optimizeCloudinaryUrl(images?.[0] ?? '', 400) || null;
+  const thumbRaw     = (images?.length ?? 0) >= 2 ? images[1] : (images?.[0] ?? '');
+  const imgSrc       = optimizeCloudinaryUrl(thumbRaw, 400) || null;
   const itemInCart   = items.find(i => i.id === id);
   const qty          = itemInCart?.quantity ?? 0;
   const hasSale      = typeof was === 'number' && was > price;
