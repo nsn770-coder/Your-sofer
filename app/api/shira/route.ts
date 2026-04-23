@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json();
     console.log('Shira API key present:', !!process.env.ANTHROPIC_API_KEY);
+    console.log('Key starts with:', process.env.ANTHROPIC_API_KEY?.substring(0, 8));
     console.log('Shira response:', JSON.stringify(data).slice(0, 200));
     const message = data.content?.[0]?.text || 'סליחה, לא הצלחתי להגיב כרגע.';
 
