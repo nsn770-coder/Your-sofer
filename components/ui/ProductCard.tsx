@@ -6,6 +6,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import ProductBadge from '@/components/ui/ProductBadge';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 interface Props {
   id: string;
@@ -139,7 +140,7 @@ export default function ProductCard({
     setTimeout(() => setRemoved(true), 300);
   }
 
-  const imgSrc       = images?.[0] ?? null;
+  const imgSrc       = optimizeCloudinaryUrl(images?.[0] ?? '', 400) || null;
   const itemInCart   = items.find(i => i.id === id);
   const qty          = itemInCart?.quantity ?? 0;
   const hasSale      = typeof was === 'number' && was > price;

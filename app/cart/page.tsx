@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 export default function CartPage() {
   const router = useRouter();
@@ -90,7 +91,7 @@ export default function CartPage() {
                             onClick={() => router.push(`/product/${item.id}`)}
                             style={{ width: 80, height: 80, background: '#f7f8f8', borderRadius: 6, overflow: 'hidden', flexShrink: 0, border: '1px solid #eee', cursor: 'pointer' }}>
                             {item.imgUrl ? (
-                              <img src={item.imgUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              <img src={optimizeCloudinaryUrl(item.imgUrl, 100)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 onError={e => (e.currentTarget.style.display = 'none')} />
                             ) : (
                               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>📦</div>
@@ -150,7 +151,7 @@ export default function CartPage() {
                         <div style={{ width: 100, height: 100, background: '#f7f8f8', borderRadius: 6, overflow: 'hidden', flexShrink: 0, border: '1px solid #eee', cursor: 'pointer' }}
                           onClick={() => router.push(`/product/${item.id}`)}>
                           {item.imgUrl ? (
-                            <img src={item.imgUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            <img src={optimizeCloudinaryUrl(item.imgUrl, 100)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               onError={e => (e.currentTarget.style.display = 'none')} />
                           ) : (
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>📦</div>

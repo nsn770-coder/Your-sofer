@@ -7,6 +7,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
 import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -703,6 +704,8 @@ export default function ProductClient() {
   );
 
   const allMedia = [product.imgUrl || product.image_url, product.imgUrl2 || product.img1, product.imgUrl3 || product.img2, product.imgUrl4 || product.img3].filter(Boolean) as string[];
+  const allMediaOptimized = allMedia.map(u => optimizeCloudinaryUrl(u, 800));
+  const allMediaThumb     = allMedia.map(u => optimizeCloudinaryUrl(u, 100));
   const hasVideo = !!product.videoUrl;
   const discount = product.was ? Math.round((1 - product.price / product.was) * 100) : 0;
 
@@ -833,7 +836,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   <source src={product.videoUrl} />
                 </video>
               ) : (
-                <img src={allMedia[activeImg] || '/placeholder.png'} alt={product.name} onClick={() => setZoomVisible(true)}
+                <img src={allMediaOptimized[activeImg] || '/placeholder.png'} alt={product.name} onClick={() => setZoomVisible(true)}
                   style={{ width: '100%', aspectRatio: isMobile ? '4/3' : '1', objectFit: 'contain', padding: isMobile ? 8 : 20, display: 'block' }}
                   onError={e => (e.currentTarget.style.display = 'none')} />
               )}
@@ -848,7 +851,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               {allMedia.map((img, i) => (
                 <button key={i} onClick={() => { setActiveImg(i); setShowVideo(false); }}
                   style={{ width: isMobile ? 52 : 60, height: isMobile ? 52 : 60, flexShrink: 0, borderRadius: 8, overflow: 'hidden', border: `2px solid ${activeImg === i && !showVideo ? '#b8972a' : '#e0e0e0'}`, background: '#fff', cursor: 'pointer', padding: 2, transition: 'border-color 0.15s' }}>
-                  <img src={img} alt={`תמונה ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={e => (e.currentTarget.style.display = 'none')} />
+                  <img src={allMediaThumb[i]} alt={`תמונה ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={e => (e.currentTarget.style.display = 'none')} />
                 </button>
               ))}
               {hasVideo && (
@@ -1000,7 +1003,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: isMobile ? 10 : 14 }}>
               {related.map(r => {
-                const rImg = r.imgUrl || r.image_url;
+                const rImg = optimizeCloudinaryUrl(r.imgUrl || r.image_url || '', 400) || undefined;
                 return (
                   <div key={r.id} onClick={() => router.push(`/product/${r.id}`)}
                     style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}

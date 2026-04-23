@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 function IconLock({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
@@ -177,7 +178,7 @@ export default function CheckoutPage() {
         {items.map(item => (
           <div key={item.id} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{ width: 44, height: 44, borderRadius: 8, overflow: 'hidden', background: '#f8f6f2', flexShrink: 0, border: '1px solid #e8e2d8' }}>
-              {item.imgUrl ? <img src={item.imgUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCart size={18} color="#ccc" /></div>}
+              {item.imgUrl ? <img src={optimizeCloudinaryUrl(item.imgUrl, 100)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCart size={18} color="#ccc" /></div>}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: '#0c1a35', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
@@ -333,7 +334,7 @@ export default function CheckoutPage() {
                   {items.map(item => (
                     <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{ width: 48, height: 48, background: '#f8f6f2', borderRadius: 8, overflow: 'hidden', flexShrink: 0, border: '1px solid #e8e2d8' }}>
-                        {item.imgUrl ? <img src={item.imgUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCart size={18} color="#ccc" /></div>}
+                        {item.imgUrl ? <img src={optimizeCloudinaryUrl(item.imgUrl, 100)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCart size={18} color="#ccc" /></div>}
                       </div>
                       <div style={{ flex: 1, fontSize: 13 }}>
                         <div style={{ fontWeight: 600, color: '#0c1a35' }}>{item.name}</div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { collection, query, where, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCart } from '../contexts/CartContext';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 interface Product {
   id: string;
@@ -383,7 +384,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 16 }}>
               {cases.map(p => (
                 <div key={p.id} style={{ background: '#f8f4ec', borderRadius: 14, overflow: 'hidden', border: '1.5px solid #e8dfc8', cursor: 'pointer' }} onClick={() => handleAddCase(p)}>
-                  {(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />}
+                  {(p.imgUrl || p.image_url) && <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 400)} alt={p.name} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />}
                   <div style={{ padding: '10px 12px' }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#0c1a35', marginBottom: 4, lineHeight: 1.3 }}>{p.name}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
