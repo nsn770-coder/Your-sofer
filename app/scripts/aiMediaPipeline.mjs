@@ -52,7 +52,7 @@ const GEMINI_MODEL = 'gemini-2.5-flash-image';
 const GEMINI_URL   = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // ══ קטגוריות ══
-const CATEGORIES = ['יודאיקה', 'מתנות', 'שבת וחגים', 'סט טלית ותפילין', 'מזוזות'];
+const CATEGORIES = ['יודאיקה', 'מתנות', 'שבת וחגים', 'סט טלית תפילין', 'מזוזות', 'כיסוי תפילין', 'בר מצווה', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'כלי שולחן והגשה', 'עיצוב הבית'];
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -270,6 +270,45 @@ async function generateWithOpenAI(imageBase64, contentType) {
   return b64;
 }
 
+// ══ בקש מ-Cloudinary להוריד URL (Cloudinary מוריד מהשרת שלו — עוקף חסימות IP) ══
+// מחזיר { secureUrl, deleteToken } — השתמש ב-deleteToken למחיקה מיידית אחרי עיבוד
+async function fetchUrlViaCloudinary(url, productId) {
+  const formData = new FormData();
+  formData.append('file', url);
+  formData.append('upload_preset', CLOUDINARY_PRESET);
+  formData.append('folder', `yoursofer/${productId}`);
+  formData.append('public_id', `${productId}_src_${Date.now()}`);
+  formData.append('return_delete_token', 'true'); // מבקש delete_token לניקוי אחר כך
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error(`Cloudinary fetch-upload: ${await res.text()}`);
+  const data = await res.json();
+  return { secureUrl: data.secure_url, deleteToken: data.delete_token || null };
+}
+
+// ══ מחק תמונת מקור זמנית מ-Cloudinary (באמצעות delete_token — ללא API credentials) ══
+async function deleteCloudinaryByToken(deleteToken) {
+  if (!deleteToken) return;
+  try {
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/delete_by_token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: deleteToken }),
+    });
+    if (res.ok) {
+      console.log('   🗑  תמונת מקור נמחקה מ-Cloudinary');
+    } else {
+      console.warn('   ⚠️ מחיקת תמונת מקור נכשלה (לא קריטי):', res.status);
+    }
+  } catch {
+    // לא קריטי — ממשיך בכל מקרה
+  }
+}
+
 // ══ העלה ל-Cloudinary ══
 async function uploadBase64ToCloudinary(base64, productId) {
   const formData = new FormData();
@@ -303,11 +342,30 @@ async function processProduct(product, provider, testMode) {
   }
 
   let imageBase64, contentType;
+  let srcDeleteToken = null; // נשמור כדי למחוק אחרי עיבוד
+
   try {
-    ({ base64: imageBase64, contentType } = await downloadImageAsBase64(imgUrl));
+    let downloadUrl = imgUrl;
+
+    // אם ה-URL לא מ-Cloudinary — בקש מ-Cloudinary להוריד בשבילנו (עוקף חסימות IP)
+    if (!imgUrl.includes('cloudinary.com')) {
+      try {
+        console.log('   🔄 מבקש מ-Cloudinary להוריד תמונה...');
+        const { secureUrl, deleteToken } = await fetchUrlViaCloudinary(imgUrl, product.id);
+        downloadUrl = secureUrl;
+        srcDeleteToken = deleteToken;
+        console.log('   ✅ Cloudinary הוריד:', downloadUrl.substring(0, 60) + '...');
+      } catch (cloudErr) {
+        console.warn(`   ⚠️ Cloudinary upload נכשל (${cloudErr.message}) — מנסה ישירות...`);
+        downloadUrl = imgUrl;
+      }
+    }
+
+    ({ base64: imageBase64, contentType } = await downloadImageAsBase64(downloadUrl));
     console.log('   📥 תמונה הורדה');
   } catch (e) {
     console.error('   ❌ הורדה נכשלה:', e.message);
+    await deleteCloudinaryByToken(srcDeleteToken); // ניקוי גם במקרה כשלון
     return {};
   }
 
@@ -321,12 +379,16 @@ async function processProduct(product, provider, testMode) {
     }
   } catch (e) {
     console.error('   ❌ יצירת תמונה נכשלה:', e.message);
+    await deleteCloudinaryByToken(srcDeleteToken);
     return {};
   }
 
   try {
     const cloudinaryUrl = await uploadBase64ToCloudinary(resultBase64, product.id);
     console.log('   ✅ הועלה:', cloudinaryUrl);
+
+    // מחק תמונת מקור זמנית — רק ה-_review_ צריך להישאר
+    await deleteCloudinaryByToken(srcDeleteToken);
 
     if (!testMode) {
       await db.collection('products').doc(product.id).update({ imgUrl2: cloudinaryUrl });
@@ -338,6 +400,7 @@ async function processProduct(product, provider, testMode) {
     return { imgUrl2: cloudinaryUrl };
   } catch (e) {
     console.error('   ❌ העלאה נכשלה:', e.message);
+    await deleteCloudinaryByToken(srcDeleteToken);
     return {};
   }
 }
