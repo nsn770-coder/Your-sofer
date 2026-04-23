@@ -168,12 +168,37 @@ A clean, realistic, high-quality customer photo focused entirely on the product.
 
 // ══ הורד תמונה כ-base64 ══
 async function downloadImageAsBase64(url) {
-  const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-  if (!res.ok) throw new Error(`לא ניתן להוריד תמונה (${res.status}): ${url}`);
-  const buffer = await res.arrayBuffer();
-  const base64 = Buffer.from(buffer).toString('base64');
-  const contentType = res.headers.get('content-type') || 'image/jpeg';
-  return { base64, contentType };
+  // Node 18+ fetch מוגבל ל-20 redirects — השתמש ב-http/https ישירות לעקיפת redirect loops
+  const { get: httpsGet } = await import('https');
+  const { get: httpGet } = await import('http');
+
+  return new Promise((resolve, reject) => {
+    function doGet(targetUrl, redirectsLeft = 10) {
+      if (redirectsLeft <= 0) return reject(new Error(`redirect loop: ${targetUrl}`));
+      const getter = targetUrl.startsWith('https') ? httpsGet : httpGet;
+      getter(targetUrl, { headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 30000 }, res => {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          const next = new URL(res.headers.location, targetUrl).href;
+          res.resume();
+          return doGet(next, redirectsLeft - 1);
+        }
+        if (res.statusCode !== 200) {
+          res.resume();
+          return reject(new Error(`לא ניתן להוריד תמונה (${res.statusCode}): ${targetUrl}`));
+        }
+        const chunks = [];
+        res.on('data', c => chunks.push(c));
+        res.on('end', () => {
+          const buffer = Buffer.concat(chunks);
+          const base64 = buffer.toString('base64');
+          const contentType = res.headers['content-type'] || 'image/jpeg';
+          resolve({ base64, contentType });
+        });
+        res.on('error', reject);
+      }).on('error', reject).on('timeout', function() { this.destroy(new Error('timeout')); });
+    }
+    doGet(url);
+  });
 }
 
 // ══ Gemini AI Studio — inlineData + generateContent ══
