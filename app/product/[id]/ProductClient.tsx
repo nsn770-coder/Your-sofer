@@ -703,7 +703,9 @@ export default function ProductClient() {
     </div>
   );
 
-  const allMedia = [product.imgUrl || product.image_url, product.imgUrl2 || product.img1, product.imgUrl3 || product.img2, product.imgUrl4 || product.img3].filter(Boolean) as string[];
+  const allMediaRaw = [product.imgUrl || product.image_url, product.imgUrl2 || product.img1, product.imgUrl3 || product.img2, product.imgUrl4 || product.img3].filter(Boolean) as string[];
+  // Show AI-generated image (index 1) as primary when available
+  const allMedia = allMediaRaw.length >= 2 ? [allMediaRaw[1], allMediaRaw[0], ...allMediaRaw.slice(2)] : allMediaRaw;
   const allMediaOptimized = allMedia.map(u => optimizeCloudinaryUrl(u, 800));
   const allMediaThumb     = allMedia.map(u => optimizeCloudinaryUrl(u, 100));
   const hasVideo = !!product.videoUrl;
