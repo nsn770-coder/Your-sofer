@@ -46,9 +46,6 @@ const OPENAI_API_KEY     = process.env.OPENAI_API_KEY || '';
 const GEMINI_API_KEY     = process.env.GEMINI_API_KEY || '';
 const CLOUDINARY_CLOUD   = process.env.CLOUDINARY_CLOUD_NAME || 'dyxzq3ucy';
 const CLOUDINARY_PRESET  = 'yoursofer_upload';
-const PALDINOX_USER      = '20552';
-const PALDINOX_PASS      = process.env.PALDINOX_PASSWORD || '580559599';
-const PALDINOX_LOGIN_URL = 'https://paldinox.co.il/wp-login.php';
 
 // ══ Gemini AI Studio ══
 const GEMINI_MODEL = 'gemini-2.5-flash-image';
@@ -169,94 +166,9 @@ Background complexity: very low
 Scene density: minimal
 A clean, realistic, high-quality customer photo focused entirely on the product.`;
 
-// ══ Paldinox session (WordPress cookie auth) ══
-let _paldinoxCookies = null;
-
-async function getPaldinoxCookies() {
-  if (_paldinoxCookies) return _paldinoxCookies;
-  console.log('   🔐 מתחבר לפלדינוקס...');
-
-  // שלב 1: GET לדף ה-login כדי לקבל את ה-testcookie
-  const getRes = await fetch(PALDINOX_LOGIN_URL, {
-    headers: { 'User-Agent': 'Mozilla/5.0' },
-    redirect: 'manual',
-  });
-  const initCookies = (getRes.headers.getSetCookie?.() ?? [getRes.headers.get('set-cookie')].filter(Boolean))
-    .map(c => c.split(';')[0]).join('; ');
-
-  // שלב 2: POST עם credentials
-  const body = new URLSearchParams({
-    log: PALDINOX_USER,
-    pwd: PALDINOX_PASS,
-    'wp-submit': 'Log In',
-    redirect_to: '/wp-admin/',
-    testcookie: '1',
-  });
-
-  const postRes = await fetch(PALDINOX_LOGIN_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'User-Agent': 'Mozilla/5.0',
-      'Cookie': initCookies,
-    },
-    body,
-    redirect: 'manual',
-  });
-
-  const setCookieHeaders = postRes.headers.getSetCookie?.() ?? [postRes.headers.get('set-cookie')].filter(Boolean);
-  const sessionCookies = setCookieHeaders.map(c => c.split(';')[0]).join('; ');
-
-  if (!sessionCookies || !sessionCookies.includes('wordpress_logged_in')) {
-    throw new Error('פלדינוקס: התחברות נכשלה — בדוק שם משתמש/סיסמה');
-  }
-
-  _paldinoxCookies = sessionCookies;
-  console.log('   ✅ מחובר לפלדינוקס');
-  return _paldinoxCookies;
-}
-
 // ══ הורד תמונה כ-base64 ══
-async function downloadImageAsBase64(url, _retry = false) {
-  const isPaldinox = url.includes('paldinox.co.il');
-  const headers = { 'User-Agent': 'Mozilla/5.0' };
-
-  if (isPaldinox) {
-    headers['Cookie'] = await getPaldinoxCookies();
-  }
-
-  let res;
-  try {
-    res = await fetch(url, { headers });
-  } catch (e) {
-    console.error('   ❌ fetch error:', e.message, '| cause:', e.cause?.message ?? e.cause ?? '—', '| url:', url.substring(0, 60));
-    // שגיאת רשת — אם paldinox ננסה פעם אחת עם session חדש
-    if (isPaldinox && !_retry) {
-      console.log('   🔄 שגיאת רשת — מחדש session פלדינוקס...');
-      _paldinoxCookies = null;
-      await new Promise(r => setTimeout(r, 2000));
-      return downloadImageAsBase64(url, true);
-    }
-    // ננסה פעם נוספת אחרי המתנה קצרה גם עבור URLs אחרים
-    if (!_retry) {
-      console.log('   🔄 מנסה שוב אחרי 3 שניות...');
-      await new Promise(r => setTimeout(r, 3000));
-      return downloadImageAsBase64(url, true);
-    }
-    throw e;
-  }
-
-  // session פג — paldinox מחזירה HTML של דף login
-  if (isPaldinox && res.headers.get('content-type')?.includes('text/html')) {
-    if (!_retry) {
-      console.log('   🔄 session פג — מתחבר מחדש לפלדינוקס...');
-      _paldinoxCookies = null;
-      await new Promise(r => setTimeout(r, 2000));
-      return downloadImageAsBase64(url, true);
-    }
-    throw new Error('פלדינוקס: session פג גם אחרי התחברות מחדש');
-  }
-
+async function downloadImageAsBase64(url) {
+  const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
   if (!res.ok) throw new Error(`לא ניתן להוריד תמונה (${res.status}): ${url}`);
   const buffer = await res.arrayBuffer();
   const base64 = Buffer.from(buffer).toString('base64');
