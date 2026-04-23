@@ -234,13 +234,22 @@ export const navigationData: NavItem[] = [
     href: "/category/כלי שולחן והגשה",
     columns: [
       {
-        title: "כלי שולחן והגשה",
+        title: "כלי הגשה",
         items: [
-          { label: "כל כלי ההגשה",     href: "/category/כלי שולחן והגשה" },
-          { label: "מגשים",             href: "/category/כלי שולחן והגשה?filter=מגש" },
-          { label: "כוסות וגביעים",    href: "/category/כלי שולחן והגשה?filter=כוס" },
-          { label: "קערות",             href: "/category/כלי שולחן והגשה?filter=קערה" },
-          { label: "בקבוקים וקנקנים",  href: "/category/כלי שולחן והגשה?filter=קנקן" },
+          { label: "כל כלי ההגשה",      href: "/category/כלי שולחן והגשה" },
+          { label: "מגשים",              href: "/category/כלי שולחן והגשה?subcat=מגשים" },
+          { label: "כוסות",              href: "/category/כלי שולחן והגשה?subcat=כוסות" },
+          { label: "צלחות וקערות",       href: "/category/כלי שולחן והגשה?subcat=צלחות וקערות" },
+          { label: "קנקנים",             href: "/category/כלי שולחן והגשה?subcat=קנקנים" },
+        ],
+      },
+      {
+        title: "עוד",
+        items: [
+          { label: "ספלים",              href: "/category/כלי שולחן והגשה?subcat=ספלים" },
+          { label: "מערכות אוכל",        href: "/category/כלי שולחן והגשה?subcat=מערכות אוכל" },
+          { label: "כלי אכילה",          href: "/category/כלי שולחן והגשה?subcat=כלי אכילה" },
+          { label: "כלי הגשה כלליים",    href: "/category/כלי שולחן והגשה?subcat=כלי הגשה" },
         ],
       },
     ],
@@ -255,11 +264,20 @@ export const navigationData: NavItem[] = [
       {
         title: "עיצוב הבית",
         items: [
-          { label: "כל עיצוב הבית",     href: "/category/עיצוב הבית" },
-          { label: "פמוטים ונרות",      href: "/category/עיצוב הבית?filter=פמוט" },
-          { label: "קופסאות ומסגרות",   href: "/category/עיצוב הבית?filter=קופסת" },
-          { label: "שעונים ועיצוב",     href: "/category/עיצוב הבית?filter=שעון" },
-          { label: "קישוטים ודקור",     href: "/category/עיצוב הבית?filter=קישוט" },
+          { label: "כל עיצוב הבית",      href: "/category/עיצוב הבית" },
+          { label: "פמוטים",              href: "/category/עיצוב הבית?subcat=פמוטים" },
+          { label: "אגרטלים",             href: "/category/עיצוב הבית?subcat=אגרטלים" },
+          { label: "מראות",               href: "/category/עיצוב הבית?subcat=מראות" },
+          { label: "נרות ריחניים",        href: "/category/עיצוב הבית?subcat=נרות ריחניים" },
+        ],
+      },
+      {
+        title: "עוד",
+        items: [
+          { label: "עציצים",              href: "/category/עיצוב הבית?subcat=עציצים" },
+          { label: "מסגרות תמונה",        href: "/category/עיצוב הבית?subcat=מסגרות תמונה" },
+          { label: "מעמדות לנר",          href: "/category/עיצוב הבית?subcat=מעמדות לנר" },
+          { label: "קישוטים",             href: "/category/עיצוב הבית?subcat=קישוטים" },
         ],
       },
     ],

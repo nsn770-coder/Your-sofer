@@ -395,9 +395,12 @@ interface SidebarProps {
   category: string;
   catFilter?: string;
   onCatFilter?: (v: string) => void;
+  subCategoryFilter?: string;
+  onSubCategoryFilter?: (v: string) => void;
+  availableSubCategories?: string[];
 }
 
-function FilterSidebar({ filters, onChange, products, category, catFilter, onCatFilter }: SidebarProps) {
+function FilterSidebar({ filters, onChange, products, category, catFilter, onCatFilter, subCategoryFilter, onSubCategoryFilter, availableSubCategories }: SidebarProps) {
   function set(partial: Partial<FilterState>) { onChange({ ...filters, ...partial }); }
   function setAttr(key: string, val: string) { onChange({ ...filters, attrFilters: { ...filters.attrFilters, [key]: val } }); }
   function setNameFilter(key: string, val: string) { onChange({ ...filters, nameFilters: { ...filters.nameFilters, [key]: val } }); }
@@ -444,6 +447,27 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
               <span className={`text-xs transition-colors ${(catFilter ?? 'הכל') === value ? 'font-bold text-[#0c1a35]' : 'text-gray-600 group-hover:text-gray-900'}`}>{label}</span>
             </label>
           ))}
+        </Section>
+      )}
+
+      {/* SubCategory filter — shown when 2+ subCategories exist */}
+      {onSubCategoryFilter && availableSubCategories && availableSubCategories.length >= 2 && (
+        <Section title="תת-קטגוריה">
+          <div className="flex flex-wrap gap-1.5">
+            {['הכל', ...availableSubCategories].map(opt => (
+              <button
+                key={opt}
+                onClick={() => onSubCategoryFilter(opt === 'הכל' ? '' : opt)}
+                className={`text-xs px-2.5 py-1 rounded-full font-semibold transition-all border ${
+                  (subCategoryFilter || '') === (opt === 'הכל' ? '' : opt)
+                    ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
         </Section>
       )}
 
@@ -552,9 +576,12 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
 
 // ─── Active filter pills (shown above product grid) ───────────────────────────
 
-function ActiveFilterPills({ filters, onChange }: { filters: FilterState; onChange: (f: FilterState) => void }) {
+function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategoryFilter }: { filters: FilterState; onChange: (f: FilterState) => void; subCategoryFilter?: string; onSubCategoryFilter?: (v: string) => void }) {
   const pills: { label: string; onRemove: () => void }[] = [];
 
+  if (subCategoryFilter && onSubCategoryFilter) {
+    pills.push({ label: subCategoryFilter, onRemove: () => onSubCategoryFilter('') });
+  }
   if (filters.minPrice || filters.maxPrice) {
     pills.push({
       label: `מחיר: ${filters.minPrice || '0'} — ${filters.maxPrice || '∞'} ₪`,
@@ -703,16 +730,18 @@ export default function CategoryClient({ category }: { category: string }) {
   const urlFilter    = searchParams.get('filter') ?? null;
   const urlLevel     = searchParams.get('level')  ?? null;
   const urlNusach    = searchParams.get('nusach') ?? null;
+  const urlSubcat    = searchParams.get('subcat') ?? null;
 
-  const [allLoaded, setAllLoaded]     = useState<Product[]>([]);
-  const [loading, setLoading]         = useState(true);
-  const [filters, setFilters]         = useState<FilterState>(EMPTY_FILTERS);
-  const [sortBy, setSortBy]           = useState<SortBy>('popular');
-  const [drawerOpen, setDrawerOpen]   = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [catFilter, setCatFilter]     = useState('הכל');
-  const [catImages, setCatImages]     = useState<Record<string, string>>({});
-  const [soferMap, setSoferMap]       = useState<Record<string, SoferData>>({});
+  const [allLoaded, setAllLoaded]               = useState<Product[]>([]);
+  const [loading, setLoading]                   = useState(true);
+  const [filters, setFilters]                   = useState<FilterState>(EMPTY_FILTERS);
+  const [sortBy, setSortBy]                     = useState<SortBy>('popular');
+  const [drawerOpen, setDrawerOpen]             = useState(false);
+  const [currentPage, setCurrentPage]           = useState(1);
+  const [catFilter, setCatFilter]               = useState('הכל');
+  const [subCategoryFilter, setSubCategoryFilter] = useState('');
+  const [catImages, setCatImages]               = useState<Record<string, string>>({});
+  const [soferMap, setSoferMap]                 = useState<Record<string, SoferData>>({});
 
   const SUBCATEGORY_PAGES = ['נטילת ידיים', 'שבת', 'חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
   const SUBCATEGORY_GROUPS: Record<string, string[]> = {
@@ -751,7 +780,8 @@ export default function CategoryClient({ category }: { category: string }) {
   }
 
   useEffect(() => {
-    setAllLoaded([]); setLoading(true); setFilters(EMPTY_FILTERS); setSortBy('popular'); setCurrentPage(1); setCatFilter('הכל');
+    setAllLoaded([]); setLoading(true); setFilters(EMPTY_FILTERS); setSortBy('popular');
+    setCurrentPage(1); setCatFilter('הכל'); setSubCategoryFilter('');
     fetchAll().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
@@ -833,13 +863,33 @@ export default function CategoryClient({ category }: { category: string }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlLevel, loading, allLoaded.length]);
 
+  // Apply ?subcat= URL param after products load
+  useEffect(() => {
+    if (!urlSubcat || loading || allLoaded.length === 0) return;
+    setSubCategoryFilter(urlSubcat);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlSubcat, loading, allLoaded.length]);
+
   useEffect(() => { setCurrentPage(1); }, [filters]);
+  useEffect(() => { setCurrentPage(1); }, [subCategoryFilter]);
+
+  // Compute distinct subCategories from loaded products (sorted by frequency)
+  const availableSubCategories = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const p of allLoaded) {
+      if (p.subCategory) counts[p.subCategory] = (counts[p.subCategory] ?? 0) + 1;
+    }
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([sub]) => sub);
+  }, [allLoaded]);
 
   const filtered = useMemo(() => {
     let result = applyFilters(allLoaded, filters);
+    if (subCategoryFilter) result = result.filter(p => p.subCategory === subCategoryFilter);
     if (category === 'מתנות' && catFilter !== 'הכל') result = result.filter(p => p.cat === catFilter);
     return applySort(result, sortBy);
-  }, [allLoaded, filters, sortBy, catFilter, category]);
+  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter]);
 
   const attrOptionsDesktop = useMemo(() =>
     ATTR_KEYS.reduce((acc, key) => {
@@ -957,7 +1007,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
           <div className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 pb-8 shadow-2xl">
             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
-            <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} />
+            <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} />
             <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#0c1a35] text-white rounded-2xl font-bold text-sm hover:bg-[#1a3060] transition-colors">
               הצג {filtered.length} תוצאות
             </button>
@@ -970,7 +1020,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
         {/* Desktop sidebar */}
         <aside className="hidden lg:block w-60 flex-shrink-0 sticky top-4">
-          <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} />
+          <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} />
         </aside>
 
         {/* Products area */}
@@ -1060,7 +1110,7 @@ export default function CategoryClient({ category }: { category: string }) {
           </div>
 
           {/* Active filter pills */}
-          <ActiveFilterPills filters={filters} onChange={setFilters} />
+          <ActiveFilterPills filters={filters} onChange={setFilters} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} />
 
           {/* Products grid / loading / empty */}
           {loading ? (
