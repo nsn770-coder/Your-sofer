@@ -83,7 +83,9 @@
       "Bash(tee pipeline_test.log)",
       "Bash(kill -9 19559)",
       "Bash(echo \"Started PID: $!\")",
-      "Bash(kill -9 19577)"
+      "Bash(kill -9 19577)",
+      "Bash(sort -k2 -h)",
+      "Bash(awk '{:*)"
     ]
   }
 }
