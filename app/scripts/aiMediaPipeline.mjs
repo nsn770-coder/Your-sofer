@@ -1,11 +1,11 @@
 // aiMediaPipeline.mjs
 // סוכן — יוצר תמונת "customer review" למוצרים
 //
-// ══ אפשרות 1 — Gemini (OAuth token, יש rate limit) ══
-// GEMINI_API_KEY=ya29.xxx CLOUDINARY_CLOUD_NAME=dyxzq3ucy node app/scripts/aiMediaPipeline.mjs --provider=gemini --limit=50
+// ══ אפשרות 1 — Gemini via Service Account (ללא OAuth, לא פג) ══
+// node app/scripts/aiMediaPipeline.mjs --provider=gemini --limit=50
 //
-// ══ אפשרות 2 — OpenAI (API key קבוע, אין rate limit) ══
-// CLOUDINARY_CLOUD_NAME=dyxzq3ucy node app/scripts/aiMediaPipeline.mjs --provider=openai --limit=50
+// ══ אפשרות 2 — OpenAI ══
+// OPENAI_API_KEY=sk-xxx node app/scripts/aiMediaPipeline.mjs --provider=openai --limit=50
 //
 // אפשרויות נוספות:
 // --test         מצב בדיקה (2 מוצרים, ללא כתיבה ל-Firestore)
@@ -20,32 +20,52 @@ import { writeFileSync, readFileSync, unlinkSync, existsSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// ══ טען .env.local אוטומטית אם משתנים חסרים ══
+(function loadEnvLocal() {
+  const envPath = resolve(__dirname, '../../.env.local');
+  if (!existsSync(envPath)) return;
+  const lines = readFileSync(envPath, 'utf8').split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
+    if (key) process.env[key] = val;
+  }
+})();
+
 // ══ Firebase Admin SDK ══
-const serviceAccount = resolve(__dirname, '../../your-sofer-firebase-adminsdk-fbsvc-418544c2de.json');
-if (getApps().length === 0) initializeApp({ credential: cert(serviceAccount) });
+const SA_PATH = resolve(__dirname, '../../your-sofer-firebase-adminsdk-fbsvc-418544c2de.json');
+if (getApps().length === 0) initializeApp({ credential: cert(SA_PATH) });
 const db = getFirestore();
 
 // ══ הגדרות ══
-const OPENAI_API_KEY    = process.env.OPENAI_API_KEY || '';
-const CLOUDINARY_CLOUD  = process.env.CLOUDINARY_CLOUD_NAME || 'dyxzq3ucy';
-const CLOUDINARY_PRESET = 'yoursofer_upload';
+const OPENAI_API_KEY     = process.env.OPENAI_API_KEY || '';
+const GEMINI_API_KEY     = process.env.GEMINI_API_KEY || '';
+const CLOUDINARY_CLOUD   = process.env.CLOUDINARY_CLOUD_NAME || 'dyxzq3ucy';
+const CLOUDINARY_PRESET  = 'yoursofer_upload';
+const PALDINOX_USER      = '20552';
+const PALDINOX_PASS      = process.env.PALDINOX_PASSWORD || '580559599';
+const PALDINOX_LOGIN_URL = 'https://paldinox.co.il/wp-login.php';
 
-// ══ Gemini ══
-const GEMINI_MODEL   = 'gemini-2.5-flash-image';
-const GEMINI_API_URL = `https://us-central1-aiplatform.googleapis.com/v1/projects/your-sofer/locations/us-central1/publishers/google/models/${GEMINI_MODEL}:generateContent`;
+// ══ Gemini AI Studio ══
+const GEMINI_MODEL = 'gemini-2.5-flash-image';
+const GEMINI_URL   = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // ══ קטגוריות ══
 const CATEGORIES = ['יודאיקה', 'מתנות', 'שבת וחגים', 'סט טלית ותפילין', 'מזוזות'];
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// ══ Lock file — מניעת ריצות מקביליות ══
+// ══ Lock file ══
 const LOCK_FILE = resolve(__dirname, '../../.pipeline.lock');
 
 function acquireLock() {
   if (existsSync(LOCK_FILE)) {
     const pid = (() => { try { return readFileSync(LOCK_FILE, 'utf8').trim(); } catch { return '?'; } })();
-    console.error(`❌ Pipeline כבר רץ (PID ${pid}). עצור אותו קודם או מחק את הקובץ: ${LOCK_FILE}`);
+    console.error(`❌ Pipeline כבר רץ (PID ${pid}). עצור אותו קודם או מחק: ${LOCK_FILE}`);
     process.exit(1);
   }
   writeFileSync(LOCK_FILE, String(process.pid));
@@ -58,23 +78,154 @@ function releaseLock() {
   try { if (existsSync(LOCK_FILE)) unlinkSync(LOCK_FILE); } catch {}
 }
 
+// ══ קבל Access Token מ-Service Account (לא פג לעולם) ══
+async function getServiceAccountToken() {
+  const sa = JSON.parse(readFileSync(SA_PATH, 'utf8'));
+
+  // יצירת JWT
+  const header = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url');
+  const now = Math.floor(Date.now() / 1000);
+  const payload = Buffer.from(JSON.stringify({
+    iss: sa.client_email,
+    scope: 'https://www.googleapis.com/auth/cloud-platform',
+    aud: 'https://oauth2.googleapis.com/token',
+    exp: now + 3600,
+    iat: now,
+  })).toString('base64url');
+
+  // חתימה עם RSA private key
+  const { createSign } = await import('crypto');
+  const sign = createSign('RSA-SHA256');
+  sign.update(`${header}.${payload}`);
+  const signature = sign.sign(sa.private_key, 'base64url');
+
+  const jwt = `${header}.${payload}.${signature}`;
+
+  // החלף JWT ב-Access Token
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: jwt,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Service Account auth נכשל: ${err.error_description || res.status}`);
+  }
+
+  const data = await res.json();
+  return data.access_token;
+}
+
+// ══ Cache token (מתחדש אוטומטית כל שעה) ══
+let _tokenCache = null;
+let _tokenExpiry = 0;
+
+async function getToken() {
+  const now = Date.now();
+  if (_tokenCache && now < _tokenExpiry - 60000) return _tokenCache;
+  console.log('   🔑 מחדש Access Token...');
+  _tokenCache = await getServiceAccountToken();
+  _tokenExpiry = now + 3600000; // שעה
+  return _tokenCache;
+}
+
 // ══ פרומט ══
-const CUSTOMER_REVIEW_PROMPT = `Create a realistic customer review photo of the product placed naturally on a real table inside a home.
-Use the attached product image as the exact reference for the product itself, keeping all colors, materials, proportions, textures, shapes, engravings, and details completely identical.
-The product should be fully visible and already placed neatly on the table, not inside packaging and not being held.
-Photograph it from a different angle than the original product image — a more casual, slightly imperfect angle, as if a customer quickly took the photo with a smartphone after placing it on the table.
-The camera angle should be high and top-down, around 80 degrees from above, almost like someone is standing over the table and taking the photo directly downward with a phone.
-The setting should feel like a real home environment with natural lighting, soft shadows, and slight background blur.
-The table can be a dining table, kitchen counter, side table, or Shabbat table, with subtle home elements in the background like a chair, tablecloth, candles, kitchen, flowers, books, or part of a living room.
-The image should look authentic and user-generated, not like a professional studio advertisement.
-Do not redesign the product.
-Do not change proportions or materials.
-Do not add packaging.
-Do not make it look overly clean, perfect, symmetrical, or heavily styled.`;
+const CUSTOMER_REVIEW_PROMPT = `Create a realistic customer-style photo of this exact product in a clean, modern home interior.
+PRODUCT ACCURACY (CRITICAL):
+Use the reference image as the strict source of truth.
+The product must remain completely identical:
+same shape, proportions, materials, colors, texture, finish, engravings, and all design details.
+Do not redesign, enhance, or reinterpret the product in any way.
+SCENE:
+Place the product naturally on a simple wooden table, marble countertop, or clean shelf.
+Use a minimal, neutral environment only.
+Background should be softly blurred and visually quiet.
+STRICT NEGATIVE RULES:
+Do NOT include:
+- candles or candlelight
+- any religious objects or Judaica props
+- bookshelves that create a religious atmosphere
+- tablecloths or decorative fabrics
+- extra products or unrelated objects
+- hands, people, packaging
+- text, logos, or watermarks
+LIGHTING:
+Soft natural daylight from a window.
+Clean, neutral lighting.
+No warm glow, no dramatic shadows, no cinematic lighting.
+COMPOSITION:
+The product must be the clear main focus.
+Fully visible, sharp, and centered or slightly off-center naturally.
+The background must not compete with the product.
+PRIORITY RULE:
+If there is any uncertainty, simplify the scene and remove background elements.
+Product accuracy and clarity are more important than atmosphere.
+Final result:
+Background complexity: very low
+Scene density: minimal
+A clean, realistic, high-quality customer photo focused entirely on the product.`;
+
+// ══ Paldinox session (WordPress cookie auth) ══
+let _paldinoxCookies = null;
+
+async function getPaldinoxCookies() {
+  if (_paldinoxCookies) return _paldinoxCookies;
+  console.log('   🔐 מתחבר לפלדינוקס...');
+
+  // שלב 1: GET לדף ה-login כדי לקבל את ה-testcookie
+  const getRes = await fetch(PALDINOX_LOGIN_URL, {
+    headers: { 'User-Agent': 'Mozilla/5.0' },
+    redirect: 'manual',
+  });
+  const initCookies = (getRes.headers.getSetCookie?.() ?? [getRes.headers.get('set-cookie')].filter(Boolean))
+    .map(c => c.split(';')[0]).join('; ');
+
+  // שלב 2: POST עם credentials
+  const body = new URLSearchParams({
+    log: PALDINOX_USER,
+    pwd: PALDINOX_PASS,
+    'wp-submit': 'Log In',
+    redirect_to: '/wp-admin/',
+    testcookie: '1',
+  });
+
+  const postRes = await fetch(PALDINOX_LOGIN_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'User-Agent': 'Mozilla/5.0',
+      'Cookie': initCookies,
+    },
+    body,
+    redirect: 'manual',
+  });
+
+  const setCookieHeaders = postRes.headers.getSetCookie?.() ?? [postRes.headers.get('set-cookie')].filter(Boolean);
+  const sessionCookies = setCookieHeaders.map(c => c.split(';')[0]).join('; ');
+
+  if (!sessionCookies || !sessionCookies.includes('wordpress_logged_in')) {
+    throw new Error('פלדינוקס: התחברות נכשלה — בדוק שם משתמש/סיסמה');
+  }
+
+  _paldinoxCookies = sessionCookies;
+  console.log('   ✅ מחובר לפלדינוקס');
+  return _paldinoxCookies;
+}
 
 // ══ הורד תמונה כ-base64 ══
 async function downloadImageAsBase64(url) {
-  const res = await fetch(url);
+  const isPaldinox = url.includes('paldinox.co.il');
+  const headers = { 'User-Agent': 'Mozilla/5.0' };
+
+  if (isPaldinox) {
+    headers['Cookie'] = await getPaldinoxCookies();
+  }
+
+  const res = await fetch(url, { headers });
   if (!res.ok) throw new Error(`לא ניתן להוריד תמונה: ${url}`);
   const buffer = await res.arrayBuffer();
   const base64 = Buffer.from(buffer).toString('base64');
@@ -82,8 +233,10 @@ async function downloadImageAsBase64(url) {
   return { base64, contentType };
 }
 
-// ══ Gemini ══
-async function generateWithGemini(imageBase64, contentType, token) {
+// ══ Gemini AI Studio — inlineData + generateContent ══
+async function generateWithGemini(imageBase64, contentType) {
+  if (!GEMINI_API_KEY) throw new Error('חסר GEMINI_API_KEY');
+
   const body = {
     contents: [{
       role: 'user',
@@ -95,39 +248,23 @@ async function generateWithGemini(imageBase64, contentType, token) {
     generationConfig: { responseModalities: ['IMAGE', 'TEXT'] },
   };
 
-  const RETRY_WAITS = [60000, 120000, 180000]; // 1min, 2min, 3min
-  for (let attempt = 0; attempt <= RETRY_WAITS.length; attempt++) {
-    const res = await fetch(GEMINI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+  const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
 
-    if (res.status === 429) {
-      if (attempt < RETRY_WAITS.length) {
-        const wait = RETRY_WAITS[attempt];
-        console.log(`   ⏳ 429 rate limit — ממתין ${wait / 1000}s לפני ניסיון ${attempt + 2}/${RETRY_WAITS.length + 1}...`);
-        await sleep(wait);
-        continue;
-      }
-      throw new Error('Gemini: Rate limit — נכשל אחרי כל הניסיונות');
-    }
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(`Gemini: ${err?.error?.message || `HTTP ${res.status}`}`);
-    }
-
-    const data = await res.json();
-    const parts = data.candidates?.[0]?.content?.parts ?? [];
-    for (const part of parts) {
-      if (part.inlineData?.data) return part.inlineData.data;
-    }
-    throw new Error('Gemini לא החזיר תמונה');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Gemini: ${err?.error?.message || `HTTP ${res.status}`}`);
   }
+
+  const data = await res.json();
+  const parts = data.candidates?.[0]?.content?.parts ?? [];
+  for (const part of parts) {
+    if (part.inlineData?.data) return part.inlineData.data;
+  }
+  throw new Error('Gemini לא החזיר תמונה');
 }
 
 // ══ OpenAI ══
@@ -160,7 +297,6 @@ async function generateWithOpenAI(imageBase64, contentType) {
   }
 
   const data = await res.json();
-  console.log(`   🔍 OpenAI response: data.data.length=${data.data?.length ?? 'undefined'}`);
   const b64 = data.data?.[0]?.b64_json;
   if (!b64) throw new Error('OpenAI לא החזיר תמונה');
   return b64;
@@ -168,9 +304,6 @@ async function generateWithOpenAI(imageBase64, contentType) {
 
 // ══ העלה ל-Cloudinary ══
 async function uploadBase64ToCloudinary(base64, productId) {
-  const caller = new Error().stack.split('\n')[2]?.trim() ?? 'unknown';
-  console.log(`   📤 Cloudinary upload called for ${productId}`);
-  console.log(`      caller: ${caller}`);
   const formData = new FormData();
   formData.append('file', `data:image/png;base64,${base64}`);
   formData.append('upload_preset', CLOUDINARY_PRESET);
@@ -188,12 +321,11 @@ async function uploadBase64ToCloudinary(base64, productId) {
 }
 
 // ══ עבד מוצר אחד ══
-async function processProduct(product, provider, testMode, geminiToken) {
+async function processProduct(product, provider, testMode) {
   const imgUrl = product.imgUrl || product.image_url;
   console.log(`\n📦 ${product.name?.substring(0, 50)}`);
   console.log(`   קטגוריה: ${product.cat} | ספק: ${provider.toUpperCase()}`);
 
-  // בדיקה רענונית — אולי עודכן ע"י ריצה מקבילת
   if (!testMode) {
     const fresh = await db.collection('products').doc(product.id).get();
     if (fresh.exists && fresh.data()?.imgUrl2) {
@@ -215,7 +347,7 @@ async function processProduct(product, provider, testMode, geminiToken) {
   try {
     console.log(`   📸 יוצר תמונה (${provider})...`);
     if (provider === 'gemini') {
-      resultBase64 = await generateWithGemini(imageBase64, contentType, geminiToken);
+      resultBase64 = await generateWithGemini(imageBase64, contentType);
     } else {
       resultBase64 = await generateWithOpenAI(imageBase64, contentType);
     }
@@ -248,23 +380,29 @@ async function runPipeline() {
   const args = process.argv.slice(2);
   const testMode    = args.includes('--test');
   const providerArg = args.find(a => a.startsWith('--provider='));
-  const provider    = providerArg ? providerArg.split('=')[1] : 'openai';
+  const provider    = providerArg ? providerArg.split('=')[1] : 'gemini';
   const limitArg    = args.find(a => a.startsWith('--limit='));
   const perCatLimit = testMode ? 2 : (limitArg ? parseInt(limitArg.split('=')[1]) : null);
   const catArg      = args.find(a => a.startsWith('--cat='));
   const categories  = catArg ? [catArg.split('=')[1]] : CATEGORIES;
-  const geminiToken = process.env.GEMINI_API_KEY || '';
 
-  if (provider === 'gemini' && !geminiToken) {
-    console.error('❌ חסר GEMINI_API_KEY — הפעל עם: GEMINI_API_KEY=ya29.xxx node ...');
+  if (provider === 'openai' && !OPENAI_API_KEY) {
+    console.error('❌ חסר OPENAI_API_KEY');
     process.exit(1);
   }
 
   console.log(`🚀 AI Media Pipeline מתחיל...`);
   console.log(`🤖 ספק: ${provider.toUpperCase()}`);
-  if (testMode) console.log('🧪 מצב בדיקה — 2 מוצרים לקטגוריה, ללא כתיבה ל-Firestore');
+  if (provider === 'gemini') console.log(`🔑 Gemini AI Studio — model: ${GEMINI_MODEL}`);
+  if (testMode) console.log('🧪 מצב בדיקה — 2 מוצרים לקטגוריה, ללא כתיבה');
   else if (perCatLimit) console.log(`📊 מוגבל ל-${perCatLimit} מוצרים לקטגוריה`);
   console.log(`📂 קטגוריות: ${categories.join(' → ')}\n`);
+
+  // בדיקת אימות לפני תחילת הריצה
+  if (provider === 'gemini' && !GEMINI_API_KEY) {
+    console.error('❌ חסר GEMINI_API_KEY — הפעל עם: GEMINI_API_KEY=AIza... node ...');
+    process.exit(1);
+  }
 
   let totalSuccess = 0, totalFailed = 0;
 
@@ -285,7 +423,7 @@ async function runPipeline() {
     });
 
     if (perCatLimit) products = products.slice(0, perCatLimit);
-    console.log(`📦 ${products.length} מוצרים לעיבוד`);
+    console.log(`📦 ${products.length} מוצרים ממתינים לתמונה`);
 
     if (products.length === 0) {
       console.log('✅ כולם כבר עודכנו!');
@@ -297,14 +435,14 @@ async function runPipeline() {
     for (let i = 0; i < products.length; i++) {
       console.log(`\n[${cat} — ${i + 1}/${products.length}]`);
       try {
-        const result = await processProduct(products[i], provider, testMode, geminiToken);
+        const result = await processProduct(products[i], provider, testMode);
         if (result.imgUrl2) { catSuccess++; totalSuccess++; }
         else { catFailed++; totalFailed++; }
       } catch (e) {
         console.error(`❌ שגיאה כללית:`, e.message);
         catFailed++; totalFailed++;
       }
-      // OpenAI: 5 שניות בין מוצרים | Gemini: 40 שניות
+      // Gemini: 40 שניות בין מוצרים | OpenAI: 5 שניות
       if (i < products.length - 1) await sleep(provider === 'gemini' ? 40000 : 5000);
     }
 
@@ -318,7 +456,7 @@ async function runPipeline() {
   }
 
   console.log('\n══════════════════════════════════════════');
-  console.log('🎉 Pipeline הושלם — כל הקטגוריות!');
+  console.log('🎉 Pipeline הושלם!');
   console.log(`✅ סה״כ הצליחו: ${totalSuccess}`);
   console.log(`❌ סה״כ נכשלו: ${totalFailed}`);
   if (testMode) console.log('🧪 זו הייתה ריצת בדיקה — הפעל ללא --test לריצה מלאה');
