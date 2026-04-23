@@ -310,12 +310,15 @@ async function deleteCloudinaryByToken(deleteToken) {
 }
 
 // ══ העלה ל-Cloudinary ══
+// public_id קבוע (ללא timestamp) + overwrite=true — מונע כפילויות אם מוצר מעובד פעמיים
 async function uploadBase64ToCloudinary(base64, productId) {
   const formData = new FormData();
   formData.append('file', `data:image/png;base64,${base64}`);
   formData.append('upload_preset', CLOUDINARY_PRESET);
   formData.append('folder', `yoursofer/${productId}`);
-  formData.append('public_id', `${productId}_review_${Date.now()}`);
+  formData.append('public_id', `${productId}_review`); // קבוע — דורס אם קיים
+  formData.append('overwrite', 'true');
+  formData.append('invalidate', 'true'); // מנקה CDN cache
 
   const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
     method: 'POST',
@@ -387,15 +390,16 @@ async function processProduct(product, provider, testMode) {
     const cloudinaryUrl = await uploadBase64ToCloudinary(resultBase64, product.id);
     console.log('   ✅ הועלה:', cloudinaryUrl);
 
-    // מחק תמונת מקור זמנית — רק ה-_review_ צריך להישאר
-    await deleteCloudinaryByToken(srcDeleteToken);
-
+    // כתוב ל-Firestore מיד אחרי ה-upload — מצמצם חלון כפילויות אם הפייפליין נעצר
     if (!testMode) {
       await db.collection('products').doc(product.id).update({ imgUrl2: cloudinaryUrl });
       console.log('   💾 Firestore עודכן');
     } else {
       console.log('   🧪 (בדיקה) דילוג על Firestore');
     }
+
+    // מחק תמונת מקור זמנית אחרי שה-Firestore עודכן בהצלחה
+    await deleteCloudinaryByToken(srcDeleteToken);
 
     return { imgUrl2: cloudinaryUrl };
   } catch (e) {
