@@ -27,7 +27,6 @@ export async function GET() {
       const price: number = d.price ?? 0;
       const cat: string = d.cat ?? d.category ?? '';
       const desc: string = d.desc ?? d.description ?? name;
-      const imgUrl: string = d.imgUrl ?? d.image_url ?? d.img1 ?? '';
       const badge: string = d.badge ?? '';
 
       // Skip products with no name or price
@@ -42,11 +41,20 @@ export async function GET() {
       const color: string = d.color ?? '';
 
       const link = `${SITE}/product/${id}`;
-      const imageLink = imgUrl.startsWith('http') ? imgUrl : '';
 
-      const additionalImages: string[] = (d.images ?? [])
-        .filter((u: string) => u.startsWith('http') && u !== imageLink)
-        .slice(0, 10);
+      // Build ordered image list from all known image fields
+      const allImages: string[] = [
+        d.imgUrl ?? d.image_url ?? d.img1,
+        d.imgUrl2 ?? d.img2,
+        d.imgUrl3 ?? d.img3,
+        d.imgUrl4,
+      ].filter((u): u is string => typeof u === 'string' && u.startsWith('http'));
+
+      const imageLink = allImages.length >= 2 ? allImages[1] : (allImages[0] ?? '');
+      const additionalImages: string[] =
+        allImages.length >= 2
+          ? [allImages[0], ...allImages.slice(2)]
+          : [];
 
       items.push(`    <item>
       <g:id>${esc(id)}</g:id>
