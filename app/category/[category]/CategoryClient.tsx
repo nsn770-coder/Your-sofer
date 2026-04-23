@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   collection, query, where, orderBy, limit,
@@ -69,7 +69,7 @@ const EMPTY_FILTERS: FilterState = {
   sizeMax: 100,
 };
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 16;
 const ATTR_KEYS = ['חומר', 'כתב', 'כשרות', 'נוסח', 'צבע'];
 
 // ─── Category-specific name-based filters ────────────────────────────────────
@@ -671,59 +671,7 @@ function EmptyState({ active, onClear }: { active: boolean; onClear: () => void 
   );
 }
 
-// ─── Pagination ───────────────────────────────────────────────────────────────
-
-function Pagination({ currentPage, totalPages, onChange }: { currentPage: number; totalPages: number; onChange: (p: number) => void }) {
-  if (totalPages <= 1) return null;
-
-  const sorted: number[] = [];
-  const add = (p: number) => { if (!sorted.includes(p) && p >= 1 && p <= totalPages) sorted.push(p); };
-  for (let p = 1; p <= Math.min(2, totalPages); p++) add(p);
-  for (let p = Math.max(1, currentPage - 1); p <= Math.min(totalPages, currentPage + 1); p++) add(p);
-  for (let p = Math.max(1, totalPages - 1); p <= totalPages; p++) add(p);
-  sorted.sort((a, b) => a - b);
-
-  const withDots: (number | '...')[] = [];
-  sorted.forEach((p, i) => {
-    if (i > 0 && p - sorted[i - 1] > 1) withDots.push('...');
-    withDots.push(p);
-  });
-
-  return (
-    <div className="mt-10 flex items-center justify-center gap-1.5" dir="ltr">
-      <button
-        onClick={() => onChange(Math.max(1, currentPage - 1))}
-        disabled={currentPage === 1}
-        className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:border-[#0c1a35] hover:text-[#0c1a35] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-      >
-        <IconChevronLeft size={16} />
-      </button>
-
-      {withDots.map((p, i) =>
-        p === '...'
-          ? <span key={`dots-${i}`} className="w-9 h-9 flex items-center justify-center text-gray-300 text-sm select-none">…</span>
-          : <button
-              key={p}
-              onClick={() => onChange(p)}
-              className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
-                currentPage === p
-                  ? 'bg-[#0c1a35] text-white shadow-sm'
-                  : 'border border-gray-200 text-gray-600 hover:border-[#0c1a35] hover:text-[#0c1a35]'
-              }`}
-            >{p}</button>
-      )}
-
-      <button
-        onClick={() => onChange(Math.min(totalPages, currentPage + 1))}
-        disabled={currentPage === totalPages}
-        className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:border-[#0c1a35] hover:text-[#0c1a35] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-        style={{ transform: 'rotate(180deg)' }}
-      >
-        <IconChevronLeft size={16} />
-      </button>
-    </div>
-  );
-}
+// Pagination replaced by infinite scroll — see IntersectionObserver in main component
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -744,6 +692,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [subCategoryFilter, setSubCategoryFilter] = useState('');
   const [catImages, setCatImages]               = useState<Record<string, string>>({});
   const [soferMap, setSoferMap]                 = useState<Record<string, SoferData>>({});
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const SUBCATEGORY_PAGES = ['נטילת ידיים', 'שבת', 'חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
   const SUBCATEGORY_GROUPS: Record<string, string[]> = {
@@ -875,8 +824,8 @@ export default function CategoryClient({ category }: { category: string }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlSubcat, loading, allLoaded.length]);
 
-  useEffect(() => { setCurrentPage(1); }, [filters]);
-  useEffect(() => { setCurrentPage(1); }, [subCategoryFilter]);
+  useEffect(() => { setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }, [filters]);
+  useEffect(() => { setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }, [subCategoryFilter]);
 
   // Compute distinct subCategories from loaded products (sorted by frequency)
   const availableSubCategories = useMemo(() => {
@@ -906,9 +855,23 @@ export default function CategoryClient({ category }: { category: string }) {
     [allLoaded]
   );
 
-  const active     = hasActiveFilters(filters);
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated  = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const active      = hasActiveFilters(filters);
+  const visibleCount = currentPage * PAGE_SIZE;
+  const paginated   = filtered.slice(0, visibleCount);
+  const hasMore     = visibleCount < filtered.length;
+
+  // ── Infinite scroll ──
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setCurrentPage(p => p + 1); },
+      { rootMargin: '400px' }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMore]);
 
   const SORT_LABELS: Record<SortBy, string> = {
     popular: 'הכי נמכר', newest: 'חדש לישן', oldest: 'ישן לחדש',
@@ -1165,7 +1128,16 @@ export default function CategoryClient({ category }: { category: string }) {
                 <CategoryScrollBar catImages={catImages} currentCategory={category} />
               </div>
 
-              <Pagination currentPage={currentPage} totalPages={totalPages} onChange={p => { setCurrentPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+              {hasMore ? (
+                <div ref={sentinelRef} className="flex justify-center items-center py-10 gap-2 text-gray-400">
+                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 border-t-[#0c1a35] animate-spin" />
+                  <span className="text-sm">טוען עוד מוצרים...</span>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-xs text-gray-400 font-medium">
+                  הצגת את כל {filtered.length} המוצרים
+                </div>
+              )}
             </>
           )}
         </div>
