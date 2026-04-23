@@ -107,6 +107,28 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
     ],
   },
   {
+    id: "tikim", label: "תיקי טלית ותפילין", cat: "תיקי טלית ותפילין",
+    columns: [
+      {
+        title: "תיקי טלית",
+        items: [
+          { label: "כל התיקים", cat: "תיקי טלית ותפילין" },
+          { label: "דמוי עור", cat: "תיקי טלית ותפילין", filter: "דמוי עור" },
+          { label: "פשתן", cat: "תיקי טלית ותפילין", filter: "פשתן" },
+          { label: "קורדרוי", cat: "תיקי טלית ותפילין", filter: "קורדרוי" },
+          { label: "פיוו", cat: "תיקי טלית ותפילין", filter: "פיוו" },
+        ]
+      },
+      {
+        title: "לפי גודל",
+        items: [
+          { label: "תיק גדול", cat: "תיקי טלית ותפילין", filter: "גדול" },
+          { label: "תיק קטן", cat: "תיקי טלית ותפילין", filter: "קטן" },
+        ]
+      },
+    ],
+  },
+  {
     id: "judaica", label: "יודאיקה", cat: "יודאיקה",
     columns: [
       {
@@ -114,7 +136,6 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
         items: [
           { label: "כל היודאיקה", cat: "יודאיקה" },
           { label: "נטלות", cat: "יודאיקה", filter: "נטלות" },
-          { label: "פיוו – תיקי טלית", cat: "יודאיקה", filter: "פיוו" },
           { label: "כסף", cat: "יודאיקה", filter: "כסף" },
           { label: "זכוכית", cat: "יודאיקה", filter: "זכוכית" },
           { label: "הבדלה", cat: "יודאיקה", filter: "הבדלה" },
