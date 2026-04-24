@@ -526,6 +526,23 @@ export default function HomePageClient() {
         maxWidth: '100vw',
       }}
     >
+      {/* ── Urgency Notification Bar ── */}
+      <div style={{
+        width: '100%',
+        background: '#f5e6b3',
+        borderBottom: '1px solid #d4b96a',
+        padding: '8px 16px',
+        textAlign: 'center',
+        direction: 'rtl',
+        zIndex: 90,
+      }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#5a3e00', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8940a', display: 'inline-block', flexShrink: 0 }} />
+          המוצרים הנמכרים ביותר השבוע – מלאי מוגבל
+          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8940a', display: 'inline-block', flexShrink: 0 }} />
+        </span>
+      </div>
+
       {/* ── Newsletter popup (45 s trigger) ── */}
       {newsletterPopupOpen && (
         <div
@@ -776,22 +793,6 @@ export default function HomePageClient() {
             </button>
           </div>
         </div>
-      </div>
-
-      {/* ── Urgency Strip ── */}
-      <div style={{
-        background: '#fffbf0',
-        borderTop: '1px solid #e8d48a',
-        borderBottom: '1px solid #e8d48a',
-        padding: isMobile ? '9px 16px' : '10px 16px',
-        textAlign: 'center',
-        direction: 'rtl',
-      }}>
-        <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#7a5c00', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#e6a817', display: 'inline-block', flexShrink: 0 }} />
-          המוצרים הנמכרים ביותר השבוע – מלאי מוגבל
-          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#e6a817', display: 'inline-block', flexShrink: 0 }} />
-        </span>
       </div>
 
       {/* ── 1. HeroSwiper ── */}
