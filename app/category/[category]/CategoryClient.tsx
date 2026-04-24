@@ -645,7 +645,7 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
 
-function EmptyState({ active, onClear }: { active: boolean; onClear: () => void }) {
+function EmptyState({ active, onClear, relatedCats = [] }: { active: boolean; onClear: () => void; relatedCats?: string[] }) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center px-6">
       <div className="w-20 h-20 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-5 text-gray-300">
@@ -657,16 +657,30 @@ function EmptyState({ active, onClear }: { active: boolean; onClear: () => void 
       <p className="text-sm text-gray-400 mb-6 max-w-xs leading-relaxed">
         {active
           ? 'נסה לשנות את הסינון או להרחיב את טווח החיפוש'
-          : 'הקטגוריה הזו תתמלא בקרוב. בינתיים — עיין בשאר הקטגוריות'}
+          : relatedCats.length > 0
+            ? 'הקטגוריה אינה קיימת — נסה לחפש ב:'
+            : 'הקטגוריה הזו תתמלא בקרוב. בינתיים — עיין בשאר הקטגוריות'}
       </p>
-      {active && (
+      {active ? (
         <button
           onClick={onClear}
           className="px-6 py-2.5 bg-[#0c1a35] text-white rounded-full font-bold text-sm hover:bg-[#1a3060] transition-colors"
         >
           נקה סינון
         </button>
-      )}
+      ) : relatedCats.length > 0 ? (
+        <div className="flex flex-wrap gap-3 justify-center">
+          {relatedCats.map(cat => (
+            <Link
+              key={cat}
+              href={`/category/${encodeURIComponent(cat)}`}
+              className="px-5 py-2.5 bg-[#0c1a35] text-white rounded-full text-sm font-bold hover:bg-[#1a3060] transition-colors"
+            >
+              {cat}
+            </Link>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -700,7 +714,57 @@ export default function CategoryClient({ category }: { category: string }) {
     'חגים ומועדים': ['חנוכה', 'פסח'],
   };
 
+  // Case A: recognized ?filter= values that map to a direct subCategory query
+  const SUBCAT_QUERY_OVERRIDES: Record<string, Record<string, string>> = {
+    'יודאיקה': { 'נטילת ידיים': 'נטילת ידיים', 'נטלות': 'נטילת ידיים' },
+  };
+
+  // Case B: category slugs that don't exist as a cat field in Firestore
+  const VIRTUAL_CATS: Record<string, { cats: string[]; subcatKeywords: string[] }> = {
+    'שבתות וחגים':  { cats: ['יודאיקה', 'כלי שולחן והגשה'], subcatKeywords: ['שבת', 'חג', 'קידוש', 'חנוכה', 'פסח', 'הבדלה', 'נטילת ידיים'] },
+    'שבתות-וחגים': { cats: ['יודאיקה', 'כלי שולחן והגשה'], subcatKeywords: ['שבת', 'חג', 'קידוש', 'חנוכה', 'פסח', 'הבדלה', 'נטילת ידיים'] },
+  };
+
+  // When this is non-null, fetchAll does a direct subCategory query and re-runs if
+  // urlFilter changes away from the override (so the full category reloads cleanly).
+  const subcatOverrideForFetch = SUBCAT_QUERY_OVERRIDES[category]?.[urlFilter ?? ''] ?? null;
+
   async function fetchAll() {
+    // Case B: virtual category slug — no products have this as cat in Firestore
+    const virtual = VIRTUAL_CATS[category];
+    if (virtual) {
+      const snaps = await Promise.all(
+        virtual.cats.map(c =>
+          getDocs(query(collection(db, 'products'), where('cat', '==', c), orderBy('priority', 'desc'), limit(1000)))
+        )
+      );
+      const seen = new Set<string>();
+      const merged: Product[] = [];
+      for (const snap of snaps) {
+        for (const d of snap.docs) {
+          if (!seen.has(d.id)) {
+            seen.add(d.id);
+            const p = { id: d.id, ...d.data() } as Product;
+            const sub = (p.subCategory ?? '').toLowerCase();
+            if (virtual.subcatKeywords.some(kw => sub.includes(kw.toLowerCase()))) {
+              merged.push(p);
+            }
+          }
+        }
+      }
+      setAllLoaded(merged.filter(p => p.hidden !== true));
+      return;
+    }
+
+    // Case A: targeted subCategory query — skip loading the full category
+    if (subcatOverrideForFetch) {
+      const snap = await getDocs(
+        query(collection(db, 'products'), where('subCategory', '==', subcatOverrideForFetch), limit(500))
+      );
+      setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true));
+      return;
+    }
+
     if (category === 'מתנות') {
       const MATANOT_CATS = ['מתנות', 'כלי שולחן והגשה', 'עיצוב הבית', 'יודאיקה'];
       const snaps = await Promise.all(
@@ -735,7 +799,7 @@ export default function CategoryClient({ category }: { category: string }) {
     setCurrentPage(1); setCatFilter('הכל'); setSubCategoryFilter('');
     fetchAll().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category]);
+  }, [category, subcatOverrideForFetch]);
 
   useEffect(() => {
     async function fetchCatImages() {
@@ -1086,7 +1150,15 @@ export default function CategoryClient({ category }: { category: string }) {
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : filtered.length === 0 ? (
-            <EmptyState active={active} onClear={() => setFilters(EMPTY_FILTERS)} />
+            <EmptyState
+              active={active}
+              onClear={() => setFilters(EMPTY_FILTERS)}
+              relatedCats={
+                active
+                  ? []
+                  : (VIRTUAL_CATS[category]?.cats ?? ['יודאיקה', 'כלי שולחן והגשה', 'עיצוב הבית', 'מתנות'])
+              }
+            />
           ) : (
             <>
               {category === 'קלפי מזוזה' ? (
