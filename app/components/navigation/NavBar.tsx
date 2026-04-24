@@ -135,7 +135,7 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
         title: "יודאיקה",
         items: [
           { label: "כל היודאיקה", cat: "יודאיקה" },
-          { label: "נטלות", cat: "יודאיקה", filter: "נטלות" },
+          { label: "נטלות", cat: "יודאיקה", filter: "נטילת ידיים" },
           { label: "כסף", cat: "יודאיקה", filter: "כסף" },
           { label: "זכוכית", cat: "יודאיקה", filter: "זכוכית" },
           { label: "הבדלה", cat: "יודאיקה", filter: "הבדלה" },
@@ -203,6 +203,7 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
 ];
 
 const SIMPLE_NAV = [
+  { label: "שבתות וחגים", action: "shabbat-holidays" },
   { label: "ספרי תורה", action: "sifrei-torah" },
   { label: "מגילות", action: "megilot" },
 ];
@@ -314,7 +315,8 @@ function NavBarContent() {
 
   function handleAction(action: string) {
     setMobileOpen(false);
-    if (action === "sifrei-torah") router.push("/category/ספרי תורה");
+    if (action === "shabbat-holidays") router.push("/category/כלי שולחן והגשה");
+    else if (action === "sifrei-torah") router.push("/category/ספרי תורה");
     else if (action === "megilot") router.push("/category/מגילות");
   }
 

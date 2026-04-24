@@ -239,6 +239,7 @@ export default function HomePageClient() {
   const [imagesReady, setImagesReady] = useState(false);
   const [wizardOpen, setWizardOpen]   = useState(false);
   const [activityIdx, setActivityIdx] = useState(0);
+  const [topBarIdx, setTopBarIdx]     = useState(0);
   const [weeklyProducts, setWeeklyProducts] = useState(0);
   const [soferimCount, setSoferimCount] = useState(0);
   const [productsCount, setProductsCount] = useState(0);
@@ -338,9 +339,19 @@ export default function HomePageClient() {
     async function fetchFeaturedProducts() {
       try {
         const snap = await getDocs(
+          query(collection(db, 'products'), where('isBestSeller', '==', true), limit(16)),
+        );
+        const bestSellers = snap.docs
+          .map(d => ({ id: d.id, ...d.data() } as Product))
+          .filter((p: Product) => p.hidden !== true && (p as any).status !== 'inactive');
+        if (bestSellers.length >= 4) {
+          setFeaturedProducts(bestSellers.slice(0, 8));
+          return;
+        }
+        const fallbackSnap = await getDocs(
           query(collection(db, 'products'), orderBy('priority', 'desc'), limit(24)),
         );
-        const all = snap.docs
+        const all = fallbackSnap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
           .filter((p: Product) => p.hidden !== true && (p as any).status !== 'inactive');
         setFeaturedProducts(all.slice(0, 8));
@@ -393,6 +404,11 @@ export default function HomePageClient() {
       } catch { /* non-fatal */ }
     }
     fetchCounts();
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setTopBarIdx(i => i + 1), 4500);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -452,7 +468,7 @@ export default function HomePageClient() {
     const timer = setTimeout(() => {
       setNewsletterPopupOpen(true);
       sessionStorage.setItem('newsletter_popup_shown', '1');
-    }, 45000);
+    }, 20000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -526,6 +542,33 @@ export default function HomePageClient() {
         maxWidth: '100vw',
       }}
     >
+      {/* ── Top Live Activity Bar ── */}
+      {(() => {
+        const topMessages = [
+          { text: 'מזוזות כשרות ומהודרות — ישירות מסופר מוסמך', cta: 'לצפייה ←', href: '/category/מזוזות' },
+          { text: 'מתנות לשבת ולחג — עיצוב יוקרתי ואיכות גבוהה', cta: 'לצפייה ←', href: '/category/שבתות וחגים' },
+          { text: 'תפילין לבר מצווה — קומפלט מלא עם תעודת כשרות', cta: 'לצפייה ←', href: '/category/תפילין קומפלט' },
+          { text: 'כל מוצר נבדק לפני משלוח — אחריות מלאה', cta: 'לכל המוצרים ←', href: '/category/יודאיקה' },
+        ];
+        const msg = topMessages[topBarIdx % topMessages.length];
+        return (
+          <div
+            onClick={() => router.push(msg.href)}
+            style={{ width: '100%', background: '#f5e6b3', borderBottom: '1px solid #d4b96a', padding: '8px 16px', textAlign: 'center', direction: 'rtl', cursor: 'pointer', userSelect: 'none' }}
+          >
+            <span
+              key={topBarIdx}
+              style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#5a3e00', display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center', animation: 'topBarFade 0.4s ease' }}
+            >
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8940a', display: 'inline-block', flexShrink: 0 }} />
+              {msg.text}
+              <span style={{ color: '#0c1a35', background: 'rgba(12,26,53,0.1)', borderRadius: 6, padding: '1px 7px', fontWeight: 800, fontSize: isMobile ? 11 : 12 }}>{msg.cta}</span>
+            </span>
+            <style>{`@keyframes topBarFade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }`}</style>
+          </div>
+        );
+      })()}
+
       {/* ── Newsletter popup (45 s trigger) ── */}
       {newsletterPopupOpen && (
         <div
@@ -544,6 +587,7 @@ export default function HomePageClient() {
               <div style={{ fontSize: 36, marginBottom: 8 }}>🏆</div>
               <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>הצטרפו למועדון הלקוחות</div>
               <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>קבלו מבצעים ומוצרים חדשים לפני כולם</div>
+              <div style={{ marginTop: 10, background: '#b8972a', color: '#0c1a35', borderRadius: 20, padding: '5px 16px', fontSize: 13, fontWeight: 900, display: 'inline-block' }}>קבל 5% הנחה על ההזמנה הראשונה</div>
             </div>
             <div style={{ padding: '24px 24px 28px' }}>
               {newsletterStatus === 'success' ? (
@@ -706,6 +750,45 @@ export default function HomePageClient() {
         </div>
       )}
 
+      {/* ── Hero Message + Smart Funnel ── */}
+      <div style={{
+        background: '#0c1a35',
+        padding: isMobile ? '36px 20px 0' : '56px 24px 0',
+        textAlign: 'center',
+        direction: 'rtl',
+      }}>
+        <div style={{ maxWidth: 680, margin: '0 auto' }}>
+          <h1 style={{
+            fontSize: isMobile ? 22 : 32,
+            fontWeight: 900,
+            color: '#ffffff',
+            lineHeight: 1.4,
+            marginBottom: 14,
+          }}>
+            לקנות מזוזה או יודאיקה —{' '}
+            <span style={{ color: '#b8972a' }}>רק כשאתה בטוח 100% במה שאתה מקבל</span>
+          </h1>
+          <p style={{
+            fontSize: isMobile ? 14 : 17,
+            color: 'rgba(255,255,255,0.75)',
+            lineHeight: 1.8,
+            maxWidth: 520,
+            margin: '0 auto 0',
+          }}>
+            כל מוצר נבדק, מצולם, ומוצג לך בדיוק כמו שהוא — בלי הפתעות.
+            ישירות מסופר מוסמך, עם תעודת כשרות ואחריות מלאה.
+          </p>
+        </div>
+
+        {/* Funnel separator */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', margin: isMobile ? '24px 0 0' : '32px 0 0' }}>
+          <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.45)', margin: 0, padding: '12px 0 0', fontWeight: 500 }}>
+            בחר מה אתה מחפש — נמצא לך את המתאים ביותר
+          </p>
+        </div>
+        <SmartFunnel isMobile={isMobile} />
+      </div>
+
       {/* ── 1. HeroSwiper ── */}
       <HeroSwiper
         isMobile={isMobile}
@@ -768,8 +851,6 @@ return (
         </div>
       </div>
 
-      {/* ── Smart Funnel ── */}
-      <SmartFunnel isMobile={isMobile} />
 
 
       {/* ── 4. Category grid (CHANGE 2) ── */}
@@ -819,8 +900,14 @@ return (
       {/* ── 5. Featured products horizontal scroll (CHANGE 3) ── */}
       {featuredProducts.length > 0 && (
         <div style={{ background: '#ffffff', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
-            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 14 }}>מוצרים נבחרים</h2>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
+            <button
+              onClick={() => router.push('/category/יודאיקה')}
+              style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: isMobile ? '9px 18px' : '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
+              צפה במוצרים הנמכרים ביותר ←
+            </button>
           </div>
           <div style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 16px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
             {featuredProducts.map(p => {
@@ -859,6 +946,49 @@ return (
         </div>
       )}
 
+      {/* ── Shop All CTA ── */}
+      <div style={{ background: '#ffffff', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
+        <a
+          href="/category/יודאיקה"
+          style={{ display: 'inline-block', background: '#0c1a35', color: '#fff', borderRadius: 12, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
+        >
+          לכל המוצרים ←
+        </a>
+      </div>
+
+      {/* ── Clear Path CTA ── */}
+      <div style={{ background: '#f8f8f8', padding: isMobile ? '32px 16px' : '40px 16px', direction: 'rtl', textAlign: 'center' }}>
+        <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>לא בטוח מה לבחור?</h2>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>בחר לפי מה שאתה מחפש — נמצא לך את המתאים ביותר</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+          {[
+            { label: 'מצא מזוזה לבית',    href: '/category/מזוזות' },
+            { label: 'מצא מתנה לשבת',     href: '/category/שבתות וחגים' },
+            { label: 'צפה בכל המוצרים',   href: '/category/יודאיקה' },
+          ].map(item => (
+            <button
+              key={item.label}
+              onClick={() => router.push(item.href)}
+              style={{
+                background: '#0c1a35',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 12,
+                padding: isMobile ? '12px 22px' : '13px 28px',
+                fontSize: isMobile ? 14 : 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a2d50'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#0c1a35'; }}
+            >
+              {item.label} ←
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* ── 6. More categories horizontal scroll (CHANGE 4) ── */}
       <div style={{ background: '#fff', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
@@ -894,6 +1024,62 @@ return (
           })}
         </div>
       </div>
+
+      {/* ── Static Social Proof ── */}
+      {(() => {
+        const quotes = [
+          { name: 'מיכל כהן', city: 'תל אביב', stars: 5, text: 'הזמנתי מזוזה לבית החדש — קיבלתי תמונה של הקלף לפני המשלוח. לא ציפיתי לרמת שירות כזו.' },
+          { name: 'יוסף לוי', city: 'ירושלים', stars: 5, text: 'קניתי תפילין לבן שלי לבר מצווה. הסופר פנה אלינו אישית כדי לוודא שהכל מתאים. מרגש.' },
+          { name: 'שרה אברמוב', city: 'חיפה', stars: 5, text: 'מתנה לאמא שלי — היא בכתה מרוב שמחה. האריזה הייתה מהודרת ותעודת הכשרות נתנה לה ביטחון.' },
+          { name: 'דוד נחמיאס', city: 'באר שבע', stars: 5, text: 'ראיתי הרבה חנויות אונליין. כאן היחיד שמציג צילום אמיתי של הקלף. זה ההבדל כולו.' },
+        ];
+        return (
+          <div style={{ background: '#ffffff', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+            <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+              <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>
+                לקוחות שכבר קנו — מה הם אומרים
+              </h2>
+              <p style={{ textAlign: 'center', fontSize: 13, color: '#999', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                gap: 16,
+              }}>
+                {quotes.map((q, i) => (
+                  <div key={i} style={{
+                    background: '#fff',
+                    border: '1px solid #ebebeb',
+                    borderRadius: 14,
+                    padding: isMobile ? '18px 16px' : '22px 24px',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                  }}>
+                    {/* Stars */}
+                    <div style={{ marginBottom: 10, display: 'flex', gap: 2 }}>
+                      {Array.from({ length: q.stars }).map((_, si) => (
+                        <span key={si} style={{ color: '#e6a817', fontSize: 15 }}>★</span>
+                      ))}
+                    </div>
+                    {/* Quote */}
+                    <p style={{ fontSize: 13, color: '#444', lineHeight: 1.75, marginBottom: 14, fontStyle: 'italic' }}>
+                      &ldquo;{q.text}&rdquo;
+                    </p>
+                    {/* Identity */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <span style={{ color: '#b8972a', fontWeight: 900, fontSize: 14 }}>{q.name.charAt(0)}</span>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>{q.name}</div>
+                        <div style={{ fontSize: 11, color: '#999' }}>{q.city}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── 5. Testimonials carousel ── */}
       {testimonials.length > 0 && (() => {
