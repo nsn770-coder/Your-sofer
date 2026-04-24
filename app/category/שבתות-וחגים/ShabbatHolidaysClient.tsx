@@ -6,18 +6,21 @@ import { db } from '../../firebase';
 import ProductCard from '@/components/ui/ProductCard';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
-const FETCH_CATS = ['יודאיקה', 'כלי שולחן והגשה', 'עיצוב הבית', 'מתנות', 'בר מצווה'];
+// Explicit holiday cats — products in these pass the include check automatically
+const SHABBAT_EXPLICIT_CATS = new Set(['שבת', 'חגים', 'פסח', 'חנוכה']);
+
+// All cats to fetch — max 10 for Firestore 'in' query
+const FETCH_CATS = ['יודאיקה', 'כלי שולחן והגשה', 'עיצוב הבית', 'מתנות', 'שבת', 'חגים', 'פסח', 'חנוכה'];
 
 const INCLUDE_KEYWORDS = [
-  'פמוט','פמוטים','גביע','קידוש','פסח','חנוכה','חנוכיה','הבדלה',
-  'בשמים','מלחיה','מלחיות','חלה','חלות','אירוח','שולחן שבת',
+  'פמוט','פמוטים','גביע','קידוש','פסח','חנוכה','חנוכיה','חנוכיות','הבדלה',
+  'בשמים','מלחיה','מלחיות','חלה','חלות','מגש','אירוח','שולחן שבת',
   'מתנה','מתנות','שבת','חג','נטלה','נטלות','נטילת ידיים',
-  'מגש מצה','קערת פסח','סביבון','נר שבת','נרות שבת',
 ];
 
 const EXCLUDE_KEYWORDS = [
   'מזוזה','מזוזות','תפילין','קלף','קלפי','ספר תורה',
-  'מגילה','מגילות','טלית','כיסוי תפילין','כיסוי טלית','תיק','תיקי',
+  'מגילה','מגילות','טלית','כיסוי תפילין','כיסוי טלית',
 ];
 
 interface Product {
@@ -43,6 +46,7 @@ interface Product {
 function matchesShabbat(p: Product): boolean {
   const text = `${p.name || ''} ${p.cat || ''} ${p.subCategory || ''}`;
   if (EXCLUDE_KEYWORDS.some(kw => text.includes(kw))) return false;
+  if (SHABBAT_EXPLICIT_CATS.has(p.cat || '')) return true;
   return INCLUDE_KEYWORDS.some(kw => text.includes(kw));
 }
 
