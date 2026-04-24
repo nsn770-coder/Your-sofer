@@ -259,7 +259,6 @@ export default function HomePageClient() {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
   const cardsRef       = useRef<HTMLDivElement>(null);
-  const funnelRef      = useRef<HTMLDivElement>(null);
   const router         = useRouter();
   const { shaliach }   = useShaliach();
   const { addItem }    = useCart();
@@ -751,10 +750,10 @@ export default function HomePageClient() {
         </div>
       )}
 
-      {/* ── Hero Message ── */}
+      {/* ── Hero Message + Smart Funnel ── */}
       <div style={{
         background: '#0c1a35',
-        padding: isMobile ? '36px 20px 32px' : '56px 24px 48px',
+        padding: isMobile ? '36px 20px 0' : '56px 24px 0',
         textAlign: 'center',
         direction: 'rtl',
       }}>
@@ -819,26 +818,15 @@ export default function HomePageClient() {
               מצא מתנה לשבת
             </button>
           </div>
-          <button
-            onClick={() => funnelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            style={{
-              marginTop: 14,
-              background: 'none',
-              border: 'none',
-              color: 'rgba(255,255,255,0.55)',
-              fontSize: isMobile ? 13 : 14,
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              margin: '14px auto 0',
-            }}
-          >
-            <span style={{ fontSize: 16 }}>🔍</span>
-            לא בטוח מה לבחור? עזור לי למצוא
-          </button>
         </div>
+
+        {/* Funnel separator */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', margin: isMobile ? '28px 0 0' : '36px 0 0' }}>
+          <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.45)', margin: '0 0 0', padding: '14px 0 0', fontWeight: 500 }}>
+            לא בטוח מה לבחור? ענה על שאלה אחת ונמצא לך את המתאים
+          </p>
+        </div>
+        <SmartFunnel isMobile={isMobile} />
       </div>
 
       {/* ── 1. HeroSwiper ── */}
@@ -903,10 +891,6 @@ return (
         </div>
       </div>
 
-      {/* ── Smart Funnel ── */}
-      <div ref={funnelRef} style={{ background: '#f8f8f8', padding: isMobile ? '24px 12px' : '32px 24px' }}>
-        <SmartFunnel isMobile={isMobile} />
-      </div>
 
 
       {/* ── 4. Category grid (CHANGE 2) ── */}
