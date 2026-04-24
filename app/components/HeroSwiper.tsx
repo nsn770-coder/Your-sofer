@@ -71,7 +71,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
   const slideHeight = isMobile ? 260 : 360;
 
   return (
-    <div style={{ background: '#ffffff', padding: '12px 0' }}>
+    <div style={{ background: '#F5F0E8', padding: '12px 0' }}>
     <div style={{
       position: 'relative',
       width: '92%',

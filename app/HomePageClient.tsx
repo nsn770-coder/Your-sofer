@@ -752,7 +752,7 @@ export default function HomePageClient() {
 
       {/* ── Hero Message + Smart Funnel ── */}
       <div style={{
-        background: '#0c1a35',
+        background: '#F5F0E8',
         padding: isMobile ? '36px 20px 0' : '56px 24px 0',
         textAlign: 'center',
         direction: 'rtl',
@@ -761,7 +761,7 @@ export default function HomePageClient() {
           <h1 style={{
             fontSize: isMobile ? 22 : 32,
             fontWeight: 900,
-            color: '#ffffff',
+            color: '#0c1a35',
             lineHeight: 1.4,
             marginBottom: 14,
           }}>
@@ -770,7 +770,7 @@ export default function HomePageClient() {
           </h1>
           <p style={{
             fontSize: isMobile ? 14 : 17,
-            color: 'rgba(255,255,255,0.75)',
+            color: '#555',
             lineHeight: 1.8,
             maxWidth: 520,
             margin: '0 auto 0',
@@ -781,8 +781,8 @@ export default function HomePageClient() {
         </div>
 
         {/* Funnel separator */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', margin: isMobile ? '24px 0 0' : '32px 0 0' }}>
-          <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.45)', margin: 0, padding: '12px 0 0', fontWeight: 500 }}>
+        <div style={{ borderTop: '1px solid rgba(0,0,0,0.1)', margin: isMobile ? '24px 0 0' : '32px 0 0' }}>
+          <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '12px 0 0', fontWeight: 500 }}>
             בחר מה אתה מחפש — נמצא לך את המתאים ביותר
           </p>
         </div>
