@@ -58,6 +58,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className="overflow-x-hidden">
+      <head>
+        <link rel="preconnect" href="https://your-sofer.firebaseapp.com" />
+        <link rel="preconnect" href="https://apis.google.com" />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+      </head>
       <body className={`${geist.className} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100vw' }}>
         <AuthProvider>
           {/* Suspense is required by Next.js when useSearchParams() is used

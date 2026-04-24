@@ -110,7 +110,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
           }}>
             {/* Background: uploaded image or fallback gradient */}
             {heroImages.soferimSlide ? (
-              <Image fill loading="lazy" src={optimizeCloudinaryUrl(heroImages.soferimSlide, 1200)} alt="הסופרים שלנו" style={{ objectFit: 'cover' }} sizes="100vw" />
+              <Image fill priority src={optimizeCloudinaryUrl(heroImages.soferimSlide, 1200)} alt="הסופרים שלנו" style={{ objectFit: 'cover' }} sizes="100vw" />
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a2a 100%)' }} />
             )}
