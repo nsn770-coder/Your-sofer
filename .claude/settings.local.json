@@ -85,7 +85,17 @@
       "Bash(echo \"Started PID: $!\")",
       "Bash(kill -9 19577)",
       "Bash(sort -k2 -h)",
-      "Bash(awk '{:*)"
+      "Bash(awk '{:*)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" stash)",
+      "Bash(\"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" run build)",
+      "Bash(C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe stash *)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" checkout -- .claude/settings.local.json)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" stash pop)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" add app/HomePageClient.tsx)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" commit -m \"style: wrap SmartFunnel with purple background\")",
+      "Bash(C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe push *)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" commit -m \"feat: newsletter 5% incentive + 20s trigger, add shop-all CTA after featured products\")",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" commit -m \"feat: improve product page conversion\")"
     ]
   }
 }

@@ -170,12 +170,12 @@ function SoferCard({ soferId }: { soferId: string }) {
   if (!sofer) return null;
 
   return (
-    <div dir="rtl" style={{ marginTop: 20, background: 'linear-gradient(135deg, #f8f9ff, #eef2ff)', border: '1px solid #c7d2fe', borderRadius: 12, padding: '14px 16px' }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>הסופר שכתב</div>
+    <div dir="rtl" style={{ marginTop: 20, background: 'linear-gradient(135deg, #f8faff, #eef3fb)', border: '1px solid #bcd0ee', borderRadius: 12, padding: '14px 16px' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: '#b8972a', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>הסופר שכתב</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
         {sofer.profileImage
-          ? <img src={sofer.profileImage} alt={sofer.name} loading="lazy" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid #6366f1', flexShrink: 0 }} />
-          : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 22, flexShrink: 0 }}>✍️</div>
+          ? <img src={sofer.profileImage} alt={sofer.name} loading="lazy" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid #b8972a', flexShrink: 0 }} />
+          : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b8972a', fontSize: 22, flexShrink: 0 }}>✍️</div>
         }
         <div>
           <div style={{ fontWeight: 800, fontSize: 15, color: '#0c1a35' }}>{sofer.name}</div>
@@ -192,13 +192,13 @@ function SoferCard({ soferId }: { soferId: string }) {
       {sofer.certifications?.length ? (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
           {sofer.certifications.map(cert => (
-            <span key={cert} style={{ background: '#e0e7ff', color: '#4338ca', fontSize: 11, fontWeight: 600, borderRadius: 20, padding: '3px 9px' }}>{cert}</span>
+            <span key={cert} style={{ background: '#e8f0fb', color: '#1a3a6b', fontSize: 11, fontWeight: 600, borderRadius: 20, padding: '3px 9px' }}>{cert}</span>
           ))}
         </div>
       ) : null}
       <button
         onClick={() => { trackOpenSoferProfile(soferId); router.push(`/soferim/${soferId}`); }}
-        style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 20, padding: '7px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+        style={{ background: '#0c1a35', color: '#b8972a', border: 'none', borderRadius: 20, padding: '7px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
       >
         ראה פרופיל מלא
       </button>
@@ -724,19 +724,31 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
   // ── Buy Box ──────────────────────────────────────────────────────────────────
   const BuyBox = ({ compact = false }: { compact?: boolean }) => (
-    <div style={{ background: '#fff', border: compact ? 'none' : '1px solid #e8e8e8', borderRadius: compact ? 0 : 12, padding: compact ? '12px 16px' : '20px 18px' }}>
+    <div style={{ background: '#fff', borderRadius: compact ? 0 : 12, padding: compact ? '12px 16px' : '20px 18px' }}>
       {!compact && (
-        <>
-          <div style={{ fontSize: 28, fontWeight: 900, color: '#0c1a35', marginBottom: 2 }}>₪{product.price}</div>
-          {product.was && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 8, fontWeight: 600 }}>חסכת {discount}% — ₪{(product.was - product.price).toFixed(0)}</div>}
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
+            <span style={{ fontSize: 32, fontWeight: 900, color: '#0c1a35' }}>₪{product.price}</span>
+            {product.was && <span style={{ fontSize: 16, textDecoration: 'line-through', color: '#bbb' }}>₪{product.was}</span>}
+            {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
+          </div>
+          <div style={{ fontSize: 12, color: '#888', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Icon.Truck /> כולל מע״מ · משלוח חינם לכל הארץ
+          </div>
           <InstallmentBadge price={product.price} />
-        </>
+        </div>
       )}
 
-      {/* Stock indicator */}
-      <div style={{ color: '#1a6b3c', fontWeight: 700, fontSize: 13, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#1a6b3c', display: 'inline-block', flexShrink: 0 }} />
-        במלאי — משלוח חינם לכל הארץ
+      {/* Urgency — directly above CTA */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#15803d', fontWeight: 700 }}>
+          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block', flexShrink: 0 }} />
+          במלאי
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#fff4f4', border: '1px solid #ffc0c0', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#c0392b', fontWeight: 700 }}>
+          <Icon.Lightning />
+          נשארו {stockCount} בלבד
+        </span>
       </div>
 
       {selectedKlafName && (
@@ -766,15 +778,24 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </div>
       )}
 
-      {/* Add to cart */}
-      <button onClick={handleAddToCart} style={{ width: '100%', background: added ? '#27ae60' : '#b8972a', color: added ? '#fff' : '#0c1a35', border: 'none', borderRadius: 24, padding: compact ? '10px' : '13px', fontSize: 15, fontWeight: 800, cursor: 'pointer', marginBottom: 10, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-        {added ? <><Icon.Check size={16} color="#fff" /> נוסף לסל!</> : <><Icon.Cart size={16} color="#0c1a35" /> הוסף לסל</>}
-      </button>
-
-      {/* Buy now */}
-      <button onClick={() => { handleAddToCart(); router.push('/cart'); }} style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 24, padding: compact ? '10px' : '13px', fontSize: 15, fontWeight: 800, cursor: 'pointer', marginBottom: compact ? 0 : 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+      {/* PRIMARY: Buy Now */}
+      <button onClick={() => { handleAddToCart(); router.push('/cart'); }}
+        style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
         <Icon.Zap /> קנה עכשיו
       </button>
+
+      {/* SECONDARY: Add to Cart */}
+      <button onClick={handleAddToCart}
+        style={{ width: '100%', background: added ? '#f0fdf4' : 'transparent', color: added ? '#15803d' : '#0c1a35', border: `1.5px solid ${added ? '#86efac' : '#0c1a35'}`, borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+        {added ? <><Icon.Check size={15} color="#15803d" /> נוסף לסל!</> : <><Icon.Cart size={15} color="#0c1a35" /> הוסף לסל</>}
+      </button>
+
+      {/* Micro-trust row */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 14, fontSize: 11, color: '#999', marginBottom: compact ? 0 : 4 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Icon.Shield /> רכישה מאובטחת</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Icon.Return /> החזר 14 יום</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Icon.Truck /> משלוח חינם</span>
+      </div>
 
       {!compact && <TrustBlock />}
     </div>
@@ -797,7 +818,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#ffffff', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', paddingBottom: isMobile ? 80 : 0 }}>
 
       {/* Save toast */}
       {saveSuccess && (
@@ -980,17 +1001,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           {/* ── Column 3: Buy Box desktop ── */}
           {!isMobile && (
             <div ref={buyBoxRef} style={{ position: 'sticky', top: 20 }}>
-              {product.was && (
-                <div style={{ background: '#fff8e1', border: '1px solid #ffc107', borderRadius: 12, padding: '10px 14px', marginBottom: 10, fontSize: 13 }}>
-                  <div style={{ fontWeight: 700, color: '#c0392b', display: 'flex', alignItems: 'center', gap: 5 }}><Icon.Lightning /> מבצע מיוחד!</div>
-                  <div style={{ color: '#555', fontSize: 12 }}>חסכת ₪{(product.was - product.price).toFixed(0)} ({discount}%)</div>
-                </div>
-              )}
-              <div style={{ border: '1px solid #e0e0e0', borderRadius: 14, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
-                <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a2d50)', padding: '16px 18px' }}>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: '#fff' }}>₪{product.price}</div>
-                  {product.was && <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', textDecoration: 'line-through', marginTop: 2 }}>₪{product.was}</div>}
-                </div>
+              <div style={{ border: '1px solid #e0e0e0', borderRadius: 14, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
                 <BuyBox />
               </div>
             </div>
@@ -1048,6 +1059,22 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i - 1 + allMedia.length) % allMedia.length); }} style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>›</button>
             </>
           )}
+        </div>
+      )}
+
+      {/* Sticky mobile CTA bar */}
+      {isMobile && (
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200, background: '#fff', borderTop: '1.5px solid #e8e8e8', padding: '10px 16px 14px', display: 'flex', gap: 12, alignItems: 'center', boxShadow: '0 -4px 20px rgba(0,0,0,0.1)', direction: 'rtl' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 11, color: '#999', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#0c1a35', lineHeight: 1.2 }}>₪{product.price}</div>
+          </div>
+          <button
+            onClick={() => { handleAddToCart(); router.push('/cart'); }}
+            style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 12, padding: '12px 24px', fontSize: 15, fontWeight: 900, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}
+          >
+            קנה עכשיו ←
+          </button>
         </div>
       )}
 
