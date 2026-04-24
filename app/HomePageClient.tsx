@@ -772,58 +772,18 @@ export default function HomePageClient() {
             fontSize: isMobile ? 14 : 17,
             color: 'rgba(255,255,255,0.75)',
             lineHeight: 1.8,
-            marginBottom: 28,
             maxWidth: 520,
-            margin: '0 auto 28px',
+            margin: '0 auto 0',
           }}>
             כל מוצר נבדק, מצולם, ומוצג לך בדיוק כמו שהוא — בלי הפתעות.
             ישירות מסופר מוסמך, עם תעודת כשרות ואחריות מלאה.
           </p>
-          <div style={{
-            display: 'flex',
-            gap: 12,
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-          }}>
-            <button
-              onClick={() => router.push('/category/מזוזות')}
-              style={{
-                background: '#b8972a',
-                color: '#0c1a35',
-                border: 'none',
-                borderRadius: 12,
-                padding: isMobile ? '13px 28px' : '14px 36px',
-                fontSize: isMobile ? 15 : 16,
-                fontWeight: 900,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              קנה מזוזות ←
-            </button>
-            <button
-              onClick={() => router.push('/category/שבתות וחגים')}
-              style={{
-                background: 'transparent',
-                color: '#ffffff',
-                border: '2px solid rgba(255,255,255,0.4)',
-                borderRadius: 12,
-                padding: isMobile ? '13px 28px' : '14px 36px',
-                fontSize: isMobile ? 15 : 16,
-                fontWeight: 700,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              מצא מתנה לשבת
-            </button>
-          </div>
         </div>
 
         {/* Funnel separator */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', margin: isMobile ? '28px 0 0' : '36px 0 0' }}>
-          <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.45)', margin: '0 0 0', padding: '14px 0 0', fontWeight: 500 }}>
-            לא בטוח מה לבחור? ענה על שאלה אחת ונמצא לך את המתאים
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', margin: isMobile ? '24px 0 0' : '32px 0 0' }}>
+          <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.45)', margin: 0, padding: '12px 0 0', fontWeight: 500 }}>
+            בחר מה אתה מחפש — נמצא לך את המתאים ביותר
           </p>
         </div>
         <SmartFunnel isMobile={isMobile} />
