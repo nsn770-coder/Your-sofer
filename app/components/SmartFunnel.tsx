@@ -244,7 +244,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
             <div style={titleStyle}>מה אתה מחפש?</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <ImageCard
-                img={mezuzahImg}
+                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg"
                 label="צפה במזוזות"
                 onClick={() => { setPath('mezuzah'); go(1); }}
                 height={140}
