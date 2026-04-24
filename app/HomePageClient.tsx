@@ -11,13 +11,13 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 const HeroSwiper = dynamic(() => import('./components/HeroSwiper'), {
-  loading: () => <div className="h-[500px] bg-gray-100" />,
+  loading: () => <div className="h-[400px] md:h-[600px] bg-gray-100 animate-pulse rounded-b-lg" />,
 });
 import SmartFunnel from './components/SmartFunnel';
 import ProductCard from '@/components/ui/ProductCard';
 
-const NewsletterPopup = dynamic(() => import('./components/NewsletterPopup'), { ssr: false, loading: () => null });
-const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => null });
+const NewsletterPopup = dynamic(() => import('./components/NewsletterPopup'), { ssr: false, loading: () => <div className="hidden" /> });
+const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => <div className="hidden" /> });
 import { useShaliach } from './contexts/ShaliachContext';
 import { useCart } from './contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
