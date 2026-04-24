@@ -315,7 +315,7 @@ function NavBarContent() {
 
   function handleAction(action: string) {
     setMobileOpen(false);
-    if (action === "shabbat-holidays") router.push("/category/כלי שולחן והגשה");
+    if (action === "shabbat-holidays") router.push("/category/שבתות-וחגים");
     else if (action === "sifrei-torah") router.push("/category/ספרי תורה");
     else if (action === "megilot") router.push("/category/מגילות");
   }
