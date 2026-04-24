@@ -338,9 +338,19 @@ export default function HomePageClient() {
     async function fetchFeaturedProducts() {
       try {
         const snap = await getDocs(
+          query(collection(db, 'products'), where('isBestSeller', '==', true), limit(16)),
+        );
+        const bestSellers = snap.docs
+          .map(d => ({ id: d.id, ...d.data() } as Product))
+          .filter((p: Product) => p.hidden !== true && (p as any).status !== 'inactive');
+        if (bestSellers.length >= 4) {
+          setFeaturedProducts(bestSellers.slice(0, 8));
+          return;
+        }
+        const fallbackSnap = await getDocs(
           query(collection(db, 'products'), orderBy('priority', 'desc'), limit(24)),
         );
-        const all = snap.docs
+        const all = fallbackSnap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
           .filter((p: Product) => p.hidden !== true && (p as any).status !== 'inactive');
         setFeaturedProducts(all.slice(0, 8));
@@ -910,8 +920,14 @@ return (
       {/* ── 5. Featured products horizontal scroll (CHANGE 3) ── */}
       {featuredProducts.length > 0 && (
         <div style={{ background: '#ffffff', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
-            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 14 }}>מוצרים נבחרים</h2>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
+            <button
+              onClick={() => router.push('/category/מזוזות')}
+              style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: isMobile ? '9px 18px' : '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
+              צפה במוצרים הנמכרים ביותר ←
+            </button>
           </div>
           <div style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 16px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
             {featuredProducts.map(p => {
