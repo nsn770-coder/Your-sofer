@@ -769,7 +769,9 @@ return (
       </div>
 
       {/* ── Smart Funnel ── */}
-      <SmartFunnel isMobile={isMobile} />
+      <div style={{ background: '#6B21A8', padding: isMobile ? '24px 12px' : '32px 24px' }}>
+        <SmartFunnel isMobile={isMobile} />
+      </div>
 
 
       {/* ── 4. Category grid (CHANGE 2) ── */}
