@@ -239,6 +239,7 @@ export default function HomePageClient() {
   const [imagesReady, setImagesReady] = useState(false);
   const [wizardOpen, setWizardOpen]   = useState(false);
   const [activityIdx, setActivityIdx] = useState(0);
+  const [topBarIdx, setTopBarIdx]     = useState(0);
   const [weeklyProducts, setWeeklyProducts] = useState(0);
   const [soferimCount, setSoferimCount] = useState(0);
   const [productsCount, setProductsCount] = useState(0);
@@ -406,6 +407,11 @@ export default function HomePageClient() {
   }, []);
 
   useEffect(() => {
+    const id = setInterval(() => setTopBarIdx(i => i + 1), 4500);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
     setActivityIdx(0);
     const id = setInterval(() => setActivityIdx(i => i + 1), 4000);
     function onVisible() {
@@ -536,22 +542,32 @@ export default function HomePageClient() {
         maxWidth: '100vw',
       }}
     >
-      {/* ── Urgency Notification Bar ── */}
-      <div style={{
-        width: '100%',
-        background: '#f5e6b3',
-        borderBottom: '1px solid #d4b96a',
-        padding: '8px 16px',
-        textAlign: 'center',
-        direction: 'rtl',
-        zIndex: 90,
-      }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#5a3e00', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8940a', display: 'inline-block', flexShrink: 0 }} />
-          המוצרים הנמכרים ביותר השבוע – מלאי מוגבל
-          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8940a', display: 'inline-block', flexShrink: 0 }} />
-        </span>
-      </div>
+      {/* ── Top Live Activity Bar ── */}
+      {(() => {
+        const topMessages = [
+          { text: 'מזוזות כשרות ומהודרות — ישירות מסופר מוסמך', cta: 'לצפייה ←', href: '/category/מזוזות' },
+          { text: 'מתנות לשבת ולחג — עיצוב יוקרתי ואיכות גבוהה', cta: 'לצפייה ←', href: '/category/שבתות וחגים' },
+          { text: 'תפילין לבר מצווה — קומפלט מלא עם תעודת כשרות', cta: 'לצפייה ←', href: '/category/תפילין קומפלט' },
+          { text: 'כל מוצר נבדק לפני משלוח — אחריות מלאה', cta: 'לכל המוצרים ←', href: '/category/מזוזות' },
+        ];
+        const msg = topMessages[topBarIdx % topMessages.length];
+        return (
+          <div
+            onClick={() => router.push(msg.href)}
+            style={{ width: '100%', background: '#f5e6b3', borderBottom: '1px solid #d4b96a', padding: '8px 16px', textAlign: 'center', direction: 'rtl', cursor: 'pointer', userSelect: 'none' }}
+          >
+            <span
+              key={topBarIdx}
+              style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#5a3e00', display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center', animation: 'topBarFade 0.4s ease' }}
+            >
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8940a', display: 'inline-block', flexShrink: 0 }} />
+              {msg.text}
+              <span style={{ color: '#0c1a35', background: 'rgba(12,26,53,0.1)', borderRadius: 6, padding: '1px 7px', fontWeight: 800, fontSize: isMobile ? 11 : 12 }}>{msg.cta}</span>
+            </span>
+            <style>{`@keyframes topBarFade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }`}</style>
+          </div>
+        );
+      })()}
 
       {/* ── Newsletter popup (45 s trigger) ── */}
       {newsletterPopupOpen && (
