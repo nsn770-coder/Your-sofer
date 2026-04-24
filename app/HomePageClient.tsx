@@ -259,6 +259,7 @@ export default function HomePageClient() {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
   const cardsRef       = useRef<HTMLDivElement>(null);
+  const funnelRef      = useRef<HTMLDivElement>(null);
   const router         = useRouter();
   const { shaliach }   = useShaliach();
   const { addItem }    = useCart();
@@ -818,59 +819,25 @@ export default function HomePageClient() {
               מצא מתנה לשבת
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* ── Quick-Choice Strip ── */}
-      <div style={{ background: '#ffffff', padding: isMobile ? '14px 16px' : '16px 24px', borderBottom: '1px solid #f0ece4' }}>
-        <div style={{
-          maxWidth: 700,
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)',
-          gap: 10,
-        }}>
-          {[
-            { label: 'מצא מזוזה לבית', emoji: '🏠', href: '/category/מזוזות' },
-            { label: 'מצא מתנה לשבת', emoji: '🎁', href: '/category/מתנות' },
-            { label: 'תפילין',          emoji: '✡️', href: '/category/תפילין' },
-            { label: 'כל המוצרים',     emoji: '←',  href: '/category/מזוזות' },
-          ].map(item => (
-            <button
-              key={item.label}
-              onClick={() => router.push(item.href)}
-              style={{
-                background: '#f8f7f4',
-                border: '1.5px solid #e8e0d0',
-                borderRadius: 12,
-                padding: isMobile ? '12px 8px' : '13px 12px',
-                fontSize: isMobile ? 13 : 14,
-                fontWeight: 700,
-                color: '#0c1a35',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-                transition: 'all 0.15s',
-                direction: 'rtl',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = '#0c1a35';
-                (e.currentTarget as HTMLButtonElement).style.color = '#b8972a';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = '#0c1a35';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = '#f8f7f4';
-                (e.currentTarget as HTMLButtonElement).style.color = '#0c1a35';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = '#e8e0d0';
-              }}
-            >
-              <span style={{ fontSize: 15 }}>{item.emoji}</span>
-              {item.label}
-            </button>
-          ))}
+          <button
+            onClick={() => funnelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            style={{
+              marginTop: 14,
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255,255,255,0.55)',
+              fontSize: isMobile ? 13 : 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              margin: '14px auto 0',
+            }}
+          >
+            <span style={{ fontSize: 16 }}>🔍</span>
+            לא בטוח מה לבחור? עזור לי למצוא
+          </button>
         </div>
       </div>
 
@@ -936,7 +903,10 @@ return (
         </div>
       </div>
 
-      {/* ── Smart Funnel (hidden — replaced by quick-choice strip above hero) ── */}
+      {/* ── Smart Funnel ── */}
+      <div ref={funnelRef} style={{ background: '#f8f8f8', padding: isMobile ? '24px 12px' : '32px 24px' }}>
+        <SmartFunnel isMobile={isMobile} />
+      </div>
 
 
       {/* ── 4. Category grid (CHANGE 2) ── */}
