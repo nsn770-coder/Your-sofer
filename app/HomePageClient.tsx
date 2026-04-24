@@ -452,7 +452,7 @@ export default function HomePageClient() {
     const timer = setTimeout(() => {
       setNewsletterPopupOpen(true);
       sessionStorage.setItem('newsletter_popup_shown', '1');
-    }, 45000);
+    }, 20000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -544,6 +544,7 @@ export default function HomePageClient() {
               <div style={{ fontSize: 36, marginBottom: 8 }}>🏆</div>
               <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>הצטרפו למועדון הלקוחות</div>
               <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>קבלו מבצעים ומוצרים חדשים לפני כולם</div>
+              <div style={{ marginTop: 10, background: '#b8972a', color: '#0c1a35', borderRadius: 20, padding: '5px 16px', fontSize: 13, fontWeight: 900, display: 'inline-block' }}>קבל 5% הנחה על ההזמנה הראשונה</div>
             </div>
             <div style={{ padding: '24px 24px 28px' }}>
               {newsletterStatus === 'success' ? (
@@ -860,6 +861,16 @@ return (
           </div>
         </div>
       )}
+
+      {/* ── Shop All CTA ── */}
+      <div style={{ background: '#ffffff', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
+        <a
+          href="/category/מזוזות"
+          style={{ display: 'inline-block', background: '#0c1a35', color: '#fff', borderRadius: 12, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
+        >
+          לכל המוצרים ←
+        </a>
+      </div>
 
       {/* ── 6. More categories horizontal scroll (CHANGE 4) ── */}
       <div style={{ background: '#fff', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
