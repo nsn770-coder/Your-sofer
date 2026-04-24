@@ -645,14 +645,14 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
 
-function EmptyState({ active, onClear, relatedCats = [] }: { active: boolean; onClear: () => void; relatedCats?: string[] }) {
+function EmptyState({ active, onClear, relatedCats = [], message }: { active: boolean; onClear: () => void; relatedCats?: string[]; message?: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center px-6">
       <div className="w-20 h-20 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-5 text-gray-300">
         <IconSearch size={40} />
       </div>
       <h3 className="text-lg font-bold text-gray-700 mb-2">
-        {active ? 'לא נמצאו מוצרים' : 'אין מוצרים בקטגוריה זו'}
+        {message ?? (active ? 'לא נמצאו מוצרים' : 'אין מוצרים בקטגוריה זו')}
       </h3>
       <p className="text-sm text-gray-400 mb-6 max-w-xs leading-relaxed">
         {active
@@ -719,10 +719,17 @@ export default function CategoryClient({ category }: { category: string }) {
     'יודאיקה': { 'נטילת ידיים': 'נטילת ידיים', 'נטלות': 'נטילת ידיים' },
   };
 
+  // Exact subCategory values that qualify for the שבתות-וחגים virtual category
+  const SHABBAT_JUDAICA_SUBCATS = new Set([
+    'גביעי קידוש', 'הבדלה', 'פמוטים', 'מגשי חלה', 'כיסויי חלה', 'סטים לקידוש',
+  ]);
+  // Keywords that also qualify (checked via .includes on subCategory)
+  const SHABBAT_SUBCAT_KEYWORDS = ['שבת', 'קידוש', 'הבדלה', 'חלה', 'פמוטים', 'חגים'];
+
   // Case B: category slugs that don't exist as a cat field in Firestore
-  const VIRTUAL_CATS: Record<string, { cats: string[]; subcatKeywords: string[] }> = {
-    'שבתות וחגים':  { cats: ['יודאיקה', 'כלי שולחן והגשה'], subcatKeywords: ['שבת', 'חג', 'קידוש', 'חנוכה', 'פסח', 'הבדלה', 'נטילת ידיים'] },
-    'שבתות-וחגים': { cats: ['יודאיקה', 'כלי שולחן והגשה'], subcatKeywords: ['שבת', 'חג', 'קידוש', 'חנוכה', 'פסח', 'הבדלה', 'נטילת ידיים'] },
+  const VIRTUAL_CATS: Record<string, { cats: string[] }> = {
+    'שבתות וחגים':  { cats: ['יודאיקה'] },
+    'שבתות-וחגים': { cats: ['יודאיקה'] },
   };
 
   // When this is non-null, fetchAll does a direct subCategory query and re-runs if
@@ -740,13 +747,23 @@ export default function CategoryClient({ category }: { category: string }) {
       );
       const seen = new Set<string>();
       const merged: Product[] = [];
+      const isShabbat = category === 'שבתות וחגים' || category === 'שבתות-וחגים';
       for (const snap of snaps) {
         for (const d of snap.docs) {
           if (!seen.has(d.id)) {
             seen.add(d.id);
             const p = { id: d.id, ...d.data() } as Product;
-            const sub = (p.subCategory ?? '').toLowerCase();
-            if (virtual.subcatKeywords.some(kw => sub.includes(kw.toLowerCase()))) {
+            if (isShabbat) {
+              // Exclude כלי שולחן והגשה entirely
+              if (p.cat === 'כלי שולחן והגשה') continue;
+              const sub = p.subCategory ?? '';
+              const subLower = sub.toLowerCase();
+              // Condition 1: יודאיקה with exact Shabbat subCategory
+              const cond1 = p.cat === 'יודאיקה' && SHABBAT_JUDAICA_SUBCATS.has(sub);
+              // Condition 2: subCategory contains any Shabbat keyword
+              const cond2 = SHABBAT_SUBCAT_KEYWORDS.some(kw => subLower.includes(kw.toLowerCase()));
+              if (cond1 || cond2) merged.push(p);
+            } else {
               merged.push(p);
             }
           }
@@ -1153,6 +1170,11 @@ export default function CategoryClient({ category }: { category: string }) {
             <EmptyState
               active={active}
               onClear={() => setFilters(EMPTY_FILTERS)}
+              message={
+                !active && (category === 'שבתות וחגים' || category === 'שבתות-וחגים')
+                  ? 'לא נמצאו מוצרים לשבתות וחגים'
+                  : undefined
+              }
               relatedCats={
                 active
                   ? []
