@@ -1,12 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { collection, getDocs, orderBy, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from 'recharts';
+
+const AnalyticsLineChart = dynamic(() => import('./AnalyticsLineChart'), {
+  ssr: false,
+  loading: () => <div style={{ height: 340, background: '#fff', borderRadius: 14, marginBottom: 28 }} />,
+});
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -206,35 +209,7 @@ export default function AnalyticsDashboard() {
             </div>
 
             {/* ── Line chart ── */}
-            <div style={{ background: '#fff', borderRadius: 14, padding: '24px 20px', marginBottom: 28, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: navy, margin: '0 0 20px' }}>📈 הזמנות — 7 ימים אחרונים</h2>
-              <ResponsiveContainer width="100%" height={260}>
-                <LineChart data={stats.last7Days} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#666' }} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#666' }} width={30} />
-                  <Tooltip
-                    formatter={(val, name) =>
-                      name === 'revenue'
-                        ? [`₪${Number(val).toLocaleString('he-IL')}`, 'הכנסות']
-                        : [val, 'הזמנות']
-                    }
-                    labelStyle={{ fontFamily: 'Heebo, Arial', direction: 'rtl' }}
-                    contentStyle={{ borderRadius: 8, fontSize: 13 }}
-                  />
-                  <Line type="monotone" dataKey="orders" stroke={navy} strokeWidth={2.5} dot={{ r: 4, fill: navy }} name="orders" />
-                  <Line type="monotone" dataKey="revenue" stroke={gold} strokeWidth={2} dot={{ r: 3, fill: gold }} name="revenue" strokeDasharray="4 2" />
-                </LineChart>
-              </ResponsiveContainer>
-              <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: 12 }}>
-                <span style={{ fontSize: 12, color: '#555', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 24, height: 3, background: navy, display: 'inline-block', borderRadius: 2 }} /> הזמנות
-                </span>
-                <span style={{ fontSize: 12, color: '#555', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 24, height: 3, background: gold, display: 'inline-block', borderRadius: 2, borderTop: '2px dashed ' + gold }} /> הכנסות (₪)
-                </span>
-              </div>
-            </div>
+            <AnalyticsLineChart data={stats.last7Days} />
 
             {/* ── Funnel + Recent orders ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,2fr)', gap: 20, marginBottom: 28, alignItems: 'start' }}>

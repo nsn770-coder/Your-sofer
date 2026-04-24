@@ -10,7 +10,10 @@ import {
   doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import HeroSwiper from './components/HeroSwiper';
+const HeroSwiper = dynamic(() => import('./components/HeroSwiper'), {
+  ssr: false,
+  loading: () => <div className="h-[500px] bg-gray-100" />,
+});
 import SmartFunnel from './components/SmartFunnel';
 import ProductCard from '@/components/ui/ProductCard';
 
