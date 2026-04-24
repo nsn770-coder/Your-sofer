@@ -85,7 +85,10 @@
       "Bash(echo \"Started PID: $!\")",
       "Bash(kill -9 19577)",
       "Bash(sort -k2 -h)",
-      "Bash(awk '{:*)"
+      "Bash(awk '{:*)",
+      "Bash(tee /tmp/badge_scan.txt)",
+      "Bash(wait)",
+      "Read(//tmp/**)"
     ]
   }
 }
