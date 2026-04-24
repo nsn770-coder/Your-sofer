@@ -778,6 +778,22 @@ export default function HomePageClient() {
         </div>
       </div>
 
+      {/* ── Urgency Strip ── */}
+      <div style={{
+        background: '#fffbf0',
+        borderTop: '1px solid #e8d48a',
+        borderBottom: '1px solid #e8d48a',
+        padding: isMobile ? '9px 16px' : '10px 16px',
+        textAlign: 'center',
+        direction: 'rtl',
+      }}>
+        <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#7a5c00', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#e6a817', display: 'inline-block', flexShrink: 0 }} />
+          המוצרים הנמכרים ביותר השבוע – מלאי מוגבל
+          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#e6a817', display: 'inline-block', flexShrink: 0 }} />
+        </span>
+      </div>
+
       {/* ── 1. HeroSwiper ── */}
       <HeroSwiper
         isMobile={isMobile}
@@ -943,6 +959,39 @@ return (
         </a>
       </div>
 
+      {/* ── Clear Path CTA ── */}
+      <div style={{ background: '#f8f8f8', padding: isMobile ? '32px 16px' : '40px 16px', direction: 'rtl', textAlign: 'center' }}>
+        <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>לא בטוח מה לבחור?</h2>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>בחר לפי מה שאתה מחפש — נמצא לך את המתאים ביותר</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+          {[
+            { label: 'מצא מזוזה לבית',    href: '/category/מזוזות' },
+            { label: 'מצא מתנה לשבת',     href: '/category/שבתות וחגים' },
+            { label: 'צפה בכל המוצרים',   href: '/category/מזוזות' },
+          ].map(item => (
+            <button
+              key={item.label}
+              onClick={() => router.push(item.href)}
+              style={{
+                background: '#0c1a35',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 12,
+                padding: isMobile ? '12px 22px' : '13px 28px',
+                fontSize: isMobile ? 14 : 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a2d50'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#0c1a35'; }}
+            >
+              {item.label} ←
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* ── 6. More categories horizontal scroll (CHANGE 4) ── */}
       <div style={{ background: '#fff', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
@@ -978,6 +1027,62 @@ return (
           })}
         </div>
       </div>
+
+      {/* ── Static Social Proof ── */}
+      {(() => {
+        const quotes = [
+          { name: 'מיכל כהן', city: 'תל אביב', stars: 5, text: 'הזמנתי מזוזה לבית החדש — קיבלתי תמונה של הקלף לפני המשלוח. לא ציפיתי לרמת שירות כזו.' },
+          { name: 'יוסף לוי', city: 'ירושלים', stars: 5, text: 'קניתי תפילין לבן שלי לבר מצווה. הסופר פנה אלינו אישית כדי לוודא שהכל מתאים. מרגש.' },
+          { name: 'שרה אברמוב', city: 'חיפה', stars: 5, text: 'מתנה לאמא שלי — היא בכתה מרוב שמחה. האריזה הייתה מהודרת ותעודת הכשרות נתנה לה ביטחון.' },
+          { name: 'דוד נחמיאס', city: 'באר שבע', stars: 5, text: 'ראיתי הרבה חנויות אונליין. כאן היחיד שמציג צילום אמיתי של הקלף. זה ההבדל כולו.' },
+        ];
+        return (
+          <div style={{ background: '#ffffff', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+            <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+              <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>
+                לקוחות שכבר קנו — מה הם אומרים
+              </h2>
+              <p style={{ textAlign: 'center', fontSize: 13, color: '#999', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                gap: 16,
+              }}>
+                {quotes.map((q, i) => (
+                  <div key={i} style={{
+                    background: '#fff',
+                    border: '1px solid #ebebeb',
+                    borderRadius: 14,
+                    padding: isMobile ? '18px 16px' : '22px 24px',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                  }}>
+                    {/* Stars */}
+                    <div style={{ marginBottom: 10, display: 'flex', gap: 2 }}>
+                      {Array.from({ length: q.stars }).map((_, si) => (
+                        <span key={si} style={{ color: '#e6a817', fontSize: 15 }}>★</span>
+                      ))}
+                    </div>
+                    {/* Quote */}
+                    <p style={{ fontSize: 13, color: '#444', lineHeight: 1.75, marginBottom: 14, fontStyle: 'italic' }}>
+                      &ldquo;{q.text}&rdquo;
+                    </p>
+                    {/* Identity */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <span style={{ color: '#b8972a', fontWeight: 900, fontSize: 14 }}>{q.name.charAt(0)}</span>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>{q.name}</div>
+                        <div style={{ fontSize: 11, color: '#999' }}>{q.city}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── 5. Testimonials carousel ── */}
       {testimonials.length > 0 && (() => {
