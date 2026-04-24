@@ -205,7 +205,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   };
 
   return (
-    <div style={{ background: '#0c1a35', padding: isMobile ? '24px 12px' : '40px 24px' }}>
+    <div style={{ background: '#F5F0E8', padding: isMobile ? '24px 12px' : '40px 24px' }}>
       <div
         style={{
           background: '#1a2744',
