@@ -6,7 +6,19 @@ import { db } from '../../firebase';
 import ProductCard from '@/components/ui/ProductCard';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
-const SHABBAT_CATS = ['שבת', 'חגים', 'פסח', 'חנוכה', 'כלי שולחן והגשה', 'יודאיקה'];
+const FETCH_CATS = ['יודאיקה', 'כלי שולחן והגשה', 'עיצוב הבית', 'מתנות', 'בר מצווה'];
+
+const INCLUDE_KEYWORDS = [
+  'פמוט','פמוטים','גביע','קידוש','פסח','חנוכה','חנוכיה','הבדלה',
+  'בשמים','מלחיה','מלחיות','חלה','חלות','אירוח','שולחן שבת',
+  'מתנה','מתנות','שבת','חג','נטלה','נטלות','נטילת ידיים',
+  'מגש מצה','קערת פסח','סביבון','נר שבת','נרות שבת',
+];
+
+const EXCLUDE_KEYWORDS = [
+  'מזוזה','מזוזות','תפילין','קלף','קלפי','ספר תורה',
+  'מגילה','מגילות','טלית','כיסוי תפילין','כיסוי טלית','תיק','תיקי',
+];
 
 interface Product {
   id: string;
@@ -23,8 +35,15 @@ interface Product {
   hidden?: boolean;
   status?: string;
   cat?: string;
+  subCategory?: string;
   tags?: string[];
   createdAt?: { seconds: number };
+}
+
+function matchesShabbat(p: Product): boolean {
+  const text = `${p.name || ''} ${p.cat || ''} ${p.subCategory || ''}`;
+  if (EXCLUDE_KEYWORDS.some(kw => text.includes(kw))) return false;
+  return INCLUDE_KEYWORDS.some(kw => text.includes(kw));
 }
 
 export default function ShabbatHolidaysClient() {
@@ -45,13 +64,13 @@ export default function ShabbatHolidaysClient() {
         const seen = new Set<string>();
         const all: Product[] = [];
 
-        // Primary query: products by category
+        // Primary query: products by category, then keyword-filtered client-side
         const catSnap = await getDocs(
-          query(collection(db, 'products'), where('cat', 'in', SHABBAT_CATS))
+          query(collection(db, 'products'), where('cat', 'in', FETCH_CATS))
         );
         catSnap.forEach(d => {
           const p = { id: d.id, ...d.data() } as Product;
-          if (!p.hidden && p.status !== 'inactive' && !seen.has(p.id)) {
+          if (!p.hidden && p.status !== 'inactive' && !seen.has(p.id) && matchesShabbat(p)) {
             seen.add(p.id);
             all.push(p);
           }
@@ -64,7 +83,7 @@ export default function ShabbatHolidaysClient() {
           );
           tagSnap.forEach(d => {
             const p = { id: d.id, ...d.data() } as Product;
-            if (!p.hidden && p.status !== 'inactive' && !seen.has(p.id)) {
+            if (!p.hidden && p.status !== 'inactive' && !seen.has(p.id) && matchesShabbat(p)) {
               seen.add(p.id);
               all.push(p);
             }
