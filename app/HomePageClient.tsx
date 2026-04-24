@@ -548,7 +548,7 @@ export default function HomePageClient() {
           { text: 'מזוזות כשרות ומהודרות — ישירות מסופר מוסמך', cta: 'לצפייה ←', href: '/category/מזוזות' },
           { text: 'מתנות לשבת ולחג — עיצוב יוקרתי ואיכות גבוהה', cta: 'לצפייה ←', href: '/category/שבתות וחגים' },
           { text: 'תפילין לבר מצווה — קומפלט מלא עם תעודת כשרות', cta: 'לצפייה ←', href: '/category/תפילין קומפלט' },
-          { text: 'כל מוצר נבדק לפני משלוח — אחריות מלאה', cta: 'לכל המוצרים ←', href: '/category/מזוזות' },
+          { text: 'כל מוצר נבדק לפני משלוח — אחריות מלאה', cta: 'לכל המוצרים ←', href: '/category/יודאיקה' },
         ];
         const msg = topMessages[topBarIdx % topMessages.length];
         return (
@@ -943,7 +943,7 @@ return (
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
             <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
             <button
-              onClick={() => router.push('/category/מזוזות')}
+              onClick={() => router.push('/category/יודאיקה')}
               style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: isMobile ? '9px 18px' : '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
             >
               צפה במוצרים הנמכרים ביותר ←
@@ -989,7 +989,7 @@ return (
       {/* ── Shop All CTA ── */}
       <div style={{ background: '#ffffff', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
         <a
-          href="/category/מזוזות"
+          href="/category/יודאיקה"
           style={{ display: 'inline-block', background: '#0c1a35', color: '#fff', borderRadius: 12, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
         >
           לכל המוצרים ←
@@ -1004,7 +1004,7 @@ return (
           {[
             { label: 'מצא מזוזה לבית',    href: '/category/מזוזות' },
             { label: 'מצא מתנה לשבת',     href: '/category/שבתות וחגים' },
-            { label: 'צפה בכל המוצרים',   href: '/category/מזוזות' },
+            { label: 'צפה בכל המוצרים',   href: '/category/יודאיקה' },
           ].map(item => (
             <button
               key={item.label}
