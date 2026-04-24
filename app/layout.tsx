@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Suspense } from "react";
-import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -9,6 +8,7 @@ import { ShaliachProvider } from "./contexts/ShaliachContext";
 import NavBar from "@/app/components/navigation/NavBar";
 import Footer from "@/app/components/Footer";
 import ShiraChat from "@/app/components/chat/ShiraChat";
+import GTMLoader from "@/app/components/GTMLoader";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 
@@ -71,15 +71,9 @@ export default function RootLayout({
               </CartProvider>
             </ShaliachProvider>
           </Suspense>
+          <GTMLoader />
         </AuthProvider>
         <ShiraChat />
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-PM7GW4MWEJ" strategy="lazyOnload" />
-        <Script id="gtag-init" strategy="lazyOnload">{`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-PM7GW4MWEJ');
-        `}</Script>
       </body>
     </html>
   );
