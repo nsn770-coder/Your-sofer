@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { collection, getDocs, query, where, limit } from 'firebase/firestore';
 import { db } from '@/app/firebase';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 type Path = 'mezuzah' | 'tefillin' | null;
 type Nusach = 'ספרדי' | 'אשכנזי' | null;
@@ -48,10 +50,13 @@ function ImageCard({
       onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'scale(1)'; }}
     >
       {img && (
-        <img
-          src={img}
+        <Image
+          fill
+          loading="lazy"
+          src={optimizeCloudinaryUrl(img, 600)}
           alt={label}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          style={{ objectFit: 'cover' }}
+          sizes="(max-width: 640px) 50vw, 300px"
         />
       )}
       {/* Dark overlay */}

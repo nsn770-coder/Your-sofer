@@ -7,9 +7,11 @@ import { Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import Image from 'next/image';
 import SmartHero from '@/app/components/SmartHero';
 import { collection, getDocs, query, where, limit, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 interface Props {
   isMobile: boolean;
@@ -108,7 +110,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
           }}>
             {/* Background: uploaded image or fallback gradient */}
             {heroImages.soferimSlide ? (
-              <img src={heroImages.soferimSlide} alt="הסופרים שלנו" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Image fill loading="lazy" src={optimizeCloudinaryUrl(heroImages.soferimSlide, 1200)} alt="הסופרים שלנו" style={{ objectFit: 'cover' }} sizes="100vw" />
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a2a 100%)' }} />
             )}
@@ -139,7 +141,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             style={{ position: 'relative', width: '100%', height: slideHeight, cursor: 'pointer', overflow: 'hidden' }}
           >
             {(heroImages.judaicaSlide || judaicaImg) ? (
-              <img src={heroImages.judaicaSlide || judaicaImg} alt="יודאיקה" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Image fill loading="lazy" src={optimizeCloudinaryUrl(heroImages.judaicaSlide || judaicaImg, 1200)} alt="יודאיקה" style={{ objectFit: 'cover' }} sizes="100vw" />
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: '#1a2d50' }} />
             )}
@@ -156,7 +158,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             style={{ position: 'relative', width: '100%', height: slideHeight, cursor: 'pointer', overflow: 'hidden' }}
           >
             {(heroImages.giftsSlide || giftsImg) ? (
-              <img src={heroImages.giftsSlide || giftsImg} alt="מתנות" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Image fill loading="lazy" src={optimizeCloudinaryUrl(heroImages.giftsSlide || giftsImg, 1200)} alt="מתנות" style={{ objectFit: 'cover' }} sizes="100vw" />
             ) : (
               <div style={{ position: 'absolute', inset: 0, background: '#2d1a50' }} />
             )}

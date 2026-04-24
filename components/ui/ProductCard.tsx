@@ -224,6 +224,7 @@ export default function ProductCard({
         {imgSrc ? (
           <img
             src={imgSrc} alt={name}
+            loading="lazy"
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             onError={e => { e.currentTarget.style.display = 'none'; }}
           />

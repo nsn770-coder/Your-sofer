@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   collection, query, where, orderBy, limit, getDocs,
   doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
@@ -130,10 +131,13 @@ function SubSlot({ imgUrl, label, href }: { imgUrl: string; label: string; href:
         style={{ borderRadius: 6 }}
       >
         {imgUrl ? (
-          <img
+          <Image
+            fill
+            loading="lazy"
             src={imgUrl}
             alt={label}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="200px"
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
         ) : (
@@ -724,7 +728,7 @@ export default function HomePageClient() {
                           onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLDivElement).style.background = '#fffbf0'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#eee'; (e.currentTarget as HTMLDivElement).style.background = '#fafafa'; }}>
                           {(p.imgUrl || p.image_url) && (
-                            <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 100)} alt={p.name} style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                            <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 100)} alt={p.name} loading="lazy" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
@@ -881,9 +885,9 @@ return (
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.14)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 10px rgba(0,0,0,0.07)'; }}
               >
-                <div style={{ height: isMobile ? 180 : 220, overflow: 'hidden', borderRadius: '16px 16px 0 0' }}>
+                <div style={{ height: isMobile ? 180 : 220, overflow: 'hidden', borderRadius: '16px 16px 0 0', position: 'relative' }}>
                   {cat.img ? (
-                    <img src={cat.img} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '16px 16px 0 0' }} />
+                    <Image fill loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 220px" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4', borderRadius: '16px 16px 0 0' }}>{cat.emoji}</div>
                   )}
@@ -919,7 +923,7 @@ return (
                 >
                   <div style={{ height: 140, overflow: 'hidden', position: 'relative' }}>
                     {imgSrc ? (
-                      <img src={imgSrc} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '12px 12px 0 0' }} />
+                      <Image fill loading="lazy" src={imgSrc} alt={p.name} style={{ objectFit: 'cover' }} sizes="160px" />
                     ) : (
                       <div style={{ width: '100%', height: '100%', background: '#e8e8e8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ fontSize: 32, color: '#ccc' }}>📦</span>
@@ -1013,7 +1017,7 @@ return (
               >
                 <div style={{ height: 100, width: '100%', borderRadius: 12, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
                   {img ? (
-                    <img src={img} alt={cat.slug} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <Image fill loading="lazy" src={img} alt={cat.slug} style={{ objectFit: 'cover' }} sizes="130px" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{cat.emoji}</div>
                   )}
@@ -1092,7 +1096,7 @@ return (
               <div key={testIdx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 28px rgba(0,0,0,0.09)', padding: isMobile ? '24px 20px' : '36px 44px', display: 'flex', alignItems: 'flex-start', gap: 28, flexDirection: isMobile ? 'column' : 'row', animation: 'testFadeIn 0.55s ease' }}>
                 <div style={{ flexShrink: 0, alignSelf: isMobile ? 'center' : 'flex-start' }}>
                   {t.imageUrl ? (
-                    <img src={t.imageUrl} alt={t.name} style={{ width: 84, height: 84, borderRadius: '50%', objectFit: 'cover', border: '3px solid #b8972a' }} />
+                    <Image src={t.imageUrl} alt={t.name} width={84} height={84} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '3px solid #b8972a' }} />
                   ) : (
                     <div style={{ width: 84, height: 84, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #b8972a' }}>
                       <span style={{ fontSize: 34, color: '#fff', fontWeight: 900 }}>{t.name.charAt(0)}</span>

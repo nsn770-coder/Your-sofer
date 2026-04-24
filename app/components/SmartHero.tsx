@@ -1,7 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { trackClickHeroMezuzot, trackClickHeroTefillin, trackClickWhatsApp } from '@/lib/analytics';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 type HeroState = 'main' | 'mezuzah' | 'tefillin' | 'unsure' | 'klaf';
 
@@ -111,7 +113,7 @@ export default function SmartHero({ isMobile, bgImage }: {
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: isMobile ? 260 : 360, overflow: 'hidden', display: 'flex', alignItems: 'center', direction: 'rtl' }}>
       {bgImage ? (
-        <img src={bgImage} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
+        <Image fill priority src={optimizeCloudinaryUrl(bgImage, 1400)} alt="" style={{ objectFit: 'cover', zIndex: 0 }} sizes="100vw" />
       ) : (
         <>
           <video autoPlay muted loop playsInline poster="/images/stam-hero.jpg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
