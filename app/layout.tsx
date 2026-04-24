@@ -73,8 +73,8 @@ export default function RootLayout({
           </Suspense>
         </AuthProvider>
         <ShiraChat />
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-PM7GW4MWEJ" strategy="afterInteractive" />
-        <Script id="gtag-init" strategy="afterInteractive">{`
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-PM7GW4MWEJ" strategy="lazyOnload" />
+        <Script id="gtag-init" strategy="lazyOnload">{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
