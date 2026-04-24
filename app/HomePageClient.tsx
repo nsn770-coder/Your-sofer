@@ -4,15 +4,18 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import {
   collection, query, where, orderBy, limit, getDocs,
   doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import HeroSwiper from './components/HeroSwiper';
-import MezuzahFunnel from './components/MezuzahFunnel';
 import SmartFunnel from './components/SmartFunnel';
 import ProductCard from '@/components/ui/ProductCard';
+
+const NewsletterPopup = dynamic(() => import('./components/NewsletterPopup'), { ssr: false, loading: () => null });
+const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => null });
 import { useShaliach } from './contexts/ShaliachContext';
 import { useCart } from './contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
@@ -575,57 +578,14 @@ export default function HomePageClient() {
 
       {/* ── Newsletter popup (45 s trigger) ── */}
       {newsletterPopupOpen && (
-        <div
-          style={{ position: 'fixed', inset: 0, zIndex: 850, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, backdropFilter: 'blur(4px)', background: 'rgba(0,0,0,0.55)' }}
-          onClick={() => setNewsletterPopupOpen(false)}
-        >
-          <div
-            style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 440, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden', direction: 'rtl' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a2d50)', padding: '22px 24px', position: 'relative', textAlign: 'center' }}>
-              <button
-                onClick={() => setNewsletterPopupOpen(false)}
-                style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >✕</button>
-              <div style={{ fontSize: 36, marginBottom: 8 }}>🏆</div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>הצטרפו למועדון הלקוחות</div>
-              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>קבלו מבצעים ומוצרים חדשים לפני כולם</div>
-              <div style={{ marginTop: 10, background: '#b8972a', color: '#0c1a35', borderRadius: 20, padding: '5px 16px', fontSize: 13, fontWeight: 900, display: 'inline-block' }}>קבל 5% הנחה על ההזמנה הראשונה</div>
-            </div>
-            <div style={{ padding: '24px 24px 28px' }}>
-              {newsletterStatus === 'success' ? (
-                <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                  <div style={{ fontSize: 40, marginBottom: 10 }}>🎉</div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>נרשמתם בהצלחה!</div>
-                  <div style={{ fontSize: 13, color: '#666' }}>נעדכן אתכם ראשונים על מוצרים חדשים ומבצעים.</div>
-                  <button onClick={() => setNewsletterPopupOpen(false)} style={{ marginTop: 18, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 14, fontWeight: 900, cursor: 'pointer' }}>סגור</button>
-                </div>
-              ) : (
-                <form onSubmit={async e => { await handleNewsletter(e); }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <input
-                    type="email"
-                    value={newsletterEmail}
-                    onChange={e => { setNewsletterEmail(e.target.value); setNewsletterStatus('idle'); }}
-                    placeholder="כתובת המייל שלכם"
-                    required
-                    style={{ border: '2px solid #e0e0e0', borderRadius: 10, padding: '12px 16px', fontSize: 14, outline: 'none', direction: 'rtl', width: '100%', boxSizing: 'border-box' }}
-                  />
-                  {newsletterStatus === 'duplicate' && <div style={{ fontSize: 12, color: '#b8972a', fontWeight: 600 }}>כתובת המייל הזו כבר רשומה 😊</div>}
-                  {newsletterStatus === 'error' && <div style={{ fontSize: 12, color: '#e74c3c', fontWeight: 600 }}>שגיאה בהרשמה, נסו שוב.</div>}
-                  <button
-                    type="submit"
-                    disabled={newsletterStatus === 'loading'}
-                    style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 900, cursor: newsletterStatus === 'loading' ? 'not-allowed' : 'pointer', opacity: newsletterStatus === 'loading' ? 0.7 : 1 }}
-                  >
-                    {newsletterStatus === 'loading' ? '⏳ שולח...' : '✉️ הצטרפו עכשיו ←'}
-                  </button>
-                  <button type="button" onClick={() => setNewsletterPopupOpen(false)} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}>לא תודה</button>
-                </form>
-              )}
-            </div>
-          </div>
-        </div>
+        <NewsletterPopup
+          email={newsletterEmail}
+          setEmail={setNewsletterEmail}
+          status={newsletterStatus}
+          setStatus={setNewsletterStatus}
+          onSubmit={handleNewsletter}
+          onClose={() => setNewsletterPopupOpen(false)}
+        />
       )}
 
       {/* ── Selection Wizard modal ── */}
@@ -1086,49 +1046,14 @@ return (
       })()}
 
       {/* ── 5. Testimonials carousel ── */}
-      {testimonials.length > 0 && (() => {
-        const t = testimonials[testIdx];
-        return (
-          <div style={{ background: '#F5F0E8', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
-            <div style={{ maxWidth: 860, margin: '0 auto' }}>
-              <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 28, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>מה הלקוחות אומרים</h2>
-              <p style={{ textAlign: 'center', fontSize: 14, color: '#888', marginBottom: 36 }}>אלפי לקוחות מרוצים ברחבי הארץ</p>
-              <div key={testIdx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 28px rgba(0,0,0,0.09)', padding: isMobile ? '24px 20px' : '36px 44px', display: 'flex', alignItems: 'flex-start', gap: 28, flexDirection: isMobile ? 'column' : 'row', animation: 'testFadeIn 0.55s ease' }}>
-                <div style={{ flexShrink: 0, alignSelf: isMobile ? 'center' : 'flex-start' }}>
-                  {t.imageUrl ? (
-                    <Image src={t.imageUrl} alt={t.name} width={84} height={84} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '3px solid #b8972a' }} />
-                  ) : (
-                    <div style={{ width: 84, height: 84, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #b8972a' }}>
-                      <span style={{ fontSize: 34, color: '#fff', fontWeight: 900 }}>{t.name.charAt(0)}</span>
-                    </div>
-                  )}
-                </div>
-                <div style={{ flex: 1, textAlign: 'right' }}>
-                  <div style={{ marginBottom: 10 }}>
-                    {Array.from({ length: 5 }).map((_, si) => (
-                      <span key={si} style={{ color: si < (t.rating ?? 5) ? '#f5c518' : '#ddd', fontSize: 22 }}>★</span>
-                    ))}
-                  </div>
-                  <p style={{ fontSize: isMobile ? 15 : 17, color: '#444', lineHeight: 1.75, marginBottom: 16, fontStyle: 'italic' }}>&ldquo;{t.text}&rdquo;</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
-                    <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35' }}>{t.name}</span>
-                    {t.city && <span style={{ fontSize: 13, color: '#999' }}>· {t.city}</span>}
-                  </div>
-                </div>
-              </div>
-              {testimonials.length > 1 && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 20 }}>
-                  <button onClick={() => setTestIdx(i => (i - 1 + testimonials.length) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#b8972a', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label="הקודם">‹</button>
-                  {testimonials.map((_, i) => (
-                    <button key={i} onClick={() => setTestIdx(i)} style={{ width: i === testIdx ? 24 : 10, height: 10, borderRadius: 5, border: 'none', cursor: 'pointer', background: i === testIdx ? '#b8972a' : '#ccc', padding: 0, transition: 'width 0.3s, background 0.3s' }} />
-                  ))}
-                  <button onClick={() => setTestIdx(i => (i + 1) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#b8972a', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label="הבא">›</button>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })()}
+      {testimonials.length > 0 && (
+        <TestimonialsCarousel
+          testimonials={testimonials}
+          testIdx={testIdx}
+          setTestIdx={setTestIdx}
+          isMobile={isMobile}
+        />
+      )}
 
     </div>
   );
