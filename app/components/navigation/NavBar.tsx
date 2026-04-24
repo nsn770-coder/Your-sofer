@@ -203,6 +203,7 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
 ];
 
 const SIMPLE_NAV = [
+  { label: "שבתות וחגים", action: "shabbat-holidays" },
   { label: "ספרי תורה", action: "sifrei-torah" },
   { label: "מגילות", action: "megilot" },
 ];
@@ -314,7 +315,8 @@ function NavBarContent() {
 
   function handleAction(action: string) {
     setMobileOpen(false);
-    if (action === "sifrei-torah") router.push("/category/ספרי תורה");
+    if (action === "shabbat-holidays") router.push("/category/שבתות-וחגים");
+    else if (action === "sifrei-torah") router.push("/category/ספרי תורה");
     else if (action === "megilot") router.push("/category/מגילות");
   }
 
