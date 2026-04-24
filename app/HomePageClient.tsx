@@ -770,7 +770,7 @@ return (
       </div>
 
       {/* ── Smart Funnel ── */}
-      <div style={{ background: '#6B21A8', padding: isMobile ? '24px 12px' : '32px 24px' }}>
+      <div style={{ background: '#f8f8f8', padding: isMobile ? '24px 12px' : '32px 24px' }}>
         <SmartFunnel isMobile={isMobile} />
       </div>
 
