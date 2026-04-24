@@ -607,6 +607,120 @@ function ReviewsSection({ productId, productName }: { productId: string; product
   );
 }
 
+// ─── Product Content Sections ────────────────────────────────────────────────
+
+function ProductContentSections({ product }: { product: Product }) {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const useCases = [
+    { emoji: '🎁', text: 'מתנה משמעותית לחתונה, בר מצווה, או כניסה לבית חדש' },
+    { emoji: '🕯️', text: 'שדרוג שולחן השבת עם פריט שנשאר לדורות' },
+    { emoji: '✡️', text: 'אספנים ואוהבי יודאיקה שמחפשים איכות אמיתית' },
+    { emoji: '🏠', text: 'עיצוב הבית עם פריטים בעלי ערך רגשי ודתי' },
+    { emoji: '💝', text: 'מחווה לאדם קרוב שמעריך מסורת ואיכות' },
+  ];
+
+  const whyDifferent = [
+    'כל מוצר נבדק על ידי מגיה מוסמך לפני שיגור — לא רק מיוצר',
+    'הסופר שכתב את המוצר מזוהה בשם — שקיפות מלאה',
+    'צילום אמיתי של הקלף לפני המשלוח — רואים בדיוק מה מקבלים',
+    'לא מחסן ענק — חנות מתמחה עם ידע אמיתי ושירות אישי',
+  ];
+
+  const benefits = [
+    'כולל תעודת כשרות מוסמכת',
+    'בדיקת מחשב ופיקוח רבני על כל יחידה',
+    'משלוח חינם לכל הארץ באריזה מוגנת',
+    'אחריות החזר מלא תוך 14 יום',
+    'ניתן לתשלומים ללא ריבית',
+    'תמיכה אישית אם יש שאלות לפני הרכישה',
+  ];
+
+  const faqs: { q: string; a: string }[] = [
+    { q: 'האם זה מוצר איכותי?', a: 'כן. כל מוצר עובר בדיקת מחשב ופיקוח מגיה מוסמך, ומגיע עם תעודת כשרות. אנחנו לא שולחים מוצרים שלא עברו בדיקה מלאה.' },
+    { q: 'האם זה מתאים כמתנה?', a: 'בהחלט. המוצר מגיע באריזה מהודרת שמרגישה כמו מתנה. ניתן לציין בהזמנה שמדובר במתנה ונדאג לפרטים.' },
+    { q: 'מה זמן האספקה?', a: `${product.days || '7–14'} ימי עסקים ברחבי הארץ. לאחר אישור ההזמנה נשלח עדכון עם מספר מעקב.` },
+    { q: 'האם ניתן להחזיר?', a: 'כן, ניתן להחזיר תוך 14 יום ממועד קבלת המוצר ובלבד שלא נעשה שימוש. ההחזר מלא ומיידי.' },
+  ];
+
+  return (
+    <div dir="rtl" style={{ marginTop: 28 }}>
+
+      {/* Emotional hook */}
+      <div style={{ borderRight: '3px solid #b8972a', paddingRight: 14, marginBottom: 24 }}>
+        <p style={{ fontSize: 14, color: '#555', lineHeight: 1.9, margin: 0, fontStyle: 'italic' }}>
+          כשמביאים מוצר כזה הביתה, מביאים איתו משהו שלא ניתן לקנות בחנות רגילה — יוקרה שקטה, חיבור לשורשים,
+          ותחושה שהבית שלכם אומר משהו עוד לפני שמדברים. בשבת, כשהאור מתעצם ומשפחה מתכנסת סביב השולחן,
+          הפריט הזה הופך לחלק מהסיפור שעובר מדור לדור.
+        </p>
+      </div>
+
+      {/* Who is this for */}
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35', marginBottom: 12, margin: '0 0 12px' }}>למי זה מתאים?</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+          {useCases.map((item, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13, color: '#444' }}>
+              <span style={{ fontSize: 15, flexShrink: 0, lineHeight: 1.5 }}>{item.emoji}</span>
+              <span style={{ lineHeight: 1.6 }}>{item.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Why different */}
+      <div style={{ marginBottom: 24, background: '#f8faff', borderRadius: 10, padding: '14px 16px' }}>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35', marginBottom: 10, margin: '0 0 10px' }}>למה Your Sofer ולא חנות אחרת?</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {whyDifferent.map((item, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: '#444' }}>
+              <span style={{ color: '#b8972a', fontWeight: 900, flexShrink: 0, marginTop: 1 }}>✓</span>
+              <span style={{ lineHeight: 1.6 }}>{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Benefits */}
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35', marginBottom: 10, margin: '0 0 10px' }}>מה מקבלים עם המוצר</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px' }}>
+          {benefits.map((b, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: 12, color: '#444' }}>
+              <span style={{ color: '#27ae60', fontWeight: 900, flexShrink: 0, marginTop: 1 }}>✓</span>
+              <span style={{ lineHeight: 1.5 }}>{b}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* FAQ accordion */}
+      <div>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35', marginBottom: 10, margin: '0 0 10px' }}>שאלות נפוצות</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {faqs.map((faq, i) => (
+            <div key={i} style={{ border: '1px solid #e8e8e8', borderRadius: 8, overflow: 'hidden' }}>
+              <button
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                style={{ width: '100%', background: openFaq === i ? '#f8f9fa' : '#fff', border: 'none', padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', direction: 'rtl', textAlign: 'right' }}
+              >
+                <span>{faq.q}</span>
+                <span style={{ color: '#b8972a', fontSize: 18, fontWeight: 400, flexShrink: 0, marginRight: 8, display: 'inline-block', transform: openFaq === i ? 'rotate(45deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>+</span>
+              </button>
+              {openFaq === i && (
+                <div style={{ padding: '10px 14px 14px', fontSize: 13, color: '#555', lineHeight: 1.75, background: '#f8f9fa', borderTop: '1px solid #e8e8e8' }}>
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ProductClient() {
@@ -778,6 +892,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </div>
       )}
 
+      {/* Urgency text */}
+      {!compact && (
+        <div style={{ fontSize: 12, color: '#c0392b', fontWeight: 600, textAlign: 'center', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+          <Icon.Lightning /> לקוחות מזמינים את המוצר הזה השבוע
+        </div>
+      )}
+
       {/* PRIMARY: Buy Now */}
       <button onClick={() => { handleAddToCart(); router.push('/cart'); }}
         style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
@@ -790,11 +911,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         {added ? <><Icon.Check size={15} color="#15803d" /> נוסף לסל!</> : <><Icon.Cart size={15} color="#0c1a35" /> הוסף לסל</>}
       </button>
 
-      {/* Micro-trust row */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 14, fontSize: 11, color: '#999', marginBottom: compact ? 0 : 4 }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Icon.Shield /> רכישה מאובטחת</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Icon.Return /> החזר 14 יום</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Icon.Truck /> משלוח חינם</span>
+      {/* Trust sentence */}
+      <div style={{ textAlign: 'center', fontSize: 11, color: '#999', marginBottom: compact ? 0 : 4 }}>
+        רכישה מאובטחת | אחריות מלאה | משלוח חינם
       </div>
 
       {!compact && <TrustBlock />}
@@ -961,6 +1080,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Tag /> קטגוריה</span>
                     <span style={{ fontWeight: 600 }}>{product.cat || '—'}</span>
                   </div>
+                  <ProductContentSections product={product} />
                 </div>
               )}
 
