@@ -106,7 +106,7 @@ export const navigationData: NavItem[] = [
         title: "יודאיקה",
         items: [
           { label: "נטילת ידיים 🤲",  href: "/category/נטילת ידיים" },
-          { label: "שבת ✨",           href: "/category/כלי שולחן והגשה?filter=שבת" },
+          { label: "שבת ✨",           href: "/category/שבתות-וחגים" },
           { label: "סטים ומארזים 🎁", href: "/category/סטים ומארזים" },
           { label: "יודאיקה כללי ✡️", href: "/category/יודאיקה כללי" },
         ],
@@ -114,7 +114,7 @@ export const navigationData: NavItem[] = [
       {
         title: "חגים 🕍",
         items: [
-          { label: "שבת וחגים", href: "/category/כלי שולחן והגשה?filter=שבת" },
+          { label: "שבת וחגים", href: "/category/שבתות-וחגים" },
           { label: "חנוכה 🕎",  href: "/category/יודאיקה?filter=חנוכי" },
           { label: "פסח 🍷",    href: "/category/כלי שולחן והגשה?filter=פסח" },
         ],
@@ -149,7 +149,7 @@ export const navigationData: NavItem[] = [
         items: [
           { label: "כלי שולחן והגשה 🍽️", href: "/category/כלי שולחן והגשה" },
           { label: "עיצוב הבית 🏠",       href: "/category/עיצוב הבית" },
-          { label: "מתנות לחגים 🕍",      href: "/category/כלי שולחן והגשה?filter=חג" },
+          { label: "מתנות לחגים 🕍",      href: "/category/שבתות-וחגים" },
           { label: "יודאיקה ✡️",           href: "/category/יודאיקה" },
           { label: "בר מצווה 🎉",          href: "/category/בר מצווה" },
         ],
@@ -203,16 +203,16 @@ export const navigationData: NavItem[] = [
   {
     id: "shabbat-chagim",
     label: "שבת וחגים",
-    href: "/category/כלי שולחן והגשה?filter=שבת",
+    href: "/category/שבתות-וחגים",
     columns: [
       {
         title: "שבת ✨",
         items: [
-          { label: "כל מוצרי שבת",      href: "/category/כלי שולחן והגשה?filter=שבת" },
-          { label: "גביעי קידוש",        href: "/category/כלי שולחן והגשה?filter=קידוש" },
-          { label: "פמוטים ונרות",       href: "/category/כלי שולחן והגשה?filter=פמוט" },
-          { label: "הבדלה",              href: "/category/יודאיקה?filter=הבדל" },
-          { label: "חלות ולחמניות",      href: "/category/יודאיקה?filter=חלה" },
+          { label: "כל מוצרי שבת",      href: "/category/שבתות-וחגים" },
+          { label: "גביעי קידוש",        href: "/category/שבתות-וחגים?filter=קידוש" },
+          { label: "פמוטים ונרות",       href: "/category/שבתות-וחגים?filter=פמוטים" },
+          { label: "הבדלה",              href: "/category/שבתות-וחגים?filter=הבדלה" },
+          { label: "חלות ולחמניות",      href: "/category/שבתות-וחגים?filter=חלה" },
         ],
       },
       {

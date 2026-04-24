@@ -719,17 +719,13 @@ export default function CategoryClient({ category }: { category: string }) {
     'יודאיקה': { 'נטילת ידיים': 'נטילת ידיים', 'נטלות': 'נטילת ידיים' },
   };
 
-  // Exact subCategory values that qualify for the שבתות-וחגים virtual category
-  const SHABBAT_JUDAICA_SUBCATS = new Set([
-    'גביעי קידוש', 'הבדלה', 'פמוטים', 'מגשי חלה', 'כיסויי חלה', 'סטים לקידוש',
-  ]);
-  // Keywords that also qualify (checked via .includes on subCategory)
-  const SHABBAT_SUBCAT_KEYWORDS = ['שבת', 'קידוש', 'הבדלה', 'חלה', 'פמוטים', 'חגים'];
+  // Keywords checked against subCategory for the שבתות-וחגים virtual category
+  const SHABBAT_SUBCAT_KEYWORDS = ['קידוש', 'הבדלה', 'חלה', 'פמוטים', 'שבת', 'חג', 'נרות', 'ברכה', 'נטלה', 'מנורה'];
 
   // Case B: category slugs that don't exist as a cat field in Firestore
   const VIRTUAL_CATS: Record<string, { cats: string[] }> = {
-    'שבתות וחגים':  { cats: ['יודאיקה'] },
-    'שבתות-וחגים': { cats: ['יודאיקה'] },
+    'שבתות וחגים':  { cats: ['יודאיקה', 'כלי שולחן והגשה'] },
+    'שבתות-וחגים': { cats: ['יודאיקה', 'כלי שולחן והגשה'] },
   };
 
   // When this is non-null, fetchAll does a direct subCategory query and re-runs if
@@ -754,15 +750,10 @@ export default function CategoryClient({ category }: { category: string }) {
             seen.add(d.id);
             const p = { id: d.id, ...d.data() } as Product;
             if (isShabbat) {
-              // Exclude כלי שולחן והגשה entirely
-              if (p.cat === 'כלי שולחן והגשה') continue;
-              const sub = p.subCategory ?? '';
-              const subLower = sub.toLowerCase();
-              // Condition 1: יודאיקה with exact Shabbat subCategory
-              const cond1 = p.cat === 'יודאיקה' && SHABBAT_JUDAICA_SUBCATS.has(sub);
-              // Condition 2: subCategory contains any Shabbat keyword
-              const cond2 = SHABBAT_SUBCAT_KEYWORDS.some(kw => subLower.includes(kw.toLowerCase()));
-              if (cond1 || cond2) merged.push(p);
+              const subLower = (p.subCategory ?? '').toLowerCase();
+              if (SHABBAT_SUBCAT_KEYWORDS.some(kw => subLower.includes(kw.toLowerCase()))) {
+                merged.push(p);
+              }
             } else {
               merged.push(p);
             }
