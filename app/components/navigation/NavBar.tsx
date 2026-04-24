@@ -354,7 +354,7 @@ function NavBarContent() {
           </button>
 
           <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
-            <img src="/logo.png" alt="logo" style={{ height: isMobile ? 26 : 32, width: "auto", objectFit: "contain" }} onError={e => (e.currentTarget.style.display = "none")} />
+            <img src="/logo.png" alt="logo" width={56} height={56} style={{ height: isMobile ? 26 : 32, width: "auto", objectFit: "contain" }} onError={e => (e.currentTarget.style.display = "none")} />
             <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 

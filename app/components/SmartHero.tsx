@@ -116,10 +116,14 @@ export default function SmartHero({ isMobile, bgImage }: {
         <Image fill priority src={optimizeCloudinaryUrl(bgImage, 1400)} alt="" style={{ objectFit: 'cover', zIndex: 0 }} sizes="100vw" />
       ) : (
         <>
-          <video autoPlay muted loop playsInline poster="/images/stam-hero.jpg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
-            <source src="/video/hero-stam.mp4" type="video/mp4" />
-          </video>
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: 'linear-gradient(160deg, #1a1008 0%, #2d1f0a 30%, #1a3a2a 70%, #0c1a10 100%)', backgroundImage: isMobile ? 'none' : 'url(/images/stam-hero.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          {isMobile ? (
+            <Image fill priority src="/images/stam-hero.jpg" alt="" style={{ objectFit: 'cover', zIndex: 0 }} sizes="100vw" />
+          ) : (
+            <video autoPlay muted loop playsInline preload="none" poster="/images/stam-hero.jpg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
+              <source src="/video/hero-stam.mp4" type="video/mp4" />
+            </video>
+          )}
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: 'linear-gradient(160deg, #1a1008 0%, #2d1f0a 30%, #1a3a2a 70%, #0c1a10 100%)' }} />
         </>
       )}
       <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to left, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.75) 100%)' }} />
