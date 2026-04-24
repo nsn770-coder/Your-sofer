@@ -11,7 +11,6 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 const HeroSwiper = dynamic(() => import('./components/HeroSwiper'), {
-  ssr: false,
   loading: () => <div className="h-[500px] bg-gray-100" />,
 });
 import SmartFunnel from './components/SmartFunnel';
