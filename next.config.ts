@@ -8,6 +8,24 @@ const nextConfig: NextConfig = {
       { hostname: 'lh3.googleusercontent.com' },
     ],
   },
+  async headers() {
+    return [
+      {
+        // Hashed filenames — safe to cache for 1 year
+        source: '/_next/static/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        // Public images — cache for 24 hours
+        source: '/images/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       {
