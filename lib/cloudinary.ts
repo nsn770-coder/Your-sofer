@@ -1,7 +1,7 @@
 export function optimizeCloudinaryUrl(
   url: string,
   width: number = 800,
-  quality: string = 'auto'
+  quality: string = 'auto:good'
 ): string {
   if (!url || !url.includes('cloudinary.com')) return url;
   return url.replace(

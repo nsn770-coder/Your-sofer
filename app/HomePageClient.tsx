@@ -139,7 +139,7 @@ function SubSlot({ imgUrl, label, href }: { imgUrl: string; label: string; href:
           <Image
             fill
             loading="lazy"
-            src={imgUrl}
+            src={optimizeCloudinaryUrl(imgUrl, 400)}
             alt={label}
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="200px"
@@ -831,8 +831,8 @@ return (
               { name: 'תפילין קומפלט',  emoji: '🖊️', img: catImages['תפילין קומפלט'] || '',  href: '/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98' },
               { name: 'מגילות',          emoji: '📖', img: catImages['מגילות'] || '',          href: '/category/%D7%9E%D7%92%D7%99%D7%9C%D7%95%D7%AA' },
               { name: 'יודאיקה',         emoji: '✡️', img: catImages['יודאיקה'] || '',         href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94' },
-              { name: 'נטלות וכלים',    emoji: '🫙', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776283325/eolm1mte2d2q1zjaijsn.png', 400), href: '/category/%D7%A0%D7%98%D7%9C%D7%95%D7%AA%20%D7%95%D7%9B%D7%9C%D7%99%D7%9D' },
-              { name: 'שבתות וחגים',    emoji: '🕯️', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/q_auto/f_auto/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', 400), href: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA%20%D7%95%D7%97%D7%92%D7%99%D7%9D' },
+              { name: 'נטלות וכלים',    emoji: '🫙', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776283325/eolm1mte2d2q1zjaijsn.png', href: '/category/%D7%A0%D7%98%D7%9C%D7%95%D7%AA%20%D7%95%D7%9B%D7%9C%D7%99%D7%9D' },
+              { name: 'שבתות וחגים',    emoji: '🕯️', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', href: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA%20%D7%95%D7%97%D7%92%D7%99%D7%9D' },
               { name: 'קלף מזוזה',       emoji: '📜', img: catImages['קלפי מזוזה'] || '',      href: '/category/קלפי-מזוזה',       fallback: '#1a2744' },
               { name: 'סט טלית תפילין', emoji: '🕍', img: catImages['סט טלית תפילין'] || '', href: '/category/סט-טלית-תפילין', fallback: '#1a2744' },
             ] as { name: string; emoji: string; img: string; href: string; fallback?: string }[]).map(cat => (
