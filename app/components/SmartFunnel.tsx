@@ -252,7 +252,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
                 noOverlay
               />
               <ImageCard
-                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg"
+                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777033362/vrknd4v6jp9z7fyrcbyf_rqnydd.webp"
                 label="צפה בתפילין"
                 onClick={() => { setPath('tefillin'); go(2); }}
                 height={140}
