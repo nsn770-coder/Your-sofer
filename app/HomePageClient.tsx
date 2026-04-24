@@ -10,8 +10,20 @@ import {
   doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase';
+const HERO_PLACEHOLDER = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1200/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg';
 const HeroSwiper = dynamic(() => import('./components/HeroSwiper'), {
-  loading: () => <div className="h-[400px] md:h-[600px] bg-gray-100 animate-pulse rounded-b-lg" />,
+  loading: () => (
+    <div style={{ background: '#F5F0E8', padding: '12px 0' }}>
+      <div
+        className="h-[260px] md:h-[360px]"
+        style={{
+          width: '92%', margin: '0 auto', borderRadius: 12, overflow: 'hidden',
+          backgroundImage: `url(${HERO_PLACEHOLDER})`,
+          backgroundSize: 'cover', backgroundPosition: 'center',
+        }}
+      />
+    </div>
+  ),
 });
 import SmartFunnel from './components/SmartFunnel';
 import ProductCard from '@/components/ui/ProductCard';

@@ -117,9 +117,9 @@ export default function SmartHero({ isMobile, bgImage }: {
       ) : (
         <>
           {isMobile ? (
-            <Image fill priority src="/images/stam-hero.jpg" alt="" style={{ objectFit: 'cover', zIndex: 0 }} sizes="100vw" />
+            <Image fill priority src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_750/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg" alt="" style={{ objectFit: 'cover', zIndex: 0 }} sizes="100vw" />
           ) : (
-            <video autoPlay muted loop playsInline preload="none" poster="/images/stam-hero.jpg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
+            <video autoPlay muted loop playsInline preload="none" poster="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1200/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}>
               <source src="/video/hero-stam.mp4" type="video/mp4" />
             </video>
           )}
