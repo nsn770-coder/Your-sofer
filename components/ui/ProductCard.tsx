@@ -112,6 +112,7 @@ export default function ProductCard({
   const [prioritySaved, setPrioritySaved] = useState(false);
   const [removing, setRemoving]           = useState(false);
   const [removed, setRemoved]             = useState(false);
+  const [wizardBar, setWizardBar]         = useState(false);
   const priorityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   async function handleToggleHidden(e: React.MouseEvent) {
@@ -154,6 +155,10 @@ export default function ProductCard({
   function handleAdd(e: React.MouseEvent) {
     e.stopPropagation();
     addItem({ id, name, price, imgUrl: imgSrc ?? undefined, quantity: 1 });
+    // Show wizard nudge if user arrived here from the Bar Mitzva wizard
+    try {
+      if (localStorage.getItem('bmWizard_step') !== null) setWizardBar(true);
+    } catch { /* ignore */ }
   }
 
   function handleDecrement(e: React.MouseEvent) {
@@ -162,6 +167,58 @@ export default function ProductCard({
   }
 
   if (removed) return null;
+
+  // ── Bar Mitzva wizard nudge bar ───────────────────────────────────────────
+  const WizardNudge = wizardBar ? (
+    <div
+      onClick={e => e.stopPropagation()}
+      style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+        background: '#0c1a35',
+        borderTop: '2px solid rgba(184,151,42,0.5)',
+        padding: '16px 20px 20px',
+        direction: 'rtl',
+        boxShadow: '0 -6px 32px rgba(0,0,0,0.35)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 12,
+      }}
+    >
+      <p style={{ color: '#fff', fontWeight: 600, fontSize: 15, margin: 0, textAlign: 'center' }}>
+        ✅ נוסף לסל! רוצה להמשיך לשלב הבא במסע הבר מצווה?
+      </p>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <button
+          onClick={() => {
+            setWizardBar(false);
+            router.push(`/category/${encodeURIComponent('בר מצווה')}?step=next`);
+          }}
+          style={{
+            background: '#b8972a', color: '#fff', border: 'none',
+            borderRadius: 10, padding: '11px 26px',
+            fontWeight: 700, fontSize: 14, cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          כן, נמשיך ←
+        </button>
+        <button
+          onClick={() => setWizardBar(false)}
+          style={{
+            background: 'rgba(255,252,240,0.08)',
+            color: 'rgba(255,252,240,0.75)',
+            border: '1px solid rgba(255,252,240,0.2)',
+            borderRadius: 10, padding: '11px 22px',
+            fontWeight: 600, fontSize: 14, cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          רוצה לבחור עוד
+        </button>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <div
@@ -291,6 +348,8 @@ export default function ProductCard({
           )}
         </div>
       </div>
+
+      {WizardNudge}
     </div>
   );
 }

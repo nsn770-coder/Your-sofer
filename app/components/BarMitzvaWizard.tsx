@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'bmWizard_v1';
+const STORAGE_KEY   = 'bmWizard_v1';
+const ACTIVE_STEP_KEY = 'bmWizard_step'; // cross-component signal: "user is mid-wizard on step N"
 
 interface StepDef {
   title: string;
@@ -61,7 +62,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
   const [current, setCurrent] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
 
-  // Load saved progress from localStorage
+  // Load saved progress + handle ?step=next return signal
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -72,19 +73,39 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
         }
       }
     } catch { /* ignore */ }
+
+    // When user returns from a category page after adding to cart,
+    // ProductCard navigates here with ?step=next. We just clean up the
+    // signal — bmWizard_v1 already has the correct advanced step.
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('step') === 'next') {
+        localStorage.removeItem(ACTIVE_STEP_KEY);
+        const url = new URL(window.location.href);
+        url.searchParams.delete('step');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch { /* ignore */ }
+
     setMounted(true);
   }, []);
 
-  // Advance step and navigate to category
+  // Advance step, mark active step for ProductCard, then navigate to category
   function handleSelect(idx: number) {
     const next = idx + 1;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ step: next })); } catch { /* ignore */ }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ step: next }));
+      localStorage.setItem(ACTIVE_STEP_KEY, String(idx));
+    } catch { /* ignore */ }
     setCurrent(next);
     router.push(STEPS[idx].href);
   }
 
   function reset() {
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(ACTIVE_STEP_KEY);
+    } catch { /* ignore */ }
     setCurrent(0);
   }
 
