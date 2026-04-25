@@ -13,7 +13,7 @@ import { db } from './firebase';
 const HERO_PLACEHOLDER = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1200/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg';
 const HeroSwiper = dynamic(() => import('./components/HeroSwiper'), {
   loading: () => (
-    <div style={{ background: '#F5F0E8', padding: '12px 0' }}>
+    <div style={{ background: '#FFFFFF', padding: '12px 0' }}>
       <div
         className="h-[260px] md:h-[360px]"
         style={{
@@ -704,7 +704,7 @@ export default function HomePageClient() {
 
       {/* ── Hero Message + Smart Funnel ── */}
       <div style={{
-        background: '#F5F0E8',
+        background: '#FFFFFF',
         padding: isMobile ? '36px 20px 0' : '56px 24px 0',
         textAlign: 'center',
         direction: 'rtl',
@@ -758,7 +758,7 @@ export default function HomePageClient() {
 ];
 const msg = messages[activityIdx % messages.length];
 return (
-  <div style={{ background: '#F5F0E8', borderBottom: '1px solid #e8e8ea', padding: '7px 16px', textAlign: 'center', overflow: 'hidden' }}>
+  <div style={{ background: '#FFFFFF', borderBottom: '1px solid #e8e8ea', padding: '7px 16px', textAlign: 'center', overflow: 'hidden' }}>
     <span key={activityIdx} style={{ fontSize: isMobile ? 12 : 13, color: '#1a2744', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 7, animation: 'fadeSlide 0.5s ease' }}>
       {msg.icon}
       {msg.text}
@@ -769,7 +769,7 @@ return (
       })()}
 
       {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#F5F0E8', padding: isMobile ? '16px 12px' : '20px 24px', borderBottom: '1px solid #f0ece4' }}>
+      <div ref={countersRef} style={{ background: '#FFFFFF', padding: isMobile ? '16px 12px' : '20px 24px', borderBottom: '1px solid #f0ece4' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
           {[
             { icon: <IconCounterBox isMobile={isMobile} />,   value: countedValues.products,  suffix: '+', label: 'מוצרים באתר' },
@@ -804,7 +804,7 @@ return (
 
 
       {/* ── 4. Category grid (CHANGE 2) ── */}
-      <div style={{ background: '#F5F0E8', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלו את מגוון מוצרי הסת&quot;מ שלנו</p>
@@ -849,7 +849,7 @@ return (
 
       {/* ── 5. Featured products horizontal scroll (CHANGE 3) ── */}
       {featuredProducts.length > 0 && (
-        <div style={{ background: '#F5F0E8', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
+        <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
             <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
             <button
@@ -897,7 +897,7 @@ return (
       )}
 
       {/* ── Shop All CTA ── */}
-      <div style={{ background: '#F5F0E8', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
         <a
           href="/category/יודאיקה"
           style={{ display: 'inline-block', background: '#0c1a35', color: '#fff', borderRadius: 12, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
@@ -907,7 +907,7 @@ return (
       </div>
 
       {/* ── Clear Path CTA ── */}
-      <div style={{ background: '#F5F0E8', padding: isMobile ? '32px 16px' : '40px 16px', direction: 'rtl', textAlign: 'center' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 16px' : '40px 16px', direction: 'rtl', textAlign: 'center' }}>
         <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>לא בטוח מה לבחור?</h2>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>בחר לפי מה שאתה מחפש — נמצא לך את המתאים ביותר</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
@@ -940,7 +940,7 @@ return (
       </div>
 
       {/* ── 6. More categories horizontal scroll (CHANGE 4) ── */}
-      <div style={{ background: '#F5F0E8', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
           <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 14 }}>עוד קטגוריות</h2>
         </div>
@@ -984,7 +984,7 @@ return (
           { name: 'דוד נחמיאס', city: 'באר שבע', stars: 5, text: 'ראיתי הרבה חנויות אונליין. כאן היחיד שמציג צילום אמיתי של הקלף. זה ההבדל כולו.' },
         ];
         return (
-          <div style={{ background: '#F5F0E8', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+          <div style={{ background: '#FFFFFF', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
             <div style={{ maxWidth: 1100, margin: '0 auto' }}>
               <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>
                 לקוחות שכבר קנו — מה הם אומרים
