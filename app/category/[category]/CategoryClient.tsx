@@ -73,6 +73,9 @@ const EMPTY_FILTERS: FilterState = {
 const PAGE_SIZE = 16;
 const ATTR_KEYS = ['חומר', 'כתב', 'כשרות', 'נוסח', 'צבע'];
 
+// Categories that show SoferProductCard (split sofer-image + product layout)
+const SOFER_LAYOUT_CATS = new Set(['קלפי מזוזה', 'תפילין קומפלט', 'קלפי תפילין', 'בר מצווה']);
+
 // ─── Category-specific name-based filters ────────────────────────────────────
 
 interface NameFilterSpec {
@@ -830,7 +833,7 @@ export default function CategoryClient({ category }: { category: string }) {
   }, []);
 
   useEffect(() => {
-    if (category !== 'קלפי מזוזה' || allLoaded.length === 0) return;
+    if (!SOFER_LAYOUT_CATS.has(category) || allLoaded.length === 0) return;
     const ids = [...new Set(allLoaded.map(p => p.soferId).filter(Boolean) as string[])];
     if (ids.length === 0) return;
 
@@ -1162,7 +1165,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
           {/* Products grid / loading / empty */}
           {loading ? (
-            <div className={category === 'קלפי מזוזה' ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4'}>
+            <div className={SOFER_LAYOUT_CATS.has(category) ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4'}>
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : filtered.length === 0 ? (
@@ -1182,7 +1185,7 @@ export default function CategoryClient({ category }: { category: string }) {
             />
           ) : (
             <>
-              {category === 'קלפי מזוזה' ? (
+              {SOFER_LAYOUT_CATS.has(category) ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {paginated.map(p => (
                     <SoferProductCard
