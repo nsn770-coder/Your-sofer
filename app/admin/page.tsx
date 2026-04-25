@@ -193,7 +193,14 @@ const ROLE_COLORS: Record<UserRole, string> = {
 
 // ─── Sofer field — categories that show the sofer selector ───────────────────
 
-const SOFER_DROPDOWN_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה']);
+const SOFER_CATS_LIST = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
+const SOFER_DROPDOWN_CATS = new Set(SOFER_CATS_LIST);
+
+/** Returns true if the cat string (after trim+normalize) is a sofer category */
+function isSoferCat(cat: string): boolean {
+  const c = cat.trim().normalize('NFC');
+  return SOFER_CATS_LIST.some(s => s.trim().normalize('NFC') === c);
+}
 
 // ─── Add Product Modal ────────────────────────────────────────────────────────
 
@@ -320,7 +327,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          {SOFER_DROPDOWN_CATS.has(cat) && (
+          {isSoferCat(cat) || !!soferId && (
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>סופר</label>
               <select value={soferId} onChange={e => setSoferId(e.target.value)}
@@ -428,6 +435,9 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [soferOptions, setSoferOptions] = useState<Sofer[]>([]);
 
   useEffect(() => {
+    // Debug: log what category value we got from Firestore
+    console.log('[EditProductModal] product.cat:', JSON.stringify(product.cat), '| product.category:', JSON.stringify(product.category), '| cat state:', JSON.stringify(product.cat || product.category || ''), '| isSoferCat:', isSoferCat(product.cat || product.category || ''));
+
     getDocs(collection(db, 'soferim'))
       .then(snap => {
         const data: Sofer[] = [];
@@ -523,7 +533,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          {SOFER_DROPDOWN_CATS.has(cat) && (
+          {isSoferCat(cat) || !!soferId && (
             <div>
               <label style={labelStyle}>סופר</label>
               <select value={soferId} onChange={e => setSoferId(e.target.value)}
