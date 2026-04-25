@@ -10,6 +10,7 @@ import Link from 'next/link';
 import ProductCard from '@/components/ui/ProductCard';
 import SoferProductCard, { type SoferData } from '@/components/ui/SoferProductCard';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import BarMitzvaWizard from '@/app/components/BarMitzvaWizard';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -987,6 +988,13 @@ export default function CategoryClient({ category }: { category: string }) {
           )}
         </div>
       </div>
+
+      {/* ── Bar Mitzva Wizard ── */}
+      {(category === 'בר מצווה' || category === 'בר-מצווה') && (
+        <div className="max-w-7xl mx-auto px-4 pt-6" dir="rtl">
+          <BarMitzvaWizard variant="page" />
+        </div>
+      )}
 
       {/* ── Subcategory banner (מתנות only) ── */}
       {category === 'מתנות' && (

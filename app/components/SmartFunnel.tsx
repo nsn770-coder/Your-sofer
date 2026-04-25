@@ -6,8 +6,9 @@ import Image from 'next/image';
 import { collection, getDocs, query, where, limit } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import BarMitzvaWizard from './BarMitzvaWizard';
 
-type Path = 'mezuzah' | 'tefillin' | null;
+type Path = 'mezuzah' | 'tefillin' | 'barMitzva' | null;
 type Nusach = 'ספרדי' | 'אשכנזי' | null;
 type Level = 'פשוט' | 'מהודר' | 'מהודר בתכלית';
 
@@ -149,6 +150,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   }
 
   function back() {
+    if (path === 'barMitzva') { setPath(null); return; }
     if (step === 1) { setPath(null); go(0); }
     else if (step === 2) {
       if (path === 'mezuzah') go(1);
@@ -224,7 +226,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
         }}
       >
         {/* Back link */}
-        {step > 0 && (
+        {(step > 0 || path === 'barMitzva') && (
           <button
             onClick={back}
             style={{
@@ -239,7 +241,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
         )}
 
         {/* STEP 0 — Choose path */}
-        {step === 0 && (
+        {step === 0 && path !== 'barMitzva' && (
           <>
             <div style={titleStyle}>מה אתה מחפש?</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -260,7 +262,37 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
                 noOverlay
               />
             </div>
+            {/* Third card — Bar Mitzva wizard */}
+            <div
+              onClick={() => { setAnimating(true); setTimeout(() => { setPath('barMitzva'); setAnimating(false); }, 200); }}
+              style={{
+                marginTop: 12,
+                height: 56,
+                borderRadius: 12,
+                overflow: 'hidden',
+                cursor: 'pointer',
+                background: 'rgba(184,151,42,0.18)',
+                border: '1px solid rgba(184,151,42,0.45)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 16px',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(184,151,42,0.28)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(184,151,42,0.18)'; }}
+            >
+              <span style={{ color: '#fff', fontWeight: 700, fontSize: isMobile ? 14 : 15, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+                סט בר מצווה
+              </span>
+              <span style={{ color: 'rgba(255,252,240,0.65)', fontSize: 13 }}>מדריך שלב אחר שלב ←</span>
+            </div>
           </>
+        )}
+
+        {/* STEP 0 — Bar Mitzva wizard expanded */}
+        {step === 0 && path === 'barMitzva' && (
+          <BarMitzvaWizard variant="homepage" />
         )}
 
         {/* STEP 1 — Sub-type (מזוזות only) */}
