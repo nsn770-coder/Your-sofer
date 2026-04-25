@@ -563,32 +563,6 @@ export default function HomePageClient() {
         maxWidth: '100vw',
       }}
     >
-      {/* ── Top Live Activity Bar ── */}
-      {(() => {
-        const topMessages = [
-          { text: 'מזוזות כשרות ומהודרות — ישירות מסופר מוסמך', cta: 'לצפייה ←', href: '/category/מזוזות' },
-          { text: 'מתנות לשבת ולחג — עיצוב יוקרתי ואיכות גבוהה', cta: 'לצפייה ←', href: '/category/שבתות וחגים' },
-          { text: 'תפילין לבר מצווה — קומפלט מלא עם תעודת כשרות', cta: 'לצפייה ←', href: '/category/תפילין קומפלט' },
-          { text: 'כל מוצר נבדק לפני משלוח — אחריות מלאה', cta: 'לכל המוצרים ←', href: '/category/יודאיקה' },
-        ];
-        const msg = topMessages[topBarIdx % topMessages.length];
-        return (
-          <div
-            onClick={() => router.push(msg.href)}
-            style={{ width: '100%', background: '#f5e6b3', borderBottom: '1px solid #d4b96a', padding: '8px 16px', textAlign: 'center', direction: 'rtl', cursor: 'pointer', userSelect: 'none' }}
-          >
-            <span
-              key={topBarIdx}
-              style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#5a3e00', display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center', animation: 'topBarFade 0.4s ease' }}
-            >
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8940a', display: 'inline-block', flexShrink: 0 }} />
-              {msg.text}
-              <span style={{ color: '#0c1a35', background: 'rgba(12,26,53,0.1)', borderRadius: 6, padding: '1px 7px', fontWeight: 800, fontSize: isMobile ? 11 : 12 }}>{msg.cta}</span>
-            </span>
-            <style>{`@keyframes topBarFade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }`}</style>
-          </div>
-        );
-      })()}
 
       {/* ── Newsletter popup (45 s trigger) ── */}
       {newsletterPopupOpen && (
@@ -743,18 +717,16 @@ export default function HomePageClient() {
             lineHeight: 1.4,
             marginBottom: 14,
           }}>
-            לקנות מזוזה או יודאיקה —{' '}
-            <span style={{ color: '#b8972a' }}>רק כשאתה בטוח 100% במה שאתה מקבל</span>
+            היחידים בעולם שמראים לך את הסופר: בחר וראה מי כותב עבורך את הדבר הכי חשוב.
           </h1>
           <p style={{
             fontSize: isMobile ? 14 : 17,
             color: '#555',
             lineHeight: 1.8,
-            maxWidth: 520,
+            maxWidth: 560,
             margin: '0 auto 0',
           }}>
-            כל מוצר נבדק, מצולם, ומוצג לך בדיוק כמו שהוא — בלי הפתעות.
-            ישירות מסופר מוסמך, עם תעודת כשרות ואחריות מלאה.
+            תגלה מה אתה מכניס הביתה. אנחנו מסירים את המחיצה בין הסופר ללקוח ומאפשרים לך לבחור את הכותב, לצפות בתהליך ולקנות סת״מ מהודר בביטחון מלא ובשקיפות שעוד לא הכרת.
           </p>
         </div>
 
