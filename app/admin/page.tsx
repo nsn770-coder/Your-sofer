@@ -195,14 +195,35 @@ const ROLE_COLORS: Record<UserRole, string> = {
 
 const SOFER_DROPDOWN_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה']);
 
-function SoferDropdown({ soferimFull, value, onChange }: {
-  soferimFull: SoferFull[];
+const PersonIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+  </svg>
+);
+
+/** Self-contained sofer picker — fetches /soferim from Firestore on mount */
+function SoferDropdown({ value, onChange }: {
   value: string;
   onChange: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [soferim, setSoferim] = useState<SoferFull[]>([]);
+  const [loading, setLoading] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
 
+  // Fetch soferim once on mount
+  useEffect(() => {
+    getDocs(collection(db, 'soferim'))
+      .then(snap => {
+        const data: SoferFull[] = [];
+        snap.forEach(d => data.push({ id: d.id, ...d.data() } as SoferFull));
+        setSoferim(data);
+      })
+      .catch(() => { /* non-fatal */ })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -211,101 +232,97 @@ function SoferDropdown({ soferimFull, value, onChange }: {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const selected = soferimFull.find(s => s.id === value);
+  const selected = soferim.find(s => s.id === value);
+
+  const avatarStyle: React.CSSProperties = {
+    width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
+    background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  };
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      {/* Trigger */}
+      {/* Trigger button */}
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
         style={{
-          width: '100%', border: '1px solid #ddd', borderRadius: 8,
-          padding: '8px 12px', fontSize: 14, background: '#fff',
+          width: '100%', border: '1.5px solid #b8972a', borderRadius: 8,
+          padding: '9px 12px', fontSize: 14, background: '#fffdf5',
           boxSizing: 'border-box', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', gap: 8,
-          textAlign: 'right', direction: 'rtl',
+          display: 'flex', alignItems: 'center', gap: 8, direction: 'rtl',
         }}
       >
-        {selected ? (
+        {loading ? (
+          <span style={{ color: '#9ca3af', fontSize: 13 }}>טוען...</span>
+        ) : selected ? (
           <>
-            {selected.imageUrl ? (
-              <img src={selected.imageUrl} alt={selected.name}
-                style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-            ) : (
-              <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#e5e7eb',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
-                  <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                </svg>
-              </div>
-            )}
+            {selected.imageUrl
+              ? <img src={selected.imageUrl} alt={selected.name} style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+              : <div style={avatarStyle}><PersonIcon /></div>
+            }
             <span style={{ fontWeight: 600 }}>{selected.name}</span>
+            {selected.city && <span style={{ fontSize: 12, color: '#6b7280' }}>· {selected.city}</span>}
           </>
         ) : (
           <span style={{ color: '#6b7280' }}>ללא סופר</span>
         )}
-        <span style={{ marginRight: 'auto', color: '#9ca3af', fontSize: 10 }}>▼</span>
+        <span style={{ marginRight: 'auto', color: '#b8972a', fontSize: 11 }}>▼</span>
       </button>
 
       {/* Dropdown list */}
       {open && (
         <div style={{
-          position: 'absolute', top: '100%', right: 0, left: 0, zIndex: 999,
+          position: 'absolute', top: '100%', right: 0, left: 0, zIndex: 1000,
           background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.12)', marginTop: 2,
-          maxHeight: 220, overflowY: 'auto',
+          boxShadow: '0 6px 20px rgba(0,0,0,0.14)', marginTop: 4,
+          maxHeight: 240, overflowY: 'auto',
         }}>
           {/* None option */}
           <div
             onClick={() => { onChange(''); setOpen(false); }}
             style={{
-              padding: '10px 12px', cursor: 'pointer', direction: 'rtl',
-              background: value === '' ? '#f0f4ff' : '#fff',
+              padding: '10px 14px', cursor: 'pointer', direction: 'rtl',
+              background: value === '' ? '#fef9ee' : '#fff',
               display: 'flex', alignItems: 'center', gap: 8,
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = '#f9fafb'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = value === '' ? '#f0f4ff' : '#fff'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = value === '' ? '#fef9ee' : '#fff'; }}
           >
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#e5e7eb',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
-                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-              </svg>
-            </div>
+            <div style={avatarStyle}><PersonIcon /></div>
             <span style={{ color: '#6b7280', fontSize: 14 }}>ללא סופר</span>
           </div>
-          {/* Sofer options */}
-          {soferimFull.map(s => (
+
+          {/* Sofer rows */}
+          {soferim.map(s => (
             <div
               key={s.id}
               onClick={() => { onChange(s.id); setOpen(false); }}
               style={{
-                padding: '10px 12px', cursor: 'pointer', direction: 'rtl',
-                background: value === s.id ? '#f0f4ff' : '#fff',
-                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 14px', cursor: 'pointer', direction: 'rtl',
+                background: value === s.id ? '#fef9ee' : '#fff',
+                display: 'flex', alignItems: 'center', gap: 10,
                 borderTop: '1px solid #f3f4f6',
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = '#f9fafb'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = value === s.id ? '#f0f4ff' : '#fff'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = value === s.id ? '#fef9ee' : '#fff'; }}
             >
-              {s.imageUrl ? (
-                <img src={s.imageUrl} alt={s.name}
-                  style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-              ) : (
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#e5e7eb',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
-                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                  </svg>
-                </div>
-              )}
+              {s.imageUrl
+                ? <img src={s.imageUrl} alt={s.name} style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                : <div style={avatarStyle}><PersonIcon /></div>
+              }
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{s.name}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{s.name}</div>
                 {s.city && <div style={{ fontSize: 11, color: '#6b7280' }}>{s.city}</div>}
               </div>
+              {value === s.id && <span style={{ marginRight: 'auto', color: '#b8972a', fontSize: 13 }}>✓</span>}
             </div>
           ))}
+
+          {!loading && soferim.length === 0 && (
+            <div style={{ padding: '12px 14px', color: '#9ca3af', fontSize: 13, direction: 'rtl' }}>
+              אין סופרים רשומים
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -419,21 +436,21 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>קטגוריה</label>
-              <select value={cat} onChange={e => setCat(e.target.value)}
-                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
-                {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            {SOFER_DROPDOWN_CATS.has(cat) && (
-              <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>סופר</label>
-                <SoferDropdown soferimFull={soferimFull} value={soferId} onChange={setSoferId} />
-              </div>
-            )}
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>קטגוריה</label>
+            <select value={cat} onChange={e => setCat(e.target.value)}
+              style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
+              {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
+          {SOFER_DROPDOWN_CATS.has(cat) && (
+            <div style={{ border: '1px solid #f0e8c8', borderRadius: 10, padding: '12px 14px', background: '#fffdf5' }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#92701a', display: 'block', marginBottom: 8 }}>
+                שיוך לסופר
+              </label>
+              <SoferDropdown value={soferId} onChange={setSoferId} />
+            </div>
+          )}
           {LEVEL_CATS.includes(cat) && (
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>רמת הידור</label>
@@ -609,21 +626,21 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               <input type="number" value={was} onChange={e => setWas(e.target.value)} placeholder="לא חובה" style={inputStyle} />
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div>
-              <label style={labelStyle}>קטגוריה</label>
-              <select value={cat} onChange={e => { setCat(e.target.value); if (!LEVEL_CATS_EDIT.includes(e.target.value)) setLevel(''); }}
-                style={{ ...inputStyle, background: '#fff' }}>
-                {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            {SOFER_DROPDOWN_CATS.has(cat) && (
-              <div>
-                <label style={labelStyle}>סופר</label>
-                <SoferDropdown soferimFull={soferimFull} value={soferId} onChange={setSoferId} />
-              </div>
-            )}
+          <div>
+            <label style={labelStyle}>קטגוריה</label>
+            <select value={cat} onChange={e => { setCat(e.target.value); if (!LEVEL_CATS_EDIT.includes(e.target.value)) setLevel(''); }}
+              style={{ ...inputStyle, background: '#fff' }}>
+              {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
+          {SOFER_DROPDOWN_CATS.has(cat) && (
+            <div style={{ border: '1px solid #f0e8c8', borderRadius: 10, padding: '12px 14px', background: '#fffdf5' }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#92701a', display: 'block', marginBottom: 8 }}>
+                שיוך לסופר
+              </label>
+              <SoferDropdown value={soferId} onChange={setSoferId} />
+            </div>
+          )}
           {LEVEL_CATS_EDIT.includes(cat) && (
             <div>
               <label style={labelStyle}>רמת הידור</label>
