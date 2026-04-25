@@ -327,7 +327,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          {isSoferCat(cat) || !!soferId && (
+          {(isSoferCat(cat) || !!soferId) && (
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>סופר</label>
               <select value={soferId} onChange={e => setSoferId(e.target.value)}
@@ -533,7 +533,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          {isSoferCat(cat) || !!soferId && (
+          {(isSoferCat(cat) || !!soferId) && (
             <div>
               <label style={labelStyle}>סופר</label>
               <select value={soferId} onChange={e => setSoferId(e.target.value)}
