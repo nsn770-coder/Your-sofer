@@ -108,15 +108,28 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             position: 'relative', width: '100%', height: slideHeight, overflow: 'hidden',
             display: 'flex', alignItems: 'center', justifyContent: 'center', direction: 'rtl',
           }}>
-            {/* Background: uploaded image or fallback gradient */}
-            {heroImages.soferimSlide ? (
-              <Image fill priority src={optimizeCloudinaryUrl(heroImages.soferimSlide, 1200)} alt="הסופרים שלנו" style={{ objectFit: 'cover' }} sizes="100vw" />
-            ) : (
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0c1a35 0%, #1a3a2a 100%)' }} />
-            )}
-            <span style={{ position: 'absolute', bottom: 20, right: 20, color: '#fff', fontSize: isMobile ? 18 : 22, fontWeight: 600, textShadow: '0 2px 8px rgba(0,0,0,0.8)', textAlign: 'right' }}>
-              הסופרים שלנו
-            </span>
+            {/* Mobile image (< 768px) */}
+            <div className="block md:hidden" style={{ position: 'absolute', inset: 0 }}>
+              <Image
+                fill
+                priority
+                src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777151830/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_unt31g.png"
+                alt="הסופרים שלנו"
+                style={{ objectFit: 'cover' }}
+                sizes="100vw"
+              />
+            </div>
+            {/* Desktop image (≥ 768px) */}
+            <div className="hidden md:block" style={{ position: 'absolute', inset: 0 }}>
+              <Image
+                fill
+                priority
+                src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777152174/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_1400_x_500_%D7%A4%D7%99%D7%A7%D7%A1%D7%9C_mbbahb.png"
+                alt="הסופרים שלנו"
+                style={{ objectFit: 'cover' }}
+                sizes="100vw"
+              />
+            </div>
             <button
               onClick={e => { e.stopPropagation(); router.push('/soferim'); }}
               style={{
