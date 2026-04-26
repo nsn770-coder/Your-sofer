@@ -1049,33 +1049,42 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       )}
 
-      {/* ── Curation banner ── */}
+      {/* ── Curation banner — appears BELOW the category header ── */}
       {curation && (
-        <div dir="rtl" style={{ position: 'relative', overflow: 'hidden', background: '#0c1a35' }}>
-          {/* Background: image if available, otherwise dark gradient */}
-          {curation.bannerImageUrl ? (
+        <div
+          dir="rtl"
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: 220,
+            overflow: 'hidden',
+            background: 'linear-gradient(135deg, #0c1a35 0%, #1a3060 100%)',
+          }}
+        >
+          {/* Full-size banner image — no opacity reduction */}
+          {curation.bannerImageUrl && (
             <img
               src={curation.bannerImageUrl}
               alt={styleTagFilter || curation.bannerTitle}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
             />
-          ) : (
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0c1a35 0%, #1a3060 100%)' }} />
           )}
-          <div style={{ position: 'relative', maxWidth: '80rem', margin: '0 auto', padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {/* Title: show selected look name when a filter is active, otherwise the curation banner title */}
-            <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0 }}>
+          {/* Gradient overlay at bottom for text legibility only */}
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)' }} />
+          {/* Text — bottom-right */}
+          <div style={{ position: 'absolute', bottom: 16, right: 20, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+            <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
               {styleTagFilter && isLookTagMode ? styleTagFilter : curation.bannerTitle}
             </h2>
             {styleTagFilter && isLookTagMode ? (
-              <span style={{ color: 'rgba(184,151,42,0.9)', fontSize: 13, fontWeight: 600 }}>
-                לוק: {styleTagFilter}
+              <span style={{ color: 'rgba(184,151,42,1)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+                קולקציית {styleTagFilter}
               </span>
-            ) : curation.activeTag && !isLookTagMode && (
-              <span style={{ color: 'rgba(184,151,42,0.9)', fontSize: 13, fontWeight: 600 }}>
-                {curation.activeTag === 'Modern' ? 'קולקציית מודרני' : curation.activeTag === 'Heritage' ? 'קולקציית קלאסי' : curation.activeTag === 'Steel' ? 'קולקציית נירוסטה' : ''}
+            ) : curation.activeTag && !isLookTagMode ? (
+              <span style={{ color: 'rgba(184,151,42,1)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+                {curation.activeTag === 'Modern' ? 'קולקציית מודרני' : curation.activeTag === 'Heritage' ? 'קולקציית קלאסי' : curation.activeTag === 'Steel' ? 'קולקציית נירוסטה' : `קולקציית ${curation.activeTag}`}
               </span>
-            )}
+            ) : null}
           </div>
         </div>
       )}
