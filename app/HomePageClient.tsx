@@ -702,43 +702,6 @@ export default function HomePageClient() {
         </div>
       )}
 
-      {/* ── Hero Message + Smart Funnel ── */}
-      <div style={{
-        background: '#FFFFFF',
-        padding: isMobile ? '36px 20px 0' : '56px 24px 0',
-        textAlign: 'center',
-        direction: 'rtl',
-      }}>
-        <div style={{ maxWidth: 680, margin: '0 auto' }}>
-          <h1 style={{
-            fontSize: isMobile ? 22 : 32,
-            fontWeight: 900,
-            color: '#0c1a35',
-            lineHeight: 1.4,
-            marginBottom: 14,
-          }}>
-            היחידים בעולם שמראים לך את הסופר: בחר וראה מי כותב עבורך את הדבר הכי חשוב.
-          </h1>
-          <p style={{
-            fontSize: isMobile ? 14 : 17,
-            color: '#555',
-            lineHeight: 1.8,
-            maxWidth: 560,
-            margin: '0 auto 0',
-          }}>
-            תגלה מה אתה מכניס הביתה. אנחנו מסירים את המחיצה בין הסופר ללקוח ומאפשרים לך לבחור את הכותב, לצפות בתהליך ולקנות סת״מ מהודר בביטחון מלא ובשקיפות שעוד לא הכרת.
-          </p>
-        </div>
-
-        {/* Funnel separator */}
-        <div style={{ borderTop: '1px solid rgba(0,0,0,0.1)', margin: isMobile ? '24px 0 0' : '32px 0 0' }}>
-          <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '12px 0 0', fontWeight: 500 }}>
-            בחר מה אתה מחפש — נמצא לך את המתאים ביותר
-          </p>
-        </div>
-        <SmartFunnel isMobile={isMobile} />
-      </div>
-
       {/* ── 1. HeroSwiper ── */}
       <HeroSwiper
         isMobile={isMobile}
