@@ -464,7 +464,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
               <button
                 key={opt}
                 onClick={() => onSubCategoryFilter(opt === 'הכל' ? '' : opt)}
-                className={`text-xs px-2.5 py-1 rounded-full font-semibold transition-all border ${
+                className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
                   (subCategoryFilter || '') === (opt === 'הכל' ? '' : opt)
                     ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
@@ -537,7 +537,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                 <button
                   key={opt}
                   onClick={() => setNameFilter(spec.key, opt)}
-                  className={`text-xs px-2.5 py-1 rounded-full font-semibold transition-all border ${
+                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
                     current === opt
                       ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
@@ -563,7 +563,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                 <button
                   key={opt}
                   onClick={() => setAttr(key, opt)}
-                  className={`text-xs px-2.5 py-1 rounded-full font-semibold transition-all border ${
+                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
                     current === opt
                       ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
@@ -633,7 +633,7 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
         פעיל:
       </span>
       {pills.map((pill, i) => (
-        <span key={i} className="inline-flex items-center gap-1.5 bg-[#0c1a35]/8 text-[#0c1a35] text-xs font-semibold px-3 py-1 rounded-full border border-[#0c1a35]/20">
+        <span key={i} className="inline-flex items-center gap-1.5 bg-[#0c1a35]/8 text-[#0c1a35] text-xs font-semibold px-3 py-1 rounded-lg border border-[#0c1a35]/20">
           {pill.label}
           <button onClick={pill.onRemove} className="hover:text-red-500 transition-colors">
             <IconX size={10} />
@@ -668,7 +668,7 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
       {active ? (
         <button
           onClick={onClear}
-          className="px-6 py-2.5 bg-[#0c1a35] text-white rounded-full font-bold text-sm hover:bg-[#1a3060] transition-colors"
+          className="px-6 py-2.5 bg-[#0c1a35] text-white rounded-lg font-bold text-sm hover:bg-[#1a3060] transition-colors"
         >
           נקה סינון
         </button>
@@ -678,7 +678,7 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
             <Link
               key={cat}
               href={`/category/${encodeURIComponent(cat)}`}
-              className="px-5 py-2.5 bg-[#0c1a35] text-white rounded-full text-sm font-bold hover:bg-[#1a3060] transition-colors"
+              className="px-5 py-2.5 bg-[#0c1a35] text-white rounded-lg text-sm font-bold hover:bg-[#1a3060] transition-colors"
             >
               {cat}
             </Link>

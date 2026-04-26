@@ -334,13 +334,13 @@ export default function ProductCard({
           {qty === 0 ? (
             <button
               onClick={handleAdd}
-              className="w-full flex items-center justify-center gap-1.5 rounded-full py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#0c1a35] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#0c1a35] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
             >
               <IconCart size={13} />
               הוסף לסל
             </button>
           ) : (
-            <div className="flex items-center justify-between bg-green-500 rounded-full overflow-hidden w-full">
+            <div className="flex items-center justify-between bg-green-500 rounded-lg overflow-hidden w-full">
               <button onClick={handleDecrement} className="px-3 py-1.5 sm:px-4 sm:py-2 text-white text-lg sm:text-xl font-bold hover:bg-green-600 transition-colors leading-none">−</button>
               <span className="text-white font-bold text-sm sm:text-base">{qty}</span>
               <button onClick={handleAdd} className="px-3 py-1.5 sm:px-4 sm:py-2 text-white text-lg sm:text-xl font-bold hover:bg-green-600 transition-colors leading-none">+</button>
