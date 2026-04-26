@@ -91,6 +91,7 @@ interface Product {
   days?: string;
   imgUrl2?: string;
   imgUrl3?: string;
+  sourceUrl?: string;
 }
 
 interface Sofer {
@@ -411,6 +412,19 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
 
 const LEVEL_CATS_EDIT = ['קלפי מזוזה', 'תפילין קומפלט'];
 
+function extractOriginalName(sourceUrl: string): string {
+  try {
+    const match = sourceUrl.match(/\/product\/([^/?#]+)/i);
+    if (!match) return '';
+    let slug = decodeURIComponent(match[1]);
+    slug = slug.replace(/^\d+/, '');
+    slug = slug.replace(/-/g, ' ').trim();
+    return slug;
+  } catch {
+    return '';
+  }
+}
+
 function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   product: Product;
   soferim: Sofer[];
@@ -516,6 +530,15 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             <label style={labelStyle}>שם מוצר *</label>
             <input value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
           </div>
+          {product.sourceUrl && (() => {
+            const orig = extractOriginalName(product.sourceUrl!);
+            return orig ? (
+              <div style={{ background: '#f8f6f0', border: '1px solid #e8dfc8', padding: '8px 12px' }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#888' }}>שם מקורי מהספק: </span>
+                <span style={{ fontSize: 13, color: '#0c1a35', fontWeight: 600 }}>{orig}</span>
+              </div>
+            ) : null;
+          })()}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <label style={labelStyle}>מחיר ₪ *</label>
