@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -28,16 +28,15 @@ const HeroSwiper = dynamic(() => import('./components/HeroSwiper'), {
 import SmartFunnel from './components/SmartFunnel';
 import ProductCard from '@/components/ui/ProductCard';
 
-const NewsletterPopup = dynamic(() => import('./components/NewsletterPopup'), { ssr: false, loading: () => <div className="hidden" /> });
+const NewsletterPopup   = dynamic(() => import('./components/NewsletterPopup'),       { ssr: false, loading: () => <div className="hidden" /> });
 const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => <div className="hidden" /> });
 import { useShaliach } from './contexts/ShaliachContext';
-import { useCart } from './contexts/CartContext';
+import { useCart }     from './contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import {
   CARDS, ALL_CATS, CONFIG_COLLECTION, CONFIG_DOC, slotKey,
 } from './constants/homepageCards';
 import type { CardDef, SubItem } from './constants/homepageCards';
-// ── הוסף את הקומפוננטות האלה בראש HomePageClient.tsx, אחרי כל ה-imports ──────
 
 // Activity bar icons
 function IconActivityCheck() {
@@ -251,6 +250,72 @@ function SkeletonCategoryCard() {
   );
 }
 
+// ── Static data (outside component — never re-created on render) ───────────────
+
+const STATIC_QUOTES = [
+  { name: 'מיכל כהן',    city: 'תל אביב',  stars: 5, text: 'הזמנתי מזוזה לבית החדש — קיבלתי תמונה של הקלף לפני המשלוח. לא ציפיתי לרמת שירות כזו.' },
+  { name: 'יוסף לוי',    city: 'ירושלים',  stars: 5, text: 'קניתי תפילין לבן שלי לבר מצווה. הסופר פנה אלינו אישית כדי לוודא שהכל מתאים. מרגש.' },
+  { name: 'שרה אברמוב',  city: 'חיפה',     stars: 5, text: 'מתנה לאמא שלי — היא בכתה מרוב שמחה. האריזה הייתה מהודרת ותעודת הכשרות נתנה לה ביטחון.' },
+  { name: 'דוד נחמיאס',  city: 'באר שבע',  stars: 5, text: 'ראיתי הרבה חנויות אונליין. כאן היחיד שמציג צילום אמיתי של הקלף. זה ההבדל כולו.' },
+] as const;
+
+const CLEAR_PATH_ITEMS = [
+  { label: 'מצא מזוזה לבית',  href: '/category/מזוזות' },
+  { label: 'מצא מתנה לשבת',   href: '/category/שבתות וחגים' },
+  { label: 'צפה בכל המוצרים', href: '/category/יודאיקה' },
+] as const;
+
+const MORE_CAT_DEFS = [
+  { slug: 'סט טלית תפילין', emoji: '🕍' },
+  { slug: 'ספרי תורה',       emoji: '📜' },
+  { slug: 'פסח',             emoji: '🍷' },
+  { slug: 'כיסוי תפילין',    emoji: '🖊️' },
+  { slug: 'חנוכה',           emoji: '🕎' },
+  { slug: 'קלפי תפילין',    emoji: '📄' },
+  { slug: 'תפילין קומפלט',  emoji: '⬛' },
+  { slug: 'בר מצווה',        emoji: '🎉' },
+] as const;
+
+// ── Activity bar — owns its own timer, never re-renders the parent ─────────────
+
+const ActivityBar = memo(function ActivityBar({
+  weeklyProducts,
+  isMobile,
+}: {
+  weeklyProducts: number;
+  isMobile: boolean;
+}) {
+  const [activityIdx, setActivityIdx] = useState(0);
+
+  useEffect(() => {
+    setActivityIdx(0);
+    const id = setInterval(() => setActivityIdx(i => i + 1), 4000);
+    function onVisible() { if (!document.hidden) setActivityIdx(0); }
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVisible); };
+  }, []);
+
+  const weeklyVisitors = 134 + ((new Date().getDate() * 7) % 83);
+  const messages = [
+    { icon: <IconActivityCheck />, text: 'לקוח מתל אביב הוסיף מזוזה לסל לפני 5 דקות' },
+    { icon: <IconActivityPen />,   text: 'סופר חדש נרשם מירושלים השבוע' },
+    { icon: <IconActivityBox />,   text: `${weeklyProducts || '12'} מוצרים נוספו השבוע` },
+    { icon: <IconActivityUsers />, text: `${weeklyVisitors} לקוחות ביקרו השבוע` },
+    { icon: <IconActivityShield />, text: 'מוצרי סת"מ נבדקים ע"י מגיה מוסמך' },
+  ];
+  const msg = messages[activityIdx % messages.length];
+
+  return (
+    <div style={{ background: '#FFFFFF', borderBottom: '1px solid #e8e8ea', padding: '7px 16px', textAlign: 'center', overflow: 'hidden' }}>
+      <span key={activityIdx} style={{ fontSize: isMobile ? 12 : 13, color: '#1a2744', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 7, animation: 'fadeSlide 0.5s ease' }}>
+        {msg.icon}
+        {msg.text}
+      </span>
+      <style>{`@keyframes fadeSlide { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }`}</style>
+    </div>
+  );
+});
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function HomePageClient() {
@@ -259,36 +324,41 @@ export default function HomePageClient() {
   const [slotImages, setSlotImages]   = useState<Record<string, string>>({});
   const [imagesReady, setImagesReady] = useState(false);
   const [wizardOpen, setWizardOpen]   = useState(false);
-  const [activityIdx, setActivityIdx] = useState(0);
-  const [topBarIdx, setTopBarIdx]     = useState(0);
   const [weeklyProducts, setWeeklyProducts] = useState(0);
-  const [soferimCount, setSoferimCount] = useState(0);
-  const [productsCount, setProductsCount] = useState(0);
+  const [soferimCount, setSoferimCount]     = useState(0);
+  const [productsCount, setProductsCount]   = useState(0);
   const countersRef = useRef<HTMLDivElement>(null);
   const [countersVisible, setCountersVisible] = useState(false);
-  const [countedValues, setCountedValues] = useState({ soferim: 0, products: 0, customers: 0 });
-  const [wizardStep, setWizardStep]   = useState(0);
-  const [wizardFor, setWizardFor]     = useState<'self' | 'gift' | null>(null);
+
+  // DOM refs for counter animation — avoids 72 React re-renders per second
+  const productsValRef  = useRef<HTMLSpanElement>(null);
+  const soferimValRef   = useRef<HTMLSpanElement>(null);
+  const customersValRef = useRef<HTMLSpanElement>(null);
+
+  const [wizardStep, setWizardStep]     = useState(0);
+  const [wizardFor, setWizardFor]       = useState<'self' | 'gift' | null>(null);
   const [wizardBudget, setWizardBudget] = useState<'low' | 'mid' | 'high' | null>(null);
   const [wizardKashrut, setWizardKashrut] = useState<'regular' | 'mehudar' | 'mehudar_plus' | null>(null);
   const [wizardResults, setWizardResults] = useState<Product[]>([]);
   const [wizardLoading, setWizardLoading] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [testIdx, setTestIdx]         = useState(0);
-  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [testimonials, setTestimonials]         = useState<Testimonial[]>([]);
+  const [newsletterEmail, setNewsletterEmail]   = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
-  const cardsRef       = useRef<HTMLDivElement>(null);
-  const router         = useRouter();
-  const { shaliach }   = useShaliach();
-  const { addItem }    = useCart();
+  const cardsRef   = useRef<HTMLDivElement>(null);
+  const router     = useRouter();
+  const { shaliach } = useShaliach();
+  const { addItem }  = useCart();
 
+  // ── Resize — debounced 150 ms so mobile touch events don't saturate the thread
   useEffect(() => {
     function update() { setIsMobile(window.innerWidth < 768); }
     update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    let timer: ReturnType<typeof setTimeout>;
+    function onResize() { clearTimeout(timer); timer = setTimeout(update, 150); }
+    window.addEventListener('resize', onResize);
+    return () => { window.removeEventListener('resize', onResize); clearTimeout(timer); };
   }, []);
 
   useEffect(() => {
@@ -401,14 +471,6 @@ export default function HomePageClient() {
   }, []);
 
   useEffect(() => {
-    if (testimonials.length < 2) return;
-    const timer = setInterval(() => {
-      setTestIdx(prev => (prev + 1) % testimonials.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [testimonials.length]);
-
-  useEffect(() => {
     async function fetchCounts() {
       try {
         const oneWeekAgo = new Date();
@@ -428,24 +490,6 @@ export default function HomePageClient() {
   }, []);
 
   useEffect(() => {
-    const id = setInterval(() => setTopBarIdx(i => i + 1), 4500);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    setActivityIdx(0);
-    const id = setInterval(() => setActivityIdx(i => i + 1), 4000);
-    function onVisible() {
-      if (!document.hidden) setActivityIdx(0);
-    }
-    document.addEventListener('visibilitychange', onVisible);
-    return () => {
-      clearInterval(id);
-      document.removeEventListener('visibilitychange', onVisible);
-    };
-  }, []);
-
-  useEffect(() => {
     const el = countersRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(([entry]) => {
@@ -455,22 +499,23 @@ export default function HomePageClient() {
     return () => obs.disconnect();
   }, []);
 
+  // Counter animation — writes directly to DOM refs, zero React re-renders
   useEffect(() => {
     if (!countersVisible) return;
     const targets = { soferim: soferimCount || 12, products: productsCount || 180, customers: 247 };
     const duration = 1200;
     const start = performance.now();
+    let rafId: number;
     function tick(now: number) {
       const t = Math.min((now - start) / duration, 1);
       const ease = 1 - Math.pow(1 - t, 3);
-      setCountedValues({
-        soferim:   Math.round(targets.soferim   * ease),
-        products:  Math.round(targets.products  * ease),
-        customers: Math.round(targets.customers * ease),
-      });
-      if (t < 1) requestAnimationFrame(tick);
+      if (productsValRef.current)  productsValRef.current.textContent  = `${Math.round(targets.products  * ease)}+`;
+      if (soferimValRef.current)   soferimValRef.current.textContent   = String(Math.round(targets.soferim   * ease));
+      if (customersValRef.current) customersValRef.current.textContent = `${Math.round(targets.customers * ease)}+`;
+      if (t < 1) rafId = requestAnimationFrame(tick);
     }
-    requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, [countersVisible, soferimCount, productsCount]);
 
   useEffect(() => {
@@ -492,6 +537,19 @@ export default function HomePageClient() {
     }, 20000);
     return () => clearTimeout(timer);
   }, []);
+
+  // ── Memoized arrays that depend on catImages ───────────────────────────────
+
+  const categoryGridItems = useMemo(() => [
+    { name: 'מזוזות',          emoji: '📜', img: catImages['מזוזות']          || '', href: '/category/%D7%9E%D7%96%D7%95%D7%96%D7%95%D7%AA' },
+    { name: 'תפילין קומפלט',  emoji: '🖊️', img: catImages['תפילין קומפלט']  || '', href: '/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98' },
+    { name: 'מגילות',          emoji: '📖', img: catImages['מגילות']          || '', href: '/category/%D7%9E%D7%92%D7%99%D7%9C%D7%95%D7%AA' },
+    { name: 'יודאיקה',         emoji: '✡️', img: catImages['יודאיקה']         || '', href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94' },
+    { name: 'נטלות וכלים',    emoji: '🫙', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776283325/eolm1mte2d2q1zjaijsn.png', href: '/category/%D7%A0%D7%98%D7%9C%D7%95%D7%AA%20%D7%95%D7%9B%D7%9C%D7%99%D7%9D' },
+    { name: 'שבתות וחגים',    emoji: '🕯️', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', href: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA%20%D7%95%D7%97%D7%92%D7%99%D7%9D' },
+    { name: 'קלף מזוזה',       emoji: '📜', img: catImages['קלפי מזוזה']      || '', href: '/category/קלפי-מזוזה',       fallback: '#1a2744' },
+    { name: 'סט טלית תפילין', emoji: '🕍', img: catImages['סט טלית תפילין'] || '', href: '/category/סט-טלית-תפילין', fallback: '#1a2744' },
+  ] as { name: string; emoji: string; img: string; href: string; fallback?: string }[], [catImages]);
 
   async function fetchWizardResults(budget: typeof wizardBudget, kashrut: typeof wizardKashrut) {
     setWizardLoading(true);
@@ -564,7 +622,7 @@ export default function HomePageClient() {
       }}
     >
 
-      {/* ── Newsletter popup (45 s trigger) ── */}
+      {/* ── Newsletter popup ── */}
       {newsletterPopupOpen && (
         <NewsletterPopup
           email={newsletterEmail}
@@ -717,52 +775,33 @@ export default function HomePageClient() {
         <SmartFunnel isMobile={isMobile} />
       </div>
 
-      {/* ── Live Activity Bar ── */}
-      {(() => {
-        const weeklyVisitors = 134 + ((new Date().getDate() * 7) % 83);
-        const messages: { icon: React.ReactNode; text: string }[] = [
-  { icon: <IconActivityCheck />, text: 'לקוח מתל אביב הוסיף מזוזה לסל לפני 5 דקות' },
-  { icon: <IconActivityPen />,   text: 'סופר חדש נרשם מירושלים השבוע' },
-  { icon: <IconActivityBox />,   text: `${weeklyProducts || '12'} מוצרים נוספו השבוע` },
-  { icon: <IconActivityUsers />, text: `${weeklyVisitors} לקוחות ביקרו השבוע` },
-  { icon: <IconActivityShield />,text: 'מוצרי סת"מ נבדקים ע"י מגיה מוסמך' },
-];
-const msg = messages[activityIdx % messages.length];
-return (
-  <div style={{ background: '#FFFFFF', borderBottom: '1px solid #e8e8ea', padding: '7px 16px', textAlign: 'center', overflow: 'hidden' }}>
-    <span key={activityIdx} style={{ fontSize: isMobile ? 12 : 13, color: '#1a2744', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 7, animation: 'fadeSlide 0.5s ease' }}>
-      {msg.icon}
-      {msg.text}
-    </span>
-    <style>{`@keyframes fadeSlide { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }`}</style>
-  </div>
-);
-      })()}
+      {/* ── Live Activity Bar — isolated component, re-renders independently ── */}
+      <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
 
       {/* ── Live Counters ── */}
       <div ref={countersRef} style={{ background: '#FFFFFF', padding: isMobile ? '16px 12px' : '20px 24px', borderBottom: '1px solid #f0ece4' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
-          {[
-            { icon: <IconCounterBox isMobile={isMobile} />,   value: countedValues.products,  suffix: '+', label: 'מוצרים באתר' },
-            { icon: <IconCounterPen isMobile={isMobile} />,   value: countedValues.soferim,   suffix: '',  label: 'סופרים מאושרים' },
-            { icon: <IconCounterCheck isMobile={isMobile} />, value: countedValues.customers, suffix: '+', label: 'לקוחות מרוצים' },
-          ].map(c => (
-            <div key={c.label} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              gap: 4, padding: isMobile ? '14px 8px' : '16px 12px',
-              background: '#fafaf8', borderRadius: 0,
-              border: '1.5px solid #ede8df',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ color: '#b8972a', display: 'flex', alignItems: 'center' }}>{c.icon}</span>
-                <span style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>
-                  {c.value + c.suffix}
-                </span>
-              </div>
-              <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>{c.label}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ color: '#b8972a', display: 'flex', alignItems: 'center' }}><IconCounterBox isMobile={isMobile} /></span>
+              <span ref={productsValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>0+</span>
             </div>
-          ))}
+            <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>מוצרים באתר</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ color: '#b8972a', display: 'flex', alignItems: 'center' }}><IconCounterPen isMobile={isMobile} /></span>
+              <span ref={soferimValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>0</span>
+            </div>
+            <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>סופרים מאושרים</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ color: '#b8972a', display: 'flex', alignItems: 'center' }}><IconCounterCheck isMobile={isMobile} /></span>
+              <span ref={customersValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>0+</span>
+            </div>
+            <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>לקוחות מרוצים</span>
+          </div>
         </div>
         {/* Rating row */}
         <div style={{ maxWidth: 900, margin: '10px auto 0', textAlign: 'center' }}>
@@ -772,25 +811,14 @@ return (
         </div>
       </div>
 
-
-
-      {/* ── 4. Category grid (CHANGE 2) ── */}
+      {/* ── 4. Category grid ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלו את מגוון מוצרי הסת&quot;מ שלנו</p>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 12 }}
             className="md:grid-cols-3 lg:grid-cols-6">
-            {([
-              { name: 'מזוזות',          emoji: '📜', img: catImages['מזוזות'] || '',          href: '/category/%D7%9E%D7%96%D7%95%D7%96%D7%95%D7%AA' },
-              { name: 'תפילין קומפלט',  emoji: '🖊️', img: catImages['תפילין קומפלט'] || '',  href: '/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98' },
-              { name: 'מגילות',          emoji: '📖', img: catImages['מגילות'] || '',          href: '/category/%D7%9E%D7%92%D7%99%D7%9C%D7%95%D7%AA' },
-              { name: 'יודאיקה',         emoji: '✡️', img: catImages['יודאיקה'] || '',         href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94' },
-              { name: 'נטלות וכלים',    emoji: '🫙', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776283325/eolm1mte2d2q1zjaijsn.png', href: '/category/%D7%A0%D7%98%D7%9C%D7%95%D7%AA%20%D7%95%D7%9B%D7%9C%D7%99%D7%9D' },
-              { name: 'שבתות וחגים',    emoji: '🕯️', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', href: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA%20%D7%95%D7%97%D7%92%D7%99%D7%9D' },
-              { name: 'קלף מזוזה',       emoji: '📜', img: catImages['קלפי מזוזה'] || '',      href: '/category/קלפי-מזוזה',       fallback: '#1a2744' },
-              { name: 'סט טלית תפילין', emoji: '🕍', img: catImages['סט טלית תפילין'] || '', href: '/category/סט-טלית-תפילין', fallback: '#1a2744' },
-            ] as { name: string; emoji: string; img: string; href: string; fallback?: string }[]).map(cat => (
+            {categoryGridItems.map(cat => (
               <div key={cat.name}
                 onClick={() => router.push(cat.href)}
                 style={{
@@ -818,7 +846,7 @@ return (
         </div>
       </div>
 
-      {/* ── 5. Featured products horizontal scroll (CHANGE 3) ── */}
+      {/* ── 5. Featured products horizontal scroll ── */}
       {featuredProducts.length > 0 && (
         <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
@@ -882,11 +910,7 @@ return (
         <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>לא בטוח מה לבחור?</h2>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>בחר לפי מה שאתה מחפש — נמצא לך את המתאים ביותר</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
-          {[
-            { label: 'מצא מזוזה לבית',    href: '/category/מזוזות' },
-            { label: 'מצא מתנה לשבת',     href: '/category/שבתות וחגים' },
-            { label: 'צפה בכל המוצרים',   href: '/category/יודאיקה' },
-          ].map(item => (
+          {CLEAR_PATH_ITEMS.map(item => (
             <button
               key={item.label}
               onClick={() => router.push(item.href)}
@@ -910,22 +934,13 @@ return (
         </div>
       </div>
 
-      {/* ── 6. More categories horizontal scroll (CHANGE 4) ── */}
+      {/* ── 6. More categories horizontal scroll ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
           <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 14 }}>עוד קטגוריות</h2>
         </div>
         <div style={{ display: 'flex', overflowX: 'auto', gap: 10, padding: '0 12px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
-          {([
-            { slug: 'סט טלית תפילין', emoji: '🕍' },
-            { slug: 'ספרי תורה',       emoji: '📜' },
-            { slug: 'פסח',             emoji: '🍷' },
-            { slug: 'כיסוי תפילין',    emoji: '🖊️' },
-            { slug: 'חנוכה',           emoji: '🕎' },
-            { slug: 'קלפי תפילין',    emoji: '📄' },
-            { slug: 'תפילין קומפלט',  emoji: '⬛' },
-            { slug: 'בר מצווה',        emoji: '🎉' },
-          ]).map(cat => {
+          {MORE_CAT_DEFS.map(cat => {
             const img = catImages[cat.slug] ? optimizeCloudinaryUrl(catImages[cat.slug], 300) : '';
             return (
               <div key={cat.slug}
@@ -947,67 +962,52 @@ return (
       </div>
 
       {/* ── Static Social Proof ── */}
-      {(() => {
-        const quotes = [
-          { name: 'מיכל כהן', city: 'תל אביב', stars: 5, text: 'הזמנתי מזוזה לבית החדש — קיבלתי תמונה של הקלף לפני המשלוח. לא ציפיתי לרמת שירות כזו.' },
-          { name: 'יוסף לוי', city: 'ירושלים', stars: 5, text: 'קניתי תפילין לבן שלי לבר מצווה. הסופר פנה אלינו אישית כדי לוודא שהכל מתאים. מרגש.' },
-          { name: 'שרה אברמוב', city: 'חיפה', stars: 5, text: 'מתנה לאמא שלי — היא בכתה מרוב שמחה. האריזה הייתה מהודרת ותעודת הכשרות נתנה לה ביטחון.' },
-          { name: 'דוד נחמיאס', city: 'באר שבע', stars: 5, text: 'ראיתי הרבה חנויות אונליין. כאן היחיד שמציג צילום אמיתי של הקלף. זה ההבדל כולו.' },
-        ];
-        return (
-          <div style={{ background: '#FFFFFF', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
-            <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-              <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>
-                לקוחות שכבר קנו — מה הם אומרים
-              </h2>
-              <p style={{ textAlign: 'center', fontSize: 13, color: '#999', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-                gap: 16,
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>
+            לקוחות שכבר קנו — מה הם אומרים
+          </h2>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#999', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+            gap: 16,
+          }}>
+            {STATIC_QUOTES.map((q, i) => (
+              <div key={i} style={{
+                background: '#fff',
+                border: '1px solid #ebebeb',
+                borderRadius: 0,
+                padding: isMobile ? '18px 16px' : '22px 24px',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
               }}>
-                {quotes.map((q, i) => (
-                  <div key={i} style={{
-                    background: '#fff',
-                    border: '1px solid #ebebeb',
-                    borderRadius: 0,
-                    padding: isMobile ? '18px 16px' : '22px 24px',
-                    boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-                  }}>
-                    {/* Stars */}
-                    <div style={{ marginBottom: 10, display: 'flex', gap: 2 }}>
-                      {Array.from({ length: q.stars }).map((_, si) => (
-                        <span key={si} style={{ color: '#e6a817', fontSize: 15 }}>★</span>
-                      ))}
-                    </div>
-                    {/* Quote */}
-                    <p style={{ fontSize: 13, color: '#444', lineHeight: 1.75, marginBottom: 14, fontStyle: 'italic' }}>
-                      &ldquo;{q.text}&rdquo;
-                    </p>
-                    {/* Identity */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <span style={{ color: '#b8972a', fontWeight: 900, fontSize: 14 }}>{q.name.charAt(0)}</span>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>{q.name}</div>
-                        <div style={{ fontSize: 11, color: '#999' }}>{q.city}</div>
-                      </div>
-                    </div>
+                <div style={{ marginBottom: 10, display: 'flex', gap: 2 }}>
+                  {Array.from({ length: q.stars }).map((_, si) => (
+                    <span key={si} style={{ color: '#e6a817', fontSize: 15 }}>★</span>
+                  ))}
+                </div>
+                <p style={{ fontSize: 13, color: '#444', lineHeight: 1.75, marginBottom: 14, fontStyle: 'italic' }}>
+                  &ldquo;{q.text}&rdquo;
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ color: '#b8972a', fontWeight: 900, fontSize: 14 }}>{q.name.charAt(0)}</span>
                   </div>
-                ))}
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>{q.name}</div>
+                    <div style={{ fontSize: 11, color: '#999' }}>{q.city}</div>
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        );
-      })()}
+        </div>
+      </div>
 
-      {/* ── 5. Testimonials carousel ── */}
+      {/* ── Testimonials carousel — self-contained timer ── */}
       {testimonials.length > 0 && (
         <TestimonialsCarousel
           testimonials={testimonials}
-          testIdx={testIdx}
-          setTestIdx={setTestIdx}
           isMobile={isMobile}
         />
       )}
