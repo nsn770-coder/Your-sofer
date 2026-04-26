@@ -78,7 +78,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
       position: 'relative',
       width: '92%',
       margin: '0 auto',
-      borderRadius: 12,
+      borderRadius: 0,
       overflow: 'hidden',
       boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
     }}>

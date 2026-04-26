@@ -144,8 +144,8 @@ function SubSlot({ imgUrl, label, href }: { imgUrl: string; label: string; href:
   return (
     <Link href={href} className="block group">
       <div
-        className="relative aspect-square rounded-md overflow-hidden bg-gray-100 mb-1.5"
-        style={{ borderRadius: 6 }}
+        className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 mb-1.5"
+        style={{ borderRadius: 8 }}
       >
         {imgUrl ? (
           <Image
