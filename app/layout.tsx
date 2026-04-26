@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
@@ -9,11 +9,12 @@ import NavBar from "@/app/components/navigation/NavBar";
 import Footer from "@/app/components/Footer";
 import ShiraChat from "@/app/components/chat/ShiraChat";
 import GTMLoader from "@/app/components/GTMLoader";
+import WizardStickyBar from "@/app/components/WizardStickyBar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 
-const BASE_URL = 'https://yoursofer.com';
+const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -79,6 +80,7 @@ export default function RootLayout({
           </Suspense>
           <GTMLoader />
         </AuthProvider>
+        <WizardStickyBar />
         <ShiraChat />
         <SpeedInsights />
       </body>

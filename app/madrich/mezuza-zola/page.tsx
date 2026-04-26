@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard, Step } from '../InfoComponents';
 
-const BASE_URL = 'https://yoursofer.com';
+const BASE_URL = 'https://your-sofer.com';
 const C = { navy: '#0c1a35', gold: '#b8972a', muted: '#666', border: '#e0e0e0', white: '#fff' };
 
 export const metadata: Metadata = {

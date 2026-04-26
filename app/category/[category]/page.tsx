@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+﻿import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import CategoryClient from './CategoryClient';
 
@@ -6,7 +6,7 @@ import CategoryClient from './CategoryClient';
 // a stale RSC payload from a previous visit with the old layout.
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = 'https://yoursofer.com';
+const BASE_URL = 'https://your-sofer.com';
 const FIREBASE_PROJECT = 'your-sofer';
 const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
 

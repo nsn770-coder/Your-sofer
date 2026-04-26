@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       <p style="color:#555;line-height:1.6;">לשאלות ניתן לפנות אלינו בוואטסאפ: <a href="https://wa.me/972584877770" style="color:#b8972a;">058-4877770</a></p>
     </div>
     <div style="background:#f0f0f0;padding:16px;text-align:center;font-size:12px;color:#888;">
-      © 2025 Your Sofer · yoursofer.com
+      © 2025 Your Sofer · your-sofer.com
     </div>
   </div>
 </body>

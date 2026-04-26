@@ -1,10 +1,10 @@
-import { Suspense } from 'react';
+﻿import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import ShabbatHolidaysClient from './ShabbatHolidaysClient';
 
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = 'https://yoursofer.com';
+const BASE_URL = 'https://your-sofer.com';
 const PAGE_URL = `${BASE_URL}/category/שבתות-וחגים`;
 
 export const metadata: Metadata = {

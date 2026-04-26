@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 interface Testimonial {
   id: string;
@@ -14,12 +15,18 @@ interface Testimonial {
 
 interface Props {
   testimonials: Testimonial[];
-  testIdx: number;
-  setTestIdx: React.Dispatch<React.SetStateAction<number>>;
   isMobile: boolean;
 }
 
-export default function TestimonialsCarousel({ testimonials, testIdx, setTestIdx, isMobile }: Props) {
+export default function TestimonialsCarousel({ testimonials, isMobile }: Props) {
+  const [testIdx, setTestIdx] = useState(0);
+
+  useEffect(() => {
+    if (testimonials.length < 2) return;
+    const timer = setInterval(() => setTestIdx(prev => (prev + 1) % testimonials.length), 4000);
+    return () => clearInterval(timer);
+  }, [testimonials.length]);
+
   const t = testimonials[testIdx];
   if (!t) return null;
 

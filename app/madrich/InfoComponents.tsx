@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useRouter } from 'next/navigation';
 
 // ══ צבעים ══
@@ -163,7 +163,7 @@ export function ArticleLayout({ children }: { children: React.ReactNode }) {
 
       {/* Footer */}
       <div style={{ background: C.navy, padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
-        © 2025 Your Sofer · yoursofer.com
+        © 2025 Your Sofer · your-sofer.com
       </div>
     </div>
   );

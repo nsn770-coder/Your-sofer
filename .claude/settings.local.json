@@ -101,7 +101,26 @@
       "Bash(kill -0 8952)",
       "Bash(kill -0 31076)",
       "Bash(kill -0 4140)",
-      "Bash(npx firebase-tools:*)"
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" stash)",
+      "Bash(\"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" run build)",
+      "Bash(C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe stash *)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" checkout -- .claude/settings.local.json)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" stash pop)",
+      "Bash(C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe push *)",
+      "Bash(C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe check-ignore *)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.exe\" push origin main)",
+      "PowerShell(cmd /c \"dir C:\\\\Users\\\\Nissan\\\\your-sofer /b\")",
+      "PowerShell(git *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(firebase deploy *)",
+      "Bash(npx firebase *)",
+      "Bash(where firebase *)",
+      "Read(//c/Users/Nissan/AppData/Roaming/npm/**)",
+      "Read(//c/Users/Nissan/AppData/Local/**)",
+      "Bash(firebase login *)",
+      "PowerShell(Get-WmiObject *)",
+      "PowerShell(Get-CimInstance *)"
     ]
   }
 }
