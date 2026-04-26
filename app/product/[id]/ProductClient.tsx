@@ -1264,7 +1264,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             <p style={{ fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 24, lineHeight: 1.5 }}>רוצה לחזור למדריך בר המצווה לבחור את המוצר הבא?</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <button
-                onClick={() => { setShowWizardModal(false); router.back(); }}
+                onClick={() => { setShowWizardModal(false); router.push('/?wizard=bar-mitzva#bar-mitzva-wizard'); }}
                 style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
               >
                 כן, חזור למדריך ←

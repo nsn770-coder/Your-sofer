@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { collection, getDocs, query, where, limit } from 'firebase/firestore';
 import { db } from '@/app/firebase';
@@ -92,6 +92,7 @@ function ImageCard({
 
 export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
   const [path, setPath] = useState<Path>(null);
   const [nusach, setNusach] = useState<Nusach>(null);
@@ -143,6 +144,13 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
     }
     fetchImages();
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get('wizard') === 'bar-mitzva') {
+      setPath('barMitzva');
+      setStep(0);
+    }
+  }, [searchParams]);
 
   function go(nextStep: number) {
     setAnimating(true);
@@ -212,7 +220,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   };
 
   return (
-    <div style={{ background: '#F5F0E8', padding: isMobile ? '24px 12px' : '40px 24px' }}>
+    <div id="bar-mitzva-wizard" style={{ background: '#F5F0E8', padding: isMobile ? '24px 12px' : '40px 24px' }}>
       <div
         style={{
           background: '#1a2744',

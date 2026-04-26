@@ -88,7 +88,7 @@ export default function WizardStickyBar() {
 
       {/* CTA */}
       <button
-        onClick={() => router.push(nextStep.href)}
+        onClick={() => router.push('/?wizard=bar-mitzva#bar-mitzva-wizard')}
         style={{
           flexShrink: 0,
           background: '#b8972a',
