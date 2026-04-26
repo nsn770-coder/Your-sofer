@@ -59,10 +59,25 @@ async function getActiveSoferIds(): Promise<string[]> {
   }
 }
 
+// Categories with confirmed products in Firestore (queried 2026-04-26).
+// Sorted by product count descending. 'קלפי תפילין' removed (0 products).
 const CATEGORIES = [
-  'סט טלית תפילין', 'מזוזות', 'יודאיקה', 'כיסוי תפילין',
-  'מתנות', 'מגילות', 'תפילין קומפלט', 'קלפי מזוזה',
-  'קלפי תפילין', 'ספרי תורה',
+  'כלי שולחן והגשה',    // 1703
+  'עיצוב הבית',          // 1285
+  'מזוזות',              // 353
+  'יודאיקה',             // 324
+  'כיפות',               // 303
+  'סט טלית תפילין',      // 260
+  'תיקי טלית ותפילין',   // 86
+  'כיסוי תפילין',        // 56
+  'מתנות',               // 19
+  'בר מצווה',            // 19
+  'קלפי מזוזה',          // 14
+  'טליתות וציציות',      // 6
+  'מגילות',              // 5
+  'ספרי תורה',           // 3
+  'שבת',                 // 3
+  'תפילין קומפלט',       // 2
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
