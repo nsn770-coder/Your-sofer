@@ -18,32 +18,32 @@ const STEPS: StepDef[] = [
   {
     title: 'בחר סט בר מצווה',
     subtitle: 'סטים מלאים הכוללים טלית, תפילין וכיסויים',
-    href: `/category/${encodeURIComponent('בר מצווה')}`,
+    href: `/category/${encodeURIComponent('בר מצווה')}?from=bar-mitzva`,
   },
   {
     title: 'בחר כיסוי',
     subtitle: 'כיסויי תפילין – מגוון צבעים ובדים',
-    href: `/category/${encodeURIComponent('סט טלית תפילין')}`,
+    href: `/category/${encodeURIComponent('סט טלית תפילין')}?from=bar-mitzva`,
   },
   {
     title: 'בחר טלית',
     subtitle: 'טליתות איכותיות לבר מצווה',
-    href: `/category/${encodeURIComponent('טליתות וציציות')}`,
+    href: `/category/${encodeURIComponent('טליתות וציציות')}?from=bar-mitzva`,
   },
   {
     title: 'בחר תפילין',
     subtitle: 'תפילין מהודרים לכל הנוסחים',
-    href: `/category/${encodeURIComponent('תפילין קומפלט')}`,
+    href: `/category/${encodeURIComponent('תפילין קומפלט')}?from=bar-mitzva`,
   },
   {
     title: 'בחר כיפה',
     subtitle: 'כיפות בסגנונות ובחומרים מגוונים',
-    href: `/category/${encodeURIComponent('כיפות')}`,
+    href: `/category/${encodeURIComponent('כיפות')}?from=bar-mitzva`,
   },
   {
     title: 'בחר סידור',
     subtitle: 'סידורים מהודרים לבר מצווה',
-    href: `/category/${encodeURIComponent('ספרים')}?filter=${encodeURIComponent('סידורים')}`,
+    href: `/category/${encodeURIComponent('ספרים')}?filter=${encodeURIComponent('סידורים')}&from=bar-mitzva`,
   },
 ];
 

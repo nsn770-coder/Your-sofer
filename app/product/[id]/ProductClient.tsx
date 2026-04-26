@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { doc, getDoc, updateDoc, setDoc, addDoc, collection, getDocs, query, where, limit, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
@@ -777,6 +777,8 @@ function ProductContentSections({ product }: { product: Product }) {
 export default function ProductClient() {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromWizard = searchParams.get('from') === 'bar-mitzva';
   const { addItem } = useCart();
   const { user } = useAuth();
 
@@ -788,6 +790,7 @@ export default function ProductClient() {
   const [added, setAdded]               = useState(false);
   const [qty, setQty]                   = useState(1);
   const [zoomVisible, setZoomVisible]   = useState(false);
+  const [showWizardModal, setShowWizardModal] = useState(false);
   const [showEdit, setShowEdit]         = useState(false);
   const [saveSuccess, setSaveSuccess]   = useState(false);
   const [selectedKlafId, setSelectedKlafId]     = useState<string | null>(null);
@@ -885,6 +888,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
+    if (fromWizard) setShowWizardModal(true);
   }
 
   // ── Buy Box ──────────────────────────────────────────────────────────────────
@@ -994,6 +998,19 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {saveSuccess && (
         <div style={{ position: 'fixed', top: 20, right: 20, background: '#27ae60', color: '#fff', padding: '12px 20px', borderRadius: 10, fontWeight: 700, fontSize: 14, zIndex: 999, boxShadow: '0 4px 20px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 8 }}>
           <Icon.Check size={16} color="#fff" /> המוצר עודכן!
+        </div>
+      )}
+
+      {/* Bar Mitzva wizard context banner */}
+      {fromWizard && (
+        <div style={{ background: '#0c1a35', color: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', direction: 'rtl', position: 'sticky', top: 0, zIndex: 40 }}>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>אתה במדריך בר מצווה</span>
+          <button
+            onClick={() => router.back()}
+            style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            חזור למדריך ←
+          </button>
         </div>
       )}
 
@@ -1230,6 +1247,31 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i - 1 + allMedia.length) % allMedia.length); }} style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>›</button>
             </>
           )}
+        </div>
+      )}
+
+      {/* Bar Mitzva wizard — post-add modal */}
+      {showWizardModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setShowWizardModal(false)}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: 380, padding: 28, direction: 'rtl', boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 36, textAlign: 'center', marginBottom: 12 }}>✅</div>
+            <h3 style={{ fontSize: 17, fontWeight: 900, color: '#0c1a35', textAlign: 'center', marginBottom: 8 }}>נוסף לסל!</h3>
+            <p style={{ fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 24, lineHeight: 1.5 }}>רוצה לחזור למדריך בר המצווה לבחור את המוצר הבא?</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button
+                onClick={() => { setShowWizardModal(false); router.back(); }}
+                style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
+              >
+                כן, חזור למדריך ←
+              </button>
+              <button
+                onClick={() => setShowWizardModal(false)}
+                style={{ background: 'none', color: '#666', border: '1.5px solid #e0e0e0', borderRadius: 0, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+              >
+                המשך בקניות
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
