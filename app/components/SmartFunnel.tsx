@@ -267,25 +267,36 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
               onClick={() => { setAnimating(true); setTimeout(() => { setPath('barMitzva'); setAnimating(false); }, 200); }}
               style={{
                 marginTop: 12,
-                height: 56,
+                height: 67,
                 borderRadius: 12,
                 overflow: 'hidden',
                 cursor: 'pointer',
-                background: 'rgba(184,151,42,0.18)',
                 border: '1px solid rgba(184,151,42,0.45)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '0 16px',
-                transition: 'background 0.15s',
+                transition: 'opacity 0.15s',
+                position: 'relative',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(184,151,42,0.28)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(184,151,42,0.18)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.opacity = '0.9'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.opacity = '1'; }}
             >
-              <span style={{ color: '#fff', fontWeight: 700, fontSize: isMobile ? 14 : 15, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+              {/* Background image */}
+              <Image
+                fill
+                src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777181486/Gemini_Generated_Image_7lmkfb7lmkfb7lmk_knxiuw.png"
+                alt="סט בר מצווה"
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
+                sizes="560px"
+              />
+              {/* Dark overlay */}
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)' }} />
+              {/* Text */}
+              <span style={{ position: 'relative', zIndex: 1, color: '#fff', fontWeight: 700, fontSize: isMobile ? 14 : 15, textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
                 סט בר מצווה
               </span>
-              <span style={{ color: 'rgba(255,252,240,0.65)', fontSize: 13 }}>מדריך שלב אחר שלב ←</span>
+              <span style={{ position: 'relative', zIndex: 1, color: 'rgba(255,252,240,0.85)', fontSize: 13 }}>מדריך שלב אחר שלב ←</span>
             </div>
           </>
         )}
