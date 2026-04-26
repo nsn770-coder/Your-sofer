@@ -722,6 +722,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [soferMap, setSoferMap]                 = useState<Record<string, SoferData>>({});
   const [curation, setCuration]                 = useState<Curation | null>(null);
   const [styleTagFilter, setStyleTagFilter]     = useState<string>('');
+  const [lookCurationMap, setLookCurationMap]   = useState<Record<string, Curation>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const SUBCATEGORY_PAGES = ['נטילת ידיים', 'שבת', 'חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
@@ -877,6 +878,21 @@ export default function CategoryClient({ category }: { category: string }) {
       })
       .catch(() => { setCuration(null); setStyleTagFilter(''); });
   }, [subcatOverrideForFetch, category]);
+
+  // Load all curations once — build bannerTitle → Curation map for look-specific banners
+  useEffect(() => {
+    getDocs(collection(db, 'curations'))
+      .then(snap => {
+        const map: Record<string, Curation> = {};
+        snap.forEach(d => {
+          const data = d.data() as Omit<Curation, 'id'>;
+          if (data.bannerTitle) map[data.bannerTitle] = { id: d.id, ...data };
+          if (data.activeTag && data.activeTag !== data.bannerTitle) map[data.activeTag] = { id: d.id, ...data };
+        });
+        setLookCurationMap(map);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setFilters(EMPTY_FILTERS);
@@ -1061,31 +1077,44 @@ export default function CategoryClient({ category }: { category: string }) {
             background: 'linear-gradient(135deg, #0c1a35 0%, #1a3060 100%)',
           }}
         >
-          {/* Full-size banner image — no opacity reduction */}
-          {curation.bannerImageUrl && (
-            <img
-              src={curation.bannerImageUrl}
-              alt={styleTagFilter || curation.bannerTitle}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          )}
-          {/* Gradient overlay at bottom for text legibility only */}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)' }} />
-          {/* Text — bottom-right */}
-          <div style={{ position: 'absolute', bottom: 16, right: 20, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-            <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
-              {styleTagFilter && isLookTagMode ? styleTagFilter : curation.bannerTitle}
-            </h2>
-            {styleTagFilter && isLookTagMode ? (
-              <span style={{ color: 'rgba(184,151,42,1)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
-                קולקציית {styleTagFilter}
-              </span>
-            ) : curation.activeTag && !isLookTagMode ? (
-              <span style={{ color: 'rgba(184,151,42,1)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
-                {curation.activeTag === 'Modern' ? 'קולקציית מודרני' : curation.activeTag === 'Heritage' ? 'קולקציית קלאסי' : curation.activeTag === 'Steel' ? 'קולקציית נירוסטה' : `קולקציית ${curation.activeTag}`}
-              </span>
-            ) : null}
-          </div>
+          {/* Resolve which banner image to show:
+              — look selected → use that look's own curation banner
+              — otherwise     → use the category curation banner */}
+          {(() => {
+            const activeBannerUrl = (styleTagFilter && isLookTagMode && lookCurationMap[styleTagFilter]?.bannerImageUrl)
+              ? lookCurationMap[styleTagFilter].bannerImageUrl
+              : curation.bannerImageUrl;
+            const activeLookName = styleTagFilter && isLookTagMode ? styleTagFilter : curation.bannerTitle;
+            return (
+              <>
+                {activeBannerUrl && (
+                  <img
+                    key={activeBannerUrl}
+                    src={activeBannerUrl}
+                    alt={activeLookName}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.3s ease' }}
+                  />
+                )}
+                {/* Gradient overlay at bottom for text legibility */}
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)' }} />
+                {/* Text — bottom-right */}
+                <div style={{ position: 'absolute', bottom: 16, right: 20, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                  <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
+                    {activeLookName}
+                  </h2>
+                  {(styleTagFilter && isLookTagMode) ? (
+                    <span style={{ color: 'rgba(184,151,42,1)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+                      קולקציית {styleTagFilter}
+                    </span>
+                  ) : curation.activeTag && !isLookTagMode ? (
+                    <span style={{ color: 'rgba(184,151,42,1)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+                      {curation.activeTag === 'Modern' ? 'קולקציית מודרני' : curation.activeTag === 'Heritage' ? 'קולקציית קלאסי' : curation.activeTag === 'Steel' ? 'קולקציית נירוסטה' : `קולקציית ${curation.activeTag}`}
+                    </span>
+                  ) : null}
+                </div>
+              </>
+            );
+          })()}
         </div>
       )}
 
