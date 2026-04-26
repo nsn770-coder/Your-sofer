@@ -129,6 +129,19 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
     ],
   },
   {
+    id: "tallitot", label: "טליתות וציציות", cat: "טליתות וציציות",
+    columns: [
+      {
+        title: "טליתות וציציות",
+        items: [
+          { label: "כל הטליתות", cat: "טליתות וציציות" },
+          { label: "טליתות", cat: "טליתות וציציות", filter: "טליתות" },
+          { label: "ציציות", cat: "טליתות וציציות", filter: "ציציות" },
+        ]
+      },
+    ],
+  },
+  {
     id: "kipot", label: "כיפות", cat: "כיפות",
     columns: [
       {
