@@ -96,6 +96,23 @@ export const navigationData: NavItem[] = [
     ],
   },
 
+  // ── טליתות וציציות ───────────────────────────────────────────────────────
+  {
+    id: "talitot",
+    label: "טליתות וציציות",
+    href: "/category/טליתות וציציות",
+    columns: [
+      {
+        title: "טליתות",
+        items: [
+          { label: "כל הטליתות",       href: "/category/טליתות וציציות" },
+          { label: "טליתות חתן",       href: "/category/טליתות וציציות?subcat=טליתות חתן" },
+          { label: "סט טלית תפילין",   href: "/category/סט טלית תפילין" },
+        ],
+      },
+    ],
+  },
+
   // ── יודאיקה ───────────────────────────────────────────────────────────────
   {
     id: "judaica",
@@ -109,6 +126,7 @@ export const navigationData: NavItem[] = [
           { label: "שבת ✨",           href: "/category/שבתות-וחגים" },
           { label: "סטים ומארזים 🎁", href: "/category/סטים ומארזים" },
           { label: "יודאיקה כללי ✡️", href: "/category/יודאיקה כללי" },
+          { label: "כיפות 🧿",         href: "/category/כיפות" },
         ],
       },
       {
