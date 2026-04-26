@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import HomePageClient from './HomePageClient';
 
-const BASE_URL = 'https://yoursofer.com';
+const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
   title: 'Your Sofer — חנות סת"מ | מזוזות, תפילין וספרי תורה',

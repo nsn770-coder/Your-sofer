@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useRouter } from 'next/navigation';
 
 const C = {
@@ -170,7 +170,7 @@ export default function MadrichPageClient() {
       </div>
 
       <div style={{ background: C.navy, padding: '20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>
-        © 2025 Your Sofer · yoursofer.com
+        © 2025 Your Sofer · your-sofer.com
       </div>
     </div>
   );

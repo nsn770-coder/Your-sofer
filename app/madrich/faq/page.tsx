@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, FAQItem, CTAStrip, RelatedCard } from '../InfoComponents';
 
-const BASE_URL = 'https://yoursofer.com';
+const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
   title: 'שאלות נפוצות על מזוזות — תשובות ברורות',

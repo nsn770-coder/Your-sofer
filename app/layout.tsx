@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
@@ -14,7 +14,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 
-const BASE_URL = 'https://yoursofer.com';
+const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

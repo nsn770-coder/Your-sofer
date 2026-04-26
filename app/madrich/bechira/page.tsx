@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard, Step } from '../InfoComponents';
 
-const BASE_URL = 'https://yoursofer.com';
+const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
   title: 'איך לבחור מזוזה נכון — מדריך מעשי',

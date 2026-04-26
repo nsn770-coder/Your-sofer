@@ -112,7 +112,15 @@
       "PowerShell(cmd /c \"dir C:\\\\Users\\\\Nissan\\\\your-sofer /b\")",
       "PowerShell(git *)",
       "Bash(git pull *)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(firebase deploy *)",
+      "Bash(npx firebase *)",
+      "Bash(where firebase *)",
+      "Read(//c/Users/Nissan/AppData/Roaming/npm/**)",
+      "Read(//c/Users/Nissan/AppData/Local/**)",
+      "Bash(firebase login *)",
+      "PowerShell(Get-WmiObject *)",
+      "PowerShell(Get-CimInstance *)"
     ]
   }
 }

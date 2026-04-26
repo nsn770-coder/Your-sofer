@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useRouter } from 'next/navigation';
 
 export default function JoinPage() {
@@ -141,7 +141,7 @@ export default function JoinPage() {
             style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             ← חזרה לחנות
           </button>
-          <a href="mailto:info@yoursofer.com"
+          <a href="mailto:info@your-sofer.com"
             style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
             📧 צור קשר
           </a>

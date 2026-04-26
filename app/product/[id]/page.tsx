@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import ProductClient from './ProductClient';
 
-const BASE_URL = 'https://yoursofer.com';
+const BASE_URL = 'https://your-sofer.com';
 const FIREBASE_PROJECT = 'your-sofer';
 const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
 
