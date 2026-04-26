@@ -129,6 +129,21 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
     ],
   },
   {
+    id: "kipot", label: "כיפות", cat: "כיפות",
+    columns: [
+      {
+        title: "כיפות",
+        items: [
+          { label: "כל הכיפות", cat: "כיפות" },
+          { label: "סרוגות", cat: "כיפות", filter: "סרוגות" },
+          { label: "עור", cat: "כיפות", filter: "עור" },
+          { label: "קטיפה", cat: "כיפות", filter: "קטיפה" },
+          { label: "בד", cat: "כיפות", filter: "בד" },
+        ]
+      },
+    ],
+  },
+  {
     id: "judaica", label: "יודאיקה", cat: "יודאיקה",
     columns: [
       {
