@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, orderBy, query, where,
-  doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc
+  doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, getCountFromServer
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -2357,14 +2357,7 @@ function CategoryCard({ cat, saving, saved, onSave }: {
 
 // ─── CurationsTab ─────────────────────────────────────────────────────────────
 
-const STYLE_TAG_OPTIONS = [
-  { value: '',          label: 'הכל' },
-  { value: 'Modern',    label: 'Modern — מודרני' },
-  { value: 'Heritage',  label: 'Heritage — קלאסי' },
-  { value: 'Steel',     label: 'Steel — נירוסטה' },
-];
-
-function CurationRow({ curation, onDelete }: { curation: Curation | null; onDelete?: () => void }) {
+function CurationRow({ curation, onDelete, lookTagCounts }: { curation: Curation | null; onDelete?: () => void; lookTagCounts?: Record<string, number> }) {
   const isNew = !curation?.id;
   const [category,       setCategory]       = useState(curation?.category       ?? '');
   const [activeTag,      setActiveTag]       = useState(curation?.activeTag      ?? '');
@@ -2421,13 +2414,19 @@ function CurationRow({ curation, onDelete }: { curation: Curation | null; onDele
         />
       </td>
       <td style={{ padding: '10px 8px' }}>
-        <select
+        <input
           value={activeTag}
           onChange={e => setActiveTag(e.target.value)}
-          style={{ border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl', background: '#fff', color: '#0c1a35' }}
-        >
-          {STYLE_TAG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+          placeholder="כגון: שחור וזהב / Modern"
+          style={{ width: 170, border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl', background: '#fff', color: '#0c1a35' }}
+        />
+        {activeTag && lookTagCounts && (
+          <div style={{ fontSize: 11, color: '#6b7280', marginTop: 3 }}>
+            {lookTagCounts[activeTag] != null
+              ? `${lookTagCounts[activeTag]} מוצרים`
+              : '— אין נתונים'}
+          </div>
+        )}
       </td>
       <td style={{ padding: '10px 8px' }}>
         <input
@@ -2473,15 +2472,29 @@ function CurationRow({ curation, onDelete }: { curation: Curation | null; onDele
 }
 
 function CurationsTab() {
-  const [curations, setCurations] = useState<Curation[]>([]);
-  const [loading, setLoading]     = useState(true);
-  const [newRows, setNewRows]     = useState(0);
+  const [curations, setCurations]         = useState<Curation[]>([]);
+  const [loading, setLoading]             = useState(true);
+  const [newRows, setNewRows]             = useState(0);
+  const [lookTagCounts, setLookTagCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     async function load() {
       try {
         const snap = await getDocs(collection(db, 'curations'));
-        setCurations(snap.docs.map(d => ({ id: d.id, ...d.data() } as Curation)));
+        const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Curation));
+        setCurations(list);
+
+        // Fetch lookTag counts for each active tag
+        const activeTags = [...new Set(list.map(c => c.activeTag).filter(Boolean))];
+        const counts: Record<string, number> = {};
+        await Promise.all(activeTags.map(async tag => {
+          try {
+            const q = query(collection(db, 'products'), where('lookTag', '==', tag));
+            const countSnap = await getCountFromServer(q);
+            counts[tag] = countSnap.data().count;
+          } catch { /* silent */ }
+        }));
+        setLookTagCounts(counts);
       } catch { /* silent */ }
       finally { setLoading(false); }
     }
@@ -2517,7 +2530,7 @@ function CurationsTab() {
               </tr>
             </thead>
             <tbody>
-              {curations.map(c => <CurationRow key={c.id} curation={c} />)}
+              {curations.map(c => <CurationRow key={c.id} curation={c} lookTagCounts={lookTagCounts} />)}
               {Array.from({ length: newRows }).map((_, i) => (
                 <CurationRow key={`new-${i}`} curation={null} onDelete={() => setNewRows(n => Math.max(0, n - 1))} />
               ))}

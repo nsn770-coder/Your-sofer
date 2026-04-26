@@ -43,6 +43,7 @@ interface Product {
   nusach?: string;
   level?: string;
   styleTag?: string[];
+  lookTag?: string;
 }
 
 interface Curation {
@@ -860,10 +861,9 @@ export default function CategoryClient({ category }: { category: string }) {
     fetchSoferim();
   }, [allLoaded, category]);
 
-  // Fetch curation for sub-categories that have one (e.g. נטילת ידיים)
+  // Fetch curation for this category or sub-category
   useEffect(() => {
-    const key = subcatOverrideForFetch;
-    if (!key) { setCuration(null); setStyleTagFilter(''); return; }
+    const key = subcatOverrideForFetch ?? category;
     getDoc(doc(db, 'curations', key))
       .then(snap => {
         if (snap.exists()) {
@@ -876,7 +876,7 @@ export default function CategoryClient({ category }: { category: string }) {
         }
       })
       .catch(() => { setCuration(null); setStyleTagFilter(''); });
-  }, [subcatOverrideForFetch]);
+  }, [subcatOverrideForFetch, category]);
 
   useEffect(() => {
     setFilters(EMPTY_FILTERS);
@@ -943,13 +943,33 @@ export default function CategoryClient({ category }: { category: string }) {
       .map(([sub]) => sub);
   }, [allLoaded]);
 
+  // Determine whether the active curation uses styleTag or lookTag
+  const STYLE_TAG_VALUES = new Set(['Modern', 'Heritage', 'Steel']);
+  const isLookTagMode = curation !== null && !!curation.activeTag && !STYLE_TAG_VALUES.has(curation.activeTag);
+
+  // Compute available lookTags from loaded products (for dynamic filter buttons)
+  const availableLookTags = useMemo(() => {
+    if (!isLookTagMode) return [];
+    const counts: Record<string, number> = {};
+    for (const p of allLoaded) {
+      if (p.lookTag) counts[p.lookTag] = (counts[p.lookTag] ?? 0) + 1;
+    }
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([tag]) => tag);
+  }, [allLoaded, isLookTagMode]);
+
   const filtered = useMemo(() => {
     let result = applyFilters(allLoaded, filters);
     if (subCategoryFilter) result = result.filter(p => p.subCategory === subCategoryFilter);
     if (category === 'מתנות' && catFilter !== 'הכל') result = result.filter(p => p.cat === catFilter);
-    if (styleTagFilter) result = result.filter(p => p.styleTag?.includes(styleTagFilter));
+    if (styleTagFilter) {
+      if (isLookTagMode) {
+        result = result.filter(p => p.lookTag === styleTagFilter);
+      } else {
+        result = result.filter(p => p.styleTag?.includes(styleTagFilter));
+      }
+    }
     return applySort(result, sortBy);
-  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter, styleTagFilter]);
+  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter, styleTagFilter, isLookTagMode]);
 
   const attrOptionsDesktop = useMemo(() =>
     ATTR_KEYS.reduce((acc, key) => {
@@ -1211,15 +1231,18 @@ export default function CategoryClient({ category }: { category: string }) {
             </div>
           </div>
 
-          {/* Style filter buttons — shown when a curation is active */}
+          {/* Style / look filter buttons — shown when a curation is active */}
           {curation && (
             <div dir="rtl" style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-              {([
-                { label: 'הכל',     value: '' },
-                { label: 'מודרני',  value: 'Modern' },
-                { label: 'קלאסי',   value: 'Heritage' },
-                { label: 'נירוסטה', value: 'Steel' },
-              ] as { label: string; value: string }[]).map(({ label, value }) => (
+              {(isLookTagMode
+                ? [{ label: 'הכל', value: '' }, ...availableLookTags.map(t => ({ label: t, value: t }))]
+                : [
+                    { label: 'הכל',     value: '' },
+                    { label: 'מודרני',  value: 'Modern' },
+                    { label: 'קלאסי',   value: 'Heritage' },
+                    { label: 'נירוסטה', value: 'Steel' },
+                  ]
+              ).map(({ label, value }) => (
                 <button
                   key={value}
                   onClick={() => setStyleTagFilter(value)}
