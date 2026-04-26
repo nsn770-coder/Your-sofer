@@ -7,6 +7,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
 import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
+import * as pixel from '@/lib/metaPixel';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -838,6 +839,7 @@ export default function ProductClient() {
           const p = { id: snap.id, ...snap.data() } as Product;
           setProduct(p);
           trackViewItem({ item_id: p.id, item_name: p.name, price: p.price, item_category: p.cat });
+          pixel.viewContent({ id: p.id, name: p.name, price: p.price, category: p.cat });
           if (p.cat) {
             const relSnap = await getDocs(query(collection(db, 'products'), where('cat', '==', p.cat), orderBy('priority', 'desc'), limit(5)));
             const relData: Product[] = [];
@@ -908,6 +910,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafId || undefined, selectedKlafName: selectedKlafName || undefined, embroideryText: embroideryText || undefined });
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
+    pixel.addToCart({ id: product!.id, name: product!.name, price: product!.price, quantity: qty });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
     if (fromWizardParam || fromWizardLS) setShowWizardModal(true);

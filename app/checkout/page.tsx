@@ -6,6 +6,7 @@ import { useShaliach } from '../contexts/ShaliachContext';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import * as pixel from '@/lib/metaPixel';
 
 function IconLock({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
@@ -82,6 +83,16 @@ export default function CheckoutPage() {
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // Meta Pixel — InitiateCheckout fires once when user enters checkout with items
+  useEffect(() => {
+    if (items.length === 0) return;
+    pixel.initiateCheckout(
+      items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+      total,
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (items.length === 0) {

@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Suspense } from "react";
+import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -9,6 +10,7 @@ import NavBar from "@/app/components/navigation/NavBar";
 import Footer from "@/app/components/Footer";
 import ShiraChat from "@/app/components/chat/ShiraChat";
 import GTMLoader from "@/app/components/GTMLoader";
+import MetaPixelPageView from "@/app/components/MetaPixelPageView";
 import WizardStickyBar from "@/app/components/WizardStickyBar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -83,6 +85,27 @@ export default function RootLayout({
         <WizardStickyBar />
         <ShiraChat />
         <SpeedInsights />
+
+        {/* ── Meta Pixel ── */}
+        {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+          <>
+            <Script id="meta-pixel" strategy="afterInteractive">{`
+              !function(f,b,e,v,n,t,s){
+              if(f.fbq)return;n=f.fbq=function(){
+              n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window,document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init','${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
+              fbq('track','PageView');
+            `}</Script>
+            <Suspense fallback={null}>
+              <MetaPixelPageView />
+            </Suspense>
+          </>
+        )}
       </body>
     </html>
   );

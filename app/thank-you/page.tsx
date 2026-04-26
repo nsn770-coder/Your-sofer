@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import * as pixel from '@/lib/metaPixel';
 
 function ThankYouContent() {
   const router = useRouter();
@@ -40,6 +41,15 @@ function ThankYouContent() {
             quantity: i.quantity,
           })),
         });
+
+        // Meta Pixel purchase event
+        pixel.purchase(
+          order.orderNumber,
+          (order.items || []).map((i: { id: string; name: string; price: number; quantity: number }) => ({
+            id: i.id, name: i.name, price: i.price, quantity: i.quantity,
+          })),
+          order.total,
+        );
 
         // שלח מייל ללקוח
         await fetch('/api/send-order-email', {

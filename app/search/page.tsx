@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import ProductCard from '@/components/ui/ProductCard';
+import { search as pixelSearch } from '@/lib/metaPixel';
 
 interface Product {
   id: string;
@@ -58,6 +59,7 @@ export default function SearchPage() {
   }, []);
 
   useEffect(() => { doSearch(q); }, [q, doSearch]);
+  useEffect(() => { if (q) pixelSearch(q); }, [q]);
 
   const totalPages = Math.ceil(results.length / PAGE_SIZE);
   const pageResults = results.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
