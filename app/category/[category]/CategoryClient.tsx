@@ -1050,18 +1050,28 @@ export default function CategoryClient({ category }: { category: string }) {
       )}
 
       {/* ── Curation banner ── */}
-      {curation && (curation.bannerTitle || curation.bannerImageUrl) && (
+      {curation && (
         <div dir="rtl" style={{ position: 'relative', overflow: 'hidden', background: '#0c1a35' }}>
-          {curation.bannerImageUrl && (
+          {/* Background: image if available, otherwise dark gradient */}
+          {curation.bannerImageUrl ? (
             <img
               src={curation.bannerImageUrl}
-              alt={curation.bannerTitle}
+              alt={styleTagFilter || curation.bannerTitle}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }}
             />
+          ) : (
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0c1a35 0%, #1a3060 100%)' }} />
           )}
           <div style={{ position: 'relative', maxWidth: '80rem', margin: '0 auto', padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0 }}>{curation.bannerTitle}</h2>
-            {curation.activeTag && (
+            {/* Title: show selected look name when a filter is active, otherwise the curation banner title */}
+            <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0 }}>
+              {styleTagFilter && isLookTagMode ? styleTagFilter : curation.bannerTitle}
+            </h2>
+            {styleTagFilter && isLookTagMode ? (
+              <span style={{ color: 'rgba(184,151,42,0.9)', fontSize: 13, fontWeight: 600 }}>
+                לוק: {styleTagFilter}
+              </span>
+            ) : curation.activeTag && !isLookTagMode && (
               <span style={{ color: 'rgba(184,151,42,0.9)', fontSize: 13, fontWeight: 600 }}>
                 {curation.activeTag === 'Modern' ? 'קולקציית מודרני' : curation.activeTag === 'Heritage' ? 'קולקציית קלאסי' : curation.activeTag === 'Steel' ? 'קולקציית נירוסטה' : ''}
               </span>
