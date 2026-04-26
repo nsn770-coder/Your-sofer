@@ -1084,7 +1084,9 @@ export default function CategoryClient({ category }: { category: string }) {
             const activeBannerUrl = (styleTagFilter && isLookTagMode && lookCurationMap[styleTagFilter]?.bannerImageUrl)
               ? lookCurationMap[styleTagFilter].bannerImageUrl
               : curation.bannerImageUrl;
-            const activeLookName = styleTagFilter && isLookTagMode ? styleTagFilter : curation.bannerTitle;
+            const activeLookName = styleTagFilter && isLookTagMode
+              ? (lookCurationMap[styleTagFilter]?.bannerTitle ?? styleTagFilter)
+              : curation.bannerTitle;
             return (
               <>
                 {activeBannerUrl && (
@@ -1283,7 +1285,7 @@ export default function CategoryClient({ category }: { category: string }) {
           {curation && (
             <div dir="rtl" style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
               {(isLookTagMode
-                ? [{ label: 'הכל', value: '' }, ...availableLookTags.map(t => ({ label: t, value: t }))]
+                ? [{ label: 'הכל', value: '' }, ...availableLookTags.map(t => ({ label: lookCurationMap[t]?.bannerTitle ?? t, value: t }))]
                 : [
                     { label: 'הכל',     value: '' },
                     { label: 'מודרני',  value: 'Modern' },
