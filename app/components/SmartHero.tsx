@@ -41,7 +41,10 @@ type BtnStyle = 'gold' | 'outline' | 'ghost';
 interface HeroButton { label: string; icon: React.ReactNode; action: () => void; style: BtnStyle; }
 
 // ─── תמונת הסופר — העלה ל-Cloudinary והחלף את ה-URL הזה ─────────────────────
-const HERO_IMAGE_URL = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1400/IMG_1277.png';
+// דסקטופ — תמונת הסופר הגולמית
+const HERO_IMAGE_DESKTOP = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1400/v1777180035/IMG_1277_apvc5v.png';
+// נייד — אותה תמונה באיכות מותאמת
+const HERO_IMAGE_MOBILE  = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_750/v1777180035/IMG_1277_apvc5v.png';
 // ────────────────────────────────────────────────────────────────────────────────
 
 export default function SmartHero({ isMobile, bgImage }: {
@@ -118,14 +121,16 @@ export default function SmartHero({ isMobile, bgImage }: {
   const isMain = state === 'main';
 
   // תמונת הרקע: עדיפות ל-bgImage מ-Firestore, אחרת תמונת הסופר הקבועה
-  const resolvedBg = bgImage ? optimizeCloudinaryUrl(bgImage, 1400) : HERO_IMAGE_URL;
+  const resolvedBg = bgImage
+    ? optimizeCloudinaryUrl(bgImage, isMobile ? 750 : 1400)
+    : isMobile ? HERO_IMAGE_MOBILE : HERO_IMAGE_DESKTOP;
 
   return (
     <div style={{
       position: 'relative',
       width: '100%',
-      minHeight: isMobile ? 320 : 100 + 'vh', // מסך מלא בדסקטופ
-      maxHeight: isMobile ? 460 : '100vh',
+      minHeight: isMobile ? '85vh' : '100vh',
+      maxHeight: isMobile ? '85vh' : '100vh',
       overflow: 'hidden',
       display: 'flex',
       alignItems: 'center',
@@ -248,7 +253,7 @@ export default function SmartHero({ isMobile, bgImage }: {
           flexDirection: isMobile ? 'column' : 'row',
           width: isMobile ? '100%' : 'auto',
         }}>
-          {c.buttons.map((btn, i) => (
+          {(isMobile && isMain ? c.buttons.slice(0, 1) : c.buttons).map((btn, i) => (
             <HeroBtn key={i} btn={btn} isMobile={isMobile} isPrimary={i === 0} />
           ))}
         </div>
