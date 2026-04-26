@@ -266,11 +266,19 @@ async function generateWithGemini(imageBase64, contentType, prompt) {
     generationConfig: { responseModalities: ['IMAGE', 'TEXT'] },
   };
 
-  const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 120_000); // 2-minute hard timeout
+  let res;
+  try {
+    res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -574,5 +582,10 @@ async function runPipeline() {
   if (testMode) console.log('🧪 זו הייתה ריצת בדיקה — הפעל ללא --test לריצה מלאה');
   process.exit(0);
 }
+
+process.on('unhandledRejection', (reason) => {
+  console.error('❌ unhandledRejection:', reason?.message || reason);
+  // Don't exit — let the pipeline continue
+});
 
 runPipeline().catch(e => { console.error(e); process.exit(1); });

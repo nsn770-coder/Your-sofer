@@ -89,7 +89,18 @@
       "Bash(tee /tmp/badge_scan.txt)",
       "Bash(wait)",
       "Read(//tmp/**)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(kill -0 19016)",
+      "Bash(find .next/static/chunks -name \"*.js\" -exec wc -c {} +)",
+      "Bash(awk -F: '{print $1}')",
+      "Bash(sort -k5 -rn)",
+      "Bash(xargs wc:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(winget upgrade:*)",
+      "Bash(kill -0 15548)",
+      "Bash(kill -0 8952)",
+      "Bash(kill -0 31076)",
+      "Bash(kill -0 4140)"
     ]
   }
 }
