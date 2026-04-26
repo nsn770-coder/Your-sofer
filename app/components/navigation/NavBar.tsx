@@ -135,7 +135,7 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
         title: "טליתות וציציות",
         items: [
           { label: "כל הטליתות", cat: "טליתות וציציות" },
-          { label: "טליתות", cat: "טליתות וציציות", filter: "טליתות" },
+          { label: "טליתות", cat: "טליתות וציציות", filter: "טליתות חתן" },
           { label: "ציציות", cat: "טליתות וציציות", filter: "ציציות" },
         ]
       },
