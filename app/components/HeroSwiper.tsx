@@ -135,7 +135,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
               style={{
                 position: 'absolute', bottom: 20, left: 20,
                 background: 'rgba(255, 252, 240, 0.55)', border: '2px solid #1a2744',
-                borderRadius: 8, padding: '10px 22px',
+                borderRadius: 0, padding: '10px 22px',
                 fontSize: isMobile ? 12 : 13, fontWeight: 600, color: '#1a2744', cursor: 'pointer',
                 backdropFilter: 'blur(4px)',
               }}

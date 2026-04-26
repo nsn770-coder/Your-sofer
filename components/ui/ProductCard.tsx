@@ -196,7 +196,7 @@ export default function ProductCard({
           }}
           style={{
             background: '#b8972a', color: '#fff', border: 'none',
-            borderRadius: 10, padding: '11px 26px',
+            borderRadius: 0, padding: '11px 26px',
             fontWeight: 700, fontSize: 14, cursor: 'pointer',
             whiteSpace: 'nowrap',
           }}
@@ -209,7 +209,7 @@ export default function ProductCard({
             background: 'rgba(255,252,240,0.08)',
             color: 'rgba(255,252,240,0.75)',
             border: '1px solid rgba(255,252,240,0.2)',
-            borderRadius: 10, padding: '11px 22px',
+            borderRadius: 0, padding: '11px 22px',
             fontWeight: 600, fontSize: 14, cursor: 'pointer',
             whiteSpace: 'nowrap',
           }}

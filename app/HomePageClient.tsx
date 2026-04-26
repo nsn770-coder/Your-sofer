@@ -17,7 +17,7 @@ const HeroSwiper = dynamic(() => import('./components/HeroSwiper'), {
       <div
         className="h-[260px] md:h-[360px]"
         style={{
-          width: '92%', margin: '0 auto', borderRadius: 12, overflow: 'hidden',
+          width: '92%', margin: '0 auto', borderRadius: 0, overflow: 'hidden',
           backgroundImage: `url(${HERO_PLACEHOLDER})`,
           backgroundSize: 'cover', backgroundPosition: 'center',
         }}
@@ -145,7 +145,7 @@ function SubSlot({ imgUrl, label, href }: { imgUrl: string; label: string; href:
     <Link href={href} className="block group">
       <div
         className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 mb-1.5"
-        style={{ borderRadius: 8 }}
+        style={{ borderRadius: 0 }}
       >
         {imgUrl ? (
           <Image
@@ -192,7 +192,7 @@ function CategoryCard({
       className="flex flex-col"
       style={{
         background: '#ffffff',
-        borderRadius: 8,
+        borderRadius: 0,
         boxShadow: '0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
         padding: 16,
         height: '100%',
@@ -232,7 +232,7 @@ function SkeletonCategoryCard() {
     <div
       style={{
         background: '#ffffff',
-        borderRadius: 8,
+        borderRadius: 0,
         boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
         padding: 16,
         height: '100%',
@@ -580,7 +580,7 @@ export default function HomePageClient() {
       {wizardOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, backdropFilter: 'blur(4px)', background: 'rgba(0,0,0,0.55)' }}
           onClick={closeWizard}>
-          <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 480, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden' }}
+          <div style={{ background: '#fff', borderRadius: 0, width: '100%', maxWidth: 480, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden' }}
             onClick={e => e.stopPropagation()}>
             <div style={{ background: '#0c1a35', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
@@ -608,7 +608,7 @@ export default function HomePageClient() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     {[{ val: 'self' as const, label: '👤 לי עצמי' }, { val: 'gift' as const, label: '🎁 מתנה לאחר' }].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardFor(opt.val); setWizardStep(1); }}
-                        style={{ padding: '18px 12px', borderRadius: 14, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', transition: 'all 0.15s' }}
+                        style={{ padding: '18px 12px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         {opt.label}
@@ -627,7 +627,7 @@ export default function HomePageClient() {
                       { val: 'high' as const, label: 'מעל 1,000 ₪',  sub: 'מוצרים מהדרין מובחרים' },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardBudget(opt.val); setWizardStep(2); }}
-                        style={{ padding: '14px 18px', borderRadius: 14, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
@@ -647,7 +647,7 @@ export default function HomePageClient() {
                       { val: 'mehudar_plus' as const, label: 'מהודר בתכלית', sub: 'רמת הכשרות הגבוהה ביותר' },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardKashrut(opt.val); setWizardStep(3); fetchWizardResults(wizardBudget, opt.val); }}
-                        style={{ padding: '14px 18px', borderRadius: 14, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
@@ -665,18 +665,18 @@ export default function HomePageClient() {
                     <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
                     לא נמצאו מוצרים מתאימים לפי הסינון.
                     <br />
-                    <button onClick={() => router.push('/')} style={{ marginTop: 16, background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
+                    <button onClick={() => router.push('/')} style={{ marginTop: 16, background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
                   </div>
                 ) : (
                   <>
                     <div style={{ display: 'grid', gap: 12, marginBottom: 20 }}>
                       {wizardResults.map(p => (
                         <div key={p.id} onClick={() => { closeWizard(); router.push(`/product/${p.id}`); }}
-                          style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 14px', borderRadius: 12, border: '1px solid #eee', cursor: 'pointer', background: '#fafafa', transition: 'all 0.15s' }}
+                          style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 14px', borderRadius: 0, border: '1px solid #eee', cursor: 'pointer', background: '#fafafa', transition: 'all 0.15s' }}
                           onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLDivElement).style.background = '#fffbf0'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#eee'; (e.currentTarget as HTMLDivElement).style.background = '#fafafa'; }}>
                           {(p.imgUrl || p.image_url) && (
-                            <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 100)} alt={p.name} loading="lazy" style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                            <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 100)} alt={p.name} loading="lazy" style={{ width: 60, height: 60, borderRadius: 0, objectFit: 'cover', flexShrink: 0 }} />
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
@@ -686,7 +686,7 @@ export default function HomePageClient() {
                         </div>
                       ))}
                     </div>
-                    <button onClick={closeWizard} style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 12, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                    <button onClick={closeWizard} style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                       המשך לגלישה
                     </button>
                   </>
@@ -750,7 +750,7 @@ return (
             <div key={c.label} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               gap: 4, padding: isMobile ? '14px 8px' : '16px 12px',
-              background: '#fafaf8', borderRadius: 14,
+              background: '#fafaf8', borderRadius: 0,
               border: '1.5px solid #ede8df',
               boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
             }}>
@@ -794,7 +794,7 @@ return (
               <div key={cat.name}
                 onClick={() => router.push(cat.href)}
                 style={{
-                  borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
+                  borderRadius: 0, overflow: 'hidden', cursor: 'pointer',
                   background: '#fff',
                   boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
@@ -802,11 +802,11 @@ return (
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.14)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 10px rgba(0,0,0,0.07)'; }}
               >
-                <div style={{ height: isMobile ? 180 : 220, overflow: 'hidden', borderRadius: '16px 16px 0 0', position: 'relative' }}>
+                <div style={{ height: isMobile ? 180 : 220, overflow: 'hidden', borderRadius: 0, position: 'relative' }}>
                   {cat.img ? (
                     <Image fill loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 220px" />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4', borderRadius: '16px 16px 0 0' }}>{cat.emoji}</div>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4', borderRadius: 0 }}>{cat.emoji}</div>
                   )}
                 </div>
                 <div style={{ padding: 10, background: '#fff', textAlign: 'center' }}>
@@ -825,7 +825,7 @@ return (
             <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
             <button
               onClick={() => router.push('/category/יודאיקה')}
-              style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: isMobile ? '9px 18px' : '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+              style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: isMobile ? '9px 18px' : '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
             >
               צפה במוצרים הנמכרים ביותר ←
             </button>
@@ -835,7 +835,7 @@ return (
               const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
               return (
                 <div key={p.id}
-                  style={{ width: 160, flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                  style={{ width: 160, flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 0, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
                   onClick={() => router.push(`/product/${p.id}`)}
                 >
                   <div style={{ height: 140, overflow: 'hidden', position: 'relative' }}>
@@ -855,7 +855,7 @@ return (
                         e.stopPropagation();
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
                       }}
-                      style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 99, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
+                      style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
                     >
                       הוסף לסל
                     </button>
@@ -871,7 +871,7 @@ return (
       <div style={{ background: '#FFFFFF', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
         <a
           href="/category/יודאיקה"
-          style={{ display: 'inline-block', background: '#0c1a35', color: '#fff', borderRadius: 12, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
+          style={{ display: 'inline-block', background: '#0c1a35', color: '#fff', borderRadius: 0, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
         >
           לכל המוצרים ←
         </a>
@@ -894,7 +894,7 @@ return (
                 background: '#0c1a35',
                 color: '#fff',
                 border: 'none',
-                borderRadius: 12,
+                borderRadius: 0,
                 padding: isMobile ? '12px 22px' : '13px 28px',
                 fontSize: isMobile ? 14 : 15,
                 fontWeight: 700,
@@ -932,7 +932,7 @@ return (
                 onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
                 style={{ width: 130, flexShrink: 0, cursor: 'pointer' }}
               >
-                <div style={{ height: 100, width: '100%', borderRadius: 12, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
+                <div style={{ height: 100, width: '100%', borderRadius: 0, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
                   {img ? (
                     <Image fill loading="lazy" src={img} alt={cat.slug} style={{ objectFit: 'cover' }} sizes="130px" />
                   ) : (
@@ -970,7 +970,7 @@ return (
                   <div key={i} style={{
                     background: '#fff',
                     border: '1px solid #ebebeb',
-                    borderRadius: 14,
+                    borderRadius: 0,
                     padding: isMobile ? '18px 16px' : '22px 24px',
                     boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
                   }}>

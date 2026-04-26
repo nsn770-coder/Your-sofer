@@ -179,7 +179,7 @@ export default function SmartHero({ isMobile, bgImage }: {
         {!isMain && (
           <button onClick={() => switchState('main')} style={{
             background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)',
-            color: '#ccc', borderRadius: 20, padding: '5px 12px', fontSize: 11,
+            color: '#ccc', borderRadius: 0, padding: '5px 12px', fontSize: 11,
             cursor: 'pointer', marginBottom: 20,
             display: 'inline-flex', alignItems: 'center', gap: 5, transition: 'background 0.2s',
           }}
@@ -335,7 +335,7 @@ function HeroBtn({
       style={{
         padding: isMobile ? '13px 20px' : isPrimary ? '13px 30px' : '11px 22px',
         fontSize: isMobile ? 13 : isPrimary ? 15 : 13,
-        borderRadius: 8,
+        borderRadius: 0,
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         display: 'flex', alignItems: 'center', gap: 7,

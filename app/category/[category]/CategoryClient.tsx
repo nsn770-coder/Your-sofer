@@ -337,7 +337,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
             key={label}
             href={dest}
             style={{
-              flexShrink: 0, width: 88, height: 114, borderRadius: 12, overflow: 'hidden',
+              flexShrink: 0, width: 88, height: 114, borderRadius: 0, overflow: 'hidden',
               position: 'relative', display: 'block', textDecoration: 'none',
               background: img ? '#000' : 'linear-gradient(135deg, #0c1a35, #1a3060)',
               boxShadow: isActive ? '0 0 0 2.5px #b8972a, 0 4px 12px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.12)',

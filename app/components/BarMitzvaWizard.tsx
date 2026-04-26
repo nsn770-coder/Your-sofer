@@ -147,7 +147,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
               color: '#fff',
               fontWeight: 700,
               fontSize: 15,
-              borderRadius: 10,
+              borderRadius: 0,
               padding: '12px 28px',
               textDecoration: 'none',
             }}
@@ -184,12 +184,12 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
             </div>
 
             {/* Progress bar */}
-            <div style={{ height: 5, borderRadius: 99, background: borderColor, overflow: 'hidden' }}>
+            <div style={{ height: 5, borderRadius: 0, background: borderColor, overflow: 'hidden' }}>
               <div style={{
                 height: '100%',
                 width: `${(current / TOTAL) * 100}%`,
                 background: accentGold,
-                borderRadius: 99,
+                borderRadius: 0,
                 transition: 'width 0.4s ease',
               }} />
             </div>
@@ -208,7 +208,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
                     key={idx}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 10,
-                      padding: '8px 10px', borderRadius: 8,
+                      padding: '8px 10px', borderRadius: 0,
                       opacity: 0.85,
                     }}
                   >
@@ -236,7 +236,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
                     style={{
                       background: currentBg,
                       border: `1.5px solid ${currentBorder}`,
-                      borderRadius: 10,
+                      borderRadius: 0,
                       padding: isPage ? '14px 16px' : '12px 14px',
                     }}
                   >
@@ -258,7 +258,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
                           background: isPage ? '#0c1a35' : accentGold,
                           color: '#fff',
                           border: 'none',
-                          borderRadius: 8,
+                          borderRadius: 0,
                           padding: '8px 14px',
                           fontSize: 13,
                           fontWeight: 700,
@@ -279,7 +279,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
                   key={idx}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '8px 10px', borderRadius: 8,
+                    padding: '8px 10px', borderRadius: 0,
                     opacity: 0.4,
                   }}
                 >
@@ -326,7 +326,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
         dir="rtl"
         style={{
           background: bg,
-          borderRadius: 16,
+          borderRadius: 0,
           border: `1px solid ${borderColor}`,
           padding: '24px 20px',
           marginBottom: 24,

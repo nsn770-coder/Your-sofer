@@ -38,7 +38,7 @@ function ImageCard({
       onClick={onClick}
       style={{
         height,
-        borderRadius: 12,
+        borderRadius: 0,
         overflow: 'hidden',
         cursor: 'pointer',
         position: 'relative',
@@ -192,7 +192,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
     background: 'rgba(255,252,240,0.15)',
     border: '2px solid rgba(255,252,240,0.6)',
     color: '#fff',
-    borderRadius: 12,
+    borderRadius: 0,
     padding: '14px 20px',
     fontSize: isMobile ? 15 : 16,
     fontWeight: 600,
@@ -216,7 +216,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
       <div
         style={{
           background: '#1a2744',
-          borderRadius: 16,
+          borderRadius: 0,
           padding: isMobile ? '24px 16px' : '32px 40px',
           direction: 'rtl',
           maxWidth: 560,
@@ -268,7 +268,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
               style={{
                 marginTop: 12,
                 height: 67,
-                borderRadius: 12,
+                borderRadius: 0,
                 overflow: 'hidden',
                 cursor: 'pointer',
                 border: '1px solid rgba(184,151,42,0.45)',

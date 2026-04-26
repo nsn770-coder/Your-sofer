@@ -18,7 +18,7 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
       onClick={onClose}
     >
       <div
-        style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 440, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden', direction: 'rtl' }}
+        style={{ background: '#fff', borderRadius: 0, width: '100%', maxWidth: 440, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden', direction: 'rtl' }}
         onClick={e => e.stopPropagation()}
       >
         <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a2d50)', padding: '22px 24px', position: 'relative', textAlign: 'center' }}>
@@ -29,7 +29,7 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
           <div style={{ fontSize: 36, marginBottom: 8 }}>🏆</div>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>הצטרפו למועדון הלקוחות</div>
           <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>קבלו מבצעים ומוצרים חדשים לפני כולם</div>
-          <div style={{ marginTop: 10, background: '#b8972a', color: '#0c1a35', borderRadius: 20, padding: '5px 16px', fontSize: 13, fontWeight: 900, display: 'inline-block' }}>קבל 5% הנחה על ההזמנה הראשונה</div>
+          <div style={{ marginTop: 10, background: '#b8972a', color: '#0c1a35', borderRadius: 0, padding: '5px 16px', fontSize: 13, fontWeight: 900, display: 'inline-block' }}>קבל 5% הנחה על ההזמנה הראשונה</div>
         </div>
         <div style={{ padding: '24px 24px 28px' }}>
           {status === 'success' ? (
@@ -37,7 +37,7 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
               <div style={{ fontSize: 40, marginBottom: 10 }}>🎉</div>
               <div style={{ fontSize: 16, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>נרשמתם בהצלחה!</div>
               <div style={{ fontSize: 13, color: '#666' }}>נעדכן אתכם ראשונים על מוצרים חדשים ומבצעים.</div>
-              <button onClick={onClose} style={{ marginTop: 18, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 14, fontWeight: 900, cursor: 'pointer' }}>סגור</button>
+              <button onClick={onClose} style={{ marginTop: 18, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '10px 28px', fontSize: 14, fontWeight: 900, cursor: 'pointer' }}>סגור</button>
             </div>
           ) : (
             <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -47,14 +47,14 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
                 onChange={e => { setEmail(e.target.value); setStatus('idle'); }}
                 placeholder="כתובת המייל שלכם"
                 required
-                style={{ border: '2px solid #e0e0e0', borderRadius: 10, padding: '12px 16px', fontSize: 14, outline: 'none', direction: 'rtl', width: '100%', boxSizing: 'border-box' }}
+                style={{ border: '2px solid #e0e0e0', borderRadius: 0, padding: '12px 16px', fontSize: 14, outline: 'none', direction: 'rtl', width: '100%', boxSizing: 'border-box' }}
               />
               {status === 'duplicate' && <div style={{ fontSize: 12, color: '#b8972a', fontWeight: 600 }}>כתובת המייל הזו כבר רשומה 😊</div>}
               {status === 'error' && <div style={{ fontSize: 12, color: '#e74c3c', fontWeight: 600 }}>שגיאה בהרשמה, נסו שוב.</div>}
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 900, cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.7 : 1 }}
+                style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '13px', fontSize: 15, fontWeight: 900, cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.7 : 1 }}
               >
                 {status === 'loading' ? '⏳ שולח...' : '✉️ הצטרפו עכשיו ←'}
               </button>

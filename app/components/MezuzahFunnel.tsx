@@ -139,7 +139,7 @@ function StepButton({ children, onClick, selected = false }: { children: React.R
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        flex: '1 1 0', padding: '0 0 14px', borderRadius: 16,
+        flex: '1 1 0', padding: '0 0 14px', borderRadius: 0,
         border: `2px solid ${active ? '#b8972a' : 'rgba(255,255,255,0.25)'}`,
         background: active ? '#f8f4ec' : '#ffffff',
         cursor: 'pointer', transition: 'all 0.18s ease',
@@ -188,7 +188,7 @@ function KlafCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: '#fff', borderRadius: 14,
+        background: '#fff', borderRadius: 0,
         border: `2px solid ${hovered ? '#b8972a' : '#ede8df'}`,
         overflow: 'hidden', transition: 'all 0.2s ease',
         boxShadow: hovered ? '0 8px 28px rgba(184,151,42,0.18)' : '0 2px 10px rgba(0,0,0,0.05)',
@@ -226,7 +226,7 @@ function KlafCard({
           </div>
         )}
         {hasSale && (
-          <div style={{ position: 'absolute', top: 8, right: 8, background: '#c0392b', color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 20 }}>
+          <div style={{ position: 'absolute', top: 8, right: 8, background: '#c0392b', color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 0 }}>
             -{savePct}%
           </div>
         )}
@@ -252,22 +252,22 @@ function KlafCard({
         {quantity === 0 ? (
           <button
             onClick={() => onAdd(product)}
-            style={{ marginTop: 'auto', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'background 0.15s' }}
+            style={{ marginTop: 'auto', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'background 0.15s' }}
             onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1a2d50')}
             onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#0c1a35')}
           >
             <IconCart size={14} /> הוסף לסל
           </button>
         ) : (
-          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0ebe0', borderRadius: 10, padding: '4px 8px' }}>
+          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0ebe0', borderRadius: 0, padding: '4px 8px' }}>
             <button
               onClick={() => onIncrease(product)}
-              style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: '#0c1a35', color: '#fff', fontSize: 20, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
+              style={{ width: 32, height: 32, borderRadius: 0, border: 'none', background: '#0c1a35', color: '#fff', fontSize: 20, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
             >+</button>
             <span style={{ fontWeight: 900, fontSize: 15, color: '#0c1a35' }}>{quantity}</span>
             <button
               onClick={() => onDecrease(product.id)}
-              style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: '#0c1a35', color: '#fff', fontSize: 20, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
+              style={{ width: 32, height: 32, borderRadius: 0, border: 'none', background: '#0c1a35', color: '#fff', fontSize: 20, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
             >−</button>
           </div>
         )}
@@ -283,7 +283,7 @@ function FinishedBanner({ onYes, onNo }: { onYes: () => void; onNo: () => void }
     <div style={{
       position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
       zIndex: 800, background: '#0c1a35', color: '#fff',
-      borderRadius: 20, padding: '16px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
+      borderRadius: 0, padding: '16px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
       display: 'flex', alignItems: 'center', gap: 16, direction: 'rtl',
       animation: 'slideUp 0.3s ease',
       whiteSpace: 'nowrap',
@@ -292,11 +292,11 @@ function FinishedBanner({ onYes, onNo }: { onYes: () => void; onNo: () => void }
       <span style={{ fontSize: 15, fontWeight: 700 }}>סיימת לבחור קלפים?</span>
       <button
         onClick={onYes}
-        style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
+        style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
       >כן, סיימתי ✓</button>
       <button
         onClick={onNo}
-        style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+        style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 0, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
       >עוד לא סיימתי</button>
     </div>
   );
@@ -309,7 +309,7 @@ function FinishedCasesBanner({ onYes, onNo }: { onYes: () => void; onNo: () => v
     <div style={{
       position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
       zIndex: 800, background: '#0c1a35', color: '#fff',
-      borderRadius: 20, padding: '16px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
+      borderRadius: 0, padding: '16px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
       display: 'flex', alignItems: 'center', gap: 16, direction: 'rtl',
       animation: 'slideUp 0.3s ease',
       whiteSpace: 'nowrap',
@@ -318,11 +318,11 @@ function FinishedCasesBanner({ onYes, onNo }: { onYes: () => void; onNo: () => v
       <span style={{ fontSize: 15, fontWeight: 700 }}>סיימת לבחור בתי מזוזה?</span>
       <button
         onClick={onYes}
-        style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
+        style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
       >כן, לסל</button>
       <button
         onClick={onNo}
-        style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+        style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 0, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
       >עוד לא, אני רוצה לראות מבחר מלא</button>
     </div>
   );
@@ -354,7 +354,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, backdropFilter: 'blur(6px)', background: 'rgba(0,0,0,0.55)' }} onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 24, width: '100%', maxWidth: 520, boxShadow: '0 32px 80px rgba(0,0,0,0.3)', overflow: 'hidden', direction: 'rtl', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+      <div style={{ background: '#fff', borderRadius: 0, width: '100%', maxWidth: 520, boxShadow: '0 32px 80px rgba(0,0,0,0.3)', overflow: 'hidden', direction: 'rtl', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
         <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2d50 100%)', padding: '28px 24px', textAlign: 'center', position: 'relative' }}>
           <button onClick={onClose} style={{ position: 'absolute', top: 14, left: 14, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', width: 34, height: 34, borderRadius: '50%', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
@@ -363,7 +363,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
             </div>
           </div>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 10 }}>נוסף לסל! עכשיו בחר גם בית מזוזה</div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#b8972a', color: '#0c1a35', borderRadius: 20, padding: '7px 20px', fontSize: 14, fontWeight: 900 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#b8972a', color: '#0c1a35', borderRadius: 0, padding: '7px 20px', fontSize: 14, fontWeight: 900 }}>
             <IconGift size={16} color="#0c1a35" /> 15% הנחה על בתי מזוזה עכשיו
           </div>
         </div>
@@ -371,11 +371,11 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
           {loading ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 16 }}>
               {[1,2,3,4].map(i => (
-                <div key={i} style={{ borderRadius: 12, overflow: 'hidden', background: '#f5f5f5' }}>
+                <div key={i} style={{ borderRadius: 0, overflow: 'hidden', background: '#f5f5f5' }}>
                   <div style={{ paddingTop: '100%', background: '#ebebeb' }} />
                   <div style={{ padding: 12 }}>
-                    <div style={{ height: 12, background: '#e0e0e0', borderRadius: 4, marginBottom: 8 }} />
-                    <div style={{ height: 10, background: '#e0e0e0', borderRadius: 4, width: '60%' }} />
+                    <div style={{ height: 12, background: '#e0e0e0', borderRadius: 0, marginBottom: 8 }} />
+                    <div style={{ height: 10, background: '#e0e0e0', borderRadius: 0, width: '60%' }} />
                   </div>
                 </div>
               ))}
@@ -383,7 +383,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
           ) : cases.length > 0 ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 16 }}>
               {cases.map(p => (
-                <div key={p.id} style={{ background: '#f8f4ec', borderRadius: 14, overflow: 'hidden', border: '1.5px solid #e8dfc8', cursor: 'pointer' }} onClick={() => handleAddCase(p)}>
+                <div key={p.id} style={{ background: '#f8f4ec', borderRadius: 0, overflow: 'hidden', border: '1.5px solid #e8dfc8', cursor: 'pointer' }} onClick={() => handleAddCase(p)}>
                   {(p.imgUrl || p.image_url) && <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 400)} alt={p.name} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />}
                   <div style={{ padding: '10px 12px' }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#0c1a35', marginBottom: 4, lineHeight: 1.3 }}>{p.name}</div>
@@ -391,16 +391,16 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
                       <span style={{ fontSize: 15, fontWeight: 900, color: '#b8972a' }}>₪{Math.round(p.price * 0.85).toLocaleString('he-IL')}</span>
                       <span style={{ fontSize: 11, color: '#bbb', textDecoration: 'line-through' }}>₪{p.price?.toLocaleString('he-IL')}</span>
                     </div>
-                    <button style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '8px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>+ הוסף לסל</button>
+                    <button style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '8px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>+ הוסף לסל</button>
                   </div>
                 </div>
               ))}
             </div>
           ) : null}
-          <button onClick={() => router.push('/category/מזוזות')} style={{ width: '100%', background: 'none', border: '2px solid #0c1a35', borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <button onClick={() => router.push('/category/מזוזות')} style={{ width: '100%', background: 'none', border: '2px solid #0c1a35', borderRadius: 0, padding: '12px', fontSize: 14, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <IconArrowLeft size={14} color="#0c1a35" /> לכל בתי המזוזה
           </button>
-          <button onClick={onViewCart} style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 12, padding: '14px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <button onClick={onViewCart} style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '14px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <IconCart size={16} /> המשך לסל הקניות
           </button>
           <button onClick={onClose} style={{ width: '100%', background: 'none', border: 'none', color: '#aaa', fontSize: 12, cursor: 'pointer', textDecoration: 'underline', padding: '4px 0' }}>לא תודה, המשך ללא בית מזוזה</button>
@@ -412,7 +412,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
 
 function Tag({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
   return (
-    <span style={{ background: '#f0ebe0', borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 700, color: '#0c1a35', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+    <span style={{ background: '#f0ebe0', borderRadius: 0, padding: '4px 12px', fontSize: 12, fontWeight: 700, color: '#0c1a35', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
       {icon}{children}
     </span>
   );
@@ -545,7 +545,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
 
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#0c1a35', color: '#b8972a', borderRadius: 20, padding: '5px 16px', fontSize: 12, fontWeight: 700, marginBottom: 14, letterSpacing: 0.5 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#0c1a35', color: '#b8972a', borderRadius: 0, padding: '5px 16px', fontSize: 12, fontWeight: 700, marginBottom: 14, letterSpacing: 0.5 }}>
               <IconStar size={12} color="#b8972a" /> המוצר הנמכר ביותר
             </div>
             <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: '#0c1a35', margin: '0 0 10px', lineHeight: 1.2 }}>
@@ -563,12 +563,12 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                   </div>
                   {!isMobile && <span style={{ fontSize: 12, fontWeight: 700, color: step >= i ? '#0c1a35' : '#bbb' }}>{label}</span>}
                 </div>
-                {i < 2 && <div style={{ width: isMobile ? 24 : 44, height: 2, background: step > i ? '#b8972a' : '#e8e2d8', borderRadius: 2, transition: 'background 0.3s' }} />}
+                {i < 2 && <div style={{ width: isMobile ? 24 : 44, height: 2, background: step > i ? '#b8972a' : '#e8e2d8', borderRadius: 0, transition: 'background 0.3s' }} />}
               </div>
             ))}
           </div>
 
-          <div style={{ background: '#0c1a35', borderRadius: 24, boxShadow: '0 4px 40px rgba(0,0,0,0.18)', padding: isMobile ? '24px 16px' : '40px 48px', border: '1.5px solid rgba(184,151,42,0.25)' }}>
+          <div style={{ background: '#0c1a35', borderRadius: 0, boxShadow: '0 4px 40px rgba(0,0,0,0.18)', padding: isMobile ? '24px 16px' : '40px 48px', border: '1.5px solid rgba(184,151,42,0.25)' }}>
 
             {step === 0 && (
               <>
@@ -577,7 +577,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                 <div style={{ display: 'flex', gap: 16 }}>
                   {locationConfig.map(loc => (
                     <StepButton key={loc.key} onClick={() => handleSelectLocation(loc.key)}>
-                      <div style={{ width: '100%', height: isMobile ? 100 : 130, overflow: 'hidden', borderRadius: '14px 14px 0 0' }}>
+                      <div style={{ width: '100%', height: isMobile ? 100 : 130, overflow: 'hidden', borderRadius: 0 }}>
                         <img src={loc.img} alt={loc.label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       </div>
                       <div style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -605,12 +605,12 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                 <div style={{ display: 'flex', gap: 12 }}>
                   {nusachConfig.map(({ key, img, fallbackIcon, popular }) => (
                     <StepButton key={key} onClick={() => handleSelectNusach(key)}>
-                      <div style={{ width: '100%', height: isMobile ? 80 : 110, overflow: 'hidden', borderRadius: '14px 14px 0 0', background: '#f0ebe0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: '100%', height: isMobile ? 80 : 110, overflow: 'hidden', borderRadius: 0, background: '#f0ebe0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {img ? <img src={img} alt={key} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : fallbackIcon}
                       </div>
                       <div style={{ padding: '0 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                         <span style={{ fontSize: 14, fontWeight: 900 }}>{key}</span>
-                        {popular && <span style={{ fontSize: 10, color: '#b8972a', fontWeight: 700, background: '#fffbf0', borderRadius: 10, padding: '2px 10px', border: '1px solid #e8d8a0' }}>נפוץ</span>}
+                        {popular && <span style={{ fontSize: 10, color: '#b8972a', fontWeight: 700, background: '#fffbf0', borderRadius: 0, padding: '2px 10px', border: '1px solid #e8d8a0' }}>נפוץ</span>}
                       </div>
                     </StepButton>
                   ))}
@@ -631,7 +631,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                     <Tag>נוסח {nusach}</Tag>
                     <Tag>{sizes.join('/')} ס"מ</Tag>
                   </div>
-                  <button onClick={handleReset} style={{ background: 'none', border: '1.5px solid #e0e0e0', borderRadius: 8, padding: '5px 12px', fontSize: 12, color: '#777', cursor: 'pointer', fontWeight: 600 }}>התחל מחדש</button>
+                  <button onClick={handleReset} style={{ background: 'none', border: '1.5px solid #e0e0e0', borderRadius: 0, padding: '5px 12px', fontSize: 12, color: '#777', cursor: 'pointer', fontWeight: 600 }}>התחל מחדש</button>
                 </div>
 
                 <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 900, color: '#0c1a35', margin: '0 0 20px' }}>קלפי מזוזה מומלצים עבורך</h3>
@@ -639,12 +639,12 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                 {loading && (
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)', gap: 12 }}>
                     {[1,2,3,4,5,6].map(i => (
-                      <div key={i} style={{ borderRadius: 16, overflow: 'hidden', background: '#f5f5f5', border: '2px solid #eee' }}>
+                      <div key={i} style={{ borderRadius: 0, overflow: 'hidden', background: '#f5f5f5', border: '2px solid #eee' }}>
                         <div style={{ paddingTop: '100%', background: '#ebebeb' }} />
                         <div style={{ padding: 14 }}>
-                          <div style={{ height: 12, background: '#e0e0e0', borderRadius: 4, marginBottom: 8 }} />
-                          <div style={{ height: 10, background: '#e0e0e0', borderRadius: 4, width: '55%', marginBottom: 14 }} />
-                          <div style={{ height: 36, background: '#e0e0e0', borderRadius: 10 }} />
+                          <div style={{ height: 12, background: '#e0e0e0', borderRadius: 0, marginBottom: 8 }} />
+                          <div style={{ height: 10, background: '#e0e0e0', borderRadius: 0, width: '55%', marginBottom: 14 }} />
+                          <div style={{ height: 36, background: '#e0e0e0', borderRadius: 0 }} />
                         </div>
                       </div>
                     ))}
@@ -670,7 +670,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                     <div style={{ textAlign: 'center' }}>
                       <button
                         onClick={() => router.push('/category/קלפי מזוזה')}
-                        style={{ background: 'none', border: '2px solid #0c1a35', borderRadius: 12, padding: '12px 36px', fontSize: 14, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, transition: 'background 0.15s' }}
+                        style={{ background: 'none', border: '2px solid #0c1a35', borderRadius: 0, padding: '12px 36px', fontSize: 14, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, transition: 'background 0.15s' }}
                         onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#f0ebe0')}
                         onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'none')}
                       >
@@ -686,7 +686,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                       <IconScroll size={52} color="#d0c8b8" />
                     </div>
                     <p style={{ marginBottom: 20, fontSize: 14, color: '#888' }}>לא נמצאו קלפים — הצג את כל קלפי המזוזה</p>
-                    <button onClick={() => router.push('/category/קלפי מזוזה')} style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <button onClick={() => router.push('/category/קלפי מזוזה')} style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '12px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                       <IconArrowLeft size={14} color="#fff" /> לכל הקלפים
                     </button>
                   </div>
