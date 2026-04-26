@@ -9,6 +9,7 @@ import NavBar from "@/app/components/navigation/NavBar";
 import Footer from "@/app/components/Footer";
 import ShiraChat from "@/app/components/chat/ShiraChat";
 import GTMLoader from "@/app/components/GTMLoader";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 
@@ -79,6 +80,7 @@ export default function RootLayout({
           <GTMLoader />
         </AuthProvider>
         <ShiraChat />
+        <SpeedInsights />
       </body>
     </html>
   );
