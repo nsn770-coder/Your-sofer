@@ -152,7 +152,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations';
 
 interface Review {
   id: string;
@@ -176,6 +176,15 @@ interface Testimonial {
   imageUrl: string;
   active: boolean;
   createdAt?: { seconds: number };
+}
+
+interface Curation {
+  id: string;
+  category: string;
+  activeTag: string;
+  bannerTitle: string;
+  bannerImageUrl: string;
+  updatedAt?: { seconds: number };
 }
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -1570,6 +1579,7 @@ export default function AdminPage() {
           { key: 'edit_requests',  label: '✏️ בקשות עריכה',     color: 'bg-emerald-700', badge: editRequests.filter(r => r.status === 'pending').length },
           { key: 'hidden_products',label: '👁️ מוסתרים',         color: 'bg-gray-600',   badge: hiddenProducts.length },
           { key: 'theme_editor',   label: '🎨 עורך עיצוב',      color: 'bg-violet-600' },
+          { key: 'curations',      label: '✨ סלקציות',          color: 'bg-fuchsia-700' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -2245,6 +2255,8 @@ export default function AdminPage() {
         </div>
       )}
 
+      {activeTab === 'curations' && <CurationsTab />}
+
       {showAddSofer && <AddSoferModal onClose={() => setShowAddSofer(false)} onSave={() => { loadSoferimFull(); loadSoferim(); }} />}
       {showAddShliach && <AddShliachModal onClose={() => setShowAddShliach(false)} onSave={() => { loadShluchimApplications(); loadUsers(); }} />}
       {showAddProduct && <AddProductModal soferim={soferim} soferimFull={soferimFull} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />}
@@ -2339,6 +2351,183 @@ function CategoryCard({ cat, saving, saved, onSave }: {
           {saved && <span className="text-green-600 text-sm font-bold">✅ נשמר!</span>}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── CurationsTab ─────────────────────────────────────────────────────────────
+
+const STYLE_TAG_OPTIONS = [
+  { value: '',          label: 'הכל' },
+  { value: 'Modern',    label: 'Modern — מודרני' },
+  { value: 'Heritage',  label: 'Heritage — קלאסי' },
+  { value: 'Steel',     label: 'Steel — נירוסטה' },
+];
+
+function CurationRow({ curation, onDelete }: { curation: Curation | null; onDelete?: () => void }) {
+  const isNew = !curation?.id;
+  const [category,       setCategory]       = useState(curation?.category       ?? '');
+  const [activeTag,      setActiveTag]       = useState(curation?.activeTag      ?? '');
+  const [bannerTitle,    setBannerTitle]     = useState(curation?.bannerTitle    ?? '');
+  const [bannerImageUrl, setBannerImageUrl]  = useState(curation?.bannerImageUrl ?? '');
+  const [saving,    setSaving]    = useState(false);
+  const [saved,     setSaved]     = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'yoursofer_upload');
+      const res  = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error('upload failed');
+      setBannerImageUrl(data.secure_url);
+    } catch { alert('שגיאה בהעלאת תמונה'); }
+    finally { setUploading(false); }
+  }
+
+  async function handleSave() {
+    if (!category.trim()) { alert('נא למלא שם קטגוריה'); return; }
+    setSaving(true);
+    try {
+      const payload = {
+        category: category.trim(),
+        activeTag,
+        bannerTitle: bannerTitle.trim(),
+        bannerImageUrl: bannerImageUrl.trim(),
+        updatedAt: serverTimestamp(),
+      };
+      const docRef = doc(db, 'curations', category.trim());
+      await setDoc(docRef, payload, { merge: true });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (e: unknown) { alert('שגיאה בשמירה: ' + (e instanceof Error ? e.message : e)); }
+    finally { setSaving(false); }
+  }
+
+  return (
+    <tr style={{ borderBottom: '1px solid #f0f0f0', verticalAlign: 'middle' }}>
+      <td style={{ padding: '10px 8px' }}>
+        <input
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+          placeholder="שם קטגוריה (כגון: נטילת ידיים)"
+          disabled={!isNew}
+          style={{ width: 180, border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl', background: isNew ? '#fff' : '#f9fafb', color: '#0c1a35', fontWeight: 600 }}
+        />
+      </td>
+      <td style={{ padding: '10px 8px' }}>
+        <select
+          value={activeTag}
+          onChange={e => setActiveTag(e.target.value)}
+          style={{ border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl', background: '#fff', color: '#0c1a35' }}
+        >
+          {STYLE_TAG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+      </td>
+      <td style={{ padding: '10px 8px' }}>
+        <input
+          value={bannerTitle}
+          onChange={e => setBannerTitle(e.target.value)}
+          placeholder="כותרת הבאנר..."
+          style={{ width: 200, border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl' }}
+        />
+      </td>
+      <td style={{ padding: '10px 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {bannerImageUrl && (
+            <img src={bannerImageUrl} alt="" style={{ width: 50, height: 34, objectFit: 'cover', borderRadius: 4, border: '1px solid #e5e7eb', flexShrink: 0 }} onError={e => (e.currentTarget.style.display = 'none')} />
+          )}
+          <label style={{ cursor: 'pointer', background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1d4ed8', borderRadius: 6, padding: '5px 10px', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0 }}>
+            {uploading ? '⏳...' : '📷 העלה'}
+            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUpload} disabled={uploading} />
+          </label>
+        </div>
+      </td>
+      <td style={{ padding: '10px 8px' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button
+            onClick={handleSave}
+            disabled={saving || uploading}
+            style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
+          >
+            {saving ? '⏳' : '💾 שמור'}
+          </button>
+          {saved && <span style={{ color: '#16a34a', fontSize: 12, fontWeight: 700 }}>✅ נשמר!</span>}
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 6, padding: '7px 10px', fontSize: 12, cursor: 'pointer' }}
+            >
+              🗑️
+            </button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function CurationsTab() {
+  const [curations, setCurations] = useState<Curation[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [newRows, setNewRows]     = useState(0);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const snap = await getDocs(collection(db, 'curations'));
+        setCurations(snap.docs.map(d => ({ id: d.id, ...d.data() } as Curation)));
+      } catch { /* silent */ }
+      finally { setLoading(false); }
+    }
+    load();
+  }, []);
+
+  return (
+    <div dir="rtl">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0c1a35' }}>✨ סלקציות (Curations)</h2>
+        <button
+          onClick={() => setNewRows(n => n + 1)}
+          style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+        >
+          + הוסף סלקציה
+        </button>
+      </div>
+
+      <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 16, lineHeight: 1.6 }}>
+        סלקציה מגדירה איזה סגנון יוצג כברירת מחדל כשגולש נכנס לתת-קטגוריה (למשל: נטילת ידיים), ומציגה באנר מעל הרשת.
+      </p>
+
+      {loading ? (
+        <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>טוען...</div>
+      ) : (
+        <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead style={{ background: '#f9fafb' }}>
+              <tr>
+                {['קטגוריה', 'סגנון פעיל', 'כותרת באנר', 'תמונת באנר', 'שמירה'].map(h => (
+                  <th key={h} style={{ padding: '10px 8px', textAlign: 'right', fontSize: 12, fontWeight: 700, color: '#374151', borderBottom: '1px solid #e5e7eb' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {curations.map(c => <CurationRow key={c.id} curation={c} />)}
+              {Array.from({ length: newRows }).map((_, i) => (
+                <CurationRow key={`new-${i}`} curation={null} onDelete={() => setNewRows(n => Math.max(0, n - 1))} />
+              ))}
+              {curations.length === 0 && newRows === 0 && (
+                <tr><td colSpan={5} style={{ padding: 32, textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>אין סלקציות עדיין — לחץ "הוסף סלקציה" כדי להתחיל</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

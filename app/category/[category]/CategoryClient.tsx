@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   collection, query, where, orderBy, limit,
-  getDocs, documentId,
+  getDocs, documentId, getDoc, doc,
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Link from 'next/link';
@@ -42,6 +42,15 @@ interface Product {
   subCategory?: string;
   nusach?: string;
   level?: string;
+  styleTag?: string[];
+}
+
+interface Curation {
+  id: string;
+  category: string;
+  activeTag: string;
+  bannerTitle: string;
+  bannerImageUrl: string;
 }
 
 interface FilterState {
@@ -710,6 +719,8 @@ export default function CategoryClient({ category }: { category: string }) {
   const [subCategoryFilter, setSubCategoryFilter] = useState('');
   const [catImages, setCatImages]               = useState<Record<string, string>>({});
   const [soferMap, setSoferMap]                 = useState<Record<string, SoferData>>({});
+  const [curation, setCuration]                 = useState<Curation | null>(null);
+  const [styleTagFilter, setStyleTagFilter]     = useState<string>('');
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const SUBCATEGORY_PAGES = ['נטילת ידיים', 'שבת', 'חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
@@ -849,6 +860,24 @@ export default function CategoryClient({ category }: { category: string }) {
     fetchSoferim();
   }, [allLoaded, category]);
 
+  // Fetch curation for sub-categories that have one (e.g. נטילת ידיים)
+  useEffect(() => {
+    const key = subcatOverrideForFetch;
+    if (!key) { setCuration(null); setStyleTagFilter(''); return; }
+    getDoc(doc(db, 'curations', key))
+      .then(snap => {
+        if (snap.exists()) {
+          const data = snap.data() as Omit<Curation, 'id'>;
+          setCuration({ id: snap.id, ...data });
+          setStyleTagFilter(data.activeTag ?? '');
+        } else {
+          setCuration(null);
+          setStyleTagFilter('');
+        }
+      })
+      .catch(() => { setCuration(null); setStyleTagFilter(''); });
+  }, [subcatOverrideForFetch]);
+
   useEffect(() => {
     setFilters(EMPTY_FILTERS);
     setCurrentPage(1);
@@ -918,8 +947,9 @@ export default function CategoryClient({ category }: { category: string }) {
     let result = applyFilters(allLoaded, filters);
     if (subCategoryFilter) result = result.filter(p => p.subCategory === subCategoryFilter);
     if (category === 'מתנות' && catFilter !== 'הכל') result = result.filter(p => p.cat === catFilter);
+    if (styleTagFilter) result = result.filter(p => p.styleTag?.includes(styleTagFilter));
     return applySort(result, sortBy);
-  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter]);
+  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter, styleTagFilter]);
 
   const attrOptionsDesktop = useMemo(() =>
     ATTR_KEYS.reduce((acc, key) => {
@@ -996,6 +1026,27 @@ export default function CategoryClient({ category }: { category: string }) {
       {(category === 'בר מצווה' || category === 'בר-מצווה') && (
         <div className="max-w-7xl mx-auto px-4 pt-6" dir="rtl">
           <BarMitzvaWizard variant="page" />
+        </div>
+      )}
+
+      {/* ── Curation banner ── */}
+      {curation && (curation.bannerTitle || curation.bannerImageUrl) && (
+        <div dir="rtl" style={{ position: 'relative', overflow: 'hidden', background: '#0c1a35' }}>
+          {curation.bannerImageUrl && (
+            <img
+              src={curation.bannerImageUrl}
+              alt={curation.bannerTitle}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }}
+            />
+          )}
+          <div style={{ position: 'relative', maxWidth: '80rem', margin: '0 auto', padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0 }}>{curation.bannerTitle}</h2>
+            {curation.activeTag && (
+              <span style={{ color: 'rgba(184,151,42,0.9)', fontSize: 13, fontWeight: 600 }}>
+                {curation.activeTag === 'Modern' ? 'קולקציית מודרני' : curation.activeTag === 'Heritage' ? 'קולקציית קלאסי' : curation.activeTag === 'Steel' ? 'קולקציית נירוסטה' : ''}
+              </span>
+            )}
+          </div>
         </div>
       )}
 
@@ -1159,6 +1210,36 @@ export default function CategoryClient({ category }: { category: string }) {
               </select>
             </div>
           </div>
+
+          {/* Style filter buttons — shown when a curation is active */}
+          {curation && (
+            <div dir="rtl" style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+              {([
+                { label: 'הכל',     value: '' },
+                { label: 'מודרני',  value: 'Modern' },
+                { label: 'קלאסי',   value: 'Heritage' },
+                { label: 'נירוסטה', value: 'Steel' },
+              ] as { label: string; value: string }[]).map(({ label, value }) => (
+                <button
+                  key={value}
+                  onClick={() => setStyleTagFilter(value)}
+                  style={{
+                    padding: '7px 18px',
+                    fontWeight: 700,
+                    fontSize: 13,
+                    background: styleTagFilter === value ? '#0c1a35' : '#fff',
+                    color:      styleTagFilter === value ? '#fff'    : '#374151',
+                    border:     `1.5px solid ${styleTagFilter === value ? '#0c1a35' : '#e5e7eb'}`,
+                    borderRadius: 0,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Active filter pills */}
           <ActiveFilterPills filters={filters} onChange={setFilters} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} />
