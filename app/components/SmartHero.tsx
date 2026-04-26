@@ -129,8 +129,8 @@ export default function SmartHero({ isMobile, bgImage }: {
     <div style={{
       position: 'relative',
       width: '100%',
-      minHeight: isMobile ? '85vh' : '100vh',
-      maxHeight: isMobile ? '85vh' : '100vh',
+      minHeight: isMobile ? 260 : 500,
+      maxHeight: isMobile ? 260 : 500,
       overflow: 'hidden',
       display: 'flex',
       alignItems: 'center',
