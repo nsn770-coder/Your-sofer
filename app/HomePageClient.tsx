@@ -709,6 +709,14 @@ export default function HomePageClient() {
         onSelectCat={(cat: string) => router.push(`/category/${encodeURIComponent(cat)}`)}
       />
 
+      {/* ── Smart Funnel ── */}
+      <div style={{ background: '#FFFFFF', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
+        <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '10px 0 6px', fontWeight: 500 }}>
+          בחר מה אתה מחפש — נמצא לך את המתאים ביותר
+        </p>
+        <SmartFunnel isMobile={isMobile} />
+      </div>
+
       {/* ── Live Activity Bar ── */}
       {(() => {
         const weeklyVisitors = 134 + ((new Date().getDate() * 7) % 83);
