@@ -31,6 +31,7 @@ interface Product {
   reviews?: number;
   videoUrl?: string;
   level?: string;
+  lookTag?: string;
 }
 
 interface KlafItem { id: string; name: string; imageUrl: string; status: string; }
@@ -785,6 +786,7 @@ export default function ProductClient() {
 
   const [product, setProduct]           = useState<Product | null>(null);
   const [related, setRelated]           = useState<Product[]>([]);
+  const [lookProducts, setLookProducts] = useState<Product[]>([]);
   const [embroideryText, setEmbroideryText] = useState('');
   const [loading, setLoading]           = useState(true);
   const [activeImg, setActiveImg]       = useState(0);
@@ -841,6 +843,21 @@ export default function ProductClient() {
             const relData: Product[] = [];
             relSnap.forEach(d => { if (d.id !== p.id) relData.push({ id: d.id, ...d.data() } as Product); });
             setRelated(relData.slice(0, 4));
+
+            // "השלם את הלוק" — same lookTag, different category
+            if (p.lookTag) {
+              const lookSnap = await getDocs(query(collection(db, 'products'), where('lookTag', '==', p.lookTag), limit(20)));
+              const seen = new Set<string>();
+              const lookData: Product[] = [];
+              lookSnap.forEach(d => {
+                const lp = { id: d.id, ...d.data() } as Product;
+                if (lp.id !== p.id && lp.cat !== p.cat && !seen.has(lp.cat ?? lp.id)) {
+                  seen.add(lp.cat ?? lp.id);
+                  lookData.push(lp);
+                }
+              });
+              setLookProducts(lookData.slice(0, 6));
+            }
           }
         }
       } finally { setLoading(false); }
@@ -1236,6 +1253,51 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </div>
         )}
       </div>
+
+      {/* ── השלם את הלוק ── */}
+      {lookProducts.length > 0 && (
+        <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0c1a35', margin: 0 }}>השלם את הלוק ✨</h2>
+            <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>מוצרים באותו סגנון מקטגוריות שונות</p>
+          </div>
+          <div style={{ display: 'flex', gap: isMobile ? 10 : 14, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>
+            {lookProducts.map(lp => {
+              const lpImg = optimizeCloudinaryUrl(lp.imgUrl || lp.image_url || '', 400) || undefined;
+              return (
+                <div
+                  key={lp.id}
+                  onClick={() => router.push(`/product/${lp.id}`)}
+                  style={{ flexShrink: 0, width: isMobile ? 148 : 178, background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'box-shadow 0.2s' }}
+                  onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)')}
+                  onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}
+                >
+                  <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
+                    {lpImg
+                      ? <img src={lpImg} alt={lp.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
+                      : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon.Package /></div>}
+                    {lp.cat && (
+                      <div style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(12,26,53,0.75)', color: '#fff', fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 20, backdropFilter: 'blur(4px)' }}>
+                        {lp.cat}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{lp.name}</div>
+                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>₪{lp.price}</div>
+                    <button
+                      onClick={e => { e.stopPropagation(); addItem({ id: lp.id, name: lp.name, price: lp.price, imgUrl: lpImg ?? undefined, quantity: 1 }); }}
+                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
+                    >
+                      הוסף לסל
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <ReviewsSection productId={product.id} productName={product.name} />
 
