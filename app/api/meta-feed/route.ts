@@ -58,23 +58,23 @@ export async function GET() {
           : [];
 
       items.push(`    <item>
-      <g:id>${esc(id)}</g:id>
-      <g:title>${esc(name)}</g:title>
-      <g:description>${esc(desc.slice(0, 9999))}</g:description>
-      <g:link>${esc(link)}</g:link>
-      ${imageLink ? `<g:image_link>${esc(imageLink)}</g:image_link>` : ''}
-      ${additionalImages.map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('\n      ')}
-      <g:availability>${esc(availability)}</g:availability>
-      <g:condition>${esc(condition)}</g:condition>
-      <g:price>${(was ?? price).toFixed(2)} ILS</g:price>
-      ${was ? `<g:sale_price>${price.toFixed(2)} ILS</g:sale_price>` : ''}
-      <g:brand>${esc(brand)}</g:brand>
-      ${cat ? `<g:product_type>${esc(cat)}</g:product_type>` : ''}
+      <id>${esc(id)}</id>
+      <title>${esc(name)}</title>
+      <description>${esc(desc.slice(0, 9999))}</description>
+      <link>${esc(link)}</link>
+      ${imageLink ? `<image_link>${esc(imageLink)}</image_link>` : ''}
+      ${additionalImages.map(u => `<additional_image_link>${esc(u)}</additional_image_link>`).join('\n      ')}
+      <availability>${esc(availability)}</availability>
+      <condition>${esc(condition)}</condition>
+      <price>${(was ?? price).toFixed(2)} ILS</price>
+      ${was ? `<sale_price>${price.toFixed(2)} ILS</sale_price>` : ''}
+      <brand>${esc(brand)}</brand>
+      ${cat ? `<product_type>${esc(cat)}</product_type>` : ''}
     </item>`);
     });
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+<rss version="2.0">
   <channel>
     <title>Your Sofer — חנות סת"מ</title>
     <link>${SITE}</link>
