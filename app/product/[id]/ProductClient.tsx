@@ -778,7 +778,8 @@ export default function ProductClient() {
   const { id } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const fromWizard = searchParams.get('from') === 'bar-mitzva';
+  const fromWizardParam = searchParams.get('from') === 'bar-mitzva';
+  const [fromWizardLS, setFromWizardLS] = useState(false);
   const { addItem } = useCart();
   const { user } = useAuth();
 
@@ -806,6 +807,10 @@ export default function ProductClient() {
     return (Math.abs(hash) % 8) + 12;
   });
   const buyBoxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try { setFromWizardLS(localStorage.getItem('wizardActive') === 'true'); } catch {}
+  }, []);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -888,7 +893,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
-    if (fromWizard) setShowWizardModal(true);
+    if (fromWizardParam || fromWizardLS) setShowWizardModal(true);
   }
 
   // ── Buy Box ──────────────────────────────────────────────────────────────────
@@ -1002,7 +1007,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       )}
 
       {/* Bar Mitzva wizard context banner */}
-      {fromWizard && (
+      {(fromWizardParam || fromWizardLS) && (
         <div style={{ background: '#0c1a35', color: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', direction: 'rtl', position: 'sticky', top: 0, zIndex: 40 }}>
           <span style={{ fontSize: 13, fontWeight: 600 }}>אתה במדריך בר מצווה</span>
           <button
