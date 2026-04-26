@@ -2420,8 +2420,9 @@ function CurationRow({ curation, onDelete, lookTagCounts }: { curation: Curation
           placeholder="כגון: שחור וזהב / Modern"
           style={{ width: 170, border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl', background: '#fff', color: '#0c1a35' }}
         />
+        <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 3 }}>הקלד את שם הלוק המדויק כפי שמופיע בפיירסטור</div>
         {activeTag && lookTagCounts && (
-          <div style={{ fontSize: 11, color: '#6b7280', marginTop: 3 }}>
+          <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
             {lookTagCounts[activeTag] != null
               ? `${lookTagCounts[activeTag]} מוצרים`
               : '— אין נתונים'}
