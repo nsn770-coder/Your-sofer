@@ -28,7 +28,7 @@ const STEPS: StepDef[] = [
   {
     title: 'בחר טלית',
     subtitle: 'טליתות איכותיות לבר מצווה',
-    href: `/category/${encodeURIComponent('יודאיקה')}?filter=${encodeURIComponent('טליתות')}`,
+    href: `/category/${encodeURIComponent('טליתות וציציות')}`,
   },
   {
     title: 'בחר תפילין',
@@ -38,7 +38,7 @@ const STEPS: StepDef[] = [
   {
     title: 'בחר כיפה',
     subtitle: 'כיפות בסגנונות ובחומרים מגוונים',
-    href: `/category/${encodeURIComponent('יודאיקה')}?filter=${encodeURIComponent('כיפות')}`,
+    href: `/category/${encodeURIComponent('כיפות')}`,
   },
   {
     title: 'בחר סידור',
