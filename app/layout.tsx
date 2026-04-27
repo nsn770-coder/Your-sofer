@@ -1,5 +1,5 @@
 ﻿import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Heebo } from "next/font/google";
 import { Suspense } from "react";
 import Script from "next/script";
 import "./globals.css";
@@ -15,6 +15,7 @@ import WizardStickyBar from "@/app/components/WizardStickyBar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
+const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "swap", variable: "--font-heebo" });
 
 const BASE_URL = 'https://your-sofer.com';
 
@@ -66,8 +67,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://your-sofer.firebaseapp.com" />
         <link rel="preconnect" href="https://apis.google.com" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="preload" as="image" href="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_750/v1777180035/IMG_1277_apvc5v.png" />
       </head>
-      <body className={`${geist.className} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100vw' }}>
+      <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100vw', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
         <AuthProvider>
           {/* Suspense is required by Next.js when useSearchParams() is used
               inside a component rendered from the root layout */}

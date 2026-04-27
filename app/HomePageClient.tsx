@@ -10,24 +10,10 @@ import {
   doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase';
-const HERO_PLACEHOLDER = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1200/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg';
-const HeroSwiper = dynamic(() => import('./components/HeroSwiper'), {
-  loading: () => (
-    <div style={{ background: '#FFFFFF', padding: '12px 0' }}>
-      <div
-        className="h-[260px] md:h-[360px]"
-        style={{
-          width: '92%', margin: '0 auto', borderRadius: 0, overflow: 'hidden',
-          backgroundImage: `url(${HERO_PLACEHOLDER})`,
-          backgroundSize: 'cover', backgroundPosition: 'center',
-        }}
-      />
-    </div>
-  ),
-});
 import SmartHero from './components/SmartHero';
-import SmartFunnel from './components/SmartFunnel';
 import ProductCard from '@/components/ui/ProductCard';
+
+const SmartFunnel        = dynamic(() => import('./components/SmartFunnel'),            { ssr: false, loading: () => <div style={{ height: 60 }} /> });
 
 const NewsletterPopup   = dynamic(() => import('./components/NewsletterPopup'),       { ssr: false, loading: () => <div className="hidden" /> });
 const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => <div className="hidden" /> });
@@ -761,10 +747,12 @@ export default function HomePageClient() {
       )}
 
       {/* ── 1. SmartHero ── */}
-      <SmartHero
-        isMobile={isMobile}
-        onScrollToProducts={() => cardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
-      />
+      <div style={{ width: '100%', height: isMobile ? 260 : 500, overflow: 'hidden' }}>
+        <SmartHero
+          isMobile={isMobile}
+          onScrollToProducts={() => cardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        />
+      </div>
 
       {/* ── Smart Funnel ── */}
       <div style={{ background: '#FFFFFF', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
