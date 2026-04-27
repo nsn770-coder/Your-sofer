@@ -73,7 +73,7 @@ export async function GET() {
       rows.push(row);
     });
 
-    const csv = rows.join('\r\n');
+    const csv = '\uFEFF' + rows.join('\r\n');
 
     return new NextResponse(csv, {
       status: 200,
