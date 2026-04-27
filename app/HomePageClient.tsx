@@ -927,6 +927,29 @@ export default function HomePageClient() {
           <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 14 }}>עוד קטגוריות</h2>
         </div>
         <div style={{ display: 'flex', overflowX: 'auto', gap: 10, padding: '0 12px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
+          {/* Soferim card */}
+          <div
+            onClick={() => router.push('/soferim')}
+            style={{ cursor: 'pointer', borderRadius: 12, overflow: 'hidden', border: '1px solid #ddd', transition: 'box-shadow 0.2s', flexShrink: 0, width: isMobile ? 130 : 180 }}
+            onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)')}
+            onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
+          >
+            <div style={{ height: isMobile ? 100 : 140, overflow: 'hidden', position: 'relative' }}>
+              <img
+                src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777151830/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_unt31g.png"
+                alt="הסופרים שלנו"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }} />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '8px 10px' }}>
+                <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 15, color: '#fff' }}>הסופרים שלנו</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>סופרי סת״מ מוסמכים</div>
+              </div>
+            </div>
+            <div style={{ padding: '8px 10px', background: '#fff' }}>
+              <div style={{ fontSize: 11, color: '#0e6ba8' }}>לכל הסופרים ←</div>
+            </div>
+          </div>
           {MORE_CAT_DEFS.map(cat => {
             const img = catImages[cat.slug] ? optimizeCloudinaryUrl(catImages[cat.slug], 300) : '';
             return (
