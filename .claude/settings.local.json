@@ -120,7 +120,9 @@
       "Read(//c/Users/Nissan/AppData/Local/**)",
       "Bash(firebase login *)",
       "PowerShell(Get-WmiObject *)",
-      "PowerShell(Get-CimInstance *)"
+      "PowerShell(Get-CimInstance *)",
+      "Bash(git checkout *)",
+      "Bash(echo \"EXIT_CODE: $?\")"
     ]
   }
 }
