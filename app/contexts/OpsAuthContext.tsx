@@ -1,12 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
 import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-} from 'firebase/auth';
-import {
   collection,
   query,
   where,
@@ -14,7 +8,8 @@ import {
   updateDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { db } from '../firebase';
+import { getAuthLazy } from '@/lib/authLazy';
 import type { OpsRole, OpsUser } from '../ops/types';
 
 interface OpsAuthContextType {
@@ -33,71 +28,87 @@ export function OpsAuthProvider({ children }: { children: React.ReactNode }) {
   const [accessDenied, setAccessDenied] = useState(false);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (!firebaseUser) {
-        setOpsUser(null);
-        setLoading(false);
-        return;
-      }
+    let unsubscribe: (() => void) | undefined;
+    let cancelled = false;
 
-      try {
-        const q = query(
-          collection(db, 'opsUsers'),
-          where('email', '==', firebaseUser.email)
-        );
-        const snap = await getDocs(q);
+    async function setup() {
+      const { onAuthStateChanged, signOut } = await import('firebase/auth');
+      const auth = await getAuthLazy();
+      if (cancelled) return;
 
-        if (snap.empty) {
-          setAccessDenied(true);
-          setOpsUser(null);
-          setLoading(false);
-          await signOut(auth);
+      unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+        if (cancelled) return;
+        if (!firebaseUser) {
+          if (!cancelled) { setOpsUser(null); setLoading(false); }
           return;
         }
 
-        const docSnap = snap.docs[0];
-        const data = docSnap.data();
+        try {
+          const q = query(
+            collection(db, 'opsUsers'),
+            where('email', '==', firebaseUser.email)
+          );
+          const snap = await getDocs(q);
 
-        if (!data.active) {
-          setAccessDenied(true);
-          setOpsUser(null);
-          setLoading(false);
-          await signOut(auth);
-          return;
+          if (snap.empty) {
+            if (!cancelled) { setAccessDenied(true); setOpsUser(null); setLoading(false); }
+            await signOut(auth);
+            return;
+          }
+
+          const docSnap = snap.docs[0];
+          const data = docSnap.data();
+
+          if (!data.active) {
+            if (!cancelled) { setAccessDenied(true); setOpsUser(null); setLoading(false); }
+            await signOut(auth);
+            return;
+          }
+
+          // Update uid + lastLogin
+          await updateDoc(docSnap.ref, {
+            uid: firebaseUser.uid,
+            lastLogin: serverTimestamp(),
+          });
+
+          if (!cancelled) {
+            setOpsUser({
+              uid: firebaseUser.uid,
+              email: data.email,
+              name: data.name,
+              role: data.role as OpsRole,
+              active: data.active,
+            });
+            setAccessDenied(false);
+          }
+        } catch (err) {
+          console.error('OpsAuth error:', err);
+          if (!cancelled) setOpsUser(null);
         }
 
-        // Update uid + lastLogin
-        await updateDoc(docSnap.ref, {
-          uid: firebaseUser.uid,
-          lastLogin: serverTimestamp(),
-        });
+        if (!cancelled) setLoading(false);
+      });
+    }
 
-        setOpsUser({
-          uid: firebaseUser.uid,
-          email: data.email,
-          name: data.name,
-          role: data.role as OpsRole,
-          active: data.active,
-        });
-        setAccessDenied(false);
-      } catch (err) {
-        console.error('OpsAuth error:', err);
-        setOpsUser(null);
-      }
+    setup();
 
-      setLoading(false);
-    });
-
-    return () => unsub();
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, []);
 
   async function signInWithGoogle() {
     setAccessDenied(false);
+    const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+    const auth = await getAuthLazy();
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
   }
 
   async function logout() {
+    const { signOut } = await import('firebase/auth');
+    const auth = await getAuthLazy();
     await signOut(auth);
     setOpsUser(null);
     setAccessDenied(false);

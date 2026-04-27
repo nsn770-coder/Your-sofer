@@ -120,7 +120,8 @@
       "Read(//c/Users/Nissan/AppData/Local/**)",
       "Bash(firebase login *)",
       "PowerShell(Get-WmiObject *)",
-      "PowerShell(Get-CimInstance *)"
+      "PowerShell(Get-CimInstance *)",
+      "Bash(head -100 /c/Users/Owner/Downloads/projects/Your-sofer/app/product/[id]/ProductClient.tsx)"
     ]
   }
 }

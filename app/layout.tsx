@@ -1,7 +1,6 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Geist, Heebo } from "next/font/google";
 import { Suspense } from "react";
-import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -13,6 +12,8 @@ import GTMLoader from "@/app/components/GTMLoader";
 import MetaPixelPageView from "@/app/components/MetaPixelPageView";
 import WizardStickyBar from "@/app/components/WizardStickyBar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { FacebookPixel } from "@/components/FacebookPixel";
+import { TidioChat } from "@/components/TidioChat";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "swap", variable: "--font-heebo" });
@@ -64,10 +65,20 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className="overflow-x-hidden">
       <head>
+        {/* ── Preconnects & DNS prefetches ── */}
         <link rel="preconnect" href="https://your-sofer.firebaseapp.com" />
         <link rel="preconnect" href="https://apis.google.com" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
-        <link rel="preload" as="image" href="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_750/v1777180035/IMG_1277_apvc5v.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://firebaseapp.com" />
+        <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        {/* ── Hero image preload ── */}
+        <link
+          rel="preload"
+          as="image"
+          href="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1400/v1777180035/IMG_1277_apvc5v.png"
+          fetchPriority="high"
+        />
       </head>
       <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100vw', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
         <AuthProvider>
@@ -88,26 +99,18 @@ export default function RootLayout({
         <ShiraChat />
         <SpeedInsights />
 
-        {/* ── Meta Pixel ── */}
+        {/* ── Meta Pixel — deferred until user interaction ── */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
           <>
-            <Script id="meta-pixel" strategy="afterInteractive">{`
-              !function(f,b,e,v,n,t,s){
-              if(f.fbq)return;n=f.fbq=function(){
-              n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window,document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init','${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
-              fbq('track','PageView');
-            `}</Script>
+            <FacebookPixel />
             <Suspense fallback={null}>
               <MetaPixelPageView />
             </Suspense>
           </>
         )}
+
+        {/* ── Tidio live chat — deferred 5 seconds ── */}
+        {process.env.NEXT_PUBLIC_TIDIO_KEY && <TidioChat />}
       </body>
     </html>
   );

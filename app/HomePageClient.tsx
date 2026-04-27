@@ -309,7 +309,7 @@ export default function HomePageClient() {
   const [isMobile, setIsMobile]       = useState(false);
   const [catImages, setCatImages]     = useState<Record<string, string>>({});
   const [slotImages, setSlotImages]   = useState<Record<string, string>>({});
-  const [imagesReady, setImagesReady] = useState(false);
+  const [imagesReady, setImagesReady] = useState(true);
   const [wizardOpen, setWizardOpen]   = useState(false);
   const [weeklyProducts, setWeeklyProducts] = useState(0);
   const [soferimCount, setSoferimCount]     = useState(0);
@@ -436,12 +436,15 @@ export default function HomePageClient() {
       } catch { /* non-fatal */ }
     }
 
-    Promise.all([
-      fetchPinnedImages().then(pinned => setSlotImages(pinned)),
-      fetchCatImages(),
-    ]).finally(() => setImagesReady(true));
-
-    fetchFeaturedProducts();
+    // Defer all Firebase reads so the hero (LCP element) paints first
+    const timer = setTimeout(() => {
+      Promise.all([
+        fetchPinnedImages().then(pinned => setSlotImages(pinned)),
+        fetchCatImages(),
+      ]);
+      fetchFeaturedProducts();
+    }, 300);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -454,7 +457,9 @@ export default function HomePageClient() {
         setTestimonials(all.filter(t => t.active === true));
       } catch (e) { console.error('testimonials fetch error:', e); }
     }
-    fetchTestimonials();
+    // Below the fold — defer so it doesn't compete with LCP
+    const timer = setTimeout(fetchTestimonials, 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -473,7 +478,9 @@ export default function HomePageClient() {
         setWeeklyProducts(weeklySnap.size);
       } catch { /* non-fatal */ }
     }
-    fetchCounts();
+    // Counter section is below the fold — defer
+    const timer = setTimeout(fetchCounts, 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
