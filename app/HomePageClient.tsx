@@ -615,7 +615,6 @@ export default function HomePageClient() {
     <div
       dir="rtl"
       style={{
-        minHeight: '100vh',
         background: '#ffffff',
         fontFamily: "'Heebo', Arial, sans-serif",
         overflowX: 'hidden',
