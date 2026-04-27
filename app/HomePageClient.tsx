@@ -616,7 +616,7 @@ export default function HomePageClient() {
     >
 
       {/* ── Newsletter popup ── */}
-      {newsletterPopupOpen && (
+      {false && (
         <NewsletterPopup
           email={newsletterEmail}
           setEmail={setNewsletterEmail}
