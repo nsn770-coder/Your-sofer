@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { trackClickHeroMezuzot, trackClickHeroTefillin, trackClickWhatsApp } from '@/lib/analytics';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
@@ -120,40 +119,22 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
   const c = content[state];
   const isMain = state === 'main';
 
-  /*
-    CLS FIX: Always use the static fallback images.
-    bgImage from Firestore arrives AFTER paint — switching src mid-render
-    doesn't cause CLS because the Image component is fill + the container
-    has a fixed height (set by HeroSwiper). The visual swap is seamless.
-  */
   const resolvedBg = bgImage
     ? optimizeCloudinaryUrl(bgImage, isMobile ? 750 : 1400)
     : isMobile ? HERO_IMAGE_MOBILE : HERO_IMAGE_DESKTOP;
-
-  // CLS FIX: fixed height — must match slideHeight in HeroSwiper
-  const containerHeight = isMobile ? 260 : 500;
 
   return (
     <div style={{
       position: 'relative',
       width: '100%',
       minHeight: isMobile ? 380 : 500,
-      height: 'auto',
-      overflow: 'visible',
+      backgroundImage: `url(${resolvedBg})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center 30%',
       display: 'flex',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       direction: 'rtl',
     }}>
-
-      {/* ── תמונת רקע ── */}
-      <Image
-        fill
-        priority
-        src={resolvedBg}
-        alt="סופר כותב קלף"
-        style={{ objectFit: 'cover', objectPosition: 'center 30%', zIndex: 0 }}
-        sizes="100vw"
-      />
 
       {/* ── Overlay כהה — 55% opacity ── */}
       <div style={{
