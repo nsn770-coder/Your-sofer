@@ -155,7 +155,6 @@ export default function ProductCard({
   function handleAdd(e: React.MouseEvent) {
     e.stopPropagation();
     addItem({ id, name, price, imgUrl: imgSrc ?? undefined, quantity: 1 });
-    // Show wizard nudge if user arrived here from the Bar Mitzva wizard
     try {
       if (localStorage.getItem('bmWizard_step') !== null) setWizardBar(true);
     } catch { /* ignore */ }
@@ -276,8 +275,11 @@ export default function ProductCard({
         </div>
       )}
 
-      {/* ── Image ── */}
-      <div className="relative w-full h-36 sm:h-auto sm:aspect-square bg-gray-50 overflow-hidden">
+      {/* ── Image ──
+          CLS FIX: Use aspect-square always (no h-36 breakpoint switch).
+          The container reserves space via padding-top trick so layout never shifts.
+      ── */}
+      <div className="relative w-full bg-gray-50 overflow-hidden" style={{ aspectRatio: '1 / 1' }}>
         {imgSrc ? (
           <img
             src={imgSrc} alt={name}

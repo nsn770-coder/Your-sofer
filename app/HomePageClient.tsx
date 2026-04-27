@@ -25,6 +25,7 @@ const HeroSwiper = dynamic(() => import('./components/HeroSwiper'), {
     </div>
   ),
 });
+import SmartHero from './components/SmartHero';
 import SmartFunnel from './components/SmartFunnel';
 import ProductCard from '@/components/ui/ProductCard';
 
@@ -760,11 +761,10 @@ export default function HomePageClient() {
         </div>
       )}
 
-      {/* ── 1. HeroSwiper ── */}
-      <HeroSwiper
+      {/* ── 1. SmartHero ── */}
+      <SmartHero
         isMobile={isMobile}
         onScrollToProducts={() => cardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
-        onSelectCat={(cat: string) => router.push(`/category/${encodeURIComponent(cat)}`)}
       />
 
       {/* ── Smart Funnel ── */}

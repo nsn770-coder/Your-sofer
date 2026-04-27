@@ -57,3 +57,37 @@ body {
     bottom: 70px !important;
   }
 }
+
+/* ─── CLS Prevention ─────────────────────────────────────────────────────────
+   These rules prevent layout shifts across the site.
+   Never use height:auto on image containers — always reserve space.
+──────────────────────────────────────────────────────────────────────────── */
+
+/* Swiper: never allow the wrapper to grow beyond its slide height */
+.swiper,
+.swiper-wrapper {
+  contain: layout size;
+}
+
+/* All Next/Image fill containers must have explicit height from parent */
+[style*="position: relative"] > img[style*="position: absolute"],
+[style*="position:relative"] > img[style*="position:absolute"] {
+  contain: layout;
+}
+
+/* Product grid: uniform card heights prevent grid reflow */
+.product-grid-card {
+  contain: layout style;
+}
+
+/* Category banner placeholder: reserve space even when image is loading */
+.category-banner-placeholder {
+  background: #1a2d50;
+  min-height: 120px;
+  contain: layout size;
+}
+
+/* Font display: prevent FOUT-driven layout shifts */
+@font-face {
+  font-display: optional; /* never cause reflow waiting for font */
+}

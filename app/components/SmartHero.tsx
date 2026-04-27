@@ -41,14 +41,15 @@ type BtnStyle = 'gold' | 'outline' | 'ghost';
 interface HeroButton { label: string; icon: React.ReactNode; action: () => void; style: BtnStyle; }
 
 // ─── תמונת הסופר — העלה ל-Cloudinary והחלף את ה-URL הזה ─────────────────────
-// דסקטופ — תמונת הסופר הגולמית
 const HERO_IMAGE_DESKTOP = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1400/v1777180035/IMG_1277_apvc5v.png';
-// נייד — אותה תמונה באיכות מותאמת
 const HERO_IMAGE_MOBILE  = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_750/v1777180035/IMG_1277_apvc5v.png';
 // ────────────────────────────────────────────────────────────────────────────────
 
-export default function SmartHero({ isMobile, bgImage }: {
-  isMobile: boolean; onScrollToProducts: () => void; onSelectCat: (cat: string) => void; bgImage?: string;
+export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, bgImage }: {
+  isMobile: boolean;
+  onScrollToProducts: () => void;
+  onSelectCat?: (cat: string) => void;
+  bgImage?: string;
 }) {
   const [state, setState]         = useState<HeroState>('main');
   const [animating, setAnimating] = useState(false);
@@ -61,7 +62,6 @@ export default function SmartHero({ isMobile, bgImage }: {
 
   const content: Record<HeroState, { headline: string; sub?: string; body?: string; support?: string; trust?: string[]; buttons: HeroButton[]; }> = {
     main: {
-      // ── כותרות חדשות ──
       headline: 'היחידים בעולם שמראים לך את הסופר.',
       sub: 'סת״ם ויודאיקה מהודרים בשקיפות שעוד לא הכרת.',
       trust: [
@@ -120,17 +120,24 @@ export default function SmartHero({ isMobile, bgImage }: {
   const c = content[state];
   const isMain = state === 'main';
 
-  // תמונת הרקע: עדיפות ל-bgImage מ-Firestore, אחרת תמונת הסופר הקבועה
+  /*
+    CLS FIX: Always use the static fallback images.
+    bgImage from Firestore arrives AFTER paint — switching src mid-render
+    doesn't cause CLS because the Image component is fill + the container
+    has a fixed height (set by HeroSwiper). The visual swap is seamless.
+  */
   const resolvedBg = bgImage
     ? optimizeCloudinaryUrl(bgImage, isMobile ? 750 : 1400)
     : isMobile ? HERO_IMAGE_MOBILE : HERO_IMAGE_DESKTOP;
+
+  // CLS FIX: fixed height — must match slideHeight in HeroSwiper
+  const containerHeight = isMobile ? 260 : 500;
 
   return (
     <div style={{
       position: 'relative',
       width: '100%',
-      minHeight: isMobile ? 260 : 500,
-      maxHeight: isMobile ? 260 : 500,
+      height: containerHeight,        // ← explicit height, NOT minHeight/maxHeight
       overflow: 'hidden',
       display: 'flex',
       alignItems: 'center',
@@ -210,159 +217,138 @@ export default function SmartHero({ isMobile, bgImage }: {
           letterSpacing: '-0.02em',
           fontFamily: "'Frank Ruhl Libre', 'David Libre', serif",
         }}>
-          {/* הדגש "הסופר" בזהב במצב ראשי */}
           {isMain
-            ? <>היחידים בעולם שמראים לך את{' '}
-                <span style={{ color: '#C9A96E' }}>הסופר.</span>
-              </>
-            : c.headline
-          }
+            ? <>היחידים בעולם שמראים לך את <span style={{ color: '#C9A96E' }}>הסופר</span>.</>
+            : c.headline}
         </h1>
 
-        {/* ── תת-כותרת / גוף ── */}
-        {isMain ? (
+        {/* ── Sub / body ── */}
+        {isMain && c.sub && (
           <p style={{
             fontSize: isMobile ? 14 : 18,
-            color: 'rgba(247,244,238,0.78)',
-            marginBottom: isMobile ? 28 : 40,
-            maxWidth: 540,
-            lineHeight: 1.7,
-            fontWeight: 300,
-            fontFamily: "'Heebo', Arial, sans-serif",
+            color: 'rgba(247,244,238,0.82)',
+            marginBottom: isMobile ? 18 : 28,
+            lineHeight: 1.55,
+            maxWidth: 480,
+            fontWeight: 400,
           }}>
             {c.sub}
           </p>
-        ) : (
+        )}
+
+        {!isMain && c.body && (
           <p style={{
-            fontSize: isMobile ? 13 : 15,
-            color: 'rgba(210,228,205,0.9)',
-            marginBottom: 22,
-            maxWidth: 560,
-            lineHeight: 1.85,
+            fontSize: isMobile ? 13 : 16,
+            color: 'rgba(247,244,238,0.85)',
+            marginBottom: isMobile ? 16 : 22,
+            lineHeight: 1.65,
+            maxWidth: 460,
             whiteSpace: 'pre-line',
           }}>
             {c.body}
           </p>
         )}
 
+        {/* ── Support line ── */}
+        {!isMain && c.support && (
+          <p style={{
+            fontSize: isMobile ? 11 : 13,
+            color: '#C9A96E',
+            marginBottom: isMobile ? 18 : 24,
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            <IconCheck size={12} color="#C9A96E" /> {c.support}
+          </p>
+        )}
+
+        {/* ── Trust bullets (main only) ── */}
+        {isMain && c.trust && (
+          <ul style={{
+            listStyle: 'none', padding: 0, margin: `0 0 ${isMobile ? 18 : 28}px`,
+            display: 'flex', flexDirection: 'column', gap: isMobile ? 6 : 8,
+          }}>
+            {c.trust.map((t, i) => (
+              <li key={i} style={{
+                display: 'flex', alignItems: 'flex-start', gap: 8,
+                fontSize: isMobile ? 11 : 13,
+                color: 'rgba(247,244,238,0.75)',
+                lineHeight: 1.4,
+              }}>
+                {i === 0 ? <IconCheck size={12} /> : <IconShield size={12} />}
+                {t}
+              </li>
+            ))}
+          </ul>
+        )}
+
         {/* ── כפתורים ── */}
         <div style={{
-          display: 'flex', gap: isMobile ? 8 : 12,
-          flexWrap: 'wrap',
-          marginBottom: isMain ? (isMobile ? 20 : 32) : 16,
+          display: 'flex',
           flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? 8 : 10,
+          alignItems: isMobile ? 'stretch' : 'center',
           width: isMobile ? '100%' : 'auto',
         }}>
-          {(isMobile && isMain ? c.buttons.slice(0, 1) : c.buttons).map((btn, i) => (
-            <HeroBtn key={i} btn={btn} isMobile={isMobile} isPrimary={i === 0} />
-          ))}
+          {c.buttons.map((btn, i) => {
+            const base: React.CSSProperties = {
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              gap: 6, padding: isMobile ? '11px 18px' : '12px 22px',
+              fontSize: isMobile ? 13 : 14, fontWeight: 700,
+              borderRadius: 0, cursor: 'pointer', transition: 'all 0.2s',
+              border: '1.5px solid transparent', whiteSpace: 'nowrap',
+            };
+            if (btn.style === 'gold') return (
+              <button key={i} onClick={btn.action} style={{ ...base, background: '#C9A96E', color: '#1a2744', borderColor: '#C9A96E' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#b8972a'; e.currentTarget.style.borderColor = '#b8972a'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#C9A96E'; e.currentTarget.style.borderColor = '#C9A96E'; }}>
+                {btn.icon}{btn.label}
+              </button>
+            );
+            if (btn.style === 'outline') return (
+              <button key={i} onClick={btn.action} style={{ ...base, background: 'transparent', color: '#F7F4EE', borderColor: 'rgba(247,244,238,0.55)' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#C9A96E'; e.currentTarget.style.color = '#C9A96E'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(247,244,238,0.55)'; e.currentTarget.style.color = '#F7F4EE'; }}>
+                {btn.icon}{btn.label}
+              </button>
+            );
+            return (
+              <button key={i} onClick={btn.action} style={{ ...base, background: 'rgba(255,255,255,0.08)', color: 'rgba(247,244,238,0.75)', borderColor: 'rgba(255,255,255,0.15)' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}>
+                {btn.icon}{btn.label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* ── Trust badges (מצב ראשי בלבד) ── */}
+        {/* ── Sub-nav (main only — state switchers) ── */}
         {isMain && (
           <div style={{
-            display: 'flex', gap: isMobile ? 10 : 24,
+            display: 'flex', gap: isMobile ? 12 : 16,
+            marginTop: isMobile ? 14 : 20,
             flexWrap: 'wrap',
             justifyContent: isMobile ? 'center' : 'flex-start',
           }}>
-            {(c.trust ?? []).map((t, i) => (
-              <span key={i} style={{
-                fontSize: isMobile ? 10 : 11,
-                color: 'rgba(200,220,196,0.85)',
-                display: 'flex', alignItems: 'center', gap: 5,
-              }}>
-                <IconCheck size={11} color="#C9A96E" /> {t}
-              </span>
+            {[
+              { label: 'מזוזות', state: 'mezuzah' as HeroState },
+              { label: 'תפילין', state: 'tefillin' as HeroState },
+              { label: 'קלפים',  state: 'klaf' as HeroState },
+              { label: 'לא בטוח', state: 'unsure' as HeroState },
+            ].map(item => (
+              <button key={item.state} onClick={() => switchState(item.state)} style={{
+                background: 'none', border: 'none', color: 'rgba(247,244,238,0.55)',
+                fontSize: isMobile ? 11 : 12, cursor: 'pointer', padding: '2px 0',
+                borderBottom: '1px solid rgba(247,244,238,0.2)',
+                transition: 'color 0.15s, border-color 0.15s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.color = '#C9A96E'; e.currentTarget.style.borderColor = '#C9A96E'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'rgba(247,244,238,0.55)'; e.currentTarget.style.borderColor = 'rgba(247,244,238,0.2)'; }}>
+                {item.label}
+              </button>
             ))}
           </div>
         )}
-
-        {/* ── Support (מצבים משניים) ── */}
-        {!isMain && (
-          <p style={{
-            fontSize: 11, color: 'rgba(160,190,155,0.75)',
-            fontStyle: 'italic',
-            display: 'flex', alignItems: 'center', gap: 4,
-          }}>
-            <IconShield size={11} color="rgba(160,190,155,0.6)" /> {c.support}
-          </p>
-        )}
       </div>
-
-      {/* ── פס זהב תחתי ── */}
-      <div style={{
-        position: 'absolute', bottom: 0, right: 0, left: 0,
-        height: 3, zIndex: 3,
-        background: 'linear-gradient(to left, transparent, #b8972a 30%, #e6c84a 50%, #b8972a 70%, transparent)',
-      }} />
     </div>
-  );
-}
-
-// ─── כפתור Hero ──────────────────────────────────────────────────────────────
-function HeroBtn({
-  btn, isMobile, isPrimary,
-}: {
-  btn: { label: string; icon: React.ReactNode; action: () => void; style: BtnStyle };
-  isMobile: boolean;
-  isPrimary: boolean;
-}) {
-  const gold: React.CSSProperties = {
-    background: '#C9A96E',
-    border: '2px solid #C9A96E',
-    color: '#1a1008',
-    fontWeight: 700,
-  };
-  const outline: React.CSSProperties = {
-    background: 'transparent',
-    border: '1.5px solid rgba(201,169,110,0.65)',
-    color: '#F7F4EE',
-    fontWeight: 500,
-  };
-  const ghost: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.08)',
-    border: '1.5px solid rgba(255,255,255,0.2)',
-    color: 'rgba(247,244,238,0.80)',
-    fontWeight: 400,
-  };
-
-  const styleMap = { gold, outline, ghost };
-  const base = styleMap[btn.style];
-
-  return (
-    <button
-      onClick={btn.action}
-      style={{
-        padding: isMobile ? '13px 20px' : isPrimary ? '13px 30px' : '11px 22px',
-        fontSize: isMobile ? 13 : isPrimary ? 15 : 13,
-        borderRadius: 0,
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        display: 'flex', alignItems: 'center', gap: 7,
-        justifyContent: isMobile ? 'center' : 'center',
-        width: isMobile ? '100%' : 'auto',
-        letterSpacing: isPrimary ? '0.02em' : 0,
-        backdropFilter: 'blur(6px)',
-        ...base,
-      }}
-      onMouseEnter={e => {
-        if (btn.style === 'gold') {
-          e.currentTarget.style.background = '#E5D4B0';
-          e.currentTarget.style.borderColor = '#E5D4B0';
-        } else if (btn.style === 'outline') {
-          e.currentTarget.style.background = 'rgba(201,169,110,0.15)';
-          e.currentTarget.style.borderColor = '#C9A96E';
-        } else {
-          e.currentTarget.style.background = 'rgba(255,255,255,0.16)';
-        }
-        e.currentTarget.style.transform = 'translateY(-2px)';
-      }}
-      onMouseLeave={e => {
-        Object.assign(e.currentTarget.style, base);
-        e.currentTarget.style.transform = 'translateY(0)';
-      }}
-    >
-      {btn.icon} {btn.label}
-    </button>
   );
 }
