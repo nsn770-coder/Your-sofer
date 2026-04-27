@@ -806,11 +806,11 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 4. Category grid ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl', minHeight: isMobile ? 700 : 560 }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלו את מגוון מוצרי הסת&quot;מ שלנו</p>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 12 }}
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 12, minHeight: isMobile ? 450 : 300 }}
             className="md:grid-cols-3 lg:grid-cols-6">
             {categoryGridItems.map(cat => (
               <div key={cat.name}
@@ -943,7 +943,7 @@ export default function HomePageClient() {
           >
             <div style={{ height: isMobile ? 100 : 140, overflow: 'hidden', position: 'relative' }}>
               <img
-                src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777151830/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_unt31g.png"
+                src="https://res.cloudinary.com/dyxzq3ucy/image/upload/w_400,h_300,c_fill,q_auto,f_auto/v1777151830/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_unt31g.png"
                 alt="הסופרים שלנו"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
