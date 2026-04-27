@@ -316,6 +316,7 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
   const [imgUrl, setImgUrl]     = useState(product.imgUrl || product.image_url || '');
   const [imgUrl2, setImgUrl2]   = useState(product.imgUrl2 || '');
   const [imgUrl3, setImgUrl3]   = useState(product.imgUrl3 || '');
+  const [imgUrl4, setImgUrl4]   = useState(product.imgUrl4 || '');
   const [videoUrl, setVideoUrl] = useState(product.videoUrl || '');
   const [badge, setBadge]       = useState(product.badge || '');
   const [days, setDays]         = useState(product.days || '7-14');
@@ -350,6 +351,7 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
       if (field === 'main') setImgUrl(url);
       else if (field === 'img2') setImgUrl2(url);
       else if (field === 'img3') setImgUrl3(url);
+      else if (field === 'img4') setImgUrl4(url);
       else if (field === 'video') setVideoUrl(url);
     } catch { alert('שגיאה בהעלאה'); }
     finally { setUploadingImg(null); }
@@ -357,7 +359,7 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
 
   async function handleSave() {
     setSaving(true);
-    try { onSave({ name, price: Number(price), was: was ? Number(was) : null, desc, cat, level: ['קלפי מזוזה', 'תפילין קומפלט'].includes(cat) ? level : '', soferId: soferId || undefined, imgUrl, imgUrl2, imgUrl3, videoUrl, badge, days }); }
+    try { onSave({ name, price: Number(price), was: was ? Number(was) : null, desc, cat, level: ['קלפי מזוזה', 'תפילין קומפלט'].includes(cat) ? level : '', soferId: soferId || undefined, imgUrl, imgUrl2, imgUrl3, imgUrl4, videoUrl, badge, days }); }
     finally { setSaving(false); }
   }
 
@@ -394,9 +396,9 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
           <div><label style={labelS}>תיאור</label><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={4} style={{ ...inputS, resize: 'vertical' }} /></div>
           <div>
             <label style={labelS}>תמונות וסרטון</label>
-            {(['main', 'img2', 'img3'] as const).map((field, idx) => {
-              const cur = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : imgUrl3;
-              const set = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : setImgUrl3;
+            {(['main', 'img2', 'img3', 'img4'] as const).map((field, idx) => {
+              const cur = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : field === 'img3' ? imgUrl3 : imgUrl4;
+              const set = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : field === 'img3' ? setImgUrl3 : setImgUrl4;
               return (
                 <div key={field} style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
                   {cur && <img src={cur} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
@@ -406,6 +408,9 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
                     <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleUpload(e, field)} />
                   </label>
                   <input value={cur} onChange={e => set(e.target.value)} placeholder="URL" style={{ flex: 1, border: '1px solid #ddd', borderRadius: 7, padding: '7px 10px', fontSize: 12, minWidth: 0 }} />
+                  {cur && (
+                    <button type="button" onClick={() => set('')} title="מחק תמונה" style={{ background: 'none', border: '1px solid #e0e0e0', borderRadius: 7, padding: '6px 8px', fontSize: 12, cursor: 'pointer', color: '#888', flexShrink: 0, lineHeight: 1 }}>✕</button>
+                  )}
                 </div>
               );
             })}

@@ -1,13 +1,8 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-} from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, getDocs, query, collection, where } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { db } from '../firebase';
+import { getAuthLazy } from '@/lib/authLazy';
 
 export type UserRole = 'customer' | 'shaliach' | 'sofer' | 'admin';
 
@@ -35,95 +30,117 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        let role: UserRole = 'customer';
-        let soferId: string | undefined;
-        let shaliachId: string | undefined;
+    let unsubscribe: (() => void) | undefined;
+    let cancelled = false;
 
-        // בדוק admins
-        const adminSnap = await getDoc(doc(db, 'admins', firebaseUser.uid));
-        if (adminSnap.exists()) {
-          role = 'admin';
-        } else {
-          // בדוק users collection
-          const userRef = doc(db, 'users', firebaseUser.uid);
-          const userSnap = await getDoc(userRef);
+    async function setup() {
+      const { onAuthStateChanged } = await import('firebase/auth');
+      const auth = await getAuthLazy();
+      if (cancelled) return;
 
-          if (userSnap.exists()) {
-            const data = userSnap.data();
-            role = data.role || 'customer';
-            soferId = data.soferId;
-            shaliachId = data.shaliachId;
+      unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+        if (cancelled) return;
+        if (firebaseUser) {
+          let role: UserRole = 'customer';
+          let soferId: string | undefined;
+          let shaliachId: string | undefined;
+
+          // בדוק admins
+          const adminSnap = await getDoc(doc(db, 'admins', firebaseUser.uid));
+          if (adminSnap.exists()) {
+            role = 'admin';
           } else {
-            // משתמש חדש — צור רשומה
-            const referredByShaliach = typeof window !== 'undefined'
-              ? localStorage.getItem('shaliachRef')
-              : null;
+            // בדוק users collection
+            const userRef = doc(db, 'users', firebaseUser.uid);
+            const userSnap = await getDoc(userRef);
 
-            // בדוק אם האימייל אושר כשליח לפני ההרשמה
-            let newRole: UserRole = 'customer';
-            let approvedShaliachId: string | undefined;
-            if (firebaseUser.email) {
-              const appSnap = await getDocs(
-                query(
-                  collection(db, 'shluchim_applications'),
-                  where('email', '==', firebaseUser.email.trim().toLowerCase()),
-                  where('status', '==', 'approved'),
-                )
-              );
-              if (!appSnap.empty) {
-                const appData = appSnap.docs[0].data();
-                const approvedDocId: string = appData.approvedDocId || appSnap.docs[0].id;
-                newRole = 'shaliach';
-                approvedShaliachId = approvedDocId;
-                // קשר את מסמך השליח ל-uid האמיתי
-                await updateDoc(doc(db, 'shluchim', approvedDocId), { uid: firebaseUser.uid });
+            if (userSnap.exists()) {
+              const data = userSnap.data();
+              role = data.role || 'customer';
+              soferId = data.soferId;
+              shaliachId = data.shaliachId;
+            } else {
+              // משתמש חדש — צור רשומה
+              const referredByShaliach = typeof window !== 'undefined'
+                ? localStorage.getItem('shaliachRef')
+                : null;
+
+              // בדוק אם האימייל אושר כשליח לפני ההרשמה
+              let newRole: UserRole = 'customer';
+              let approvedShaliachId: string | undefined;
+              if (firebaseUser.email) {
+                const appSnap = await getDocs(
+                  query(
+                    collection(db, 'shluchim_applications'),
+                    where('email', '==', firebaseUser.email.trim().toLowerCase()),
+                    where('status', '==', 'approved'),
+                  )
+                );
+                if (!appSnap.empty) {
+                  const appData = appSnap.docs[0].data();
+                  const approvedDocId: string = appData.approvedDocId || appSnap.docs[0].id;
+                  newRole = 'shaliach';
+                  approvedShaliachId = approvedDocId;
+                  // קשר את מסמך השליח ל-uid האמיתי
+                  await updateDoc(doc(db, 'shluchim', approvedDocId), { uid: firebaseUser.uid });
+                }
               }
-            }
 
-            await setDoc(userRef, {
+              await setDoc(userRef, {
+                email: firebaseUser.email,
+                displayName: firebaseUser.displayName,
+                photoURL: firebaseUser.photoURL,
+                role: newRole,
+                status: 'active',
+                createdAt: new Date(),
+                ...(approvedShaliachId
+                  ? { shaliachId: approvedShaliachId }
+                  : referredByShaliach
+                  ? { shaliachId: referredByShaliach }
+                  : {}),
+              });
+
+              role = newRole;
+              shaliachId = approvedShaliachId;
+            }
+          }
+
+          if (!cancelled) {
+            setUser({
+              uid: firebaseUser.uid,
               email: firebaseUser.email,
               displayName: firebaseUser.displayName,
               photoURL: firebaseUser.photoURL,
-              role: newRole,
-              status: 'active',
-              createdAt: new Date(),
-              ...(approvedShaliachId
-                ? { shaliachId: approvedShaliachId }
-                : referredByShaliach
-                ? { shaliachId: referredByShaliach }
-                : {}),
+              role,
+              soferId,
+              shaliachId,
             });
-
-            role = newRole;
-            shaliachId = approvedShaliachId;
           }
+        } else {
+          if (!cancelled) setUser(null);
         }
+        if (!cancelled) setLoading(false);
+      });
+    }
 
-        setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL,
-          role,
-          soferId,
-          shaliachId,
-        });
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
-    return () => unsub();
+    setup();
+
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, []);
 
   async function signInWithGoogle() {
+    const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+    const auth = await getAuthLazy();
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
   }
 
   async function logout() {
+    const { signOut } = await import('firebase/auth');
+    const auth = await getAuthLazy();
     await signOut(auth);
   }
 

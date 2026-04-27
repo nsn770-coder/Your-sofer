@@ -5,7 +5,8 @@ import {
   collection, getDocs, orderBy, query, where,
   doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, getCountFromServer
 } from 'firebase/firestore';
-import { db, auth } from '../firebase';
+import { db } from '../firebase';
+import { getAuthLazy } from '@/lib/authLazy';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
 import { CATS } from '../constants/categories';
@@ -1334,7 +1335,8 @@ export default function AdminPage() {
   async function changeUserRole(userId: string, newRole: UserRole) {
     setActionLoading(userId);
     try {
-      const idToken = await auth.currentUser?.getIdToken();
+      const _auth = await getAuthLazy();
+      const idToken = await _auth.currentUser?.getIdToken();
       if (!idToken) throw new Error('Not authenticated');
       const res = await fetch('/api/admin/update-role', {
         method: 'POST',

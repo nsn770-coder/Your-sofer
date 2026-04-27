@@ -122,7 +122,8 @@
       "PowerShell(Get-WmiObject *)",
       "PowerShell(Get-CimInstance *)",
       "Bash(git checkout *)",
-      "Bash(echo \"EXIT_CODE: $?\")"
+      "Bash(echo \"EXIT_CODE: $?\")",
+      "Bash(head -100 /c/Users/Owner/Downloads/projects/Your-sofer/app/product/[id]/ProductClient.tsx)"
     ]
   }
 }
