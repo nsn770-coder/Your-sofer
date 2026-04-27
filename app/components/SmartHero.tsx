@@ -137,7 +137,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
     <div style={{
       position: 'relative',
       width: '100%',
-      height: containerHeight,        // ← explicit height, NOT minHeight/maxHeight
+      minHeight: isMobile ? 320 : 500, height: isMobile ? 'auto' : 500,
       overflow: 'hidden',
       display: 'flex',
       alignItems: 'center',
@@ -173,7 +173,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
         position: 'relative', zIndex: 2,
         width: '100%', maxWidth: 860,
         margin: '0 auto',
-        padding: isMobile ? '40px 20px 48px' : '0 48px',
+        padding: isMobile ? '20px 20px 32px' : '0 48px',
         display: 'flex', flexDirection: 'column',
         alignItems: isMobile ? 'center' : 'flex-start',
         textAlign: isMobile ? 'center' : 'right',
