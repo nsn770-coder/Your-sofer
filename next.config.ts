@@ -47,6 +47,13 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // www → apex redirect (301)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.your-sofer.com' }],
+        destination: 'https://your-sofer.com/:path*',
+        permanent: true,
+      },
       {
         source: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA-%D7%97%D7%92%D7%99%D7%9D',
         destination: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA-%D7%95%D7%97%D7%92%D7%99%D7%9D',

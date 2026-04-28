@@ -1,15 +1,12 @@
 'use client';
-import { useEffect } from 'react';
+import Script from 'next/script';
 
 export function TidioChat() {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const s = document.createElement('script');
-      s.src = `//code.tidio.co/${process.env.NEXT_PUBLIC_TIDIO_KEY}.js`;
-      s.async = true;
-      document.body.appendChild(s);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, []);
-  return null;
+  if (!process.env.NEXT_PUBLIC_TIDIO_KEY) return null;
+  return (
+    <Script
+      src={`//code.tidio.co/${process.env.NEXT_PUBLIC_TIDIO_KEY}.js`}
+      strategy="lazyOnload"
+    />
+  );
 }

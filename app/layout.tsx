@@ -14,6 +14,7 @@ import WizardStickyBar from "@/app/components/WizardStickyBar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FacebookPixel } from "@/components/FacebookPixel";
 import { TidioChat } from "@/components/TidioChat";
+import { CanonicalTag } from "@/components/CanonicalTag";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "swap", variable: "--font-heebo" });
@@ -53,7 +54,7 @@ export const metadata: Metadata = {
     description: 'רכישת סת"מ מסופרים מוסמכים — מזוזות, תפילין ועוד.',
     images: ['/og-default.png'],
   },
-  alternates: { canonical: BASE_URL },
+  alternates: {},
   icons: { icon: '/favicon.png' },
 };
 
@@ -66,6 +67,7 @@ export default function RootLayout({
     <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className="overflow-x-hidden">
       <head>
         <meta name="facebook-domain-verification" content="xuwtu57l434nldfe7p4s8l2sr829jw" />
+        <CanonicalTag />
         {/* ── Preconnects & DNS prefetches ── */}
         <link rel="preconnect" href="https://your-sofer.firebaseapp.com" />
         <link rel="preconnect" href="https://apis.google.com" />
