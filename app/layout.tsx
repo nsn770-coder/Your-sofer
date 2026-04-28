@@ -65,6 +65,7 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className="overflow-x-hidden">
       <head>
+        <meta name="facebook-domain-verification" content="xuwtu57l434nldfe7p4s8l2sr829jw" />
         {/* ── Preconnects & DNS prefetches ── */}
         <link rel="preconnect" href="https://your-sofer.firebaseapp.com" />
         <link rel="preconnect" href="https://apis.google.com" />
