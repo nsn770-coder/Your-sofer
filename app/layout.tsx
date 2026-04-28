@@ -76,7 +76,7 @@ export default function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1400/v1777180035/IMG_1277_apvc5v.png"
+          href="https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777363162/%D7%91%D7%90%D7%A0%D7%A8_lbwxgj.png"
           fetchPriority="high"
         />
       </head>

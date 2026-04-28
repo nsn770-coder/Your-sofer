@@ -1,28 +1,21 @@
 'use client';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 
-const HERO_IMAGE = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_1400/v1777180035/IMG_1277_apvc5v.png';
-
-function IconCheck({ size = 13, color = '#b8972a' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-function IconShield({ size = 13, color = '#b8972a' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2l7 4v5c0 5-3.5 9.7-7 11-3.5-1.3-7-6-7-11V6l7-4z" />
-    </svg>
-  );
-}
-
-const TRUST = [
-  'המזוזות נבדקות ע"י רב מוסמך · צילום קלף אמיתי לפני משלוח',
-  'תעודת כשרות והסמכה לכל סופר',
-  'אפשרות להחזר כספי מלא',
+const SLIDES = [
+  {
+    src: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777363162/%D7%91%D7%90%D7%A0%D7%A8_lbwxgj.png',
+    alt: 'Your Sofer — סת״מ ויודאיקה מהודרים',
+    priority: true,
+  },
+  {
+    src: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777363664/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_1200_x_800_%D7%A4%D7%99%D7%A7%D7%A1%D7%9C_mpaeoc.png',
+    alt: 'הסופרים שלנו — סופרי סת״מ מוסמכים',
+    priority: false,
+  },
 ] as const;
+
+const AUTO_ADVANCE_MS = 5000;
 
 export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, bgImage }: {
   isMobile: boolean;
@@ -34,104 +27,118 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
   void onSelectCat;
   void bgImage;
 
+  const [current, setCurrent] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const goTo = useCallback((idx: number) => {
+    setCurrent(idx);
+    if (trackRef.current) {
+      trackRef.current.scrollTo({ left: idx * trackRef.current.offsetWidth, behavior: 'smooth' });
+    }
+  }, []);
+
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setCurrent(prev => {
+        const next = (prev + 1) % SLIDES.length;
+        if (trackRef.current) {
+          trackRef.current.scrollTo({ left: next * trackRef.current.offsetWidth, behavior: 'smooth' });
+        }
+        return next;
+      });
+    }, AUTO_ADVANCE_MS);
+  }, []);
+
+  useEffect(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [current, startTimer]);
+
+  // Sync dot indicator when user manually scrolls
+  const handleScroll = useCallback(() => {
+    if (!trackRef.current) return;
+    const idx = Math.round(trackRef.current.scrollLeft / trackRef.current.offsetWidth);
+    setCurrent(idx);
+  }, []);
+
+  const desktopHeight = 800;
+  // Mobile: 3:2 aspect ratio expressed as padding-top trick via minHeight calc
+  const mobileHeight = isMobile ? `calc(100vw * 2 / 3)` : `${desktopHeight}px`;
+
   return (
-    <div style={{
-      position: 'relative',
-      width: '100%',
-      minHeight: isMobile ? 380 : 500,
-      display: 'flex',
-      alignItems: 'center',
-      direction: 'rtl',
-    }}>
-      {/* ── Background image via Next.js Image ── */}
-      <Image
-        src={HERO_IMAGE}
-        alt="Your Sofer — סופר סת״מ"
-        fill
-        priority={true}
-        fetchPriority="high"
-        loading="eager"
-        sizes="100vw"
-        quality={80}
-        style={{ objectFit: 'cover', objectPosition: 'center 30%' }}
-      />
+    <div style={{ position: 'relative', width: '100%', direction: 'ltr' }}>
+      {/* ── Scroll track ── */}
+      <div
+        ref={trackRef}
+        onScroll={handleScroll}
+        style={{
+          display: 'flex',
+          overflowX: 'scroll',
+          scrollSnapType: 'x mandatory',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          width: '100%',
+          height: mobileHeight,
+        } as React.CSSProperties}
+      >
+        {SLIDES.map((slide, i) => (
+          <div
+            key={i}
+            style={{
+              flex: '0 0 100%',
+              scrollSnapAlign: 'start',
+              position: 'relative',
+              height: '100%',
+            }}
+          >
+            <Image
+              src={slide.src}
+              alt={slide.alt}
+              fill
+              priority={slide.priority}
+              fetchPriority={slide.priority ? 'high' : 'auto'}
+              loading={slide.priority ? 'eager' : 'lazy'}
+              sizes="100vw"
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
+            />
+          </div>
+        ))}
+      </div>
 
-      {/* ── Dark overlay ── */}
-      <div style={{
-        position: 'absolute', inset: 0, zIndex: 1,
-        background: 'linear-gradient(160deg, rgba(10,8,5,0.70) 0%, rgba(13,10,6,0.52) 55%, rgba(10,8,5,0.75) 100%)',
-      }} />
+      {/* ── Hide scrollbar (WebKit) ── */}
+      <style>{`
+        div[style*="scroll-snap-type"]::-webkit-scrollbar { display: none; }
+      `}</style>
 
-      {/* ── Vignette ── */}
+      {/* ── Dot indicators ── */}
       <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0,
-        height: '35%', zIndex: 1,
-        background: 'linear-gradient(to top, rgba(10,8,5,0.70) 0%, transparent 100%)',
-        pointerEvents: 'none',
-      }} />
-
-      {/* ── Content ── */}
-      <div style={{
-        position: 'relative', zIndex: 2,
-        width: '100%', maxWidth: 860,
-        margin: '0 auto',
-        padding: isMobile ? '32px 20px 40px' : '0 48px',
-        display: 'flex', flexDirection: 'column',
-        alignItems: isMobile ? 'center' : 'flex-start',
-        textAlign: isMobile ? 'center' : 'right',
+        position: 'absolute',
+        bottom: isMobile ? 10 : 16,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        gap: 8,
+        zIndex: 10,
       }}>
-
-        {/* ── Gold line ── */}
-        <div style={{
-          width: 44, height: 1,
-          background: 'linear-gradient(to left, transparent, #C9A96E, transparent)',
-          marginBottom: isMobile ? 20 : 28,
-          alignSelf: isMobile ? 'center' : 'flex-start',
-        }} />
-
-        {/* ── H1 ── */}
-        <h1 style={{
-          fontSize: isMobile ? 26 : 52,
-          fontWeight: 900,
-          color: '#F7F4EE',
-          lineHeight: 1.18,
-          marginBottom: isMobile ? 14 : 20,
-          textShadow: '0 2px 40px rgba(0,0,0,0.8)',
-          letterSpacing: '-0.02em',
-          fontFamily: "'Frank Ruhl Libre', 'David Libre', serif",
-        }}>
-          היחידים בעולם שמראים לך את <span style={{ color: '#C9A96E' }}>הסופר</span>.
-        </h1>
-
-        {/* ── Subtitle ── */}
-        <p style={{
-          fontSize: isMobile ? 14 : 18,
-          color: 'rgba(247,244,238,0.82)',
-          marginBottom: isMobile ? 18 : 28,
-          lineHeight: 1.55,
-          maxWidth: 480,
-          fontWeight: 400,
-        }}>
-          סת״מ ויודאיקה מהודרים בשקיפות שעוד לא הכרת.
-        </p>
-
-        {/* ── Trust bullets ── */}
-        <ul style={{
-          listStyle: 'none', padding: 0, margin: 0,
-          display: 'flex', flexDirection: 'column', gap: isMobile ? 6 : 8,
-        }}>
-          {TRUST.map((t, i) => (
-            <li key={i} style={{
-              display: 'flex', alignItems: 'flex-start', gap: 8,
-              fontSize: isMobile ? 11 : 13,
-              color: 'rgba(247,244,238,0.75)',
-              lineHeight: 1.4,
-            }}>
-              {i === 0 ? <IconCheck size={12} /> : <IconShield size={12} />}
-              {t}
-            </li>
-          ))}
-        </ul>
+        {SLIDES.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`מעבר לבאנר ${i + 1}`}
+            onClick={() => { goTo(i); startTimer(); }}
+            style={{
+              width: current === i ? 24 : 8,
+              height: 8,
+              borderRadius: 4,
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              background: current === i ? '#fff' : 'rgba(255,255,255,0.45)',
+              transition: 'width 0.3s ease, background 0.3s ease',
+            }}
+          />
+        ))}
       </div>
     </div>
   );

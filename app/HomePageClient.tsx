@@ -122,6 +122,7 @@ interface Product {
   was?: number | null;
   createdAt?: { seconds: number } | null;
   hidden?: boolean;
+  cat?: string;
 }
 
 // ── Sub-image slot ─────────────────────────────────────────────────────────────
@@ -419,19 +420,26 @@ export default function HomePageClient() {
         const snap = await getDocs(
           query(collection(db, 'products'), where('isBestSeller', '==', true), limit(16)),
         );
+        const KLAF_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'מגילות', 'ספרי תורה']);
+        const isShowable = (p: Product) =>
+          p.hidden !== true &&
+          (p as any).status !== 'inactive' &&
+          !KLAF_CATS.has(p.cat ?? '') &&
+          !!(p.imgUrl || p.image_url);
+
         const bestSellers = snap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
-          .filter((p: Product) => p.hidden !== true && (p as any).status !== 'inactive');
+          .filter(isShowable);
         if (bestSellers.length >= 4) {
           setFeaturedProducts(bestSellers.slice(0, 8));
           return;
         }
         const fallbackSnap = await getDocs(
-          query(collection(db, 'products'), orderBy('priority', 'desc'), limit(24)),
+          query(collection(db, 'products'), orderBy('priority', 'desc'), limit(40)),
         );
         const all = fallbackSnap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
-          .filter((p: Product) => p.hidden !== true && (p as any).status !== 'inactive');
+          .filter(isShowable);
         setFeaturedProducts(all.slice(0, 8));
       } catch { /* non-fatal */ }
     }

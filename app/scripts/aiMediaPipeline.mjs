@@ -37,7 +37,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 })();
 
 // ══ Firebase Admin SDK ══
-const SA_PATH = resolve(__dirname, '../../your-sofer-firebase-adminsdk-fbsvc-418544c2de.json');
+const SA_PATH = resolve(__dirname, '../../serviceAccountKey.json.json');
 if (getApps().length === 0) initializeApp({ credential: cert(SA_PATH) });
 const db = getFirestore();
 
