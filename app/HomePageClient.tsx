@@ -912,7 +912,7 @@ export default function HomePageClient() {
       {/* ── Clear Path CTA ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 16px' : '40px 16px', direction: 'rtl', textAlign: 'center' }}>
         <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>לא בטוח מה לבחור?</h2>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>בחר לפי מה שאתה מחפש — נמצא לך את המתאים ביותר</p>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>הכירו את הסופרים שלנו — סופרים מוסמכים, מאומתים ומדורגים</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
           {CLEAR_PATH_ITEMS.map(item => (
             <button
@@ -936,6 +936,33 @@ export default function HomePageClient() {
             </button>
           ))}
         </div>
+        <button
+          onClick={() => router.push('/soferim')}
+          style={{
+            marginTop: 16,
+            background: 'linear-gradient(135deg, #b8972a, #d4af37, #b8972a)',
+            color: '#0c1a35',
+            fontWeight: 900,
+            fontSize: 16,
+            padding: '16px 48px',
+            borderRadius: 0,
+            border: '2px solid #d4af37',
+            letterSpacing: 1,
+            boxShadow: '0 4px 20px rgba(184,151,42,0.4)',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)';
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 28px rgba(184,151,42,0.6)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.filter = '';
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 20px rgba(184,151,42,0.4)';
+          }}
+        >
+          לצפייה במאגר הסופרים שלנו ←
+        </button>
       </div>
 
       {/* ── 6. More categories horizontal scroll ── */}
