@@ -4,16 +4,18 @@ import Image from 'next/image';
 
 const SLIDES = [
   {
-    src: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777365682/%D7%91%D7%90%D7%A0%D7%A8_2_wovsve.png',
+    mobileSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777365682/%D7%91%D7%90%D7%A0%D7%A8_2_wovsve.png',
+    desktopSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777452503/%D7%9E%D7%97%D7%A9%D7%91_dmat7m.png',
     alt: 'Your Sofer — סת״מ ויודאיקה מהודרים',
     priority: true,
   },
   {
-    src: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777363664/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_1200_x_800_%D7%A4%D7%99%D7%A7%D7%A1%D7%9C_mpaeoc.png',
+    mobileSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777363664/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_1200_x_800_%D7%A4%D7%99%D7%A7%D7%A1%D7%9C_mpaeoc.png',
+    desktopSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777452872/%D7%9E%D7%97%D7%A9%D7%91_2_k4rzk2.png',
     alt: 'הסופרים שלנו — סופרי סת״מ מוסמכים',
     priority: false,
   },
-] as const;
+];
 
 const AUTO_ADVANCE_MS = 5000;
 
@@ -63,7 +65,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
     setCurrent(idx);
   }, []);
 
-  const desktopHeight = 800;
+  const desktopHeight = 580;
   // Mobile: 3:2 aspect ratio expressed as padding-top trick via minHeight calc
   const mobileHeight = isMobile ? `calc(100vw * 2 / 3)` : `${desktopHeight}px`;
 
@@ -94,7 +96,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
             }}
           >
             <Image
-              src={slide.src}
+              src={isMobile ? slide.mobileSrc : slide.desktopSrc}
               alt={slide.alt}
               fill
               priority={slide.priority}
