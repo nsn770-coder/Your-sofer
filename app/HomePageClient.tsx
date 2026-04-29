@@ -418,7 +418,7 @@ export default function HomePageClient() {
     async function fetchFeaturedProducts() {
       try {
         const snap = await getDocs(
-          query(collection(db, 'products'), where('isBestSeller', '==', true), limit(16)),
+          query(collection(db, 'products'), where('isBestSeller', '==', true), limit(50)),
         );
         const KLAF_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'מגילות', 'ספרי תורה']);
         const BLOCKED_NAMES = /מלחי|מלחית|מלחיות/;
@@ -433,16 +433,16 @@ export default function HomePageClient() {
           .map(d => ({ id: d.id, ...d.data() } as Product))
           .filter(isShowable);
         if (bestSellers.length >= 4) {
-          setFeaturedProducts(bestSellers.slice(0, 8));
+          setFeaturedProducts(bestSellers);
           return;
         }
         const fallbackSnap = await getDocs(
-          query(collection(db, 'products'), orderBy('priority', 'desc'), limit(40)),
+          query(collection(db, 'products'), orderBy('priority', 'desc'), limit(50)),
         );
         const all = fallbackSnap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
           .filter(isShowable);
-        setFeaturedProducts(all.slice(0, 8));
+        setFeaturedProducts(all);
       } catch { /* non-fatal */ }
     }
 
