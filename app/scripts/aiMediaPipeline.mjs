@@ -409,26 +409,35 @@ async function generateAndUpload(imageBase64, contentType, prompt, productId, ty
   }
 }
 
+const url_s = url => url ? url.substring(url.lastIndexOf('/') + 1, url.lastIndexOf('/') + 40) + '...' : '—';
+
 // ══ עבד מוצר אחד — יוצר רק את התמונות החסרות ══
 async function processProduct(product, provider, testMode) {
   const imgUrl = product.imgUrl || product.image_url;
-  console.log(`\n📦 ${product.name?.substring(0, 60)}`);
+  console.log(`\n📦 [ID: ${product.id}] ${product.name?.substring(0, 60)}`);
   console.log(`   קטגוריה: ${product.cat} | ספק: ${provider.toUpperCase()}`);
 
+  // ── קרא ערכים נוכחיים מ-Firestore (תמיד — גם ב-testMode) ──
+  const freshBefore = await db.collection('products').doc(product.id).get();
+  const dBefore = freshBefore.data() || {};
+  console.log('\n   ═══ לפני עיבוד (ערכים ב-Firestore) ═══');
+  console.log(`   imgUrl2 (lifestyle): ${dBefore.imgUrl2 ? url_s(dBefore.imgUrl2) : '❌ חסר'}`);
+  console.log(`   imgUrl3 (studio):    ${dBefore.imgUrl3 ? url_s(dBefore.imgUrl3) : '❌ חסר'}`);
+  console.log(`   imgUrl4 (human):     ${dBefore.imgUrl4 ? url_s(dBefore.imgUrl4) : '❌ חסר'}`);
+
   // בדוק כל שדה בנפרד — דלג על מה שכבר קיים
-  let needsLifestyle = true, needsStudio = true, needsHuman = true;
-  if (!testMode) {
-    const fresh = await db.collection('products').doc(product.id).get();
-    const d = fresh.data() || {};
-    needsLifestyle = !d.imgUrl2;
-    needsStudio    = !d.imgUrl3;
-    needsHuman     = !d.imgUrl4;
-    if (!needsLifestyle && !needsStudio && !needsHuman) {
-      console.log('   ⏭ כל 3 תמונות כבר קיימות — דולג');
-      return { skipped: true };
-    }
-    const missing = [needsLifestyle && 'imgUrl2', needsStudio && 'imgUrl3', needsHuman && 'imgUrl4'].filter(Boolean);
-    console.log(`   🔍 חסרות: ${missing.join(', ')}`);
+  const needsLifestyle = !dBefore.imgUrl2;
+  const needsStudio    = !dBefore.imgUrl3;
+  const needsHuman     = !dBefore.imgUrl4;
+
+  console.log('\n   ═══ החלטה ═══');
+  console.log(`   imgUrl2 (lifestyle): ${needsLifestyle ? '🔨 יוצר' : '⏭  מדלג (קיים)'}`);
+  console.log(`   imgUrl3 (studio):    ${needsStudio    ? '🔨 יוצר' : '⏭  מדלג (קיים)'}`);
+  console.log(`   imgUrl4 (human):     ${needsHuman     ? '🔨 יוצר' : '⏭  מדלג (קיים)'}`);
+
+  if (!needsLifestyle && !needsStudio && !needsHuman) {
+    console.log('\n   ⏭ כל 3 תמונות כבר קיימות — דולג לחלוטין');
+    return { skipped: true };
   }
 
   // ══ הורד תמונת מקור ══
@@ -437,7 +446,7 @@ async function processProduct(product, provider, testMode) {
     let downloadUrl = imgUrl;
     if (!imgUrl.includes('cloudinary.com')) {
       try {
-        console.log('   🔄 מבקש מ-Cloudinary להוריד תמונה...');
+        console.log('\n   🔄 מבקש מ-Cloudinary להוריד תמונה...');
         downloadUrl = await fetchUrlViaCloudinary(imgUrl, product.id);
         console.log('   ✅ Cloudinary הוריד:', downloadUrl.substring(0, 60) + '...');
       } catch (cloudErr) {
@@ -462,11 +471,9 @@ async function processProduct(product, provider, testMode) {
     );
     if (lifestyleUrl && !testMode) {
       await db.collection('products').doc(product.id).update({ imgUrl2: lifestyleUrl });
-      console.log('   💾 imgUrl2 נשמר');
+      console.log('   💾 imgUrl2 נשמר:', url_s(lifestyleUrl));
     }
     if (needsStudio || needsHuman) await sleep(INTER_IMAGE_DELAY);
-  } else {
-    console.log('   ⏭ imgUrl2 כבר קיים — מדלג');
   }
 
   // ══ תמונה 2: Studio (imgUrl3) ══
@@ -477,11 +484,9 @@ async function processProduct(product, provider, testMode) {
     );
     if (studioUrl && !testMode) {
       await db.collection('products').doc(product.id).update({ imgUrl3: studioUrl });
-      console.log('   💾 imgUrl3 נשמר');
+      console.log('   💾 imgUrl3 נשמר:', url_s(studioUrl));
     }
     if (needsHuman) await sleep(INTER_IMAGE_DELAY);
-  } else {
-    console.log('   ⏭ imgUrl3 כבר קיים — מדלג');
   }
 
   // ══ תמונה 3: Human model (imgUrl4) ══
@@ -492,21 +497,32 @@ async function processProduct(product, provider, testMode) {
     );
     if (humanUrl && !testMode) {
       await db.collection('products').doc(product.id).update({ imgUrl4: humanUrl });
-      console.log('   💾 imgUrl4 נשמר');
+      console.log('   💾 imgUrl4 נשמר:', url_s(humanUrl));
     }
-  } else {
-    console.log('   ⏭ imgUrl4 כבר קיים — מדלג');
   }
 
+  // ── קרא ערכים סופיים מ-Firestore (רק אם לא testMode — אחרת לא כתבנו כלום) ──
+  console.log('\n   ═══ אחרי עיבוד ═══');
   if (testMode) {
-    console.log('\n   🧪 תוצאות בדיקה:');
-    console.log(`   imgUrl2 (lifestyle): ${lifestyleUrl || (needsLifestyle ? '❌ נכשל' : '⏭ קיים')}`);
-    console.log(`   imgUrl3 (studio):    ${studioUrl   || (needsStudio    ? '❌ נכשל' : '⏭ קיים')}`);
-    console.log(`   imgUrl4 (human):     ${humanUrl    || (needsHuman     ? '❌ נכשל' : '⏭ קיים')}`);
+    console.log('   (testMode — לא נכתב ל-Firestore. ערכים שהיו בזמן הריצה:)');
+    console.log(`   imgUrl2 (lifestyle): ${lifestyleUrl ? '🆕 ' + url_s(lifestyleUrl) : (needsLifestyle ? '❌ נכשל' : '⏭  לא שונה')}`);
+    console.log(`   imgUrl3 (studio):    ${studioUrl   ? '🆕 ' + url_s(studioUrl)    : (needsStudio    ? '❌ נכשל' : '⏭  לא שונה')}`);
+    console.log(`   imgUrl4 (human):     ${humanUrl    ? '🆕 ' + url_s(humanUrl)     : (needsHuman     ? '❌ נכשל' : '⏭  לא שונה')}`);
+  } else {
+    const freshAfter = await db.collection('products').doc(product.id).get();
+    const dAfter = freshAfter.data() || {};
+    console.log(`   imgUrl2 (lifestyle): ${dAfter.imgUrl2 ? url_s(dAfter.imgUrl2) : '❌ חסר'}`);
+    console.log(`   imgUrl3 (studio):    ${dAfter.imgUrl3 ? url_s(dAfter.imgUrl3) : '❌ חסר'}`);
+    console.log(`   imgUrl4 (human):     ${dAfter.imgUrl4 ? url_s(dAfter.imgUrl4) : '❌ חסר'}`);
+    const changed = [];
+    if (dBefore.imgUrl2 !== dAfter.imgUrl2) changed.push('imgUrl2');
+    if (dBefore.imgUrl3 !== dAfter.imgUrl3) changed.push('imgUrl3');
+    if (dBefore.imgUrl4 !== dAfter.imgUrl4) changed.push('imgUrl4');
+    console.log(`   🔄 שינויים: ${changed.length ? changed.join(', ') : 'ללא'}`);
   }
 
   const created = [lifestyleUrl, studioUrl, humanUrl].filter(Boolean).length;
-  console.log(`   📊 ${created} תמונות חדשות נוצרו`);
+  console.log(`   📊 ${created} תמונות חדשות נוצרו בריצה זו`);
 
   return { imgUrl2: lifestyleUrl, imgUrl3: studioUrl, imgUrl4: humanUrl };
 }
