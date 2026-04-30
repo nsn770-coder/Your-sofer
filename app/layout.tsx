@@ -15,6 +15,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FacebookPixel } from "@/components/FacebookPixel";
 import { TidioChat } from "@/components/TidioChat";
 import { CanonicalTag } from "@/components/CanonicalTag";
+import Script from "next/script";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "swap", variable: "--font-heebo" });
@@ -82,13 +83,6 @@ export default function RootLayout({
           href="https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777365682/%D7%91%D7%90%D7%A0%D7%A8_2_wovsve.png"
           fetchPriority="high"
         />
-        <script async dangerouslySetInnerHTML={{ __html: `
-          (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window,document,"clarity","script","wiozsdfcgm");
-        ` }} />
       </head>
       <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100vw', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
         <AuthProvider>
@@ -108,6 +102,15 @@ export default function RootLayout({
         <WizardStickyBar />
         <ShiraChat />
         <SpeedInsights />
+
+        {/* ── Microsoft Clarity — deferred until browser idle ── */}
+        <Script id="clarity" strategy="lazyOnload">{`
+          (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          })(window,document,"clarity","script","wiozsdfcgm");
+        `}</Script>
 
         {/* ── Meta Pixel — deferred until user interaction ── */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
