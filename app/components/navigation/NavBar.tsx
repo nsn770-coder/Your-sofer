@@ -351,6 +351,10 @@ function NavBarContent() {
 
   return (
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif" }}>
+      <style>{`
+        .ys-nav-logo { height: 32px; }
+        @media (max-width: 1023px) { .ys-nav-logo { height: 26px; } }
+      `}</style>
 
       {shaliach && (
         <div style={{ background: "linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)", borderBottom: "3px solid #b8972a", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
@@ -383,7 +387,7 @@ function NavBarContent() {
           </button>
 
           <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
-            <Image src="/logo.png" alt="logo" width={56} height={56} style={{ height: isMobile ? 26 : 32, width: "auto", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
+            <Image src="/logo.png" alt="logo" width={56} height={56} className="ys-nav-logo" style={{ width: "auto", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
             <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 

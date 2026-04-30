@@ -13,10 +13,10 @@ import { db } from './firebase';
 import SmartHero from './components/SmartHero';
 import ProductCard from '@/components/ui/ProductCard';
 
-const SmartFunnel        = dynamic(() => import('./components/SmartFunnel'),            { ssr: false, loading: () => <div style={{ height: 60 }} /> });
+const SmartFunnel        = dynamic(() => import('./components/SmartFunnel'),            { ssr: false, loading: () => <div style={{ height: 400 }} /> });
 
 const NewsletterPopup   = dynamic(() => import('./components/NewsletterPopup'),       { ssr: false, loading: () => <div className="hidden" /> });
-const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => <div className="hidden" /> });
+const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => <div style={{ height: 450 }} /> });
 import { useShaliach } from './contexts/ShaliachContext';
 import { useCart }     from './contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
@@ -624,6 +624,18 @@ export default function HomePageClient() {
         maxWidth: '100vw',
       }}
     >
+      <style>{`
+        .ys-hero-clip { height: 500px; }
+        .ys-cats-section { min-height: 560px; }
+        .ys-cats-grid { grid-template-columns: repeat(3, 1fr); min-height: 300px; }
+        .ys-quotes-grid { grid-template-columns: repeat(2, 1fr); }
+        @media (max-width: 767px) {
+          .ys-hero-clip { height: 260px; }
+          .ys-cats-section { min-height: 700px; }
+          .ys-cats-grid { grid-template-columns: repeat(2, 1fr); min-height: 450px; }
+          .ys-quotes-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
 
       {/* ── Newsletter popup ── */}
       {false && (
@@ -764,7 +776,7 @@ export default function HomePageClient() {
       )}
 
       {/* ── 1. SmartHero ── */}
-      <div style={{ width: '100%', height: isMobile ? 260 : 500, overflow: 'hidden' }}>
+      <div className="ys-hero-clip" style={{ width: '100%', overflow: 'hidden' }}>
         <SmartHero
           isMobile={isMobile}
           onScrollToProducts={() => cardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
@@ -816,12 +828,12 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 4. Category grid ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl', minHeight: isMobile ? 700 : 560 }}>
+      <div className="ys-cats-section" style={{ background: '#FFFFFF', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלו את מגוון מוצרי הסת&quot;מ שלנו</p>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 12, minHeight: isMobile ? 450 : 300 }}
-            className="md:grid-cols-3 lg:grid-cols-6">
+          <div style={{ display: 'grid', gap: 12 }}
+            className="ys-cats-grid md:grid-cols-3 lg:grid-cols-6">
             {categoryGridItems.map(cat => (
               <div key={cat.name}
                 onClick={() => router.push(cat.href)}
@@ -999,9 +1011,8 @@ export default function HomePageClient() {
             לקוחות שכבר קנו — מה הם אומרים
           </h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#999', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
-          <div style={{
+          <div className="ys-quotes-grid" style={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
             gap: 16,
           }}>
             {STATIC_QUOTES.map((q, i) => (

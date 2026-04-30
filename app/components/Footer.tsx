@@ -66,10 +66,18 @@ export default function Footer() {
 
   return (
     <>
+      <style>{`
+        .ys-footer-benefits { grid-template-columns: repeat(4, 1fr); }
+        .ys-footer-links { grid-template-columns: repeat(6, 1fr); gap: 28px; }
+        @media (max-width: 767px) {
+          .ys-footer-benefits { grid-template-columns: 1fr; }
+          .ys-footer-links { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        }
+      `}</style>
       <footer style={{ background: '#0f1111', color: '#fff' }}>
         {/* Benefits accordion */}
         <div style={{ borderBottom: '1px solid #222', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4,1fr)' }}>
+          <div className="ys-footer-benefits" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid' }}>
             {BENEFITS.map((b, i) => {
               const open = benefitOpen === i;
               return (
@@ -90,7 +98,7 @@ export default function Footer() {
 
         {/* Links grid */}
         <div style={{ borderBottom: '1px solid #333', padding: '28px 16px' }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, 1fr)', gap: isMobile ? 16 : 28 }}>
+          <div className="ys-footer-links" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid' }}>
 
             {/* קבלו מידע */}
             <div>

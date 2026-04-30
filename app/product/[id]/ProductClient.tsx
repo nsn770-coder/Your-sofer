@@ -9,6 +9,7 @@ import { CATS } from '../../constants/categories';
 import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
 import * as pixel from '@/lib/metaPixel';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import NextImage from 'next/image';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -186,7 +187,7 @@ function SoferCard({ soferId }: { soferId: string }) {
       <div style={{ fontSize: 11, fontWeight: 700, color: '#b8972a', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>הסופר שכתב</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
         {sofer.profileImage
-          ? <img src={sofer.profileImage} alt={sofer.name} loading="lazy" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid #b8972a', flexShrink: 0 }} />
+          ? <NextImage src={sofer.profileImage!} alt={sofer.name ?? ''} width={52} height={52} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #b8972a', flexShrink: 0 }} />
           : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b8972a', fontSize: 22, flexShrink: 0 }}>✍️</div>
         }
         <div>
@@ -263,7 +264,9 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
         {klafImages.map(img => (
           <div key={img.id} style={{ border: `2px solid ${selected === img.id ? '#b8972a' : '#e0e0e0'}`, borderRadius: 8, overflow: 'hidden', cursor: 'pointer', background: selected === img.id ? '#fffbf0' : '#fff', transition: 'all 0.15s', position: 'relative' }}>
             <div onClick={() => handleSelect(img)}>
-              <img src={img.imageUrl} alt={img.name} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', display: 'block' }} onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3'; }} />
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4' }}>
+                <NextImage src={img.imageUrl} alt={img.name} fill style={{ objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3'; }} />
+              </div>
               {selected === img.id && (
                 <div style={{ position: 'absolute', top: 4, right: 4, background: '#b8972a', color: '#fff', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Icon.Check size={11} color="#fff" />
@@ -290,7 +293,7 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
       )}
       {zoomImg && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setZoomImg(null)}>
-          <img src={zoomImg} alt="קלף" style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 8 }} />
+          <NextImage src={zoomImg} alt="קלף" width={600} height={800} style={{ maxWidth: '90vw', maxHeight: '90vh', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: 8 }} />
           <button onClick={() => setZoomImg(null)} style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon.X size={18} />
           </button>

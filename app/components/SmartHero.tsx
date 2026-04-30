@@ -5,13 +5,13 @@ import Image from 'next/image';
 const SLIDES = [
   {
     mobileSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777365682/%D7%91%D7%90%D7%A0%D7%A8_2_wovsve.png',
-    desktopSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777452503/%D7%9E%D7%97%D7%A9%D7%91_dmat7m.png',
+    desktopSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1280,q_auto:best,f_auto/v1777452503/%D7%9E%D7%97%D7%A9%D7%91_dmat7m.png',
     alt: 'Your Sofer — סת״מ ויודאיקה מהודרים',
     priority: true,
   },
   {
     mobileSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777363664/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_1200_x_800_%D7%A4%D7%99%D7%A7%D7%A1%D7%9C_mpaeoc.png',
-    desktopSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777452872/%D7%9E%D7%97%D7%A9%D7%91_2_k4rzk2.png',
+    desktopSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1280,q_auto:best,f_auto/v1777452872/%D7%9E%D7%97%D7%A9%D7%91_2_k4rzk2.png',
     alt: 'הסופרים שלנו — סופרי סת״מ מוסמכים',
     priority: false,
   },
@@ -65,16 +65,13 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
     setCurrent(idx);
   }, []);
 
-  const desktopHeight = 580;
-  // Mobile: 3:2 aspect ratio expressed as padding-top trick via minHeight calc
-  const mobileHeight = isMobile ? `calc(100vw * 2 / 3)` : `${desktopHeight}px`;
-
   return (
     <div style={{ position: 'relative', width: '100%', direction: 'ltr' }}>
       {/* ── Scroll track ── */}
       <div
         ref={trackRef}
         onScroll={handleScroll}
+        className="ys-hero-track"
         style={{
           display: 'flex',
           overflowX: 'scroll',
@@ -82,7 +79,6 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           width: '100%',
-          height: mobileHeight,
         } as React.CSSProperties}
       >
         {SLIDES.map((slide, i) => (
@@ -109,9 +105,11 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
         ))}
       </div>
 
-      {/* ── Hide scrollbar (WebKit) ── */}
+      {/* ── Hide scrollbar (WebKit) + responsive hero height ── */}
       <style>{`
         div[style*="scroll-snap-type"]::-webkit-scrollbar { display: none; }
+        .ys-hero-track { height: 580px; }
+        @media (max-width: 767px) { .ys-hero-track { height: calc(100vw * 2 / 3); } }
       `}</style>
 
       {/* ── Dot indicators ── */}

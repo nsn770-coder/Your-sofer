@@ -26,7 +26,7 @@ export default function WizardStickyBar() {
   }, []);
 
   // Wait for mount (localStorage is client-only) and validate state
-  if (!mounted || !active || step <= 0 || step >= BAR_MITZVA_TOTAL) return null;
+  if (!mounted || !active || step <= 0 || step >= BAR_MITZVA_TOTAL) return <div aria-hidden="true" style={{ height: 66 }} />;
 
   const nextStep = BAR_MITZVA_STEPS[step];
   if (!nextStep) return null;
