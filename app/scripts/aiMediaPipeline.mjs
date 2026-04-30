@@ -343,7 +343,7 @@ async function fetchUrlViaCloudinary(url, productId) {
 
   if (!res.ok) throw new Error(`Cloudinary fetch-upload: ${await res.text()}`);
   const data = await res.json();
-  return data.secure_url;
+  return { secure_url: data.secure_url, delete_token: data.delete_token };
 }
 
 // ══ מחק תמונת מקור זמנית מ-Cloudinary (באמצעות delete_token — ללא API credentials) ══
@@ -444,10 +444,13 @@ async function processProduct(product, provider, testMode) {
   let imageBase64, contentType;
   try {
     let downloadUrl = imgUrl;
+    let srcDeleteToken = null;
     if (!imgUrl.includes('cloudinary.com')) {
       try {
         console.log('\n   🔄 מבקש מ-Cloudinary להוריד תמונה...');
-        downloadUrl = await fetchUrlViaCloudinary(imgUrl, product.id);
+        const { secure_url, delete_token } = await fetchUrlViaCloudinary(imgUrl, product.id);
+        downloadUrl = secure_url;
+        srcDeleteToken = delete_token;
         console.log('   ✅ Cloudinary הוריד:', downloadUrl.substring(0, 60) + '...');
       } catch (cloudErr) {
         console.warn(`   ⚠️ Cloudinary נכשל (${cloudErr.message}) — מנסה ישירות...`);
@@ -456,6 +459,8 @@ async function processProduct(product, provider, testMode) {
     }
     ({ base64: imageBase64, contentType } = await downloadImageAsBase64(downloadUrl));
     console.log('   📥 תמונת מקור הורדה');
+    // מחק את תמונת המקור הזמנית מ-Cloudinary (לא נחוצה יותר — base64 בזיכרון)
+    await deleteCloudinaryByToken(srcDeleteToken);
   } catch (e) {
     console.error('   ❌ הורדה נכשלה:', e.message);
     return {};
