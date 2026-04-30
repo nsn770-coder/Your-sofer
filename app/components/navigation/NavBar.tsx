@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useShaliach } from "@/app/contexts/ShaliachContext";
@@ -237,54 +237,43 @@ const SIMPLE_NAV = [
   { label: "מגילות", action: "megilot" },
 ];
 
-const menuVariants: Variants = {
-  hidden: { opacity: 0, y: -8, scale: 0.98 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: "easeOut", staggerChildren: 0.04, delayChildren: 0.04 } },
-  exit: { opacity: 0, y: -6, transition: { duration: 0.14, ease: "easeIn" } },
-};
-const colVariants: Variants = {
-  hidden: { opacity: 0, y: 5 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.18, ease: "easeOut" } },
-};
-const itemVariants: Variants = {
-  hidden: { opacity: 0, x: 3 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.15, ease: "easeOut" } },
-};
-
 function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
   return (
-    <motion.div variants={menuVariants} initial="hidden" animate="visible" exit="exit"
-      style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 520, maxWidth: 860 }}
-      onMouseDown={e => e.preventDefault()}
-    >
-      <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "#1a2a4a", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
-      <div style={{ background: "linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)", borderRadius: 0, border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(184,151,42,0.15)", overflow: "hidden" }}>
-        <div style={{ display: "flex", flexDirection: "row-reverse", padding: "24px 24px 16px" }}>
-          {item.columns.map((col, ci) => (
-            <motion.div key={ci} variants={colVariants} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "#b8972a", textTransform: "uppercase", textAlign: "right", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(184,151,42,0.2)" }}>{col.title}</div>
-              <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-                {col.items.map((sub, si) => (
-                  <motion.li key={si} variants={itemVariants}>
-                    <button onClick={() => onSelect(sub.cat, sub.filter)}
-                      style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, width: "100%", padding: "7px 8px", borderRadius: 0, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "right", fontFamily: "inherit", transition: "all 0.15s" }}
-                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(184,151,42,0.12)"; e.currentTarget.style.color = "#fff"; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}
-                    >
-                      {sub.label}
-                      <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#b8972a", flexShrink: 0, opacity: 0.6 }} />
-                    </button>
-                  </motion.li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
-        </div>
-        <div style={{ padding: "10px 24px", background: "rgba(0,0,0,0.2)", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "#b8972a", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>הכל {item.label} ←</button>
+    <>
+      <style>{`@keyframes navMegaIn{from{opacity:0;transform:translateX(50%) translateY(-8px) scale(0.98)}to{opacity:1;transform:translateX(50%) translateY(0) scale(1)}}`}</style>
+      <div
+        style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 520, maxWidth: 860, animation: "navMegaIn 0.2s ease-out" }}
+        onMouseDown={e => e.preventDefault()}
+      >
+        <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "#1a2a4a", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
+        <div style={{ background: "linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)", borderRadius: 0, border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(184,151,42,0.15)", overflow: "hidden" }}>
+          <div style={{ display: "flex", flexDirection: "row-reverse", padding: "24px 24px 16px" }}>
+            {item.columns.map((col, ci) => (
+              <div key={ci} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "#b8972a", textTransform: "uppercase", textAlign: "right", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(184,151,42,0.2)" }}>{col.title}</div>
+                <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                  {col.items.map((sub, si) => (
+                    <li key={si}>
+                      <button onClick={() => onSelect(sub.cat, sub.filter)}
+                        style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, width: "100%", padding: "7px 8px", borderRadius: 0, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "right", fontFamily: "inherit", transition: "all 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(184,151,42,0.12)"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}
+                      >
+                        {sub.label}
+                        <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#b8972a", flexShrink: 0, opacity: 0.6 }} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div style={{ padding: "10px 24px", background: "rgba(0,0,0,0.2)", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "flex-end" }}>
+            <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "#b8972a", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>הכל {item.label} ←</button>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </>
   );
 }
 
@@ -444,11 +433,9 @@ function NavBarContent() {
                 >
                   <button onClick={() => handleSelect(item.cat)} style={{ background: "none", border: "none", color: activeId === item.id ? "#b8972a" : "#fff", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 400, borderBottom: activeId === item.id ? "2px solid #b8972a" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
                     {item.label}
-                    <motion.span animate={{ rotate: activeId === item.id ? 180 : 0 }} transition={{ duration: 0.2 }} style={{ fontSize: 9, color: "#b8972a" }}>▾</motion.span>
+                    <span style={{ fontSize: 9, color: "#b8972a", display: "inline-block", transition: "transform 0.2s ease", transform: activeId === item.id ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
                   </button>
-                  <AnimatePresence>
-                    {activeId === item.id && <MegaPanel item={item} onSelect={handleSelect} />}
-                  </AnimatePresence>
+                  {activeId === item.id && <MegaPanel item={item} onSelect={handleSelect} />}
                 </div>
               ))}
               <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.15)", margin: "0 4px" }} />
