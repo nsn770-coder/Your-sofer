@@ -5,7 +5,7 @@ const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 export function FacebookPixel() {
   if (!PIXEL_ID) return null;
   return (
-    <Script id="meta-pixel" strategy="afterInteractive">{`
+    <Script id="meta-pixel" strategy="lazyOnload">{`
       !function(f,b,e,v,n,t,s){
       if(f.fbq)return;n=f.fbq=function(){
       n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
