@@ -15,7 +15,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FacebookPixel } from "@/components/FacebookPixel";
 import { TidioChat } from "@/components/TidioChat";
 import { CanonicalTag } from "@/components/CanonicalTag";
-import ClarityInit from "@/app/components/ClarityInit";
+import Script from "next/script";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "swap", variable: "--font-heebo" });
@@ -102,7 +102,15 @@ export default function RootLayout({
         <WizardStickyBar />
         <ShiraChat />
         <SpeedInsights />
-        <ClarityInit />
+
+        {/* ── Microsoft Clarity — deferred until browser idle ── */}
+        <Script id="clarity" strategy="lazyOnload">{`
+          (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          })(window,document,"clarity","script","wiozsdfcgm");
+        `}</Script>
 
         {/* ── Meta Pixel — deferred until user interaction ── */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
