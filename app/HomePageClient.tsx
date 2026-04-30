@@ -10,7 +10,7 @@ import {
   doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import SmartHero from './components/SmartHero';
+import HeroSwiper from './components/HeroSwiper';
 import ProductCard from '@/components/ui/ProductCard';
 
 const SmartFunnel        = dynamic(() => import('./components/SmartFunnel'),            { ssr: false, loading: () => <div style={{ height: 400 }} /> });
@@ -775,11 +775,12 @@ export default function HomePageClient() {
         </div>
       )}
 
-      {/* ── 1. SmartHero ── */}
+      {/* ── 1. Hero ── */}
       <div className="ys-hero-clip" style={{ width: '100%', overflow: 'hidden' }}>
-        <SmartHero
+        <HeroSwiper
           isMobile={isMobile}
           onScrollToProducts={() => cardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          onSelectCat={() => {}}
         />
       </div>
 
