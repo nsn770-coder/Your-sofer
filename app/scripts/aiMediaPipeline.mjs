@@ -368,11 +368,14 @@ async function deleteCloudinaryByToken(deleteToken) {
 // ══ העלה ל-Cloudinary ══
 // type: 'lifestyle' | 'studio' | 'human'
 async function uploadBase64ToCloudinary(base64, productId, type) {
+  const publicId = `${productId}_${type}_${Date.now()}`;
+  console.log(`   ☁️  [CLOUDINARY UPLOAD] folder=yoursofer/${productId}  public_id=${publicId}`);
+
   const formData = new FormData();
   formData.append('file', `data:image/png;base64,${base64}`);
   formData.append('upload_preset', CLOUDINARY_PRESET);
   formData.append('folder', `yoursofer/${productId}`);
-  formData.append('public_id', `${productId}_${type}_${Date.now()}`);
+  formData.append('public_id', publicId);
 
   const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
     method: 'POST',
@@ -381,6 +384,7 @@ async function uploadBase64ToCloudinary(base64, productId, type) {
 
   if (!res.ok) throw new Error(`Cloudinary: ${await res.text()}`);
   const data = await res.json();
+  console.log(`   ☁️  [CLOUDINARY RESULT] secure_url=${data.secure_url}`);
   return data.secure_url;
 }
 
@@ -420,20 +424,37 @@ async function processProduct(product, provider, testMode) {
   // ── קרא ערכים נוכחיים מ-Firestore (תמיד — גם ב-testMode) ──
   const freshBefore = await db.collection('products').doc(product.id).get();
   const dBefore = freshBefore.data() || {};
-  console.log('\n   ═══ לפני עיבוד (ערכים ב-Firestore) ═══');
-  console.log(`   imgUrl2 (lifestyle): ${dBefore.imgUrl2 ? url_s(dBefore.imgUrl2) : '❌ חסר'}`);
-  console.log(`   imgUrl3 (studio):    ${dBefore.imgUrl3 ? url_s(dBefore.imgUrl3) : '❌ חסר'}`);
-  console.log(`   imgUrl4 (human):     ${dBefore.imgUrl4 ? url_s(dBefore.imgUrl4) : '❌ חסר'}`);
+
+  console.log('\n   ════════════════════════════════════════');
+  console.log('   לפני עיבוד — כל שדות המוצר ב-Firestore:');
+  console.log('   ════════════════════════════════════════');
+  console.log(`   id:          ${product.id}`);
+  console.log(`   name:        ${dBefore.name ?? '—'}`);
+  console.log(`   cat:         ${dBefore.cat ?? '—'}`);
+  console.log(`   status:      ${dBefore.status ?? '—'}`);
+  console.log(`   imgUrl:      ${dBefore.imgUrl      ? url_s(dBefore.imgUrl)      : '❌ חסר'}`);
+  console.log(`   image_url:   ${dBefore.image_url   ? url_s(dBefore.image_url)   : '❌ חסר'}`);
+  console.log(`   imgUrl2:     ${dBefore.imgUrl2     ? url_s(dBefore.imgUrl2)     : '❌ חסר'}`);
+  console.log(`   imgUrl3:     ${dBefore.imgUrl3     ? url_s(dBefore.imgUrl3)     : '❌ חסר'}`);
+  console.log(`   imgUrl4:     ${dBefore.imgUrl4     ? url_s(dBefore.imgUrl4)     : '❌ חסר'}`);
+  // שאר השדות
+  const knownKeys = new Set(['name','cat','status','imgUrl','image_url','imgUrl2','imgUrl3','imgUrl4']);
+  for (const [k, v] of Object.entries(dBefore)) {
+    if (!knownKeys.has(k)) console.log(`   ${k.padEnd(12)}: ${String(v).substring(0, 80)}`);
+  }
 
   // בדוק כל שדה בנפרד — דלג על מה שכבר קיים
   const needsLifestyle = !dBefore.imgUrl2;
   const needsStudio    = !dBefore.imgUrl3;
   const needsHuman     = !dBefore.imgUrl4;
 
-  console.log('\n   ═══ החלטה ═══');
-  console.log(`   imgUrl2 (lifestyle): ${needsLifestyle ? '🔨 יוצר' : '⏭  מדלג (קיים)'}`);
-  console.log(`   imgUrl3 (studio):    ${needsStudio    ? '🔨 יוצר' : '⏭  מדלג (קיים)'}`);
-  console.log(`   imgUrl4 (human):     ${needsHuman     ? '🔨 יוצר' : '⏭  מדלג (קיים)'}`);
+  console.log('\n   ════════ החלטה ════════');
+  console.log(`   needsLifestyle (imgUrl2 חסר?): ${needsLifestyle}  raw value="${dBefore.imgUrl2 ?? 'undefined'}"`);
+  console.log(`   needsStudio    (imgUrl3 חסר?): ${needsStudio}  raw value="${dBefore.imgUrl3 ?? 'undefined'}"`);
+  console.log(`   needsHuman     (imgUrl4 חסר?): ${needsHuman}  raw value="${dBefore.imgUrl4 ?? 'undefined'}"`);
+  console.log(`   → imgUrl2 (lifestyle): ${needsLifestyle ? '🔨 יוצר' : '⏭  מדלג'}`);
+  console.log(`   → imgUrl3 (studio):    ${needsStudio    ? '🔨 יוצר' : '⏭  מדלג'}`);
+  console.log(`   → imgUrl4 (human):     ${needsHuman     ? '🔨 יוצר' : '⏭  מדלג'}`);
 
   if (!needsLifestyle && !needsStudio && !needsHuman) {
     console.log('\n   ⏭ כל 3 תמונות כבר קיימות — דולג לחלוטין');
@@ -471,6 +492,7 @@ async function processProduct(product, provider, testMode) {
   // ══ תמונה 1: Lifestyle (imgUrl2) ══
   let lifestyleUrl = null;
   if (needsLifestyle) {
+    console.log(`\n   ▶ קורא ל-generateAndUpload type=lifestyle productId=${product.id} testMode=${testMode}`);
     lifestyleUrl = await generateAndUpload(
       imageBase64, contentType, PROMPT_LIFESTYLE, product.id, 'lifestyle', provider, testMode
     );
@@ -484,6 +506,7 @@ async function processProduct(product, provider, testMode) {
   // ══ תמונה 2: Studio (imgUrl3) ══
   let studioUrl = null;
   if (needsStudio) {
+    console.log(`\n   ▶ קורא ל-generateAndUpload type=studio productId=${product.id} testMode=${testMode}`);
     studioUrl = await generateAndUpload(
       imageBase64, contentType, PROMPT_STUDIO, product.id, 'studio', provider, testMode
     );
@@ -497,6 +520,7 @@ async function processProduct(product, provider, testMode) {
   // ══ תמונה 3: Human model (imgUrl4) ══
   let humanUrl = null;
   if (needsHuman) {
+    console.log(`\n   ▶ קורא ל-generateAndUpload type=human productId=${product.id} testMode=${testMode}`);
     humanUrl = await generateAndUpload(
       imageBase64, contentType, buildHumanPrompt(product), product.id, 'human', provider, testMode
     );
