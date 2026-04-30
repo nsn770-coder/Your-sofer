@@ -409,20 +409,26 @@ async function generateAndUpload(imageBase64, contentType, prompt, productId, ty
   }
 }
 
-// ══ עבד מוצר אחד — יוצר 3 תמונות ══
+// ══ עבד מוצר אחד — יוצר רק את התמונות החסרות ══
 async function processProduct(product, provider, testMode) {
   const imgUrl = product.imgUrl || product.image_url;
   console.log(`\n📦 ${product.name?.substring(0, 60)}`);
   console.log(`   קטגוריה: ${product.cat} | ספק: ${provider.toUpperCase()}`);
 
-  // בדיקה ראשונה — דלג אם כל 3 כבר קיימות
+  // בדוק כל שדה בנפרד — דלג על מה שכבר קיים
+  let needsLifestyle = true, needsStudio = true, needsHuman = true;
   if (!testMode) {
     const fresh = await db.collection('products').doc(product.id).get();
     const d = fresh.data() || {};
-    if (d.imgUrl2 && d.imgUrl3 && d.imgUrl4) {
+    needsLifestyle = !d.imgUrl2;
+    needsStudio    = !d.imgUrl3;
+    needsHuman     = !d.imgUrl4;
+    if (!needsLifestyle && !needsStudio && !needsHuman) {
       console.log('   ⏭ כל 3 תמונות כבר קיימות — דולג');
       return { skipped: true };
     }
+    const missing = [needsLifestyle && 'imgUrl2', needsStudio && 'imgUrl3', needsHuman && 'imgUrl4'].filter(Boolean);
+    console.log(`   🔍 חסרות: ${missing.join(', ')}`);
   }
 
   // ══ הורד תמונת מקור ══
@@ -449,45 +455,58 @@ async function processProduct(product, provider, testMode) {
   const INTER_IMAGE_DELAY = provider === 'gemini' ? 40000 : 3000;
 
   // ══ תמונה 1: Lifestyle (imgUrl2) ══
-  const lifestyleUrl = await generateAndUpload(
-    imageBase64, contentType, PROMPT_LIFESTYLE, product.id, 'lifestyle', provider, testMode
-  );
-  if (lifestyleUrl && !testMode) {
-    await db.collection('products').doc(product.id).update({ imgUrl2: lifestyleUrl });
-    console.log('   💾 imgUrl2 נשמר');
+  let lifestyleUrl = null;
+  if (needsLifestyle) {
+    lifestyleUrl = await generateAndUpload(
+      imageBase64, contentType, PROMPT_LIFESTYLE, product.id, 'lifestyle', provider, testMode
+    );
+    if (lifestyleUrl && !testMode) {
+      await db.collection('products').doc(product.id).update({ imgUrl2: lifestyleUrl });
+      console.log('   💾 imgUrl2 נשמר');
+    }
+    if (needsStudio || needsHuman) await sleep(INTER_IMAGE_DELAY);
+  } else {
+    console.log('   ⏭ imgUrl2 כבר קיים — מדלג');
   }
-
-  await sleep(INTER_IMAGE_DELAY);
 
   // ══ תמונה 2: Studio (imgUrl3) ══
-  const studioUrl = await generateAndUpload(
-    imageBase64, contentType, PROMPT_STUDIO, product.id, 'studio', provider, testMode
-  );
-  if (studioUrl && !testMode) {
-    await db.collection('products').doc(product.id).update({ imgUrl3: studioUrl });
-    console.log('   💾 imgUrl3 נשמר');
+  let studioUrl = null;
+  if (needsStudio) {
+    studioUrl = await generateAndUpload(
+      imageBase64, contentType, PROMPT_STUDIO, product.id, 'studio', provider, testMode
+    );
+    if (studioUrl && !testMode) {
+      await db.collection('products').doc(product.id).update({ imgUrl3: studioUrl });
+      console.log('   💾 imgUrl3 נשמר');
+    }
+    if (needsHuman) await sleep(INTER_IMAGE_DELAY);
+  } else {
+    console.log('   ⏭ imgUrl3 כבר קיים — מדלג');
   }
 
-  await sleep(INTER_IMAGE_DELAY);
-
   // ══ תמונה 3: Human model (imgUrl4) ══
-  const humanUrl = await generateAndUpload(
-    imageBase64, contentType, buildHumanPrompt(product), product.id, 'human', provider, testMode
-  );
-  if (humanUrl && !testMode) {
-    await db.collection('products').doc(product.id).update({ imgUrl4: humanUrl });
-    console.log('   💾 imgUrl4 נשמר');
+  let humanUrl = null;
+  if (needsHuman) {
+    humanUrl = await generateAndUpload(
+      imageBase64, contentType, buildHumanPrompt(product), product.id, 'human', provider, testMode
+    );
+    if (humanUrl && !testMode) {
+      await db.collection('products').doc(product.id).update({ imgUrl4: humanUrl });
+      console.log('   💾 imgUrl4 נשמר');
+    }
+  } else {
+    console.log('   ⏭ imgUrl4 כבר קיים — מדלג');
   }
 
   if (testMode) {
     console.log('\n   🧪 תוצאות בדיקה:');
-    console.log(`   imgUrl2 (lifestyle): ${lifestyleUrl || '❌ נכשל'}`);
-    console.log(`   imgUrl3 (studio):    ${studioUrl   || '❌ נכשל'}`);
-    console.log(`   imgUrl4 (human):     ${humanUrl    || '❌ נכשל'}`);
+    console.log(`   imgUrl2 (lifestyle): ${lifestyleUrl || (needsLifestyle ? '❌ נכשל' : '⏭ קיים')}`);
+    console.log(`   imgUrl3 (studio):    ${studioUrl   || (needsStudio    ? '❌ נכשל' : '⏭ קיים')}`);
+    console.log(`   imgUrl4 (human):     ${humanUrl    || (needsHuman     ? '❌ נכשל' : '⏭ קיים')}`);
   }
 
-  const success = [lifestyleUrl, studioUrl, humanUrl].filter(Boolean).length;
-  console.log(`   📊 ${success}/3 תמונות נוצרו בהצלחה`);
+  const created = [lifestyleUrl, studioUrl, humanUrl].filter(Boolean).length;
+  console.log(`   📊 ${created} תמונות חדשות נוצרו`);
 
   return { imgUrl2: lifestyleUrl, imgUrl3: studioUrl, imgUrl4: humanUrl };
 }
@@ -500,7 +519,7 @@ async function runPipeline() {
   const providerArg = args.find(a => a.startsWith('--provider='));
   const provider    = providerArg ? providerArg.split('=')[1] : 'gemini';
   const limitArg    = args.find(a => a.startsWith('--limit='));
-  const perCatLimit = testMode ? 1 : (limitArg ? parseInt(limitArg.split('=')[1]) : null);
+  const perCatLimit = testMode ? null : (limitArg ? parseInt(limitArg.split('=')[1]) : null);
   const catArg      = args.find(a => a.startsWith('--cat='));
   const categories  = catArg ? [catArg.split('=')[1]] : CATEGORIES;
 
@@ -512,7 +531,7 @@ async function runPipeline() {
   console.log(`🚀 AI Media Pipeline מתחיל...`);
   console.log(`🤖 ספק: ${provider.toUpperCase()}`);
   if (provider === 'gemini') console.log(`🔑 Gemini AI Studio — model: ${GEMINI_MODEL}`);
-  if (testMode) console.log('🧪 מצב בדיקה — מוצר אחד בלבד, ללא כתיבה ל-Firestore');
+  if (testMode) console.log('🧪 מצב בדיקה — מוצר אחד בלבד (ראשון שנמצא), ללא כתיבה ל-Firestore');
   else if (perCatLimit) console.log(`📊 מוגבל ל-${perCatLimit} מוצרים לקטגוריה`);
   console.log(`📂 קטגוריות: ${categories.join(' → ')}\n`);
 
@@ -524,7 +543,7 @@ async function runPipeline() {
 
   let totalSuccess = 0, totalFailed = 0;
 
-  for (const cat of categories) {
+  catLoop: for (const cat of categories) {
     console.log(`\n${'═'.repeat(40)}`);
     console.log(`📂 קטגוריה: ${cat}`);
     console.log('═'.repeat(40));
@@ -562,6 +581,8 @@ async function runPipeline() {
         console.error(`❌ שגיאה כללית:`, e.message);
         catFailed++; totalFailed++;
       }
+      // test mode: עצור אחרי מוצר ראשון בלבד
+      if (testMode) break catLoop;
       // delay בין מוצרים (לא בין התמונות — הוא כבר בתוך processProduct)
       if (i < products.length - 1) await sleep(provider === 'gemini' ? 15000 : 5000);
     }
