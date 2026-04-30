@@ -1,7 +1,5 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { doc, getDoc, setDoc, updateDoc, getDocs, query, collection, where } from 'firebase/firestore';
-import { db } from '../firebase';
 import { getAuthLazy } from '@/lib/authLazy';
 
 export type UserRole = 'customer' | 'shaliach' | 'sofer' | 'admin';
@@ -41,6 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
         if (cancelled) return;
         if (firebaseUser) {
+          const [{ doc, getDoc, setDoc, updateDoc, getDocs, query, collection, where, getFirestore }, { default: firebaseApp }] = await Promise.all([
+            import('firebase/firestore'),
+            import('../firebase-app'),
+          ]);
+          const db = getFirestore(firebaseApp);
+
           let role: UserRole = 'customer';
           let soferId: string | undefined;
           let shaliachId: string | undefined;

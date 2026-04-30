@@ -1,8 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 
 interface Shaliach {
   id: string;
@@ -54,6 +52,11 @@ export function ShaliachProvider({ children }: { children: React.ReactNode }) {
   async function loadShaliach(code: string) {
     console.log('[ShaliachContext] Fetching shluchim/' + code);
     try {
+      const [{ doc, getDoc, getFirestore }, { default: firebaseApp }] = await Promise.all([
+        import('firebase/firestore'),
+        import('../firebase-app'),
+      ]);
+      const db = getFirestore(firebaseApp);
       const snap = await getDoc(doc(db, 'shluchim', code));
       console.log('[ShaliachContext] Doc exists:', snap.exists(), snap.data());
       if (snap.exists()) {
