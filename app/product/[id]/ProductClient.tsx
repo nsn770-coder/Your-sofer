@@ -913,7 +913,7 @@ export default function ProductClient() {
                   }
                 }
               });
-              setCollectionProducts(collData.slice(0, 8));
+              setCollectionProducts(collData.slice(0, 50));
             }
           }
         }
