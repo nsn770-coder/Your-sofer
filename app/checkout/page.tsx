@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
-import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import * as pixel from '@/lib/metaPixel';
@@ -73,6 +73,13 @@ export default function CheckoutPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [step, setStep] = useState<'shipping' | 'review'>('shipping');
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', notes: '' });
+
+  const [sessionId] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    let id = localStorage.getItem('yoursofer_guest_id');
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem('yoursofer_guest_id', id); }
+    return id;
+  });
   const [couponInput, setCouponInput] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
@@ -94,6 +101,23 @@ export default function CheckoutPage() {
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Save abandoned cart when user reaches review step
+  useEffect(() => {
+    if (step !== 'review' || !sessionId || items.length === 0) return;
+    setDoc(doc(db, 'abandoned_carts', sessionId), {
+      sessionId,
+      name: form.name, phone: form.phone, email: form.email,
+      address: `${form.address}, ${form.city}`,
+      cartItems: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+      cartTotal: total,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      converted: false,
+      convertedOrderId: null,
+    }).catch(console.error);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   if (items.length === 0) {
     return (
@@ -147,6 +171,7 @@ export default function CheckoutPage() {
         status: 'pending_payment', createdAt: serverTimestamp(),
         shaliachRef: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
         commissionPercent, commissionAmount,
+        guestId: sessionId, sessionId, isGuest: true,
       });
 
       if (appliedCoupon) {

@@ -153,7 +153,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers';
 
 interface Review {
   id: string;
@@ -186,6 +186,35 @@ interface Curation {
   bannerTitle: string;
   bannerImageUrl: string;
   updatedAt?: { seconds: number };
+}
+
+interface AbandonedCart {
+  id: string;
+  sessionId: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  cartItems: { id: string; name: string; price: number; quantity: number }[];
+  cartTotal: number;
+  converted: boolean;
+  convertedOrderId: string | null;
+  createdAt?: { seconds: number } | string;
+  updatedAt?: { seconds: number } | string;
+}
+
+interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  firstOrderAt: string;
+  lastOrderAt: string;
+  totalOrders: number;
+  totalSpent: number;
+  isGuest: boolean;
+  uid: string | null;
 }
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -1045,6 +1074,10 @@ export default function AdminPage() {
   const [editRequests, setEditRequests] = useState<SoferEditRequest[]>([]);
   const [editRequestsLoading, setEditRequestsLoading] = useState(true);
   const [rejectNoteMap, setRejectNoteMap] = useState<Record<string, string>>({});
+  const [abandonedCarts, setAbandonedCarts] = useState<AbandonedCart[]>([]);
+  const [abandonedCartsLoading, setAbandonedCartsLoading] = useState(true);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customersLoading, setCustomersLoading] = useState(true);
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<string | null>(null);
   const [priorityUpdating, setPriorityUpdating] = useState<string | null>(null);
   const priorityTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
@@ -1058,6 +1091,7 @@ export default function AdminPage() {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
       loadReviews(); loadShluchimApplications(); loadTestimonials(); loadEditRequests();
+      loadAbandonedCarts(); loadCustomers();
     }
   }, [user]);
 
@@ -1079,6 +1113,30 @@ export default function AdminPage() {
       setOrders(data);
     } catch (e) { console.error(e); }
     finally { setOrdersLoading(false); }
+  }
+
+  async function loadAbandonedCarts() {
+    try {
+      const snap = await getDocs(query(
+        collection(db, 'abandoned_carts'),
+        where('converted', '==', false),
+        orderBy('updatedAt', 'desc'),
+      ));
+      const data: AbandonedCart[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as AbandonedCart));
+      setAbandonedCarts(data);
+    } catch (e) { console.error(e); }
+    finally { setAbandonedCartsLoading(false); }
+  }
+
+  async function loadCustomers() {
+    try {
+      const snap = await getDocs(query(collection(db, 'customers'), orderBy('lastOrderAt', 'desc')));
+      const data: Customer[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Customer));
+      setCustomers(data);
+    } catch (e) { console.error(e); }
+    finally { setCustomersLoading(false); }
   }
 
   async function loadApplications() {
@@ -1582,6 +1640,8 @@ export default function AdminPage() {
           { key: 'hidden_products',label: '👁️ מוסתרים',         color: 'bg-gray-600',   badge: hiddenProducts.length },
           { key: 'theme_editor',   label: '🎨 עורך עיצוב',      color: 'bg-violet-600' },
           { key: 'curations',      label: '✨ סלקציות',          color: 'bg-fuchsia-700' },
+          { key: 'abandoned_carts', label: '🛒 נטישות עגלה',    color: 'bg-orange-600',  badge: abandonedCarts.length },
+          { key: 'customers',      label: '👤 לקוחות',           color: 'bg-cyan-700' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -2250,6 +2310,110 @@ export default function AdminPage() {
                       <td className="p-3"><button onClick={() => toggleHidden(p.id, true)} disabled={actionLoading === p.id + '_hidden'} className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 hover:bg-green-200 transition">✅ החזר לאתר</button></td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'abandoned_carts' && (
+        <div className="bg-white rounded-xl shadow overflow-hidden">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h2 className="text-lg font-bold">🛒 נטישות עגלה ({abandonedCarts.length})</h2>
+            <button onClick={loadAbandonedCarts} className="text-sm text-blue-600 hover:underline">רענן</button>
+          </div>
+          {abandonedCartsLoading ? (
+            <div className="p-8 text-center text-gray-400">טוען...</div>
+          ) : abandonedCarts.length === 0 ? (
+            <div className="p-8 text-center text-gray-400">אין נטישות עגלה</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-3 text-right">שם</th>
+                    <th className="p-3 text-right">אימייל</th>
+                    <th className="p-3 text-right">טלפון</th>
+                    <th className="p-3 text-right">פריטים</th>
+                    <th className="p-3 text-right">סה"כ</th>
+                    <th className="p-3 text-right">זמן</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {abandonedCarts.map(cart => {
+                    const ts = typeof cart.updatedAt === 'object' && cart.updatedAt && 'seconds' in cart.updatedAt
+                      ? new Date(cart.updatedAt.seconds * 1000)
+                      : typeof cart.updatedAt === 'string' ? new Date(cart.updatedAt) : null;
+                    const minutesAgo = ts ? Math.round((Date.now() - ts.getTime()) / 60000) : null;
+                    const timeAgo = minutesAgo === null ? '—'
+                      : minutesAgo < 60 ? `לפני ${minutesAgo} דקות`
+                      : minutesAgo < 1440 ? `לפני ${Math.round(minutesAgo / 60)} שעות`
+                      : `לפני ${Math.round(minutesAgo / 1440)} ימים`;
+                    const cartTotal = cart.cartItems?.reduce((s, i) => s + i.price * i.quantity, 0) ?? cart.cartTotal ?? 0;
+                    return (
+                      <tr key={cart.id} className="border-t hover:bg-orange-50">
+                        <td className="p-3 font-semibold">{cart.name || '—'}</td>
+                        <td className="p-3 text-gray-600 text-xs">{cart.email || '—'}</td>
+                        <td className="p-3 text-gray-600">{cart.phone || '—'}</td>
+                        <td className="p-3 text-gray-500 text-xs">
+                          {(cart.cartItems || []).map(i => `${i.name} ×${i.quantity}`).join(', ') || '—'}
+                        </td>
+                        <td className="p-3 font-bold text-green-700">₪{cartTotal.toFixed(2)}</td>
+                        <td className="p-3 text-gray-400 text-xs whitespace-nowrap">{timeAgo}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'customers' && (
+        <div className="bg-white rounded-xl shadow overflow-hidden">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h2 className="text-lg font-bold">👤 לקוחות ({customers.length})</h2>
+            <button onClick={loadCustomers} className="text-sm text-blue-600 hover:underline">רענן</button>
+          </div>
+          {customersLoading ? (
+            <div className="p-8 text-center text-gray-400">טוען...</div>
+          ) : customers.length === 0 ? (
+            <div className="p-8 text-center text-gray-400">אין לקוחות עדיין</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-3 text-right">שם</th>
+                    <th className="p-3 text-right">אימייל</th>
+                    <th className="p-3 text-right">טלפון</th>
+                    <th className="p-3 text-right">הזמנות</th>
+                    <th className="p-3 text-right">סה"כ הוצאה</th>
+                    <th className="p-3 text-right">הזמנה ראשונה</th>
+                    <th className="p-3 text-right">סוג</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customers.map(c => {
+                    const firstDate = c.firstOrderAt ? new Date(c.firstOrderAt).toLocaleDateString('he-IL') : '—';
+                    return (
+                      <tr key={c.id} className="border-t hover:bg-cyan-50">
+                        <td className="p-3 font-semibold">{c.name || '—'}</td>
+                        <td className="p-3 text-gray-600 text-xs">{c.email || '—'}</td>
+                        <td className="p-3 text-gray-600">{c.phone || '—'}</td>
+                        <td className="p-3 text-center font-bold text-blue-700">{c.totalOrders ?? 0}</td>
+                        <td className="p-3 font-bold text-green-700">₪{(c.totalSpent ?? 0).toFixed(2)}</td>
+                        <td className="p-3 text-gray-400 text-xs whitespace-nowrap">{firstDate}</td>
+                        <td className="p-3">
+                          {c.isGuest
+                            ? <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs">אורח</span>
+                            : <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs">רשום</span>}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

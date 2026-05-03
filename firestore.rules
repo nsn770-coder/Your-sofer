@@ -80,13 +80,29 @@ service cloud.firestore {
     // ── Orders ──────────────────────────────────────────────────────────────
 
     match /orders/{orderId} {
-      allow create: if isSignedIn();
+      // Signed-in users or guests who include a guestId string can create orders
+      allow create: if isSignedIn()
+                    || request.resource.data.guestId is string;
       allow read:   if isAdmin()
                     || (isShaliach()
                         && resource.data.shaliachId ==
                            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shaliachId);
       allow update: if isAdmin();
       allow delete: if isAdmin();
+    }
+
+    // ── Abandoned carts (anyone can write, admin reads/deletes) ──────────────
+
+    match /abandoned_carts/{sessionId} {
+      allow create, update: if true;
+      allow read, delete:   if isAdmin();
+    }
+
+    // ── Customers (anyone can write post-payment, admin reads/deletes) ────────
+
+    match /customers/{customerId} {
+      allow create, update: if true;
+      allow read, delete:   if isAdmin();
     }
 
     // ── Sofer profile edit requests ─────────────────────────────────────────
