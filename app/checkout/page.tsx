@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
@@ -80,6 +80,11 @@ export default function CheckoutPage() {
     if (!id) { id = crypto.randomUUID(); localStorage.setItem('yoursofer_guest_id', id); }
     return id;
   });
+
+  // Keep a ref so the abandoned-cart effect always reads the latest form values
+  // without needing form in the dependency array
+  const formRef = useRef(form);
+  useEffect(() => { formRef.current = form; }, [form]);
   const [couponInput, setCouponInput] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
@@ -102,20 +107,30 @@ export default function CheckoutPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save abandoned cart when user reaches review step
+  // Save abandoned cart the moment user reaches review step (before payment)
   useEffect(() => {
-    if (step !== 'review' || !sessionId || items.length === 0) return;
+    if (step !== 'review') return;
+    const f = formRef.current;
+    console.log('[checkout] step=review — saving abandoned cart, sessionId:', sessionId, 'email:', f.email);
+    if (!sessionId || items.length === 0) {
+      console.warn('[checkout] abandoned cart skipped: sessionId=', sessionId, 'items=', items.length);
+      return;
+    }
     setDoc(doc(db, 'abandoned_carts', sessionId), {
       sessionId,
-      name: form.name, phone: form.phone, email: form.email,
-      address: `${form.address}, ${form.city}`,
+      name: f.name, phone: f.phone, email: f.email,
+      address: `${f.address}, ${f.city}`,
       cartItems: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
       cartTotal: total,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       converted: false,
       convertedOrderId: null,
-    }).catch(console.error);
+    }).then(() => {
+      console.log('[checkout] abandoned_cart saved OK, sessionId:', sessionId);
+    }).catch(e => {
+      console.error('[checkout] abandoned_cart save FAILED:', e);
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
@@ -176,6 +191,34 @@ export default function CheckoutPage() {
 
       if (appliedCoupon) {
         await updateDoc(doc(db, 'coupons', appliedCoupon.code), { active: false, usedBy: form.email || form.name, usedAt: serverTimestamp() });
+      }
+
+      // Upsert customer record immediately — don't rely on /thank-you reaching Firestore
+      const customerEmail = form.email.toLowerCase();
+      const customerRef = doc(db, 'customers', customerEmail);
+      try {
+        const customerSnap = await getDoc(customerRef);
+        const now = new Date().toISOString();
+        if (customerSnap.exists()) {
+          const prev = customerSnap.data();
+          await updateDoc(customerRef, {
+            lastOrderAt: now,
+            totalOrders: (prev.totalOrders || 0) + 1,
+            totalSpent: Math.round(((prev.totalSpent || 0) + finalTotal) * 100) / 100,
+          });
+          console.log('[checkout] customer updated:', customerEmail);
+        } else {
+          await setDoc(customerRef, {
+            name: form.name, email: customerEmail, phone: form.phone,
+            address: `${form.address}, ${form.city}`,
+            firstOrderAt: now, lastOrderAt: now,
+            totalOrders: 1, totalSpent: finalTotal,
+            isGuest: true, uid: null,
+          });
+          console.log('[checkout] customer created:', customerEmail);
+        }
+      } catch (e) {
+        console.error('[checkout] customer upsert failed (non-fatal):', e);
       }
 
       const klafUpdates = items.filter(i => i.selectedKlafId).map(i =>
