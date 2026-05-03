@@ -1,10 +1,7 @@
-import Link from 'next/link';
-import type { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'הקולקציות שלנו | Your Sofer',
-  description: 'חמש קולקציות עיצוב נבחרות – מצאו את הסגנון שמדבר אליכם',
-};
+import Link from 'next/link';
+
 
 const COLLECTIONS = [
   {
