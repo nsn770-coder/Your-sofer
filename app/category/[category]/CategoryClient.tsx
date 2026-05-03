@@ -86,6 +86,9 @@ const ATTR_KEYS = ['חומר', 'כתב', 'כשרות', 'נוסח', 'צבע'];
 // Categories that show SoferProductCard (split sofer-image + product layout)
 const SOFER_LAYOUT_CATS = new Set(['קלפי מזוזה', 'תפילין קומפלט', 'קלפי תפילין', 'בר מצווה']);
 
+// Categories that show nusach + kashrut-level filter controls
+const STAM_FILTER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'תפילין']);
+
 // ─── Category-specific name-based filters ────────────────────────────────────
 
 interface NameFilterSpec {
@@ -226,16 +229,14 @@ function applyFilters(products: Product[], f: FilterState): Product[] {
     if (f.minPrice !== '' && p.price < Number(f.minPrice)) return false;
     if (f.maxPrice !== '' && p.price > Number(f.maxPrice)) return false;
     if (f.level) {
-      // Normalise URL param: 'מהודר-בתכלית' → 'מהודר בתכלית'
       const wantedLevel = f.level === 'מהודר-בתכלית' ? 'מהודר בתכלית' : f.level;
+      const isBasic = wantedLevel === 'פשוט' || wantedLevel === 'כשר לכתחילה';
       if (p.level && p.level !== '') {
-        // Product has a level field — use exact match
-        if (p.level !== wantedLevel) return false;
+        if (p.level !== wantedLevel && !(isBasic && (p.level === 'פשוט' || p.level === 'כשר לכתחילה'))) return false;
       } else {
-        // Fallback: name-keyword matching for products without level field
         const name = p.name;
-        if (wantedLevel === 'פשוט') {
-          if (!['פשוט', 'כשרות לכתחילה', 'כשרות טובה', 'לכתחילה'].some(kw => name.includes(kw))) return false;
+        if (isBasic) {
+          if (!['פשוט', 'כשרות לכתחילה', 'כשרות טובה', 'לכתחילה', 'כשר לכתחילה'].some(kw => name.includes(kw))) return false;
         } else if (wantedLevel === 'מהודר') {
           if (!(name.includes('מהודר') || name.includes('מהודרת')) || name.includes('בתכלית')) return false;
         } else if (wantedLevel === 'מהודר בתכלית') {
@@ -244,9 +245,16 @@ function applyFilters(products: Product[], f: FilterState): Product[] {
       }
     }
     if (f.nusachFilter) {
-      const sfarad = f.nusachFilter === 'ספרדי';
-      const keywords = sfarad ? ['ספרד', 'ספרדי'] : ['אשכנז', 'אשכנזי'];
-      // Check product.nusach field first, then name keywords, then filterAttributes
+      const nusachKeywords: Record<string, string[]> = {
+        'אשכנז':        ['אשכנז', 'אשכנזי'],
+        'ספרד':         ['ספרד', 'ספרדי'],
+        'חב"ד':         ['חב"ד', 'חבד'],
+        'תימני':        ['תימני', 'תימן'],
+        'עדות המזרח':   ['עדות המזרח', 'מזרחי'],
+        'ספרדי':        ['ספרד', 'ספרדי'],
+        'אשכנזי':       ['אשכנז', 'אשכנזי'],
+      };
+      const keywords = nusachKeywords[f.nusachFilter] ?? [f.nusachFilter];
       const matches =
         (p.nusach != null && p.nusach !== '' && keywords.some(kw => p.nusach!.includes(kw))) ||
         keywords.some(kw => p.name.includes(kw)) ||
@@ -476,6 +484,48 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                 onClick={() => onSubCategoryFilter(opt === 'הכל' ? '' : opt)}
                 className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
                   (subCategoryFilter || '') === (opt === 'הכל' ? '' : opt)
+                    ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* STaM nusach filter */}
+      {STAM_FILTER_CATS.has(category) && (
+        <Section title="נוסח">
+          <div className="flex flex-wrap gap-1.5">
+            {['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'עדות המזרח'].map(opt => (
+              <button
+                key={opt}
+                onClick={() => set({ nusachFilter: opt === 'הכל' ? '' : opt })}
+                className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
+                  (filters.nusachFilter || '') === (opt === 'הכל' ? '' : opt)
+                    ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* STaM kashrut level filter */}
+      {STAM_FILTER_CATS.has(category) && (
+        <Section title="רמת כשרות">
+          <div className="flex flex-wrap gap-1.5">
+            {['הכל', 'מהודר בתכלית', 'מהודר', 'כשר לכתחילה'].map(opt => (
+              <button
+                key={opt}
+                onClick={() => set({ level: opt === 'הכל' ? '' : opt })}
+                className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
+                  (filters.level || '') === (opt === 'הכל' ? '' : opt)
                     ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                 }`}
@@ -1256,6 +1306,32 @@ export default function CategoryClient({ category }: { category: string }) {
                   </button>
                 );
               })}
+
+              {/* STaM nusach dropdown */}
+              {STAM_FILTER_CATS.has(category) && (
+                <select
+                  value={filters.nusachFilter || 'הכל'}
+                  onChange={e => setFilters(prev => ({ ...prev, nusachFilter: e.target.value === 'הכל' ? '' : e.target.value }))}
+                  className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
+                  style={{ direction: 'rtl', borderColor: filters.nusachFilter ? '#0c1a35' : '#e5e7eb', color: filters.nusachFilter ? '#0c1a35' : '#6b7280', background: filters.nusachFilter ? '#f0f4ff' : '#fff' }}
+                >
+                  <option value="הכל">נוסח: הכל</option>
+                  {['אשכנז', 'ספרד', 'חב"ד', 'תימני', 'עדות המזרח'].map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              )}
+
+              {/* STaM kashrut level dropdown */}
+              {STAM_FILTER_CATS.has(category) && (
+                <select
+                  value={filters.level || 'הכל'}
+                  onChange={e => setFilters(prev => ({ ...prev, level: e.target.value === 'הכל' ? '' : e.target.value }))}
+                  className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
+                  style={{ direction: 'rtl', borderColor: filters.level ? '#0c1a35' : '#e5e7eb', color: filters.level ? '#0c1a35' : '#6b7280', background: filters.level ? '#f0f4ff' : '#fff' }}
+                >
+                  <option value="הכל">רמת כשרות: הכל</option>
+                  {['מהודר בתכלית', 'מהודר', 'כשר לכתחילה'].map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              )}
 
               {/* Rating */}
               <select

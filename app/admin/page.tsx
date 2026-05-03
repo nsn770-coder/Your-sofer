@@ -86,6 +86,7 @@ interface Product {
   hidden?: boolean;
   priority?: number;
   level?: string;
+  nusach?: string;
   was?: number | null;
   desc?: string;
   badge?: string | null;
@@ -256,6 +257,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
   const [desc, setDesc] = useState('');
   const [cat, setCat] = useState(CATS.filter(c => c !== 'הכל')[0] || '');
   const [level, setLevel] = useState('');
+  const [nusach, setNusach] = useState('');
   const [badge, setBadge] = useState('');
   const [days, setDays] = useState('7-14');
   const [soferId, setSoferId] = useState('');
@@ -265,7 +267,8 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState<string | null>(null);
   const [soferOptions, setSoferOptions] = useState<Sofer[]>([]);
-  const LEVEL_CATS = ['קלפי מזוזה', 'תפילין קומפלט'];
+  const STAM_CATS_ADMIN = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'תפילין'];
+  const LEVEL_CATS = STAM_CATS_ADMIN;
 
   useEffect(() => {
     getDocs(collection(db, 'soferim'))
@@ -313,6 +316,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
         desc, cat,
         category: cat,
         level: LEVEL_CATS.includes(cat) ? level : '',
+        nusach: LEVEL_CATS.includes(cat) ? nusach : '',
         badge: badge || null,
         priority: 50,
         isBestSeller: false,
@@ -378,15 +382,29 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
             </div>
           )}
           {LEVEL_CATS.includes(cat) && (
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>רמת הידור</label>
-              <select value={level} onChange={e => setLevel(e.target.value)}
-                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
-                <option value="">לא מוגדר</option>
-                <option value="פשוט">פשוט</option>
-                <option value="מהודר">מהודר</option>
-                <option value="מהודר בתכלית">מהודר בתכלית</option>
-              </select>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>רמת כשרות</label>
+                <select value={level} onChange={e => setLevel(e.target.value)}
+                  style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
+                  <option value="">לא מוגדר</option>
+                  <option value="כשר לכתחילה">כשר לכתחילה</option>
+                  <option value="מהודר">מהודר</option>
+                  <option value="מהודר בתכלית">מהודר בתכלית</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>נוסח</label>
+                <select value={nusach} onChange={e => setNusach(e.target.value)}
+                  style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
+                  <option value="">לא מוגדר</option>
+                  <option value="אשכנז">אשכנז</option>
+                  <option value="ספרד">ספרד</option>
+                  <option value='חב"ד'>חב"ד</option>
+                  <option value="תימני">תימני</option>
+                  <option value="עדות המזרח">עדות המזרח</option>
+                </select>
+              </div>
             </div>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -449,7 +467,8 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
   );
 }
 
-const LEVEL_CATS_EDIT = ['קלפי מזוזה', 'תפילין קומפלט'];
+const STAM_CATS_ADMIN_EDIT = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'תפילין'];
+const LEVEL_CATS_EDIT = STAM_CATS_ADMIN_EDIT;
 
 function extractOriginalName(sourceUrl: string): string {
   try {
@@ -477,6 +496,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [desc, setDesc]       = useState(product.desc || '');
   const [cat, setCat]         = useState(product.cat || product.category || '');
   const [level, setLevel]     = useState(product.level || '');
+  const [nusach, setNusach]   = useState(product.nusach || '');
   const [badge, setBadge]     = useState(product.badge || '');
   const [days, setDays]       = useState(product.days || '');
   const [soferId, setSoferId] = useState(product.soferId || '');
@@ -536,6 +556,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         desc, cat,
         category: cat,
         level: LEVEL_CATS_EDIT.includes(cat) ? level : '',
+        nusach: LEVEL_CATS_EDIT.includes(cat) ? nusach : '',
         badge: badge || null,
         days,
         soferId: soferId || null,
@@ -590,7 +611,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
           </div>
           <div>
             <label style={labelStyle}>קטגוריה</label>
-            <select value={cat} onChange={e => { setCat(e.target.value); if (!LEVEL_CATS_EDIT.includes(e.target.value)) setLevel(''); }}
+            <select value={cat} onChange={e => { setCat(e.target.value); if (!LEVEL_CATS_EDIT.includes(e.target.value)) { setLevel(''); setNusach(''); } }}
               style={{ ...inputStyle, background: '#fff' }}>
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -606,15 +627,29 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             </div>
           )}
           {LEVEL_CATS_EDIT.includes(cat) && (
-            <div>
-              <label style={labelStyle}>רמת הידור</label>
-              <select value={level} onChange={e => setLevel(e.target.value)}
-                style={{ ...inputStyle, background: '#fff' }}>
-                <option value="">לא מוגדר</option>
-                <option value="פשוט">פשוט</option>
-                <option value="מהודר">מהודר</option>
-                <option value="מהודר בתכלית">מהודר בתכלית</option>
-              </select>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div>
+                <label style={labelStyle}>רמת כשרות</label>
+                <select value={level} onChange={e => setLevel(e.target.value)}
+                  style={{ ...inputStyle, background: '#fff' }}>
+                  <option value="">לא מוגדר</option>
+                  <option value="כשר לכתחילה">כשר לכתחילה</option>
+                  <option value="מהודר">מהודר</option>
+                  <option value="מהודר בתכלית">מהודר בתכלית</option>
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>נוסח</label>
+                <select value={nusach} onChange={e => setNusach(e.target.value)}
+                  style={{ ...inputStyle, background: '#fff' }}>
+                  <option value="">לא מוגדר</option>
+                  <option value="אשכנז">אשכנז</option>
+                  <option value="ספרד">ספרד</option>
+                  <option value='חב"ד'>חב"ד</option>
+                  <option value="תימני">תימני</option>
+                  <option value="עדות המזרח">עדות המזרח</option>
+                </select>
+              </div>
             </div>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
