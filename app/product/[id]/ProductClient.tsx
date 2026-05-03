@@ -960,10 +960,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block', flexShrink: 0 }} />
           במלאי
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#fff4f4', border: '1px solid #ffc0c0', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#c0392b', fontWeight: 700 }}>
-          <Icon.Lightning />
-          נשארו {stockCount} בלבד
-        </span>
+        {product.cat !== 'מגילות' && product.cat !== 'ספרי תורה' && (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#fff4f4', border: '1px solid #ffc0c0', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#c0392b', fontWeight: 700 }}>
+            <Icon.Lightning />
+            נשארו {stockCount} בלבד
+          </span>
+        )}
       </div>
 
       {selectedKlafName && (
@@ -1159,10 +1161,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                 <Icon.Eye />
                 <span key={currentViewers}>{currentViewers} צופים עכשיו</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#fff4f4', border: '1px solid #ffc0c0', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#c0392b', fontWeight: 700 }}>
-                <Icon.Lightning />
-                נשארו {stockCount} פריטים
-              </div>
+              {product.cat !== 'מגילות' && product.cat !== 'ספרי תורה' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#fff4f4', border: '1px solid #ffc0c0', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#c0392b', fontWeight: 700 }}>
+                  <Icon.Lightning />
+                  נשארו {stockCount} פריטים
+                </div>
+              )}
             </div>
 
             {/* Mobile price */}
