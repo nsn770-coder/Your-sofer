@@ -929,8 +929,9 @@ export default function ProductClient() {
   );
 
   const allMediaRaw = [product.imgUrl || product.image_url, product.imgUrl2 || product.img1, product.imgUrl3 || product.img2, product.imgUrl4 || product.img3, product.imgUrl5].filter(Boolean) as string[];
+  const allMediaDeduped = [...new Set(allMediaRaw)];
   // Show AI-generated image (index 1) as primary when available
-  const allMedia = allMediaRaw.length >= 2 ? [allMediaRaw[1], allMediaRaw[0], ...allMediaRaw.slice(2)] : allMediaRaw;
+  const allMedia = allMediaDeduped.length >= 2 ? [allMediaDeduped[1], allMediaDeduped[0], ...allMediaDeduped.slice(2)] : allMediaDeduped;
   const allMediaOptimized = allMedia.map(u => optimizeCloudinaryUrl(u, 800));
   const allMediaThumb     = allMedia.map(u => optimizeCloudinaryUrl(u, 100));
   const hasVideo = !!product.videoUrl;
