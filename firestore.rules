@@ -83,11 +83,15 @@ service cloud.firestore {
       // Signed-in users or guests who include a guestId string can create orders
       allow create: if isSignedIn()
                     || request.resource.data.guestId is string;
+      // Guest orders (guestId present) are readable/updatable by anyone with the orderId.
+      // The 20-char random Firestore ID acts as an unguessable access token.
       allow read:   if isAdmin()
+                    || resource.data.guestId is string
                     || (isShaliach()
                         && resource.data.shaliachId ==
                            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shaliachId);
-      allow update: if isAdmin();
+      allow update: if isAdmin()
+                    || resource.data.guestId is string;
       allow delete: if isAdmin();
     }
 

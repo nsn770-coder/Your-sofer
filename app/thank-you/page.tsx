@@ -1,7 +1,7 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import * as pixel from '@/lib/metaPixel';
 
@@ -18,10 +18,15 @@ function ThankYouContent() {
     async function sendEmail() {
       try {
         // קבל פרטי ההזמנה מ-Firestore
+        console.log('[thank-you] fetching order', orderId);
         const orderSnap = await getDoc(doc(db, 'orders', orderId!));
-        if (!orderSnap.exists()) return;
+        if (!orderSnap.exists()) {
+          console.error('[thank-you] order not found:', orderId);
+          return;
+        }
 
         const order = orderSnap.data();
+        console.log('[thank-you] order loaded, sessionId:', order.sessionId, 'email:', order.email);
 
         // עדכן סטטוס הזמנה ל-paid
         await updateDoc(doc(db, 'orders', orderId!), {
@@ -34,36 +39,42 @@ function ThankYouContent() {
           updateDoc(doc(db, 'abandoned_carts', order.sessionId), {
             converted: true,
             convertedOrderId: orderId,
-            updatedAt: new Date().toISOString(),
-          }).catch(() => {});
+            updatedAt: serverTimestamp(),
+          }).catch((e) => console.error('[thank-you] abandoned_cart update failed:', e));
         }
 
         // שמור / עדכן רשומת לקוח
         const email: string = order.email || '';
         if (email) {
-          const customerRef = doc(db, 'customers', email.toLowerCase());
-          const customerSnap = await getDoc(customerRef);
-          const now = new Date().toISOString();
-          if (customerSnap.exists()) {
-            const existing = customerSnap.data();
-            await updateDoc(customerRef, {
-              lastOrderAt: now,
-              totalOrders: (existing.totalOrders || 0) + 1,
-              totalSpent: Math.round(((existing.totalSpent || 0) + (order.total || 0)) * 100) / 100,
-            });
-          } else {
-            await setDoc(customerRef, {
-              name: order.customerName || '',
-              email: email.toLowerCase(),
-              phone: order.phone || '',
-              address: order.address || '',
-              firstOrderAt: now,
-              lastOrderAt: now,
-              totalOrders: 1,
-              totalSpent: order.total || 0,
-              isGuest: !order.uid,
-              uid: order.uid || null,
-            });
+          try {
+            const customerRef = doc(db, 'customers', email.toLowerCase());
+            const customerSnap = await getDoc(customerRef);
+            const now = new Date().toISOString();
+            if (customerSnap.exists()) {
+              const existing = customerSnap.data();
+              await updateDoc(customerRef, {
+                lastOrderAt: now,
+                totalOrders: (existing.totalOrders || 0) + 1,
+                totalSpent: Math.round(((existing.totalSpent || 0) + (order.total || 0)) * 100) / 100,
+              });
+              console.log('[thank-you] customer updated:', email);
+            } else {
+              await setDoc(customerRef, {
+                name: order.customerName || '',
+                email: email.toLowerCase(),
+                phone: order.phone || '',
+                address: order.address || '',
+                firstOrderAt: now,
+                lastOrderAt: now,
+                totalOrders: 1,
+                totalSpent: order.total || 0,
+                isGuest: !order.uid,
+                uid: order.uid || null,
+              });
+              console.log('[thank-you] customer created:', email);
+            }
+          } catch (e) {
+            console.error('[thank-you] customer upsert failed:', e);
           }
         }
 

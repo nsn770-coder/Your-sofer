@@ -7,6 +7,14 @@
         { "fieldPath": "cat",      "order": "ASCENDING"  },
         { "fieldPath": "priority", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "abandoned_carts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "converted",  "order": "ASCENDING"  },
+        { "fieldPath": "updatedAt",  "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
