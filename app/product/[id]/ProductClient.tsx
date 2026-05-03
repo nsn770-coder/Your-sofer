@@ -905,7 +905,7 @@ export default function ProductClient() {
               collSnap.forEach(d => {
                 const cp = { id: d.id, ...d.data() } as Product;
                 const cat = cp.cat ?? '';
-                if (cp.id !== p.id && cp.cat !== p.cat && ALLOWED_CATS.has(cat)) {
+                if (cp.id !== p.id && cp.cat !== p.cat && ALLOWED_CATS.has(cat) && !cat.includes('מזוזה') && cat !== 'מזוזות') {
                   const count = catCounts[cat] ?? 0;
                   if (count < 10) {
                     catCounts[cat] = count + 1;
