@@ -898,17 +898,22 @@ export default function ProductClient() {
 
             // "השלם את המראה" - same collection, different category
             if (p.collection) {
-              const collSnap = await getDocs(query(collection(db, 'products'), where('collection', '==', p.collection), limit(20)));
-              const seenCats = new Set<string>();
+              const EXCLUDED_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'כיסוי תפילין', 'סט טלית תפילין', 'תפילין', 'כיסויים']);
+              const collSnap = await getDocs(query(collection(db, 'products'), where('collection', '==', p.collection), limit(50)));
+              const catCounts: Record<string, number> = {};
               const collData: Product[] = [];
               collSnap.forEach(d => {
                 const cp = { id: d.id, ...d.data() } as Product;
-                if (cp.id !== p.id && cp.cat !== p.cat && !seenCats.has(cp.cat ?? cp.id)) {
-                  seenCats.add(cp.cat ?? cp.id);
-                  collData.push(cp);
+                const cat = cp.cat ?? '';
+                if (cp.id !== p.id && cp.cat !== p.cat && !EXCLUDED_CATS.has(cat)) {
+                  const count = catCounts[cat] ?? 0;
+                  if (count < 2) {
+                    catCounts[cat] = count + 1;
+                    collData.push(cp);
+                  }
                 }
               });
-              setCollectionProducts(collData.slice(0, 4));
+              setCollectionProducts(collData.slice(0, 8));
             }
           }
         }
@@ -1309,75 +1314,43 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               </h2>
               <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>לקוחות שרכשו מוצר זה הוסיפו גם:</p>
             </div>
-            {isMobile ? (
-              <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>
-                {collectionProducts.map(cp => {
-                  const cpImg = optimizeCloudinaryUrl(cp.imgUrl || cp.image_url || '', 400) || undefined;
-                  return (
-                    <div
-                      key={cp.id}
-                      onClick={() => router.push(`/product/${cp.id}`)}
-                      style={{ flexShrink: 0, width: 148, background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'box-shadow 0.2s' }}
-                      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)')}
-                      onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}
-                    >
-                      <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
-                        {cpImg
-                          ? <img src={cpImg} alt={cp.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
-                          : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon.Package /></div>}
-                        {cp.cat && (
-                          <div style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(12,26,53,0.75)', color: '#fff', fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 20, backdropFilter: 'blur(4px)' }}>
-                            {cp.cat}
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ padding: '8px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{cp.name}</div>
-                        <div style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35' }}>₪{cp.price}</div>
-                        <button
-                          onClick={e => { e.stopPropagation(); addItem({ id: cp.id, name: cp.name, price: cp.price, imgUrl: cpImg ?? undefined, quantity: 1 }); }}
-                          style={{ marginTop: 'auto', width: '100%', padding: '5px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}
-                        >
-                          הוסף לסל
-                        </button>
-                      </div>
+            <div style={{ display: 'flex', gap: isMobile ? 10 : 14, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>
+              {collectionProducts.map(cp => {
+                const cpImg = optimizeCloudinaryUrl(cp.imgUrl || cp.image_url || '', 400) || undefined;
+                const cardW = isMobile ? 160 : 200;
+                return (
+                  <div
+                    key={cp.id}
+                    onClick={() => router.push(`/product/${cp.id}`)}
+                    style={{ flexShrink: 0, width: cardW, background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'box-shadow 0.2s' }}
+                    onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)')}
+                    onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}
+                  >
+                    <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
+                      {cpImg
+                        ? <img src={cpImg} alt={cp.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
+                        : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon.Package /></div>}
+                      {cp.cat && (
+                        <div style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(12,26,53,0.75)', color: '#fff', fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 20, backdropFilter: 'blur(4px)' }}>
+                          {cp.cat}
+                        </div>
+                      )}
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
-                {collectionProducts.map(cp => {
-                  const cpImg = optimizeCloudinaryUrl(cp.imgUrl || cp.image_url || '', 400) || undefined;
-                  return (
-                    <div key={cp.id} onClick={() => router.push(`/product/${cp.id}`)}
-                      style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}
-                      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)')}
-                      onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}>
-                      <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
-                        {cpImg
-                          ? <img src={cpImg} alt={cp.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
-                          : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon.Package /></div>}
-                        {cp.cat && (
-                          <div style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(12,26,53,0.75)', color: '#fff', fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 20, backdropFilter: 'blur(4px)' }}>
-                            {cp.cat}
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ padding: '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{cp.name}</div>
-                        <Stars n={cp.stars || 4.5} size={11} />
-                        <div style={{ fontSize: 16, fontWeight: 900, color: '#0c1a35' }}>₪{cp.price}</div>
-                        <button onClick={e => { e.stopPropagation(); addItem({ id: cp.id, name: cp.name, price: cp.price, imgUrl: cpImg ?? undefined, quantity: 1 }); }}
-                          style={{ marginTop: 'auto', width: '100%', padding: '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
-                          הוסף לסל
-                        </button>
-                      </div>
+                    <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{cp.name}</div>
+                      <Stars n={cp.stars || 4.5} size={11} />
+                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>₪{cp.price}</div>
+                      <button
+                        onClick={e => { e.stopPropagation(); addItem({ id: cp.id, name: cp.name, price: cp.price, imgUrl: cpImg ?? undefined, quantity: 1 }); }}
+                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
+                      >
+                        הוסף לסל
+                      </button>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
