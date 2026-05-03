@@ -107,7 +107,7 @@ export default function OwnerDashboard() {
           <h1 className="text-2xl font-black" style={{ color: '#0c1a35' }}>
             שלום {opsUser?.name} 👋
           </h1>
-          <p className="text-gray-500 text-sm mt-1">דשבורד בעלים — סקירה מלאה</p>
+          <p className="text-gray-500 text-sm mt-1">דשבורד בעלים - סקירה מלאה</p>
         </div>
         <div className="text-xs text-gray-400 bg-white border rounded-lg px-3 py-1.5">
           {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}

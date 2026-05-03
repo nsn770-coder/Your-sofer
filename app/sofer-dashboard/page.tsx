@@ -277,7 +277,7 @@ export default function SoferDashboard() {
                   {orderItems.map(item => (
                     <tr key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
                       <td style={{ padding: '10px 8px', fontWeight: 600 }}>{item.productTitle}</td>
-                      <td style={{ padding: '10px 8px', color: '#555' }}>{item.customerName || '—'}</td>
+                      <td style={{ padding: '10px 8px', color: '#555' }}>{item.customerName || '-'}</td>
                       <td style={{ padding: '10px 8px' }}>{item.quantity}</td>
                       <td style={{ padding: '10px 8px', color: '#27ae60', fontWeight: 700 }}>₪{(item.price * (item.quantity || 1)).toFixed(0)}</td>
                       <td style={{ padding: '10px 8px' }}>

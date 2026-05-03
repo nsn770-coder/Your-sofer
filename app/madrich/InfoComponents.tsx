@@ -27,7 +27,7 @@ export function QuoteBlock({ text, author }: { text: string; author?: string }) 
     }}>
       <div style={{ fontSize: 40, color: C.gold, lineHeight: 1, marginBottom: 8, fontFamily: 'Georgia, serif' }}>"</div>
       <p style={{ fontSize: 18, fontWeight: 700, color: C.navy, margin: 0, lineHeight: 1.6 }}>{text}</p>
-      {author && <p style={{ fontSize: 13, color: C.muted, marginTop: 10, marginBottom: 0 }}>— {author}</p>}
+      {author && <p style={{ fontSize: 13, color: C.muted, marginTop: 10, marginBottom: 0 }}>- {author}</p>}
     </div>
   );
 }

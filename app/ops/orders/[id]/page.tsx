@@ -25,7 +25,7 @@ const ALL_STATUSES: OrderStatus[] = [
 ];
 
 function formatTs(ts: any): string {
-  if (!ts) return '—';
+  if (!ts) return '-';
   const d = ts?.toDate ? ts.toDate() : new Date(ts);
   return d.toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
@@ -43,7 +43,7 @@ function Field({ label, value }: { label: string; value?: string | number | null
   return (
     <div>
       <div className="text-xs text-gray-400 mb-0.5">{label}</div>
-      <div className="text-sm font-medium text-gray-800">{value || '—'}</div>
+      <div className="text-sm font-medium text-gray-800">{value || '-'}</div>
     </div>
   );
 }
@@ -197,7 +197,7 @@ export default function OrderDetailPage() {
       shipmentTracking: tracking,
       updatedAt: serverTimestamp(),
     });
-    await writeAudit('מספר מעקב עודכן', order.shipmentTracking || '—', tracking);
+    await writeAudit('מספר מעקב עודכן', order.shipmentTracking || '-', tracking);
     setSaving(false);
     await loadOrder();
   }
@@ -596,7 +596,7 @@ export default function OrderDetailPage() {
                 </>
               )}
               <Field label="עדיפות" value={PRIORITY_LABELS[order.priority] || order.priority} />
-              <Field label="תאריך יעד" value={order.dueDate ? formatTs(order.dueDate) : '—'} />
+              <Field label="תאריך יעד" value={order.dueDate ? formatTs(order.dueDate) : '-'} />
               <Field label="מעקב משלוח" value={order.shipmentTracking} />
             </div>
           </Section>

@@ -6,10 +6,10 @@ import { db } from '../../firebase';
 import ProductCard from '@/components/ui/ProductCard';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
-// Explicit holiday cats — products in these pass the include check automatically
+// Explicit holiday cats - products in these pass the include check automatically
 const SHABBAT_EXPLICIT_CATS = new Set(['שבת', 'חגים', 'פסח', 'חנוכה']);
 
-// All cats to fetch — max 10 for Firestore 'in' query
+// All cats to fetch - max 10 for Firestore 'in' query
 const FETCH_CATS = ['יודאיקה', 'כלי שולחן והגשה', 'עיצוב הבית', 'מתנות', 'שבת', 'חגים', 'פסח', 'חנוכה'];
 
 const INCLUDE_KEYWORDS = [
@@ -92,7 +92,7 @@ export default function ShabbatHolidaysClient() {
               all.push(p);
             }
           });
-        } catch { /* tags index may not exist yet — non-fatal */ }
+        } catch { /* tags index may not exist yet - non-fatal */ }
 
         // Sort by priority desc
         all.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));

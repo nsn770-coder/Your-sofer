@@ -65,14 +65,14 @@ export async function generateMetadata(
   const product = await fetchProduct(id);
 
   if (!product) {
-    return { title: 'מוצר | Your Sofer', description: 'חנות סת"מ — Your Sofer' };
+    return { title: 'מוצר | Your Sofer', description: 'חנות סת"מ - Your Sofer' };
   }
 
   const name = product.name ?? 'מוצר';
   const desc =
     product.desc ||
     product.description ||
-    `${name} מסופר סת"מ מוסמך — נבדק ומצולם לפני מכירה. Your Sofer.`;
+    `${name} מסופר סת"מ מוסמך - נבדק ומצולם לפני מכירה. Your Sofer.`;
   const image = product.imgUrl || product.image_url || product.imgUrl2;
   const priceStr = product.price ? `₪${product.price}` : '';
   const pageUrl = `${BASE_URL}/product/${id}`;
@@ -82,7 +82,7 @@ export async function generateMetadata(
     : undefined;
 
   return {
-    title: `${name}${priceStr ? ` — ${priceStr}` : ''}`,
+    title: `${name}${priceStr ? ` - ${priceStr}` : ''}`,
     description: desc,
     alternates: { canonical: pageUrl },
     openGraph: {

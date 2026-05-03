@@ -133,7 +133,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
           />
           <ProfileCard
             initials="נ״ב"
-            name="ניסים בואהרון"
+            name="הרב ניסים בואהרון"
             title='סופר סת"מ מוסמך'
             description='סופר מוסמך עם שנות ניסיון בכתיבת סת"מ ברמה הגבוהה ביותר'
             badge='סופר מוסמך'

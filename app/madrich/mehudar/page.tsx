@@ -6,7 +6,7 @@ const BASE_URL = 'https://your-sofer.com';
 export const metadata: Metadata = {
   title: 'מה זה מזוזה מהודרת באמת? ההבדל בין כשר למהודר',
   description:
-    'לא כל מזוזה כשרה היא מהודרת — מה ההבדל בין כשר למהודר, מה בודקים במזוזה מהודרת, ולמה זה משנה.',
+    'לא כל מזוזה כשרה היא מהודרת - מה ההבדל בין כשר למהודר, מה בודקים במזוזה מהודרת, ולמה זה משנה.',
   alternates: { canonical: `${BASE_URL}/madrich/mehudar` },
   openGraph: {
     type: 'article',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     url: `${BASE_URL}/madrich/mehudar`,
     siteName: 'Your Sofer',
     title: 'מה זה מזוזה מהודרת באמת? | Your Sofer',
-    description: 'ההבדל בין כשר למהודר — מה מוסיף ה"הידור" ולמה זה חשוב.',
+    description: 'ההבדל בין כשר למהודר - מה מוסיף ה"הידור" ולמה זה חשוב.',
   },
 };
 
@@ -22,7 +22,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'מה זה מזוזה מהודרת באמת?',
-  description: 'לא כל מזוזה כשרה היא מהודרת — הנה ההבדלים שחשוב להכיר.',
+  description: 'לא כל מזוזה כשרה היא מהודרת - הנה ההבדלים שחשוב להכיר.',
   url: `${BASE_URL}/madrich/mehudar`,
   publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
   inLanguage: 'he',
@@ -39,13 +39,13 @@ export default function MehudarPage() {
       <PageHero
         badge="מדריך איכות"
         title="מה זה מזוזה מהודרת באמת?"
-        subtitle="לא כל מזוזה כשרה היא מהודרת — הנה ההבדלים שחשוב להכיר"
+        subtitle="לא כל מזוזה כשרה היא מהודרת - הנה ההבדלים שחשוב להכיר"
       />
 
       <div style={{ padding: '40px 0' }}>
 
         <p style={{ fontSize: 17, lineHeight: 1.8, color: '#333', marginBottom: 24 }}>
-          "כשר" ו"מהודר" — שתי מילים שנשמעות דומות, אבל מתארות דברים שונים מאוד. הבנת ההבדל יכולה לשנות את ההחלטה שלכם.
+          "כשר" ו"מהודר" - שתי מילים שנשמעות דומות, אבל מתארות דברים שונים מאוד. הבנת ההבדל יכולה לשנות את ההחלטה שלכם.
         </p>
 
         <QuoteBlock text="כשר פירושו עמידה בדרישות. מהודר פירושו שמישהו שם לב גם כשלא היה חייב." />
@@ -54,14 +54,14 @@ export default function MehudarPage() {
           מה הופך מזוזה לכשרה?
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
-          מזוזה כשרה היא כזו שעמדה בכל דרישות ההלכה: האותיות תקינות, הסדר נכון, הכוונה הייתה כראוי. זה הבסיס. בלי זה — אין מזוזה.
+          מזוזה כשרה היא כזו שעמדה בכל דרישות ההלכה: האותיות תקינות, הסדר נכון, הכוונה הייתה כראוי. זה הבסיס. בלי זה - אין מזוזה.
         </p>
 
         <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 16px' }}>
           מה מוסיף ה"הידור"?
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
-          מזוזה מהודרת עומדת בבסיס — ועוד הרבה מעבר לזה. הסופר בחר לכתוב בצורה יפה ומדוקדקת גם כשלא היה חייב. הוא הקדיש זמן לכל אות, לכל שורה, לכל הצטרפות.
+          מזוזה מהודרת עומדת בבסיס - ועוד הרבה מעבר לזה. הסופר בחר לכתוב בצורה יפה ומדוקדקת גם כשלא היה חייב. הוא הקדיש זמן לכל אות, לכל שורה, לכל הצטרפות.
         </p>
 
         {/* Comparison */}
@@ -110,10 +110,10 @@ export default function MehudarPage() {
 
         {[
           { title: 'צורת האותיות', desc: 'כל אות בסת"ם יש לה צורה מדויקת. מהודרת = כל אות קרובה לצורה האידיאלית.' },
-          { title: 'רווחים ומרחקים', desc: 'הרווחים בין מילים ובין אותיות — עקביים ומאוזנים.' },
+          { title: 'רווחים ומרחקים', desc: 'הרווחים בין מילים ובין אותיות - עקביים ומאוזנים.' },
           { title: 'ישרות השורות', desc: 'השורות מרוּוחות ומישרות על פני הקלף.' },
-          { title: 'עובי הכתיבה', desc: 'העט נמשך באחידות — ללא לחצים לא אחידים או דהייה.' },
-          { title: 'תגים ועיטורים', desc: 'האותיות שדורשות תגים — יש להן תגים יפים ומדויקים.' },
+          { title: 'עובי הכתיבה', desc: 'העט נמשך באחידות - ללא לחצים לא אחידים או דהייה.' },
+          { title: 'תגים ועיטורים', desc: 'האותיות שדורשות תגים - יש להן תגים יפים ומדויקים.' },
         ].map(item => (
           <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
             <span style={{ color: '#b8972a', fontSize: 20, flexShrink: 0 }}>✦</span>
@@ -134,7 +134,7 @@ export default function MehudarPage() {
           מה שחשוב: לדעת מה אתם קונים. לא לשלם על "מהודר" ולקבל "כשר בלבד".
         </p>
 
-        <QuoteBlock text="לא חשוב מה תבחרו — חשוב שתדעו בדיוק מה אתם מקבלים." />
+        <QuoteBlock text="לא חשוב מה תבחרו - חשוב שתדעו בדיוק מה אתם מקבלים." />
 
         <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35', margin: '40px 0 16px' }}>קריאה נוספת</h3>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>

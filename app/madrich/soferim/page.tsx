@@ -5,9 +5,9 @@ const BASE_URL = 'https://your-sofer.com';
 const C = { navy: '#0c1a35', gold: '#b8972a', border: '#e0e0e0', white: '#fff' };
 
 export const metadata: Metadata = {
-  title: 'מי הסופרים שלנו — הקריטריונים לבחירת סופר סת"מ',
+  title: 'מי הסופרים שלנו - הקריטריונים לבחירת סופר סת"מ',
   description:
-    'איך אנחנו בוחרים עם מי לעבוד — ומה מייחד כל סופר סת"מ שעובד עם Your Sofer. הקריטריונים, תהליך הכניסה, והמחויבות לאיכות.',
+    'איך אנחנו בוחרים עם מי לעבוד - ומה מייחד כל סופר סת"מ שעובד עם Your Sofer. הקריטריונים, תהליך הכניסה, והמחויבות לאיכות.',
   alternates: { canonical: `${BASE_URL}/madrich/soferim` },
   openGraph: {
     type: 'article',
@@ -23,7 +23,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'מי הסופרים שלנו',
-  description: 'איך אנחנו בוחרים עם מי לעבוד — ומה מייחד כל סופר שעובד איתנו.',
+  description: 'איך אנחנו בוחרים עם מי לעבוד - ומה מייחד כל סופר שעובד איתנו.',
   url: `${BASE_URL}/madrich/soferim`,
   publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
   inLanguage: 'he',
@@ -40,13 +40,13 @@ export default function SoferimPage() {
       <PageHero
         badge="הסופרים שלנו"
         title="מי הסופרים שלנו"
-        subtitle="איך אנחנו בוחרים עם מי לעבוד — ומה מייחד כל סופר שעובד איתנו"
+        subtitle="איך אנחנו בוחרים עם מי לעבוד - ומה מייחד כל סופר שעובד איתנו"
       />
 
       <div style={{ padding: '40px 0' }}>
 
         <p style={{ fontSize: 17, lineHeight: 1.8, color: '#333', marginBottom: 24 }}>
-          אנחנו לא עובדים עם כל מי שמחזיק בד ועט. הסופרים שעובדים איתנו עמדו בסטנדרט מסוים — ואנחנו ממשיכים לבדוק.
+          אנחנו לא עובדים עם כל מי שמחזיק בד ועט. הסופרים שעובדים איתנו עמדו בסטנדרט מסוים - ואנחנו ממשיכים לבדוק.
         </p>
 
         <h2 style={{ fontSize: 22, fontWeight: 900, color: C.navy, margin: '36px 0 16px' }}>
@@ -71,16 +71,16 @@ export default function SoferimPage() {
         </div>
 
         <h2 style={{ fontSize: 22, fontWeight: 900, color: C.navy, margin: '36px 0 16px' }}>
-          אנחנו לא רק קונים — אנחנו מעלים את הרמה
+          אנחנו לא רק קונים - אנחנו מעלים את הרמה
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
           עם כל סופר שעובד איתנו נבנה קשר אישי ואמיתי. אנחנו בודקים את הכתבים שמגיעים, נותנים הערות, ומוכנים לשלם יותר עבור כתיבה טובה יותר.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
-          למה זה חשוב? כי כשהסופר יודע שמישהו שם לב — הוא כותב בתשומת לב. כשאין מי שמבחין, קשה לשמור על סטנדרט לאורך זמן.
+          למה זה חשוב? כי כשהסופר יודע שמישהו שם לב - הוא כותב בתשומת לב. כשאין מי שמבחין, קשה לשמור על סטנדרט לאורך זמן.
         </p>
 
-        <QuoteBlock text="אנחנו לא רק קונים מסופרים — אנחנו מעלים את הרמה שלהם." />
+        <QuoteBlock text="אנחנו לא רק קונים מסופרים - אנחנו מעלים את הרמה שלהם." />
 
         <h2 style={{ fontSize: 22, fontWeight: 900, color: C.navy, margin: '36px 0 16px' }}>
           תהליך הכניסה לעבודה איתנו
@@ -91,7 +91,7 @@ export default function SoferimPage() {
             { title: 'פגישה והיכרות', desc: 'אנחנו פוגשים את הסופר, בודקים את הכתבים שלו, ומבררים על הרקע שלו.' },
             { title: 'בדיקת דוגמאות', desc: 'מעיינים בכתבים, מקבלים המלצות מרבנים ומוסמכים.' },
             { title: 'הסכמה על סטנדרט', desc: 'מגדירים יחד את רמת הכתיבה המינימלית שנקבל.' },
-            { title: 'ביקורת שוטפת', desc: 'כל מזוזה שמגיעה עוברת בדיקה. אם יש הערות — הסופר מקבל אותן.' },
+            { title: 'ביקורת שוטפת', desc: 'כל מזוזה שמגיעה עוברת בדיקה. אם יש הערות - הסופר מקבל אותן.' },
             { title: 'תמריץ לאיכות', desc: 'אנחנו מוכנים לשלם יותר עבור כתיבה יוצאת דופן.' },
           ].map((s, i) => (
             <div key={s.title} style={{ marginBottom: 24 }}>

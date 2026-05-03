@@ -4,9 +4,9 @@ import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard, Step } from
 const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
-  title: 'איך אנחנו בודקים מזוזות — תהליך הבדיקה המלא',
+  title: 'איך אנחנו בודקים מזוזות - תהליך הבדיקה המלא',
   description:
-    'כל מזוזה עוברת בדיקה מקצועית לפני שמגיעה אליך — בדיקה ידנית מוסמכת, בדיקת מחשב, וצילום הקלף. הנה התהליך המלא.',
+    'כל מזוזה עוברת בדיקה מקצועית לפני שמגיעה אליך - בדיקה ידנית מוסמכת, בדיקת מחשב, וצילום הקלף. הנה התהליך המלא.',
   alternates: { canonical: `${BASE_URL}/madrich/bedika` },
   openGraph: {
     type: 'article',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     url: `${BASE_URL}/madrich/bedika`,
     siteName: 'Your Sofer',
     title: 'איך אנחנו בודקים מזוזות | Your Sofer',
-    description: 'תהליך בדיקת המזוזות שלנו — 6 שלבים מהסופר ועד אליך.',
+    description: 'תהליך בדיקת המזוזות שלנו - 6 שלבים מהסופר ועד אליך.',
   },
 };
 
@@ -22,7 +22,7 @@ const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'איך אנחנו בודקים מזוזות',
-  description: 'כל מזוזה עוברת בדיקה מקצועית לפני שמגיעה אליך — הנה התהליך המלא.',
+  description: 'כל מזוזה עוברת בדיקה מקצועית לפני שמגיעה אליך - הנה התהליך המלא.',
   url: `${BASE_URL}/madrich/bedika`,
   publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
   inLanguage: 'he',
@@ -39,27 +39,27 @@ export default function BedikaPage() {
       <PageHero
         badge="תהליך הבדיקה"
         title="איך אנחנו בודקים מזוזות"
-        subtitle="כל מזוזה עוברת בדיקה מקצועית לפני שמגיעה אליך — הנה התהליך המלא"
+        subtitle="כל מזוזה עוברת בדיקה מקצועית לפני שמגיעה אליך - הנה התהליך המלא"
       />
 
       <div style={{ padding: '40px 0' }}>
 
         <p style={{ fontSize: 17, lineHeight: 1.8, color: '#333', marginBottom: 24 }}>
-          אצלנו המזוזה לא הולכת ישר למדף. היא עוברת קודם דרך בדיקה — ורק אחרי שעברה, היא מצולמת ומוצגת לכם.
+          אצלנו המזוזה לא הולכת ישר למדף. היא עוברת קודם דרך בדיקה - ורק אחרי שעברה, היא מצולמת ומוצגת לכם.
         </p>
 
-        <QuoteBlock text="אצלנו המזוזה לא הולכת ישר למדף — היא עוברת קודם דרך בדיקה." />
+        <QuoteBlock text="אצלנו המזוזה לא הולכת ישר למדף - היא עוברת קודם דרך בדיקה." />
 
         <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 20px' }}>
           התהליך שלב אחר שלב
         </h2>
 
-        <Step num={1} title="קבלה מהסופר" desc="המזוזה מגיעה אלינו ישירות מהסופר — לא דרך סיטונאים." />
+        <Step num={1} title="קבלה מהסופר" desc="המזוזה מגיעה אלינו ישירות מהסופר - לא דרך סיטונאים." />
         <Step num={2} title="בדיקה ידנית מוסמכת" desc="רב/בודק מוסמך עובר על כל אות, כל מילה, כל שורה. הוא בודק צורת אותיות, רווחים, תגים ועוד." />
         <Step num={3} title="בדיקת מחשב (היכן שרלוונטי)" desc="לחלק מהמזוזות מתווספת גם בדיקת תוכנה שמאתרת שגיאות שקשה לאתר בעין." />
-        <Step num={4} title="החלטה: כשר / לתיקון / גניזה" desc="מזוזה כשרה ממשיכה. מזוזה הניתנת לתיקון חוזרת לסופר. מזוזה פסולה — לגניזה." />
-        <Step num={5} title="צילום הקלף" desc="כל מזוזה שעברה בדיקה מצולמת — קדמי ואחורי — ותמונה אמיתית שלה מועלית לאתר." />
-        <Step num={6} title="מכירה ספציפית" desc="אתם בוחרים קלף ספציפי מהגלריה — לא קונים עיוור. אתם יודעים בדיוק מה מגיע אליכם." />
+        <Step num={4} title="החלטה: כשר / לתיקון / גניזה" desc="מזוזה כשרה ממשיכה. מזוזה הניתנת לתיקון חוזרת לסופר. מזוזה פסולה - לגניזה." />
+        <Step num={5} title="צילום הקלף" desc="כל מזוזה שעברה בדיקה מצולמת - קדמי ואחורי - ותמונה אמיתית שלה מועלית לאתר." />
+        <Step num={6} title="מכירה ספציפית" desc="אתם בוחרים קלף ספציפי מהגלריה - לא קונים עיוור. אתם יודעים בדיוק מה מגיע אליכם." />
 
         <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '40px 0 16px' }}>
           מה זה אומר עבורכם?
@@ -67,10 +67,10 @@ export default function BedikaPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 32 }}>
           {[
-            { icon: '📸', title: 'תמונה אמיתית', desc: 'לא תמונת מלאי — הקלף שאתם רואים הוא הקלף שתקבלו' },
+            { icon: '📸', title: 'תמונה אמיתית', desc: 'לא תמונת מלאי - הקלף שאתם רואים הוא הקלף שתקבלו' },
             { icon: '🛡️', title: 'בדיקה מוסמכת', desc: 'כל מזוזה נבדקה לפני המכירה' },
             { icon: '🔁', title: 'שקיפות מלאה', desc: 'אפשר לשלוח את התמונה לרב שלכם לאישור נוסף' },
-            { icon: '❌', title: 'לא מוכרים פסול', desc: 'מזוזה שלא עברה בדיקה — לא מגיעה לאתר' },
+            { icon: '❌', title: 'לא מוכרים פסול', desc: 'מזוזה שלא עברה בדיקה - לא מגיעה לאתר' },
           ].map(b => (
             <div key={b.title} style={{ background: '#fff', border: '1px solid #e0e0e0', borderRadius: 10, padding: '20px', textAlign: 'center' }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>{b.icon}</div>

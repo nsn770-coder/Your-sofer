@@ -54,7 +54,7 @@ export default function SoferimClient() {
           <div style={{ fontSize: 48, marginBottom: 12 }}>✍️</div>
           <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הסופרים שלנו</h1>
           <p style={{ color: '#a8c8b4', fontSize: 15, marginBottom: 24, maxWidth: 500, margin: '0 auto 24px' }}>
-            סופרים מוסמכים ומאומתים — כל סופר עבר בדיקה קפדנית עם פיקוח רבני ותעודת כשרות
+            סופרים מוסמכים ומאומתים - כל סופר עבר בדיקה קפדנית עם פיקוח רבני ותעודת כשרות
           </p>
 
           {/* חיפוש */}
@@ -195,7 +195,7 @@ export default function SoferimClient() {
 
       <footer style={{ background: '#0f1111', color: '#fff', padding: '20px', textAlign: 'center' }}>
         <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>✡ Your Sofer</div>
-        <div style={{ fontSize: 12, color: '#666' }}>© 2025 Your Sofer — סת"מ מסופרים מוסמכים</div>
+        <div style={{ fontSize: 12, color: '#666' }}>© 2025 Your Sofer - סת"מ מסופרים מוסמכים</div>
       </footer>
     </div>
   );

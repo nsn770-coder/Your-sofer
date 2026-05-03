@@ -15,7 +15,7 @@ const gold = '#b8972a';
 export default function AnalyticsLineChart({ data }: { data: DayStat[] }) {
   return (
     <div style={{ background: '#fff', borderRadius: 14, padding: '24px 20px', marginBottom: 28, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-      <h2 style={{ fontSize: 16, fontWeight: 800, color: navy, margin: '0 0 20px' }}>📈 הזמנות — 7 ימים אחרונים</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: navy, margin: '0 0 20px' }}>📈 הזמנות - 7 ימים אחרונים</h2>
       <ResponsiveContainer width="100%" height={260}>
         <LineChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

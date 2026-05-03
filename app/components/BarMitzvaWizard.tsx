@@ -50,7 +50,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
       // Legacy keys (used by ProductCard redirect signal)
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ step: next }));
       localStorage.setItem(ACTIVE_STEP_KEY, String(idx));
-      // Shared session keys — read by useWizardSession + WizardStickyBar
+      // Shared session keys - read by useWizardSession + WizardStickyBar
       localStorage.setItem(LS_WIZARD_ACTIVE,   'true');
       localStorage.setItem(LS_WIZARD_STEP,     String(next));
       localStorage.setItem(LS_WIZARD_CATEGORY, STEPS[idx].category);
@@ -94,7 +94,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
             הגעת לעגלה המוכנה שלך!
           </p>
           <p style={{ color: textMuted, fontSize: 13, marginBottom: 20 }}>
-            כל הפריטים נבחרו — עכשיו עבור לעגלה ורכוש
+            כל הפריטים נבחרו - עכשיו עבור לעגלה ורכוש
           </p>
           <a
             href="/cart"

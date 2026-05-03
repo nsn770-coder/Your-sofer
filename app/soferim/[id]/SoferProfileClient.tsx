@@ -314,7 +314,7 @@ export default function SoferProfileClient({ id }: { id: string }) {
                     style={{ aspectRatio: '1', borderRadius: 8, overflow: 'hidden', cursor: 'zoom-in', border: '2px solid #e8e8e8', transition: 'border-color 0.2s' }}
                     onMouseEnter={e => (e.currentTarget.style.borderColor = gold)}
                     onMouseLeave={e => (e.currentTarget.style.borderColor = '#e8e8e8')}>
-                    <img src={url} alt={`דוגמת כתיבה ${i + 1} — ${sofer.name}`}
+                    <img src={url} alt={`דוגמת כתיבה ${i + 1} - ${sofer.name}`}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 ))}

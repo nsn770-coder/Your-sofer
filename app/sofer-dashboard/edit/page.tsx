@@ -106,13 +106,13 @@ export default function SoferEditPage() {
           setStyle(d.style ?? '');
           setDescription(d.description ?? '');
           setImageUrl(d.imageUrl ?? '');
-          // Normalise writingSamples — may be string[] or WritingSample[]
+          // Normalise writingSamples - may be string[] or WritingSample[]
           const raw = d.writingSamples ?? [];
           setSamples(raw.map((s: unknown) =>
             typeof s === 'string' ? { type: 'image', url: s } : s as WritingSample
           ));
         }
-        // Past requests — query by auth uid (soferId field = uid per rules)
+        // Past requests - query by auth uid (soferId field = uid per rules)
         const reqSnap = await getDocs(
           query(
             collection(db, 'sofer_edit_requests'),
@@ -147,7 +147,7 @@ export default function SoferEditPage() {
     }
   }
 
-  // ── Writing samples — multiple image upload with progress ────────────────
+  // ── Writing samples - multiple image upload with progress ────────────────
   async function handleSamplesChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
@@ -211,7 +211,7 @@ export default function SoferEditPage() {
 
     const changes = computeChanges();
     if (Object.keys(changes).length === 0) {
-      setError('לא בוצע שינוי — הנתונים זהים לפרופיל הנוכחי.');
+      setError('לא בוצע שינוי - הנתונים זהים לפרופיל הנוכחי.');
       return;
     }
     if (requests.some(r => r.status === 'pending')) {
@@ -222,8 +222,8 @@ export default function SoferEditPage() {
     setSaving(true);
     try {
       const newReq = {
-        soferId:     user.uid,          // Firebase Auth UID — matches firestore.rules
-        soferDocId:  user.soferId,      // soferim/{soferDocId} — used by admin to apply changes
+        soferId:     user.uid,          // Firebase Auth UID - matches firestore.rules
+        soferDocId:  user.soferId,      // soferim/{soferDocId} - used by admin to apply changes
         soferName:   user.displayName ?? current?.name ?? '',
         status:      'pending',
         changes,

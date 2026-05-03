@@ -14,38 +14,38 @@ const ARTICLES = [
   {
     emoji: '💸',
     title: 'למה לא לקנות מזוזה זולה',
-    desc: 'מה ההבדל האמיתי בין מזוזה ב־150₪ למזוזה ב־400₪ — ולמה זה לא עניין של יופי',
+    desc: 'מה ההבדל האמיתי בין מזוזה ב־150₪ למזוזה ב־400₪ - ולמה זה לא עניין של יופי',
     href: '/madrich/mezuza-zola',
     badge: 'פופולרי',
   },
   {
     emoji: '🎯',
     title: 'איך לבחור מזוזה נכון',
-    desc: 'מדריך שלב-אחר-שלב — גם אם אין לך מושג בסת"ם',
+    desc: 'מדריך שלב-אחר-שלב - גם אם אין לך מושג בסת"ם',
     href: '/madrich/bechira',
   },
   {
     emoji: '🏛️',
     title: 'האמת על שוק המזוזות',
-    desc: 'למה כל כך קשה לדעת מה באמת קונים — וכיצד המודל שלנו שונה',
+    desc: 'למה כל כך קשה לדעת מה באמת קונים - וכיצד המודל שלנו שונה',
     href: '/madrich/shuk',
   },
   {
     emoji: '✍️',
     title: 'מי הסופרים שלנו',
-    desc: 'איך אנחנו בוחרים עם מי לעבוד — ומה מייחד כל סופר',
+    desc: 'איך אנחנו בוחרים עם מי לעבוד - ומה מייחד כל סופר',
     href: '/madrich/soferim',
   },
   {
     emoji: '🔍',
     title: 'איך אנחנו בודקים מזוזות',
-    desc: 'כל מזוזה עוברת בדיקה לפני שמגיעה אליך — הנה התהליך המלא',
+    desc: 'כל מזוזה עוברת בדיקה לפני שמגיעה אליך - הנה התהליך המלא',
     href: '/madrich/bedika',
   },
   {
     emoji: '⭐',
     title: 'מה זה מזוזה מהודרת באמת',
-    desc: 'לא כל מזוזה כשרה היא מהודרת — הנה ההבדלים שחשוב להכיר',
+    desc: 'לא כל מזוזה כשרה היא מהודרת - הנה ההבדלים שחשוב להכיר',
     href: '/madrich/mehudar',
   },
   {
@@ -89,7 +89,7 @@ export default function MadrichPageClient() {
       {/* Brand Promise */}
       <div style={{ background: '#fdf8ee', borderTop: `3px solid ${C.gold}`, padding: '24px', textAlign: 'center' }}>
         <p style={{ fontSize: 17, fontWeight: 700, color: C.navy, margin: 0 }}>
-          ״שתקבל מזוזה כשרה — ותדע בדיוק מה אתה קונה״
+          ״שתקבל מזוזה כשרה - ותדע בדיוק מה אתה קונה״
         </p>
       </div>
 
@@ -97,7 +97,7 @@ export default function MadrichPageClient() {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 16px' }}>
         <h2 style={{ fontSize: 22, fontWeight: 900, color: C.navy, marginBottom: 8, textAlign: 'center' }}>מאמרים ומדריכים</h2>
         <p style={{ textAlign: 'center', color: C.muted, fontSize: 15, marginBottom: 36 }}>
-          בחרו נושא שמעניין אתכם — כל מאמר נכתב כדי לעזור לכם לקבל החלטה מושכלת
+          בחרו נושא שמעניין אתכם - כל מאמר נכתב כדי לעזור לכם לקבל החלטה מושכלת
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
@@ -144,7 +144,7 @@ export default function MadrichPageClient() {
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 28, textAlign: 'center' }}>
           {[
             { icon: '🔍', title: 'בדיקה לפני מכירה', desc: 'כל מזוזה נבדקת לפני שמועלית לאתר' },
-            { icon: '📸', title: 'תמונת הקלף האמיתי', desc: 'רואים בדיוק מה קונים — לא תמונת מלאי' },
+            { icon: '📸', title: 'תמונת הקלף האמיתי', desc: 'רואים בדיוק מה קונים - לא תמונת מלאי' },
             { icon: '✍️', title: 'סופרים מוכרים אישית', desc: 'אנחנו מכירים כל סופר שעובד איתנו' },
             { icon: '💬', title: 'ייעוץ אישי חינם', desc: 'לא בטוחים? דברו עם הסופר לפני הקנייה' },
           ].map(t => (
@@ -160,7 +160,7 @@ export default function MadrichPageClient() {
       {/* CTA */}
       <div style={{ padding: '48px 24px', textAlign: 'center', background: C.white }}>
         <h3 style={{ fontSize: 22, fontWeight: 900, color: C.navy, marginBottom: 12 }}>מוכנים לבחור?</h3>
-        <p style={{ color: C.muted, fontSize: 15, marginBottom: 24 }}>צפו בגלריית הקלפים הזמינים — עם תמונה אמיתית של כל מזוזה</p>
+        <p style={{ color: C.muted, fontSize: 15, marginBottom: 24 }}>צפו בגלריית הקלפים הזמינים - עם תמונה אמיתית של כל מזוזה</p>
         <button
           onClick={() => router.push('/')}
           style={{ background: C.gold, color: C.navy, border: 'none', borderRadius: 8, padding: '14px 32px', fontSize: 16, fontWeight: 800, cursor: 'pointer' }}

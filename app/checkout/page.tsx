@@ -97,7 +97,7 @@ export default function CheckoutPage() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Meta Pixel — InitiateCheckout fires once when user enters checkout with items
+  // Meta Pixel - InitiateCheckout fires once when user enters checkout with items
   useEffect(() => {
     if (items.length === 0) return;
     pixel.initiateCheckout(
@@ -111,7 +111,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (step !== 'review') return;
     const f = formRef.current;
-    console.log('[checkout] step=review — saving abandoned cart, sessionId:', sessionId, 'email:', f.email);
+    console.log('[checkout] step=review - saving abandoned cart, sessionId:', sessionId, 'email:', f.email);
     if (!sessionId || items.length === 0) {
       console.warn('[checkout] abandoned cart skipped: sessionId=', sessionId, 'items=', items.length);
       return;
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
         await updateDoc(doc(db, 'coupons', appliedCoupon.code), { active: false, usedBy: form.email || form.name, usedAt: serverTimestamp() });
       }
 
-      // Upsert customer record immediately — don't rely on /thank-you reaching Firestore
+      // Upsert customer record immediately - don't rely on /thank-you reaching Firestore
       const customerEmail = form.email.toLowerCase();
       const customerRef = doc(db, 'customers', customerEmail);
       try {
@@ -289,7 +289,7 @@ export default function CheckoutPage() {
         <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#555" /> קוד קופון</div>
         {appliedCoupon ? (
           <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} — {appliedCoupon.discount}% הנחה</span>
+            <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} - {appliedCoupon.discount}% הנחה</span>
             <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', display: 'flex' }}><IconX size={14} /></button>
           </div>
         ) : (
@@ -350,7 +350,7 @@ export default function CheckoutPage() {
         </div>
       )}
 
-      {/* Main layout — עמודה אחת במובייל, שתיים בדסקטופ */}
+      {/* Main layout - עמודה אחת במובייל, שתיים בדסקטופ */}
       <div style={{
         maxWidth: 1000, margin: '28px auto', padding: '0 16px',
         display: 'grid',
@@ -429,7 +429,7 @@ export default function CheckoutPage() {
                 <IconLock size={16} color="#1a6b3c" />
                 <div>
                   <div style={{ fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>תשלום מאובטח</div>
-                  <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>לאחר לחיצה תועבר לדף תשלום מאובטח — ויזה, מסטרקארד, ביט ועוד</div>
+                  <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>לאחר לחיצה תועבר לדף תשלום מאובטח - ויזה, מסטרקארד, ביט ועוד</div>
                 </div>
               </div>
               <button onClick={handleSubmit} disabled={loading}
@@ -443,7 +443,7 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        {/* Summary — מוצג מתחת לטופס במובייל */}
+        {/* Summary - מוצג מתחת לטופס במובייל */}
         <OrderSummary />
       </div>
     </div>

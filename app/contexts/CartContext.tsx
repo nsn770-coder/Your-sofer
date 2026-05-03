@@ -41,7 +41,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems(prev => {
       const existing = prev.find(x => x.id === product.id);
       if (existing) {
-        // אם יש קלף נבחר חדש — עדכן אותו, אחרת רק הוסף כמות
+        // אם יש קלף נבחר חדש - עדכן אותו, אחרת רק הוסף כמות
         return prev.map(x => x.id === product.id
           ? {
               ...x,

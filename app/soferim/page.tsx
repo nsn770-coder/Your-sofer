@@ -8,7 +8,7 @@ const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
 // ── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'הסופרים שלנו — סופרי סת"מ מוסמכים ומאומתים',
+  title: 'הסופרים שלנו - סופרי סת"מ מוסמכים ומאומתים',
   description: 'הכירו את סופרי סת"מ המוסמכים של Your Sofer. כל סופר עבר בדיקה קפדנית עם פיקוח רבני, תעודת כשרות, ובדיקת מחשב. מזוזות, תפילין, מגילות וספרי תורה.',
   alternates: { canonical: `${BASE_URL}/soferim` },
   openGraph: {
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     locale: 'he_IL',
     url: `${BASE_URL}/soferim`,
     siteName: 'Your Sofer',
-    title: 'הסופרים שלנו — סופרי סת"מ מוסמכים | Your Sofer',
+    title: 'הסופרים שלנו - סופרי סת"מ מוסמכים | Your Sofer',
     description: 'הכירו את סופרי סת"מ המוסמכים של Your Sofer. כל סופר עבר בדיקה קפדנית עם פיקוח רבני ותעודת כשרות.',
   },
 };
@@ -74,7 +74,7 @@ async function SoferimItemListJsonLd() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'סופרי סת"מ מוסמכים — Your Sofer',
+    name: 'סופרי סת"מ מוסמכים - Your Sofer',
     url: `${BASE_URL}/soferim`,
     numberOfItems: soferim.length,
     itemListElement: soferim.map((s, i) => ({

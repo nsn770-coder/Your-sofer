@@ -12,7 +12,7 @@ declare global {
 }
 
 const GA_ID = 'G-PM7GW4MWEJ';
-let loaded = false; // module-level guard — survives route changes
+let loaded = false; // module-level guard - survives route changes
 
 function loadGTM() {
   if (loaded || typeof document === 'undefined') return;

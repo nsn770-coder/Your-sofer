@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               soferId = data.soferId;
               shaliachId = data.shaliachId;
             } else {
-              // משתמש חדש — צור רשומה
+              // משתמש חדש - צור רשומה
               const referredByShaliach = typeof window !== 'undefined'
                 ? localStorage.getItem('shaliachRef')
                 : null;

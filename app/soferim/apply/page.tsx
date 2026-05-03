@@ -253,7 +253,7 @@ export default function SoferApplyPage() {
           <div style={cardStyle}>
             <h3 style={sectionTitle}>🖼️ תמונת פנים</h3>
             <p style={{ fontSize: 13, color: '#555', marginBottom: 16, background: '#fffbf0', border: '1px solid #e6d5a0', borderRadius: 8, padding: '10px 14px' }}>
-              📸 <strong>העלה תמונת פנים ברורה שלך</strong> — הלקוחות רוצים להכיר את הסופר! תמונה אישית מגבירה אמון ומעלה את הסיכוי לרכישה.
+              📸 <strong>העלה תמונת פנים ברורה שלך</strong> - הלקוחות רוצים להכיר את הסופר! תמונה אישית מגבירה אמון ומעלה את הסיכוי לרכישה.
             </p>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -282,7 +282,7 @@ export default function SoferApplyPage() {
           <div style={cardStyle}>
             <h3 style={sectionTitle}>✍️ דוגמאות כתב (עד 4 תמונות)</h3>
             <p style={{ fontSize: 13, color: '#555', marginBottom: 16, background: '#f0f7f3', border: '1px solid #c8e6d4', borderRadius: 8, padding: '10px 14px' }}>
-              📜 <strong>חשוב מאוד!</strong> העלה תמונות של כתב איכותי — זה מה שהלקוחות יראו ויחליטו על פיו. תמונות ברורות ומוארות יגדילו מכירות.
+              📜 <strong>חשוב מאוד!</strong> העלה תמונות של כתב איכותי - זה מה שהלקוחות יראו ויחליטו על פיו. תמונות ברורות ומוארות יגדילו מכירות.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10, marginBottom: 12 }}>
@@ -318,7 +318,7 @@ export default function SoferApplyPage() {
           <div style={cardStyle}>
             <h3 style={sectionTitle}>🛍️ המוצרים שלי (עד 4 מוצרים)</h3>
             <p style={{ fontSize: 13, color: '#555', marginBottom: 16 }}>
-              הוסף את המוצרים שאתה מציע — בחר סוג מוצר והעלה תמונות (עד 4 לכל מוצר).
+              הוסף את המוצרים שאתה מציע - בחר סוג מוצר והעלה תמונות (עד 4 לכל מוצר).
             </p>
 
             {products.map((product, pIdx) => (

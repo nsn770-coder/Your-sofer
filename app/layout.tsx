@@ -24,11 +24,11 @@ const BASE_URL = 'https://your-sofer.com';
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'Your Sofer — חנות סת"מ | מזוזות, תפילין וספרי תורה',
+    default: 'Your Sofer - חנות סת"מ | מזוזות, תפילין וספרי תורה',
     template: '%s | Your Sofer',
   },
   description:
-    'רכישת סת"מ מסופרים מוסמכים — מזוזות, תפילין, מגילות וספרי תורה עם שקיפות מלאה. כל קלף מצולם, נבדק ומקושר לסופר שכתב אותו.',
+    'רכישת סת"מ מסופרים מוסמכים - מזוזות, תפילין, מגילות וספרי תורה עם שקיפות מלאה. כל קלף מצולם, נבדק ומקושר לסופר שכתב אותו.',
   keywords: [
     'מזוזה', 'מזוזות', 'סת"מ', 'קלף', 'תפילין', 'מגילה', 'ספר תורה',
     'סופר סת"מ', 'yoursofer', 'your sofer', 'קניית מזוזה',
@@ -43,15 +43,15 @@ export const metadata: Metadata = {
     locale: 'he_IL',
     url: BASE_URL,
     siteName: 'Your Sofer',
-    title: 'Your Sofer — חנות סת"מ | מזוזות, תפילין וספרי תורה',
+    title: 'Your Sofer - חנות סת"מ | מזוזות, תפילין וספרי תורה',
     description:
-      'רכישת סת"מ מסופרים מוסמכים — מזוזות, תפילין, מגילות וספרי תורה עם שקיפות מלאה.',
+      'רכישת סת"מ מסופרים מוסמכים - מזוזות, תפילין, מגילות וספרי תורה עם שקיפות מלאה.',
     images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'Your Sofer' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Your Sofer — חנות סת"מ',
-    description: 'רכישת סת"מ מסופרים מוסמכים — מזוזות, תפילין ועוד.',
+    title: 'Your Sofer - חנות סת"מ',
+    description: 'רכישת סת"מ מסופרים מוסמכים - מזוזות, תפילין ועוד.',
     images: ['/og-default.png'],
   },
   alternates: {},
@@ -109,7 +109,7 @@ export default function RootLayout({
         <ShiraChat />
         <SpeedInsights />
 
-        {/* ── Meta Pixel — deferred until user interaction ── */}
+        {/* ── Meta Pixel - deferred until user interaction ── */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
           <>
             <FacebookPixel />
@@ -119,7 +119,7 @@ export default function RootLayout({
           </>
         )}
 
-        {/* ── Tidio live chat — deferred 5 seconds ── */}
+        {/* ── Tidio live chat - deferred 5 seconds ── */}
         {process.env.NEXT_PUBLIC_TIDIO_KEY && <TidioChat />}
       </body>
     </html>

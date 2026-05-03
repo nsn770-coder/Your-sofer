@@ -26,7 +26,7 @@ const PACKAGES = [
     label: 'מהודר',
     levelParam: 'מהודר',
     price: 'החל מ-₪3,200',
-    desc: 'רמה גבוהה מעל הרגיל — הפופולרי ביותר',
+    desc: 'רמה גבוהה מעל הרגיל - הפופולרי ביותר',
     badge: '⭐ מומלץ' as string | null,
     featured: true,
     bg: '#142350',
@@ -108,7 +108,7 @@ export default function BarMitzvaPage() {
             lineHeight: 1.75, marginBottom: 36,
             maxWidth: 520, marginRight: 'auto', marginLeft: 'auto',
           }}>
-            בחר את רמת ההידור המתאימה — תפילין קומפלט כשרים ומאושרים.
+            בחר את רמת ההידור המתאימה - תפילין קומפלט כשרים ומאושרים.
             <br style={{ display: isMobile ? 'none' : 'block' }} />
             טלית, כיסוי תפילין וסידור לבחירתך בנפרד.
           </p>
@@ -243,7 +243,7 @@ export default function BarMitzvaPage() {
             השלם את הסט שלך
           </h2>
           <p style={{ fontSize: 14, color: '#888', margin: '0 0 32px', lineHeight: 1.65 }}>
-            תפילין קומפלט מגיעים ללא טלית וכיסויים — השלם את הסט עם הפריטים הנוספים
+            תפילין קומפלט מגיעים ללא טלית וכיסויים - השלם את הסט עם הפריטים הנוספים
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             {COMPLETE_SET.map(item => (
@@ -304,7 +304,7 @@ export default function BarMitzvaPage() {
             צריך עזרה לבחור?
           </h2>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', margin: '0 0 28px', lineHeight: 1.7 }}>
-            דבר ישירות עם ניסים — סופר סת״מ מוסמך שיעזור לך לבחור את הסט המתאים לבנך
+            דבר ישירות עם ניסים - סופר סת״מ מוסמך שיעזור לך לבחור את הסט המתאים לבנך
           </p>
           <a
             href={WA}

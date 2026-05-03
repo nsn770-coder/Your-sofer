@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
-// Carousel loads only after hydration — keeps it out of the critical render path
+// Carousel loads only after hydration - keeps it out of the critical render path
 const SmartHeroCarousel = dynamic(() => import('@/app/components/SmartHero'), { ssr: false });
 
-// Mirrors SLIDES[0] from SmartHero — shown instantly on SSR for fast LCP
+// Mirrors SLIDES[0] from SmartHero - shown instantly on SSR for fast LCP
 const SLIDE0 = {
   mobileSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777365682/%D7%91%D7%90%D7%A0%D7%A8_2_wovsve.png',
   desktopSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1280,q_auto:best,f_auto/v1777452503/%D7%9E%D7%97%D7%A9%D7%91_dmat7m.png',
-  alt: 'Your Sofer — סת״מ ויודאיקה מהודרים',
+  alt: 'Your Sofer - סת״מ ויודאיקה מהודרים',
 };
 
 interface Props {

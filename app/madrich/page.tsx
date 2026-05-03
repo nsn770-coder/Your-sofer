@@ -4,9 +4,9 @@ import MadrichPageClient from './MadrichPageClient';
 const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
-  title: 'מדריך למזוזות — כל מה שצריך לדעת לפני הקנייה',
+  title: 'מדריך למזוזות - כל מה שצריך לדעת לפני הקנייה',
   description:
-    'לא קונים מזוזה בעיניים עצומות. מאמרים ומדריכים על בחירת מזוזה, בדיקות כשרות, פערי מחירים ועוד — כתובים בשפה ברורה.',
+    'לא קונים מזוזה בעיניים עצומות. מאמרים ומדריכים על בחירת מזוזה, בדיקות כשרות, פערי מחירים ועוד - כתובים בשפה ברורה.',
   alternates: { canonical: `${BASE_URL}/madrich` },
   openGraph: {
     type: 'website',

@@ -254,7 +254,7 @@ export default function AnalyticsDashboard() {
                             <td style={{ padding: '8px 10px', fontWeight: 700, color: gold }}>₪{(o.total || 0).toLocaleString('he-IL')}</td>
                             <td style={{ padding: '8px 10px' }}><StatusBadge status={o.status} /></td>
                             <td style={{ padding: '8px 10px', color: '#888', whiteSpace: 'nowrap' }}>
-                              {d ? d.toLocaleDateString('he-IL') : '—'}
+                              {d ? d.toLocaleDateString('he-IL') : '-'}
                             </td>
                           </tr>
                         );

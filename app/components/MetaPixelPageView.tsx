@@ -6,7 +6,7 @@ import { pageview } from '@/lib/metaPixel';
 /**
  * Fires fbq('track', 'PageView') on every client-side navigation.
  * The initial PageView on first load is already fired by the inline
- * pixel script in layout.tsx — so we skip the very first render.
+ * pixel script in layout.tsx - so we skip the very first render.
  */
 export default function MetaPixelPageView() {
   const pathname = usePathname();

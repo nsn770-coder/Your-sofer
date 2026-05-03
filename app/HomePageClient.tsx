@@ -239,12 +239,12 @@ function SkeletonCategoryCard() {
   );
 }
 
-// ── Static data (outside component — never re-created on render) ───────────────
+// ── Static data (outside component - never re-created on render) ───────────────
 
 const STATIC_QUOTES = [
-  { name: 'מיכל כהן',    city: 'תל אביב',  stars: 5, text: 'הזמנתי מזוזה לבית החדש — קיבלתי תמונה של הקלף לפני המשלוח. לא ציפיתי לרמת שירות כזו.' },
+  { name: 'מיכל כהן',    city: 'תל אביב',  stars: 5, text: 'הזמנתי מזוזה לבית החדש - קיבלתי תמונה של הקלף לפני המשלוח. לא ציפיתי לרמת שירות כזו.' },
   { name: 'יוסף לוי',    city: 'ירושלים',  stars: 5, text: 'קניתי תפילין לבן שלי לבר מצווה. הסופר פנה אלינו אישית כדי לוודא שהכל מתאים. מרגש.' },
-  { name: 'שרה אברמוב',  city: 'חיפה',     stars: 5, text: 'מתנה לאמא שלי — היא בכתה מרוב שמחה. האריזה הייתה מהודרת ותעודת הכשרות נתנה לה ביטחון.' },
+  { name: 'שרה אברמוב',  city: 'חיפה',     stars: 5, text: 'מתנה לאמא שלי - היא בכתה מרוב שמחה. האריזה הייתה מהודרת ותעודת הכשרות נתנה לה ביטחון.' },
   { name: 'דוד נחמיאס',  city: 'באר שבע',  stars: 5, text: 'ראיתי הרבה חנויות אונליין. כאן היחיד שמציג צילום אמיתי של הקלף. זה ההבדל כולו.' },
 ] as const;
 
@@ -265,7 +265,7 @@ const MORE_CAT_DEFS = [
   { slug: 'בר מצווה',        emoji: '🎉' },
 ] as const;
 
-// ── Activity bar — owns its own timer, never re-renders the parent ─────────────
+// ── Activity bar - owns its own timer, never re-renders the parent ─────────────
 
 const ActivityBar = memo(function ActivityBar({
   weeklyProducts,
@@ -319,7 +319,7 @@ export default function HomePageClient() {
   const countersRef = useRef<HTMLDivElement>(null);
   const [countersVisible, setCountersVisible] = useState(false);
 
-  // DOM refs for counter animation — avoids 72 React re-renders per second
+  // DOM refs for counter animation - avoids 72 React re-renders per second
   const productsValRef  = useRef<HTMLSpanElement>(null);
   const soferimValRef   = useRef<HTMLSpanElement>(null);
   const customersValRef = useRef<HTMLSpanElement>(null);
@@ -340,7 +340,7 @@ export default function HomePageClient() {
   const { shaliach } = useShaliach();
   const { addItem }  = useCart();
 
-  // ── Resize — debounced 150 ms so mobile touch events don't saturate the thread
+  // ── Resize - debounced 150 ms so mobile touch events don't saturate the thread
   useEffect(() => {
     function update() { setIsMobile(window.innerWidth < 768); }
     update();
@@ -468,7 +468,7 @@ export default function HomePageClient() {
         setTestimonials(all.filter(t => t.active === true));
       } catch (e) { console.error('testimonials fetch error:', e); }
     }
-    // Below the fold — defer so it doesn't compete with LCP
+    // Below the fold - defer so it doesn't compete with LCP
     const timer = setTimeout(fetchTestimonials, 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -489,7 +489,7 @@ export default function HomePageClient() {
         setWeeklyProducts(weeklySnap.size);
       } catch { /* non-fatal */ }
     }
-    // Counter section is below the fold — defer
+    // Counter section is below the fold - defer
     const timer = setTimeout(fetchCounts, 1500);
     return () => clearTimeout(timer);
   }, []);
@@ -504,7 +504,7 @@ export default function HomePageClient() {
     return () => obs.disconnect();
   }, []);
 
-  // Counter animation — writes directly to DOM refs, zero React re-renders
+  // Counter animation - writes directly to DOM refs, zero React re-renders
   useEffect(() => {
     if (!countersVisible) return;
     const targets = { soferim: soferimCount || 12, products: productsCount || 180, customers: 247 };
@@ -788,7 +788,7 @@ export default function HomePageClient() {
       {/* ── Smart Funnel ── */}
       <div style={{ background: '#FFFFFF', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
         <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '10px 0 6px', fontWeight: 500 }}>
-          בחר מה אתה מחפש — נמצא לך את המתאים ביותר
+          בחר מה אתה מחפש - נמצא לך את המתאים ביותר
         </p>
         <SmartFunnel isMobile={isMobile} />
       </div>
@@ -818,7 +818,7 @@ export default function HomePageClient() {
             }}>✡</span>
             <div>
               <div style={{ fontSize: isMobile ? 13 : 15, fontWeight: 900, color: '#fff', lineHeight: 1.3 }}>
-                סט בר מצווה — תפילין קומפלט + טלית
+                סט בר מצווה - תפילין קומפלט + טלית
               </div>
               <div style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
                 שלוש חבילות מוכנות · החל מ-₪2,700
@@ -837,7 +837,7 @@ export default function HomePageClient() {
         </div>
       </Link>
 
-      {/* ── Live Activity Bar — isolated component, re-renders independently ── */}
+      {/* ── Live Activity Bar - isolated component, re-renders independently ── */}
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
 
       {/* ── Live Counters ── */}
@@ -970,7 +970,7 @@ export default function HomePageClient() {
       {/* ── Clear Path CTA ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 16px' : '40px 16px', direction: 'rtl', textAlign: 'center' }}>
         <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>לא בטוח מה לבחור?</h2>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>הכירו את הסופרים שלנו — סופרים מוסמכים, מאומתים ומדורגים</p>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>הכירו את הסופרים שלנו - סופרים מוסמכים, מאומתים ומדורגים</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
           {CLEAR_PATH_ITEMS.map(item => (
             <button
@@ -1057,7 +1057,7 @@ export default function HomePageClient() {
       <div style={{ background: '#FFFFFF', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>
-            לקוחות שכבר קנו — מה הם אומרים
+            לקוחות שכבר קנו - מה הם אומרים
           </h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#999', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
           <div className="ys-quotes-grid" style={{
@@ -1095,7 +1095,7 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── Testimonials carousel — self-contained timer ── */}
+      {/* ── Testimonials carousel - self-contained timer ── */}
       {testimonials.length > 0 && (
         <TestimonialsCarousel
           testimonials={testimonials}

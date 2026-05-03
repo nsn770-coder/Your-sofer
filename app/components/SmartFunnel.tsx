@@ -248,7 +248,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
           </button>
         )}
 
-        {/* STEP 0 — Choose path */}
+        {/* STEP 0 - Choose path */}
         {step === 0 && path !== 'barMitzva' && (
           <>
             <div style={titleStyle}>מה אתה מחפש?</div>
@@ -270,7 +270,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
                 noOverlay
               />
             </div>
-            {/* Third card — Bar Mitzva wizard */}
+            {/* Third card - Bar Mitzva wizard */}
             <div
               onClick={() => { setAnimating(true); setTimeout(() => { setPath('barMitzva'); setAnimating(false); }, 200); }}
               style={{
@@ -309,12 +309,12 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
           </>
         )}
 
-        {/* STEP 0 — Bar Mitzva wizard expanded */}
+        {/* STEP 0 - Bar Mitzva wizard expanded */}
         {step === 0 && path === 'barMitzva' && (
           <BarMitzvaWizard variant="homepage" />
         )}
 
-        {/* STEP 1 — Sub-type (מזוזות only) */}
+        {/* STEP 1 - Sub-type (מזוזות only) */}
         {step === 1 && (
           <>
             <div style={titleStyle}>בחר סוג מזוזה</div>
@@ -341,7 +341,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
           </>
         )}
 
-        {/* STEP 2 — Nusach */}
+        {/* STEP 2 - Nusach */}
         {step === 2 && (
           <>
             <div style={titleStyle}>בחר נוסח</div>
@@ -362,7 +362,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
           </>
         )}
 
-        {/* STEP 3 — Level */}
+        {/* STEP 3 - Level */}
         {step === 3 && (
           <>
             <div style={titleStyle}>בחר רמת הידור</div>

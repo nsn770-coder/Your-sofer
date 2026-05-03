@@ -6,13 +6,13 @@ const SLIDES = [
   {
     mobileSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777365682/%D7%91%D7%90%D7%A0%D7%A8_2_wovsve.png',
     desktopSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1280,q_auto:best,f_auto/v1777452503/%D7%9E%D7%97%D7%A9%D7%91_dmat7m.png',
-    alt: 'Your Sofer — סת״מ ויודאיקה מהודרים',
+    alt: 'Your Sofer - סת״מ ויודאיקה מהודרים',
     priority: true,
   },
   {
     mobileSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777363664/%D7%94%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D_%D7%A9%D7%9C%D7%A0%D7%95_1200_x_800_%D7%A4%D7%99%D7%A7%D7%A1%D7%9C_mpaeoc.png',
     desktopSrc: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1280,q_auto:best,f_auto/v1777452872/%D7%9E%D7%97%D7%A9%D7%91_2_k4rzk2.png',
-    alt: 'הסופרים שלנו — סופרי סת״מ מוסמכים',
+    alt: 'הסופרים שלנו - סופרי סת״מ מוסמכים',
     priority: false,
   },
 ];

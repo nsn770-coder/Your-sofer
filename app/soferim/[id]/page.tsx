@@ -102,15 +102,15 @@ export async function generateMetadata(
   const sofer = await fetchSofer(id);
 
   if (!sofer?.name) {
-    return { title: 'סופר סת"מ | Your Sofer', description: 'פרופיל סופר סת"מ מוסמך — Your Sofer' };
+    return { title: 'סופר סת"מ | Your Sofer', description: 'פרופיל סופר סת"מ מוסמך - Your Sofer' };
   }
 
   const name = sofer.name;
   const cityPart = sofer.city ? ` מ${sofer.city}` : '';
   const stylePart = sofer.style ? `, כתב ${sofer.style}` : '';
-  const catsPart = sofer.categories?.length ? ` — מתמחה ב${sofer.categories.join(', ')}` : '';
+  const catsPart = sofer.categories?.length ? ` - מתמחה ב${sofer.categories.join(', ')}` : '';
 
-  const title = `${name} — סופר סת"מ מוסמך${cityPart}`;
+  const title = `${name} - סופר סת"מ מוסמך${cityPart}`;
   const description =
     sofer.description?.slice(0, 155) ||
     `${name}${cityPart}${stylePart}${catsPart}. סופר סת"מ מאושר ומאומת על ידי Your Sofer עם פיקוח רבני ותעודת כשרות.`;

@@ -192,7 +192,7 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
   const heroFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const HERO_SLIDES = [
-    { key: 'mainSlide',    label: 'שקופית ראשית (SmartHero)',    hint: 'רקע לבאנר הראשי — מוצג מאחורי הטקסט והכפתורים' },
+    { key: 'mainSlide',    label: 'שקופית ראשית (SmartHero)',    hint: 'רקע לבאנר הראשי - מוצג מאחורי הטקסט והכפתורים' },
     { key: 'soferimSlide', label: 'שקופית הסופרים שלנו',          hint: 'מומלץ: תמונה רחבה ביחס 16:9 או 3:1, לפחות 1200px רוחב' },
     { key: 'judaicaSlide', label: 'שקופית יודאיקה',               hint: 'מחליפה את תמונת הקטגוריה בשקופית יודאיקה' },
     { key: 'giftsSlide',   label: 'שקופית מתנות',                 hint: 'מחליפה את תמונת הקטגוריה בשקופית מתנות' },

@@ -180,7 +180,7 @@ function ThemePreview({ theme }: { theme: ThemeConfig }) {
       </div>
 
       <p className="text-center text-xs mt-8" style={{ color: theme.colorTextMuted }}>
-        תצוגה מקדימה — זו לא האתר החי
+        תצוגה מקדימה - זו לא האתר החי
       </p>
     </div>
   );

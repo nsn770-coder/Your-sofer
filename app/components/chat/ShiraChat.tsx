@@ -40,7 +40,7 @@ function parseSearchAction(text: string): { action: string; filters: SearchFilte
     const parsed = JSON.parse(trimmed);
     if (parsed.action === 'search' && parsed.filters) return parsed;
   } catch {
-    // not JSON — normal text
+    // not JSON - normal text
   }
   return null;
 }
@@ -119,7 +119,7 @@ export default function ShiraChat() {
           setIsTyping(false);
           setMessages([{
             role: 'assistant',
-            content: 'שלום! אני שירה 💛 אשמח לעזור לך למצוא בדיוק מה שאתה מחפש. ספר לי — מה מביא אותך היום?',
+            content: 'שלום! אני שירה 💛 אשמח לעזור לך למצוא בדיוק מה שאתה מחפש. ספר לי - מה מביא אותך היום?',
           }]);
         }, 1200);
       }, 400);
@@ -142,7 +142,7 @@ export default function ShiraChat() {
     setIsTyping(true);
 
     try {
-      // 1 — Ask Shira (may return text or JSON search action)
+      // 1 - Ask Shira (may return text or JSON search action)
       const chatRes = await fetch('/api/shira', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -156,14 +156,14 @@ export default function ShiraChat() {
 
       setIsTyping(false);
 
-      // 2 — Check if it's a search action
+      // 2 - Check if it's a search action
       const action = parseSearchAction(rawMessage);
 
       if (action) {
         const mergedFilters = mergeFilters(currentFilters, action.filters);
         setCurrentFilters(mergedFilters);
 
-        // 3 — Execute search on server
+        // 3 - Execute search on server
         const searchRes = await fetch('/api/shira/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -226,7 +226,7 @@ export default function ShiraChat() {
           <div className="shira-header">
             <div className="shira-header-avatar">ש</div>
             <div className="shira-header-info">
-              <div className="shira-header-name">שירה — יועצת מוצרים</div>
+              <div className="shira-header-name">שירה - יועצת מוצרים</div>
               <div className="shira-header-status">
                 <span className="shira-status-dot" />זמינה עכשיו
               </div>
@@ -250,7 +250,7 @@ export default function ShiraChat() {
                   <div className="shira-products">
                     {msg.products.map(p => <ProductCard key={p.id} product={p} />)}
                     {msg.isFallback && (
-                      <div className="shira-fallback-note">* תוצאות קרובות — לא בדיוק מה שביקשת</div>
+                      <div className="shira-fallback-note">* תוצאות קרובות - לא בדיוק מה שביקשת</div>
                     )}
                   </div>
                 )}
@@ -288,7 +288,7 @@ export default function ShiraChat() {
             </button>
           </div>
 
-          {/* Human agent — WhatsApp */}
+          {/* Human agent - WhatsApp */}
           <div className="shira-wa-bar">
             <a href="https://wa.me/972552722228" target="_blank" rel="noopener noreferrer" className="shira-wa-btn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">

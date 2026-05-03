@@ -8,8 +8,8 @@ const BASE_URL = 'https://your-sofer.com';
 const PAGE_URL = `${BASE_URL}/category/שבתות-וחגים`;
 
 export const metadata: Metadata = {
-  title: 'שבתות וחגים — מוצרים נבחרים לשבת וחג | Your Sofer',
-  description: 'מוצרים נבחרים לשבת, חג ואירוח יהודי — כלי שולחן, יודאיקה, נרות שבת, מגשים, כוסות קידוש ועוד. Your Sofer.',
+  title: 'שבתות וחגים - מוצרים נבחרים לשבת וחג | Your Sofer',
+  description: 'מוצרים נבחרים לשבת, חג ואירוח יהודי - כלי שולחן, יודאיקה, נרות שבת, מגשים, כוסות קידוש ועוד. Your Sofer.',
   keywords: ['שבת', 'חג', 'יודאיקה', 'כלי שולחן', 'נרות שבת', 'כוס קידוש', 'מתנות לחג'],
   alternates: { canonical: PAGE_URL },
   openGraph: {
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     locale: 'he_IL',
     url: PAGE_URL,
     siteName: 'Your Sofer',
-    title: 'שבתות וחגים — מוצרים נבחרים לשבת וחג',
+    title: 'שבתות וחגים - מוצרים נבחרים לשבת וחג',
     description: 'מוצרים נבחרים לשבת, חג ואירוח יהודי. Your Sofer.',
     images: [{ url: `${BASE_URL}/og-default.jpg`, width: 1200, height: 630, alt: 'שבתות וחגים' }],
   },

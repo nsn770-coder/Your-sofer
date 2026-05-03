@@ -17,12 +17,12 @@ const BENEFITS = [
   },
   {
     title: 'תשלום מאובטח',
-    desc: 'כל העסקאות מוצפנות בתקן SSL. אנו תומכים בכרטיסי אשראי, ביט ופייפאל — בצורה בטוחה לחלוטין.',
+    desc: 'כל העסקאות מוצפנות בתקן SSL. אנו תומכים בכרטיסי אשראי, ביט ופייפאל - בצורה בטוחה לחלוטין.',
     svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>),
   },
   {
     title: 'שירות לקוחות אישי',
-    desc: 'צוות מומחי סת"מ זמין בוואטסאפ ובמייל לענות על כל שאלה — לפני ואחרי הרכישה.',
+    desc: 'צוות מומחי סת"מ זמין בוואטסאפ ובמייל לענות על כל שאלה - לפני ואחרי הרכישה.',
     svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>),
   },
 ];
@@ -157,7 +157,7 @@ export default function Footer() {
         {/* Copyright */}
         <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>Your Sofer</span>
-          <span style={{ fontSize: 11, color: '#555' }}>© 2025 Your Sofer — כל הזכויות שמורות</span>
+          <span style={{ fontSize: 11, color: '#555' }}>© 2025 Your Sofer - כל הזכויות שמורות</span>
         </div>
       </footer>
 

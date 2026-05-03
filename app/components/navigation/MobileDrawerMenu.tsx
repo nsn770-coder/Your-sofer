@@ -104,7 +104,7 @@ export default function MobileDrawerMenu({
 
   return (
     <>
-      {/* Backdrop — always in DOM, CSS opacity/pointer-events toggle */}
+      {/* Backdrop - always in DOM, CSS opacity/pointer-events toggle */}
       <div
         className="fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm"
         style={{
@@ -115,7 +115,7 @@ export default function MobileDrawerMenu({
         onClick={onClose}
       />
 
-      {/* Drawer panel — always in DOM, CSS transform toggle */}
+      {/* Drawer panel - always in DOM, CSS transform toggle */}
       <div
         className="fixed top-0 right-0 bottom-0 z-[310] w-[85vw] max-w-sm bg-white shadow-2xl flex flex-col"
         style={{

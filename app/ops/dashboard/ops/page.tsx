@@ -92,7 +92,7 @@ export default function OpsDashboard() {
           <h1 className="text-2xl font-black" style={{ color: '#0c1a35' }}>
             שלום {opsUser?.name} 👋
           </h1>
-          <p className="text-gray-500 text-sm mt-1">דשבורד תפעול — ניהול הזמנות</p>
+          <p className="text-gray-500 text-sm mt-1">דשבורד תפעול - ניהול הזמנות</p>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default function OpsDashboard() {
             ) : (
               <div>
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-sm text-red-700">
-                  🚨 {overdue.length} הזמנות מאוחרות או חסומות — נדרשת התערבות מיידית
+                  🚨 {overdue.length} הזמנות מאוחרות או חסומות - נדרשת התערבות מיידית
                 </div>
                 <OrdersTable orders={overdue} showFinancial={false} highlightDelayed highlightBlocked />
               </div>

@@ -85,7 +85,7 @@ export default function ShaliachDashboard() {
     if (!file || !user?.shaliachId) return;
 
     if (file.size > 2 * 1024 * 1024) {
-      alert('הקובץ גדול מדי — מקסימום 2MB');
+      alert('הקובץ גדול מדי - מקסימום 2MB');
       return;
     }
 
@@ -178,7 +178,7 @@ export default function ShaliachDashboard() {
               📋 העתק
             </button>
           </div>
-          <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>שתף עם לקוחות — כל הזמנה דרכו תזוכה אליך</div>
+          <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>שתף עם לקוחות - כל הזמנה דרכו תזוכה אליך</div>
         </div>
 
         {/* Stats */}
@@ -287,7 +287,7 @@ export default function ShaliachDashboard() {
                   {profile.commissionPercent && <div><span style={{ color: '#888' }}>עמלה: </span><strong>{profile.commissionPercent}%</strong></div>}
                 </div>
                 <div style={{ marginTop: 12, fontSize: 12, color: '#888' }}>
-                  לשינוי פרטים — פנה למנהל המערכת
+                  לשינוי פרטים - פנה למנהל המערכת
                 </div>
               </div>
             )}
@@ -325,7 +325,7 @@ export default function ShaliachDashboard() {
                       <td style={{ padding: '12px 16px', fontWeight: 700 }}>{o.customerName}</td>
                       <td style={{ padding: '12px 16px', color: '#27ae60', fontWeight: 700 }}>₪{o.total}</td>
                       <td style={{ padding: '12px 16px', color: '#b8972a', fontWeight: 700 }}>
-                        ₪{o.commissionAmount?.toFixed(0) || '—'}
+                        ₪{o.commissionAmount?.toFixed(0) || '-'}
                         {o.commissionPercent && <span style={{ fontSize: 11, color: '#aaa', marginRight: 4 }}>({o.commissionPercent}%)</span>}
                       </td>
                       <td style={{ padding: '12px 16px' }}>

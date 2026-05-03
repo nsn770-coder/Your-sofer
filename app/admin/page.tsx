@@ -232,7 +232,7 @@ const ROLE_COLORS: Record<UserRole, string> = {
   customer: 'bg-gray-100 text-gray-600',
 };
 
-// ─── Sofer field — categories that show the sofer selector ───────────────────
+// ─── Sofer field - categories that show the sofer selector ───────────────────
 
 const SOFER_CATS_LIST = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
 const SOFER_DROPDOWN_CATS = new Set(SOFER_CATS_LIST);
@@ -883,7 +883,7 @@ function EditSoferModal({ sofer, onClose, onSave }: {
       <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
         onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>✏️ עריכת סופר — {sofer.name}</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>✏️ עריכת סופר - {sofer.name}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
         </div>
         <div style={{ display: 'grid', gap: 14 }}>
@@ -1722,7 +1722,7 @@ export default function AdminPage() {
                   : filteredProducts.map(p => (
                     <tr key={p.id} className="border-t hover:bg-gray-50">
                       <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
-                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
+                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '-'}</td>
                       <td className="p-3 font-bold text-green-700">₪{p.price}</td>
                       <td className="p-3"><button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'} className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>{p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}</button></td>
                       <td className="p-3"><select value={p.soferId || ''} disabled={actionLoading === p.id} onChange={e => assignSoferToProduct(p.id, e.target.value)} className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}><option value="">⚠️ ללא סופר</option>{soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></td>
@@ -1765,7 +1765,7 @@ export default function AdminPage() {
             <h2 className="text-xl font-black mb-1">🖼️ ניהול קטגוריות</h2>
             <p className="text-sm text-gray-500 mb-6">
               ערוך שם תצוגה, העלה תמונה (Cloudinary) וקבע עדיפות לכל קטגוריה.<br/>
-              <span className="font-mono text-xs text-gray-400">slug</span> = מזהה הקטגוריה — לא ניתן לשינוי מכאן.
+              <span className="font-mono text-xs text-gray-400">slug</span> = מזהה הקטגוריה - לא ניתן לשינוי מכאן.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {categories.map(cat => (
@@ -1808,7 +1808,7 @@ export default function AdminPage() {
                     <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
                     <td className="p-3 font-bold">{o.customerName}</td>
                     <td className="p-3 text-green-700 font-bold">₪{o.total}</td>
-                    <td className="p-3 text-blue-600">{o.shaliachName || '—'}</td>
+                    <td className="p-3 text-blue-600">{o.shaliachName || '-'}</td>
                     <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-bold ${o.status === 'new' ? 'bg-yellow-100 text-yellow-700' : o.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{o.status === 'new' ? '⏳ חדש' : o.status === 'processing' ? '🔄 בעיבוד' : o.status === 'delivered' ? '✅ נמסר' : o.status}</span></td>
                   </tr>
                   {o.items && o.items.some(i => i.embroideryText) && (
@@ -1816,7 +1816,7 @@ export default function AdminPage() {
                       <td colSpan={5} className="px-4 py-2">
                         {o.items.filter(i => i.embroideryText).map((i, idx) => (
                           <span key={idx} className="inline-flex items-center gap-1 text-xs text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5 mr-2">
-                            ✍️ {i.name} — ריקמה: <strong>{i.embroideryText}</strong>
+                            ✍️ {i.name} - ריקמה: <strong>{i.embroideryText}</strong>
                           </span>
                         ))}
                       </td>
@@ -2005,7 +2005,7 @@ export default function AdminPage() {
                 <tbody>
                   {filteredUsers.map(u => (
                     <tr key={u.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3 font-bold">{u.displayName || '—'}</td>
+                      <td className="p-3 font-bold">{u.displayName || '-'}</td>
                       <td className="p-3 text-gray-500 text-xs">{u.email}</td>
                       <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span></td>
                       <td className="p-3">
@@ -2339,7 +2339,7 @@ export default function AdminPage() {
                   {hiddenProducts.map(p => (
                     <tr key={p.id} className="border-t hover:bg-gray-50 opacity-70">
                       <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
-                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '—'}</td>
+                      <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '-'}</td>
                       <td className="p-3 font-bold text-green-700">₪{p.price}</td>
                       <td className="p-3 text-xs text-gray-500">{p.priority ?? 50}</td>
                       <td className="p-3"><button onClick={() => toggleHidden(p.id, true)} disabled={actionLoading === p.id + '_hidden'} className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 hover:bg-green-200 transition">✅ החזר לאתר</button></td>
@@ -2381,18 +2381,18 @@ export default function AdminPage() {
                       ? new Date(cart.updatedAt.seconds * 1000)
                       : typeof cart.updatedAt === 'string' ? new Date(cart.updatedAt) : null;
                     const minutesAgo = ts ? Math.round((Date.now() - ts.getTime()) / 60000) : null;
-                    const timeAgo = minutesAgo === null ? '—'
+                    const timeAgo = minutesAgo === null ? '-'
                       : minutesAgo < 60 ? `לפני ${minutesAgo} דקות`
                       : minutesAgo < 1440 ? `לפני ${Math.round(minutesAgo / 60)} שעות`
                       : `לפני ${Math.round(minutesAgo / 1440)} ימים`;
                     const cartTotal = cart.cartItems?.reduce((s, i) => s + i.price * i.quantity, 0) ?? cart.cartTotal ?? 0;
                     return (
                       <tr key={cart.id} className="border-t hover:bg-orange-50">
-                        <td className="p-3 font-semibold">{cart.name || '—'}</td>
-                        <td className="p-3 text-gray-600 text-xs">{cart.email || '—'}</td>
-                        <td className="p-3 text-gray-600">{cart.phone || '—'}</td>
+                        <td className="p-3 font-semibold">{cart.name || '-'}</td>
+                        <td className="p-3 text-gray-600 text-xs">{cart.email || '-'}</td>
+                        <td className="p-3 text-gray-600">{cart.phone || '-'}</td>
                         <td className="p-3 text-gray-500 text-xs">
-                          {(cart.cartItems || []).map(i => `${i.name} ×${i.quantity}`).join(', ') || '—'}
+                          {(cart.cartItems || []).map(i => `${i.name} ×${i.quantity}`).join(', ') || '-'}
                         </td>
                         <td className="p-3 font-bold text-green-700">₪{cartTotal.toFixed(2)}</td>
                         <td className="p-3 text-gray-400 text-xs whitespace-nowrap">{timeAgo}</td>
@@ -2432,12 +2432,12 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   {customers.map(c => {
-                    const firstDate = c.firstOrderAt ? new Date(c.firstOrderAt).toLocaleDateString('he-IL') : '—';
+                    const firstDate = c.firstOrderAt ? new Date(c.firstOrderAt).toLocaleDateString('he-IL') : '-';
                     return (
                       <tr key={c.id} className="border-t hover:bg-cyan-50">
-                        <td className="p-3 font-semibold">{c.name || '—'}</td>
-                        <td className="p-3 text-gray-600 text-xs">{c.email || '—'}</td>
-                        <td className="p-3 text-gray-600">{c.phone || '—'}</td>
+                        <td className="p-3 font-semibold">{c.name || '-'}</td>
+                        <td className="p-3 text-gray-600 text-xs">{c.email || '-'}</td>
+                        <td className="p-3 text-gray-600">{c.phone || '-'}</td>
                         <td className="p-3 text-center font-bold text-blue-700">{c.totalOrders ?? 0}</td>
                         <td className="p-3 font-bold text-green-700">₪{(c.totalSpent ?? 0).toFixed(2)}</td>
                         <td className="p-3 text-gray-400 text-xs whitespace-nowrap">{firstDate}</td>
@@ -2626,7 +2626,7 @@ function CurationRow({ curation, onDelete, lookTagCounts }: { curation: Curation
           <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
             {lookTagCounts[activeTag] != null
               ? `${lookTagCounts[activeTag]} מוצרים`
-              : '— אין נתונים'}
+              : '- אין נתונים'}
           </div>
         )}
       </td>
@@ -2737,7 +2737,7 @@ function CurationsTab() {
                 <CurationRow key={`new-${i}`} curation={null} onDelete={() => setNewRows(n => Math.max(0, n - 1))} />
               ))}
               {curations.length === 0 && newRows === 0 && (
-                <tr><td colSpan={5} style={{ padding: 32, textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>אין סלקציות עדיין — לחץ "הוסף סלקציה" כדי להתחיל</td></tr>
+                <tr><td colSpan={5} style={{ padding: 32, textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>אין סלקציות עדיין - לחץ "הוסף סלקציה" כדי להתחיל</td></tr>
               )}
             </tbody>
           </table>

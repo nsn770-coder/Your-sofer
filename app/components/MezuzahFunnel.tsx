@@ -212,7 +212,7 @@ function KlafCard({
         </div>
       )}
 
-      {/* Image — clickable → product page */}
+      {/* Image - clickable → product page */}
       <div
         onClick={() => onNavigate(product.id)}
         style={{ position: 'relative', paddingTop: '100%', background: '#f5f1ea', overflow: 'hidden', cursor: 'pointer' }}
@@ -233,7 +233,7 @@ function KlafCard({
       </div>
 
       <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-        {/* Name — clickable → product page */}
+        {/* Name - clickable → product page */}
         <div
           onClick={() => onNavigate(product.id)}
           style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#0c1a35', lineHeight: 1.4, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'text-decoration-color 0.15s' }}
@@ -551,7 +551,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
             <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: '#0c1a35', margin: '0 0 10px', lineHeight: 1.2 }}>
               מצא את קלף המזוזה המתאים לך
             </h2>
-            <p style={{ fontSize: 14, color: '#888', margin: 0 }}>ענה על שתי שאלות פשוטות — נמצא את המתאים ביותר</p>
+            <p style={{ fontSize: 14, color: '#888', margin: 0 }}>ענה על שתי שאלות פשוטות - נמצא את המתאים ביותר</p>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginBottom: 32 }}>
@@ -597,7 +597,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                     <IconArrowLeft size={13} color="#b8972a" /> חזרה
                   </button>
                   <Tag icon={location === 'room' ? <IconDoor size={11} color="#0c1a35" /> : <IconHome size={11} color="#0c1a35" />}>
-                    {location === 'room' ? 'חדר' : 'כניסה ראשית'} — {sizes.join(' / ')} ס"מ
+                    {location === 'room' ? 'חדר' : 'כניסה ראשית'} - {sizes.join(' / ')} ס"מ
                   </Tag>
                 </div>
                 <h3 style={{ textAlign: 'center', fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: '0 0 6px' }}>מה הנוסח שלך?</h3>
@@ -685,7 +685,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
                       <IconScroll size={52} color="#d0c8b8" />
                     </div>
-                    <p style={{ marginBottom: 20, fontSize: 14, color: '#888' }}>לא נמצאו קלפים — הצג את כל קלפי המזוזה</p>
+                    <p style={{ marginBottom: 20, fontSize: 14, color: '#888' }}>לא נמצאו קלפים - הצג את כל קלפי המזוזה</p>
                     <button onClick={() => router.push('/category/קלפי מזוזה')} style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '12px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                       <IconArrowLeft size={14} color="#fff" /> לכל הקלפים
                     </button>

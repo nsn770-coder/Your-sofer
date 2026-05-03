@@ -25,7 +25,7 @@ export default function JoinPage() {
             הצטרף למשפחת<br /><span style={{ color: '#b8972a' }}>Your Sofer</span>
           </h1>
           <p style={{ color: '#a8c8b4', fontSize: 16, maxWidth: 500, margin: '0 auto', lineHeight: 1.7 }}>
-            פלטפורמה ייחודית המחברת בין סופרי סת"מ מוסמכים לבין קהל לקוחות רחב — עם כלים מתקדמים לניהול ומכירה
+            פלטפורמה ייחודית המחברת בין סופרי סת"מ מוסמכים לבין קהל לקוחות רחב - עם כלים מתקדמים לניהול ומכירה
           </p>
         </div>
       </div>
@@ -61,7 +61,7 @@ export default function JoinPage() {
 
             <div style={{ background: '#f8f9fa', borderRadius: 8, padding: '14px 16px', marginBottom: 20, fontSize: 13 }}>
               <div style={{ fontWeight: 700, marginBottom: 4, color: '#1a3a2a' }}>עמלה: 0% בחודשים הראשונים</div>
-              <div style={{ color: '#888' }}>לאחר מכן — עמלה נמוכה על כל מכירה בלבד</div>
+              <div style={{ color: '#888' }}>לאחר מכן - עמלה נמוכה על כל מכירה בלבד</div>
             </div>
 
             <button onClick={() => router.push('/soferim/apply')}
@@ -77,7 +77,7 @@ export default function JoinPage() {
             <div style={{ fontSize: 56, marginBottom: 12 }}>🏛️</div>
             <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הצטרף כרב קהילה</h2>
             <p style={{ color: '#a8c0d8', fontSize: 14, lineHeight: 1.6 }}>
-              הפנה את קהילתך לקנות סת"מ מאומת — 10% מכל הזמנה יועברו כתרומה לעמותה שלך
+              הפנה את קהילתך לקנות סת"מ מאומת - 10% מכל הזמנה יועברו כתרומה לעמותה שלך
             </p>
           </div>
           <div style={{ padding: '28px' }}>
@@ -151,7 +151,7 @@ export default function JoinPage() {
       {/* Footer */}
       <footer style={{ background: '#0f1111', color: '#fff', padding: '20px', textAlign: 'center' }}>
         <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>✡ Your Sofer</div>
-        <div style={{ fontSize: 12, color: '#666' }}>© 2025 Your Sofer — כל הזכויות שמורות</div>
+        <div style={{ fontSize: 12, color: '#666' }}>© 2025 Your Sofer - כל הזכויות שמורות</div>
       </footer>
     </div>
   );

@@ -152,7 +152,7 @@ export default function ShaliachApplyPage() {
           <div style={cardStyle}>
             <h3 style={sectionTitle}>🖼️ לוגו העמותה</h3>
             <p style={{ fontSize: 13, color: '#555', marginBottom: 16, background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 8, padding: '10px 14px' }}>
-              הלוגו יופיע בבאנר האתר כשלקוחות נכנסים דרך הלינק שלך — מומלץ להעלות לוגו ברור ומקצועי.
+              הלוגו יופיע בבאנר האתר כשלקוחות נכנסים דרך הלינק שלך - מומלץ להעלות לוגו ברור ומקצועי.
             </p>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

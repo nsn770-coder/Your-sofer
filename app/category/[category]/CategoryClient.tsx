@@ -392,7 +392,7 @@ function SizeRangeSlider({ sizeMin, sizeMax, onChange }: { sizeMin: number; size
     <>
       <style dangerouslySetInnerHTML={{ __html: `.size-range{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0}.size-range::-webkit-slider-thumb{appearance:none;width:18px;height:18px}.size-range::-moz-range-thumb{width:18px;height:18px;border:none;background:transparent}` }} />
       <div className="flex justify-between items-center mb-2" dir="rtl">
-        <span className="text-xs font-semibold text-[#0c1a35]">{isActive ? `${sizeMin} ס״מ — ${sizeMax} ס״מ` : 'כל הגדלים'}</span>
+        <span className="text-xs font-semibold text-[#0c1a35]">{isActive ? `${sizeMin} ס״מ - ${sizeMax} ס״מ` : 'כל הגדלים'}</span>
         {isActive && <button onClick={() => onChange(MIN, MAX)} className="text-[10px] text-red-400 hover:text-red-600">איפוס</button>}
       </div>
       <div className="relative h-6 flex items-center mx-1" style={{ direction: 'ltr' }}>
@@ -474,7 +474,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
         </Section>
       )}
 
-      {/* SubCategory filter — shown when 2+ subCategories exist */}
+      {/* SubCategory filter - shown when 2+ subCategories exist */}
       {onSubCategoryFilter && availableSubCategories && availableSubCategories.length >= 2 && (
         <Section title="תת-קטגוריה">
           <div className="flex flex-wrap gap-1.5">
@@ -549,7 +549,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
         <div className="flex items-center gap-2">
           <input type="number" min={0} placeholder="מינ׳" value={filters.minPrice} onChange={e => set({ minPrice: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#0c1a35] focus:ring-1 focus:ring-[#0c1a35]/20 transition-all" />
-          <span className="text-gray-300">—</span>
+          <span className="text-gray-300">-</span>
           <input type="number" min={0} placeholder="מקס׳" value={filters.maxPrice} onChange={e => set({ maxPrice: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#0c1a35] focus:ring-1 focus:ring-[#0c1a35]/20 transition-all" />
         </div>
@@ -650,7 +650,7 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
   }
   if (filters.minPrice || filters.maxPrice) {
     pills.push({
-      label: `מחיר: ${filters.minPrice || '0'} — ${filters.maxPrice || '∞'} ₪`,
+      label: `מחיר: ${filters.minPrice || '0'} - ${filters.maxPrice || '∞'} ₪`,
       onRemove: () => onChange({ ...filters, minPrice: '', maxPrice: '' }),
     });
   }
@@ -722,8 +722,8 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
         {active
           ? 'נסה לשנות את הסינון או להרחיב את טווח החיפוש'
           : relatedCats.length > 0
-            ? 'הקטגוריה אינה קיימת — נסה לחפש ב:'
-            : 'הקטגוריה הזו תתמלא בקרוב. בינתיים — עיין בשאר הקטגוריות'}
+            ? 'הקטגוריה אינה קיימת - נסה לחפש ב:'
+            : 'הקטגוריה הזו תתמלא בקרוב. בינתיים - עיין בשאר הקטגוריות'}
       </p>
       {active ? (
         <button
@@ -749,7 +749,7 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
   );
 }
 
-// Pagination replaced by infinite scroll — see IntersectionObserver in main component
+// Pagination replaced by infinite scroll - see IntersectionObserver in main component
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -800,7 +800,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const subcatOverrideForFetch = SUBCAT_QUERY_OVERRIDES[category]?.[urlFilter ?? ''] ?? null;
 
   async function fetchAll() {
-    // Case B: virtual category slug — no products have this as cat in Firestore
+    // Case B: virtual category slug - no products have this as cat in Firestore
     const virtual = VIRTUAL_CATS[category];
     if (virtual) {
       const snaps = await Promise.all(
@@ -831,7 +831,7 @@ export default function CategoryClient({ category }: { category: string }) {
       return;
     }
 
-    // Case A: targeted subCategory query — skip loading the full category
+    // Case A: targeted subCategory query - skip loading the full category
     if (subcatOverrideForFetch) {
       const snap = await getDocs(
         query(collection(db, 'products'), where('subCategory', '==', subcatOverrideForFetch), limit(500))
@@ -929,7 +929,7 @@ export default function CategoryClient({ category }: { category: string }) {
       .catch(() => { setCuration(null); setStyleTagFilter(''); });
   }, [subcatOverrideForFetch, category]);
 
-  // Load all curations once — build bannerTitle → Curation map for look-specific banners
+  // Load all curations once - build bannerTitle → Curation map for look-specific banners
   useEffect(() => {
     getDocs(collection(db, 'curations'))
       .then(snap => {
@@ -1115,7 +1115,7 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       )}
 
-      {/* ── Curation banner — appears BELOW the category header ── */}
+      {/* ── Curation banner - appears BELOW the category header ── */}
       {curation && (
         <div
           dir="rtl"
@@ -1128,8 +1128,8 @@ export default function CategoryClient({ category }: { category: string }) {
           }}
         >
           {/* Resolve which banner image to show:
-              — look selected → use that look's own curation banner
-              — otherwise     → use the category curation banner */}
+              - look selected → use that look's own curation banner
+              - otherwise     → use the category curation banner */}
           {(() => {
             const activeBannerUrl = (styleTagFilter && isLookTagMode && lookCurationMap[styleTagFilter]?.bannerImageUrl)
               ? lookCurationMap[styleTagFilter].bannerImageUrl
@@ -1149,7 +1149,7 @@ export default function CategoryClient({ category }: { category: string }) {
                 )}
                 {/* Gradient overlay at bottom for text legibility */}
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)' }} />
-                {/* Text — bottom-right */}
+                {/* Text - bottom-right */}
                 <div style={{ position: 'absolute', bottom: 16, right: 20, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                   <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
                     {activeLookName}
@@ -1190,7 +1190,7 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       )}
 
-      {/* ── Rabbinical trust banner — STaM categories only ── */}
+      {/* ── Rabbinical trust banner - STaM categories only ── */}
       {['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה'].includes(category) && (
         <div dir="rtl" style={{
           background: 'linear-gradient(90deg, #111d3a 0%, #18274a 100%)',
@@ -1387,7 +1387,7 @@ export default function CategoryClient({ category }: { category: string }) {
             </div>
           </div>
 
-          {/* Style / look filter buttons — shown when a curation is active */}
+          {/* Style / look filter buttons - shown when a curation is active */}
           {curation && (
             <div dir="rtl" style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
               {(isLookTagMode
