@@ -24,7 +24,7 @@ interface Product {
   imgUrl?: string;
   image_url?: string;
   img1?: string; img2?: string; img3?: string;
-  imgUrl2?: string; imgUrl3?: string; imgUrl4?: string;
+  imgUrl2?: string; imgUrl3?: string; imgUrl4?: string; imgUrl5?: string;
   cat?: string;
   badge?: string;
   sofer?: string;
@@ -327,6 +327,7 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
   const [imgUrl2, setImgUrl2]   = useState(product.imgUrl2 || '');
   const [imgUrl3, setImgUrl3]   = useState(product.imgUrl3 || '');
   const [imgUrl4, setImgUrl4]   = useState(product.imgUrl4 || '');
+  const [imgUrl5, setImgUrl5]   = useState(product.imgUrl5 || '');
   const [videoUrl, setVideoUrl] = useState(product.videoUrl || '');
   const [badge, setBadge]       = useState(product.badge || '');
   const [days, setDays]         = useState(product.days || '7-14');
@@ -362,6 +363,7 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
       else if (field === 'img2') setImgUrl2(url);
       else if (field === 'img3') setImgUrl3(url);
       else if (field === 'img4') setImgUrl4(url);
+      else if (field === 'img5') setImgUrl5(url);
       else if (field === 'video') setVideoUrl(url);
     } catch { alert('שגיאה בהעלאה'); }
     finally { setUploadingImg(null); }
@@ -369,7 +371,7 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
 
   async function handleSave() {
     setSaving(true);
-    try { onSave({ name, price: Number(price), was: was ? Number(was) : null, desc, cat, level: ['קלפי מזוזה', 'תפילין קומפלט'].includes(cat) ? level : '', soferId: soferId || undefined, imgUrl, imgUrl2, imgUrl3, imgUrl4, videoUrl, badge, days }); }
+    try { onSave({ name, price: Number(price), was: was ? Number(was) : null, desc, cat, level: ['קלפי מזוזה', 'תפילין קומפלט'].includes(cat) ? level : '', soferId: soferId || undefined, imgUrl, imgUrl2, imgUrl3, imgUrl4, imgUrl5, videoUrl, badge, days }); }
     finally { setSaving(false); }
   }
 
@@ -406,9 +408,9 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
           <div><label style={labelS}>תיאור</label><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={4} style={{ ...inputS, resize: 'vertical' }} /></div>
           <div>
             <label style={labelS}>תמונות וסרטון</label>
-            {(['main', 'img2', 'img3', 'img4'] as const).map((field, idx) => {
-              const cur = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : field === 'img3' ? imgUrl3 : imgUrl4;
-              const set = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : field === 'img3' ? setImgUrl3 : setImgUrl4;
+            {(['main', 'img2', 'img3', 'img4', 'img5'] as const).map((field, idx) => {
+              const cur = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : field === 'img3' ? imgUrl3 : field === 'img4' ? imgUrl4 : imgUrl5;
+              const set = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : field === 'img3' ? setImgUrl3 : field === 'img4' ? setImgUrl4 : setImgUrl5;
               return (
                 <div key={field} style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
                   {cur && <img src={cur} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
@@ -926,7 +928,7 @@ export default function ProductClient() {
     </div>
   );
 
-  const allMediaRaw = [product.imgUrl || product.image_url, product.imgUrl2 || product.img1, product.imgUrl3 || product.img2, product.imgUrl4 || product.img3].filter(Boolean) as string[];
+  const allMediaRaw = [product.imgUrl || product.image_url, product.imgUrl2 || product.img1, product.imgUrl3 || product.img2, product.imgUrl4 || product.img3, product.imgUrl5].filter(Boolean) as string[];
   // Show AI-generated image (index 1) as primary when available
   const allMedia = allMediaRaw.length >= 2 ? [allMediaRaw[1], allMediaRaw[0], ...allMediaRaw.slice(2)] : allMediaRaw;
   const allMediaOptimized = allMedia.map(u => optimizeCloudinaryUrl(u, 800));
