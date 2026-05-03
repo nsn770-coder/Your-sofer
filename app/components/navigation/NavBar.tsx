@@ -235,6 +235,7 @@ const SIMPLE_NAV = [
   { label: "שבתות וחגים", action: "shabbat-holidays" },
   { label: "ספרי תורה", action: "sifrei-torah" },
   { label: "מגילות", action: "megilot" },
+  { label: "בר מצווה", action: "bar-mitzva" },
 ];
 
 function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
@@ -336,6 +337,7 @@ function NavBarContent() {
     if (action === "shabbat-holidays") router.push("/category/שבתות-וחגים");
     else if (action === "sifrei-torah") router.push("/category/ספרי תורה");
     else if (action === "megilot") router.push("/category/מגילות");
+    else if (action === "bar-mitzva") router.push("/bar-mitzva");
   }
 
   return (

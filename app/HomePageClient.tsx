@@ -793,6 +793,50 @@ export default function HomePageClient() {
         <SmartFunnel isMobile={isMobile} />
       </div>
 
+      {/* ── Bar Mitzva Banner ── */}
+      <Link href="/bar-mitzva" style={{ textDecoration: 'none', display: 'block' }}>
+        <div
+          dir="rtl"
+          style={{
+            background: 'linear-gradient(135deg, #0c1a35 0%, #18274a 100%)',
+            borderBottom: '3px solid rgba(197,160,40,0.45)',
+            padding: isMobile ? '14px 16px' : '16px 28px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'linear-gradient(135deg, #111d3a 0%, #1e2f56 100%)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'linear-gradient(135deg, #0c1a35 0%, #18274a 100%)'; }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 14 }}>
+            <span style={{
+              fontSize: isMobile ? 20 : 24,
+              width: isMobile ? 38 : 44, height: isMobile ? 38 : 44,
+              borderRadius: '50%',
+              background: 'rgba(197,160,40,0.15)',
+              border: '1.5px solid rgba(197,160,40,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>✡</span>
+            <div>
+              <div style={{ fontSize: isMobile ? 13 : 15, fontWeight: 900, color: '#fff', lineHeight: 1.3 }}>
+                סט בר מצווה — תפילין קומפלט + טלית
+              </div>
+              <div style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
+                שלוש חבילות מוכנות · החל מ-₪2,700
+              </div>
+            </div>
+          </div>
+          <span style={{
+            fontSize: isMobile ? 12 : 13, fontWeight: 800, color: '#C5A028',
+            background: 'rgba(197,160,40,0.12)',
+            border: '1px solid rgba(197,160,40,0.35)',
+            padding: isMobile ? '6px 12px' : '7px 16px',
+            whiteSpace: 'nowrap', flexShrink: 0,
+          }}>
+            לבחירת חבילה ←
+          </span>
+        </div>
+      </Link>
+
       {/* ── Live Activity Bar — isolated component, re-renders independently ── */}
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
 
