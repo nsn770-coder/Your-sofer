@@ -907,7 +907,7 @@ export default function ProductClient() {
                 const cat = cp.cat ?? '';
                 if (cp.id !== p.id && cp.cat !== p.cat && !EXCLUDED_CATS.has(cat)) {
                   const count = catCounts[cat] ?? 0;
-                  if (count < 2) {
+                  if (count < 10) {
                     catCounts[cat] = count + 1;
                     collData.push(cp);
                   }
