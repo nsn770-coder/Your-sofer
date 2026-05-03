@@ -46,8 +46,9 @@ const PACKAGES = [
 ];
 
 const COMPLETE_SET = [
-  { label: 'טלית', emoji: '🟦', href: '/category/טלית' },
-  { label: 'כיסוי תפילין', emoji: '🎒', href: '/category/כיסוי תפילין' },
+  { label: 'טלית', emoji: '🟦', href: '/category/טליתות וציציות' },
+  { label: 'כיסוי תפילין', emoji: '🎒', href: '/category/סט טלית תפילין' },
+  { label: 'כיפה', emoji: '🎩', href: '/category/כיפות' },
   { label: 'סידור', emoji: '📖', href: '/category/סידור' },
 ];
 
