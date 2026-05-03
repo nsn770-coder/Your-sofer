@@ -3,6 +3,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+const SHIRA_AVATAR = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777792770/%D7%A9%D7%99%D7%A8%D7%94_itw0l5.png';
+
+const QUICK_REPLIES = [
+  'עזרי לי לבחור מזוזה',
+  'איך בוחרים תפילין לבר מצווה?',
+  'מה ההבדל בין רמות הכשרות?',
+];
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface SearchFilters {
@@ -59,7 +69,19 @@ function mergeFilters(current: SearchFilters, next: SearchFilters): SearchFilter
   return merged;
 }
 
-// ── Product card (inline in chat) ─────────────────────────────────────────────
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function ShiraAvatar({ size }: { size: number }) {
+  return (
+    <img
+      src={SHIRA_AVATAR}
+      alt="שירה"
+      width={size}
+      height={size}
+      style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', display: 'block', flexShrink: 0 }}
+    />
+  );
+}
 
 function ProductCard({ product }: { product: ProductResult }) {
   return (
@@ -119,7 +141,7 @@ export default function ShiraChat() {
           setIsTyping(false);
           setMessages([{
             role: 'assistant',
-            content: 'שלום! אני שירה 💛 אשמח לעזור לך למצוא בדיוק מה שאתה מחפש. ספר לי - מה מביא אותך היום?',
+            content: 'שלום! אני שירה, היועצת שלך לסת״ם ויודאיקה 👋\nאיך אני יכולה לעזור לך היום?',
           }]);
         }, 1200);
       }, 400);
@@ -130,19 +152,13 @@ export default function ShiraChat() {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   }, [isOpen]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
-
-    const userText = input.trim();
-    setInput('');
-
+  const executeSend = async (userText: string) => {
     const updatedMessages: ChatMessage[] = [...messages, { role: 'user', content: userText }];
     setMessages(updatedMessages);
     setIsLoading(true);
     setIsTyping(true);
 
     try {
-      // 1 - Ask Shira (may return text or JSON search action)
       const chatRes = await fetch('/api/shira', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -153,17 +169,16 @@ export default function ShiraChat() {
       });
       const chatData = await chatRes.json();
       const rawMessage: string = chatData.message ?? '';
+      const directProducts: ProductResult[] = chatData.products ?? [];
 
       setIsTyping(false);
 
-      // 2 - Check if it's a search action
+      // Legacy JSON search path (kept for backwards compatibility)
       const action = parseSearchAction(rawMessage);
-
       if (action) {
         const mergedFilters = mergeFilters(currentFilters, action.filters);
         setCurrentFilters(mergedFilters);
 
-        // 3 - Execute search on server
         const searchRes = await fetch('/api/shira/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -183,8 +198,9 @@ export default function ShiraChat() {
           ...prev,
           { role: 'assistant', content: intro, products: products.length > 0 ? products : undefined, isFallback: fallback },
         ]);
+      } else if (directProducts.length > 0) {
+        setMessages(prev => [...prev, { role: 'assistant', content: rawMessage, products: directProducts }]);
       } else {
-        // Regular text response
         setMessages(prev => [...prev, { role: 'assistant', content: rawMessage }]);
       }
     } catch {
@@ -196,6 +212,18 @@ export default function ShiraChat() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const sendMessage = async () => {
+    const userText = input.trim();
+    if (!userText || isLoading) return;
+    setInput('');
+    await executeSend(userText);
+  };
+
+  const sendWithText = async (text: string) => {
+    if (isLoading) return;
+    await executeSend(text);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -212,7 +240,7 @@ export default function ShiraChat() {
           </svg>
         ) : (
           <div className="shira-avatar-btn">
-            <span>ש</span>
+            <ShiraAvatar size={44} />
             <div className="shira-online-dot" />
           </div>
         )}
@@ -224,9 +252,11 @@ export default function ShiraChat() {
 
           {/* Header */}
           <div className="shira-header">
-            <div className="shira-header-avatar">ש</div>
+            <div className="shira-header-avatar">
+              <ShiraAvatar size={40} />
+            </div>
             <div className="shira-header-info">
-              <div className="shira-header-name">שירה - יועצת מוצרים</div>
+              <div className="shira-header-name">שירה - יועצת סת״ם</div>
               <div className="shira-header-status">
                 <span className="shira-status-dot" />זמינה עכשיו
               </div>
@@ -240,8 +270,28 @@ export default function ShiraChat() {
                 {/* Text bubble */}
                 {msg.content && (
                   <div className={`shira-msg shira-msg-${msg.role}`}>
-                    {msg.role === 'assistant' && <div className="shira-msg-avatar">ש</div>}
+                    {msg.role === 'assistant' && (
+                      <div className="shira-msg-avatar">
+                        <ShiraAvatar size={32} />
+                      </div>
+                    )}
                     <div className="shira-msg-bubble">{msg.content}</div>
+                  </div>
+                )}
+
+                {/* Quick replies — only below the first welcome message */}
+                {i === 0 && msg.role === 'assistant' && messages.length === 1 && (
+                  <div className="shira-quick-replies">
+                    {QUICK_REPLIES.map(q => (
+                      <button
+                        key={q}
+                        className="shira-quick-btn"
+                        onClick={() => sendWithText(q)}
+                        disabled={isLoading}
+                      >
+                        {q}
+                      </button>
+                    ))}
                   </div>
                 )}
 
@@ -259,7 +309,9 @@ export default function ShiraChat() {
 
             {isTyping && (
               <div className="shira-msg shira-msg-assistant">
-                <div className="shira-msg-avatar">ש</div>
+                <div className="shira-msg-avatar">
+                  <ShiraAvatar size={32} />
+                </div>
                 <div className="shira-msg-bubble shira-typing">
                   <span /><span /><span />
                 </div>
@@ -276,7 +328,7 @@ export default function ShiraChat() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="תאר מה אתה מחפש..."
+              placeholder="שאלי אותי על סת״ם, תפילין, מזוזות..."
               className="shira-input"
               disabled={isLoading}
             />
@@ -307,20 +359,21 @@ export default function ShiraChat() {
         .shira-toggle {
           position: fixed; bottom: 24px; left: 24px;
           width: 60px; height: 60px; border-radius: 50%;
-          background: linear-gradient(135deg, #b8860b, #d4a017);
-          border: none; cursor: pointer; z-index: 9999;
-          box-shadow: 0 4px 20px rgba(184,134,11,0.4);
+          background: linear-gradient(135deg, #111d3a, #1a2d5a);
+          border: 2px solid rgba(197,160,40,0.5);
+          cursor: pointer; z-index: 9999;
+          box-shadow: 0 4px 20px rgba(17,29,58,0.45);
           display: flex; align-items: center; justify-content: center;
           color: white; transition: transform 0.2s, box-shadow 0.2s;
+          padding: 0;
         }
-        .shira-toggle:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(184,134,11,0.5); }
+        .shira-toggle:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(17,29,58,0.55); }
         .shira-avatar-btn {
           position: relative; width: 100%; height: 100%;
           display: flex; align-items: center; justify-content: center;
-          font-size: 22px; font-weight: 700; font-family: 'David', serif;
         }
         .shira-online-dot {
-          position: absolute; top: 10px; right: 10px;
+          position: absolute; top: 8px; right: 8px;
           width: 12px; height: 12px;
           background: #22c55e; border-radius: 50%; border: 2px solid white;
         }
@@ -341,15 +394,13 @@ export default function ShiraChat() {
 
         /* Header */
         .shira-header {
-          background: linear-gradient(135deg, #b8860b, #d4a017);
+          background: linear-gradient(135deg, #111d3a 0%, #1a2d5a 100%);
           padding: 14px 18px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
         }
         .shira-header-avatar {
-          width: 42px; height: 42px; border-radius: 50%;
-          background: rgba(255,255,255,0.25);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 19px; font-weight: 700; color: white; flex-shrink: 0;
-          font-family: 'David', serif;
+          width: 40px; height: 40px; border-radius: 50%;
+          overflow: hidden; flex-shrink: 0;
+          border: 2px solid rgba(197,160,40,0.6);
         }
         .shira-header-name { color: white; font-weight: 700; font-size: 15px; }
         .shira-header-status {
@@ -370,11 +421,9 @@ export default function ShiraChat() {
         .shira-msg { display: flex; align-items: flex-end; gap: 8px; }
         .shira-msg-user { flex-direction: row-reverse; }
         .shira-msg-avatar {
-          width: 28px; height: 28px; border-radius: 50%;
-          background: linear-gradient(135deg, #b8860b, #d4a017);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
-          font-family: 'David', serif;
+          width: 32px; height: 32px; border-radius: 50%;
+          overflow: hidden; flex-shrink: 0;
+          border: 1.5px solid rgba(197,160,40,0.4);
         }
         .shira-msg-bubble {
           max-width: 78%; padding: 9px 13px; border-radius: 17px;
@@ -385,14 +434,14 @@ export default function ShiraChat() {
           box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         }
         .shira-msg-user .shira-msg-bubble {
-          background: linear-gradient(135deg, #b8860b, #d4a017);
+          background: linear-gradient(135deg, #111d3a, #1a2d5a);
           color: white; border-bottom-left-radius: 4px;
         }
 
         /* Typing dots */
         .shira-typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; }
         .shira-typing span {
-          width: 7px; height: 7px; background: #b8860b; border-radius: 50%;
+          width: 7px; height: 7px; background: #C5A028; border-radius: 50%;
           animation: shiraBounce 1.2s infinite;
         }
         .shira-typing span:nth-child(2) { animation-delay: 0.2s; }
@@ -402,9 +451,29 @@ export default function ShiraChat() {
           30% { transform: translateY(-5px); opacity: 1; }
         }
 
+        /* Quick reply buttons */
+        .shira-quick-replies {
+          display: flex; flex-direction: column; gap: 6px;
+          margin: 6px 0 2px 40px;
+        }
+        .shira-quick-btn {
+          background: rgba(17,29,58,0.05);
+          border: 1.5px solid rgba(197,160,40,0.5);
+          border-radius: 18px; padding: 8px 14px;
+          font-size: 12.5px; font-weight: 600; color: #0c1a35;
+          cursor: pointer; text-align: right; direction: rtl;
+          transition: background 0.15s, border-color 0.15s;
+          font-family: inherit;
+        }
+        .shira-quick-btn:hover:not(:disabled) {
+          background: rgba(197,160,40,0.12);
+          border-color: #C5A028;
+        }
+        .shira-quick-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
         /* Product cards */
         .shira-products {
-          margin: 4px 0 0 36px;
+          margin: 4px 0 0 40px;
           display: flex; flex-direction: column; gap: 6px;
         }
         .shira-product-card {
@@ -416,8 +485,8 @@ export default function ShiraChat() {
           cursor: pointer;
         }
         .shira-product-card:hover {
-          box-shadow: 0 3px 12px rgba(184,134,11,0.18);
-          border-color: #d4a017;
+          box-shadow: 0 3px 12px rgba(197,160,40,0.2);
+          border-color: #C5A028;
         }
         .shira-product-img {
           width: 56px; height: 56px; border-radius: 8px;
@@ -425,37 +494,30 @@ export default function ShiraChat() {
           display: flex; align-items: center; justify-content: center;
           border: 1px solid #ede8df;
         }
-        .shira-product-info {
-          flex: 1; min-width: 0;
-        }
+        .shira-product-info { flex: 1; min-width: 0; }
         .shira-product-name {
-          font-size: 12px; font-weight: 700; color: #1a1a1a;
-          line-height: 1.35;
+          font-size: 12px; font-weight: 700; color: #1a1a1a; line-height: 1.35;
           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
           overflow: hidden;
         }
-        .shira-product-cat {
-          font-size: 10px; color: #b8860b; font-weight: 600; margin-top: 2px;
-        }
+        .shira-product-cat { font-size: 10px; color: #C5A028; font-weight: 600; margin-top: 2px; }
         .shira-product-price-col {
-          flex-shrink: 0; text-align: left; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+          flex-shrink: 0; text-align: left;
+          display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
         }
-        .shira-product-price {
-          font-size: 14px; font-weight: 900; color: #0c1a35; white-space: nowrap;
-        }
+        .shira-product-price { font-size: 14px; font-weight: 900; color: #0c1a35; white-space: nowrap; }
         .shira-product-cta {
           font-size: 10px; font-weight: 700;
-          background: linear-gradient(135deg, #b8860b, #d4a017);
+          background: linear-gradient(135deg, #111d3a, #1a2d5a);
           color: white; padding: 3px 8px; border-radius: 20px; white-space: nowrap;
         }
-        .shira-fallback-note {
-          font-size: 10px; color: #aaa; text-align: center; padding: 2px 0;
-        }
+        .shira-fallback-note { font-size: 10px; color: #aaa; text-align: center; padding: 2px 0; }
 
         /* Input */
         .shira-input-area {
           padding: 10px 14px; background: white;
-          border-top: 1px solid #f0ebe3; display: flex; gap: 8px; align-items: center; flex-shrink: 0;
+          border-top: 1px solid #f0ebe3;
+          display: flex; gap: 8px; align-items: center; flex-shrink: 0;
         }
         .shira-input {
           flex: 1; border: 1.5px solid #e8e0d4; border-radius: 22px;
@@ -463,10 +525,10 @@ export default function ShiraChat() {
           direction: rtl; background: #faf9f7;
           transition: border-color 0.2s; font-family: inherit;
         }
-        .shira-input:focus { border-color: #b8860b; background: white; }
+        .shira-input:focus { border-color: #C5A028; background: white; }
         .shira-send {
           width: 38px; height: 38px; border-radius: 50%;
-          background: linear-gradient(135deg, #b8860b, #d4a017);
+          background: linear-gradient(135deg, #111d3a, #1a2d5a);
           border: none; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
           color: white; flex-shrink: 0; transition: opacity 0.2s, transform 0.2s;
@@ -481,10 +543,9 @@ export default function ShiraChat() {
         }
         .shira-wa-btn {
           display: inline-flex; align-items: center; gap: 7px;
-          background: #25D366; color: white;
-          border-radius: 20px; padding: 7px 16px;
-          font-size: 12.5px; font-weight: 700; text-decoration: none;
-          transition: opacity 0.2s;
+          background: #25D366; color: white; border-radius: 20px;
+          padding: 7px 16px; font-size: 12.5px; font-weight: 700;
+          text-decoration: none; transition: opacity 0.2s;
         }
         .shira-wa-btn:hover { opacity: 0.88; }
 
@@ -493,6 +554,7 @@ export default function ShiraChat() {
           .shira-window { left: 10px; right: 10px; width: auto; bottom: 86px; max-height: 75vh; }
           .shira-toggle { left: 14px; bottom: 14px; width: 54px; height: 54px; }
           .shira-products { margin-left: 0; }
+          .shira-quick-replies { margin-left: 0; }
         }
       `}</style>
     </>
