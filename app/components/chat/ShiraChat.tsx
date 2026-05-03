@@ -2,10 +2,22 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { useChatPersona } from './ChatPersonaContext';
 
-// ── Constants ─────────────────────────────────────────────────────────────────
+// ── Personas ──────────────────────────────────────────────────────────────────
 
-const SHIRA_AVATAR = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777792770/%D7%A9%D7%99%D7%A8%D7%94_itw0l5.png';
+const PERSONAS = {
+  shira: {
+    avatar: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777792770/%D7%A9%D7%99%D7%A8%D7%94_itw0l5.png',
+    name: 'שירה - יועצת סת״ם',
+    welcome: 'שלום! אני שירה, היועצת שלך לסת״ם ויודאיקה 👋\nאיך אני יכולה לעזור לך היום?',
+  },
+  nissim: {
+    avatar: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777793258/%D7%A6_%D7%90%D7%98_%D7%91%D7%95%D7%98_%D7%94%D7%A8%D7%91_%D7%A0%D7%99%D7%A1%D7%99%D7%9D_lkojgh.png',
+    name: 'הרב ניסים - יועץ סת״ם',
+    welcome: 'שלום! אני הרב ניסים, יועץ סת״ם מוסמך 👋 אשמח לעזור לך לבחור את המוצר המתאים.',
+  },
+};
 
 const QUICK_REPLIES = [
   'עזרי לי לבחור מזוזה',
@@ -71,11 +83,11 @@ function mergeFilters(current: SearchFilters, next: SearchFilters): SearchFilter
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function ShiraAvatar({ size }: { size: number }) {
+function ChatAvatar({ src, size }: { src: string; size: number }) {
   return (
     <img
-      src={SHIRA_AVATAR}
-      alt="שירה"
+      src={src}
+      alt="advisor"
       width={size}
       height={size}
       style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', display: 'block', flexShrink: 0 }}
@@ -120,6 +132,9 @@ function ProductCard({ product }: { product: ProductResult }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function ShiraChat() {
+  const { stamPage } = useChatPersona();
+  const persona = stamPage ? PERSONAS.nissim : PERSONAS.shira;
+
   const [isOpen, setIsOpen]               = useState(false);
   const [messages, setMessages]           = useState<ChatMessage[]>([]);
   const [currentFilters, setCurrentFilters] = useState<SearchFilters>({});
@@ -133,16 +148,19 @@ export default function ShiraChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  // Reset chat when switching between Shira and Rav Nissim contexts
+  useEffect(() => {
+    setMessages([]);
+    setIsOpen(false);
+  }, [stamPage]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setTimeout(() => {
         setIsTyping(true);
         setTimeout(() => {
           setIsTyping(false);
-          setMessages([{
-            role: 'assistant',
-            content: 'שלום! אני שירה, היועצת שלך לסת״ם ויודאיקה 👋\nאיך אני יכולה לעזור לך היום?',
-          }]);
+          setMessages([{ role: 'assistant', content: persona.welcome }]);
         }, 1200);
       }, 400);
     }
@@ -240,7 +258,7 @@ export default function ShiraChat() {
           </svg>
         ) : (
           <div className="shira-avatar-btn">
-            <ShiraAvatar size={44} />
+            <ChatAvatar src={persona.avatar} size={44} />
             <div className="shira-online-dot" />
           </div>
         )}
@@ -253,10 +271,10 @@ export default function ShiraChat() {
           {/* Header */}
           <div className="shira-header">
             <div className="shira-header-avatar">
-              <ShiraAvatar size={40} />
+              <ChatAvatar src={persona.avatar} size={40} />
             </div>
             <div className="shira-header-info">
-              <div className="shira-header-name">שירה - יועצת סת״ם</div>
+              <div className="shira-header-name">{persona.name}</div>
               <div className="shira-header-status">
                 <span className="shira-status-dot" />זמינה עכשיו
               </div>
@@ -272,7 +290,7 @@ export default function ShiraChat() {
                   <div className={`shira-msg shira-msg-${msg.role}`}>
                     {msg.role === 'assistant' && (
                       <div className="shira-msg-avatar">
-                        <ShiraAvatar size={32} />
+                        <ChatAvatar src={persona.avatar} size={32} />
                       </div>
                     )}
                     <div className="shira-msg-bubble">{msg.content}</div>
@@ -310,7 +328,7 @@ export default function ShiraChat() {
             {isTyping && (
               <div className="shira-msg shira-msg-assistant">
                 <div className="shira-msg-avatar">
-                  <ShiraAvatar size={32} />
+                  <ChatAvatar src={persona.avatar} size={32} />
                 </div>
                 <div className="shira-msg-bubble shira-typing">
                   <span /><span /><span />

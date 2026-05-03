@@ -11,6 +11,7 @@ import ProductCard from '@/components/ui/ProductCard';
 import SoferProductCard, { type SoferData } from '@/components/ui/SoferProductCard';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import BarMitzvaWizard from '@/app/components/BarMitzvaWizard';
+import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -774,6 +775,13 @@ export default function CategoryClient({ category }: { category: string }) {
   const [styleTagFilter, setStyleTagFilter]     = useState<string>('');
   const [lookCurationMap, setLookCurationMap]   = useState<Record<string, Curation>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const { setStamPage } = useChatPersona();
+
+  useEffect(() => {
+    const STAM_CHAT_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
+    setStamPage(STAM_CHAT_CATS.has(category));
+    return () => setStamPage(false);
+  }, [category, setStamPage]);
 
   const SUBCATEGORY_PAGES = ['נטילת ידיים', 'שבת', 'חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
   const SUBCATEGORY_GROUPS: Record<string, string[]> = {

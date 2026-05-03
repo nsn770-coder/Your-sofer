@@ -9,6 +9,7 @@ import { CATS } from '../../constants/categories';
 import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
 import * as pixel from '@/lib/metaPixel';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import NextImage from 'next/image';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -831,6 +832,7 @@ export default function ProductClient() {
     return (Math.abs(hash) % 8) + 12;
   });
   const buyBoxRef = useRef<HTMLDivElement>(null);
+  const { setStamPage } = useChatPersona();
 
   useEffect(() => {
     try { setFromWizardLS(localStorage.getItem('wizardActive') === 'true'); } catch {}
@@ -841,6 +843,12 @@ export default function ProductClient() {
     check(); window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  useEffect(() => {
+    const STAM_CHAT_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
+    setStamPage(!!product?.cat && STAM_CHAT_CATS.has(product.cat));
+    return () => setStamPage(false);
+  }, [product?.cat, setStamPage]);
 
   useEffect(() => {
     setCurrentViewers(Math.floor(Math.random() * 5) + 2);

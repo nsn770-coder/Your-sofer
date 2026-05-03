@@ -8,6 +8,7 @@ import { ShaliachProvider } from "./contexts/ShaliachContext";
 import NavBar from "@/app/components/navigation/NavBar";
 import Footer from "@/app/components/Footer";
 import ShiraChat from "@/app/components/chat/ShiraChat";
+import { ChatPersonaProvider } from "@/app/components/chat/ChatPersonaContext";
 import GTMLoader from "@/app/components/GTMLoader";
 import MetaPixelPageView from "@/app/components/MetaPixelPageView";
 import WizardStickyBar from "@/app/components/WizardStickyBar";
@@ -91,6 +92,7 @@ export default function RootLayout({
         ` }} />
       </head>
       <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100vw', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
+        <ChatPersonaProvider>
         <AuthProvider>
           {/* Suspense is required by Next.js when useSearchParams() is used
               inside a component rendered from the root layout */}
@@ -107,6 +109,7 @@ export default function RootLayout({
         </AuthProvider>
         <WizardStickyBar />
         <ShiraChat />
+        </ChatPersonaProvider>
         <SpeedInsights />
 
         {/* ── Meta Pixel - deferred until user interaction ── */}
