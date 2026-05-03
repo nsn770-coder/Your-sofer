@@ -16,32 +16,19 @@
  * Requires: app/scripts/serviceAccountKey.json
  */
 
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteField } from 'firebase/firestore';
+import { writeFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SA_PATH   = resolve(__dirname, './serviceAccountKey.json');
 
-// ── Load .env.local ────────────────────────────────────────────────────────────
-(function loadEnvLocal() {
-  const envPath = resolve(__dirname, '../../.env.local');
-  if (!existsSync(envPath)) return;
-  for (const line of readFileSync(envPath, 'utf8').split('\n')) {
-    const t = line.trim();
-    if (!t || t.startsWith('#')) continue;
-    const eq = t.indexOf('=');
-    if (eq === -1) continue;
-    const k = t.slice(0, eq).trim();
-    const v = t.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
-    if (k) process.env[k] = v;
-  }
-})();
-
-if (getApps().length === 0) initializeApp({ credential: cert(SA_PATH) });
-const db = getFirestore();
+const app = initializeApp({
+  apiKey: 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I',
+  projectId: 'your-sofer',
+});
+const db = getFirestore(app);
 
 const FIX_MODE  = process.argv.includes('--fix');
 const IMG_FIELDS = ['imgUrl2', 'imgUrl3', 'imgUrl4', 'imgUrl5'];
@@ -99,7 +86,7 @@ async function run() {
   console.log(`🔍 מצב: ${FIX_MODE ? '🔧 תיקון (--fix)' : '🔎 dry-run בלבד'}`);
   console.log('📦 טוען מוצרים פעילים...');
 
-  const snap = await db.collection('products').get();
+  const snap = await getDocs(collection(db, 'products'));
   const active = [];
   snap.forEach(d => { const p = d.data(); if (p.status === 'active') active.push({ id: d.id, ...p }); });
   console.log(`✅ ${active.length} מוצרים פעילים\n`);
@@ -187,9 +174,9 @@ async function run() {
   for (const p of flagged) {
     const update = {};
     for (const c of p.toClear) {
-      update[c.field] = FieldValue.delete();
+      update[c.field] = deleteField();
     }
-    await db.collection('products').doc(p.id).update(update);
+    await updateDoc(doc(db, 'products', p.id), update);
     console.log(`  ✅ ${p.id} — נוקו: ${p.toClear.map(c => c.field).join(', ')}`);
     fixed++;
   }
