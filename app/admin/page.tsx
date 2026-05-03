@@ -94,6 +94,8 @@ interface Product {
   imgUrl2?: string;
   imgUrl3?: string;
   sourceUrl?: string;
+  stockCount?: number;
+  stockVisible?: boolean;
 }
 
 interface Sofer {
@@ -503,6 +505,13 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [imgUrl, setImgUrl]   = useState(product.imgUrl || '');
   const [imgUrl2, setImgUrl2] = useState(product.imgUrl2 || '');
   const [imgUrl3, setImgUrl3] = useState(product.imgUrl3 || '');
+  const [stockVisible, setStockVisible] = useState<boolean>(() => {
+    if (product.stockVisible !== undefined) return product.stockVisible;
+    return !['מגילות', 'ספרי תורה'].includes(product.cat || product.category || '');
+  });
+  const [stockCountInput, setStockCountInput] = useState(
+    product.stockCount != null ? String(product.stockCount) : ''
+  );
   const [saving, setSaving]   = useState(false);
   const [uploadingImg, setUploadingImg] = useState<string | null>(null);
   const [soferOptions, setSoferOptions] = useState<Sofer[]>([]);
@@ -563,6 +572,8 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         imgUrl: imgUrl || null,
         imgUrl2: imgUrl2 || null,
         imgUrl3: imgUrl3 || null,
+        stockVisible,
+        stockCount: stockCountInput !== '' ? Number(stockCountInput) : null,
       });
       onSave();
       onClose();
@@ -696,6 +707,36 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             })}
           </div>
         </div>
+
+        {/* ── מלאי ── */}
+        <div style={{ marginTop: 14, background: '#f8f6f2', border: '1px solid #e8e0d0', borderRadius: 8, padding: '12px 14px' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35', marginBottom: 10 }}>מלאי</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: stockVisible ? 10 : 0 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#333' }}>
+              <input
+                type="checkbox"
+                checked={stockVisible}
+                onChange={e => setStockVisible(e.target.checked)}
+                style={{ width: 16, height: 16, cursor: 'pointer' }}
+              />
+              הצג כמות במלאי
+            </label>
+          </div>
+          {stockVisible && (
+            <div>
+              <label style={labelStyle}>כמות במלאי (ריק = מספר אקראי)</label>
+              <input
+                type="number"
+                min={1}
+                value={stockCountInput}
+                onChange={e => setStockCountInput(e.target.value)}
+                placeholder="למשל: 3"
+                style={{ ...inputStyle, maxWidth: 140 }}
+              />
+            </div>
+          )}
+        </div>
+
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
             style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
