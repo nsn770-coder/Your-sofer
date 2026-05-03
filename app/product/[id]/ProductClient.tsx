@@ -898,14 +898,14 @@ export default function ProductClient() {
 
             // "השלם את המראה" - same collection, different category
             if (p.collection) {
-              const EXCLUDED_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'כיסוי תפילין', 'סט טלית תפילין', 'תפילין', 'כיסויים']);
+              const ALLOWED_CATS = new Set(['נטלות', 'עיצוב הבית', 'כלי שולחן והגשה', 'יודאיקה', 'כיפות', 'מזוזות', 'חנוכיות', 'מנורות', 'פמוטים', 'תשמישי קדושה']);
               const collSnap = await getDocs(query(collection(db, 'products'), where('collection', '==', p.collection), limit(50)));
               const catCounts: Record<string, number> = {};
               const collData: Product[] = [];
               collSnap.forEach(d => {
                 const cp = { id: d.id, ...d.data() } as Product;
                 const cat = cp.cat ?? '';
-                if (cp.id !== p.id && cp.cat !== p.cat && !EXCLUDED_CATS.has(cat)) {
+                if (cp.id !== p.id && cp.cat !== p.cat && ALLOWED_CATS.has(cat)) {
                   const count = catCounts[cat] ?? 0;
                   if (count < 10) {
                     catCounts[cat] = count + 1;
