@@ -12,6 +12,7 @@ import {
 import { db } from './firebase';
 import HeroSwiper from './components/HeroSwiper';
 import ProductCard from '@/components/ui/ProductCard';
+import RabbinicalSupervision from './components/RabbinicalSupervision';
 
 const SmartFunnel        = dynamic(() => import('./components/SmartFunnel'),            { ssr: false, loading: () => <div style={{ height: 400 }} /> });
 
@@ -1004,6 +1005,9 @@ export default function HomePageClient() {
           })}
         </div>
       </div>
+
+      {/* ── Rabbinical Supervision ── */}
+      <RabbinicalSupervision isMobile={isMobile} />
 
       {/* ── Static Social Proof ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>

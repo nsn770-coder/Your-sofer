@@ -130,6 +130,7 @@ function TrustIcons({ hasSofer }: { hasSofer?: boolean }) {
 // ─── Trust Block ─────────────────────────────────────────────────────────────
 
 const STAM_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
+const RABBINICAL_CATEGORIES = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
 
 function TrustBlock({ isStam }: { isStam: boolean }) {
   const items = isStam
@@ -1012,6 +1013,30 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       <div style={{ textAlign: 'center', fontSize: 11, color: '#999', marginBottom: compact ? 0 : 4 }}>
         רכישה מאובטחת | אחריות מלאה | משלוח חינם
       </div>
+
+      {/* Rabbinical approval badge — STaM categories only */}
+      {!compact && product.cat && RABBINICAL_CATEGORIES.has(product.cat) && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          background: 'linear-gradient(90deg, #111d3a 0%, #18274a 100%)',
+          border: '1px solid rgba(197,160,40,0.35)',
+          borderRadius: 10, padding: '9px 14px', marginBottom: 4,
+          direction: 'rtl',
+        }}>
+          <span style={{
+            width: 22, height: 22, borderRadius: '50%',
+            background: 'rgba(197,160,40,0.18)',
+            border: '1.5px solid rgba(197,160,40,0.6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11, color: '#C5A028', fontWeight: 900, flexShrink: 0,
+          }}>✓</span>
+          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: 600, lineHeight: 1.4 }}>
+            נבדק ואושר על ידי{' '}
+            <span style={{ color: '#C5A028', fontWeight: 800 }}>הרב בנימין גליס</span>
+            {' '}— מגיה רבני מוסמך
+          </span>
+        </div>
+      )}
 
       {!compact && <TrustBlock isStam={!!product.cat && STAM_CATEGORIES.includes(product.cat)} />}
     </div>

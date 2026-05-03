@@ -1140,6 +1140,36 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       )}
 
+      {/* ── Rabbinical trust banner — STaM categories only ── */}
+      {['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה'].includes(category) && (
+        <div dir="rtl" style={{
+          background: 'linear-gradient(90deg, #111d3a 0%, #18274a 100%)',
+          borderBottom: '2px solid rgba(197,160,40,0.35)',
+          padding: '10px 20px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          flexWrap: 'wrap',
+        }}>
+          <span style={{
+            width: 20, height: 20, borderRadius: '50%',
+            background: 'rgba(197,160,40,0.18)',
+            border: '1.5px solid rgba(197,160,40,0.7)',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11, color: '#C5A028', fontWeight: 900, flexShrink: 0,
+          }}>✓</span>
+          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>
+            כל המוצרים בקטגוריה זו עברו בדיקת מגיה רבנית
+          </span>
+          <span style={{
+            fontSize: 11, color: '#C5A028', fontWeight: 700,
+            background: 'rgba(197,160,40,0.12)',
+            border: '1px solid rgba(197,160,40,0.35)',
+            borderRadius: 20, padding: '3px 10px',
+          }}>
+            הרב בנימין גליס · מגיה מוסמך
+          </span>
+        </div>
+      )}
+
       {/* ── Mobile toolbar ── */}
       <div className="lg:hidden sticky top-0 z-20 bg-white border-b border-gray-100 shadow-sm px-3 py-2.5 flex items-center gap-2">
         <button
