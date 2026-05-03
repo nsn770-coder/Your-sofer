@@ -52,7 +52,10 @@ const GEMINI_MODEL = 'gemini-2.5-flash-image';
 const GEMINI_URL   = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // ══ קטגוריות ══
-const CATEGORIES = ['יודאיקה', 'מתנות', 'שבת וחגים', 'סט טלית תפילין', 'מזוזות', 'כיסוי תפילין', 'בר מצווה', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'כלי שולחן והגשה', 'עיצוב הבית'];
+// קלפים כתובים ביד — תמונות AI לא רלוונטיות
+const SKIP_CATEGORIES = new Set(['קלפי מזוזה', 'קלפי תפילין', 'מגילות']);
+
+const CATEGORIES = ['יודאיקה', 'מתנות', 'שבת וחגים', 'סט טלית תפילין', 'מזוזות', 'כיסוי תפילין', 'בר מצווה', 'ספרי תורה', 'תפילין קומפלט', 'כלי שולחן והגשה', 'עיצוב הבית'];
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 

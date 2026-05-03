@@ -1053,6 +1053,66 @@ export default function HomePageClient() {
       {/* ── Rabbinical Supervision ── */}
       <RabbinicalSupervision isMobile={isMobile} />
 
+      {/* ── Collections section ── */}
+      <div style={{ background: '#0c1a35', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#b8972a', letterSpacing: '0.15em', textAlign: 'center', marginBottom: 8 }}>COLLECTIONS</p>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 28, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הקולקציות שלנו</h2>
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 28 }}>חמישה קוים עיצוביים — מצאו את הסגנון שמדבר אליכם</p>
+
+          {/* Horizontal scroll on mobile, grid on desktop */}
+          <div style={isMobile
+            ? { display: 'flex', overflowX: 'auto', gap: 12, paddingBottom: 8, scrollbarWidth: 'none' } as React.CSSProperties
+            : { display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14 }
+          }>
+            {[
+              { id: 'יהלום', tagline: 'הקו השקוף והמודרני', color: '#87CEEB', bg: 'rgba(135,206,235,0.12)', border: 'rgba(135,206,235,0.3)', dot: '#87CEEB', href: '/category/מזוזות?collection=יהלום' },
+              { id: 'שוהם',  tagline: 'הקו הטבעי והכהה',    color: '#d97706', bg: 'rgba(217,119,6,0.1)',   border: 'rgba(217,119,6,0.3)',   dot: '#78350f', href: '/category/מזוזות?collection=שוהם' },
+              { id: 'ישפה',  tagline: 'הקו האומנותי והצבעוני', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.3)', dot: 'rainbow', href: '/category/כלי שולחן והגשה?collection=ישפה' },
+              { id: 'ספיר',  tagline: 'הקו המתכתי והקריר',  color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', border: 'rgba(148,163,184,0.3)', dot: '#94a3b8', href: '/category/יודאיקה?collection=ספיר' },
+              { id: 'ברקת',  tagline: 'הקו החגיגי והיוקרתי', color: '#4ade80', bg: 'rgba(74,222,128,0.1)', border: 'rgba(74,222,128,0.3)',  dot: '#15803d', href: '/category/כלי שולחן והגשה?collection=ברקת' },
+            ].map(col => (
+              <a
+                key={col.id}
+                href={col.href}
+                style={{
+                  textDecoration: 'none',
+                  display: 'block',
+                  flexShrink: 0,
+                  width: isMobile ? 170 : 'auto',
+                  background: col.bg,
+                  border: `1px solid ${col.border}`,
+                  borderRadius: 0,
+                  padding: '18px 16px',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = 'none'; }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{
+                    width: 10, height: 10, borderRadius: '50%', flexShrink: 0, display: 'inline-block',
+                    background: col.dot === 'rainbow'
+                      ? 'linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)'
+                      : col.dot,
+                  }} />
+                  <span style={{ fontSize: isMobile ? 16 : 17, fontWeight: 900, color: col.color }}>{col.id}</span>
+                </div>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', margin: 0, lineHeight: 1.5 }}>{col.tagline}</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: col.color, marginTop: 10, margin: '10px 0 0' }}>לצפייה ←</p>
+              </a>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <a href="/collections" style={{ display: 'inline-block', border: '1.5px solid rgba(184,151,42,0.5)', color: '#b8972a', background: 'none', padding: '10px 28px', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+              לכל הקולקציות ←
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* ── Static Social Proof ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>

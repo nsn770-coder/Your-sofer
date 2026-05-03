@@ -45,6 +45,7 @@ interface Product {
   level?: string;
   styleTag?: string[];
   lookTag?: string;
+  collection?: string;
 }
 
 interface Curation {
@@ -131,6 +132,18 @@ const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
     { key: 'צבע',  label: 'צבע',  options: ['זהב', 'כסף', 'לבן', 'צבעוני'] },
   ],
 };
+
+// ─── Collection metadata ──────────────────────────────────────────────────────
+
+const COLLECTION_DOT: Record<string, React.ReactNode> = {
+  'יהלום': <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#87CEEB', border: '1px solid #bae6fd', display: 'inline-block', flexShrink: 0 }} />,
+  'שוהם':  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#78350f', display: 'inline-block', flexShrink: 0 }} />,
+  'ישפה':  <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)', display: 'inline-block', flexShrink: 0 }} />,
+  'ספיר':  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#94a3b8', border: '1px solid #cbd5e1', display: 'inline-block', flexShrink: 0 }} />,
+  'ברקת':  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#15803d', display: 'inline-block', flexShrink: 0 }} />,
+};
+
+const COLLECTIONS_ORDER = ['יהלום', 'שוהם', 'ישפה', 'ספיר', 'ברקת'];
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 
@@ -423,9 +436,12 @@ interface SidebarProps {
   subCategoryFilter?: string;
   onSubCategoryFilter?: (v: string) => void;
   availableSubCategories?: string[];
+  collectionFilter?: string;
+  onCollectionFilter?: (v: string) => void;
+  availableCollections?: string[];
 }
 
-function FilterSidebar({ filters, onChange, products, category, catFilter, onCatFilter, subCategoryFilter, onSubCategoryFilter, availableSubCategories }: SidebarProps) {
+function FilterSidebar({ filters, onChange, products, category, catFilter, onCatFilter, subCategoryFilter, onSubCategoryFilter, availableSubCategories, collectionFilter, onCollectionFilter, availableCollections }: SidebarProps) {
   function set(partial: Partial<FilterState>) { onChange({ ...filters, ...partial }); }
   function setAttr(key: string, val: string) { onChange({ ...filters, attrFilters: { ...filters.attrFilters, [key]: val } }); }
   function setNameFilter(key: string, val: string) { onChange({ ...filters, nameFilters: { ...filters.nameFilters, [key]: val } }); }
@@ -489,6 +505,28 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                 }`}
               >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* Collection filter — shown when 2+ distinct collections exist */}
+      {onCollectionFilter && availableCollections && availableCollections.length >= 2 && (
+        <Section title="קולקציה">
+          <div className="flex flex-wrap gap-1.5">
+            {['הכל', ...COLLECTIONS_ORDER.filter(c => availableCollections.includes(c))].map(opt => (
+              <button
+                key={opt}
+                onClick={() => onCollectionFilter(opt === 'הכל' ? '' : opt)}
+                className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border flex items-center gap-1.5 ${
+                  (collectionFilter || '') === (opt === 'הכל' ? '' : opt)
+                    ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
+                }`}
+              >
+                {opt !== 'הכל' && COLLECTION_DOT[opt]}
                 {opt}
               </button>
             ))}
@@ -643,9 +681,12 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
 
 // ─── Active filter pills (shown above product grid) ───────────────────────────
 
-function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategoryFilter }: { filters: FilterState; onChange: (f: FilterState) => void; subCategoryFilter?: string; onSubCategoryFilter?: (v: string) => void }) {
+function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategoryFilter, collectionFilter, onCollectionFilter }: { filters: FilterState; onChange: (f: FilterState) => void; subCategoryFilter?: string; onSubCategoryFilter?: (v: string) => void; collectionFilter?: string; onCollectionFilter?: (v: string) => void }) {
   const pills: { label: string; onRemove: () => void }[] = [];
 
+  if (collectionFilter && onCollectionFilter) {
+    pills.push({ label: `קולקציה: ${collectionFilter}`, onRemove: () => onCollectionFilter('') });
+  }
   if (subCategoryFilter && onSubCategoryFilter) {
     pills.push({ label: subCategoryFilter, onRemove: () => onSubCategoryFilter('') });
   }
@@ -756,10 +797,11 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
 
 export default function CategoryClient({ category }: { category: string }) {
   const searchParams = useSearchParams();
-  const urlFilter    = searchParams.get('filter') ?? null;
-  const urlLevel     = searchParams.get('level')  ?? null;
-  const urlNusach    = searchParams.get('nusach') ?? null;
-  const urlSubcat    = searchParams.get('subcat') ?? null;
+  const urlFilter     = searchParams.get('filter')     ?? null;
+  const urlLevel      = searchParams.get('level')      ?? null;
+  const urlNusach     = searchParams.get('nusach')     ?? null;
+  const urlSubcat     = searchParams.get('subcat')     ?? null;
+  const urlCollection = searchParams.get('collection') ?? null;
 
   const [allLoaded, setAllLoaded]               = useState<Product[]>([]);
   const [loading, setLoading]                   = useState(true);
@@ -774,6 +816,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [curation, setCuration]                 = useState<Curation | null>(null);
   const [styleTagFilter, setStyleTagFilter]     = useState<string>('');
   const [lookCurationMap, setLookCurationMap]   = useState<Record<string, Curation>>({});
+  const [collectionFilter, setCollectionFilter] = useState<string>('');
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { setStamPage } = useChatPersona();
 
@@ -1003,8 +1046,16 @@ export default function CategoryClient({ category }: { category: string }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlSubcat, loading, allLoaded.length]);
 
+  // Apply ?collection= URL param after products load
+  useEffect(() => {
+    if (!urlCollection || loading || allLoaded.length === 0) return;
+    setCollectionFilter(urlCollection);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlCollection, loading, allLoaded.length]);
+
   useEffect(() => { setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }, [filters]);
   useEffect(() => { setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }, [subCategoryFilter]);
+  useEffect(() => { setCurrentPage(1); }, [collectionFilter]);
 
   // Compute distinct subCategories from loaded products (sorted by frequency)
   const availableSubCategories = useMemo(() => {
@@ -1015,6 +1066,12 @@ export default function CategoryClient({ category }: { category: string }) {
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
       .map(([sub]) => sub);
+  }, [allLoaded]);
+
+  // Compute distinct collections from loaded products (in canonical order)
+  const availableCollections = useMemo(() => {
+    const present = new Set(allLoaded.map(p => p.collection).filter(Boolean) as string[]);
+    return COLLECTIONS_ORDER.filter(c => present.has(c));
   }, [allLoaded]);
 
   // Determine whether the active curation uses styleTag or lookTag
@@ -1035,6 +1092,7 @@ export default function CategoryClient({ category }: { category: string }) {
     let result = applyFilters(allLoaded, filters);
     if (subCategoryFilter) result = result.filter(p => p.subCategory === subCategoryFilter);
     if (category === 'מתנות' && catFilter !== 'הכל') result = result.filter(p => p.cat === catFilter);
+    if (collectionFilter) result = result.filter(p => p.collection === collectionFilter);
     if (styleTagFilter) {
       if (isLookTagMode) {
         result = result.filter(p => p.lookTag === styleTagFilter);
@@ -1043,7 +1101,7 @@ export default function CategoryClient({ category }: { category: string }) {
       }
     }
     return applySort(result, sortBy);
-  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter, styleTagFilter, isLookTagMode]);
+  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter, collectionFilter, styleTagFilter, isLookTagMode]);
 
   const attrOptionsDesktop = useMemo(() =>
     ATTR_KEYS.reduce((acc, key) => {
@@ -1056,6 +1114,7 @@ export default function CategoryClient({ category }: { category: string }) {
   );
 
   const active      = hasActiveFilters(filters);
+  const anyActive   = active || !!collectionFilter;
   const visibleCount = currentPage * PAGE_SIZE;
   const paginated   = filtered.slice(0, visibleCount);
   const hasMore     = visibleCount < filtered.length;
@@ -1107,7 +1166,7 @@ export default function CategoryClient({ category }: { category: string }) {
             </p>
           </div>
           {/* Active filter count badge */}
-          {active && (
+          {anyActive && (
             <div className="flex items-center gap-2 bg-[#b8972a]/20 border border-[#b8972a]/40 rounded-xl px-3 py-2">
               <IconFilter size={13} />
               <span className="text-[#b8972a] text-xs font-bold">סינון פעיל</span>
@@ -1234,14 +1293,14 @@ export default function CategoryClient({ category }: { category: string }) {
           onClick={() => setDrawerOpen(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0 transition-all"
           style={{
-            background: active ? '#0c1a35' : '#f3f4f6',
-            color: active ? '#fff' : '#374151',
-            border: active ? '1.5px solid #0c1a35' : '1.5px solid #e5e7eb',
+            background: anyActive ? '#0c1a35' : '#f3f4f6',
+            color: anyActive ? '#fff' : '#374151',
+            border: anyActive ? '1.5px solid #0c1a35' : '1.5px solid #e5e7eb',
           }}
         >
           <IconFilter size={14} />
           סינון
-          {active && <span className="w-2 h-2 rounded-full bg-[#b8972a]" />}
+          {anyActive && <span className="w-2 h-2 rounded-full bg-[#b8972a]" />}
         </button>
 
         <div className="flex items-center gap-1.5 flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2" style={{ direction: 'rtl' }}>
@@ -1267,7 +1326,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
           <div className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 pb-8 shadow-2xl">
             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
-            <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} />
+            <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} availableCollections={availableCollections} />
             <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#0c1a35] text-white rounded-2xl font-bold text-sm hover:bg-[#1a3060] transition-colors">
               הצג {filtered.length} תוצאות
             </button>
@@ -1280,7 +1339,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
         {/* Desktop sidebar */}
         <aside className="hidden lg:block w-60 flex-shrink-0 sticky top-4">
-          <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} />
+          <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} availableCollections={availableCollections} />
         </aside>
 
         {/* Products area */}
@@ -1381,6 +1440,21 @@ export default function CategoryClient({ category }: { category: string }) {
               )}
             </div>
 
+            {/* Collection filter dropdown */}
+            {availableCollections.length >= 2 && (
+              <select
+                value={collectionFilter || 'הכל'}
+                onChange={e => setCollectionFilter(e.target.value === 'הכל' ? '' : e.target.value)}
+                className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
+                style={{ direction: 'rtl', borderColor: collectionFilter ? '#0c1a35' : '#e5e7eb', color: collectionFilter ? '#0c1a35' : '#6b7280', background: collectionFilter ? '#f0f4ff' : '#fff' }}
+              >
+                <option value="הכל">קולקציה: הכל</option>
+                {COLLECTIONS_ORDER.filter(c => availableCollections.includes(c)).map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            )}
+
             {/* Sort */}
             <div className="flex items-center gap-1.5 border-r border-gray-100 pr-3 flex-shrink-0">
               <IconSort size={13} />
@@ -1429,7 +1503,7 @@ export default function CategoryClient({ category }: { category: string }) {
           )}
 
           {/* Active filter pills */}
-          <ActiveFilterPills filters={filters} onChange={setFilters} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} />
+          <ActiveFilterPills filters={filters} onChange={setFilters} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} />
 
           {/* Products grid / loading / empty */}
           {loading ? (

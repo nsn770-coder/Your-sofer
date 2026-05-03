@@ -236,6 +236,7 @@ const SIMPLE_NAV = [
   { label: "ספרי תורה", action: "sifrei-torah" },
   { label: "מגילות", action: "megilot" },
   { label: "בר מצווה", action: "bar-mitzva" },
+  { label: "קולקציות", action: "collections" },
 ];
 
 function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
@@ -338,6 +339,7 @@ function NavBarContent() {
     else if (action === "sifrei-torah") router.push("/category/ספרי תורה");
     else if (action === "megilot") router.push("/category/מגילות");
     else if (action === "bar-mitzva") router.push("/bar-mitzva");
+    else if (action === "collections") router.push("/collections");
   }
 
   return (
