@@ -814,8 +814,6 @@ export default function CategoryClient({ category }: { category: string }) {
   const [catImages, setCatImages]               = useState<Record<string, string>>({});
   const [soferMap, setSoferMap]                 = useState<Record<string, SoferData>>({});
   const [curation, setCuration]                 = useState<Curation | null>(null);
-  const [styleTagFilter, setStyleTagFilter]     = useState<string>('');
-  const [lookCurationMap, setLookCurationMap]   = useState<Record<string, Curation>>({});
   const [collectionFilter, setCollectionFilter] = useState<string>('');
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { setStamPage } = useChatPersona();
@@ -971,29 +969,13 @@ export default function CategoryClient({ category }: { category: string }) {
         if (snap.exists()) {
           const data = snap.data() as Omit<Curation, 'id'>;
           setCuration({ id: snap.id, ...data });
-          setStyleTagFilter(data.activeTag ?? '');
         } else {
           setCuration(null);
-          setStyleTagFilter('');
         }
       })
-      .catch(() => { setCuration(null); setStyleTagFilter(''); });
+      .catch(() => { setCuration(null); });
   }, [subcatOverrideForFetch, category]);
 
-  // Load all curations once - build bannerTitle → Curation map for look-specific banners
-  useEffect(() => {
-    getDocs(collection(db, 'curations'))
-      .then(snap => {
-        const map: Record<string, Curation> = {};
-        snap.forEach(d => {
-          const data = d.data() as Omit<Curation, 'id'>;
-          if (data.bannerTitle) map[data.bannerTitle] = { id: d.id, ...data };
-          if (data.activeTag && data.activeTag !== data.bannerTitle) map[data.activeTag] = { id: d.id, ...data };
-        });
-        setLookCurationMap(map);
-      })
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     setFilters(EMPTY_FILTERS);
@@ -1074,34 +1056,14 @@ export default function CategoryClient({ category }: { category: string }) {
     return COLLECTIONS_ORDER.filter(c => present.has(c));
   }, [allLoaded]);
 
-  // Determine whether the active curation uses styleTag or lookTag
-  const STYLE_TAG_VALUES = new Set(['Modern', 'Heritage', 'Steel']);
-  const isLookTagMode = curation !== null && !!curation.activeTag && !STYLE_TAG_VALUES.has(curation.activeTag);
-
-  // Compute available lookTags from loaded products (for dynamic filter buttons)
-  const availableLookTags = useMemo(() => {
-    if (!isLookTagMode) return [];
-    const counts: Record<string, number> = {};
-    for (const p of allLoaded) {
-      if (p.lookTag) counts[p.lookTag] = (counts[p.lookTag] ?? 0) + 1;
-    }
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([tag]) => tag);
-  }, [allLoaded, isLookTagMode]);
 
   const filtered = useMemo(() => {
     let result = applyFilters(allLoaded, filters);
     if (subCategoryFilter) result = result.filter(p => p.subCategory === subCategoryFilter);
     if (category === 'מתנות' && catFilter !== 'הכל') result = result.filter(p => p.cat === catFilter);
     if (collectionFilter) result = result.filter(p => p.collection === collectionFilter);
-    if (styleTagFilter) {
-      if (isLookTagMode) {
-        result = result.filter(p => p.lookTag === styleTagFilter);
-      } else {
-        result = result.filter(p => p.styleTag?.includes(styleTagFilter));
-      }
-    }
     return applySort(result, sortBy);
-  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter, collectionFilter, styleTagFilter, isLookTagMode]);
+  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter, collectionFilter]);
 
   const attrOptionsDesktop = useMemo(() =>
     ATTR_KEYS.reduce((acc, key) => {
@@ -1194,46 +1156,19 @@ export default function CategoryClient({ category }: { category: string }) {
             background: 'linear-gradient(135deg, #0c1a35 0%, #1a3060 100%)',
           }}
         >
-          {/* Resolve which banner image to show:
-              - look selected → use that look's own curation banner
-              - otherwise     → use the category curation banner */}
-          {(() => {
-            const activeBannerUrl = (styleTagFilter && isLookTagMode && lookCurationMap[styleTagFilter]?.bannerImageUrl)
-              ? lookCurationMap[styleTagFilter].bannerImageUrl
-              : curation.bannerImageUrl;
-            const activeLookName = styleTagFilter && isLookTagMode
-              ? (lookCurationMap[styleTagFilter]?.bannerTitle ?? styleTagFilter)
-              : curation.bannerTitle;
-            return (
-              <>
-                {activeBannerUrl && (
-                  <img
-                    key={activeBannerUrl}
-                    src={activeBannerUrl}
-                    alt={activeLookName}
-                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.3s ease' }}
-                  />
-                )}
-                {/* Gradient overlay at bottom for text legibility */}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)' }} />
-                {/* Text - bottom-right */}
-                <div style={{ position: 'absolute', bottom: 16, right: 20, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                  <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
-                    {activeLookName}
-                  </h2>
-                  {(styleTagFilter && isLookTagMode) ? (
-                    <span style={{ color: 'rgba(184,151,42,1)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
-                      קולקציית {styleTagFilter}
-                    </span>
-                  ) : curation.activeTag && !isLookTagMode ? (
-                    <span style={{ color: 'rgba(184,151,42,1)', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
-                      {curation.activeTag === 'Modern' ? 'קולקציית מודרני' : curation.activeTag === 'Heritage' ? 'קולקציית קלאסי' : curation.activeTag === 'Steel' ? 'קולקציית נירוסטה' : `קולקציית ${curation.activeTag}`}
-                    </span>
-                  ) : null}
-                </div>
-              </>
-            );
-          })()}
+          {curation.bannerImageUrl && (
+            <img
+              src={curation.bannerImageUrl}
+              alt={curation.bannerTitle}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          )}
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)' }} />
+          <div style={{ position: 'absolute', bottom: 16, right: 20, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+            <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
+              {curation.bannerTitle}
+            </h2>
+          </div>
         </div>
       )}
 
@@ -1469,34 +1404,36 @@ export default function CategoryClient({ category }: { category: string }) {
             </div>
           </div>
 
-          {/* Style / look filter buttons - shown when a curation is active */}
-          {curation && (
-            <div dir="rtl" style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-              {(isLookTagMode
-                ? [{ label: 'הכל', value: '' }, ...availableLookTags.map(t => ({ label: lookCurationMap[t]?.bannerTitle ?? t, value: t }))]
-                : [
-                    { label: 'הכל',     value: '' },
-                    { label: 'מודרני',  value: 'Modern' },
-                    { label: 'קלאסי',   value: 'Heritage' },
-                    { label: 'נירוסטה', value: 'Steel' },
-                  ]
-              ).map(({ label, value }) => (
+          {/* Collection filter chips */}
+          {availableCollections.length >= 2 && (
+            <div dir="rtl" className="hide-scrollbar" style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 2 }}>
+              <button
+                onClick={() => setCollectionFilter('')}
+                style={{
+                  padding: '7px 18px', fontWeight: 700, fontSize: 13,
+                  background: !collectionFilter ? '#0c1a35' : '#fff',
+                  color:      !collectionFilter ? '#fff'    : '#374151',
+                  border:     `1.5px solid ${!collectionFilter ? '#0c1a35' : '#e5e7eb'}`,
+                  borderRadius: 0, cursor: 'pointer', transition: 'all 0.15s ease', flexShrink: 0,
+                }}
+              >
+                הכל
+              </button>
+              {availableCollections.map(col => (
                 <button
-                  key={value}
-                  onClick={() => setStyleTagFilter(value)}
+                  key={col}
+                  onClick={() => setCollectionFilter(collectionFilter === col ? '' : col)}
                   style={{
-                    padding: '7px 18px',
-                    fontWeight: 700,
-                    fontSize: 13,
-                    background: styleTagFilter === value ? '#0c1a35' : '#fff',
-                    color:      styleTagFilter === value ? '#fff'    : '#374151',
-                    border:     `1.5px solid ${styleTagFilter === value ? '#0c1a35' : '#e5e7eb'}`,
-                    borderRadius: 0,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
+                    padding: '7px 18px', fontWeight: 700, fontSize: 13,
+                    background: collectionFilter === col ? '#0c1a35' : '#fff',
+                    color:      collectionFilter === col ? '#fff'    : '#374151',
+                    border:     `1.5px solid ${collectionFilter === col ? '#0c1a35' : '#e5e7eb'}`,
+                    borderRadius: 0, cursor: 'pointer', transition: 'all 0.15s ease',
+                    display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0,
                   }}
                 >
-                  {label}
+                  {COLLECTION_DOT[col]}
+                  {col}
                 </button>
               ))}
             </div>
