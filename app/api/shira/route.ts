@@ -61,7 +61,7 @@ async function getRelevantProducts(userMessage: string): Promise<ProductResult[]
       .where('cat', '==', matchedCat)
       .limit(50)
       .get();
-    const docs = snap.docs.map(d => ({ id: d.id, ...(d.data() as Record<string, unknown>) }));
+    const docs = snap.docs.map(d => ({ id: d.id, ...(d.data() as Record<string, unknown>) })) as Array<Record<string, unknown> & { id: string }>;
     docs.sort((a, b) => Number(b.priority ?? 0) - Number(a.priority ?? 0));
     return docs.slice(0, 3).map(p => ({
       id: String(p.id),
