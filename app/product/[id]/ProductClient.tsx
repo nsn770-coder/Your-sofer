@@ -898,7 +898,7 @@ export default function ProductClient() {
 
             // "השלם את המראה" - same collection, different category
             if (p.collection) {
-              const ALLOWED_CATS = new Set(['נטלות', 'עיצוב הבית', 'כלי שולחן והגשה', 'יודאיקה', 'כיפות', 'מזוזות', 'חנוכיות', 'מנורות', 'פמוטים', 'תשמישי קדושה']);
+              const ALLOWED_CATS = new Set(['נטלות', 'עיצוב הבית', 'כלי שולחן והגשה', 'יודאיקה', 'חנוכיות', 'פמוטים']);
               const collSnap = await getDocs(query(collection(db, 'products'), where('collection', '==', p.collection), limit(50)));
               const catCounts: Record<string, number> = {};
               const collData: Product[] = [];
