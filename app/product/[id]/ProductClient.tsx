@@ -33,6 +33,7 @@ interface Product {
   stars?: number;
   reviews?: number;
   videoUrl?: string;
+  size?: string;
   level?: string;
   lookTag?: string;
   collection?: string;
@@ -41,6 +42,7 @@ interface Product {
   closeupImageUrl?: string;
   stockCount?: number;
   stockVisible?: boolean;
+  size?: string;
   marketingIntro?: string;
   whoIsItFor?: { emoji: string; text: string }[];
   whyUs?: string[];
@@ -393,6 +395,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [was, setWas]                         = useState(String(product.was || ''));
   const [cat, setCat]                         = useState(product.cat || '');
   const [days, setDays]                       = useState(product.days || '7-14');
+  const [size, setSize]                       = useState(product.size || '');
   const [badge, setBadge]                     = useState(product.badge || '');
   const [desc, setDesc]                       = useState(product.desc || product.description || '');
   const [extraDesc, setExtraDesc]             = useState(product.extraDesc || '');
@@ -417,6 +420,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [whyUsList, setWhyUsList]             = useState<string[]>(product.whyUs ?? pageDefaults?.whyUs ?? []);
   const [whatYouGetList, setWhatYouGetList]   = useState<string[]>(product.whatYouGet ?? pageDefaults?.whatYouGet ?? []);
   const [saveGlobal, setSaveGlobal]           = useState(false);
+  const [size, setSize]                       = useState(product.size || '');
 
   useEffect(() => {
     getDocs(collection(db, 'soferim'))
@@ -468,7 +472,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         name, price: Number(price),
         was: was ? Number(was) : null,
         desc, extraDesc: extraDesc || undefined,
-        cat, days, badge: badge || undefined,
+        cat, days, size: size || undefined, badge: badge || undefined,
         imgUrl, imgUrl2, imgUrl3, imgUrl4, imgUrl5,
         videoUrl: videoUrl || undefined,
         level: isStam ? level : '',
@@ -476,6 +480,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         closeupImageUrl: isStam ? (closeupImageUrl || undefined) : undefined,
         stockCount: stockCount ? Number(stockCount) : undefined,
         stockVisible,
+        size: size || undefined,
         soferId: soferId || undefined,
         ...(saveGlobal ? {} : textData),
       });
@@ -527,6 +532,23 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
           </div>
         </div>
       </div>
+
+      {['קלפי מזוזה', 'בתי מזוזה', 'מזוזות'].some(c => cat.includes(c)) && (
+        <div>
+          <label style={lS}>גודל</label>
+          <select value={size} onChange={e => setSize(e.target.value)} style={{ ...iS, background: '#152040' }}>
+            <option value="">— בחר גודל —</option>
+            <option value="6">6 ס"מ</option>
+            <option value="7">7 ס"מ</option>
+            <option value="10">10 ס"מ</option>
+            <option value="12">12 ס"מ</option>
+            <option value="15">15 ס"מ</option>
+            <option value="20">20 ס"מ</option>
+            <option value="25">25 ס"מ</option>
+            <option value="30">30 ס"מ</option>
+          </select>
+        </div>
+      )}
 
       {/* § תיאור */}
       <div style={secS}>
@@ -1042,6 +1064,7 @@ export default function ProductClient() {
   const [related, setRelated]                       = useState<Product[]>([]);
   const [lookProducts, setLookProducts]             = useState<Product[]>([]);
   const [collectionProducts, setCollectionProducts] = useState<Product[]>([]);
+  const [sizeMatchProducts, setSizeMatchProducts]   = useState<Product[]>([]);
   const [pageDefaults, setPageDefaults]             = useState<PageDefaults | null>(null);
   const [embroideryText, setEmbroideryText] = useState('');
   const [loading, setLoading]           = useState(true);
@@ -1148,6 +1171,23 @@ export default function ProductClient() {
     }
     load();
   }, [id]);
+
+  useEffect(() => {
+    console.log('[sizeMatch] product.size:', product?.size, '| cat:', product?.cat);
+    if (!product?.size) return;
+    const isKlaf = product.cat?.includes('קלפי מזוזה');
+    const isBayit = product.cat?.includes('בתי מזוזה');
+    if (!isKlaf && !isBayit) return;
+    const targetCat = isKlaf ? 'בתי מזוזה' : 'קלפי מזוזה';
+    getDocs(query(collection(db, 'products'), where('cat', '==', targetCat), where('size', '==', product.size), limit(4)))
+      .then(snap => {
+        console.log('[sizeMatch] results count:', snap.size, '| targetCat:', targetCat, '| size:', product.size);
+        const results: Product[] = [];
+        snap.forEach(d => results.push({ id: d.id, ...d.data() } as Product));
+        setSizeMatchProducts(results);
+      })
+      .catch(err => console.error('[sizeMatch] query error:', err));
+  }, [product]);
 
   useEffect(() => {
     getDoc(doc(db, 'siteConfig', 'productPageDefaults'))
@@ -1554,7 +1594,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </div>
 
         {/* ── השלם את המראה — collection cross-sell ── */}
-        {collectionProducts.length >= 2 && product.collection && (
+        {collectionProducts.length >= 2 && product.collection && !['קלפי מזוזה', 'בתי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'].some(c => product.cat?.includes(c)) && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
             <div style={{ marginBottom: 16 }}>
               <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0c1a35', margin: 0 }}>
@@ -1673,6 +1713,42 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                       onClick={e => { e.stopPropagation(); addItem({ id: lp.id, name: lp.name, price: lp.price, imgUrl: lpImg ?? undefined, quantity: 1 }); }}
                       style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
                     >
+                      הוסף לסל
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {sizeMatchProducts.length > 0 && product.size && (product.cat?.includes('קלפי מזוזה') || product.cat?.includes('בתי מזוזה')) && (
+        <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
+          <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 16 }}>
+            {product.cat?.includes('קלפי מזוזה')
+              ? `השלם את המצווה — בתי מזוזה מתאימים לגודל ${product.size} ס״מ`
+              : `הוסף קלף כשר מתאים — ${product.size} ס״מ`}
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: isMobile ? 10 : 14 }}>
+            {sizeMatchProducts.map(r => {
+              const rImg = optimizeCloudinaryUrl(r.imgUrl || r.image_url || '', 400) || undefined;
+              return (
+                <div key={r.id} onClick={() => router.push(`/product/${r.id}`)}
+                  style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}
+                  onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)')}
+                  onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}>
+                  <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
+                    {rImg
+                      ? <img src={rImg} alt={r.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
+                      : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon.Package /></div>}
+                  </div>
+                  <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.name}</div>
+                    <Stars n={r.stars || 4.5} size={11} />
+                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>₪{r.price}</div>
+                    <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 }); }}
+                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
                       הוסף לסל
                     </button>
                   </div>
