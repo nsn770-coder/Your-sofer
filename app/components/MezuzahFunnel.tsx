@@ -480,6 +480,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
   function handleAddToCart(p: Product) {
     addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
     setQuantities(q => ({ ...q, [p.id]: (q[p.id] ?? 0) + 1 }));
+    setStep(3);
   }
 
   function handleIncrease(p: Product) {
@@ -509,7 +510,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
 
   function handleFinishedYes() {
     setShowFinished(false);
-    setStep(3);
+    setShowUpsell(true);
   }
 
   function handleFinishedNo() {
@@ -560,7 +561,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
         <UpsellModal isMobile={isMobile} onClose={handleUpsellClose} onViewCart={() => { setShowUpsell(false); router.push('/cart'); }} />
       )}
 
-      {showFinished && !showUpsell && (
+      {showFinished && !showUpsell && step < 3 && (
         <FinishedBanner onYes={handleFinishedYes} onNo={handleFinishedNo} />
       )}
 
