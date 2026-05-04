@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import type { InternalOrder, OrderStatus, OrderType, Priority } from '@/app/ops/types';
 import { STATUS_LABELS, PRIORITY_LABELS, ORDER_TYPE_LABELS } from '@/app/ops/types';
 import StatusBadge from './StatusBadge';
+import { formatPrice } from '@/app/lib/utils';
 
 interface Props {
   orders: InternalOrder[];
@@ -263,7 +264,7 @@ export default function OrdersTable({
                     </td>
                     {showFinancial && (
                       <td className="px-4 py-3 font-semibold text-gray-800">
-                        ₪{order.totalAmount?.toLocaleString()}
+                        {formatPrice(order.totalAmount)}
                       </td>
                     )}
                     <td className="px-4 py-3 text-gray-500 text-xs">{formatDate(order.createdAt)}</td>

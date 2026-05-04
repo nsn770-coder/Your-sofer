@@ -7,6 +7,7 @@ import ProductBadge from '@/components/ui/ProductBadge';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { formatPrice } from '@/app/lib/utils';
 
 interface Props {
   id: string;
@@ -322,12 +323,12 @@ export default function ProductCard({
         <div className="flex flex-col gap-0.5">
           {hasSale && (
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-red-500 line-through font-medium">₪{was!.toLocaleString('he-IL')}</span>
+              <span className="text-xs text-red-500 line-through font-medium">{formatPrice(was!)}</span>
               <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full">חסכת {savePct}%</span>
             </div>
           )}
           <p className="text-base sm:text-lg font-black text-[#0c1a35]">
-            ₪{price.toLocaleString('he-IL')}
+            {formatPrice(price)}
           </p>
         </div>
 

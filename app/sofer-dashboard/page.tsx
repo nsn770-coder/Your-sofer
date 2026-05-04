@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { formatPrice } from '@/app/lib/utils';
 
 interface Product {
   id: string;
@@ -145,7 +146,7 @@ export default function SoferDashboard() {
             <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>יחידות שנמכרו</div>
           </div>
           <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <div style={{ fontSize: 32, fontWeight: 900, color: '#27ae60' }}>₪{totalRevenue.toFixed(0)}</div>
+            <div style={{ fontSize: 32, fontWeight: 900, color: '#27ae60' }}>{formatPrice(totalRevenue)}</div>
             <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>סה"כ מכירות</div>
           </div>
         </div>
@@ -194,7 +195,7 @@ export default function SoferDashboard() {
                     <tr key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
                       <td style={{ padding: '10px 8px', fontWeight: 600 }}>{item.productTitle}</td>
                       <td style={{ padding: '10px 8px', color: '#555' }}>{item.quantity}</td>
-                      <td style={{ padding: '10px 8px', color: '#27ae60', fontWeight: 700 }}>₪{item.price}</td>
+                      <td style={{ padding: '10px 8px', color: '#27ae60', fontWeight: 700 }}>{formatPrice(item.price)}</td>
                       <td style={{ padding: '10px 8px' }}>
                         <span style={{
                           background: item.orderStatus === 'delivered' ? '#d5f5e3' : '#fef9e7',
@@ -245,7 +246,7 @@ export default function SoferDashboard() {
                     <div style={{ padding: 14 }}>
                       <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{p.name}</div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: 16, fontWeight: 900, color: '#1a3a2a' }}>₪{p.price}</span>
+                        <span style={{ fontSize: 16, fontWeight: 900, color: '#1a3a2a' }}>{formatPrice(p.price)}</span>
                         <span style={{
                           fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 10,
                           background: p.status === 'active' ? '#d5f5e3' : p.status === 'pending' ? '#fef9c3' : '#fde8e8',
@@ -288,7 +289,7 @@ export default function SoferDashboard() {
                       <td style={{ padding: '10px 8px', fontWeight: 600 }}>{item.productTitle}</td>
                       <td style={{ padding: '10px 8px', color: '#555' }}>{item.customerName || '-'}</td>
                       <td style={{ padding: '10px 8px' }}>{item.quantity}</td>
-                      <td style={{ padding: '10px 8px', color: '#27ae60', fontWeight: 700 }}>₪{(item.price * (item.quantity || 1)).toFixed(0)}</td>
+                      <td style={{ padding: '10px 8px', color: '#27ae60', fontWeight: 700 }}>{formatPrice(item.price * (item.quantity || 1))}</td>
                       <td style={{ padding: '10px 8px' }}>
                         <span style={{
                           background: item.orderStatus === 'delivered' ? '#d5f5e3' : '#fef9e7',

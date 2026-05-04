@@ -5,6 +5,7 @@ import { collection, getDocs, query, where, doc, updateDoc } from 'firebase/fire
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { formatPrice } from '@/app/lib/utils';
 
 interface Order {
   id: string;
@@ -185,8 +186,8 @@ export default function ShaliachDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
           {[
             { value: orders.length, label: 'סה"כ הזמנות', color: '#0c1a35' },
-            { value: `₪${totalRevenue.toFixed(0)}`, label: 'סה"כ מכירות', color: '#27ae60' },
-            { value: `₪${totalCommissions.toFixed(0)}`, label: 'עמלות שלך', color: '#b8972a' },
+            { value: formatPrice(totalRevenue), label: 'סה"כ מכירות', color: '#27ae60' },
+            { value: formatPrice(totalCommissions), label: 'עמלות שלך', color: '#b8972a' },
             { value: deliveredOrders, label: 'הזמנות שנמסרו', color: '#8e44ad' },
           ].map((s, i) => (
             <div key={i} style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
@@ -323,9 +324,9 @@ export default function ShaliachDashboard() {
                     <tr key={o.id} style={{ borderTop: '1px solid #f0f0f0' }}>
                       <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontSize: 12, color: '#555' }}>{o.orderNumber}</td>
                       <td style={{ padding: '12px 16px', fontWeight: 700 }}>{o.customerName}</td>
-                      <td style={{ padding: '12px 16px', color: '#27ae60', fontWeight: 700 }}>₪{o.total}</td>
+                      <td style={{ padding: '12px 16px', color: '#27ae60', fontWeight: 700 }}>{formatPrice(o.total)}</td>
                       <td style={{ padding: '12px 16px', color: '#b8972a', fontWeight: 700 }}>
-                        ₪{o.commissionAmount?.toFixed(0) || '-'}
+                        {o.commissionAmount != null ? formatPrice(o.commissionAmount) : '-'}
                         {o.commissionPercent && <span style={{ fontSize: 11, color: '#aaa', marginRight: 4 }}>({o.commissionPercent}%)</span>}
                       </td>
                       <td style={{ padding: '12px 16px' }}>

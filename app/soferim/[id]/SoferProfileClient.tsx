@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useCart } from '../../contexts/CartContext';
+import { formatPrice } from '@/app/lib/utils';
 
 interface Sofer {
   id: string;
@@ -370,8 +371,8 @@ export default function SoferProfileClient({ id }: { id: string }) {
                           {p.name}
                         </div>
                         <div style={{ marginBottom: 8 }}>
-                          {p.was && <div style={{ fontSize: 11, color: '#888', textDecoration: 'line-through' }}>₪{p.was}</div>}
-                          <span style={{ fontSize: 18, fontWeight: 900, color: navy }}>₪{p.price}</span>
+                          {p.was && <div style={{ fontSize: 11, color: '#888', textDecoration: 'line-through' }}>{formatPrice(p.was)}</div>}
+                          <span style={{ fontSize: 18, fontWeight: 900, color: navy }}>{formatPrice(p.price)}</span>
                         </div>
                         <button
                           onClick={e => { e.stopPropagation(); handleAddToCart(p); }}

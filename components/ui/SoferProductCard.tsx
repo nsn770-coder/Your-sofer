@@ -1,6 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/app/contexts/CartContext';
+import { formatPrice } from '@/app/lib/utils';
 
 export interface SoferData {
   name: string;
@@ -125,10 +126,10 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
           <p className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2">{name}</p>
 
           <div className="flex items-baseline gap-2 mt-auto">
-            <span className="text-lg font-black text-[#0c1a35]">₪{price.toLocaleString('he-IL')}</span>
+            <span className="text-lg font-black text-[#0c1a35]">{formatPrice(price)}</span>
             {hasSale && (
               <>
-                <span className="text-xs text-gray-400 line-through">₪{was!.toLocaleString('he-IL')}</span>
+                <span className="text-xs text-gray-400 line-through">{formatPrice(was!)}</span>
                 <span className="text-xs font-bold text-green-600">-{savePct}%</span>
               </>
             )}

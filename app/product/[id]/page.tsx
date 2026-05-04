@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from 'next';
 import ProductClient from './ProductClient';
+import { formatPrice } from '@/app/lib/utils';
 
 const BASE_URL = 'https://your-sofer.com';
 const FIREBASE_PROJECT = 'your-sofer';
@@ -74,7 +75,7 @@ export async function generateMetadata(
     product.description ||
     `${name} מסופר סת"מ מוסמך - נבדק ומצולם לפני מכירה. Your Sofer.`;
   const image = product.imgUrl || product.image_url || product.imgUrl2;
-  const priceStr = product.price ? `₪${product.price}` : '';
+  const priceStr = product.price ? formatPrice(product.price) : '';
   const pageUrl = `${BASE_URL}/product/${id}`;
 
   const images = image

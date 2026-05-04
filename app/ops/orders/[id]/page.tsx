@@ -6,6 +6,7 @@ import {
   orderBy, query, where, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/app/firebase';
+import { formatPrice } from '@/app/lib/utils';
 import { useOpsAuth } from '@/app/contexts/OpsAuthContext';
 import type {
   InternalOrder, AuditEntry, OrderStatus, Priority,
@@ -318,7 +319,7 @@ export default function OrderDetailPage() {
                     <div className="text-xs text-gray-400">{p.category} · כמות: {p.quantity}</div>
                   </div>
                   {isFinancialVisible && (
-                    <div className="font-semibold text-gray-700">₪{p.price?.toLocaleString()}</div>
+                    <div className="font-semibold text-gray-700">{formatPrice(p.price)}</div>
                   )}
                 </div>
               ))}
@@ -326,7 +327,7 @@ export default function OrderDetailPage() {
             {isFinancialVisible && (
               <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between font-bold text-gray-800">
                 <span>סה"כ</span>
-                <span>₪{order.totalAmount?.toLocaleString()}</span>
+                <span>{formatPrice(order.totalAmount)}</span>
               </div>
             )}
           </Section>
@@ -591,7 +592,7 @@ export default function OrderDetailPage() {
               <Field label="סוג הזמנה" value={ORDER_TYPE_LABELS[order.orderType] || order.orderType} />
               {isFinancialVisible && (
                 <>
-                  <Field label="סכום כולל" value={`₪${order.totalAmount?.toLocaleString()}`} />
+                  <Field label="סכום כולל" value={formatPrice(order.totalAmount)} />
                   <Field label="סטטוס כספי" value={order.financialStatus === 'paid' ? 'שולם' : order.financialStatus === 'refunded' ? 'הוחזר' : 'ממתין'} />
                 </>
               )}

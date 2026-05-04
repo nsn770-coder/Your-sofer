@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { formatPrice } from '@/app/lib/utils';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -416,9 +417,9 @@ export default function SoferApplyPage() {
                 </div>
                 {calcNum > 0 && (
                   <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#5a4a18', flexWrap: 'wrap' }}>
-                    <span>+ עמלה (15%): ₪{calcData.commission.toLocaleString()}</span>
-                    <span>+ מע"מ (18%): ₪{calcData.vat.toLocaleString()}</span>
-                    <span style={{ fontWeight: 900, fontSize: 13, color: '#0c1a35' }}>= ₪{calcData.total.toLocaleString()} ללקוח</span>
+                    <span>+ עמלה (15%): {formatPrice(calcData.commission)}</span>
+                    <span>+ מע"מ (18%): {formatPrice(calcData.vat)}</span>
+                    <span style={{ fontWeight: 900, fontSize: 13, color: '#0c1a35' }}>= {formatPrice(calcData.total)} ללקוח</span>
                   </div>
                 )}
               </div>
@@ -523,13 +524,13 @@ export default function SoferApplyPage() {
                       {spNum > 0 && (
                         <div style={{ marginTop: 8, background: '#fff', border: '1px solid #e0d9c8', borderRadius: 8, padding: '10px 14px', fontSize: 13 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', color: '#666', marginBottom: 4 }}>
-                            <span>+ עמלת החנות (15%)</span><span>₪{prices.commission.toLocaleString()}</span>
+                            <span>+ עמלת החנות (15%)</span><span>{formatPrice(prices.commission)}</span>
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', color: '#666', marginBottom: 8 }}>
-                            <span>+ מע"מ (18%)</span><span>₪{prices.vat.toLocaleString()}</span>
+                            <span>+ מע"מ (18%)</span><span>{formatPrice(prices.vat)}</span>
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, color: '#0c1a35', fontSize: 14, borderTop: '1px solid #e0d9c8', paddingTop: 8 }}>
-                            <span>מחיר ללקוח</span><span>₪{prices.total.toLocaleString()}</span>
+                            <span>מחיר ללקוח</span><span>{formatPrice(prices.total)}</span>
                           </div>
                           {LARGE_CATS.has(product.type) && (
                             <div style={{ marginTop: 8, fontSize: 12, color: '#92400e' }}>

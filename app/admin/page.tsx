@@ -6,6 +6,7 @@ import {
   doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, getCountFromServer
 } from 'firebase/firestore';
 import { db } from '../firebase';
+import { formatPrice } from '@/app/lib/utils';
 import { getAuthLazy } from '@/lib/authLazy';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
@@ -1714,7 +1715,7 @@ export default function AdminPage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-green-700">₪{totalRevenue.toFixed(0)}</div><div className="text-sm text-gray-500 mt-1">סה"כ הכנסות</div></div>
+        <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-green-700">{formatPrice(totalRevenue)}</div><div className="text-sm text-gray-500 mt-1">סה"כ הכנסות</div></div>
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-blue-600">{products.length}</div><div className="text-sm text-gray-500 mt-1">מוצרים</div></div>
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-purple-600">{users.length}</div><div className="text-sm text-gray-500 mt-1">משתמשים</div></div>
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-orange-500">{pendingApps.length}</div><div className="text-sm text-gray-500 mt-1">בקשות סופרים</div></div>
@@ -1789,7 +1790,7 @@ export default function AdminPage() {
                     <tr key={p.id} className="border-t hover:bg-gray-50">
                       <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
                       <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '-'}</td>
-                      <td className="p-3 font-bold text-green-700">₪{p.price}</td>
+                      <td className="p-3 font-bold text-green-700">{formatPrice(p.price)}</td>
                       <td className="p-3"><button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'} className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>{p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}</button></td>
                       <td className="p-3"><select value={p.soferId || ''} disabled={actionLoading === p.id} onChange={e => assignSoferToProduct(p.id, e.target.value)} className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}><option value="">⚠️ ללא סופר</option>{soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></td>
                       <td className="p-3">
@@ -1873,7 +1874,7 @@ export default function AdminPage() {
                   <tr key={o.id} className="border-t hover:bg-gray-50">
                     <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
                     <td className="p-3 font-bold">{o.customerName}</td>
-                    <td className="p-3 text-green-700 font-bold">₪{o.total}</td>
+                    <td className="p-3 text-green-700 font-bold">{formatPrice(o.total)}</td>
                     <td className="p-3 text-blue-600">{o.shaliachName || '-'}</td>
                     <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-bold ${o.status === 'new' ? 'bg-yellow-100 text-yellow-700' : o.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{o.status === 'new' ? '⏳ חדש' : o.status === 'processing' ? '🔄 בעיבוד' : o.status === 'delivered' ? '✅ נמסר' : o.status}</span></td>
                   </tr>
@@ -1900,7 +1901,7 @@ export default function AdminPage() {
           {shaliachOrders.length === 0 ? <div className="p-10 text-center text-gray-400">אין הזמנות שליחים עדיין</div> : (
             <table className="w-full text-sm">
               <thead className="bg-gray-50"><tr><th className="p-3 text-right">מספר הזמנה</th><th className="p-3 text-right">שליח</th><th className="p-3 text-right">סכום</th><th className="p-3 text-right">אחוז</th><th className="p-3 text-right">עמלה</th></tr></thead>
-              <tbody>{shaliachOrders.map(o => <tr key={o.id} className="border-t hover:bg-gray-50"><td className="p-3 font-mono text-xs">{o.orderNumber}</td><td className="p-3 font-bold text-blue-600">{o.shaliachName}</td><td className="p-3">₪{o.total}</td><td className="p-3">{(o as any).commissionPercent}%</td><td className="p-3 font-bold text-orange-500">₪{o.commissionAmount?.toFixed(2)}</td></tr>)}</tbody>
+              <tbody>{shaliachOrders.map(o => <tr key={o.id} className="border-t hover:bg-gray-50"><td className="p-3 font-mono text-xs">{o.orderNumber}</td><td className="p-3 font-bold text-blue-600">{o.shaliachName}</td><td className="p-3">{formatPrice(o.total)}</td><td className="p-3">{(o as any).commissionPercent}%</td><td className="p-3 font-bold text-orange-500">{o.commissionAmount != null ? formatPrice(o.commissionAmount) : '-'}</td></tr>)}</tbody>
             </table>
           )}
         </div>
@@ -1976,8 +1977,8 @@ export default function AdminPage() {
                         <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-2">
                           {p.soferName && <span>✍️ {p.soferName}</span>}
                           <span>📁 {p.cat || p.category || '—'}</span>
-                          {p.soferPrice != null && <span>💰 מחיר סופר: ₪{p.soferPrice.toLocaleString()}</span>}
-                          <span>🏷 מחיר ללקוח: ₪{p.price.toLocaleString()}</span>
+                          {p.soferPrice != null && <span>💰 מחיר סופר: {formatPrice(p.soferPrice)}</span>}
+                          <span>🏷 מחיר ללקוח: {formatPrice(p.price)}</span>
                           {p.createdAt && <span>📅 {new Date(p.createdAt.seconds * 1000).toLocaleDateString('he-IL')}</span>}
                         </div>
                         {p.desc && <p className="text-xs text-gray-400 line-clamp-2">{p.desc}</p>}
@@ -2464,7 +2465,7 @@ export default function AdminPage() {
                     <tr key={p.id} className="border-t hover:bg-gray-50 opacity-70">
                       <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
                       <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '-'}</td>
-                      <td className="p-3 font-bold text-green-700">₪{p.price}</td>
+                      <td className="p-3 font-bold text-green-700">{formatPrice(p.price)}</td>
                       <td className="p-3 text-xs text-gray-500">{p.priority ?? 50}</td>
                       <td className="p-3"><button onClick={() => toggleHidden(p.id, true)} disabled={actionLoading === p.id + '_hidden'} className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 hover:bg-green-200 transition">✅ החזר לאתר</button></td>
                     </tr>
@@ -2518,7 +2519,7 @@ export default function AdminPage() {
                         <td className="p-3 text-gray-500 text-xs">
                           {(cart.cartItems || []).map(i => `${i.name} ×${i.quantity}`).join(', ') || '-'}
                         </td>
-                        <td className="p-3 font-bold text-green-700">₪{cartTotal.toFixed(2)}</td>
+                        <td className="p-3 font-bold text-green-700">{formatPrice(cartTotal)}</td>
                         <td className="p-3 text-gray-400 text-xs whitespace-nowrap">{timeAgo}</td>
                       </tr>
                     );
@@ -2563,7 +2564,7 @@ export default function AdminPage() {
                         <td className="p-3 text-gray-600 text-xs">{c.email || '-'}</td>
                         <td className="p-3 text-gray-600">{c.phone || '-'}</td>
                         <td className="p-3 text-center font-bold text-blue-700">{c.totalOrders ?? 0}</td>
-                        <td className="p-3 font-bold text-green-700">₪{(c.totalSpent ?? 0).toFixed(2)}</td>
+                        <td className="p-3 font-bold text-green-700">{formatPrice(c.totalSpent ?? 0)}</td>
                         <td className="p-3 text-gray-400 text-xs whitespace-nowrap">{firstDate}</td>
                         <td className="p-3">
                           {c.isGuest

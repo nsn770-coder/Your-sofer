@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { formatPrice } from '@/app/lib/utils';
 
 export default function CartPage() {
   const router = useRouter();
@@ -110,10 +111,10 @@ export default function CartPage() {
                             <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ ריקמה: {item.embroideryText}</div>
                           )}
                             <div style={{ fontSize: 17, fontWeight: 900, color: '#0c1a35' }}>
-                              ₪{(item.price * item.quantity).toFixed(2)}
+                              {formatPrice(item.price * item.quantity)}
                             </div>
                             {item.quantity > 1 && (
-                              <div style={{ fontSize: 11, color: '#888' }}>₪{item.price} × {item.quantity}</div>
+                              <div style={{ fontSize: 11, color: '#888' }}>{formatPrice(item.price)} × {item.quantity}</div>
                             )}
                           </div>
                         </div>
@@ -197,11 +198,11 @@ export default function CartPage() {
                         {/* Price */}
                         <div style={{ textAlign: 'left', flexShrink: 0 }}>
                           <div style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>
-                            ₪{(item.price * item.quantity).toFixed(2)}
+                            {formatPrice(item.price * item.quantity)}
                           </div>
                           {item.quantity > 1 && (
                             <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
-                              ₪{item.price} × {item.quantity}
+                              {formatPrice(item.price)} × {item.quantity}
                             </div>
                           )}
                         </div>
@@ -231,7 +232,7 @@ export default function CartPage() {
               <div style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
                   <span style={{ color: '#555' }}>סכום ביניים ({totalItems} פריטים):</span>
-                  <span style={{ fontWeight: 700 }}>₪{total.toFixed(2)}</span>
+                  <span style={{ fontWeight: 700 }}>{formatPrice(total)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
                   <span style={{ color: '#555' }}>משלוח:</span>
@@ -240,7 +241,7 @@ export default function CartPage() {
                 <div style={{ borderTop: '1px solid #eee', paddingTop: 12, marginTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 900 }}>
                     <span>סה"כ לתשלום:</span>
-                    <span style={{ color: '#0c1a35' }}>₪{total.toFixed(2)}</span>
+                    <span style={{ color: '#0c1a35' }}>{formatPrice(total)}</span>
                   </div>
                   <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע"מ</div>
                 </div>

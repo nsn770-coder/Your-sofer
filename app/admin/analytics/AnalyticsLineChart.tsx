@@ -2,6 +2,7 @@
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
+import { formatPrice } from '@/app/lib/utils';
 
 interface DayStat {
   date: string;
@@ -24,7 +25,7 @@ export default function AnalyticsLineChart({ data }: { data: DayStat[] }) {
           <Tooltip
             formatter={(val, name) =>
               name === 'revenue'
-                ? [`₪${Number(val).toLocaleString('he-IL')}`, 'הכנסות']
+                ? [formatPrice(Number(val)), 'הכנסות']
                 : [val, 'הזמנות']
             }
             labelStyle={{ fontFamily: 'Heebo, Arial', direction: 'rtl' }}

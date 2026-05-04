@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { formatPrice } from '@/app/lib/utils';
 import { useChatPersona } from './ChatPersonaContext';
 
 // ── Personas ──────────────────────────────────────────────────────────────────
@@ -122,7 +123,7 @@ function ProductCard({ product }: { product: ProductResult }) {
         {product.cat && <div className="shira-product-cat">{product.cat}</div>}
       </div>
       <div className="shira-product-price-col">
-        <div className="shira-product-price">₪{Math.round(product.price).toLocaleString('he-IL')}</div>
+        <div className="shira-product-price">{formatPrice(product.price)}</div>
         <div className="shira-product-cta">לצפייה ←</div>
       </div>
     </a>

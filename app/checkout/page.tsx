@@ -6,6 +6,7 @@ import { useShaliach } from '../contexts/ShaliachContext';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { formatPrice } from '@/app/lib/utils';
 import * as pixel from '@/lib/metaPixel';
 
 function IconLock({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
@@ -264,12 +265,12 @@ export default function CheckoutPage() {
               <div style={{ fontSize: 11, color: '#999' }}>כמות: {item.quantity}</div>
               {item.selectedKlafName && <div style={{ fontSize: 10, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 3 }}><IconCheck size={9} color="#1a6b3c" /> {item.selectedKlafName}</div>}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35', flexShrink: 0 }}>₪{(item.price * item.quantity).toFixed(2)}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35', flexShrink: 0 }}>{formatPrice(item.price * item.quantity)}</div>
           </div>
         ))}
       </div>
       <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}><span>סכום ביניים</span><span>₪{total.toFixed(2)}</span></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}><span>סכום ביניים</span><span>{formatPrice(total)}</span></div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span style={{ color: '#777' }}>משלוח</span>
           <span style={{ color: '#1a6b3c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck size={12} color="#1a6b3c" /> חינם</span>
@@ -277,11 +278,11 @@ export default function CheckoutPage() {
         {appliedCoupon && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.discount}%)</span>
-            <span>-₪{discountAmount.toFixed(2)}</span>
+            <span>-{formatPrice(discountAmount)}</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17, fontWeight: 900, color: '#0c1a35', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
-          <span>סה"כ לתשלום</span><span>₪{finalTotal.toFixed(2)}</span>
+          <span>סה"כ לתשלום</span><span>{formatPrice(finalTotal)}</span>
         </div>
         <div style={{ fontSize: 11, color: '#aaa' }}>כולל מע"מ</div>
       </div>
@@ -420,7 +421,7 @@ export default function CheckoutPage() {
                         <div style={{ color: '#888', fontSize: 12 }}>כמות: {item.quantity}</div>
                         {item.selectedKlafName && <div style={{ color: '#1a6b3c', fontSize: 11, display: 'flex', alignItems: 'center', gap: 3 }}><IconCheck size={9} color="#1a6b3c" /> קלף: {item.selectedKlafName}</div>}
                       </div>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: '#0c1a35' }}>₪{(item.price * item.quantity).toFixed(2)}</div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: '#0c1a35' }}>{formatPrice(item.price * item.quantity)}</div>
                     </div>
                   ))}
                 </div>

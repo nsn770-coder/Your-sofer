@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { collection, getDocs, orderBy, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { formatPrice } from '@/app/lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 
 const AnalyticsLineChart = dynamic(() => import('./AnalyticsLineChart'), {
@@ -203,7 +204,7 @@ export default function AnalyticsDashboard() {
             {/* ── Summary cards ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 28 }}>
               <Card icon="📦" label="הזמנות היום" value={stats.ordersToday} color="#16a34a" />
-              <Card icon="₪"  label="סכום היום"   value={`₪${stats.revenueToday.toLocaleString('he-IL', { minimumFractionDigits: 0 })}`} color="#b8972a" />
+              <Card icon="₪"  label="סכום היום"   value={formatPrice(stats.revenueToday)} color="#b8972a" />
               <Card icon="👤" label="משתמשים חדשים" value={stats.newUsersToday} color="#7c3aed" />
               <Card icon="✍️" label="סופרים חדשים" value={stats.newSoferimToday} color="#0c1a35" />
             </div>
@@ -251,7 +252,7 @@ export default function AnalyticsDashboard() {
                           <tr key={o.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                             <td style={{ padding: '8px 10px', fontFamily: 'monospace', fontSize: 12, color: '#333' }}>{o.orderNumber}</td>
                             <td style={{ padding: '8px 10px', fontWeight: 600, color: navy }}>{o.customerName}</td>
-                            <td style={{ padding: '8px 10px', fontWeight: 700, color: gold }}>₪{(o.total || 0).toLocaleString('he-IL')}</td>
+                            <td style={{ padding: '8px 10px', fontWeight: 700, color: gold }}>{formatPrice(o.total || 0)}</td>
                             <td style={{ padding: '8px 10px' }}><StatusBadge status={o.status} /></td>
                             <td style={{ padding: '8px 10px', color: '#888', whiteSpace: 'nowrap' }}>
                               {d ? d.toLocaleDateString('he-IL') : '-'}

@@ -6,6 +6,7 @@ import { collection, query, where, orderBy, limit, getDocs, doc, getDoc, addDoc,
 import { db } from '../firebase';
 import { useCart } from '../contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { formatPrice } from '@/app/lib/utils';
 
 interface Product {
   id: string;
@@ -245,8 +246,8 @@ function KlafCard({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ fontSize: 17, fontWeight: 900, color: '#b8972a' }}>₪{product.price?.toLocaleString('he-IL')}</div>
-          {hasSale && <div style={{ fontSize: 12, color: '#aaa', textDecoration: 'line-through' }}>₪{product.was?.toLocaleString('he-IL')}</div>}
+          <div style={{ fontSize: 17, fontWeight: 900, color: '#b8972a' }}>{formatPrice(product.price)}</div>
+          {hasSale && <div style={{ fontSize: 12, color: '#aaa', textDecoration: 'line-through' }}>{formatPrice(product.was)}</div>}
         </div>
 
         {/* Add / quantity control */}
@@ -389,8 +390,8 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
                   <div style={{ padding: '10px 12px' }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#0c1a35', marginBottom: 4, lineHeight: 1.3 }}>{p.name}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                      <span style={{ fontSize: 15, fontWeight: 900, color: '#b8972a' }}>₪{Math.round(p.price * 0.85).toLocaleString('he-IL')}</span>
-                      <span style={{ fontSize: 11, color: '#bbb', textDecoration: 'line-through' }}>₪{p.price?.toLocaleString('he-IL')}</span>
+                      <span style={{ fontSize: 15, fontWeight: 900, color: '#b8972a' }}>{formatPrice(p.price * 0.85)}</span>
+                      <span style={{ fontSize: 11, color: '#bbb', textDecoration: 'line-through' }}>{formatPrice(p.price)}</span>
                     </div>
                     <button style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '8px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>+ הוסף לסל</button>
                   </div>

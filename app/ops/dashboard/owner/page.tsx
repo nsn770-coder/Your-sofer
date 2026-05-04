@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, orderBy, query, limit, writeBatch } from 'firebase/firestore';
 import { db } from '@/app/firebase';
+import { formatPrice } from '@/app/lib/utils';
 import { useOpsAuth } from '@/app/contexts/OpsAuthContext';
 import type { InternalOrder, AuditEntry } from '@/app/ops/types';
 import OrdersTable from '@/components/ops/OrdersTable';
@@ -172,9 +173,9 @@ export default function OwnerDashboard() {
             <StatCard label="הזמנות היום" value={today.count} />
             <StatCard label="הזמנות השבוע" value={week.count} />
             <StatCard label="הזמנות החודש" value={month.count} />
-            <StatCard label="הכנסות היום" value={`₪${today.revenue.toLocaleString()}`} color="#15803d" />
-            <StatCard label="הכנסות השבוע" value={`₪${week.revenue.toLocaleString()}`} color="#15803d" />
-            <StatCard label="הכנסות החודש" value={`₪${month.revenue.toLocaleString()}`} color="#15803d" />
+            <StatCard label="הכנסות היום" value={formatPrice(today.revenue)} color="#15803d" />
+            <StatCard label="הכנסות השבוע" value={formatPrice(week.revenue)} color="#15803d" />
+            <StatCard label="הכנסות החודש" value={formatPrice(month.revenue)} color="#15803d" />
           </div>
 
           {/* Status breakdown */}

@@ -21,6 +21,7 @@ const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCaro
 import { useShaliach } from './contexts/ShaliachContext';
 import { useCart }     from './contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { formatPrice } from '@/app/lib/utils';
 import {
   CARDS, ALL_CATS, CONFIG_COLLECTION, CONFIG_DOC, slotKey,
 } from './constants/homepageCards';
@@ -754,7 +755,7 @@ export default function HomePageClient() {
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                            <div style={{ fontSize: 15, fontWeight: 900, color: '#b8972a' }}>₪{p.price?.toLocaleString('he-IL')}</div>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: '#b8972a' }}>{formatPrice(p.price)}</div>
                           </div>
                           <span style={{ color: '#b8972a', fontSize: 18, flexShrink: 0 }}>←</span>
                         </div>
@@ -939,7 +940,7 @@ export default function HomePageClient() {
                   </div>
                   <div style={{ padding: '8px 10px 10px' }}>
                     <p style={{ fontSize: 12, fontWeight: 600, color: '#0c1a35', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>{p.name}</p>
-                    <p style={{ fontSize: 14, fontWeight: 800, color: '#b8972a', marginBottom: 8 }}>₪{p.price?.toLocaleString('he-IL')}</p>
+                    <p style={{ fontSize: 14, fontWeight: 800, color: '#b8972a', marginBottom: 8 }}>{formatPrice(p.price)}</p>
                     <button
                       onClick={e => {
                         e.stopPropagation();

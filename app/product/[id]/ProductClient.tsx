@@ -9,6 +9,7 @@ import { CATS } from '../../constants/categories';
 import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
 import * as pixel from '@/lib/metaPixel';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { formatPrice } from '@/app/lib/utils';
 import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import NextImage from 'next/image';
 
@@ -169,7 +170,7 @@ function InstallmentBadge({ price }: { price: number }) {
   return (
     <div style={{ background: '#f0f7ff', border: '1px solid #bde0ff', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#0c1a35', display: 'flex', alignItems: 'center', gap: 8 }}>
       <span style={{ color: '#0e6ba8', flexShrink: 0 }}><Icon.CreditCard /></span>
-      <span><strong>3 תשלומים של ₪{monthly3}</strong> ללא ריבית</span>
+      <span><strong>3 תשלומים של {formatPrice(monthly3)}</strong> ללא ריבית</span>
       {price >= 400 && <span style={{ color: '#888', fontSize: 11, marginRight: 'auto' }}>· עד 12 תשלומים בתוספת ריבית</span>}
     </div>
   );
@@ -1254,8 +1255,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {!compact && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-            <span style={{ fontSize: 32, fontWeight: 900, color: '#0c1a35' }}>₪{product.price}</span>
-            {product.was && <span style={{ fontSize: 16, textDecoration: 'line-through', color: '#bbb' }}>₪{product.was}</span>}
+            <span style={{ fontSize: 32, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(product.price)}</span>
+            {product.was && <span style={{ fontSize: 16, textDecoration: 'line-through', color: '#bbb' }}>{formatPrice(product.was)}</span>}
             {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
           </div>
           <div style={{ fontSize: 12, color: '#888', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -1483,8 +1484,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             {/* Mobile price */}
             {isMobile && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f0f0f0' }}>
-                {product.was && <div style={{ fontSize: 12, color: '#888' }}>מחיר רגיל: <span style={{ textDecoration: 'line-through' }}>₪{product.was}</span> <span style={{ color: '#c0392b', fontWeight: 700 }}>({discount}% הנחה)</span></div>}
-                <div style={{ fontSize: 30, fontWeight: 900, color: '#0c1a35', marginTop: 2 }}>₪{product.price}</div>
+                {product.was && <div style={{ fontSize: 12, color: '#888' }}>מחיר רגיל: <span style={{ textDecoration: 'line-through' }}>{formatPrice(product.was)}</span> <span style={{ color: '#c0392b', fontWeight: 700 }}>({discount}% הנחה)</span></div>}
+                <div style={{ fontSize: 30, fontWeight: 900, color: '#0c1a35', marginTop: 2 }}>{formatPrice(product.price)}</div>
                 <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Truck /> כולל מע״מ · משלוח חינם</div>
                 <InstallmentBadge price={product.price} />
               </div>
@@ -1624,7 +1625,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{cp.name}</div>
                       <Stars n={cp.stars || 4.5} size={11} />
-                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>₪{cp.price}</div>
+                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(cp.price)}</div>
                       <button
                         onClick={e => { e.stopPropagation(); addItem({ id: cp.id, name: cp.name, price: cp.price, imgUrl: cpImg ?? undefined, quantity: 1 }); }}
                         style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
@@ -1661,7 +1662,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.name}</div>
                       <Stars n={r.stars || 4.5} size={11} />
-                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>₪{r.price}</div>
+                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(r.price)}</div>
                       <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 }); }}
                         style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
                         הוסף לסל
@@ -1705,7 +1706,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   </div>
                   <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{lp.name}</div>
-                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>₪{lp.price}</div>
+                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(lp.price)}</div>
                     <button
                       onClick={e => { e.stopPropagation(); addItem({ id: lp.id, name: lp.name, price: lp.price, imgUrl: lpImg ?? undefined, quantity: 1 }); }}
                       style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
@@ -1743,7 +1744,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.name}</div>
                     <Stars n={r.stars || 4.5} size={11} />
-                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>₪{r.price}</div>
+                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(r.price)}</div>
                     <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 }); }}
                       style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#b8972a', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
                       הוסף לסל
@@ -1804,7 +1805,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200, background: '#fff', borderTop: '1.5px solid #e8e8e8', padding: '10px 16px 14px', display: 'flex', gap: 12, alignItems: 'center', boxShadow: '0 -4px 20px rgba(0,0,0,0.1)', direction: 'rtl' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 11, color: '#999', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</div>
-            <div style={{ fontSize: 20, fontWeight: 900, color: '#0c1a35', lineHeight: 1.2 }}>₪{product.price}</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#0c1a35', lineHeight: 1.2 }}>{formatPrice(product.price)}</div>
           </div>
           <button
             onClick={() => { handleAddToCart(); router.push('/cart'); }}
