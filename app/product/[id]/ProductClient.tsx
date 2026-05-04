@@ -1176,7 +1176,7 @@ export default function ProductClient() {
     const isBayit = product.cat?.includes('מזוזות');
     if (!isKlaf && !isBayit) return;
     const targetCat = isKlaf ? 'מזוזות' : 'קלפי מזוזה';
-    getDocs(query(collection(db, 'products'), where('cat', '==', targetCat), where('size', '==', product.size), limit(4)))
+    getDocs(query(collection(db, 'products'), where('cat', '==', targetCat), where('size', '==', product.size), limit(50)))
       .then(snap => {
         console.log('[sizeMatch] results count:', snap.size, '| targetCat:', targetCat, '| size:', product.size);
         const results: Product[] = [];
@@ -1727,12 +1727,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               ? `השלם את המצווה — בתי מזוזה מתאימים לגודל ${product.size} ס״מ`
               : `הוסף קלף כשר מתאים — ${product.size} ס״מ`}
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: isMobile ? 10 : 14 }}>
+          <div style={{ display: 'flex', gap: isMobile ? 10 : 14, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>
             {sizeMatchProducts.map(r => {
               const rImg = optimizeCloudinaryUrl(r.imgUrl || r.image_url || '', 400) || undefined;
               return (
                 <div key={r.id} onClick={() => router.push(`/product/${r.id}`)}
-                  style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}
+                  style={{ width: 160, flexShrink: 0, background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}
                   onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)')}
                   onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}>
                   <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
