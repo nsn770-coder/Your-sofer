@@ -4,41 +4,102 @@ import { useRouter } from 'next/navigation';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 
-const CATEGORIES = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'יודאיקה'];
-const PRODUCT_TYPES = ['מזוזה', 'תפילין', 'מגילה', 'ספר תורה'];
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const CATEGORIES   = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'יודאיקה'];
+const PRODUCT_TYPES = ['קלף מזוזה', 'קלף תפילין', 'מגילה', 'ספר תורה', 'אחר'];
+const LARGE_CATS   = new Set(['מגילות', 'ספרי תורה', 'מגילה', 'ספר תורה']);
+
+function calcPrices(soferPrice: number) {
+  const commission = Math.round(soferPrice * 0.15);
+  const preVat     = soferPrice + commission;
+  const vat        = Math.round(preVat * 0.18);
+  return { commission, vat, total: preVat + vat };
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ProductEntry {
   type: string;
+  name: string;
+  desc: string;
+  nusach: string;
+  level: string;
+  days: string;
+  soferPrice: string;
+  size: string;
   images: string[];
 }
 
+function emptyProduct(): ProductEntry {
+  return { type: PRODUCT_TYPES[0], name: '', desc: '', nusach: 'אשכנזי', level: 'כשר לכתחילה', days: '7-14', soferPrice: '', size: '', images: [] };
+}
+
+// ─── Shared styles ────────────────────────────────────────────────────────────
+
+const cardStyle: React.CSSProperties = {
+  background: '#fff', borderRadius: 12, padding: 24, marginBottom: 20,
+  boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+};
+
+const sectionTitle: React.CSSProperties = {
+  fontSize: 17, fontWeight: 800, color: '#1a3a2a', marginBottom: 20,
+  borderBottom: '2px solid #f0f0f0', paddingBottom: 10,
+};
+
+const labelStyle: React.CSSProperties = {
+  display: 'block', fontSize: 13, fontWeight: 700, color: '#333', marginBottom: 6,
+};
+
+const inputStyle: React.CSSProperties = {
+  width: '100%', border: '1px solid #ddd', borderRadius: 8,
+  padding: '10px 12px', fontSize: 14, color: '#333',
+  outline: 'none', background: '#fafafa', boxSizing: 'border-box',
+};
+
+const guidanceStyle: React.CSSProperties = {
+  background: 'rgba(197,160,40,0.08)', border: '1px solid rgba(184,151,42,0.28)',
+  borderRadius: 10, padding: '12px 14px', marginBottom: 14,
+  fontSize: 13, color: '#5a4a18', lineHeight: 1.65,
+};
+
+const tipStyle: React.CSSProperties = {
+  fontSize: 12, color: '#b8972a', marginTop: 5, lineHeight: 1.5,
+};
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function SoferApplyPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [loading, setLoading]         = useState(false);
+  const [success, setSuccess]         = useState(false);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
+
+  // Personal info
   const [form, setForm] = useState({
-    name: '',
-    city: '',
-    phone: '',
-    whatsapp: '',
-    email: '',
-    description: '',
-    style: '',
-    categories: [] as string[],
-    imageUrl: '',
-    writingSamples: [] as string[], // עד 4 תמונות דוגמת כתב
+    name: '', city: '', phone: '', whatsapp: '', email: '',
+    description: '', style: '', categories: [] as string[],
+    imageUrl: '', writingSamples: [] as string[],
   });
-  const [products, setProducts] = useState<ProductEntry[]>([]); // עד 4 מוצרים
+
+  // Products
+  const [products, setProducts]     = useState<ProductEntry[]>([]);
+
+  // Tax status (once for whole application)
+  const [taxStatus, setTaxStatus]   = useState('');
+
+  // Standalone price calculator
+  const [calcPrice, setCalcPrice]   = useState('');
+  const calcNum  = parseFloat(calcPrice) || 0;
+  const calcData = calcPrices(calcNum);
+
+  // ── Cloudinary upload ──────────────────────────────────────────────────────
 
   async function uploadToCloudinary(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'yoursofer_upload');
-    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', {
-      method: 'POST',
-      body: formData,
-    });
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', 'yoursofer_upload');
+    const res  = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
     const data = await res.json();
     if (!data.secure_url) throw new Error(data.error?.message || 'שגיאה בהעלאה');
     return data.secure_url;
@@ -48,14 +109,9 @@ export default function SoferApplyPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingField('profile');
-    try {
-      const url = await uploadToCloudinary(file);
-      setForm(prev => ({ ...prev, imageUrl: url }));
-    } catch {
-      alert('שגיאה בהעלאת תמונה');
-    } finally {
-      setUploadingField(null);
-    }
+    try { const url = await uploadToCloudinary(file); setForm(prev => ({ ...prev, imageUrl: url })); }
+    catch { alert('שגיאה בהעלאת תמונה'); }
+    finally { setUploadingField(null); }
   }
 
   async function handleWritingSampleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -63,31 +119,28 @@ export default function SoferApplyPage() {
     if (!file) return;
     if (form.writingSamples.length >= 4) { alert('ניתן להעלות עד 4 תמונות כתב'); return; }
     setUploadingField('writing');
-    try {
-      const url = await uploadToCloudinary(file);
-      setForm(prev => ({ ...prev, writingSamples: [...prev.writingSamples, url] }));
-    } catch {
-      alert('שגיאה בהעלאת תמונה');
-    } finally {
-      setUploadingField(null);
-    }
+    try { const url = await uploadToCloudinary(file); setForm(prev => ({ ...prev, writingSamples: [...prev.writingSamples, url] })); }
+    catch { alert('שגיאה בהעלאת תמונה'); }
+    finally { setUploadingField(null); }
   }
 
   function removeWritingSample(idx: number) {
     setForm(prev => ({ ...prev, writingSamples: prev.writingSamples.filter((_, i) => i !== idx) }));
   }
 
+  // ── Product helpers ────────────────────────────────────────────────────────
+
   function addProduct() {
     if (products.length >= 4) { alert('ניתן להוסיף עד 4 מוצרים'); return; }
-    setProducts(prev => [...prev, { type: PRODUCT_TYPES[0], images: [] }]);
+    setProducts(prev => [...prev, emptyProduct()]);
   }
 
   function removeProduct(idx: number) {
     setProducts(prev => prev.filter((_, i) => i !== idx));
   }
 
-  function setProductType(idx: number, type: string) {
-    setProducts(prev => prev.map((p, i) => i === idx ? { ...p, type } : p));
+  function updateProduct<K extends keyof ProductEntry>(idx: number, key: K, value: ProductEntry[K]) {
+    setProducts(prev => prev.map((p, i) => i === idx ? { ...p, [key]: value } : p));
   }
 
   async function handleProductImageUpload(productIdx: number, e: React.ChangeEvent<HTMLInputElement>) {
@@ -98,16 +151,15 @@ export default function SoferApplyPage() {
     try {
       const url = await uploadToCloudinary(file);
       setProducts(prev => prev.map((p, i) => i === productIdx ? { ...p, images: [...p.images, url] } : p));
-    } catch {
-      alert('שגיאה בהעלאת תמונה');
-    } finally {
-      setUploadingField(null);
-    }
+    } catch { alert('שגיאה בהעלאת תמונה'); }
+    finally { setUploadingField(null); }
   }
 
   function removeProductImage(productIdx: number, imgIdx: number) {
     setProducts(prev => prev.map((p, i) => i === productIdx ? { ...p, images: p.images.filter((_, j) => j !== imgIdx) } : p));
   }
+
+  // ── Form helpers ───────────────────────────────────────────────────────────
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -133,6 +185,7 @@ export default function SoferApplyPage() {
       await addDoc(collection(db, 'soferim_applications'), {
         ...form,
         products,
+        taxStatus: taxStatus || null,
         status: 'pending',
         createdAt: serverTimestamp(),
       });
@@ -144,6 +197,8 @@ export default function SoferApplyPage() {
       setLoading(false);
     }
   }
+
+  // ── Success screen ─────────────────────────────────────────────────────────
 
   if (success) {
     return (
@@ -163,6 +218,8 @@ export default function SoferApplyPage() {
     );
   }
 
+  // ── Main form ──────────────────────────────────────────────────────────────
+
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
 
@@ -178,7 +235,7 @@ export default function SoferApplyPage() {
       <div style={{ maxWidth: 640, margin: '32px auto', padding: '0 16px' }}>
         <form onSubmit={handleSubmit}>
 
-          {/* פרטים אישיים */}
+          {/* ── פרטים אישיים ── */}
           <div style={cardStyle}>
             <h3 style={sectionTitle}>✍️ פרטים אישיים</h3>
 
@@ -215,7 +272,7 @@ export default function SoferApplyPage() {
             </div>
           </div>
 
-          {/* קטגוריות */}
+          {/* ── קטגוריות ── */}
           <div style={cardStyle}>
             <h3 style={sectionTitle}>📜 קטגוריות כתיבה *</h3>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
@@ -233,7 +290,7 @@ export default function SoferApplyPage() {
             </div>
           </div>
 
-          {/* תיאור */}
+          {/* ── תיאור ── */}
           <div style={cardStyle}>
             <h3 style={sectionTitle}>📝 תיאור וסגנון</h3>
             <div style={{ marginBottom: 16 }}>
@@ -249,11 +306,11 @@ export default function SoferApplyPage() {
             </div>
           </div>
 
-          {/* תמונת פנים */}
+          {/* ── תמונת פנים ── */}
           <div style={cardStyle}>
             <h3 style={sectionTitle}>🖼️ תמונת פנים</h3>
             <p style={{ fontSize: 13, color: '#555', marginBottom: 16, background: '#fffbf0', border: '1px solid #e6d5a0', borderRadius: 8, padding: '10px 14px' }}>
-              📸 <strong>העלה תמונת פנים ברורה שלך</strong> - הלקוחות רוצים להכיר את הסופר! תמונה אישית מגבירה אמון ומעלה את הסיכוי לרכישה.
+              📸 <strong>העלה תמונת פנים ברורה שלך</strong> — הלקוחות רוצים להכיר את הסופר! תמונה אישית מגבירה אמון ומעלה את הסיכוי לרכישה.
             </p>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -264,8 +321,7 @@ export default function SoferApplyPage() {
               <div>
                 <label style={{ display: 'inline-block', background: '#1a3a2a', color: '#fff', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                   {uploadingField === 'profile' ? '⏳ מעלה...' : '📷 העלה תמונת פנים'}
-                  <input type="file" accept="image/*" style={{ display: 'none' }}
-                    onChange={handleProfileImageUpload} />
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProfileImageUpload} />
                 </label>
                 {form.imageUrl && (
                   <button type="button" onClick={() => setForm(prev => ({ ...prev, imageUrl: '' }))}
@@ -278,11 +334,11 @@ export default function SoferApplyPage() {
             </div>
           </div>
 
-          {/* דוגמאות כתב */}
+          {/* ── דוגמאות כתב ── */}
           <div style={cardStyle}>
             <h3 style={sectionTitle}>✍️ דוגמאות כתב (עד 4 תמונות)</h3>
             <p style={{ fontSize: 13, color: '#555', marginBottom: 16, background: '#f0f7f3', border: '1px solid #c8e6d4', borderRadius: 8, padding: '10px 14px' }}>
-              📜 <strong>חשוב מאוד!</strong> העלה תמונות של כתב איכותי - זה מה שהלקוחות יראו ויחליטו על פיו. תמונות ברורות ומוארות יגדילו מכירות.
+              📜 <strong>חשוב מאוד!</strong> העלה תמונות של כתב איכותי — זה מה שהלקוחות יראו ויחליטו על פיו. תמונות ברורות ומוארות יגדילו מכירות.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10, marginBottom: 12 }}>
@@ -301,71 +357,224 @@ export default function SoferApplyPage() {
                   {uploadingField === 'writing' ? (
                     <span style={{ fontSize: 12, color: '#888' }}>⏳ מעלה...</span>
                   ) : (
-                    <>
-                      <span style={{ fontSize: 24 }}>📷</span>
-                      <span style={{ fontSize: 11, color: '#888', textAlign: 'center' }}>הוסף תמונת כתב</span>
-                    </>
+                    <><span style={{ fontSize: 24 }}>📷</span><span style={{ fontSize: 11, color: '#888', textAlign: 'center' }}>הוסף תמונת כתב</span></>
                   )}
-                  <input type="file" accept="image/*" style={{ display: 'none' }}
-                    onChange={handleWritingSampleUpload} />
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleWritingSampleUpload} />
                 </label>
               )}
             </div>
             <p style={{ fontSize: 11, color: '#aaa' }}>{form.writingSamples.length}/4 תמונות הועלו</p>
           </div>
 
-          {/* מוצרים */}
+          {/* ── סטטוס עוסק ── */}
+          <div style={cardStyle}>
+            <h3 style={sectionTitle}>🧾 סטטוס עוסק</h3>
+            <p style={{ fontSize: 13, color: '#555', marginBottom: 14, margin: '0 0 14px' }}>מה הסטטוס שלך לצרכי מס?</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
+              {[
+                { value: 'osek_patur',   label: '✅ יש לי עוסק פטור' },
+                { value: 'osek_morsheh', label: '✅ עוסק מורשה' },
+                { value: 'no_osek',      label: '🔗 אין לי עוסק' },
+                { value: 'salary',       label: '📄 אני מעדיף תלוש שכר' },
+              ].map(opt => (
+                <label key={opt.value} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
+                  <input type="radio" name="taxStatus" value={opt.value} checked={taxStatus === opt.value} onChange={() => setTaxStatus(opt.value)} style={{ marginTop: 3, flexShrink: 0, accentColor: '#b8972a' }} />
+                  <span style={{ fontSize: 14, color: '#0c1a35', fontWeight: taxStatus === opt.value ? 700 : 400 }}>{opt.label}</span>
+                </label>
+              ))}
+            </div>
+
+            {taxStatus === 'no_osek' && (
+              <div style={{ background: 'rgba(197,160,40,0.1)', border: '1.5px solid #b8972a', borderRadius: 10, padding: '14px 16px' }}>
+                <div style={{ fontSize: 13, color: '#888', textDecoration: 'line-through', marginBottom: 4 }}>עלות רגילה: ₪499</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>🎉 לרגל ההשקה — הצטרפות חינם!</div>
+                <div style={{ fontSize: 13, color: '#555', marginBottom: 12 }}>פתיחת עוסק פטור דרכנו עם 10% הנחה על השירות</div>
+                <a href="https://mycount.co.il/הסופר-שלך/" target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'inline-block', background: '#b8972a', color: '#0c1a35', fontWeight: 900, fontSize: 14, padding: '10px 20px', borderRadius: 8, textDecoration: 'none' }}>
+                  פתחו לי עוסק פטור ←
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* ── מוצרים ── */}
           <div style={cardStyle}>
             <h3 style={sectionTitle}>🛍️ המוצרים שלי (עד 4 מוצרים)</h3>
-            <p style={{ fontSize: 13, color: '#555', marginBottom: 16 }}>
-              הוסף את המוצרים שאתה מציע - בחר סוג מוצר והעלה תמונות (עד 4 לכל מוצר).
-            </p>
 
-            {products.map((product, pIdx) => (
-              <div key={pIdx} style={{ border: '1px solid #e0e0e0', borderRadius: 10, padding: 16, marginBottom: 14, background: '#fafafa' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontWeight: 700, fontSize: 14, color: '#1a3a2a' }}>מוצר {pIdx + 1}</span>
-                    <select value={product.type} onChange={e => setProductType(pIdx, e.target.value)}
-                      style={{ border: '1px solid #ddd', borderRadius: 6, padding: '6px 10px', fontSize: 13, background: '#fff' }}>
-                      {PRODUCT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
+            {/* Price calculator tool */}
+            <div style={{ ...guidanceStyle, marginBottom: 20 }}>
+              <div style={{ fontWeight: 800, marginBottom: 8 }}>💡 מחשבון מחיר — חשב את המחיר הסופי ללקוח</div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 13, whiteSpace: 'nowrap' }}>המחיר שלך ₪</span>
+                  <input
+                    type="number" min="0" value={calcPrice}
+                    onChange={e => setCalcPrice(e.target.value)}
+                    placeholder="0"
+                    style={{ width: 90, border: '1px solid rgba(184,151,42,0.4)', borderRadius: 6, padding: '5px 8px', fontSize: 13, background: 'rgba(255,255,255,0.7)', outline: 'none', direction: 'rtl' }}
+                  />
+                </div>
+                {calcNum > 0 && (
+                  <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#5a4a18', flexWrap: 'wrap' }}>
+                    <span>+ עמלה (15%): ₪{calcData.commission.toLocaleString()}</span>
+                    <span>+ מע"מ (18%): ₪{calcData.vat.toLocaleString()}</span>
+                    <span style={{ fontWeight: 900, fontSize: 13, color: '#0c1a35' }}>= ₪{calcData.total.toLocaleString()} ללקוח</span>
                   </div>
-                  <button type="button" onClick={() => removeProduct(pIdx)}
-                    style={{ background: 'none', border: 'none', color: '#c0392b', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
-                    הסר ✕
-                  </button>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 8 }}>
-                  {product.images.map((url, imgIdx) => (
-                    <div key={imgIdx} style={{ position: 'relative', border: '1px solid #ddd', borderRadius: 6, overflow: 'hidden' }}>
-                      <img src={url} alt={`תמונה ${imgIdx + 1}`} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-                      <button type="button" onClick={() => removeProductImage(pIdx, imgIdx)}
-                        style={{ position: 'absolute', top: 2, left: 2, background: 'rgba(192,57,43,0.85)', color: '#fff', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-
-                  {product.images.length < 4 && (
-                    <label style={{ border: '2px dashed #ccc', borderRadius: 6, aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: '#fff', gap: 4 }}>
-                      {uploadingField === `product_${pIdx}` ? (
-                        <span style={{ fontSize: 11, color: '#888' }}>⏳</span>
-                      ) : (
-                        <>
-                          <span style={{ fontSize: 20 }}>+</span>
-                          <span style={{ fontSize: 10, color: '#999' }}>תמונה</span>
-                        </>
-                      )}
-                      <input type="file" accept="image/*" style={{ display: 'none' }}
-                        onChange={e => handleProductImageUpload(pIdx, e)} />
-                    </label>
-                  )}
-                </div>
-                <p style={{ fontSize: 11, color: '#aaa', marginTop: 6 }}>{product.images.length}/4 תמונות</p>
+                )}
               </div>
-            ))}
+              <div style={{ fontSize: 12, color: '#7a6020' }}>
+                📸 תמונות טובות = יותר מכירות! תמונה ברורה על רקע נייטרלי + מקרוב של הכתב = אמינות גבוהה.
+              </div>
+            </div>
+
+            {/* Product entries */}
+            {products.map((product, pIdx) => {
+              const spNum  = parseFloat(product.soferPrice) || 0;
+              const prices = calcPrices(spNum);
+              return (
+                <div key={pIdx} style={{ border: '1px solid #e0e0e0', borderRadius: 10, padding: 16, marginBottom: 16, background: '#fafafa' }}>
+                  {/* Header */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontWeight: 800, fontSize: 14, color: '#1a3a2a' }}>מוצר {pIdx + 1}</span>
+                      <select value={product.type} onChange={e => updateProduct(pIdx, 'type', e.target.value)}
+                        style={{ border: '1px solid #ddd', borderRadius: 6, padding: '6px 10px', fontSize: 13, background: '#fff' }}>
+                        {PRODUCT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                    </div>
+                    <button type="button" onClick={() => removeProduct(pIdx)}
+                      style={{ background: 'none', border: 'none', color: '#c0392b', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
+                      הסר ✕
+                    </button>
+                  </div>
+
+                  {/* Guidance */}
+                  <div style={{ ...guidanceStyle, fontSize: 12 }}>
+                    ✍️ <strong>איך לכתוב תיאור שמוכר?</strong> ציין וותק, הקפדות מיוחדות (מקווה, זקן וכו׳), הכשרה, והתמחות בנוסח מסוים
+                  </div>
+
+                  <div style={{ display: 'grid', gap: 12 }}>
+                    {/* Name */}
+                    <div>
+                      <label style={labelStyle}>שם המוצר</label>
+                      <input value={product.name} onChange={e => updateProduct(pIdx, 'name', e.target.value)}
+                        placeholder="לדוגמה: קלף מזוזה מהודר נוסח ספרד — כתב בית יוסף"
+                        style={inputStyle} />
+                      <div style={tipStyle}>💡 שם טוב כולל: סוג + נוסח + רמת הידור</div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <label style={labelStyle}>תיאור</label>
+                      <textarea value={product.desc} onChange={e => updateProduct(pIdx, 'desc', e.target.value)}
+                        placeholder="תאר את המוצר, את הכתיבה שלך, ומה מיוחד בך..."
+                        rows={3} style={{ ...inputStyle, resize: 'vertical', minHeight: 80 }} />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div style={tipStyle}>💡 תיאור של 3-4 משפטים לפחות מוכר הרבה יותר</div>
+                        <div style={{ fontSize: 11, color: product.desc.length < 60 ? '#c0392b' : '#aaa', marginTop: 4 }}>{product.desc.length} תווים</div>
+                      </div>
+                    </div>
+
+                    {/* Nusach + Level */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                      <div>
+                        <label style={labelStyle}>נוסח</label>
+                        <select value={product.nusach} onChange={e => updateProduct(pIdx, 'nusach', e.target.value)}
+                          style={{ ...inputStyle, background: '#fff' }}>
+                          <option value="אשכנזי">אשכנזי</option>
+                          <option value="ספרדי">ספרדי</option>
+                          <option value={'אדמוה"ז'}>{'אדמוה"ז'}</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={labelStyle}>רמת כשרות</label>
+                        <select value={product.level} onChange={e => updateProduct(pIdx, 'level', e.target.value)}
+                          style={{ ...inputStyle, background: '#fff' }}>
+                          <option value="כשר לכתחילה">כשר לכתחילה</option>
+                          <option value="מהודר">מהודר</option>
+                          <option value="מהודר בתכלית">מהודר בתכלית</option>
+                        </select>
+                        <div style={tipStyle}>💡 מהודר נמכר במחיר גבוה יותר</div>
+                      </div>
+                    </div>
+
+                    {/* Days + Size */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                      <div>
+                        <label style={labelStyle}>זמן אספקה (ימי עסקים)</label>
+                        <input value={product.days} onChange={e => updateProduct(pIdx, 'days', e.target.value)}
+                          placeholder="7-14" style={inputStyle} />
+                        <div style={tipStyle}>💡 זמן קצר מגביר סיכוי לרכישה</div>
+                      </div>
+                      <div>
+                        <label style={labelStyle}>גודל כתב</label>
+                        <input value={product.size} onChange={e => updateProduct(pIdx, 'size', e.target.value)}
+                          placeholder="למשל: 12 שורות, גס, דק..." style={inputStyle} />
+                        <div style={tipStyle}>💡 גודל ופרטי הכתב עוזרים ללקוח לבחור</div>
+                      </div>
+                    </div>
+
+                    {/* Sofer price */}
+                    <div>
+                      <label style={labelStyle}>המחיר שלך ₪</label>
+                      <input type="number" min="0" value={product.soferPrice}
+                        onChange={e => updateProduct(pIdx, 'soferPrice', e.target.value)}
+                        placeholder="0" style={{ ...inputStyle, maxWidth: 160 }} />
+                      {spNum > 0 && (
+                        <div style={{ marginTop: 8, background: '#fff', border: '1px solid #e0d9c8', borderRadius: 8, padding: '10px 14px', fontSize: 13 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#666', marginBottom: 4 }}>
+                            <span>+ עמלת החנות (15%)</span><span>₪{prices.commission.toLocaleString()}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#666', marginBottom: 8 }}>
+                            <span>+ מע"מ (18%)</span><span>₪{prices.vat.toLocaleString()}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, color: '#0c1a35', fontSize: 14, borderTop: '1px solid #e0d9c8', paddingTop: 8 }}>
+                            <span>מחיר ללקוח</span><span>₪{prices.total.toLocaleString()}</span>
+                          </div>
+                          {LARGE_CATS.has(product.type) && (
+                            <div style={{ marginTop: 8, fontSize: 12, color: '#92400e' }}>
+                              ⚠️ שים לב: המחיר כולל עלות הגעה לאחר בדיקה
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Images */}
+                    <div>
+                      <label style={labelStyle}>תמונות המוצר</label>
+                      <div style={{ ...guidanceStyle, fontSize: 12, marginBottom: 10 }}>
+                        📸 העלה תמונה ברורה על רקע נייטרלי · תמונת מקרוב של הכתב מוסיפה אמינות עצומה · תאורה טובה שווה יותר מאלף מילים
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 8 }}>
+                        {product.images.map((url, imgIdx) => (
+                          <div key={imgIdx} style={{ position: 'relative', border: '1px solid #ddd', borderRadius: 6, overflow: 'hidden' }}>
+                            <img src={url} alt={`תמונה ${imgIdx + 1}`} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+                            <button type="button" onClick={() => removeProductImage(pIdx, imgIdx)}
+                              style={{ position: 'absolute', top: 2, left: 2, background: 'rgba(192,57,43,0.85)', color: '#fff', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+
+                        {product.images.length < 4 && (
+                          <label style={{ border: '2px dashed #ccc', borderRadius: 6, aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: '#fff', gap: 4 }}>
+                            {uploadingField === `product_${pIdx}` ? (
+                              <span style={{ fontSize: 11, color: '#888' }}>⏳</span>
+                            ) : (
+                              <><span style={{ fontSize: 20 }}>+</span><span style={{ fontSize: 10, color: '#999' }}>תמונה</span></>
+                            )}
+                            <input type="file" accept="image/*" style={{ display: 'none' }}
+                              onChange={e => handleProductImageUpload(pIdx, e)} />
+                          </label>
+                        )}
+                      </div>
+                      <p style={{ fontSize: 11, color: '#aaa', marginTop: 6 }}>{product.images.length}/4 תמונות</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
 
             {products.length < 4 && (
               <button type="button" onClick={addProduct}
@@ -375,7 +584,7 @@ export default function SoferApplyPage() {
             )}
           </div>
 
-          {/* Submit */}
+          {/* ── Submit ── */}
           <button type="submit" disabled={loading}
             style={{
               width: '100%', background: loading ? '#888' : '#b8972a',
@@ -392,23 +601,3 @@ export default function SoferApplyPage() {
     </div>
   );
 }
-
-const cardStyle: React.CSSProperties = {
-  background: '#fff', borderRadius: 12, padding: 24, marginBottom: 20,
-  boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-};
-
-const sectionTitle: React.CSSProperties = {
-  fontSize: 17, fontWeight: 800, color: '#1a3a2a', marginBottom: 20,
-  borderBottom: '2px solid #f0f0f0', paddingBottom: 10,
-};
-
-const labelStyle: React.CSSProperties = {
-  display: 'block', fontSize: 13, fontWeight: 700, color: '#333', marginBottom: 6,
-};
-
-const inputStyle: React.CSSProperties = {
-  width: '100%', border: '1px solid #ddd', borderRadius: 8,
-  padding: '10px 12px', fontSize: 14, color: '#333',
-  outline: 'none', background: '#fafafa', boxSizing: 'border-box',
-};
