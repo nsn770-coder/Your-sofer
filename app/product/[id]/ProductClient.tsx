@@ -36,6 +36,9 @@ interface Product {
   level?: string;
   lookTag?: string;
   collection?: string;
+  nusach?: string;
+  extraDesc?: string;
+  closeupImageUrl?: string;
   stockCount?: number;
   stockVisible?: boolean;
 }
@@ -311,29 +314,41 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
   );
 }
 
-// ─── Edit Modal ───────────────────────────────────────────────────────────────
+// ─── Admin Panel ──────────────────────────────────────────────────────────────
 
 const SOFER_EDIT_CATS = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
+const STAM_ADMIN_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
 
-function EditModal({ product, onClose, onSave }: { product: Product; onClose: () => void; onSave: (updated: Partial<Product>) => void }) {
-  const [name, setName]         = useState(product.name);
-  const [price, setPrice]       = useState(String(product.price));
-  const [was, setWas]           = useState(String(product.was || ''));
-  const [desc, setDesc]         = useState(product.desc || product.description || '');
-  const [cat, setCat]           = useState(product.cat || '');
-  const [level, setLevel]       = useState(product.level || '');
-  const [soferId, setSoferId]   = useState(product.soferId || '');
-  const [soferOptions, setSoferOptions] = useState<{ id: string; name: string }[]>([]);
-  const [imgUrl, setImgUrl]     = useState(product.imgUrl || product.image_url || '');
-  const [imgUrl2, setImgUrl2]   = useState(product.imgUrl2 || '');
-  const [imgUrl3, setImgUrl3]   = useState(product.imgUrl3 || '');
-  const [imgUrl4, setImgUrl4]   = useState(product.imgUrl4 || '');
-  const [imgUrl5, setImgUrl5]   = useState(product.imgUrl5 || '');
-  const [videoUrl, setVideoUrl] = useState(product.videoUrl || '');
-  const [badge, setBadge]       = useState(product.badge || '');
-  const [days, setDays]         = useState(product.days || '7-14');
-  const [saving, setSaving]     = useState(false);
-  const [uploadingImg, setUploadingImg] = useState<string | null>(null);
+function AdminPanel({ product, onSave, isMobile, onClose }: {
+  product: Product;
+  onSave: (updated: Partial<Product>) => Promise<void>;
+  isMobile: boolean;
+  onClose: () => void;
+}) {
+  const [name, setName]                       = useState(product.name);
+  const [price, setPrice]                     = useState(String(product.price));
+  const [was, setWas]                         = useState(String(product.was || ''));
+  const [cat, setCat]                         = useState(product.cat || '');
+  const [days, setDays]                       = useState(product.days || '7-14');
+  const [badge, setBadge]                     = useState(product.badge || '');
+  const [desc, setDesc]                       = useState(product.desc || product.description || '');
+  const [extraDesc, setExtraDesc]             = useState(product.extraDesc || '');
+  const [imgUrl, setImgUrl]                   = useState(product.imgUrl || product.image_url || '');
+  const [imgUrl2, setImgUrl2]                 = useState(product.imgUrl2 || '');
+  const [imgUrl3, setImgUrl3]                 = useState(product.imgUrl3 || '');
+  const [imgUrl4, setImgUrl4]                 = useState(product.imgUrl4 || '');
+  const [imgUrl5, setImgUrl5]                 = useState(product.imgUrl5 || '');
+  const [videoUrl, setVideoUrl]               = useState(product.videoUrl || '');
+  const [level, setLevel]                     = useState(product.level || '');
+  const [nusach, setNusach]                   = useState(product.nusach || '');
+  const [closeupImageUrl, setCloseupImageUrl] = useState(product.closeupImageUrl || '');
+  const [stockCount, setStockCount]           = useState(String(product.stockCount || ''));
+  const [stockVisible, setStockVisible]       = useState(product.stockVisible !== false);
+  const [soferId, setSoferId]                 = useState(product.soferId || '');
+  const [soferOptions, setSoferOptions]       = useState<{ id: string; name: string }[]>([]);
+  const [saving, setSaving]                   = useState(false);
+  const [uploadingImg, setUploadingImg]       = useState<string | null>(null);
+  const [saved, setSaved]                     = useState(false);
 
   useEffect(() => {
     getDocs(collection(db, 'soferim'))
@@ -345,106 +360,232 @@ function EditModal({ product, onClose, onSave }: { product: Product; onClose: ()
       .catch(() => {});
   }, []);
 
-  async function uploadToCloudinary(file: File, isVideo = false): Promise<string> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'yoursofer_upload');
-    const res = await fetch(`https://api.cloudinary.com/v1_1/dyxzq3ucy/${isVideo ? 'video' : 'image'}/upload`, { method: 'POST', body: formData });
-    const data = await res.json();
-    return data.secure_url;
-  }
-
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>, field: string) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingImg(field);
     try {
-      const url = await uploadToCloudinary(file, file.type.startsWith('video/'));
-      if (field === 'main') setImgUrl(url);
-      else if (field === 'img2') setImgUrl2(url);
-      else if (field === 'img3') setImgUrl3(url);
-      else if (field === 'img4') setImgUrl4(url);
-      else if (field === 'img5') setImgUrl5(url);
-      else if (field === 'video') setVideoUrl(url);
+      const isVideo = file.type.startsWith('video/');
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'yoursofer_upload');
+      const res = await fetch(`https://api.cloudinary.com/v1_1/dyxzq3ucy/${isVideo ? 'video' : 'image'}/upload`, { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error('שגיאה');
+      if (field === 'main') setImgUrl(data.secure_url);
+      else if (field === 'img2') setImgUrl2(data.secure_url);
+      else if (field === 'img3') setImgUrl3(data.secure_url);
+      else if (field === 'img4') setImgUrl4(data.secure_url);
+      else if (field === 'img5') setImgUrl5(data.secure_url);
+      else if (field === 'video') setVideoUrl(data.secure_url);
+      else if (field === 'closeup') setCloseupImageUrl(data.secure_url);
     } catch { alert('שגיאה בהעלאה'); }
     finally { setUploadingImg(null); }
   }
 
   async function handleSave() {
     setSaving(true);
-    try { onSave({ name, price: Number(price), was: was ? Number(was) : null, desc, cat, level: ['קלפי מזוזה', 'תפילין קומפלט'].includes(cat) ? level : '', soferId: soferId || undefined, imgUrl, imgUrl2, imgUrl3, imgUrl4, imgUrl5, videoUrl, badge, days }); }
-    finally { setSaving(false); }
+    try {
+      const isStam = STAM_ADMIN_CATS.has(cat);
+      await onSave({
+        name, price: Number(price),
+        was: was ? Number(was) : null,
+        desc, extraDesc: extraDesc || undefined,
+        cat, days, badge: badge || undefined,
+        imgUrl, imgUrl2, imgUrl3, imgUrl4, imgUrl5,
+        videoUrl: videoUrl || undefined,
+        level: isStam ? level : '',
+        nusach: isStam ? (nusach || undefined) : undefined,
+        closeupImageUrl: isStam ? (closeupImageUrl || undefined) : undefined,
+        stockCount: stockCount ? Number(stockCount) : undefined,
+        stockVisible,
+        soferId: soferId || undefined,
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } finally { setSaving(false); }
   }
 
-  const inputS: React.CSSProperties = { width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box', fontFamily: 'inherit' };
-  const labelS: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 };
+  const iS: React.CSSProperties = { width: '100%', border: '1px solid #243a62', borderRadius: 6, padding: '6px 9px', fontSize: 12, boxSizing: 'border-box', fontFamily: 'inherit', background: '#152040', color: '#ddd5c0', outline: 'none' };
+  const lS: React.CSSProperties = { fontSize: 9, fontWeight: 800, color: '#b8972a', display: 'block', marginBottom: 2, letterSpacing: '0.1em', textTransform: 'uppercase' };
+  const secS: React.CSSProperties = { borderBottom: '1px solid #152040', paddingBottom: 12, marginBottom: 12 };
+  const secTitleS: React.CSSProperties = { fontSize: 9, fontWeight: 900, color: 'rgba(184,151,42,0.65)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 };
+  const isStam = STAM_ADMIN_CATS.has(cat);
 
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 540, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl', boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }} onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b8972a' }}><Icon.Edit /></div>
-            <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35', margin: 0 }}>עריכת מוצר</h2>
-          </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', display: 'flex' }}><Icon.X size={20} /></button>
+  const panelContent = (
+    <div style={{ padding: '10px 12px 88px' }}>
+      {saved && (
+        <div style={{ position: 'sticky', top: 0, zIndex: 2, background: '#166534', color: '#dcfce7', padding: '7px 10px', borderRadius: 5, fontWeight: 700, fontSize: 12, textAlign: 'center', marginBottom: 10 }}>
+          ✓ נשמר
         </div>
-        <div style={{ display: 'grid', gap: 14 }}>
-          <div><label style={labelS}>שם מוצר</label><input value={name} onChange={e => setName(e.target.value)} style={inputS} /></div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div><label style={labelS}>מחיר ₪</label><input type="number" value={price} onChange={e => setPrice(e.target.value)} style={inputS} /></div>
-            <div><label style={labelS}>מחיר מקורי ₪</label><input type="number" value={was} onChange={e => setWas(e.target.value)} placeholder="לא חובה" style={inputS} /></div>
+      )}
+
+      {/* § בסיסי */}
+      <div style={secS}>
+        <div style={secTitleS}>§ בסיסי</div>
+        <div style={{ display: 'grid', gap: 7 }}>
+          <div><label style={lS}>שם</label><input value={name} onChange={e => setName(e.target.value)} style={iS} /></div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <div><label style={lS}>מחיר ₪</label><input type="number" value={price} onChange={e => setPrice(e.target.value)} style={iS} /></div>
+            <div><label style={lS}>לפני הנחה ₪</label><input type="number" value={was} onChange={e => setWas(e.target.value)} placeholder="–" style={iS} /></div>
           </div>
-          <div><label style={labelS}>קטגוריה</label><select value={cat} onChange={e => { setCat(e.target.value); if (!['קלפי מזוזה', 'תפילין קומפלט'].includes(e.target.value)) setLevel(''); }} style={{ ...inputS, background: '#fff' }}>{CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-          {(SOFER_EDIT_CATS.includes(cat) || !!soferId) && (
-            <div><label style={labelS}>סופר</label><select value={soferId} onChange={e => setSoferId(e.target.value)} style={{ ...inputS, background: '#fff' }}><option value="">ללא סופר</option>{soferOptions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
-          )}
-          {['קלפי מזוזה', 'תפילין קומפלט'].includes(cat) && (
-            <div><label style={labelS}>רמת הידור</label><select value={level} onChange={e => setLevel(e.target.value)} style={{ ...inputS, background: '#fff' }}><option value="">לא מוגדר</option><option value="פשוט">פשוט</option><option value="מהודר">מהודר</option><option value="מהודר בתכלית">מהודר בתכלית</option></select></div>
-          )}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div><label style={labelS}>תווית</label><select value={badge} onChange={e => setBadge(e.target.value)} style={{ ...inputS, background: '#fff' }}><option value="">ללא</option><option value="חדש">חדש</option><option value="מבצע">מבצע</option><option value="פופולרי">פופולרי</option></select></div>
-            <div><label style={labelS}>זמן אספקה</label><input value={days} onChange={e => setDays(e.target.value)} placeholder="7-14" style={inputS} /></div>
-          </div>
-          <div><label style={labelS}>תיאור</label><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={4} style={{ ...inputS, resize: 'vertical' }} /></div>
           <div>
-            <label style={labelS}>תמונות וסרטון</label>
-            {(['main', 'img2', 'img3', 'img4', 'img5'] as const).map((field, idx) => {
-              const cur = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : field === 'img3' ? imgUrl3 : field === 'img4' ? imgUrl4 : imgUrl5;
-              const set = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : field === 'img3' ? setImgUrl3 : field === 'img4' ? setImgUrl4 : setImgUrl5;
-              return (
-                <div key={field} style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-                  {cur && <img src={cur} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
-                  <label style={{ background: '#0c1a35', color: '#fff', borderRadius: 7, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 5 }}>
-                    {uploadingImg === field ? <Icon.Loader /> : <Icon.Camera />}
-                    תמונה {idx + 1}
-                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleUpload(e, field)} />
-                  </label>
-                  <input value={cur} onChange={e => set(e.target.value)} placeholder="URL" style={{ flex: 1, border: '1px solid #ddd', borderRadius: 7, padding: '7px 10px', fontSize: 12, minWidth: 0 }} />
-                  {cur && (
-                    <button type="button" onClick={() => set('')} title="מחק תמונה" style={{ background: 'none', border: '1px solid #e0e0e0', borderRadius: 7, padding: '6px 8px', fontSize: 12, cursor: 'pointer', color: '#888', flexShrink: 0, lineHeight: 1 }}>✕</button>
-                  )}
-                </div>
-              );
-            })}
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
-              {videoUrl && <div style={{ width: 44, height: 44, background: '#111', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon.Play /></div>}
-              <label style={{ background: '#7c3aed', color: '#fff', borderRadius: 7, padding: '7px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 5 }}>
-                {uploadingImg === 'video' ? <Icon.Loader /> : <Icon.Video />}
-                סרטון
-                <input type="file" accept="video/*" style={{ display: 'none' }} onChange={e => handleUpload(e, 'video')} />
-              </label>
-              <input value={videoUrl} onChange={e => setVideoUrl(e.target.value)} placeholder="URL סרטון (אופציונלי)" style={{ flex: 1, border: '1px solid #ddd', borderRadius: 7, padding: '7px 10px', fontSize: 12, minWidth: 0 }} />
+            <label style={lS}>קטגוריה</label>
+            <select value={cat} onChange={e => setCat(e.target.value)} style={{ ...iS, background: '#152040' }}>
+              {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            <div><label style={lS}>זמן אספקה</label><input value={days} onChange={e => setDays(e.target.value)} placeholder="7-14" style={iS} /></div>
+            <div>
+              <label style={lS}>תווית</label>
+              <select value={badge} onChange={e => setBadge(e.target.value)} style={{ ...iS, background: '#152040' }}>
+                <option value="">ללא</option>
+                <option value="חדש">חדש</option>
+                <option value="מבצע">מבצע</option>
+                <option value="פופולרי">פופולרי</option>
+              </select>
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
-          <button onClick={handleSave} disabled={saving} style={{ flex: 1, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            {saving ? <><Icon.Loader /> שומר...</> : <><Icon.Save /> שמור שינויים</>}
-          </button>
-          <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
+      </div>
+
+      {/* § תיאור */}
+      <div style={secS}>
+        <div style={secTitleS}>§ תיאור</div>
+        <div style={{ display: 'grid', gap: 7 }}>
+          <div><label style={lS}>תיאור ראשי</label><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={4} style={{ ...iS, resize: 'vertical' }} /></div>
+          <div><label style={lS}>טקסט נוסף</label><textarea value={extraDesc} onChange={e => setExtraDesc(e.target.value)} rows={3} placeholder="יוצג מתחת לתיאור הראשי" style={{ ...iS, resize: 'vertical' }} /></div>
         </div>
       </div>
+
+      {/* § תמונות */}
+      <div style={secS}>
+        <div style={secTitleS}>§ תמונות וסרטון</div>
+        {(['main', 'img2', 'img3', 'img4', 'img5'] as const).map((field, idx) => {
+          const cur = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : field === 'img3' ? imgUrl3 : field === 'img4' ? imgUrl4 : imgUrl5;
+          const setter = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : field === 'img3' ? setImgUrl3 : field === 'img4' ? setImgUrl4 : setImgUrl5;
+          return (
+            <div key={field} style={{ display: 'flex', gap: 5, alignItems: 'center', marginBottom: 5 }}>
+              {cur && <img src={cur} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 3, border: '1px solid #243a62', flexShrink: 0 }} />}
+              <label style={{ border: '1px solid #b8972a', color: '#b8972a', borderRadius: 4, padding: '3px 6px', fontSize: 10, fontWeight: 800, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+                {uploadingImg === field ? '…' : '📷'}{idx + 1}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleUpload(e, field)} />
+              </label>
+              <input value={cur} onChange={e => setter(e.target.value)} placeholder="URL" style={{ flex: 1, ...iS, padding: '4px 7px', fontSize: 11 }} />
+              {cur && <button type="button" onClick={() => setter('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 12, padding: 2, lineHeight: 1, flexShrink: 0 }}>✕</button>}
+            </div>
+          );
+        })}
+        <div style={{ display: 'flex', gap: 5, alignItems: 'center', marginTop: 4 }}>
+          <label style={{ border: '1px solid #7c3aed', color: '#c4b5fd', borderRadius: 4, padding: '3px 6px', fontSize: 10, fontWeight: 800, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+            {uploadingImg === 'video' ? '…' : '🎬'} וידאו
+            <input type="file" accept="video/*" style={{ display: 'none' }} onChange={e => handleUpload(e, 'video')} />
+          </label>
+          <input value={videoUrl} onChange={e => setVideoUrl(e.target.value)} placeholder="URL" style={{ flex: 1, ...iS, padding: '4px 7px', fontSize: 11 }} />
+        </div>
+      </div>
+
+      {/* § סת״ם — only for STaM categories */}
+      {isStam && (
+        <div style={secS}>
+          <div style={secTitleS}>§ סת״ם</div>
+          <div style={{ display: 'grid', gap: 7 }}>
+            <div>
+              <label style={lS}>רמת כשרות</label>
+              <select value={level} onChange={e => setLevel(e.target.value)} style={{ ...iS, background: '#152040' }}>
+                <option value="">לא מוגדר</option>
+                <option value="כשר לכתחילה">כשר לכתחילה</option>
+                <option value="מהודר">מהודר</option>
+                <option value="מהודר בתכלית">מהודר בתכלית</option>
+              </select>
+            </div>
+            <div>
+              <label style={lS}>נוסח</label>
+              <select value={nusach} onChange={e => setNusach(e.target.value)} style={{ ...iS, background: '#152040' }}>
+                <option value="">לא מוגדר</option>
+                <option value="אשכנזי">אשכנזי</option>
+                <option value="ספרדי">ספרדי</option>
+                <option value={'אדמוה"ז'}>{'אדמוה"ז'}</option>
+              </select>
+            </div>
+            <div>
+              <label style={lS}>תמונת מקרוב</label>
+              <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                {closeupImageUrl && <img src={closeupImageUrl} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 3, border: '1px solid #243a62', flexShrink: 0 }} />}
+                <label style={{ border: '1px solid #b8972a', color: '#b8972a', borderRadius: 4, padding: '3px 6px', fontSize: 10, fontWeight: 800, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+                  {uploadingImg === 'closeup' ? '…' : '📷'} העלה
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleUpload(e, 'closeup')} />
+                </label>
+                <input value={closeupImageUrl} onChange={e => setCloseupImageUrl(e.target.value)} placeholder="URL" style={{ flex: 1, ...iS, padding: '4px 7px', fontSize: 11 }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* § מלאי */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={secTitleS}>§ מלאי</div>
+        <div style={{ display: 'grid', gap: 7 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 6, alignItems: 'end' }}>
+            <div><label style={lS}>כמות במלאי</label><input type="number" value={stockCount} onChange={e => setStockCount(e.target.value)} placeholder="–" style={iS} /></div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: 11, color: '#ddd5c0', whiteSpace: 'nowrap', paddingBottom: 4 }}>
+              <input type="checkbox" checked={stockVisible} onChange={e => setStockVisible(e.target.checked)} />
+              הצג
+            </label>
+          </div>
+          {(SOFER_EDIT_CATS.includes(cat) || !!soferId) && (
+            <div>
+              <label style={lS}>סופר</label>
+              <select value={soferId} onChange={e => setSoferId(e.target.value)} style={{ ...iS, background: '#152040' }}>
+                <option value="">ללא סופר</option>
+                {soferOptions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Save */}
+      <button
+        onClick={handleSave}
+        disabled={saving}
+        style={{ width: '100%', padding: '11px', background: saving ? '#5a4a18' : '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 900, cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+      >
+        {saving ? 'שומר...' : '💾 שמור שינויים'}
+      </button>
+    </div>
+  );
+
+  const panelHeader = (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 12px', borderBottom: '1px solid #152040', position: 'sticky', top: 0, background: '#0c1a35', zIndex: 2 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+        <span style={{ fontSize: 12 }}>✏️</span>
+        <span style={{ fontSize: 13, fontWeight: 900, color: '#e8e0d0' }}>עריכת מוצר</span>
+        <span style={{ fontSize: 9, fontWeight: 800, color: '#b8972a', background: 'rgba(184,151,42,0.12)', border: '1px solid rgba(184,151,42,0.25)', padding: '1px 5px', borderRadius: 8 }}>ADMIN</span>
+      </div>
+      <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 16, lineHeight: 1, padding: 4 }}>✕</button>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1048 }} onClick={onClose} />
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, maxHeight: '88vh', overflowY: 'auto', background: '#0c1a35', borderTop: '2px solid #b8972a', borderRadius: '14px 14px 0 0', zIndex: 1050, direction: 'rtl', boxShadow: '0 -6px 30px rgba(0,0,0,0.4)' }}>
+          <div style={{ width: 32, height: 3, background: '#243a62', borderRadius: 2, margin: '8px auto 0' }} />
+          {panelHeader}
+          {panelContent}
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <div style={{ position: 'fixed', top: 0, right: 0, width: 300, height: '100vh', overflowY: 'auto', background: '#0c1a35', borderLeft: '2px solid #b8972a', zIndex: 1050, direction: 'rtl', boxShadow: '-4px 0 24px rgba(0,0,0,0.4)' }}>
+      {panelHeader}
+      {panelContent}
     </div>
   );
 }
@@ -823,13 +964,13 @@ export default function ProductClient() {
   const [qty, setQty]                   = useState(1);
   const [zoomVisible, setZoomVisible]   = useState(false);
   const [showWizardModal, setShowWizardModal] = useState(false);
-  const [showEdit, setShowEdit]         = useState(false);
+  const [adminOpen, setAdminOpen]       = useState(false);
   const [saveSuccess, setSaveSuccess]   = useState(false);
   const [selectedKlafId, setSelectedKlafId]     = useState<string | null>(null);
   const [selectedKlafName, setSelectedKlafName] = useState<string | null>(null);
   const [isMobile, setIsMobile]         = useState(false);
   const [showVideo, setShowVideo]       = useState(false);
-  const [activeTab, setActiveTab]       = useState<'details' | 'kashrut' | 'shipping'>('details');
+  const [activeTab, setActiveTab]       = useState<'details' | 'kashrut' | 'shipping' | 'closeup'>('details');
   const [currentViewers, setCurrentViewers] = useState(2);
   const [stockCount] = useState(() => {
     const pid = Array.isArray(id) ? id[0] : (id ?? '');
@@ -927,7 +1068,6 @@ export default function ProductClient() {
     try {
       await updateDoc(doc(db, 'products', product.id), Object.fromEntries(Object.entries(updated).filter(([, v]) => v !== undefined)));
       setProduct(prev => prev ? { ...prev, ...updated } : prev);
-      setShowEdit(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) { console.error(err); alert('שגיאה בשמירה'); }
@@ -1135,8 +1275,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             <span style={{ color: '#555', fontWeight: 500 }}>{product.name.slice(0, isMobile ? 28 : 48)}{product.name.length > (isMobile ? 28 : 48) ? '…' : ''}</span>
           </div>
           {user?.role === 'admin' && (
-            <button onClick={() => setShowEdit(true)} style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
-              <Icon.Edit /> עריכת מוצר
+            <button onClick={() => setAdminOpen(prev => !prev)} style={{ background: adminOpen ? '#b8972a' : '#0c1a35', color: adminOpen ? '#0c1a35' : '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
+              <Icon.Edit /> {adminOpen ? 'סגור עריכה' : 'עריכת מוצר'}
             </button>
           )}
         </div>
@@ -1234,8 +1374,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                 {([
                   { key: 'details',  label: 'פרטי המוצר' },
                   ...(product.cat && KASHRUT_CATEGORIES.includes(product.cat) ? [{ key: 'kashrut' as const, label: 'כשרות ואיכות' }] : []),
-
                   { key: 'shipping', label: 'משלוח והחזרות' },
+                  ...(product.closeupImageUrl && product.cat && KASHRUT_CATEGORIES.includes(product.cat) ? [{ key: 'closeup' as const, label: 'תמונת מקרוב' }] : []),
                 ] as { key: typeof activeTab; label: string }[]).map(tab => (
                   <button key={tab.key} onClick={() => { setActiveTab(tab.key); if (tab.key === 'kashrut') trackOpenKashrutCertificate(product.id); }}
                     style={{ flex: 1, background: 'none', border: 'none', padding: '9px 6px', fontSize: isMobile ? 12 : 13, fontWeight: activeTab === tab.key ? 800 : 600, color: activeTab === tab.key ? '#0c1a35' : '#888', borderBottom: `2px solid ${activeTab === tab.key ? '#b8972a' : 'transparent'}`, marginBottom: -2, cursor: 'pointer', transition: 'color 0.15s', whiteSpace: 'nowrap' }}>
@@ -1250,6 +1390,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <div style={{ fontSize: 13, color: '#444', lineHeight: 1.8, marginBottom: 12 }}>{product.desc || product.description}</div>
                   ) : (
                     <div style={{ fontSize: 13, color: '#aaa', fontStyle: 'italic' }}>אין תיאור למוצר זה.</div>
+                  )}
+                  {product.extraDesc && (
+                    <div style={{ fontSize: 13, color: '#555', lineHeight: 1.8, marginBottom: 12, fontStyle: 'italic', borderRight: '3px solid #e0d9c8', paddingRight: 10 }}>{product.extraDesc}</div>
                   )}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px', background: '#f8f9fa', borderRadius: 10, padding: '10px 14px', fontSize: 12 }}>
                     <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Clock /> זמן אספקה</span>
@@ -1284,6 +1427,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                       <span style={{ color: '#555' }}>{row.v}</span>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {activeTab === 'closeup' && product.closeupImageUrl && (
+                <div style={{ textAlign: 'center' }}>
+                  <img src={product.closeupImageUrl} alt="תמונת מקרוב" style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid #e8e8e8' }} />
                 </div>
               )}
             </div>
@@ -1494,7 +1643,21 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </div>
       )}
 
-      {showEdit && <EditModal product={product} onClose={() => setShowEdit(false)} onSave={handleSave} />}
+      {/* Mobile FAB — admin only */}
+      {user?.role === 'admin' && isMobile && !adminOpen && (
+        <button
+          onClick={() => setAdminOpen(true)}
+          style={{ position: 'fixed', bottom: 82, left: 16, zIndex: 1040, background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: '50%', width: 48, height: 48, fontSize: 18, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          title="עריכת מוצר"
+        >
+          ✏️
+        </button>
+      )}
+
+      {/* Admin panel */}
+      {user?.role === 'admin' && adminOpen && (
+        <AdminPanel product={product} onSave={handleSave} isMobile={isMobile} onClose={() => setAdminOpen(false)} />
+      )}
     </div>
   );
 }
