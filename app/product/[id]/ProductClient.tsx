@@ -42,7 +42,6 @@ interface Product {
   closeupImageUrl?: string;
   stockCount?: number;
   stockVisible?: boolean;
-  size?: string;
   marketingIntro?: string;
   whoIsItFor?: { emoji: string; text: string }[];
   whyUs?: string[];
@@ -420,7 +419,6 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [whyUsList, setWhyUsList]             = useState<string[]>(product.whyUs ?? pageDefaults?.whyUs ?? []);
   const [whatYouGetList, setWhatYouGetList]   = useState<string[]>(product.whatYouGet ?? pageDefaults?.whatYouGet ?? []);
   const [saveGlobal, setSaveGlobal]           = useState(false);
-  const [size, setSize]                       = useState(product.size || '');
 
   useEffect(() => {
     getDocs(collection(db, 'soferim'))
@@ -480,7 +478,6 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         closeupImageUrl: isStam ? (closeupImageUrl || undefined) : undefined,
         stockCount: stockCount ? Number(stockCount) : undefined,
         stockVisible,
-        size: size || undefined,
         soferId: soferId || undefined,
         ...(saveGlobal ? {} : textData),
       });

@@ -215,11 +215,20 @@ export default function SoferDashboard() {
         {/* Products */}
         {activeTab === 'products' && (
           <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ fontSize: 16, fontWeight: 900, color: '#1a3a2a' }}>המוצרים שלי ({products.length})</div>
+              <button onClick={() => router.push('/sofer/upload')} style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 14, fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                ➕ הוסף מוצר חדש
+              </button>
+            </div>
             {products.length === 0 ? (
               <div style={{ background: '#fff', borderRadius: 12, padding: 48, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>📜</div>
                 <div style={{ fontSize: 18, color: '#555', marginBottom: 8 }}>אין מוצרים עדיין</div>
-                <div style={{ fontSize: 14, color: '#888' }}>המנהל ישייך אליך מוצרים בקרוב</div>
+                <div style={{ fontSize: 14, color: '#888', marginBottom: 20 }}>העלה את המוצר הראשון שלך ותתחיל למכור!</div>
+                <button onClick={() => router.push('/sofer/upload')} style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 900, cursor: 'pointer' }}>
+                  ➕ העלה מוצר ראשון
+                </button>
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
@@ -239,10 +248,10 @@ export default function SoferDashboard() {
                         <span style={{ fontSize: 16, fontWeight: 900, color: '#1a3a2a' }}>₪{p.price}</span>
                         <span style={{
                           fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 10,
-                          background: p.status === 'active' ? '#d5f5e3' : '#fde8e8',
-                          color: p.status === 'active' ? '#1e8449' : '#c0392b',
+                          background: p.status === 'active' ? '#d5f5e3' : p.status === 'pending' ? '#fef9c3' : '#fde8e8',
+                          color: p.status === 'active' ? '#1e8449' : p.status === 'pending' ? '#92400e' : '#c0392b',
                         }}>
-                          {p.status === 'active' ? '● פעיל' : '● לא פעיל'}
+                          {p.status === 'active' ? '● פעיל' : p.status === 'pending' ? '⏳ ממתין לאישור' : '● לא פעיל'}
                         </span>
                       </div>
                       <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{p.category}</div>

@@ -96,6 +96,9 @@ interface Product {
   sourceUrl?: string;
   stockCount?: number;
   stockVisible?: boolean;
+  soferName?: string;
+  soferPrice?: number;
+  createdAt?: { seconds: number };
 }
 
 interface Sofer {
@@ -1935,6 +1938,64 @@ export default function AdminPage() {
 
       {activeTab === 'soferim' && (
         <div>
+          {/* ── Pending Products from Soferim ── */}
+          {(() => {
+            const pending = products.filter(p => p.status === 'pending');
+            if (productsLoading) return null;
+            return pending.length > 0 ? (
+              <div className="mb-8">
+                <h2 className="text-xl font-black mb-4">📦 מוצרים ממתינים לאישור ({pending.length})</h2>
+                <div className="grid gap-4">
+                  {pending.map(p => (
+                    <div key={p.id} className="bg-white rounded-xl shadow p-4 flex gap-4 items-start">
+                      {p.imgUrl && <img src={p.imgUrl} alt={p.name} className="w-16 h-16 object-cover rounded-lg border border-gray-200 flex-shrink-0" />}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-black text-base mb-1 truncate">{p.name}</div>
+                        <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-2">
+                          {p.soferName && <span>✍️ {p.soferName}</span>}
+                          <span>📁 {p.cat || p.category || '—'}</span>
+                          {p.soferPrice != null && <span>💰 מחיר סופר: ₪{p.soferPrice.toLocaleString()}</span>}
+                          <span>🏷 מחיר ללקוח: ₪{p.price.toLocaleString()}</span>
+                          {p.createdAt && <span>📅 {new Date(p.createdAt.seconds * 1000).toLocaleDateString('he-IL')}</span>}
+                        </div>
+                        {p.desc && <p className="text-xs text-gray-400 line-clamp-2">{p.desc}</p>}
+                      </div>
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <button onClick={() => window.open(`/product/${p.id}`, '_blank')} className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-200 whitespace-nowrap">
+                          👁 תצוגה
+                        </button>
+                        <button
+                          onClick={async () => {
+                            setActionLoading(p.id + '_approve');
+                            try { await updateDoc(doc(db, 'products', p.id), { status: 'active' }); setProducts(prev => prev.map(x => x.id === p.id ? { ...x, status: 'active' } : x)); }
+                            catch { alert('שגיאה'); } finally { setActionLoading(null); }
+                          }}
+                          disabled={actionLoading === p.id + '_approve'}
+                          className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {actionLoading === p.id + '_approve' ? '...' : '✅ אשר'}
+                        </button>
+                        <button
+                          onClick={async () => {
+                            setActionLoading(p.id + '_reject');
+                            try { await updateDoc(doc(db, 'products', p.id), { status: 'rejected' }); setProducts(prev => prev.map(x => x.id === p.id ? { ...x, status: 'rejected' } : x)); }
+                            catch { alert('שגיאה'); } finally { setActionLoading(null); }
+                          }}
+                          disabled={actionLoading === p.id + '_reject'}
+                          className="bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-200 disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {actionLoading === p.id + '_reject' ? '...' : '❌ דחה'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <hr className="my-6 border-gray-200" />
+              </div>
+            ) : null;
+          })()}
+
+          {/* ── Sofer Applications ── */}
           {appsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
           : applications.length === 0 ? <div className="p-10 text-center text-gray-400">אין בקשות עדיין</div>
           : (
