@@ -1058,19 +1058,20 @@ export default function HomePageClient() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#b8972a', letterSpacing: '0.15em', textAlign: 'center', marginBottom: 8 }}>COLLECTIONS</p>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 28, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הקולקציות שלנו</h2>
-          <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 28 }}>חמישה קוים עיצוביים — מצאו את הסגנון שמדבר אליכם</p>
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 28 }}>שישה קוים עיצוביים — מצאו את הסגנון שמדבר אליכם</p>
 
           {/* Horizontal scroll on mobile, grid on desktop */}
           <div style={isMobile
             ? { display: 'flex', overflowX: 'auto', gap: 12, paddingBottom: 8, scrollbarWidth: 'none' } as React.CSSProperties
-            : { display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14 }
+            : { display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 14 }
           }>
             {[
-              { id: 'יהלום', tagline: 'הקו השקוף והמודרני', color: '#87CEEB', bg: 'rgba(135,206,235,0.12)', border: 'rgba(135,206,235,0.3)', dot: '#87CEEB', href: '/category/מזוזות?collection=יהלום' },
-              { id: 'שוהם',  tagline: 'הקו הטבעי והכהה',    color: '#d97706', bg: 'rgba(217,119,6,0.1)',   border: 'rgba(217,119,6,0.3)',   dot: '#78350f', href: '/category/מזוזות?collection=שוהם' },
-              { id: 'ישפה',  tagline: 'הקו האומנותי והצבעוני', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.3)', dot: 'rainbow', href: '/category/כלי שולחן והגשה?collection=ישפה' },
-              { id: 'ספיר',  tagline: 'הקו המתכתי והקריר',  color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', border: 'rgba(148,163,184,0.3)', dot: '#94a3b8', href: '/category/יודאיקה?collection=ספיר' },
-              { id: 'ברקת',  tagline: 'הקו החגיגי והיוקרתי', color: '#4ade80', bg: 'rgba(74,222,128,0.1)', border: 'rgba(74,222,128,0.3)',  dot: '#15803d', href: '/category/כלי שולחן והגשה?collection=ברקת' },
+              { id: 'יהלום',  tagline: 'הקו השקוף והמודרני',     dot: '#87CEEB', href: '/category/מזוזות?collection=יהלום',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919873/1777913222083_ibossf.png' },
+              { id: 'ישפה',   tagline: 'הקו האומנותי והצבעוני',  dot: 'rainbow', href: '/category/כלי שולחן והגשה?collection=ישפה',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png' },
+              { id: 'ברקת',   tagline: 'הקו החגיגי והיוקרתי',    dot: '#15803d', href: '/category/כלי שולחן והגשה?collection=ברקת',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919689931_fkb8c6.png' },
+              { id: 'תרשיש',  tagline: 'הקו הזהוב והמאיר',       dot: '#b45309', href: '/category/יודאיקה?collection=תרשיש',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919932/1777919910394_olu4mi.png' },
+              { id: 'ספיר',   tagline: 'הקו המתכתי והקריר',      dot: '#94a3b8', href: '/category/יודאיקה?collection=ספיר',                      img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919702083_vflhuc.png' },
+              { id: 'שוהם',   tagline: 'הקו הטבעי והכהה',        dot: '#78350f', href: '/category/מזוזות?collection=שוהם',                       img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777920809/1777920771814_vikmum.png' },
             ].map(col => (
               <a
                 key={col.id}
@@ -1079,28 +1080,36 @@ export default function HomePageClient() {
                   textDecoration: 'none',
                   display: 'block',
                   flexShrink: 0,
-                  width: isMobile ? 170 : 'auto',
-                  background: col.bg,
-                  border: `1px solid ${col.border}`,
+                  width: isMobile ? 160 : 'auto',
+                  backgroundImage: `url(${col.img})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  border: '1px solid rgba(255,255,255,0.15)',
                   borderRadius: 0,
                   padding: '18px 16px',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  minHeight: isMobile ? 140 : 160,
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = 'none'; }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{
-                    width: 10, height: 10, borderRadius: '50%', flexShrink: 0, display: 'inline-block',
-                    background: col.dot === 'rainbow'
-                      ? 'linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)'
-                      : col.dot,
-                  }} />
-                  <span style={{ fontSize: isMobile ? 16 : 17, fontWeight: 900, color: col.color }}>{col.id}</span>
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 0 }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <span style={{
+                      width: 10, height: 10, borderRadius: '50%', flexShrink: 0, display: 'inline-block',
+                      background: col.dot === 'rainbow'
+                        ? 'linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)'
+                        : col.dot,
+                    }} />
+                    <span style={{ fontSize: isMobile ? 16 : 17, fontWeight: 900, color: '#fff' }}>{col.id}</span>
+                  </div>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.5 }}>{col.tagline}</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#fff', margin: '10px 0 0' }}>לצפייה ←</p>
                 </div>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', margin: 0, lineHeight: 1.5 }}>{col.tagline}</p>
-                <p style={{ fontSize: 11, fontWeight: 700, color: col.color, marginTop: 10, margin: '10px 0 0' }}>לצפייה ←</p>
               </a>
             ))}
           </div>
