@@ -159,7 +159,18 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads';
+
+interface Lead {
+  id: string;
+  name?: string;
+  phone?: string;
+  nusach?: string;
+  location?: string;
+  klafimCount?: number;
+  createdAt?: { seconds: number };
+  source?: string;
+}
 
 interface Review {
   id: string;
@@ -1130,6 +1141,7 @@ export default function AdminPage() {
   const [appsLoading, setAppsLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('orders');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>('הכל');
@@ -1170,7 +1182,7 @@ export default function AdminPage() {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
       loadReviews(); loadShluchimApplications(); loadTestimonials(); loadEditRequests();
-      loadAbandonedCarts(); loadCustomers();
+      loadAbandonedCarts(); loadCustomers(); loadLeads();
     }
   }, [user]);
 
@@ -1216,6 +1228,15 @@ export default function AdminPage() {
       setCustomers(data);
     } catch (e) { console.error(e); }
     finally { setCustomersLoading(false); }
+  }
+
+  async function loadLeads() {
+    try {
+      const snap = await getDocs(query(collection(db, 'leads'), orderBy('createdAt', 'desc')));
+      const data: Lead[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Lead));
+      setLeads(data);
+    } catch (e) { console.error(e); }
   }
 
   async function loadApplications() {
@@ -1721,6 +1742,7 @@ export default function AdminPage() {
           { key: 'curations',      label: '✨ סלקציות',          color: 'bg-fuchsia-700' },
           { key: 'abandoned_carts', label: '🛒 נטישות עגלה',    color: 'bg-orange-600',  badge: abandonedCarts.length },
           { key: 'customers',      label: '👤 לקוחות',           color: 'bg-cyan-700' },
+          { key: 'leads',          label: '📋 לידים',            color: 'bg-lime-700',   badge: leads.length },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -2559,6 +2581,58 @@ export default function AdminPage() {
       )}
 
       {activeTab === 'curations' && <CurationsTab />}
+
+      {activeTab === 'leads' && (
+        <div className="bg-white rounded-xl shadow overflow-hidden">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h2 className="text-xl font-black text-gray-800">📋 לידים מהאתר ({leads.length})</h2>
+            <button onClick={loadLeads} className="text-sm text-blue-600 underline">רענן</button>
+          </div>
+          {leads.length === 0 ? (
+            <div className="p-10 text-center text-gray-400">אין לידים עדיין</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm" style={{ direction: 'rtl' }}>
+                <thead className="bg-gray-50 text-gray-600 text-right">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">שם</th>
+                    <th className="px-4 py-3 font-semibold">טלפון</th>
+                    <th className="px-4 py-3 font-semibold">נוסח</th>
+                    <th className="px-4 py-3 font-semibold">מיקום</th>
+                    <th className="px-4 py-3 font-semibold">כמות קלפים</th>
+                    <th className="px-4 py-3 font-semibold">תאריך</th>
+                    <th className="px-4 py-3 font-semibold"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {leads.map(lead => {
+                    const date = lead.createdAt ? new Date(lead.createdAt.seconds * 1000).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
+                    const waPhone = lead.phone?.replace(/\D/g, '').replace(/^0/, '972');
+                    return (
+                      <tr key={lead.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium">{lead.name || '—'}</td>
+                        <td className="px-4 py-3 font-mono text-sm">{lead.phone || '—'}</td>
+                        <td className="px-4 py-3">{lead.nusach || '—'}</td>
+                        <td className="px-4 py-3">{lead.location === 'room' ? 'חדר' : lead.location === 'entrance' ? 'כניסה ראשית' : '—'}</td>
+                        <td className="px-4 py-3 text-center">{lead.klafimCount ?? '—'}</td>
+                        <td className="px-4 py-3 text-gray-500 text-xs">{date}</td>
+                        <td className="px-4 py-3">
+                          {waPhone && (
+                            <a href={`https://wa.me/${waPhone}`} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-green-600 transition">
+                              💬 פתח וואטסאפ
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       {showAddSofer && <AddSoferModal onClose={() => setShowAddSofer(false)} onSave={() => { loadSoferimFull(); loadSoferim(); }} />}
       {showAddShliach && <AddShliachModal onClose={() => setShowAddShliach(false)} onSave={() => { loadShluchimApplications(); loadUsers(); }} />}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, query, where, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, getDocs, doc, getDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCart } from '../contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
@@ -30,6 +30,7 @@ interface SoferInfo {
 }
 
 type Location = 'room' | 'entrance';
+type Step = 0 | 1 | 2 | 3;
 type Nusach   = 'ספרדי' | 'אשכנזי' | 'תימני';
 
 const SIZES_BY_LOCATION: Record<Location, string[]> = {
@@ -424,7 +425,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
   const router = useRouter();
   const { addItem } = useCart();
 
-  const [step, setStep]         = useState<0 | 1 | 2>(0);
+  const [step, setStep]         = useState<Step>(0);
   const [location, setLocation] = useState<Location | null>(null);
   const [nusach, setNusach]     = useState<Nusach>('ספרדי');
   const [klafim, setKlafim]     = useState<Product[]>([]);
@@ -432,6 +433,10 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
   const [showUpsell, setShowUpsell] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
   const [showFinishedCases, setShowFinishedCases] = useState(false);
+  const [leadPhone, setLeadPhone]   = useState('');
+  const [leadName, setLeadName]     = useState('');
+  const [leadSaving, setLeadSaving] = useState(false);
+  const [leadSaved, setLeadSaved]   = useState(false);
 
   // quantity per product id
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -499,16 +504,41 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
 
   function handleReset() {
     setStep(0); setLocation(null); setNusach('ספרדי'); setKlafim([]);
-    setQuantities({}); setShowFinished(false);
+    setQuantities({}); setShowFinished(false); setLeadPhone(''); setLeadName(''); setLeadSaved(false);
   }
 
   function handleFinishedYes() {
     setShowFinished(false);
-    setShowUpsell(true);
+    setStep(3);
   }
 
   function handleFinishedNo() {
     setShowFinished(false);
+  }
+
+  async function handleSendLead() {
+    setLeadSaving(true);
+    try {
+      await addDoc(collection(db, 'leads'), {
+        name: leadName,
+        phone: leadPhone,
+        nusach,
+        location,
+        klafimCount: klafim.length,
+        createdAt: serverTimestamp(),
+        source: 'mezuzah_funnel',
+      });
+      setLeadSaved(true);
+      setTimeout(() => { setLeadSaved(false); setShowUpsell(true); }, 2000);
+    } catch {
+      setShowUpsell(true);
+    } finally {
+      setLeadSaving(false);
+    }
+  }
+
+  function handleSkipLead() {
+    setShowUpsell(true);
   }
 
   const sizes = location ? SIZES_BY_LOCATION[location] : [];
@@ -555,7 +585,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginBottom: 32 }}>
-            {(['מיקום', 'נוסח', 'קלפים'] as const).map((label, i) => (
+            {(['מיקום', 'נוסח', 'קלפים', 'מתנה'] as const).map((label, i) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: step >= i ? 1 : 0.35, transition: 'opacity 0.3s' }}>
                   <div style={{ width: 28, height: 28, borderRadius: '50%', background: step > i ? '#b8972a' : step === i ? '#0c1a35' : '#e0e0e0', color: '#fff', fontSize: 12, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.3s', boxShadow: step === i ? '0 0 0 3px rgba(12,26,53,0.15)' : 'none' }}>
@@ -563,7 +593,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                   </div>
                   {!isMobile && <span style={{ fontSize: 12, fontWeight: 700, color: step >= i ? '#0c1a35' : '#bbb' }}>{label}</span>}
                 </div>
-                {i < 2 && <div style={{ width: isMobile ? 24 : 44, height: 2, background: step > i ? '#b8972a' : '#e8e2d8', borderRadius: 0, transition: 'background 0.3s' }} />}
+                {i < 3 && <div style={{ width: isMobile ? 24 : 44, height: 2, background: step > i ? '#b8972a' : '#e8e2d8', borderRadius: 0, transition: 'background 0.3s' }} />}
               </div>
             ))}
           </div>
@@ -692,6 +722,62 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
                   </div>
                 )}
               </>
+            )}
+
+            {step === 3 && (
+              <div style={{ direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
+                {leadSaved ? (
+                  <div style={{ textAlign: 'center', padding: '48px 0' }}>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}>🙏</div>
+                    <div style={{ fontSize: 20, fontWeight: 900, color: '#0c1a35' }}>תודה! ניצור איתך קשר בקרוב</div>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                      <div style={{ fontSize: 32, marginBottom: 8 }}>🎁</div>
+                      <h3 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: '0 0 8px' }}>
+                        רוצה לקבל את ההמלצה שלך + מדריך בדיקת מזוזות במתנה?
+                      </h3>
+                      <p style={{ fontSize: 13, color: '#666', margin: 0 }}>נשלח לך סיכום של מה שבחרת ישירות לוואטסאפ</p>
+                    </div>
+                    <div style={{ background: '#fff', border: '2px solid #b8972a', borderRadius: 10, padding: isMobile ? '20px 16px' : '28px 32px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                      <div>
+                        <label style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35', display: 'block', marginBottom: 6 }}>מספר וואטסאפ</label>
+                        <input
+                          type="tel"
+                          placeholder="05X-XXXXXXX"
+                          value={leadPhone}
+                          onChange={e => setLeadPhone(e.target.value)}
+                          style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 6, padding: '10px 12px', fontSize: 15, fontFamily: 'Heebo, Arial, sans-serif', outline: 'none', boxSizing: 'border-box', direction: 'ltr', textAlign: 'right' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35', display: 'block', marginBottom: 6 }}>השם שלך</label>
+                        <input
+                          type="text"
+                          placeholder="השם שלך"
+                          value={leadName}
+                          onChange={e => setLeadName(e.target.value)}
+                          style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 6, padding: '10px 12px', fontSize: 15, fontFamily: 'Heebo, Arial, sans-serif', outline: 'none', boxSizing: 'border-box' }}
+                        />
+                      </div>
+                      <button
+                        onClick={handleSendLead}
+                        disabled={leadSaving || !leadPhone}
+                        style={{ background: leadSaving || !leadPhone ? '#ccc' : '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '13px', fontSize: 15, fontWeight: 900, cursor: leadSaving || !leadPhone ? 'not-allowed' : 'pointer', transition: 'background 0.15s' }}
+                      >
+                        {leadSaving ? 'שולח...' : 'שלח לי במתנה 🎁'}
+                      </button>
+                      <button
+                        onClick={handleSkipLead}
+                        style={{ background: 'none', border: 'none', color: '#999', fontSize: 13, cursor: 'pointer', textDecoration: 'underline', padding: '4px 0' }}
+                      >
+                        דלג, המשך לרכישה
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
           </div>
         </div>
