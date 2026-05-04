@@ -135,15 +135,16 @@ const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
 
 // ─── Collection metadata ──────────────────────────────────────────────────────
 
-const COLLECTION_DOT: Record<string, React.ReactNode> = {
-  'יהלום': <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#87CEEB', border: '1px solid #bae6fd', display: 'inline-block', flexShrink: 0 }} />,
-  'שוהם':  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#78350f', display: 'inline-block', flexShrink: 0 }} />,
-  'ישפה':  <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)', display: 'inline-block', flexShrink: 0 }} />,
-  'ספיר':  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#94a3b8', border: '1px solid #cbd5e1', display: 'inline-block', flexShrink: 0 }} />,
-  'ברקת':  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#15803d', display: 'inline-block', flexShrink: 0 }} />,
+const COLLECTION_IMG: Record<string, string> = {
+  'יהלום': 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919873/1777913222083_ibossf.png',
+  'ישפה':  'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png',
+  'ברקת':  'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919689931_fkb8c6.png',
+  'תרשיש': 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919932/1777919910394_olu4mi.png',
+  'ספיר':  'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919702083_vflhuc.png',
+  'שוהם':  'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777920809/1777920771814_vikmum.png',
 };
 
-const COLLECTIONS_ORDER = ['יהלום', 'שוהם', 'ישפה', 'ספיר', 'ברקת'];
+const COLLECTIONS_ORDER = ['יהלום', 'ישפה', 'ברקת', 'תרשיש', 'ספיר', 'שוהם'];
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 
@@ -515,21 +516,45 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
       {/* Collection filter — shown when 2+ distinct collections exist */}
       {onCollectionFilter && availableCollections && availableCollections.length >= 2 && (
         <Section title="קולקציה">
-          <div className="flex flex-wrap gap-1.5">
-            {['הכל', ...COLLECTIONS_ORDER.filter(c => availableCollections.includes(c))].map(opt => (
-              <button
-                key={opt}
-                onClick={() => onCollectionFilter(opt === 'הכל' ? '' : opt)}
-                className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border flex items-center gap-1.5 ${
-                  (collectionFilter || '') === (opt === 'הכל' ? '' : opt)
-                    ? 'bg-[#0c1a35] text-white border-[#0c1a35]'
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
-                }`}
-              >
-                {opt !== 'הכל' && COLLECTION_DOT[opt]}
-                {opt}
-              </button>
-            ))}
+          <div className="flex flex-wrap gap-2">
+            {['הכל', ...COLLECTIONS_ORDER.filter(c => availableCollections.includes(c))].map(opt => {
+              const isActive = (collectionFilter || '') === (opt === 'הכל' ? '' : opt);
+              const img = opt !== 'הכל' ? COLLECTION_IMG[opt] : undefined;
+              return (
+                <button
+                  key={opt}
+                  onClick={() => onCollectionFilter(opt === 'הכל' ? '' : opt)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 0,
+                    border: isActive ? '2px solid #b8972a' : '1.5px solid #d1d5db',
+                    borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
+                    background: isActive ? '#fffbf0' : '#fff',
+                    transition: 'border-color 0.15s, background 0.15s',
+                    padding: img ? 0 : '4px 10px',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {img && (
+                    <div style={{
+                      width: 34, height: 34, flexShrink: 0, position: 'relative',
+                      backgroundImage: `url(${img})`,
+                      backgroundSize: 'cover', backgroundPosition: 'center',
+                      opacity: isActive ? 1 : 0.8,
+                    }}>
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.28)' }} />
+                    </div>
+                  )}
+                  <span style={{
+                    fontSize: 11, fontWeight: 700,
+                    color: isActive ? '#0c1a35' : '#6b7280',
+                    padding: img ? '0 9px' : 0,
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {opt}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </Section>
       )}
@@ -1419,23 +1444,44 @@ export default function CategoryClient({ category }: { category: string }) {
               >
                 הכל
               </button>
-              {availableCollections.map(col => (
-                <button
-                  key={col}
-                  onClick={() => setCollectionFilter(collectionFilter === col ? '' : col)}
-                  style={{
-                    padding: '7px 18px', fontWeight: 700, fontSize: 13,
-                    background: collectionFilter === col ? '#0c1a35' : '#fff',
-                    color:      collectionFilter === col ? '#fff'    : '#374151',
-                    border:     `1.5px solid ${collectionFilter === col ? '#0c1a35' : '#e5e7eb'}`,
-                    borderRadius: 0, cursor: 'pointer', transition: 'all 0.15s ease',
-                    display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0,
-                  }}
-                >
-                  {COLLECTION_DOT[col]}
-                  {col}
-                </button>
-              ))}
+              {availableCollections.map(col => {
+                const isActive = collectionFilter === col;
+                const img = COLLECTION_IMG[col];
+                return (
+                  <button
+                    key={col}
+                    onClick={() => setCollectionFilter(isActive ? '' : col)}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 0,
+                      border: isActive ? '2px solid #b8972a' : '1.5px solid #e5e7eb',
+                      borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
+                      background: isActive ? '#fffbf0' : '#fff',
+                      transition: 'border-color 0.15s, background 0.15s',
+                      padding: img ? 0 : '7px 14px',
+                      flexShrink: 0, fontFamily: 'inherit',
+                    }}
+                  >
+                    {img && (
+                      <div style={{
+                        width: 38, height: 38, flexShrink: 0, position: 'relative',
+                        backgroundImage: `url(${img})`,
+                        backgroundSize: 'cover', backgroundPosition: 'center',
+                        opacity: isActive ? 1 : 0.8,
+                      }}>
+                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.28)' }} />
+                      </div>
+                    )}
+                    <span style={{
+                      fontSize: 13, fontWeight: 700,
+                      color: isActive ? '#0c1a35' : '#374151',
+                      padding: img ? '0 12px' : 0,
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {col}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           )}
 
