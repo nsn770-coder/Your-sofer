@@ -37,11 +37,12 @@ function BadgePill({ children }: { children: React.ReactNode }) {
 }
 
 function ProfileCard({
-  initials, name, title, description, badge, isMobile,
+  initials, name, title, description, badge, isMobile, imageUrl,
 }: {
   initials: string; name: string; title: string;
-  description: string; badge: string; isMobile: boolean;
+  description: string; badge: string; isMobile: boolean; imageUrl?: string;
 }) {
+  const avatarSize = isMobile ? 76 : 88;
   return (
     <div style={{
       flex: 1,
@@ -53,7 +54,20 @@ function ProfileCard({
       gap: 14, textAlign: 'center',
       boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
     }}>
-      <InitialsAvatar initials={initials} size={isMobile ? 76 : 88} />
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={name}
+          style={{
+            width: avatarSize, height: avatarSize, borderRadius: '50%',
+            objectFit: 'cover', flexShrink: 0,
+            border: `3px solid ${GOLD}`,
+            boxShadow: `0 0 0 4px rgba(197,160,40,0.18), 0 4px 20px rgba(0,0,0,0.35)`,
+          }}
+        />
+      ) : (
+        <InitialsAvatar initials={initials} size={avatarSize} />
+      )}
       <div>
         <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 900, color: '#fff', marginBottom: 3 }}>{name}</div>
         <div style={{ fontSize: 13, color: GOLD, fontWeight: 700 }}>{title}</div>
@@ -133,11 +147,12 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
           />
           <ProfileCard
             initials="נ״ב"
-            name="הרב ניסים בואהרון"
+            name="הרב ניסים בוארון"
             title='סופר סת"מ מוסמך'
             description='סופר מוסמך עם שנות ניסיון בכתיבת סת"מ ברמה הגבוהה ביותר'
             badge='סופר מוסמך'
             isMobile={isMobile}
+            imageUrl="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777926225/FB_IMG_1777926117765_rbw8ny.jpg"
           />
         </div>
 

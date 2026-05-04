@@ -7,6 +7,7 @@ const TEAM = [
     name: 'הרב ניסים בוארון',
     role: 'מנהל ומייסד | סופר סת"מ מומחה',
     desc: 'סופר סת"מ מוסמך עם שנות ניסיון בכתיבת קלפים ברמה הגבוהה ביותר. מוביל את החזון של Your Sofer להנגיש סת"מ איכותי לכל יהודי.',
+    imageUrl: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777926225/FB_IMG_1777926117765_rbw8ny.jpg',
   },
   {
     initials: 'בג',
@@ -71,13 +72,25 @@ export default function AboutPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16, marginBottom: 12 }}>
           {TEAM.map(member => (
             <div key={member.name} style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '24px 20px', textAlign: 'center' }}>
-              <div style={{
-                width: 64, height: 64, borderRadius: '50%', background: '#b8972a', color: '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 22, fontWeight: 900, margin: '0 auto 16px',
-              }}>
-                {member.initials}
-              </div>
+              {member.imageUrl ? (
+                <img
+                  src={member.imageUrl}
+                  alt={member.name}
+                  style={{
+                    width: 64, height: 64, borderRadius: '50%', objectFit: 'cover',
+                    margin: '0 auto 16px', display: 'block',
+                    border: '3px solid #b8972a',
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: 64, height: 64, borderRadius: '50%', background: '#b8972a', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 22, fontWeight: 900, margin: '0 auto 16px',
+                }}>
+                  {member.initials}
+                </div>
+              )}
               <div style={{ fontWeight: 800, fontSize: 15, color: '#0c1a35', marginBottom: 4 }}>{member.name}</div>
               <div style={{ fontSize: 12, color: '#b8972a', fontWeight: 600, marginBottom: 10 }}>{member.role}</div>
               <p style={{ fontSize: 13, color: '#555', lineHeight: 1.65, margin: 0 }}>{member.desc}</p>
