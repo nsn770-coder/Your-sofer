@@ -41,6 +41,10 @@ interface Product {
   closeupImageUrl?: string;
   stockCount?: number;
   stockVisible?: boolean;
+  marketingIntro?: string;
+  whoIsItFor?: { emoji: string; text: string }[];
+  whyUs?: string[];
+  whatYouGet?: string[];
 }
 
 interface KlafItem { id: string; name: string; imageUrl: string; status: string; }
@@ -50,6 +54,63 @@ interface ReviewItem {
   mediaUrl?: string; mediaType?: 'image' | 'video';
   approved: boolean; createdAt?: { seconds: number };
 }
+
+interface PageDefaults {
+  marketingIntro?: string;
+  whoIsItFor?: { emoji: string; text: string }[];
+  whyUs?: string[];
+  whatYouGet?: string[];
+}
+
+const HARDCODED_STAM_DEFAULTS: Required<PageDefaults> = {
+  marketingIntro: 'קלף מזוזה כשר ומהודר, נכתב בכתב יד על ידי סופר סת״ם ירא שמים, ונבדק בקפידה לפני המכירה. ב־Your Sofer ניתן לראות את פרטי הסופר, להתרשם מהכתב, ולבחור את הקלף בצורה שקופה וברורה - בלי לקנות חתול בשק.',
+  whoIsItFor: [
+    { emoji: '🏠', text: 'למי שחשוב לו קלף מזוזה מהודר - לא רק בית מזוזה יפה מבחוץ' },
+    { emoji: '🛡️', text: 'מי שמעניין אותו השמירה האמיתית - הקלף שבפנים הוא מה שחשוב' },
+    { emoji: '🔑', text: 'למי שנכנס לבית חדש, או שנמצאה אצלו מזוזה שצריך להחליף' },
+    { emoji: '✡️', text: 'את הקלף אף אחד לא רואה - אבל יש אלוקים ששומר!' },
+    { emoji: '🙏', text: 'למי שרוצה לדעת בוודאות שהקלף נכתב על ידי יהודי ירא שמים' },
+  ],
+  whyUs: [
+    'כל מוצר נבדק על ידי מגיה מוסמך לפני שיגור - לא רק מיוצר',
+    'הסופר שכתב את המוצר מזוהה בשם - שקיפות מלאה',
+    'צילום אמיתי של הקלף לפני המשלוח - רואים בדיוק מה מקבלים',
+    'שירות אישי וליווי מלא - שיחה ישירה עם איש מקצוע בוואטסאפ',
+  ],
+  whatYouGet: [
+    'כולל תעודת כשרות מוסמכת',
+    'בדיקת מחשב ופיקוח רבני על כל יחידה',
+    'משלוח חינם לכל הארץ באריזה מוגנת',
+    'אחריות החזר מלא תוך 14 יום',
+    'ניתן לתשלומים ללא ריבית',
+    'תמיכה אישית אם יש שאלות לפני הרכישה',
+  ],
+};
+
+const HARDCODED_NON_STAM_DEFAULTS: Required<PageDefaults> = {
+  marketingIntro: 'כשמביאים מוצר כזה הביתה, מביאים איתו משהו שלא ניתן לקנות בחנות רגילה - יוקרה שקטה, חיבור לשורשים, ותחושה שהבית שלכם אומר משהו עוד לפני שמדברים. בשבת, כשהאור מתעצם ומשפחה מתכנסת סביב השולחן, הפריט הזה הופך לחלק מהסיפור שעובר מדור לדור.',
+  whoIsItFor: [
+    { emoji: '🎁', text: 'מתנה משמעותית לחתונה, בר מצווה, או כניסה לבית חדש' },
+    { emoji: '🕯️', text: 'שדרוג שולחן השבת עם פריט שנשאר לדורות' },
+    { emoji: '✡️', text: 'אספנים ואוהבי יודאיקה שמחפשים איכות אמיתית' },
+    { emoji: '🏠', text: 'עיצוב הבית עם פריטים בעלי ערך רגשי ודתי' },
+    { emoji: '💝', text: 'מחווה לאדם קרוב שמעריך מסורת ואיכות' },
+  ],
+  whyUs: [
+    'כל פריט נבחר בקפידה מיצרנים מובילים בישראל ובעולם',
+    'גימור יוקרתי ואריזה מהודרת לכל מוצר',
+    'שירות אישי וליווי מלא - שיחה ישירה עם איש מקצוע בוואטסאפ',
+    'כל מוצר מצולם ומוצג בדיוק כמו שהוא - בלי הפתעות',
+  ],
+  whatYouGet: [
+    'עיצוב מוקפד וחומרים איכותיים',
+    'אריזה מהודרת - מושלם כמתנה',
+    'משלוח חינם לכל הארץ באריזה מוגנת',
+    'אחריות החזר מלא תוך 14 יום',
+    'ניתן לתשלומים ללא ריבית',
+    'תמיכה אישית אם יש שאלות לפני הרכישה',
+  ],
+};
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 
@@ -319,9 +380,11 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
 const SOFER_EDIT_CATS = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
 const STAM_ADMIN_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
 
-function AdminPanel({ product, onSave, isMobile, onClose }: {
+function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onClose }: {
   product: Product;
   onSave: (updated: Partial<Product>) => Promise<void>;
+  onSaveGlobal: (data: Partial<PageDefaults>) => Promise<void>;
+  pageDefaults: PageDefaults | null;
   isMobile: boolean;
   onClose: () => void;
 }) {
@@ -349,6 +412,11 @@ function AdminPanel({ product, onSave, isMobile, onClose }: {
   const [saving, setSaving]                   = useState(false);
   const [uploadingImg, setUploadingImg]       = useState<string | null>(null);
   const [saved, setSaved]                     = useState(false);
+  const [marketingIntroTxt, setMarketingIntroTxt] = useState(product.marketingIntro ?? pageDefaults?.marketingIntro ?? '');
+  const [whoIsItForList, setWhoIsItForList]   = useState<{ emoji: string; text: string }[]>(product.whoIsItFor ?? pageDefaults?.whoIsItFor ?? []);
+  const [whyUsList, setWhyUsList]             = useState<string[]>(product.whyUs ?? pageDefaults?.whyUs ?? []);
+  const [whatYouGetList, setWhatYouGetList]   = useState<string[]>(product.whatYouGet ?? pageDefaults?.whatYouGet ?? []);
+  const [saveGlobal, setSaveGlobal]           = useState(false);
 
   useEffect(() => {
     getDocs(collection(db, 'soferim'))
@@ -387,6 +455,15 @@ function AdminPanel({ product, onSave, isMobile, onClose }: {
     setSaving(true);
     try {
       const isStam = STAM_ADMIN_CATS.has(cat);
+      const textData: Partial<PageDefaults> = {
+        marketingIntro: marketingIntroTxt || undefined,
+        whoIsItFor: whoIsItForList.length ? whoIsItForList : undefined,
+        whyUs: whyUsList.length ? whyUsList : undefined,
+        whatYouGet: whatYouGetList.length ? whatYouGetList : undefined,
+      };
+      if (saveGlobal) {
+        await onSaveGlobal(textData);
+      }
       await onSave({
         name, price: Number(price),
         was: was ? Number(was) : null,
@@ -400,6 +477,7 @@ function AdminPanel({ product, onSave, isMobile, onClose }: {
         stockCount: stockCount ? Number(stockCount) : undefined,
         stockVisible,
         soferId: soferId || undefined,
+        ...(saveGlobal ? {} : textData),
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -544,6 +622,58 @@ function AdminPanel({ product, onSave, isMobile, onClose }: {
               </select>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* § טקסטים */}
+      <div style={secS}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div style={secTitleS}>§ טקסטים</div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: 10, color: saveGlobal ? '#b8972a' : '#888', whiteSpace: 'nowrap' }}>
+            <input type="checkbox" checked={saveGlobal} onChange={e => setSaveGlobal(e.target.checked)} />
+            ברירת מחדל גלובלית
+          </label>
+        </div>
+        <div style={{ display: 'grid', gap: 8 }}>
+          {/* marketingIntro */}
+          <div>
+            <label style={lS}>הוק רגשי (פסקת פתיחה)</label>
+            <textarea value={marketingIntroTxt} onChange={e => setMarketingIntroTxt(e.target.value)} rows={3} placeholder="פסקת הפתיחה..." style={{ ...iS, resize: 'vertical' }} />
+          </div>
+          {/* whoIsItFor */}
+          <div>
+            <label style={lS}>למי זה מתאים</label>
+            {whoIsItForList.map((item, i) => (
+              <div key={i} style={{ display: 'flex', gap: 3, marginBottom: 3, alignItems: 'center' }}>
+                <input value={item.emoji} onChange={e => { const a = [...whoIsItForList]; a[i] = { ...a[i], emoji: e.target.value }; setWhoIsItForList(a); }} style={{ ...iS, width: 32, padding: '3px 4px', fontSize: 14, textAlign: 'center', flexShrink: 0 }} />
+                <input value={item.text} onChange={e => { const a = [...whoIsItForList]; a[i] = { ...a[i], text: e.target.value }; setWhoIsItForList(a); }} style={{ flex: 1, ...iS, padding: '3px 6px', fontSize: 11 }} />
+                <button type="button" onClick={() => setWhoIsItForList(whoIsItForList.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 12, padding: 2, flexShrink: 0, lineHeight: 1 }}>✕</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => setWhoIsItForList([...whoIsItForList, { emoji: '', text: '' }])} style={{ fontSize: 10, color: '#b8972a', background: 'none', border: '1px solid rgba(184,151,42,0.35)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}>+ הוסף</button>
+          </div>
+          {/* whyUs */}
+          <div>
+            <label style={lS}>למה Your Sofer</label>
+            {whyUsList.map((item, i) => (
+              <div key={i} style={{ display: 'flex', gap: 3, marginBottom: 3 }}>
+                <input value={item} onChange={e => { const a = [...whyUsList]; a[i] = e.target.value; setWhyUsList(a); }} style={{ flex: 1, ...iS, padding: '3px 6px', fontSize: 11 }} />
+                <button type="button" onClick={() => setWhyUsList(whyUsList.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 12, padding: 2, flexShrink: 0, lineHeight: 1 }}>✕</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => setWhyUsList([...whyUsList, ''])} style={{ fontSize: 10, color: '#b8972a', background: 'none', border: '1px solid rgba(184,151,42,0.35)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}>+ הוסף</button>
+          </div>
+          {/* whatYouGet */}
+          <div>
+            <label style={lS}>מה מקבלים</label>
+            {whatYouGetList.map((item, i) => (
+              <div key={i} style={{ display: 'flex', gap: 3, marginBottom: 3 }}>
+                <input value={item} onChange={e => { const a = [...whatYouGetList]; a[i] = e.target.value; setWhatYouGetList(a); }} style={{ flex: 1, ...iS, padding: '3px 6px', fontSize: 11 }} />
+                <button type="button" onClick={() => setWhatYouGetList(whatYouGetList.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 12, padding: 2, flexShrink: 0, lineHeight: 1 }}>✕</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => setWhatYouGetList([...whatYouGetList, ''])} style={{ fontSize: 10, color: '#b8972a', background: 'none', border: '1px solid rgba(184,151,42,0.35)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}>+ הוסף</button>
+          </div>
         </div>
       </div>
 
@@ -797,57 +927,15 @@ function ReviewsSection({ productId, productName }: { productId: string; product
 
 // ─── Product Content Sections ────────────────────────────────────────────────
 
-function ProductContentSections({ product }: { product: Product }) {
+function ProductContentSections({ product, pageDefaults }: { product: Product; pageDefaults: PageDefaults | null }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const isStam = !!product.cat && STAM_CATEGORIES.includes(product.cat);
+  const hardcoded = isStam ? HARDCODED_STAM_DEFAULTS : HARDCODED_NON_STAM_DEFAULTS;
 
-  const useCases = isStam
-    ? [
-        { emoji: '🏠', text: 'למי שחשוב לו קלף מזוזה מהודר - לא רק בית מזוזה יפה מבחוץ' },
-        { emoji: '🛡️', text: 'מי שמעניין אותו השמירה האמיתית - הקלף שבפנים הוא מה שחשוב' },
-        { emoji: '🔑', text: 'למי שנכנס לבית חדש, או שנמצאה אצלו מזוזה שצריך להחליף' },
-        { emoji: '✡️', text: 'את הקלף אף אחד לא רואה - אבל יש אלוקים ששומר!' },
-        { emoji: '🙏', text: 'למי שרוצה לדעת בוודאות שהקלף נכתב על ידי יהודי ירא שמים' },
-      ]
-    : [
-        { emoji: '🎁', text: 'מתנה משמעותית לחתונה, בר מצווה, או כניסה לבית חדש' },
-        { emoji: '🕯️', text: 'שדרוג שולחן השבת עם פריט שנשאר לדורות' },
-        { emoji: '✡️', text: 'אספנים ואוהבי יודאיקה שמחפשים איכות אמיתית' },
-        { emoji: '🏠', text: 'עיצוב הבית עם פריטים בעלי ערך רגשי ודתי' },
-        { emoji: '💝', text: 'מחווה לאדם קרוב שמעריך מסורת ואיכות' },
-      ];
-
-  const whyDifferent = isStam
-    ? [
-        'כל מוצר נבדק על ידי מגיה מוסמך לפני שיגור - לא רק מיוצר',
-        'הסופר שכתב את המוצר מזוהה בשם - שקיפות מלאה',
-        'צילום אמיתי של הקלף לפני המשלוח - רואים בדיוק מה מקבלים',
-        'שירות אישי וליווי מלא - שיחה ישירה עם איש מקצוע בוואטסאפ',
-      ]
-    : [
-        'כל פריט נבחר בקפידה מיצרנים מובילים בישראל ובעולם',
-        'גימור יוקרתי ואריזה מהודרת לכל מוצר',
-        'שירות אישי וליווי מלא - שיחה ישירה עם איש מקצוע בוואטסאפ',
-        'כל מוצר מצולם ומוצג בדיוק כמו שהוא - בלי הפתעות',
-      ];
-
-  const benefits = isStam
-    ? [
-        'כולל תעודת כשרות מוסמכת',
-        'בדיקת מחשב ופיקוח רבני על כל יחידה',
-        'משלוח חינם לכל הארץ באריזה מוגנת',
-        'אחריות החזר מלא תוך 14 יום',
-        'ניתן לתשלומים ללא ריבית',
-        'תמיכה אישית אם יש שאלות לפני הרכישה',
-      ]
-    : [
-        'עיצוב מוקפד וחומרים איכותיים',
-        'אריזה מהודרת - מושלם כמתנה',
-        'משלוח חינם לכל הארץ באריזה מוגנת',
-        'אחריות החזר מלא תוך 14 יום',
-        'ניתן לתשלומים ללא ריבית',
-        'תמיכה אישית אם יש שאלות לפני הרכישה',
-      ];
+  const useCases      = product.whoIsItFor    ?? (isStam ? hardcoded.whoIsItFor  : (pageDefaults?.whoIsItFor  ?? hardcoded.whoIsItFor));
+  const whyDifferent  = product.whyUs         ?? (isStam ? hardcoded.whyUs       : (pageDefaults?.whyUs       ?? hardcoded.whyUs));
+  const benefits      = product.whatYouGet    ?? (isStam ? hardcoded.whatYouGet  : (pageDefaults?.whatYouGet  ?? hardcoded.whatYouGet));
+  const emotionalHook = product.marketingIntro ?? (isStam ? hardcoded.marketingIntro : (pageDefaults?.marketingIntro ?? hardcoded.marketingIntro));
 
   const faqs: { q: string; a: string }[] = isStam
     ? [
@@ -869,10 +957,7 @@ function ProductContentSections({ product }: { product: Product }) {
       {/* Emotional hook */}
       <div style={{ borderRight: '3px solid #b8972a', paddingRight: 14, marginBottom: 24 }}>
         <p style={{ fontSize: 14, color: '#555', lineHeight: 1.9, margin: 0, fontStyle: 'italic' }}>
-          {isStam
-            ? 'קלף מזוזה כשר ומהודר, נכתב בכתב יד על ידי סופר סת״ם ירא שמים, ונבדק בקפידה לפני המכירה. ב־Your Sofer ניתן לראות את פרטי הסופר, להתרשם מהכתב, ולבחור את הקלף בצורה שקופה וברורה - בלי לקנות חתול בשק.'
-            : 'כשמביאים מוצר כזה הביתה, מביאים איתו משהו שלא ניתן לקנות בחנות רגילה - יוקרה שקטה, חיבור לשורשים, ותחושה שהבית שלכם אומר משהו עוד לפני שמדברים. בשבת, כשהאור מתעצם ומשפחה מתכנסת סביב השולחן, הפריט הזה הופך לחלק מהסיפור שעובר מדור לדור.'
-          }
+          {emotionalHook}
         </p>
       </div>
 
@@ -957,6 +1042,7 @@ export default function ProductClient() {
   const [related, setRelated]                       = useState<Product[]>([]);
   const [lookProducts, setLookProducts]             = useState<Product[]>([]);
   const [collectionProducts, setCollectionProducts] = useState<Product[]>([]);
+  const [pageDefaults, setPageDefaults]             = useState<PageDefaults | null>(null);
   const [embroideryText, setEmbroideryText] = useState('');
   const [loading, setLoading]           = useState(true);
   const [activeImg, setActiveImg]       = useState(0);
@@ -1062,6 +1148,19 @@ export default function ProductClient() {
     }
     load();
   }, [id]);
+
+  useEffect(() => {
+    getDoc(doc(db, 'siteConfig', 'productPageDefaults'))
+      .then(snap => { if (snap.exists()) setPageDefaults(snap.data() as PageDefaults); })
+      .catch(() => {});
+  }, []);
+
+  async function handleSaveGlobal(data: Partial<PageDefaults>) {
+    try {
+      await setDoc(doc(db, 'siteConfig', 'productPageDefaults'), data, { merge: true });
+      setPageDefaults(prev => prev ? { ...prev, ...data } : (data as PageDefaults));
+    } catch (err) { console.error(err); alert('שגיאה בשמירת ברירות מחדל'); }
+  }
 
   async function handleSave(updated: Partial<Product>) {
     if (!product) return;
@@ -1400,7 +1499,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Tag /> קטגוריה</span>
                     <span style={{ fontWeight: 600 }}>{product.cat || '-'}</span>
                   </div>
-                  <ProductContentSections product={product} />
+                  <ProductContentSections product={product} pageDefaults={pageDefaults} />
                 </div>
               )}
 
@@ -1656,7 +1755,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
       {/* Admin panel */}
       {user?.role === 'admin' && adminOpen && (
-        <AdminPanel product={product} onSave={handleSave} isMobile={isMobile} onClose={() => setAdminOpen(false)} />
+        <AdminPanel product={product} onSave={handleSave} onSaveGlobal={handleSaveGlobal} pageDefaults={pageDefaults} isMobile={isMobile} onClose={() => setAdminOpen(false)} />
       )}
     </div>
   );
