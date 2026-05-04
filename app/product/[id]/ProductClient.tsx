@@ -1173,9 +1173,9 @@ export default function ProductClient() {
     console.log('[sizeMatch] product.size:', product?.size, '| cat:', product?.cat);
     if (!product?.size) return;
     const isKlaf = product.cat?.includes('קלפי מזוזה');
-    const isBayit = product.cat?.includes('בתי מזוזה');
+    const isBayit = product.cat?.includes('מזוזות');
     if (!isKlaf && !isBayit) return;
-    const targetCat = isKlaf ? 'בתי מזוזה' : 'קלפי מזוזה';
+    const targetCat = isKlaf ? 'מזוזות' : 'קלפי מזוזה';
     getDocs(query(collection(db, 'products'), where('cat', '==', targetCat), where('size', '==', product.size), limit(4)))
       .then(snap => {
         console.log('[sizeMatch] results count:', snap.size, '| targetCat:', targetCat, '| size:', product.size);
@@ -1591,7 +1591,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </div>
 
         {/* ── השלם את המראה — collection cross-sell ── */}
-        {collectionProducts.length >= 2 && product.collection && !['קלפי מזוזה', 'בתי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'].some(c => product.cat?.includes(c)) && (
+        {collectionProducts.length >= 2 && product.collection && !['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'].some(c => product.cat?.includes(c)) && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
             <div style={{ marginBottom: 16 }}>
               <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0c1a35', margin: 0 }}>
@@ -1720,7 +1720,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </div>
       )}
 
-      {sizeMatchProducts.length > 0 && product.size && (product.cat?.includes('קלפי מזוזה') || product.cat?.includes('בתי מזוזה')) && (
+      {sizeMatchProducts.length > 0 && product.size && (product.cat?.includes('קלפי מזוזה') || product.cat?.includes('מזוזות')) && (
         <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
           <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 16 }}>
             {product.cat?.includes('קלפי מזוזה')
