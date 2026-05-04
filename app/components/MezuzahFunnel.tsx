@@ -478,6 +478,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
   function handleSelectNusach(nos: Nusach) { setNusach(nos); setStep(2); fetchKlafim(location!, nos); }
 
   function handleAddToCart(p: Product) {
+    console.log('addToCart clicked', p.id);
     addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
     setQuantities(q => ({ ...q, [p.id]: (q[p.id] ?? 0) + 1 }));
     setStep(3);
@@ -554,6 +555,8 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
     { key: 'אשכנזי', img: IMAGES.ashkenazi },
     { key: 'תימני',  fallbackIcon: <IconSun size={40} color="#0c1a35" /> },
   ];
+
+  console.log('step:', step);
 
   return (
     <>
