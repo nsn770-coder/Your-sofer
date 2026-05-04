@@ -237,6 +237,8 @@ const SIMPLE_NAV = [
   { label: "מגילות", action: "megilot" },
   { label: "בר מצווה", action: "bar-mitzva" },
   { label: "קולקציות", action: "collections" },
+  { label: "מי אנחנו", action: "about" },
+  { label: "צור קשר", action: "contact" },
 ];
 
 function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
@@ -340,6 +342,8 @@ function NavBarContent() {
     else if (action === "megilot") router.push("/category/מגילות");
     else if (action === "bar-mitzva") router.push("/bar-mitzva");
     else if (action === "collections") router.push("/collections");
+    else if (action === "about") router.push("/about");
+    else if (action === "contact") router.push("/contact");
   }
 
   return (

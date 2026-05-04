@@ -121,7 +121,8 @@ export default function Footer() {
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: '#ddd' }}>שירות לקוחות</div>
               <NavLink label="שאלות נפוצות"    path="/madrich/faq" />
               <NavLink label="מדיניות החזרות"  path="/legal/returns" />
-              <NavLink label="צרו קשר"         href={WA_LINK} />
+              <NavLink label="צור קשר"         path="/contact" />
+              <NavLink label="וואטסאפ"         href={WA_LINK} />
             </div>
 
             {/* קהילה */}
@@ -130,6 +131,7 @@ export default function Footer() {
               <NavLink label="✍️ הסופרים שלנו" path="/soferim" />
               <NavLink label="🌟 הצטרף"         path="/join" />
               <NavLink label="🏛️ רבני קהילה"   path="/join/apply" />
+              <NavLink label="מי אנחנו"          path="/about" />
             </div>
 
             {/* מידע ולמידה */}
