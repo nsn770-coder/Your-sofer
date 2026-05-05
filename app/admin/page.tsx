@@ -1364,7 +1364,7 @@ export default function AdminPage() {
       const data: Category[] = [];
       snap.forEach(d => {
         const r = d.data();
-        const slug = (r.slug || r.name || '') as string;
+        const slug = (d.id || r.slug || r.name || '') as string;
         existingSlugs.add(slug);
         data.push({
           id: d.id, slug,
@@ -1378,7 +1378,7 @@ export default function AdminPage() {
         REQUIRED_CATS
           .filter(c => !existingSlugs.has(c.slug))
           .map(c => setDoc(doc(db, 'categories', c.slug), {
-            slug: c.slug, displayName: c.displayName, imageUrl: '', priority: c.priority,
+            slug: c.slug, displayName: c.displayName, priority: c.priority,
           }, { merge: true }))
       );
       if (REQUIRED_CATS.some(c => !existingSlugs.has(c.slug))) {
