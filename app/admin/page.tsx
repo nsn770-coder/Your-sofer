@@ -2691,22 +2691,37 @@ function CategoryCard({ cat, saving, saved, onSave }: {
   const [imageUrl, setImageUrl]       = useState(cat.imageUrl || cat.imgUrl || '');
   const [priority, setPriority]       = useState(cat.priority ?? cat.order ?? 0);
   const [uploading, setUploading]     = useState(false);
+  const [imgSaved, setImgSaved]       = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    console.log('uploading file...');
     setUploading(true);
+    setImgSaved(false);
     try {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('upload_preset', 'yoursofer_upload');
       const res  = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
       const data = await res.json();
-      if (!data.secure_url) throw new Error('upload failed');
-      setImageUrl(data.secure_url);
-      console.log('[CategoryCard] uploaded URL:', data.secure_url);
-    } catch { alert('שגיאה בהעלאת תמונה'); }
-    finally { setUploading(false); }
+      console.log('cloudinary response:', data);
+      if (!data.secure_url) throw new Error('upload failed — no secure_url in response');
+      const url = data.secure_url as string;
+      setImageUrl(url);
+      console.log('saving to firestore:', cat.id, url);
+      onSave({ displayName, imageUrl: url, priority });
+      console.log('saved!');
+      setImgSaved(true);
+      setTimeout(() => setImgSaved(false), 3000);
+    } catch (err) {
+      console.error('[CategoryCard] upload error:', err);
+      alert('שגיאה בהעלאת תמונה');
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
   }
 
   return (
@@ -2725,11 +2740,16 @@ function CategoryCard({ cat, saving, saved, onSave }: {
         <div>
           <label className="block text-xs font-bold text-gray-500 mb-1">תמונה</label>
           <div className="flex gap-2 items-center">
-            <label className="flex-shrink-0 cursor-pointer bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg px-3 py-1.5 hover:bg-indigo-100">
-              {uploading ? '⏳...' : '📷 העלה'}
-              <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
-            </label>
-            <input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="URL ידני" className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-xs min-w-0" />
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className="flex-shrink-0 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-lg px-3 py-1.5 hover:bg-indigo-100 disabled:opacity-50"
+            >
+              {uploading ? '⏳ מעלה...' : '📷 העלה תמונה'}
+            </button>
+            {imgSaved && <span className="text-green-600 text-xs font-bold">✅ נשמר!</span>}
           </div>
         </div>
         <div>
