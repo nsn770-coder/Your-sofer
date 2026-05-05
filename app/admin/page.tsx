@@ -1359,6 +1359,7 @@ export default function AdminPage() {
     { slug: 'פסח',             displayName: 'פסח',             priority: 12 },
     { slug: 'חנוכה',           displayName: 'חנוכה',           priority: 13 },
     { slug: 'שבתות וחגים',    displayName: 'שבתות וחגים',    priority: 14 },
+    { slug: 'נטלות וכלים',    displayName: 'נטלות וכלים',    priority: 15 },
   ];
 
   async function loadCategories() {
