@@ -1355,6 +1355,9 @@ export default function AdminPage() {
     { slug: 'בר מצווה',         displayName: 'בר מצווה',         priority: 8  },
     { slug: 'מתנות',           displayName: 'מתנות',           priority: 9  },
     { slug: 'מגילות',          displayName: 'מגילות',          priority: 10 },
+    { slug: 'ספרי תורה',       displayName: 'ספרי תורה',       priority: 11 },
+    { slug: 'פסח',             displayName: 'פסח',             priority: 12 },
+    { slug: 'חנוכה',           displayName: 'חנוכה',           priority: 13 },
   ];
 
   async function loadCategories() {
