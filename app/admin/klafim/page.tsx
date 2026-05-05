@@ -7,7 +7,7 @@ import { db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import Link from 'next/link';
 
-const KLAF_CATS = ['קלפי מזוזה', 'קלפי תפילין', 'מגילות'];
+const KLAF_CATS = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
 
 interface Product {
   id: string;
