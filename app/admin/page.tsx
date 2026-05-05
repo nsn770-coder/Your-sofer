@@ -1358,6 +1358,7 @@ export default function AdminPage() {
     { slug: 'ספרי תורה',       displayName: 'ספרי תורה',       priority: 11 },
     { slug: 'פסח',             displayName: 'פסח',             priority: 12 },
     { slug: 'חנוכה',           displayName: 'חנוכה',           priority: 13 },
+    { slug: 'שבתות וחגים',    displayName: 'שבתות וחגים',    priority: 14 },
   ];
 
   async function loadCategories() {
