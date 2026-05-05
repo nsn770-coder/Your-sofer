@@ -37,6 +37,11 @@ function randStr(len: number): string {
   return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
+// Item serial numbers use digits only: MZ-847293, TF-512984
+function randDigits(len: number): string {
+  return Array.from({ length: len }, () => Math.floor(Math.random() * 10)).join('');
+}
+
 function datestamp(): string {
   const d = new Date();
   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
@@ -94,7 +99,7 @@ export async function POST(req: NextRequest) {
       const prefix = itemPrefix(p.category ?? '');
       for (let i = 0; i < qty; i++) {
         items.push({
-          serialNumber: `${prefix}-${randStr(6)}`,
+          serialNumber: `${prefix}-${randDigits(6)}`,
           productName: p.name ?? '',
           type: itemType(p.category ?? p.name ?? ''),
           category: p.category ?? '',
@@ -112,9 +117,10 @@ export async function POST(req: NextRequest) {
       orderId,
       externalOrderId: order.orderId ?? orderId,
       customerName: order.customerName ?? '',
+      customerEmail: order.customerEmail ?? '',
       issuedAt: serverTimestamp(),
       items,
-      magiaName: 'הרב בנימין גליס',
+      magiaName: 'הרב בנימין גליס',   // matches RabbinicalSupervision, CategoryClient, ProductClient
       valid: true,
     });
 

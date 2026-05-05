@@ -19,6 +19,7 @@ interface Certificate {
   orderId: string;
   externalOrderId: string;
   customerName: string;
+  customerEmail: string;
   issuedAt: any;
   items: CertItem[];
   magiaName: string;
@@ -36,6 +37,9 @@ export default function CertificatePage() {
   const [cert, setCert] = useState<Certificate | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState('');
 
   useEffect(() => {
     if (!certId) return;
@@ -68,27 +72,77 @@ export default function CertificatePage() {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&color=0c1a35&bgcolor=ffffff&data=${encodeURIComponent(verifyUrl)}`;
   const dateStr = formatDate(cert.issuedAt);
 
+  async function sendEmail() {
+    setSendingEmail(true);
+    setEmailError('');
+    try {
+      const res = await fetch('/api/certificate/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ certId: cert!.certId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEmailSent(true);
+        setTimeout(() => setEmailSent(false), 4000);
+      } else {
+        setEmailError(data.error ?? 'שגיאה בשליחה');
+      }
+    } catch (e: any) {
+      setEmailError(e.message ?? 'שגיאה בשליחה');
+    } finally {
+      setSendingEmail(false);
+    }
+  }
+
   return (
     <>
-      {/* Print button — hidden when printing */}
+      {/* Toolbar — hidden when printing */}
       <div className="no-print" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
         background: '#0c1a35', padding: '10px 24px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: 12, flexWrap: 'wrap',
       }}>
         <span style={{ color: '#b8972a', fontWeight: 700, fontFamily: 'Heebo, Arial, sans-serif', fontSize: 14 }}>
           תעודת כשרות — {cert.certId}
         </span>
-        <button
-          onClick={() => window.print()}
-          style={{
-            background: '#b8972a', color: '#0c1a35', border: 'none',
-            borderRadius: 8, padding: '8px 22px', fontWeight: 800,
-            fontSize: 14, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif',
-          }}
-        >
-          הדפסה / שמירה כ-PDF ↓
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Send email button — only when email is available */}
+          {cert.customerEmail && (
+            <button
+              onClick={sendEmail}
+              disabled={sendingEmail}
+              style={{
+                background: emailSent ? '#15803d' : '#1a2744',
+                color: emailSent ? '#fff' : '#b8972a',
+                border: '1.5px solid rgba(184,151,42,0.4)',
+                borderRadius: 8, padding: '8px 18px', fontWeight: 700,
+                fontSize: 13, cursor: sendingEmail ? 'default' : 'pointer',
+                fontFamily: 'Heebo, Arial, sans-serif', whiteSpace: 'nowrap',
+                opacity: sendingEmail ? 0.7 : 1,
+              }}
+            >
+              {emailSent ? '✓ נשלח!' : sendingEmail ? 'שולח...' : '✉ שלח למייל'}
+            </button>
+          )}
+          {emailError && (
+            <span style={{ fontSize: 12, color: '#ff8080', fontFamily: 'Heebo, Arial, sans-serif' }}>
+              {emailError}
+            </span>
+          )}
+          <button
+            onClick={() => window.print()}
+            style={{
+              background: '#b8972a', color: '#0c1a35', border: 'none',
+              borderRadius: 8, padding: '8px 22px', fontWeight: 800,
+              fontSize: 14, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            הדפסה / שמירה כ-PDF ↓
+          </button>
+        </div>
       </div>
 
       {/* Page background */}
