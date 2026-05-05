@@ -1388,7 +1388,7 @@ export default function AdminPage() {
         REQUIRED_CATS
           .filter(c => !existingSlugs.has(c.slug))
           .map(c => setDoc(doc(db, 'categories', c.slug), {
-            slug: c.slug, displayName: c.displayName, priority: c.priority,
+            slug: c.slug, displayName: c.displayName, priority: c.priority, imageUrl: '',
           }, { merge: true }))
       );
       if (REQUIRED_CATS.some(c => !existingSlugs.has(c.slug))) {
