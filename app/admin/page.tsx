@@ -1751,6 +1751,9 @@ export default function AdminPage() {
             {(t as any).badge > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{(t as any).badge}</span>}
           </button>
         ))}
+        <a href="/admin/klafim" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-amber-700 hover:text-white" style={{ textDecoration: 'none' }}>
+          📜 ניהול קלפים
+        </a>
       </div>
 
       {/* ── תוכן טאבים ── */}
