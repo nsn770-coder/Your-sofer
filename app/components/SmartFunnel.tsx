@@ -109,9 +109,9 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
     async function fetchImages() {
       try {
         const [mezSnap, tefSnap, klafSnap] = await Promise.all([
-          getDocs(query(collection(db, 'categories'), where('name', '==', 'מזוזות'), limit(1))),
-          getDocs(query(collection(db, 'categories'), where('name', '==', 'תפילין קומפלט'), limit(1))),
-          getDocs(query(collection(db, 'categories'), where('name', '==', 'קלפי מזוזה'), limit(1))),
+          getDocs(query(collection(db, 'categories'), where('slug', '==', 'מזוזות'), limit(1))),
+          getDocs(query(collection(db, 'categories'), where('slug', '==', 'תפילין קומפלט'), limit(1))),
+          getDocs(query(collection(db, 'categories'), where('slug', '==', 'קלפי מזוזה'), limit(1))),
         ]);
 
         if (!mezSnap.empty) {
@@ -132,7 +132,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
 
         // Tefillin fallback chain
         if (tefSnap.empty || !(tefSnap.docs[0]?.data().imageUrl || tefSnap.docs[0]?.data().imgUrl)) {
-          const tefSlugSnap = await getDocs(query(collection(db, 'categories'), where('slug', '==', 'תפילין-קומפלט'), limit(1)));
+          const tefSlugSnap = await getDocs(query(collection(db, 'categories'), where('slug', '==', 'תפילין קומפלט'), limit(1)));
           if (!tefSlugSnap.empty) {
             const d = tefSlugSnap.docs[0].data();
             const img = (d.imageUrl || d.imgUrl || '') as string;

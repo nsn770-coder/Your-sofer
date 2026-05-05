@@ -1387,7 +1387,7 @@ export default function AdminPage() {
         fresh.forEach(d => {
           const r = d.data();
           data.push({
-            id: d.id, slug: r.slug || r.name || '',
+            id: d.id, slug: (d.id || r.slug || r.name || '') as string,
             displayName: r.displayName || r.name || '',
             imageUrl: r.imageUrl || r.imgUrl || '',
             priority: r.priority ?? r.order ?? 0,

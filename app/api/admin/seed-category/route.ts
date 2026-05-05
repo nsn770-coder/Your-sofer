@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc, query, where } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 
 async function runSeed(params: URLSearchParams, body?: Record<string, any>) {
@@ -9,22 +9,37 @@ async function runSeed(params: URLSearchParams, body?: Record<string, any>) {
   }
 
   try {
-    const name    = body?.name    ?? params.get('name')    ?? 'בר מצווה';
-    const sub     = body?.sub     ?? params.get('sub')     ?? 'סטים לבר מצווה';
-    const imgUrl  = body?.imgUrl  ?? params.get('imgUrl')  ?? '';
-    const order   = body?.order   ?? Number(params.get('order') ?? 8);
+    const name     = body?.name    ?? params.get('name')    ?? 'בר מצווה';
+    const sub      = body?.sub     ?? params.get('sub')     ?? 'סטים לבר מצווה';
+    const imgUrl   = body?.imgUrl  ?? params.get('imgUrl')  ?? '';
+    const order    = body?.order   ?? Number(params.get('order') ?? 8);
 
     if (!name) return NextResponse.json({ error: 'name required' }, { status: 400 });
 
-    const col = collection(db, 'categories');
-    const existing = await getDocs(query(col, where('name', '==', name)));
+    // Use name as doc ID (matches REQUIRED_CATS slug convention)
+    const slug = name as string;
+    const docRef = doc(db, 'categories', slug);
+    const existing = await getDoc(docRef);
 
-    if (!existing.empty) {
-      return NextResponse.json({ success: true, alreadyExists: true });
+    if (existing.exists()) {
+      return NextResponse.json({ success: true, alreadyExists: true, id: slug });
     }
 
-    const ref = await addDoc(col, { name, sub, imgUrl, order });
-    return NextResponse.json({ success: true, id: ref.id });
+    // Also check old-schema docs created with addDoc (name field)
+    const col = collection(db, 'categories');
+    const oldSnap = await getDocs(query(col, where('name', '==', name)));
+    if (!oldSnap.empty) {
+      return NextResponse.json({ success: true, alreadyExists: true, id: oldSnap.docs[0].id });
+    }
+
+    await setDoc(docRef, {
+      slug,
+      displayName: name,
+      imageUrl: imgUrl || '',
+      priority: order,
+    });
+
+    return NextResponse.json({ success: true, id: slug });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
