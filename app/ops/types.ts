@@ -100,6 +100,7 @@ export interface InternalOrder {
   createdAt: any;
   updatedAt: any;
   dueDate?: any;
+  certId?: string;
 }
 
 export interface AuditEntry {

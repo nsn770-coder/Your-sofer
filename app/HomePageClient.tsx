@@ -285,7 +285,7 @@ const ActivityBar = memo(function ActivityBar({
     return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVisible); };
   }, []);
 
-  const weeklyVisitors = 134 + ((new Date().getDate() * 7) % 83);
+  const weeklyVisitors = (3196).toLocaleString('en-US');
   const messages = [
     { icon: <IconActivityCheck />, text: 'לקוח מתל אביב הוסיף מזוזה לסל לפני 5 דקות' },
     { icon: <IconActivityPen />,   text: 'סופר חדש נרשם מירושלים השבוע' },

@@ -58,6 +58,8 @@ export default function OrderDetailPage() {
   const [audit, setAudit] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [generatingCert, setGeneratingCert] = useState(false);
+  const [certId, setCertId] = useState<string | null>(null);
 
   // Edit state
   const [newStatus, setNewStatus] = useState<OrderStatus | ''>('');
@@ -87,6 +89,7 @@ export default function OrderDetailPage() {
 
     const data = { id: orderSnap.id, ...orderSnap.data() } as InternalOrder;
     setOrder(data);
+    if (data.certId) setCertId(data.certId);
     setNewStatus(data.status);
     setNewPriority(data.priority);
     setPrimaryOwner(data.primaryOwner || '');
@@ -253,6 +256,29 @@ export default function OrderDetailPage() {
     setCommText('');
     setSaving(false);
     await loadOrder();
+  }
+
+  async function generateCertificate() {
+    if (!id) return;
+    setGeneratingCert(true);
+    try {
+      const res = await fetch('/api/certificate/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: id }),
+      });
+      const data = await res.json();
+      if (data.certId) {
+        setCertId(data.certId);
+        await loadOrder();
+      } else {
+        alert('שגיאה ביצירת תעודה: ' + (data.error ?? 'שגיאה לא ידועה'));
+      }
+    } catch (e: any) {
+      alert('שגיאה: ' + e.message);
+    } finally {
+      setGeneratingCert(false);
+    }
   }
 
   if (loading) {
@@ -629,6 +655,60 @@ export default function OrderDetailPage() {
                   {order.stamStream.notes && (
                     <div className="text-xs text-gray-500">{order.stamStream.notes}</div>
                   )}
+                </div>
+              )}
+            </Section>
+          )}
+
+          {/* Certificate */}
+          {(order.orderType === 'stam' || order.orderType === 'mixed') && (
+            <Section title='תעודת כשרות סת"מ'>
+              {certId ? (
+                <div className="space-y-3">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="text-xs text-gray-500 mb-1">מספר תעודה</div>
+                    <div className="font-mono font-bold text-sm text-gray-800 break-all">{certId}</div>
+                  </div>
+                  <div className="flex gap-2">
+                    <a
+                      href={`/certificate/${certId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 text-center py-2 rounded-lg text-sm font-semibold"
+                      style={{ background: '#0c1a35', color: '#b8972a' }}
+                    >
+                      הצג תעודה ↗
+                    </a>
+                    <a
+                      href={`/verify/${certId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 text-center py-2 rounded-lg text-sm font-semibold border border-gray-300 text-gray-600"
+                    >
+                      דף אימות
+                    </a>
+                  </div>
+                  <button
+                    onClick={generateCertificate}
+                    disabled={generatingCert}
+                    className="w-full py-2 rounded-lg text-xs text-gray-400 border border-gray-200 hover:border-gray-300"
+                  >
+                    {generatingCert ? 'מייצר...' : 'יצר מחדש'}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-xs text-gray-500">
+                    יצור תעודת כשרות מותאמת אישית לפריטי הסת"מ בהזמנה זו, עם מספר סידורי וקוד QR לאימות.
+                  </p>
+                  <button
+                    onClick={generateCertificate}
+                    disabled={generatingCert}
+                    className="w-full py-2.5 rounded-lg text-sm font-bold"
+                    style={{ background: '#0c1a35', color: '#b8972a' }}
+                  >
+                    {generatingCert ? 'מייצר תעודה...' : '📜 צור תעודת כשרות'}
+                  </button>
                 </div>
               )}
             </Section>

@@ -570,8 +570,8 @@ export default function ShiraChat() {
 
         /* Mobile */
         @media (max-width: 480px) {
-          .shira-window { left: 10px; right: 10px; width: auto; bottom: 86px; max-height: 75vh; }
-          .shira-toggle { left: 14px; bottom: 14px; width: 54px; height: 54px; }
+          .shira-window { left: 10px; right: 10px; width: auto; bottom: 192px; max-height: 75vh; }
+          .shira-toggle { left: 14px; bottom: 120px; width: 54px; height: 54px; }
           .shira-products { margin-left: 0; }
           .shira-quick-replies { margin-left: 0; }
         }
