@@ -1423,6 +1423,7 @@ export default function AdminPage() {
   async function saveCategory(catId: string, data: { displayName: string; imageUrl: string; priority: number }) {
     setCatSaving(catId);
     try {
+      console.log('[saveCategory] saving to doc:', catId, 'data:', data);
       await updateDoc(doc(db, 'categories', catId), data);
       setCategories(prev =>
         prev.map(c => c.id === catId ? { ...c, ...data } : c)
@@ -2703,6 +2704,7 @@ function CategoryCard({ cat, saving, saved, onSave }: {
       const data = await res.json();
       if (!data.secure_url) throw new Error('upload failed');
       setImageUrl(data.secure_url);
+      console.log('[CategoryCard] uploaded URL:', data.secure_url);
     } catch { alert('שגיאה בהעלאת תמונה'); }
     finally { setUploading(false); }
   }
