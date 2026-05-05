@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
-  doc, getDoc, setDoc, updateDoc, collection,
+  doc, getDoc, setDoc, updateDoc,
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/app/firebase';
@@ -95,17 +95,43 @@ export async function POST(req: NextRequest) {
       }
       if (!qualityLevel) qualityLevel = 'כשר לכתחילה';
 
+      // Fetch klaf image and mark as sold
+      let klafImageUrl: string | undefined;
+      const klafId = p.selectedKlafId ?? p.klafId;
+      if (klafId) {
+        try {
+          const klafSnap = await getDoc(doc(db, 'klafim', klafId));
+          if (klafSnap.exists()) {
+            klafImageUrl = klafSnap.data().imageUrl ?? undefined;
+            await updateDoc(doc(db, 'klafim', klafId), {
+              status: 'sold',
+              soldAt: serverTimestamp(),
+            });
+          }
+        } catch (_) {}
+      }
+
       const qty = Math.max(1, p.quantity ?? 1);
       const prefix = itemPrefix(p.category ?? '');
       for (let i = 0; i < qty; i++) {
-        items.push({
+        const item: {
+          serialNumber: string;
+          productName: string;
+          type: string;
+          category: string;
+          qualityLevel: string;
+          soferName: string;
+          klafImageUrl?: string;
+        } = {
           serialNumber: `${prefix}-${randDigits(6)}`,
           productName: p.name ?? '',
           type: itemType(p.category ?? p.name ?? ''),
           category: p.category ?? '',
           qualityLevel,
           soferName,
-        });
+        };
+        if (klafImageUrl) item.klafImageUrl = klafImageUrl;
+        items.push(item);
       }
     }
 

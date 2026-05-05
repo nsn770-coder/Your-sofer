@@ -12,6 +12,7 @@ interface CertItem {
   type: string;
   qualityLevel: string;
   soferName: string;
+  klafImageUrl?: string;
 }
 
 interface Certificate {
@@ -48,7 +49,7 @@ export default function VerifyPage() {
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #0c1a35 0%, #18274a 100%)',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'flex-start', paddingTop: 48, padding: '48px 16px 48px',
+      justifyContent: 'flex-start', padding: '48px 16px 48px',
       fontFamily: 'Heebo, Arial, sans-serif',
     }}>
       {/* Brand */}
@@ -137,7 +138,7 @@ export default function VerifyPage() {
 
             {/* Details */}
             <div style={{ padding: '24px' }}>
-              {/* Cert ID */}
+              {/* Cert ID + date */}
               <div style={{
                 background: '#f8f6f2', borderRadius: 10, padding: '12px 16px',
                 marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -167,27 +168,65 @@ export default function VerifyPage() {
                 <div style={{ fontSize: 10, color: '#888', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                   פריטים מאושרים ({cert.items.length})
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {cert.items.map((item, i) => (
                     <div key={i} style={{
-                      border: '1px solid #e8e0d0', borderRadius: 8, padding: '10px 14px',
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      gap: 12,
+                      border: '1px solid #e8e0d0', borderRadius: 10, overflow: 'hidden',
                     }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, color: '#0c1a35', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {item.productName}
+                      {/* Klaf image */}
+                      {item.klafImageUrl && (
+                        <div style={{ position: 'relative', height: 140, background: '#f5f0e8', overflow: 'hidden' }}>
+                          <img
+                            src={item.klafImageUrl}
+                            alt={`קלף ${item.productName}`}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            loading="lazy"
+                          />
+                          {/* Sold badge */}
+                          <div style={{
+                            position: 'absolute', top: 10, right: 10,
+                            background: '#15803d', color: '#fff',
+                            fontSize: 11, fontWeight: 700,
+                            borderRadius: 6, padding: '3px 10px',
+                            display: 'flex', alignItems: 'center', gap: 4,
+                          }}>
+                            ✓ נמכר ומאומת
+                          </div>
                         </div>
-                        <div style={{ fontSize: 11, color: '#666', marginTop: 2 }}>
-                          {item.type} · {item.soferName}
+                      )}
+
+                      {/* Item details */}
+                      <div style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 700, color: '#0c1a35', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {item.productName}
+                          </div>
+                          <div style={{ fontSize: 11, color: '#666', marginTop: 3 }}>
+                            {item.type} · {item.soferName}
+                          </div>
+                          <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
+                            נבדק על ידי: {cert.magiaName}
+                          </div>
+                          <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>
+                            תאריך בדיקה: {formatDate(cert.issuedAt)}
+                          </div>
+                          {!item.klafImageUrl && (
+                            <div style={{
+                              display: 'inline-flex', alignItems: 'center', gap: 4,
+                              marginTop: 5, background: '#f0fdf4', border: '1px solid #86efac',
+                              borderRadius: 6, padding: '2px 8px', fontSize: 10, color: '#15803d', fontWeight: 700,
+                            }}>
+                              ✓ נמכר ומאומת
+                            </div>
+                          )}
                         </div>
-                      </div>
-                      <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                        <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#0c1a35', fontWeight: 700 }}>
-                          {item.serialNumber}
-                        </div>
-                        <div style={{ fontSize: 10, color: '#15803d', fontWeight: 600, marginTop: 2 }}>
-                          {item.qualityLevel}
+                        <div style={{ textAlign: 'left', flexShrink: 0 }}>
+                          <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#0c1a35', fontWeight: 700 }}>
+                            {item.serialNumber}
+                          </div>
+                          <div style={{ fontSize: 10, color: '#15803d', fontWeight: 600, marginTop: 2 }}>
+                            {item.qualityLevel}
+                          </div>
                         </div>
                       </div>
                     </div>
