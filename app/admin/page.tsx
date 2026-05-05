@@ -1423,7 +1423,7 @@ export default function AdminPage() {
   async function saveCategory(catId: string, data: { displayName: string; imageUrl: string; priority: number }) {
     setCatSaving(catId);
     try {
-      console.log('[saveCategory] saving to doc:', catId, 'data:', data);
+      console.log('[saveCategory] writing:', catId, data);
       await updateDoc(doc(db, 'categories', catId), data);
       setCategories(prev =>
         prev.map(c => c.id === catId ? { ...c, ...data } : c)
