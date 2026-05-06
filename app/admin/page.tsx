@@ -1161,6 +1161,7 @@ export default function AdminPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [applications, setApplications] = useState<SoferApplication[]>([]);
+  const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
   const [users, setUsers] = useState<AppUser[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
@@ -2136,6 +2137,62 @@ export default function AdminPage() {
                               <img key={i} src={url} alt={`דוגמת כתיבה ${i + 1}`} onClick={() => setLightboxImage(url)} className="w-16 h-16 object-cover rounded-lg border border-gray-200 cursor-zoom-in hover:opacity-80 transition-opacity" />
                             ))}
                           </div>
+                        </div>
+                      )}
+
+                      {/* taxStatus */}
+                      {app.taxStatus && (
+                        <div className="mt-2">
+                          <span className="text-xs font-bold text-gray-500">🧾 סטטוס עוסק: </span>
+                          <span className="text-xs font-bold text-amber-700">
+                            {app.taxStatus === 'osek_patur' ? 'עוסק פטור' : app.taxStatus === 'osek_morsheh' ? 'עוסק מורשה' : app.taxStatus === 'no_osek' ? 'ללא עוסק' : app.taxStatus === 'salary' ? 'תלוש שכר' : app.taxStatus}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Collapsible products section */}
+                      {app.products && app.products.length > 0 && (
+                        <div className="mt-3">
+                          <button
+                            type="button"
+                            onClick={() => setExpandedProducts(prev => {
+                              const next = new Set(prev);
+                              next.has(app.id) ? next.delete(app.id) : next.add(app.id);
+                              return next;
+                            })}
+                            className="flex items-center gap-2 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-1.5 hover:bg-indigo-100 transition"
+                          >
+                            🛍️ מוצרים שהוגשו ({app.products.length})
+                            <span>{expandedProducts.has(app.id) ? '▲' : '▼'}</span>
+                          </button>
+
+                          {expandedProducts.has(app.id) && (
+                            <div className="mt-3 grid gap-3">
+                              {app.products.map((p, pi) => (
+                                <div key={pi} className="border border-gray-200 rounded-xl p-3 bg-gray-50">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="font-black text-sm text-gray-900">{p.name || `מוצר ${pi + 1}`}</span>
+                                    <span className="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded-full font-bold">{p.type}</span>
+                                  </div>
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600 mb-2">
+                                    {p.level && <span>✡️ {p.level}</span>}
+                                    {p.nusach && <span>📜 {p.nusach}</span>}
+                                    {p.size && <span>📐 {p.size}</span>}
+                                    {p.days && <span>🕐 {p.days} ימי עסקים</span>}
+                                    {p.soferPrice && <span className="font-bold text-green-700">💰 ₪{p.soferPrice} (מחיר סופר)</span>}
+                                  </div>
+                                  {p.desc && <p className="text-xs text-gray-500 mb-2 leading-relaxed">{p.desc}</p>}
+                                  {p.images && p.images.length > 0 && (
+                                    <div className="flex gap-2 flex-wrap">
+                                      {p.images.slice(0, 4).map((url, ii) => (
+                                        <img key={ii} src={url} alt={`תמונה ${ii + 1}`} onClick={() => setLightboxImage(url)} className="w-14 h-14 object-cover rounded-lg border border-gray-200 cursor-zoom-in hover:opacity-80 transition-opacity" />
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
