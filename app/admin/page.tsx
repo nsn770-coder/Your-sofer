@@ -1611,6 +1611,7 @@ export default function AdminPage() {
             size: p.size,
             deliveryDays: p.days,
             days: p.days,
+            priority: 0,
             status: 'active',
             createdAt: serverTimestamp(),
           })
@@ -1670,6 +1671,7 @@ export default function AdminPage() {
           size: p.size,
           deliveryDays: p.days,
           days: p.days,
+          priority: 0,
           status: 'active',
           createdAt: serverTimestamp(),
         })
