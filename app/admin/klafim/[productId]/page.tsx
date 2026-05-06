@@ -123,11 +123,13 @@ export default function KlafimProductPage() {
     if (user?.role === 'admin' && productId) loadData();
   }, [user, productId]);
 
-  const prefix = product ? getPrefix(product.cat ?? product.category ?? '') : 'YS';
-
   function addFiles(files: FileList | File[]) {
-    const safePrefix = prefix && prefix.length > 0 ? prefix : 'YS';
-    console.log('addFiles: prefix=', prefix, 'safePrefix=', safePrefix, 'product.cat=', product?.cat, 'product.category=', product?.category);
+    const currentProduct = product;
+    const cat = currentProduct?.cat ?? currentProduct?.category ?? '';
+    const computedPrefix = cat ? getPrefix(cat) : 'YS';
+    const safePrefix = computedPrefix || 'YS';
+    console.log('addFiles: cat=', cat, 'prefix=', safePrefix, 'product=', currentProduct);
+
     const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
     setPending(prev => [
       ...prev,
@@ -177,9 +179,6 @@ export default function KlafimProductPage() {
 
       try {
         const serial = updatedPending[i].serial;
-        if (!serial || serial.startsWith('-')) {
-          throw new Error(`מספר סידורי לא תקין: "${serial}" — רענן את הדף ונסה שוב`);
-        }
         console.log('uploading file', updatedPending[i].file.name, serial);
         const imageUrl = await uploadToCloudinary(updatedPending[i].file);
         await addDoc(collection(db, 'klafim'), {
