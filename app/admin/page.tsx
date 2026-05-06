@@ -34,6 +34,18 @@ interface Order {
   items?: OrderItem[];
 }
 
+interface ProductEntry {
+  type: string;
+  name: string;
+  desc: string;
+  nusach: string;
+  level: string;
+  days: string;
+  soferPrice: string;
+  size: string;
+  images: string[];
+}
+
 interface SoferApplication {
   id: string;
   name: string;
@@ -46,6 +58,8 @@ interface SoferApplication {
   categories: string[];
   imageUrl?: string;
   writingSamples?: string[];
+  products?: ProductEntry[];
+  taxStatus?: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt?: { seconds: number };
 }
@@ -1565,13 +1579,42 @@ export default function AdminPage() {
         description: app.description || '', style: app.style || '',
         categories: app.categories, imageUrl: app.imageUrl || '',
         writingSamples: app.writingSamples || [],
+        taxStatus: app.taxStatus || null,
         status: 'active', createdAt: serverTimestamp(),
       });
+      // Create a product document for each submitted product
+      if (app.products?.length) {
+        await Promise.all(app.products.map((p: ProductEntry) =>
+          addDoc(collection(db, 'products'), {
+            name: p.name,
+            description: p.desc,
+            category: p.type,
+            cat: p.type,
+            level: p.level,
+            soferId: soferRef.id,
+            soferName: app.name,
+            price: p.soferPrice ? Number(p.soferPrice) : 0,
+            imgUrl: p.images?.[0] ?? '',
+            image_url: p.images?.[0] ?? '',
+            images: p.images ?? [],
+            nusach: p.nusach,
+            size: p.size,
+            deliveryDays: p.days,
+            days: p.days,
+            status: 'active',
+            createdAt: serverTimestamp(),
+          })
+        ));
+      }
       if (app.email) {
         const normalizedEmail = app.email.trim().toLowerCase();
         const usersSnap = await getDocs(query(collection(db, 'users'), where('email', '==', normalizedEmail)));
         if (!usersSnap.empty) {
-          await updateDoc(usersSnap.docs[0].ref, { role: 'sofer', soferId: soferRef.id });
+          await updateDoc(usersSnap.docs[0].ref, {
+            role: 'sofer',
+            soferId: soferRef.id,
+            taxStatus: app.taxStatus || null,
+          });
           setUsers(prev => prev.map(u => u.id === usersSnap.docs[0].id ? { ...u, role: 'sofer', soferId: soferRef.id } : u));
         }
       }
