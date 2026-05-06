@@ -224,7 +224,7 @@ export default function KlafimProductPage() {
     e.preventDefault();
     setIsDragOver(false);
     if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
-  }, [prefix]);
+  }, [product]);
 
   if (loading || pageLoading) {
     return (
