@@ -254,7 +254,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
           <div style={{ display: "flex", flexDirection: "row-reverse", padding: "24px 24px 16px" }}>
             {item.columns.map((col, ci) => (
               <div key={ci} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-                <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", color: "#b8972a", textTransform: "uppercase", textAlign: "right", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(184,151,42,0.2)" }}>{col.title}</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: "#0c1a35", textAlign: "right", marginBottom: 10, paddingBottom: 6, borderBottom: "2px solid #b8972a" }}>{col.title}</div>
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {col.items.map((sub, si) => (
                     <li key={si}>
