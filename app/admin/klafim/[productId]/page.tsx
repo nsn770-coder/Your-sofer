@@ -54,9 +54,14 @@ function randDigits(n: number) {
 }
 
 function getPrefix(cat: string): string {
+  console.log('getPrefix called with cat:', JSON.stringify(cat));
   for (const [key, prefix] of Object.entries(CAT_PREFIX)) {
-    if (cat.includes(key)) return prefix;
+    if (cat.includes(key)) {
+      console.log('getPrefix matched:', key, '->', prefix);
+      return prefix;
+    }
   }
+  console.log('getPrefix: no match, returning YS');
   return 'YS';
 }
 
@@ -88,6 +93,7 @@ export default function KlafimProductPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    console.log('CAT_PREFIX:', CAT_PREFIX);
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
   }, [user, loading]);
 
@@ -120,13 +126,15 @@ export default function KlafimProductPage() {
   const prefix = product ? getPrefix(product.cat ?? product.category ?? '') : 'YS';
 
   function addFiles(files: FileList | File[]) {
+    const safePrefix = prefix && prefix.length > 0 ? prefix : 'YS';
+    console.log('addFiles: prefix=', prefix, 'safePrefix=', safePrefix, 'product.cat=', product?.cat, 'product.category=', product?.category);
     const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
     setPending(prev => [
       ...prev,
       ...arr.map(file => ({
         file,
         previewUrl: URL.createObjectURL(file),
-        serial: `${prefix}-${randDigits(6)}`,
+        serial: `${safePrefix}-${randDigits(6)}`,
         uploading: false,
         error: '',
       })),
@@ -167,11 +175,15 @@ export default function KlafimProductPage() {
       setPending([...updatedPending]);
 
       try {
-        console.log('uploading file', updatedPending[i].file.name, updatedPending[i].serial);
+        const serial = updatedPending[i].serial;
+        if (!serial || serial.startsWith('-')) {
+          throw new Error(`מספר סידורי לא תקין: "${serial}" — רענן את הדף ונסה שוב`);
+        }
+        console.log('uploading file', updatedPending[i].file.name, serial);
         const imageUrl = await uploadToCloudinary(updatedPending[i].file);
         await addDoc(collection(db, 'klafim'), {
           productId,
-          name: updatedPending[i].serial,
+          name: serial,
           imageUrl,
           status: 'available',
           createdAt: serverTimestamp(),
