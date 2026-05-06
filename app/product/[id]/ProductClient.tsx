@@ -1356,7 +1356,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {/* PRIMARY: Buy Now */}
       <button onClick={() => { handleAddToCart(); router.push('/cart'); }}
         style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
-        <Icon.Zap /> קנה עכשיו
+        <Icon.Zap /> הוסף לעגלה
       </button>
 
       {/* SECONDARY: Add to Cart */}
@@ -1871,7 +1871,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             onClick={() => { handleAddToCart(); router.push('/cart'); }}
             style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 12, padding: '12px 24px', fontSize: 15, fontWeight: 900, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}
           >
-            קנה עכשיו ←
+            הוסף לעגלה ←
           </button>
         </div>
       )}
