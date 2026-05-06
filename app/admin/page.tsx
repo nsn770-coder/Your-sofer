@@ -1634,6 +1634,43 @@ export default function AdminPage() {
     finally { setActionLoading(null); }
   }
 
+  async function createProductsForApprovedApp(app: SoferApplication) {
+    if (!app.products?.length) { alert('אין מוצרים בבקשה זו'); return; }
+    setActionLoading(app.id + '_products');
+    try {
+      // Find the sofer document by email match
+      let soferId = '';
+      let soferName = app.name;
+      if (app.email) {
+        const soferSnap = await getDocs(query(collection(db, 'soferim'), where('email', '==', app.email.trim().toLowerCase())));
+        if (!soferSnap.empty) { soferId = soferSnap.docs[0].id; soferName = soferSnap.docs[0].data().name || app.name; }
+      }
+      await Promise.all(app.products.map((p: ProductEntry) =>
+        addDoc(collection(db, 'products'), {
+          name: p.name,
+          description: p.desc,
+          category: p.type,
+          cat: p.type,
+          level: p.level,
+          soferId: soferId || null,
+          soferName,
+          price: p.soferPrice ? Number(p.soferPrice) : 0,
+          imgUrl: p.images?.[0] ?? '',
+          image_url: p.images?.[0] ?? '',
+          images: p.images ?? [],
+          nusach: p.nusach,
+          size: p.size,
+          deliveryDays: p.days,
+          days: p.days,
+          status: 'active',
+          createdAt: serverTimestamp(),
+        })
+      ));
+      alert(`✅ נוצרו ${app.products.length} מוצרים בהצלחה${soferId ? '' : ' (ללא soferId — סופר לא נמצא)'}`);
+    } catch (e) { console.error(e); alert('שגיאה ביצירת מוצרים'); }
+    finally { setActionLoading(null); }
+  }
+
   async function loadTestimonials() {
     try {
       const snap = await getDocs(query(collection(db, 'testimonials'), orderBy('createdAt', 'desc')));
@@ -2200,6 +2237,17 @@ export default function AdminPage() {
                       <div className="flex flex-col gap-2 flex-shrink-0">
                         <button onClick={() => approveApplication(app)} disabled={actionLoading === app.id} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50">{actionLoading === app.id ? '...' : '✅ אשר'}</button>
                         <button onClick={() => rejectApplication(app.id)} disabled={actionLoading === app.id} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">❌ דחה</button>
+                      </div>
+                    )}
+                    {app.status === 'approved' && app.products && app.products.length > 0 && (
+                      <div className="flex-shrink-0">
+                        <button
+                          onClick={() => createProductsForApprovedApp(app)}
+                          disabled={actionLoading === app.id + '_products'}
+                          className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {actionLoading === app.id + '_products' ? '...' : '🛍️ צור מוצרים'}
+                        </button>
                       </div>
                     )}
                   </div>
