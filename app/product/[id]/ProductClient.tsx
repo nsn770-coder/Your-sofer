@@ -296,7 +296,7 @@ function SoferCard({ soferId }: { soferId: string }) {
 
 // ─── Klaf Gallery ─────────────────────────────────────────────────────────────
 
-function KlafGallery({ productId, maxSelect, onSelect }: { productId: string; maxSelect: number; onSelect: (ids: string[], names: string[]) => void }) {
+function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (ids: string[], names: string[]) => void }) {
   const [klafImages, setKlafImages] = useState<KlafItem[]>([]);
   const [loading, setLoading]       = useState(true);
   const [selected, setSelected]     = useState<string[]>([]);
@@ -317,14 +317,9 @@ function KlafGallery({ productId, maxSelect, onSelect }: { productId: string; ma
 
   function handleSelect(img: KlafItem) {
     setSelected(prev => {
-      let next: string[];
-      if (prev.includes(img.id)) {
-        next = prev.filter(id => id !== img.id);
-      } else if (prev.length >= maxSelect) {
-        next = prev; // already at limit
-      } else {
-        next = [...prev, img.id];
-      }
+      const next = prev.includes(img.id)
+        ? prev.filter(id => id !== img.id)
+        : [...prev, img.id];
       const names = next.map(sid => klafImages.find(k => k.id === sid)?.name ?? '');
       onSelect(next, names);
       return next;
@@ -345,20 +340,17 @@ function KlafGallery({ productId, maxSelect, onSelect }: { productId: string; ma
           <Icon.Scroll />
           <span style={{ fontWeight: 800, fontSize: 15, color: '#0f1111' }}>בחר את הקלף שלך</span>
         </div>
-        {maxSelect > 1 && (
-          <span style={{ fontSize: 12, fontWeight: 700, color: selected.length === maxSelect ? '#1a6b3c' : '#b8972a' }}>
-            נבחרו {selected.length} מתוך {maxSelect} קלפים
-          </span>
-        )}
+        <span style={{ fontSize: 12, fontWeight: 700, color: selected.length > 0 ? '#1a6b3c' : '#888' }}>
+          נבחרו {selected.length} קלפים
+        </span>
       </div>
       <div style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>{klafImages.length} קלפים זמינים - כל קלף כתוב ביד</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 8 }}>
         {klafImages.map(img => {
           const isSelected = selected.includes(img.id);
-          const atLimit = selected.length >= maxSelect && !isSelected;
           return (
-            <div key={img.id} style={{ border: `2px solid ${isSelected ? '#b8972a' : '#e0e0e0'}`, borderRadius: 8, overflow: 'hidden', cursor: atLimit ? 'not-allowed' : 'pointer', background: isSelected ? '#fffbf0' : '#fff', transition: 'all 0.15s', position: 'relative', opacity: atLimit ? 0.5 : 1 }}>
-              <div onClick={() => !atLimit && handleSelect(img)}>
+            <div key={img.id} style={{ border: `2px solid ${isSelected ? '#b8972a' : '#e0e0e0'}`, borderRadius: 8, overflow: 'hidden', cursor: 'pointer', background: isSelected ? '#fffbf0' : '#fff', transition: 'all 0.15s', position: 'relative' }}>
+              <div onClick={() => handleSelect(img)}>
                 <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4' }}>
                   <NextImage src={img.imageUrl} alt={img.name} fill style={{ objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3'; }} />
                 </div>
@@ -1301,8 +1293,14 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     : null;
 
   function handleAddToCart() {
-    for (let i = 0; i < qty; i++) {
-      addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafIds[i] || undefined, selectedKlafName: selectedKlafNames[i] || undefined, embroideryText: embroideryText || undefined });
+    if (selectedKlafIds.length > 0) {
+      for (let i = 0; i < selectedKlafIds.length; i++) {
+        addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined });
+      }
+    } else {
+      for (let i = 0; i < qty; i++) {
+        addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, embroideryText: embroideryText || undefined });
+      }
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
     pixel.addToCart({ id: product!.id, name: product!.name, price: product!.price, quantity: qty });
@@ -1349,7 +1347,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </div>
       )}
 
-      {!compact && (
+      {!compact && selectedKlafIds.length === 0 && (
         <div style={{ marginBottom: 12 }}>
           <label style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 4 }}>כמות:</label>
           <select value={qty} onChange={e => setQty(Number(e.target.value))} style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#f8f9fa', cursor: 'pointer' }}>
@@ -1651,7 +1649,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               )}
             </div>
 
-            <KlafGallery productId={product.id} maxSelect={qty} onSelect={(ids, names) => { setSelectedKlafIds(ids); setSelectedKlafNames(names); }} />
+            <KlafGallery productId={product.id} onSelect={(ids, names) => { setSelectedKlafIds(ids); setSelectedKlafNames(names); }} />
 
             {product.soferId && <SoferCard soferId={product.soferId} />}
 
