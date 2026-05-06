@@ -333,6 +333,7 @@ export default function KlafimProductPage() {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
                 <button
+                  type="button"
                   onClick={handleSave}
                   disabled={saving}
                   style={{
