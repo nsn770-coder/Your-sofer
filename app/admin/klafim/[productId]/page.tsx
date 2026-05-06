@@ -145,6 +145,7 @@ export default function KlafimProductPage() {
   }
 
   async function handleSave() {
+    console.log('handleSave called', pending.length, product);
     if (!pending.length || !product) return;
     setSaving(true);
     setSaveError('');
@@ -166,6 +167,7 @@ export default function KlafimProductPage() {
       setPending([...updatedPending]);
 
       try {
+        console.log('uploading file', updatedPending[i].file.name, updatedPending[i].serial);
         const imageUrl = await uploadToCloudinary(updatedPending[i].file);
         await addDoc(collection(db, 'klafim'), {
           productId,
@@ -175,6 +177,7 @@ export default function KlafimProductPage() {
           createdAt: serverTimestamp(),
           soferName,
         });
+        console.log('saved to firestore successfully');
         URL.revokeObjectURL(updatedPending[i].previewUrl);
         updatedPending.splice(i, 1);
         i--;
@@ -182,6 +185,7 @@ export default function KlafimProductPage() {
         setPending([...updatedPending]);
         setSavedCount(successCount);
       } catch (err: any) {
+        console.log('ERROR:', err);
         updatedPending[i] = { ...updatedPending[i], uploading: false, error: err.message ?? 'שגיאה' };
         setPending([...updatedPending]);
       }
@@ -326,7 +330,7 @@ export default function KlafimProductPage() {
                     opacity: saving ? 0.7 : 1,
                   }}
                 >
-                  {saving ? 'מעלה...' : `העלה קלפים (${pending.length})`}
+                  {saving ? '...מעלה' : `העלה קלפים (${pending.length})`}
                 </button>
                 {savedCount > 0 && (
                   <div style={{ fontSize: 13, color: '#15803d', fontWeight: 700 }}>✓ {savedCount} קלפים נשמרו</div>

@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-05-03T08:55:35.001Z",
+  "fixMode": false,
+  "summary": {
+    "totalActive": 4438,
+    "productsWithDuplicates": 5,
+    "fieldsToFix": 5
+  },
+  "flagged": [
+    {
+      "id": "2aDzGTDOSjqjMzEgW9h6",
+      "name": "מזוזה בטון עם אות ש' להבה",
+      "cat": "מזוזות",
+      "toClear": [
+        {
+          "field": "imgUrl3",
+          "url": "https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_600/v1774303078/yoursofer/2aDzGTDOSjqjMzEgW9h6/2aDzGTDOSjqjMzEgW9h6_lifestyle_1774303074704.png",
+          "duplicateOf": "imgUrl2",
+          "base": "yoursofer/2aDzGTDOSjqjMzEgW9h6/2aDzGTDOSjqjMzEgW9h6_lifestyle"
+        }
+      ]
+    },
+    {
+      "id": "7nSFCbDezd6kUABndCkF",
+      "name": "מזוזה בטון לבנה עם אות ש' זהב – עיצוב רחב",
+      "cat": "מזוזות",
+      "toClear": [
+        {
+          "field": "imgUrl3",
+          "url": "https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_600/v1774307557/yoursofer/7nSFCbDezd6kUABndCkF/7nSFCbDezd6kUABndCkF_lifestyle_1774307554077.png",
+          "duplicateOf": "imgUrl2",
+          "base": "yoursofer/7nSFCbDezd6kUABndCkF/7nSFCbDezd6kUABndCkF_lifestyle"
+        }
+      ]
+    },
+    {
+      "id": "DuQh4UkNbZPUi0s6ghqI",
+      "name": "מזוזה עץ עם אפוקסי בגוון כחול שמיים",
+      "cat": "מזוזות",
+      "toClear": [
+        {
+          "field": "imgUrl3",
+          "url": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777200217/yoursofer/DuQh4UkNbZPUi0s6ghqI/DuQh4UkNbZPUi0s6ghqI_studio_1777200211921.png",
+          "duplicateOf": "imgUrl2",
+          "base": "yoursofer/DuQh4UkNbZPUi0s6ghqI/DuQh4UkNbZPUi0s6ghqI_studio"
+        }
+      ]
+    },
+    {
+      "id": "EI5KByEVpg9SDwQcsTae",
+      "name": "מזוזה פלסטיק בגוון עץ פקק עם גומי – 15 ס\"מ",
+      "cat": "מזוזות",
+      "toClear": [
+        {
+          "field": "imgUrl3",
+          "url": "https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_600/v1774311015/yoursofer/EI5KByEVpg9SDwQcsTae/EI5KByEVpg9SDwQcsTae_lifestyle_1774311013697.png",
+          "duplicateOf": "imgUrl2",
+          "base": "yoursofer/EI5KByEVpg9SDwQcsTae/EI5KByEVpg9SDwQcsTae_lifestyle"
+        }
+      ]
+    },
+    {
+      "id": "JMm0QuyOBEornkH7U067",
+      "name": "מזוזה \"פולימר בטון \"ש\" 30 ס\"מ",
+      "cat": "מזוזות",
+      "toClear": [
+        {
+          "field": "imgUrl3",
+          "url": "https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto:good,w_600/v1774313333/yoursofer/JMm0QuyOBEornkH7U067/JMm0QuyOBEornkH7U067_lifestyle_1774313331246.png",
+          "duplicateOf": "imgUrl2",
+          "base": "yoursofer/JMm0QuyOBEornkH7U067/JMm0QuyOBEornkH7U067_lifestyle"
+        }
+      ]
+    }
+  ]
+}

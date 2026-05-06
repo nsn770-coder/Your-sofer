@@ -123,7 +123,17 @@
       "PowerShell(Get-CimInstance *)",
       "Bash(git checkout *)",
       "Bash(echo \"EXIT_CODE: $?\")",
-      "Bash(head -100 /c/Users/Owner/Downloads/projects/Your-sofer/app/product/[id]/ProductClient.tsx)"
+      "Bash(head -100 /c/Users/Owner/Downloads/projects/Your-sofer/app/product/[id]/ProductClient.tsx)",
+      "Bash(kill -9 17176)",
+      "Bash(kill -9 1205)",
+      "Bash(kill -9 13608)",
+      "Bash(xargs sed *)",
+      "Bash(git reset *)",
+      "Bash(New-Item -ItemType Directory -Path \"app\\\\collections\" -Force)",
+      "Bash(Out-Null)",
+      "Bash(git rm *)",
+      "Bash(node app/scripts/aiMediaPipeline.mjs --provider=gemini --cat=כיפות)",
+      "Bash(echo \"Pipeline PID: $!\")"
     ]
   }
 }
