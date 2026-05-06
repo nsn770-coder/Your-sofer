@@ -32,9 +32,19 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
     id: "mezuzot", label: "מזוזות", cat: "מזוזות",
     columns: [
       {
-        title: "לפי חומר",
+        title: "קלפי מזוזה",
         items: [
-          { label: "כל המזוזות", cat: "מזוזות" },
+          { label: "כל הקלפים", cat: "קלפי מזוזה" },
+          { label: '10 ס"מ', cat: "קלפי מזוזה", filter: '10 ס"מ' },
+          { label: '12 ס"מ', cat: "קלפי מזוזה", filter: '12 ס"מ' },
+          { label: '15 ס"מ', cat: "קלפי מזוזה", filter: '15 ס"מ' },
+          { label: '20 ס"מ', cat: "קלפי מזוזה", filter: '20 ס"מ' },
+        ]
+      },
+      {
+        title: "בתי מזוזה",
+        items: [
+          { label: "כל בתי המזוזה", cat: "מזוזות" },
           { label: "פולימר", cat: "מזוזות", filter: "פולימר" },
           { label: "בטון וסמנט", cat: "מזוזות", filter: "בטון" },
           { label: "פלסטיק", cat: "מזוזות", filter: "פלסטיק" },
@@ -55,16 +65,6 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
           { label: '20 ס"מ', cat: "מזוזות", filter: '20 ס"מ' },
           { label: '25 ס"מ', cat: "מזוזות", filter: '25 ס"מ' },
           { label: '30 ס"מ', cat: "מזוזות", filter: '30 ס"מ' },
-        ]
-      },
-      {
-        title: "קלפי מזוזה",
-        items: [
-          { label: "כל הקלפים", cat: "קלפי מזוזה" },
-          { label: '10 ס"מ', cat: "קלפי מזוזה", filter: '10 ס"מ' },
-          { label: '12 ס"מ', cat: "קלפי מזוזה", filter: '12 ס"מ' },
-          { label: '15 ס"מ', cat: "קלפי מזוזה", filter: '15 ס"מ' },
-          { label: '20 ס"מ', cat: "קלפי מזוזה", filter: '20 ס"מ' },
         ]
       },
     ],
@@ -254,7 +254,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
           <div style={{ display: "flex", flexDirection: "row-reverse", padding: "24px 24px 16px" }}>
             {item.columns.map((col, ci) => (
               <div key={ci} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "#b8972a", textTransform: "uppercase", textAlign: "right", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(184,151,42,0.2)" }}>{col.title}</div>
+                <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", color: "#b8972a", textTransform: "uppercase", textAlign: "right", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(184,151,42,0.2)" }}>{col.title}</div>
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {col.items.map((sub, si) => (
                     <li key={si}>

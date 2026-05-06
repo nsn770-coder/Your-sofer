@@ -35,22 +35,22 @@ export const navigationData: NavItem[] = [
     href: "/category/מזוזות",
     columns: [
       {
-        title: "בתי מזוזה",
-        items: [
-          { label: "כל המזוזות",        href: "/category/מזוזות" },
-          { label: "מזוזות אלומיניום",  href: "/category/מזוזות?filter=אלומיניום" },
-          { label: "מזוזות עץ",         href: "/category/מזוזות?filter=עץ" },
-          { label: "מזוזות כסף",        href: "/category/מזוזות?filter=כסף" },
-          { label: "מזוזות פלסטיק",     href: "/category/מזוזות?filter=פלסטיק" },
-        ],
-      },
-      {
         title: "קלפי מזוזה",
         items: [
           { label: "קלפי מזוזה — כל הגדלים", href: "/category/קלפי מזוזה" },
           { label: 'קלף 10 ס"מ',               href: '/category/קלפי מזוזה?filter=10 ס"מ' },
           { label: 'קלף 12 ס"מ',               href: '/category/קלפי מזוזה?filter=12 ס"מ' },
           { label: 'קלף 15 ס"מ',               href: '/category/קלפי מזוזה?filter=15 ס"מ' },
+        ],
+      },
+      {
+        title: "בתי מזוזה",
+        items: [
+          { label: "כל בתי המזוזה",      href: "/category/מזוזות" },
+          { label: "מזוזות אלומיניום",  href: "/category/מזוזות?filter=אלומיניום" },
+          { label: "מזוזות עץ",         href: "/category/מזוזות?filter=עץ" },
+          { label: "מזוזות כסף",        href: "/category/מזוזות?filter=כסף" },
+          { label: "מזוזות פלסטיק",     href: "/category/מזוזות?filter=פלסטיק" },
         ],
       },
     ],
