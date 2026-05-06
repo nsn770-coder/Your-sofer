@@ -527,7 +527,8 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [stockCountInput, setStockCountInput] = useState(
     product.stockCount != null ? String(product.stockCount) : ''
   );
-  const [saving, setSaving]   = useState(false);
+  const [saving, setSaving]         = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
   const [uploadingImg, setUploadingImg] = useState<string | null>(null);
   const [soferOptions, setSoferOptions] = useState<Sofer[]>([]);
 
@@ -570,6 +571,17 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
     }
   }
 
+  async function handleDuplicate() {
+    setDuplicating(true);
+    try {
+      const { id, ...rest } = product;
+      await addDoc(collection(db, 'products'), { ...rest, name: `${product.name} — עותק`, createdAt: serverTimestamp() });
+      onClose();
+      alert(`המוצר שוכפל בהצלחה: "${product.name} — עותק"`);
+    } catch (e) { console.error(e); alert('שגיאה בשכפול'); }
+    finally { setDuplicating(false); }
+  }
+
   async function handleSave() {
     if (!name || !price) { alert('שם ומחיר הם שדות חובה'); return; }
     setSaving(true);
@@ -609,7 +621,17 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>✏️ עריכת מוצר</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              onClick={handleDuplicate}
+              disabled={duplicating}
+              style={{ background: '#fffbf0', border: '1px solid #b8972a', color: '#7a6018', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 700, cursor: duplicating ? 'not-allowed' : 'pointer', opacity: duplicating ? 0.6 : 1 }}
+            >
+              {duplicating ? '...' : '📋 שכפל מוצר'}
+            </button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+          </div>
         </div>
         <div style={{ display: 'grid', gap: 14 }}>
           <div>
