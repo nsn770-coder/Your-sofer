@@ -429,6 +429,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [soferId, setSoferId]                 = useState(product.soferId || '');
   const [soferOptions, setSoferOptions]       = useState<{ id: string; name: string }[]>([]);
   const [saving, setSaving]                   = useState(false);
+  const [duplicating, setDuplicating]         = useState(false);
   const [uploadingImg, setUploadingImg]       = useState<string | null>(null);
   const [saved, setSaved]                     = useState(false);
   const [marketingIntroTxt, setMarketingIntroTxt] = useState(product.marketingIntro ?? pageDefaults?.marketingIntro ?? '');
@@ -468,6 +469,17 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
       else if (field === 'closeup') setCloseupImageUrl(data.secure_url);
     } catch { alert('שגיאה בהעלאה'); }
     finally { setUploadingImg(null); }
+  }
+
+  async function handleDuplicate() {
+    setDuplicating(true);
+    try {
+      const { id, ...rest } = product;
+      await addDoc(collection(db, 'products'), { ...rest, name: `${product.name} — עותק`, createdAt: serverTimestamp() });
+      onClose();
+      alert(`המוצר שוכפל בהצלחה: "${product.name} — עותק"`);
+    } catch (e) { console.error(e); alert('שגיאה בשכפול'); }
+    finally { setDuplicating(false); }
   }
 
   async function handleSave() {
@@ -731,7 +743,17 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         <span style={{ fontSize: 13, fontWeight: 900, color: '#e8e0d0' }}>עריכת מוצר</span>
         <span style={{ fontSize: 9, fontWeight: 800, color: '#b8972a', background: 'rgba(184,151,42,0.12)', border: '1px solid rgba(184,151,42,0.25)', padding: '1px 5px', borderRadius: 8 }}>ADMIN</span>
       </div>
-      <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 16, lineHeight: 1, padding: 4 }}>✕</button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button
+          type="button"
+          onClick={handleDuplicate}
+          disabled={duplicating}
+          style={{ background: 'rgba(184,151,42,0.15)', border: '1px solid rgba(184,151,42,0.4)', color: '#b8972a', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: duplicating ? 'not-allowed' : 'pointer', opacity: duplicating ? 0.6 : 1 }}
+        >
+          {duplicating ? '...' : '📋 שכפל'}
+        </button>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 16, lineHeight: 1, padding: 4 }}>✕</button>
+      </div>
     </div>
   );
 
