@@ -1481,6 +1481,17 @@ export default function AdminPage() {
     } catch (e) { console.error(e); alert('שגיאה במחיקה'); }
   }
 
+  async function duplicateProduct(product: Product) {
+    try {
+      const { id, ...rest } = product;
+      const newData = { ...rest, name: `${product.name} — עותק`, createdAt: serverTimestamp() };
+      const ref = await addDoc(collection(db, 'products'), newData);
+      const newProduct: Product = { ...rest, id: ref.id, name: newData.name };
+      setProducts(prev => [newProduct, ...prev]);
+      alert(`המוצר שוכפל בהצלחה: "${newData.name}"`);
+    } catch (e) { console.error(e); alert('שגיאה בשכפול'); }
+  }
+
   async function toggleHidden(productId: string, currentHidden: boolean) {
     setActionLoading(productId + '_hidden');
     const newHidden = !currentHidden;
@@ -1817,6 +1828,9 @@ export default function AdminPage() {
                           className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.hidden ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                           {p.hidden ? '👁️ הצג' : '🙈 הסתר'}
                         </button>
+                      </td>
+                      <td className="p-3">
+                        <button onClick={() => duplicateProduct(p)} className="px-2 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-100">📋 שכפל</button>
                       </td>
                       <td className="p-3">
                         <button onClick={() => setEditingProduct(p)} className="px-2 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-600 hover:bg-blue-100">✏️ ערוך</button>
