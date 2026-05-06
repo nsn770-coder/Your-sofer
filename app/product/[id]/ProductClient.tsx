@@ -296,10 +296,10 @@ function SoferCard({ soferId }: { soferId: string }) {
 
 // ─── Klaf Gallery ─────────────────────────────────────────────────────────────
 
-function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id: string | null, name: string | null) => void }) {
+function KlafGallery({ productId, maxSelect, onSelect }: { productId: string; maxSelect: number; onSelect: (ids: string[], names: string[]) => void }) {
   const [klafImages, setKlafImages] = useState<KlafItem[]>([]);
   const [loading, setLoading]       = useState(true);
-  const [selected, setSelected]     = useState<string | null>(null);
+  const [selected, setSelected]     = useState<string[]>([]);
   const [zoomImg, setZoomImg]       = useState<string | null>(null);
 
   useEffect(() => {
@@ -316,9 +316,19 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
   }, [productId]);
 
   function handleSelect(img: KlafItem) {
-    const newVal = selected === img.id ? null : img.id;
-    setSelected(newVal);
-    onSelect(newVal, newVal ? img.name : null);
+    setSelected(prev => {
+      let next: string[];
+      if (prev.includes(img.id)) {
+        next = prev.filter(id => id !== img.id);
+      } else if (prev.length >= maxSelect) {
+        next = prev; // already at limit
+      } else {
+        next = [...prev, img.id];
+      }
+      const names = next.map(sid => klafImages.find(k => k.id === sid)?.name ?? '');
+      onSelect(next, names);
+      return next;
+    });
   }
 
   if (loading) return (
@@ -330,39 +340,52 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
 
   return (
     <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <Icon.Scroll />
-        <span style={{ fontWeight: 800, fontSize: 15, color: '#0f1111' }}>בחר את הקלף שלך</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Icon.Scroll />
+          <span style={{ fontWeight: 800, fontSize: 15, color: '#0f1111' }}>בחר את הקלף שלך</span>
+        </div>
+        {maxSelect > 1 && (
+          <span style={{ fontSize: 12, fontWeight: 700, color: selected.length === maxSelect ? '#1a6b3c' : '#b8972a' }}>
+            נבחרו {selected.length} מתוך {maxSelect} קלפים
+          </span>
+        )}
       </div>
       <div style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>{klafImages.length} קלפים זמינים - כל קלף כתוב ביד</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 8 }}>
-        {klafImages.map(img => (
-          <div key={img.id} style={{ border: `2px solid ${selected === img.id ? '#b8972a' : '#e0e0e0'}`, borderRadius: 8, overflow: 'hidden', cursor: 'pointer', background: selected === img.id ? '#fffbf0' : '#fff', transition: 'all 0.15s', position: 'relative' }}>
-            <div onClick={() => handleSelect(img)}>
-              <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4' }}>
-                <NextImage src={img.imageUrl} alt={img.name} fill style={{ objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3'; }} />
-              </div>
-              {selected === img.id && (
-                <div style={{ position: 'absolute', top: 4, right: 4, background: '#b8972a', color: '#fff', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon.Check size={11} color="#fff" />
+        {klafImages.map(img => {
+          const isSelected = selected.includes(img.id);
+          const atLimit = selected.length >= maxSelect && !isSelected;
+          return (
+            <div key={img.id} style={{ border: `2px solid ${isSelected ? '#b8972a' : '#e0e0e0'}`, borderRadius: 8, overflow: 'hidden', cursor: atLimit ? 'not-allowed' : 'pointer', background: isSelected ? '#fffbf0' : '#fff', transition: 'all 0.15s', position: 'relative', opacity: atLimit ? 0.5 : 1 }}>
+              <div onClick={() => !atLimit && handleSelect(img)}>
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4' }}>
+                  <NextImage src={img.imageUrl} alt={img.name} fill style={{ objectFit: 'cover' }} onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.3'; }} />
                 </div>
-              )}
+                {isSelected && (
+                  <div style={{ position: 'absolute', top: 4, right: 4, background: '#b8972a', color: '#fff', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon.Check size={11} color="#fff" />
+                  </div>
+                )}
+              </div>
+              <div style={{ padding: '3px 5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 9, color: '#666', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', flex: 1 }}>{img.name}</span>
+                <button onClick={() => setZoomImg(img.imageUrl)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0e6ba8', flexShrink: 0, display: 'flex', padding: '0 2px' }}>
+                  <Icon.Search />
+                </button>
+              </div>
             </div>
-            <div style={{ padding: '3px 5px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 9, color: '#666', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', flex: 1 }}>{img.name}</span>
-              <button onClick={() => setZoomImg(img.imageUrl)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0e6ba8', flexShrink: 0, display: 'flex', padding: '0 2px' }}>
-                <Icon.Search />
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-      {selected && (
+      {selected.length > 0 && (
         <div style={{ marginTop: 10, background: '#fffbf0', border: '1px solid #b8972a', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#0c1a35', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Icon.Check size={14} color="#b8972a" />
-          קלף נבחר
-          <button onClick={() => { setSelected(null); onSelect(null, null); }} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 12, marginRight: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Icon.X size={11} /> ביטול
+          {selected.length === 1
+            ? `קלף נבחר: ${klafImages.find(k => k.id === selected[0])?.name ?? ''}`
+            : `${selected.length} קלפים נבחרו`}
+          <button onClick={() => { setSelected([]); onSelect([], []); }} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 12, marginRight: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Icon.X size={11} /> נקה
           </button>
         </div>
       )}
@@ -1074,8 +1097,8 @@ export default function ProductClient() {
   const [showWizardModal, setShowWizardModal] = useState(false);
   const [adminOpen, setAdminOpen]       = useState(false);
   const [saveSuccess, setSaveSuccess]   = useState(false);
-  const [selectedKlafId, setSelectedKlafId]     = useState<string | null>(null);
-  const [selectedKlafName, setSelectedKlafName] = useState<string | null>(null);
+  const [selectedKlafIds, setSelectedKlafIds]     = useState<string[]>([]);
+  const [selectedKlafNames, setSelectedKlafNames] = useState<string[]>([]);
   const [isMobile, setIsMobile]         = useState(false);
   const [showVideo, setShowVideo]       = useState(false);
   const [activeTab, setActiveTab]       = useState<'details' | 'kashrut' | 'shipping' | 'closeup'>('details');
@@ -1279,7 +1302,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
   function handleAddToCart() {
     for (let i = 0; i < qty; i++) {
-      addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafId || undefined, selectedKlafName: selectedKlafName || undefined, embroideryText: embroideryText || undefined });
+      addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafIds[i] || undefined, selectedKlafName: selectedKlafNames[i] || undefined, embroideryText: embroideryText || undefined });
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
     pixel.addToCart({ id: product!.id, name: product!.name, price: product!.price, quantity: qty });
@@ -1319,9 +1342,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         )}
       </div>
 
-      {selectedKlafName && (
+      {selectedKlafNames.length > 0 && (
         <div style={{ fontSize: 11, color: '#1a6b3c', background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 8, padding: '6px 10px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 5 }}>
-          <Icon.Check size={11} color="#1a6b3c" /> {selectedKlafName}
+          <Icon.Check size={11} color="#1a6b3c" />
+          {selectedKlafNames.length === 1 ? selectedKlafNames[0] : `${selectedKlafNames.length} קלפים נבחרו`}
         </div>
       )}
 
@@ -1627,7 +1651,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               )}
             </div>
 
-            <KlafGallery productId={product.id} onSelect={(klafId, klafName) => { setSelectedKlafId(klafId); setSelectedKlafName(klafName); }} />
+            <KlafGallery productId={product.id} maxSelect={qty} onSelect={(ids, names) => { setSelectedKlafIds(ids); setSelectedKlafNames(names); }} />
 
             {product.soferId && <SoferCard soferId={product.soferId} />}
 
