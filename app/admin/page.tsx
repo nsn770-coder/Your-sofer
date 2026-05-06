@@ -501,6 +501,14 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
 const STAM_CATS_ADMIN_EDIT = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'תפילין'];
 const LEVEL_CATS_EDIT = STAM_CATS_ADMIN_EDIT;
 
+const TYPE_TO_CAT: Record<string, string> = {
+  'קלף מזוזה':  'קלפי מזוזה',
+  'קלף תפילין': 'קלפי תפילין',
+  'מגילה':      'מגילות',
+  'ספר תורה':   'ספרי תורה',
+  'אחר':        '',
+};
+
 function extractOriginalName(sourceUrl: string): string {
   try {
     const match = sourceUrl.match(/\/product\/([^/?#]+)/i);
@@ -1590,8 +1598,8 @@ export default function AdminPage() {
           addDoc(collection(db, 'products'), {
             name: p.name,
             description: p.desc,
-            category: p.type,
-            cat: p.type,
+            category: TYPE_TO_CAT[p.type] ?? p.type,
+            cat: TYPE_TO_CAT[p.type] ?? p.type,
             level: p.level,
             soferId: soferRef.id,
             soferName: app.name,
@@ -1649,8 +1657,8 @@ export default function AdminPage() {
         addDoc(collection(db, 'products'), {
           name: p.name,
           description: p.desc,
-          category: p.type,
-          cat: p.type,
+          category: TYPE_TO_CAT[p.type] ?? p.type,
+          cat: TYPE_TO_CAT[p.type] ?? p.type,
           level: p.level,
           soferId: soferId || null,
           soferName,
