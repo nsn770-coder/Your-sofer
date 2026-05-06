@@ -1162,6 +1162,7 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [applications, setApplications] = useState<SoferApplication[]>([]);
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
+  const [createdProductLinks, setCreatedProductLinks] = useState<Record<string, { id: string; name: string }[]>>({});
   const [users, setUsers] = useState<AppUser[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
@@ -1638,14 +1639,13 @@ export default function AdminPage() {
     if (!app.products?.length) { alert('אין מוצרים בבקשה זו'); return; }
     setActionLoading(app.id + '_products');
     try {
-      // Find the sofer document by email match
       let soferId = '';
       let soferName = app.name;
       if (app.email) {
         const soferSnap = await getDocs(query(collection(db, 'soferim'), where('email', '==', app.email.trim().toLowerCase())));
         if (!soferSnap.empty) { soferId = soferSnap.docs[0].id; soferName = soferSnap.docs[0].data().name || app.name; }
       }
-      await Promise.all(app.products.map((p: ProductEntry) =>
+      const refs = await Promise.all(app.products.map((p: ProductEntry) =>
         addDoc(collection(db, 'products'), {
           name: p.name,
           description: p.desc,
@@ -1666,7 +1666,8 @@ export default function AdminPage() {
           createdAt: serverTimestamp(),
         })
       ));
-      alert(`✅ נוצרו ${app.products.length} מוצרים בהצלחה${soferId ? '' : ' (ללא soferId — סופר לא נמצא)'}`);
+      const links = refs.map((ref, i) => ({ id: ref.id, name: app.products![i].name || `מוצר ${i + 1}` }));
+      setCreatedProductLinks(prev => ({ ...prev, [app.id]: links }));
     } catch (e) { console.error(e); alert('שגיאה ביצירת מוצרים'); }
     finally { setActionLoading(null); }
   }
@@ -2240,14 +2241,33 @@ export default function AdminPage() {
                       </div>
                     )}
                     {app.status === 'approved' && app.products && app.products.length > 0 && (
-                      <div className="flex-shrink-0">
-                        <button
-                          onClick={() => createProductsForApprovedApp(app)}
-                          disabled={actionLoading === app.id + '_products'}
-                          className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 whitespace-nowrap"
-                        >
-                          {actionLoading === app.id + '_products' ? '...' : '🛍️ צור מוצרים'}
-                        </button>
+                      <div className="flex-shrink-0 flex flex-col gap-2 items-end">
+                        {!createdProductLinks[app.id] ? (
+                          <button
+                            onClick={() => createProductsForApprovedApp(app)}
+                            disabled={actionLoading === app.id + '_products'}
+                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 whitespace-nowrap"
+                          >
+                            {actionLoading === app.id + '_products' ? '⏳ יוצר...' : '🛍️ צור מוצרים'}
+                          </button>
+                        ) : (
+                          <div className="bg-green-50 border border-green-200 rounded-xl p-3 min-w-[180px]">
+                            <p className="text-xs font-black text-green-700 mb-2">✅ {createdProductLinks[app.id].length} מוצרים נוצרו:</p>
+                            <div className="flex flex-col gap-1">
+                              {createdProductLinks[app.id].map(link => (
+                                <a
+                                  key={link.id}
+                                  href={`/product/${link.id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-indigo-700 font-bold hover:text-indigo-900 hover:underline truncate max-w-[160px]"
+                                >
+                                  ✏️ {link.name}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
