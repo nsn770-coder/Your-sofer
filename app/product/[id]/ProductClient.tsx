@@ -1446,7 +1446,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           }}>✓</span>
           <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: 600, lineHeight: 1.4 }}>
             נבדק ואושר על ידי{' '}
-            <span style={{ color: '#C5A028', fontWeight: 800 }}>הרב בנימין גליס</span>
+            <span style={{ color: '#C5A028', fontWeight: 800 }}>הרב שמחה בונים ברג'יקובסקי</span>
             {' '}- מגיה רבני מוסמך
           </span>
         </div>

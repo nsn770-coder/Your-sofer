@@ -138,10 +138,10 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
           gap: 16,
         }}>
           <ProfileCard
-            initials="ב״ג"
-            name="הרב בנימין גליס"
+            initials="שב"
+            name="הרב שמחה בונים ברג'יקובסקי"
             title="רב מגיה מוסמך"
-            description="מגיה ומאשר את כל קלפי המזוזות, התפילין והמגילות הנמכרים באתר"
+            description="עם נסיון של 12 שנה בתחום ההגהה קיבל הסמכה מגדולי הרבנים בארץ וממכון יד רפאל המוכר"
             badge="פיקוח רבני"
             isMobile={isMobile}
           />

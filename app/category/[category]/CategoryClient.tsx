@@ -1242,7 +1242,7 @@ export default function CategoryClient({ category }: { category: string }) {
             border: '1px solid rgba(197,160,40,0.35)',
             borderRadius: 20, padding: '3px 10px',
           }}>
-            הרב בנימין גליס · מגיה מוסמך
+            הרב שמחה בונים ברג'יקובסקי · מגיה מוסמך
           </span>
         </div>
       )}

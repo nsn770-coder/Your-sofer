@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       customerEmail: order.customerEmail ?? '',
       issuedAt: serverTimestamp(),
       items,
-      magiaName: 'הרב בנימין גליס',   // matches RabbinicalSupervision, CategoryClient, ProductClient
+      magiaName: 'הרב שמחה בונים ברג\'יקובסקי',
       valid: true,
     });
 
