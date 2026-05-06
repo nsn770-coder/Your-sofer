@@ -54,14 +54,9 @@ function randDigits(n: number) {
 }
 
 function getPrefix(cat: string): string {
-  console.log('getPrefix called with cat:', JSON.stringify(cat));
   for (const [key, prefix] of Object.entries(CAT_PREFIX)) {
-    if (cat.includes(key)) {
-      console.log('getPrefix matched:', key, '->', prefix);
-      return prefix;
-    }
+    if (cat.includes(key)) return prefix;
   }
-  console.log('getPrefix: no match, returning YS');
   return 'YS';
 }
 
@@ -93,7 +88,6 @@ export default function KlafimProductPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    console.log('CAT_PREFIX:', CAT_PREFIX);
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
   }, [user, loading]);
 
@@ -128,7 +122,6 @@ export default function KlafimProductPage() {
     const cat = currentProduct?.cat ?? currentProduct?.category ?? '';
     const computedPrefix = cat ? getPrefix(cat) : 'YS';
     const safePrefix = computedPrefix || 'YS';
-    console.log('addFiles: cat=', cat, 'prefix=', safePrefix, 'product=', currentProduct);
 
     const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
     setPending(prev => [
@@ -155,15 +148,13 @@ export default function KlafimProductPage() {
   }
 
   async function handleSave() {
-    alert('handleSave called! pending: ' + pending.length + ' product: ' + JSON.stringify(product?.id));
-    console.log('handleSave called', pending.length, product);
-    if (!pending.length || !product) return;
+    if (!pending.length) return;
     setSaving(true);
     setSaveError('');
     setSavedCount(0);
 
-    let soferName = product.soferName ?? '';
-    if (!soferName && product.soferId) {
+    let soferName = product?.soferName ?? '';
+    if (!soferName && product?.soferId) {
       try {
         const sSnap = await getDoc(doc(db, 'soferim', product.soferId));
         if (sSnap.exists()) soferName = sSnap.data().name ?? '';
@@ -179,7 +170,6 @@ export default function KlafimProductPage() {
 
       try {
         const serial = updatedPending[i].serial;
-        console.log('uploading file', updatedPending[i].file.name, serial);
         const imageUrl = await uploadToCloudinary(updatedPending[i].file);
         await addDoc(collection(db, 'klafim'), {
           productId,
@@ -189,7 +179,6 @@ export default function KlafimProductPage() {
           createdAt: serverTimestamp(),
           soferName,
         });
-        console.log('saved to firestore successfully');
         URL.revokeObjectURL(updatedPending[i].previewUrl);
         updatedPending.splice(i, 1);
         i--;
@@ -197,7 +186,6 @@ export default function KlafimProductPage() {
         setPending([...updatedPending]);
         setSavedCount(successCount);
       } catch (err: any) {
-        console.log('ERROR:', err);
         updatedPending[i] = { ...updatedPending[i], uploading: false, error: err.message ?? 'שגיאה' };
         setPending([...updatedPending]);
       }
