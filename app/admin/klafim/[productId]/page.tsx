@@ -155,7 +155,7 @@ export default function KlafimProductPage() {
   }
 
   async function handleSave() {
-    alert('handleSave called! pending: ' + pending.length);
+    alert('handleSave called! pending: ' + pending.length + ' product: ' + JSON.stringify(product?.id));
     console.log('handleSave called', pending.length, product);
     if (!pending.length || !product) return;
     setSaving(true);
