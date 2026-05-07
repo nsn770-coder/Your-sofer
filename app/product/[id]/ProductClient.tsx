@@ -65,7 +65,7 @@ interface PageDefaults {
   whatYouGet?: string[];
 }
 
-const HARDCODED_STAM_DEFAULTS: Required<PageDefaults> = {
+const HARDCODED_MEZUZA_DEFAULTS: Required<PageDefaults> = {
   marketingIntro: 'קלף מזוזה כשר ומהודר, נכתב בכתב יד על ידי סופר סת״ם ירא שמים, ונבדק בקפידה לפני המכירה. ב־Your Sofer ניתן לראות את פרטי הסופר, להתרשם מהכתב, ולבחור את הקלף בצורה שקופה וברורה - בלי לקנות חתול בשק.',
   whoIsItFor: [
     { emoji: '🏠', text: 'למי שחשוב לו קלף מזוזה מהודר - לא רק בית מזוזה יפה מבחוץ' },
@@ -89,6 +89,65 @@ const HARDCODED_STAM_DEFAULTS: Required<PageDefaults> = {
     'תמיכה אישית אם יש שאלות לפני הרכישה',
   ],
 };
+
+const HARDCODED_TEFILLIN_DEFAULTS: Required<PageDefaults> = {
+  marketingIntro: 'תפילין כשרים ומהודרים, נכתבים בכתב יד על ידי סופר סת״ם ירא שמים, ונבדקים בקפידה לפני המכירה. ב־Your Sofer ניתן לראות את פרטי הסופר, להתרשם מהכתב, ולבחור את התפילין בצורה שקופה וברורה - בלי לקנות חתול בשק.',
+  whoIsItFor: [
+    { emoji: '📿', text: 'בר מצווה שמחפש תפילין כשרים ומהודרים לתחילת דרכו' },
+    { emoji: '🛡️', text: 'מי שרוצה לוודא שהפרשיות כשרות לכתחילה ולא רק בדיעבד' },
+    { emoji: '🔄', text: 'מי שתפיליו ישנים ורוצה לבדוק אם הפרשיות עדיין כשרות' },
+    { emoji: '✡️', text: 'את קדושת הפרשיות אף אחד לא רואה - אבל יש אלוקים שיודע!' },
+    { emoji: '🙏', text: 'למי שרוצה לדעת בוודאות שהפרשיות נכתבו על ידי יהודי ירא שמים' },
+  ],
+  whyUs: [
+    'כל מוצר נבדק על ידי מגיה מוסמך לפני שיגור - לא רק מיוצר',
+    'הסופר שכתב את המוצר מזוהה בשם - שקיפות מלאה',
+    'צילום אמיתי של הפרשיות לפני המשלוח - רואים בדיוק מה מקבלים',
+    'שירות אישי וליווי מלא - שיחה ישירה עם איש מקצוע בוואטסאפ',
+  ],
+  whatYouGet: [
+    'כולל תעודת כשרות מוסמכת',
+    'בדיקת מחשב ופיקוח רבני על כל יחידה',
+    'משלוח חינם לכל הארץ באריזה מוגנת',
+    'אחריות החזר מלא תוך 14 יום',
+    'ניתן לתשלומים ללא ריבית',
+    'תמיכה אישית אם יש שאלות לפני הרכישה',
+  ],
+};
+
+const HARDCODED_STAM_GENERIC_DEFAULTS: Required<PageDefaults> = {
+  marketingIntro: 'מוצר סת״ם כשר ומהודר, נכתב בכתב יד על ידי סופר סת״ם ירא שמים, ונבדק בקפידה לפני המכירה. ב־Your Sofer ניתן לראות את פרטי הסופר, להתרשם מהכתב, ולבחור את המוצר בצורה שקופה וברורה - בלי לקנות חתול בשק.',
+  whoIsItFor: [
+    { emoji: '✡️', text: 'מי שמחפש מוצר סת״ם כשר ומהודר, כתוב בידי סופר מוסמך' },
+    { emoji: '🛡️', text: 'מי שחשוב לו לדעת את זהות הסופר ורמת הכשרות' },
+    { emoji: '🙏', text: 'למי שרוצה ודאות שהמוצר נכתב על ידי יהודי ירא שמים' },
+    { emoji: '🎁', text: 'מתנה משמעותית לאדם מיוחד שמעריך מסורת וכשרות' },
+    { emoji: '📜', text: 'מי שמחפש שקיפות מלאה על המוצר שהוא קונה' },
+  ],
+  whyUs: [
+    'כל מוצר נבדק על ידי מגיה מוסמך לפני שיגור - לא רק מיוצר',
+    'הסופר שכתב את המוצר מזוהה בשם - שקיפות מלאה',
+    'צילום אמיתי של המוצר לפני המשלוח - רואים בדיוק מה מקבלים',
+    'שירות אישי וליווי מלא - שיחה ישירה עם איש מקצוע בוואטסאפ',
+  ],
+  whatYouGet: [
+    'כולל תעודת כשרות מוסמכת',
+    'בדיקת מחשב ופיקוח רבני על כל יחידה',
+    'משלוח חינם לכל הארץ באריזה מוגנת',
+    'אחריות החזר מלא תוך 14 יום',
+    'ניתן לתשלומים ללא ריבית',
+    'תמיכה אישית אם יש שאלות לפני הרכישה',
+  ],
+};
+
+const MEZUZA_CATS = new Set(['קלפי מזוזה', 'מזוזות']);
+const TEFILLIN_CATS = new Set(['קלפי תפילין', 'תפילין קומפלט']);
+
+function getStamDefaults(cat: string | undefined): Required<PageDefaults> {
+  if (cat && MEZUZA_CATS.has(cat)) return HARDCODED_MEZUZA_DEFAULTS;
+  if (cat && TEFILLIN_CATS.has(cat)) return HARDCODED_TEFILLIN_DEFAULTS;
+  return HARDCODED_STAM_GENERIC_DEFAULTS;
+}
 
 const HARDCODED_NON_STAM_DEFAULTS: Required<PageDefaults> = {
   marketingIntro: 'כשמביאים מוצר כזה הביתה, מביאים איתו משהו שלא ניתן לקנות בחנות רגילה - יוקרה שקטה, חיבור לשורשים, ותחושה שהבית שלכם אומר משהו עוד לפני שמדברים. בשבת, כשהאור מתעצם ומשפחה מתכנסת סביב השולחן, הפריט הזה הופך לחלק מהסיפור שעובר מדור לדור.',
@@ -988,7 +1047,7 @@ function ReviewsSection({ productId, productName }: { productId: string; product
 function ProductContentSections({ product, pageDefaults }: { product: Product; pageDefaults: PageDefaults | null }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const isStam = !!product.cat && STAM_CATEGORIES.includes(product.cat);
-  const hardcoded = isStam ? HARDCODED_STAM_DEFAULTS : HARDCODED_NON_STAM_DEFAULTS;
+  const hardcoded = isStam ? getStamDefaults(product.cat) : HARDCODED_NON_STAM_DEFAULTS;
 
   const useCases      = product.whoIsItFor    ?? (isStam ? hardcoded.whoIsItFor  : (pageDefaults?.whoIsItFor  ?? hardcoded.whoIsItFor));
   const whyDifferent  = product.whyUs         ?? (isStam ? hardcoded.whyUs       : (pageDefaults?.whyUs       ?? hardcoded.whyUs));
