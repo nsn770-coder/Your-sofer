@@ -105,7 +105,7 @@ export default function KashrutPage() {
           <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0c1a35', margin: '0 0 20px' }}>המגיה שלנו</h2>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 18 }}>
             <img
-              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778136770/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2026-05-07_095231_wojjah.png"
+              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_200/v1778136770/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2026-05-07_095231_wojjah.png"
               alt="הרב שמחה בונים ברג׳יקובסקי"
               style={{
                 width: 64, height: 64, borderRadius: '50%', objectFit: 'cover',

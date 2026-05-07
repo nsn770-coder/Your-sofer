@@ -9,7 +9,7 @@ import { useChatPersona } from './ChatPersonaContext';
 
 const PERSONAS = {
   shira: {
-    avatar: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777792770/%D7%A9%D7%99%D7%A8%D7%94_itw0l5.png',
+    avatar: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_88/v1777792770/%D7%A9%D7%99%D7%A8%D7%94_itw0l5.png',
     name: 'שירה - יועצת סת״ם',
     welcome: 'שלום! אני שירה, היועצת שלך לסת״ם ויודאיקה 👋\nאיך אני יכולה לעזור לך היום?',
   },

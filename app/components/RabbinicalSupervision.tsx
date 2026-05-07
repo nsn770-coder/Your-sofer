@@ -144,7 +144,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
             description="עם נסיון של 12 שנה בתחום ההגהה קיבל הסמכה מגדולי הרבנים בארץ וממכון יד רפאל המוכר"
             badge="פיקוח רבני"
             isMobile={isMobile}
-            imageUrl="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778136770/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2026-05-07_095231_wojjah.png"
+            imageUrl="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_200/v1778136770/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2026-05-07_095231_wojjah.png"
           />
           <ProfileCard
             initials="נ״ב"
@@ -153,7 +153,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
             description='סופר מוסמך עם שנות ניסיון בכתיבת סת"מ ברמה הגבוהה ביותר'
             badge='סופר מוסמך'
             isMobile={isMobile}
-            imageUrl="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777926225/FB_IMG_1777926117765_rbw8ny.jpg"
+            imageUrl="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_200/v1777926225/FB_IMG_1777926117765_rbw8ny.jpg"
           />
         </div>
 
