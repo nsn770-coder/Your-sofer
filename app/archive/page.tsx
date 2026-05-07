@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import Link from 'next/link';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 interface KlafDoc {
   id: string;
@@ -90,7 +91,7 @@ export default function ArchivePage() {
                 <div style={{ position: 'relative', height: 180, background: '#f0ece0', overflow: 'hidden' }}>
                   {klaf.imageUrl ? (
                     <img
-                      src={klaf.imageUrl}
+                      src={optimizeCloudinaryUrl(klaf.imageUrl, 800)}
                       alt={klaf.name ?? klaf.productName ?? 'קלף'}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       loading="lazy"

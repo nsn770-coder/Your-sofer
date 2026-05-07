@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/app/contexts/CartContext';
 import { formatPrice } from '@/app/lib/utils';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 export interface SoferData {
   name: string;
@@ -77,7 +78,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
       <div className="flex flex-row sm:flex-col items-center sm:justify-center gap-3 p-4 sm:w-[40%] bg-gradient-to-b from-[#f8f6f2] to-white border-b sm:border-b-0 sm:border-l border-gray-100 flex-shrink-0">
         <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border-2 border-[#0c1a35]/10 flex items-center justify-center">
           {sofer?.imageUrl ? (
-            <img src={sofer.imageUrl} alt={sofer.name} className="w-full h-full object-cover" />
+            <img src={optimizeCloudinaryUrl(sofer.imageUrl, 200)} alt={sofer.name} className="w-full h-full object-cover" />
           ) : (
             <IconUser size={32} />
           )}
@@ -102,7 +103,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
         <div className="relative aspect-[16/9] sm:aspect-[4/3] bg-gray-50 overflow-hidden">
           {imgUrl ? (
             <img
-              src={imgUrl}
+              src={optimizeCloudinaryUrl(imgUrl, 600)}
               alt={name}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />

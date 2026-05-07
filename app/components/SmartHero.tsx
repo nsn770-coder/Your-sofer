@@ -95,6 +95,7 @@ export default function SmartHero({ isMobile, onScrollToProducts, onSelectCat, b
               src={isMobile ? slide.mobileSrc : slide.desktopSrc}
               alt={slide.alt}
               fill
+              unoptimized
               priority={slide.priority}
               fetchPriority={slide.priority ? 'high' : 'auto'}
               loading={slide.priority ? 'eager' : 'lazy'}

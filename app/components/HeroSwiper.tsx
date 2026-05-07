@@ -48,6 +48,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
             src={isMobile ? SLIDE0.mobileSrc : SLIDE0.desktopSrc}
             alt={SLIDE0.alt}
             fill
+            unoptimized
             priority
             fetchPriority="high"
             sizes="92vw"

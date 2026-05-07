@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { useState, useEffect } from 'react';
 
 interface Testimonial {
@@ -38,7 +38,7 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
         <div key={testIdx} style={{ background: '#fff', borderRadius: 0, boxShadow: '0 4px 28px rgba(0,0,0,0.09)', padding: isMobile ? '24px 20px' : '36px 44px', display: 'flex', alignItems: 'flex-start', gap: 28, flexDirection: isMobile ? 'column' : 'row', animation: 'testFadeIn 0.55s ease' }}>
           <div style={{ flexShrink: 0, alignSelf: isMobile ? 'center' : 'flex-start' }}>
             {t.imageUrl ? (
-              <Image src={t.imageUrl} alt={t.name} width={84} height={84} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '3px solid #b8972a' }} />
+              <img src={optimizeCloudinaryUrl(t.imageUrl, 200)} alt={t.name} width={84} height={84} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '3px solid #b8972a' }} />
             ) : (
               <div style={{ width: 84, height: 84, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #b8972a' }}>
                 <span style={{ fontSize: 34, color: '#fff', fontWeight: 900 }}>{t.name.charAt(0)}</span>

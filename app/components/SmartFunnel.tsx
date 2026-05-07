@@ -53,6 +53,7 @@ function ImageCard({
       {img && (
         <Image
           fill
+          unoptimized
           loading="lazy"
           src={optimizeCloudinaryUrl(img, 600)}
           alt={label}
@@ -254,7 +255,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
             <div style={titleStyle}>מה אתה מחפש?</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <ImageCard
-                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg"
+                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg"
                 label="צפה במזוזות"
                 onClick={() => { setPath('mezuzah'); go(1); }}
                 height={140}
@@ -262,7 +263,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
                 noOverlay
               />
               <ImageCard
-                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777033362/vrknd4v6jp9z7fyrcbyf_rqnydd.webp"
+                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1777033362/vrknd4v6jp9z7fyrcbyf_rqnydd.webp"
                 label="צפה בתפילין"
                 onClick={() => { setPath('tefillin'); go(2); }}
                 height={140}
@@ -293,7 +294,8 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
               {/* Background image */}
               <Image
                 fill
-                src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777181486/Gemini_Generated_Image_7lmkfb7lmkfb7lmk_knxiuw.png"
+                unoptimized
+                src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1777181486/Gemini_Generated_Image_7lmkfb7lmkfb7lmk_knxiuw.png"
                 alt="סט בר מצווה"
                 style={{ objectFit: 'cover', objectPosition: 'center' }}
                 sizes="560px"
