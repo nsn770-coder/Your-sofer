@@ -104,16 +104,14 @@ export default function KashrutPage() {
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', borderRadius: 12, padding: '28px 24px', marginBottom: 24 }}>
           <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0c1a35', margin: '0 0 20px' }}>המגיה שלנו</h2>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 18 }}>
-            <div style={{
-              width: 64, height: 64, borderRadius: '50%',
-              background: 'radial-gradient(circle at 35% 35%, #223366, #0c1a35)',
-              border: '3px solid #b8972a',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-              fontSize: 20, fontWeight: 900, color: '#b8972a',
-            }}>
-              שב
-            </div>
+            <img
+              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778136770/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2026-05-07_095231_wojjah.png"
+              alt="הרב שמחה בונים ברג׳יקובסקי"
+              style={{
+                width: 64, height: 64, borderRadius: '50%', objectFit: 'cover',
+                border: '3px solid #b8972a', flexShrink: 0,
+              }}
+            />
             <div>
               <div style={{ fontWeight: 800, fontSize: 16, color: '#0c1a35', marginBottom: 3 }}>
                 הרב שמחה בונים ברג׳יקובסקי

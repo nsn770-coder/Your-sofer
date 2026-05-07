@@ -14,6 +14,7 @@ const TEAM = [
     name: 'הרב שמחה בונים ברג\'יקובסקי',
     role: 'רב מגיה ובודק מוסמך',
     desc: 'עם נסיון של 12 שנה בתחום ההגהה קיבל הסמכה מגדולי הרבנים בארץ וממכון יד רפאל המוכר',
+    imageUrl: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778136770/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2026-05-07_095231_wojjah.png',
   },
   {
     initials: 'ימ',
