@@ -156,6 +156,25 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
           />
         </div>
 
+        {/* Kashrut certificate link */}
+        <div style={{ textAlign: 'center', marginTop: isMobile ? 24 : 32 }}>
+          <a
+            href="/kashrut"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: GOLD,
+              color: NAVY,
+              borderRadius: 10, padding: isMobile ? '11px 24px' : '13px 32px',
+              fontSize: isMobile ? 14 : 15, fontWeight: 900,
+              textDecoration: 'none',
+              boxShadow: '0 4px 20px rgba(197,160,40,0.35)',
+              letterSpacing: 0.2,
+            }}
+          >
+            📜 צפה בתעודת הכשרות
+          </a>
+        </div>
+
         {/* Bottom trust strip */}
         <div style={{
           marginTop: isMobile ? 28 : 36,
