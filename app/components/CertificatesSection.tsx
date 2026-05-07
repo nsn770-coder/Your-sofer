@@ -7,6 +7,7 @@ export interface Certificate {
   title: string;
   description: string;
   alt: string;
+  placeholderText?: string;
 }
 
 interface Props {
@@ -92,7 +93,7 @@ export default function CertificatesSection({ certificates, heading = 'תעוד�
                   }}>
                     <span style={{ fontSize: 30, opacity: 0.55 }}>📜</span>
                     <span style={{ fontSize: 10, fontWeight: 600, color: '#b0956a', textAlign: 'center', padding: '0 8px', lineHeight: 1.4 }}>
-                      תמונה בקרוב
+                      {cert.placeholderText ?? 'תמונה בקרוב'}
                     </span>
                   </div>
                 )}
