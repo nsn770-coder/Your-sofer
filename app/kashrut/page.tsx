@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 const CERT_URL =
-  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778134296/%D7%9B%D7%A9%D7%A8%D7%95%D7%AA_j3eo9p.png';
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778138941/%D7%AA%D7%A2%D7%95%D7%93%D7%AA_%D7%9B%D7%A9%D7%A8%D7%95%D7%AA_%D7%97%D7%AA%D7%95%D7%9E%D7%94_qrnchm.png';
 
 const PROCESS = [
   { icon: '🔍', title: 'בדיקת מחשב', desc: 'כל קלף עובר סריקה ממוחשבת לאיתור שגיאות בכתב' },
