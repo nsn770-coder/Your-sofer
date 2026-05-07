@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
@@ -91,11 +91,14 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
 
+  // Read isMobile before first paint to prevent the false→true CLS flip on mobile
+  useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
+
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
+    let timer: ReturnType<typeof setTimeout>;
+    function onResize() { clearTimeout(timer); timer = setTimeout(() => setIsMobile(window.innerWidth < 768), 150); }
+    window.addEventListener('resize', onResize);
+    return () => { window.removeEventListener('resize', onResize); clearTimeout(timer); };
   }, []);
 
   // Meta Pixel - InitiateCheckout fires once when user enters checkout with items
@@ -355,7 +358,7 @@ export default function CheckoutPage() {
       <div style={{
         maxWidth: 1000, margin: '28px auto', padding: '0 16px',
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : '1fr 320px',
+        gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) 320px',
         gap: 20, alignItems: 'start',
       }}>
         {/* Form */}
