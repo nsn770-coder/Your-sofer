@@ -107,7 +107,6 @@ const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
   ],
   'קלפי מזוזה': [
     { key: 'גודל',   label: 'גודל',   options: ['7 ס"מ', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ', '25 ס"מ', '30 ס"מ'] },
-    { key: 'כתב',    label: 'כתב',    options: ['אשכנז', 'ספרד', 'חב"ד', 'תימני', 'פרדי'] },
     { key: 'כשרות',  label: 'כשרות',  options: ['מהודר', 'מהדרין', 'פשוט'] },
   ],
   'כיסוי תפילין': [
@@ -1027,15 +1026,10 @@ export default function CategoryClient({ category }: { category: string }) {
   // Apply nusach URL param after products load
   useEffect(() => {
     if (!urlNusach || loading || allLoaded.length === 0) return;
-    if (category === 'קלפי מזוזה') {
-      // Funnel sends 'ספרדי'/'אשכנזי'; the כתב name-filter uses 'ספרד'/'אשכנז'
-      const map: Record<string, string> = { 'ספרדי': 'ספרד', 'אשכנזי': 'אשכנז' };
-      const val = map[urlNusach] ?? urlNusach;
-      setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, כתב: val } }));
-    } else {
-      // For תפילין and others: check product.nusach or name keywords
-      setFilters(prev => ({ ...prev, nusachFilter: urlNusach }));
-    }
+    // Funnel sends 'ספרדי'/'אשכנזי'; normalise to 'ספרד'/'אשכנז'
+    const map: Record<string, string> = { 'ספרדי': 'ספרד', 'אשכנזי': 'אשכנז' };
+    const val = map[urlNusach] ?? urlNusach;
+    setFilters(prev => ({ ...prev, nusachFilter: val }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlNusach, loading, allLoaded.length]);
 

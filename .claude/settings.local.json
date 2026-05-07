@@ -124,16 +124,20 @@
       "Bash(git checkout *)",
       "Bash(echo \"EXIT_CODE: $?\")",
       "Bash(head -100 /c/Users/Owner/Downloads/projects/Your-sofer/app/product/[id]/ProductClient.tsx)",
-      "Bash(kill -9 17176)",
-      "Bash(kill -9 1205)",
-      "Bash(kill -9 13608)",
-      "Bash(xargs sed *)",
-      "Bash(git reset *)",
-      "Bash(New-Item -ItemType Directory -Path \"app\\\\collections\" -Force)",
-      "Bash(Out-Null)",
-      "Bash(git rm *)",
-      "Bash(node app/scripts/aiMediaPipeline.mjs --provider=gemini --cat=כיפות)",
-      "Bash(echo \"Pipeline PID: $!\")"
+      "Bash(npm update:*)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Stop-Process *)",
+      "Bash(awk '{printf \"%s KB  %s\\\\n\", int\\($5/1024\\), $9}')",
+      "Bash(awk '{sum+=$5; count++} END {printf \"Total chunks: %d\\\\nTotal size: %d KB\\\\n\", count, sum/1024}')",
+      "Bash(npm uninstall *)",
+      "WebFetch(domain:pagespeed.web.dev)",
+      "WebFetch(domain:www.googleapis.com)",
+      "WebSearch",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:clarity.microsoft.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:www.willfox.dev)"
     ]
   }
 }
