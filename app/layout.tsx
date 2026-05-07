@@ -70,13 +70,12 @@ export default function RootLayout({
         <meta name="facebook-domain-verification" content="xuwtu57l434nldfe7p4s8l2sr829jw" />
         <CanonicalTag />
         {/* ── Preconnects & DNS prefetches ── */}
-        <link rel="preconnect" href="https://your-sofer.firebaseapp.com" />
-        <link rel="preconnect" href="https://apis.google.com" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://firebaseapp.com" />
+        <link rel="dns-prefetch" href="https://your-sofer.firebaseapp.com" />
+        <link rel="dns-prefetch" href="https://apis.google.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://firebaseapp.com" />
         <link
           rel="preload"
           as="image"

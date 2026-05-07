@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo, memo } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useMemo, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,7 +12,7 @@ import {
 import { db } from './firebase';
 import HeroSwiper from './components/HeroSwiper';
 import ProductCard from '@/components/ui/ProductCard';
-import RabbinicalSupervision from './components/RabbinicalSupervision';
+const RabbinicalSupervision = dynamic(() => import('./components/RabbinicalSupervision'), { ssr: false, loading: () => <div style={{ height: 420 }} /> });
 
 const SmartFunnel        = dynamic(() => import('./components/SmartFunnel'),            { ssr: false, loading: () => <div style={{ height: 400 }} /> });
 
@@ -342,12 +342,14 @@ export default function HomePageClient() {
   const { shaliach } = useShaliach();
   const { addItem }  = useCart();
 
-  // ── Resize - debounced 150 ms so mobile touch events don't saturate the thread
+  // Read isMobile synchronously before the browser paints to prevent CLS on mobile
+  // (avoids the false→true flip that shifts the entire layout after hydration)
+  useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
+
+  // Resize — debounced 150 ms so mobile touch events don't saturate the thread
   useEffect(() => {
-    function update() { setIsMobile(window.innerWidth < 768); }
-    update();
     let timer: ReturnType<typeof setTimeout>;
-    function onResize() { clearTimeout(timer); timer = setTimeout(update, 150); }
+    function onResize() { clearTimeout(timer); timer = setTimeout(() => setIsMobile(window.innerWidth < 768), 150); }
     window.addEventListener('resize', onResize);
     return () => { window.removeEventListener('resize', onResize); clearTimeout(timer); };
   }, []);
@@ -911,6 +913,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 5. Featured products horizontal scroll ── */}
+      <div style={{ minHeight: isMobile ? 290 : 330 }}>
       {featuredProducts.length > 0 && (
         <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
@@ -958,6 +961,7 @@ export default function HomePageClient() {
           </div>
         </div>
       )}
+      </div>
 
       {/* ── Shop All CTA ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
@@ -1167,12 +1171,14 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Testimonials carousel - self-contained timer ── */}
-      {testimonials.length > 0 && (
-        <TestimonialsCarousel
-          testimonials={testimonials}
-          isMobile={isMobile}
-        />
-      )}
+      <div style={{ minHeight: 450 }}>
+        {testimonials.length > 0 && (
+          <TestimonialsCarousel
+            testimonials={testimonials}
+            isMobile={isMobile}
+          />
+        )}
+      </div>
 
     </div>
   );
