@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 import { useChatPersona } from './ChatPersonaContext';
@@ -135,6 +136,8 @@ function ProductCard({ product }: { product: ProductResult }) {
 export default function ShiraChat() {
   const { stamPage } = useChatPersona();
   const persona = stamPage ? PERSONAS.nissim : PERSONAS.shira;
+  const pathname = usePathname();
+  const isHomepage = pathname === '/';
 
   const [isOpen, setIsOpen]               = useState(false);
   const [messages, setMessages]           = useState<ChatMessage[]>([]);
@@ -142,8 +145,15 @@ export default function ShiraChat() {
   const [input, setInput]                 = useState('');
   const [isLoading, setIsLoading]         = useState(false);
   const [isTyping, setIsTyping]           = useState(false);
+  const [showBadge, setShowBadge]         = useState(false);
   const messagesEndRef                    = useRef<HTMLDivElement>(null);
   const inputRef                          = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isHomepage || isOpen) { setShowBadge(false); return; }
+    const t = setTimeout(() => setShowBadge(true), 3000);
+    return () => clearTimeout(t);
+  }, [isHomepage, isOpen]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -251,8 +261,17 @@ export default function ShiraChat() {
 
   return (
     <>
+      {/* ── Availability badge (non-homepage only, fades in after 3s) ── */}
+      {showBadge && !isOpen && (
+        <div className="shira-badge">יועץ אנושי פנוי כרגע 🟢</div>
+      )}
+
       {/* ── Toggle button ── */}
-      <button onClick={() => setIsOpen(o => !o)} className="shira-toggle" aria-label="פתח צ'אט עם שירה">
+      <button
+        onClick={() => { setShowBadge(false); setIsOpen(o => !o); }}
+        className={`shira-toggle${!isHomepage && !isOpen ? ' shira-toggle--pulse' : ''}`}
+        aria-label="פתח צ'אט עם שירה"
+      >
         {isOpen ? (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -387,6 +406,38 @@ export default function ShiraChat() {
           padding: 0;
         }
         .shira-toggle:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(17,29,58,0.55); }
+
+        /* Pulse/glow animation — active on non-homepage when chat is closed */
+        @keyframes shiraGlowPulse {
+          0%, 100% { transform: scale(1);    box-shadow: 0 4px 20px rgba(17,29,58,0.45), 0 0 0 0   rgba(201,168,76,0); }
+          50%       { transform: scale(1.15); box-shadow: 0 6px 28px rgba(17,29,58,0.55), 0 0 0 10px rgba(201,168,76,0.18); }
+        }
+        .shira-toggle--pulse {
+          animation: shiraGlowPulse 2s ease-in-out infinite;
+          border-color: rgba(201,168,76,0.75);
+        }
+        .shira-toggle--pulse:hover {
+          animation-play-state: paused;
+          transform: scale(1.08);
+          box-shadow: 0 6px 24px rgba(17,29,58,0.55);
+        }
+
+        /* Availability badge */
+        @keyframes shiraBadgeFadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .shira-badge {
+          position: fixed; bottom: 94px; left: 8px; z-index: 9999;
+          background: white; color: #0c1a35;
+          font-size: 11.5px; font-weight: 700;
+          padding: 5px 11px; border-radius: 20px;
+          box-shadow: 0 2px 14px rgba(0,0,0,0.13);
+          border: 1.5px solid rgba(201,168,76,0.45);
+          white-space: nowrap; direction: rtl;
+          animation: shiraBadgeFadeIn 0.4s ease-out forwards;
+          pointer-events: none;
+        }
         .shira-avatar-btn {
           position: relative; width: 100%; height: 100%;
           display: flex; align-items: center; justify-content: center;
@@ -574,6 +625,7 @@ export default function ShiraChat() {
           .shira-toggle { left: 14px; bottom: 120px; width: 54px; height: 54px; }
           .shira-products { margin-left: 0; }
           .shira-quick-replies { margin-left: 0; }
+          .shira-badge { bottom: 182px; left: 6px; }
         }
       `}</style>
     </>
