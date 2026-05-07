@@ -841,6 +841,29 @@ export default function HomePageClient() {
       {/* ── Live Activity Bar - isolated component, re-renders independently ── */}
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
 
+      {/* ── Kashrut trust banner ── */}
+      <a
+        href="/kashrut"
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? 10 : 14,
+          background: 'linear-gradient(90deg, #0c1a35 0%, #1a2a4a 100%)',
+          borderTop: '1px solid rgba(184,151,42,0.3)',
+          borderBottom: '1px solid rgba(184,151,42,0.3)',
+          padding: isMobile ? '11px 16px' : '13px 24px',
+          textDecoration: 'none',
+          cursor: 'pointer',
+          direction: 'rtl',
+        }}
+      >
+        <span style={{ fontSize: isMobile ? 22 : 26, flexShrink: 0 }}>📜</span>
+        <span style={{ fontSize: isMobile ? 13 : 15, fontWeight: 800, color: '#b8972a', letterSpacing: 0.2 }}>
+          תעודת הכשרות שלנו ←
+        </span>
+        <span style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>
+          כל מוצר סת״מ נבדק ומאושר על ידי מגיה מוסמך
+        </span>
+      </a>
+
       {/* ── Live Counters ── */}
       <div ref={countersRef} style={{ background: '#FFFFFF', padding: isMobile ? '16px 12px' : '20px 24px', borderBottom: '1px solid #f0ece4' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
