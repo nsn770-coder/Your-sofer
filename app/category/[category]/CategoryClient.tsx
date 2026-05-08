@@ -145,6 +145,56 @@ const COLLECTION_IMG: Record<string, string> = {
 
 const COLLECTIONS_ORDER = ['יהלום', 'ישפה', 'ברקת', 'תרשיש', 'ספיר', 'שוהם'];
 
+const COLLECTION_DESC: Record<string, string> = {
+  'יהלום': 'הקו השקוף והמודרני',
+  'ישפה':  'הקו האומנותי והצבעוני',
+  'ברקת':  'הקו החגיגי והיוקרתי',
+  'תרשיש': 'הקו הזהוב והמאיר',
+  'ספיר':  'הקו המתכתי והקריר',
+  'שוהם':  'הקו הטבעי והכהה',
+};
+
+// ─── Look-break banner ────────────────────────────────────────────────────────
+
+function LookBreakBanner({ col, onSelect }: { col: string; onSelect: (c: string) => void }) {
+  const img  = COLLECTION_IMG[col];
+  const desc = COLLECTION_DESC[col] ?? '';
+  return (
+    <div style={{ margin: '24px 0', position: 'relative', borderRadius: 12, overflow: 'hidden', height: 250 }}>
+      {img && (
+        <img
+          src={img}
+          alt={col}
+          loading="lazy"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        />
+      )}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 100%)' }} />
+      <div dir="rtl" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', padding: '0 36px' }}>
+        <div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 6, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>
+            {col}
+          </div>
+          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', marginBottom: 18 }}>
+            {desc}
+          </div>
+          <button
+            onClick={() => { onSelect(col); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            style={{
+              background: '#b8972a', color: '#0c1a35',
+              border: 'none', borderRadius: 8,
+              padding: '10px 22px', fontSize: 14, fontWeight: 900,
+              cursor: 'pointer',
+            }}
+          >
+            ✨ צפה בעוד סגנונות
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 
 function IconHome({ size = 14 }: { size?: number }) {
@@ -1521,22 +1571,45 @@ export default function CategoryClient({ category }: { category: string }) {
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
-                  {paginated.map(p => (
-                    <ProductCard
-                      key={p.id}
-                      id={p.id}
-                      name={p.name}
-                      price={p.price}
-                      images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                      priority={p.priority}
-                      isBestSeller={p.isBestSeller}
-                      badge={p.badge}
-                      was={p.was}
-                      createdAt={p.createdAt}
-                    />
-                  ))}
-                </div>
+                <>
+                  {(() => {
+                    const BANNER_EVERY = 20;
+                    const bannerPool = collectionFilter
+                      ? COLLECTIONS_ORDER.filter(c => c !== collectionFilter)
+                      : COLLECTIONS_ORDER;
+                    const result: React.ReactNode[] = [];
+                    let bannerIdx = 0;
+                    for (let start = 0; start < paginated.length; start += BANNER_EVERY) {
+                      const chunk = paginated.slice(start, start + BANNER_EVERY);
+                      result.push(
+                        <div key={`chunk-${start}`} className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+                          {chunk.map(p => (
+                            <ProductCard
+                              key={p.id}
+                              id={p.id}
+                              name={p.name}
+                              price={p.price}
+                              images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                              priority={p.priority}
+                              isBestSeller={p.isBestSeller}
+                              badge={p.badge}
+                              was={p.was}
+                              createdAt={p.createdAt}
+                            />
+                          ))}
+                        </div>
+                      );
+                      if (start + BANNER_EVERY < paginated.length && bannerPool.length > 0) {
+                        const col = bannerPool[bannerIdx % bannerPool.length];
+                        bannerIdx++;
+                        result.push(
+                          <LookBreakBanner key={`banner-${start}`} col={col} onSelect={setCollectionFilter} />
+                        );
+                      }
+                    }
+                    return result;
+                  })()}
+                </>
               )}
 
               <div className="mt-8 mb-2">
