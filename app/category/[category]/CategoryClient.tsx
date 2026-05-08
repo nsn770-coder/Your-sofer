@@ -1573,7 +1573,7 @@ export default function CategoryClient({ category }: { category: string }) {
               ) : (
                 <>
                   {(() => {
-                    const BANNER_EVERY = 20;
+                    const BANNER_EVERY = 16;
                     const bannerPool = collectionFilter
                       ? COLLECTIONS_ORDER.filter(c => c !== collectionFilter)
                       : COLLECTIONS_ORDER;
