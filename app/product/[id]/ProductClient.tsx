@@ -1333,7 +1333,7 @@ export default function ProductClient() {
   const hasVideo = !!product.videoUrl;
   const discount = product.was ? Math.round((1 - product.price / product.was) * 100) : 0;
 
-  const EMBROIDERY_CATEGORIES = ['כיסוי תפילין', 'כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן', 'תיקי טלית', 'תיקי תפילין'];
+  const EMBROIDERY_CATEGORIES = ['כיסוי תפילין', 'כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן', 'תיקי טלית ותפילין'];
 const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
 
   const MEZUZAH_CERTS: Certificate[] = [
