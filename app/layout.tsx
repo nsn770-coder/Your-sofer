@@ -18,7 +18,7 @@ import { TidioChat } from "@/components/TidioChat";
 import { CanonicalTag } from "@/components/CanonicalTag";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
-const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "swap", variable: "--font-heebo" });
+const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
 
 const BASE_URL = 'https://your-sofer.com';
 

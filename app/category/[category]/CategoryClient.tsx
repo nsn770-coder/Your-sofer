@@ -1583,7 +1583,7 @@ export default function CategoryClient({ category }: { category: string }) {
                       const chunk = paginated.slice(start, start + BANNER_EVERY);
                       result.push(
                         <div key={`chunk-${start}`} className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
-                          {chunk.map(p => (
+                          {chunk.map((p, idx) => (
                             <ProductCard
                               key={p.id}
                               id={p.id}
@@ -1595,6 +1595,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               badge={p.badge}
                               was={p.was}
                               createdAt={p.createdAt}
+                              aboveFold={start === 0 && idx < 4}
                             />
                           ))}
                         </div>

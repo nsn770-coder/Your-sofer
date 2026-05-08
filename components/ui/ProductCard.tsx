@@ -20,6 +20,7 @@ interface Props {
   was?: number | null;
   createdAt?: { seconds: number } | null;
   hidden?: boolean;
+  aboveFold?: boolean;
 }
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
@@ -100,7 +101,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProductCard({
-  id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden,
+  id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -284,7 +285,8 @@ export default function ProductCard({
         {imgSrc ? (
           <img
             src={imgSrc} alt={name}
-            loading="lazy"
+            loading={aboveFold ? 'eager' : 'lazy'}
+            fetchPriority={aboveFold ? 'high' : 'auto'}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             onError={e => { e.currentTarget.style.display = 'none'; }}
           />
