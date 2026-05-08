@@ -1333,7 +1333,7 @@ export default function ProductClient() {
   const hasVideo = !!product.videoUrl;
   const discount = product.was ? Math.round((1 - product.price / product.was) * 100) : 0;
 
-  const EMBROIDERY_CATEGORIES = ['כיסוי תפילין', 'כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן'];
+  const EMBROIDERY_CATEGORIES = ['כיסוי תפילין', 'כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן', 'תיקי טלית', 'תיקי תפילין'];
 const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
 
   const MEZUZAH_CERTS: Certificate[] = [
@@ -1445,6 +1445,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
           <label style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
             <Icon.Pen /> טקסט לריקמה אישית
           </label>
+          <p style={{ fontSize: 11, color: '#888', marginTop: 2, marginBottom: 6 }}>* כל אות עולה 5 ש״ח</p>
           <input type="text" value={embroideryText} onChange={e => setEmbroideryText(e.target.value)} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
             style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
             onFocus={e => (e.target.style.borderColor = '#b8972a')} onBlur={e => (e.target.style.borderColor = '#e0e0e0')} />
