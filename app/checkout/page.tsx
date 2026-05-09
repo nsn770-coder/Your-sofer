@@ -66,6 +66,11 @@ function Input({ label, name, value, onChange, placeholder, type = 'text', requi
   );
 }
 
+const KLAF_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין']);
+const SHIPPING_REGULAR = 25;
+const SHIPPING_EXPRESS = 45;
+const FREE_SHIPPING_THRESHOLD = 350;
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, total } = useCart();
@@ -90,6 +95,8 @@ export default function CheckoutPage() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [shippingOption, setShippingOption] = useState<'regular' | 'express'>('regular');
+  const [itemCategories, setItemCategories] = useState<Record<string, string>>({});
 
   // Read isMobile before first paint to prevent the false→true CLS flip on mobile
   useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
@@ -99,6 +106,18 @@ export default function CheckoutPage() {
     function onResize() { clearTimeout(timer); timer = setTimeout(() => setIsMobile(window.innerWidth < 768), 150); }
     window.addEventListener('resize', onResize);
     return () => { window.removeEventListener('resize', onResize); clearTimeout(timer); };
+  }, []);
+
+  // Fetch product categories once so we can compute shipping correctly
+  useEffect(() => {
+    if (items.length === 0) return;
+    Promise.all(items.map(async item => {
+      try {
+        const snap = await getDoc(doc(db, 'products', item.id));
+        return [item.id, (snap.exists() ? snap.data().category : '') ?? ''] as const;
+      } catch { return [item.id, ''] as const; }
+    })).then(pairs => setItemCategories(Object.fromEntries(pairs)));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Meta Pixel - InitiateCheckout fires once when user enters checkout with items
@@ -169,8 +188,11 @@ export default function CheckoutPage() {
     finally { setCouponLoading(false); }
   }
 
+  const hasKlafItem = items.some(i => KLAF_CATS.has(itemCategories[i.id] ?? ''));
+  const isFreeShipping = !hasKlafItem && total >= FREE_SHIPPING_THRESHOLD;
+  const shippingCost = isFreeShipping ? 0 : (shippingOption === 'express' ? SHIPPING_EXPRESS : SHIPPING_REGULAR);
   const discountAmount = appliedCoupon ? Math.round(total * appliedCoupon.discount / 100 * 100) / 100 : 0;
-  const finalTotal = total - discountAmount;
+  const finalTotal = total - discountAmount + shippingCost;
 
   async function handleSubmit() {
     if (!form.name || !form.email || !form.phone || !form.address || !form.city) {
@@ -187,6 +209,7 @@ export default function CheckoutPage() {
         address: `${form.address}, ${form.city}`, notes: form.notes || '',
         items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null })),
         total: finalTotal, couponCode: appliedCoupon?.code || null, couponDiscount: appliedCoupon ? discountAmount : null,
+        shippingCost, shippingType: isFreeShipping ? 'free' : shippingOption,
         status: 'pending_payment', createdAt: serverTimestamp(),
         shaliachRef: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
         commissionPercent, commissionAmount,
@@ -274,10 +297,24 @@ export default function CheckoutPage() {
       </div>
       <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}><span>סכום ביניים</span><span>{formatPrice(total)}</span></div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-          <span style={{ color: '#777' }}>משלוח</span>
-          <span style={{ color: '#1a6b3c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck size={12} color="#1a6b3c" /> חינם</span>
-        </div>
+        {isFreeShipping ? (
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+            <span style={{ color: '#777' }}>משלוח</span>
+            <span style={{ color: '#1a6b3c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck size={12} color="#1a6b3c" /> חינם 🎉</span>
+          </div>
+        ) : (
+          <div style={{ fontSize: 13 }}>
+            <div style={{ color: '#777', marginBottom: 6 }}>משלוח</div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, cursor: 'pointer' }}>
+              <input type="radio" name="shipping" value="regular" checked={shippingOption === 'regular'} onChange={() => setShippingOption('regular')} style={{ accentColor: '#b8972a' }} />
+              <span>רגיל (3–7 ימים) — {formatPrice(SHIPPING_REGULAR)}</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <input type="radio" name="shipping" value="express" checked={shippingOption === 'express'} onChange={() => setShippingOption('express')} style={{ accentColor: '#b8972a' }} />
+              <span>מהיר — שליח עד הבית (1–3 ימים) — {formatPrice(SHIPPING_EXPRESS)}</span>
+            </label>
+          </div>
+        )}
         {appliedCoupon && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.discount}%)</span>
@@ -307,7 +344,7 @@ export default function CheckoutPage() {
         {couponError && <div style={{ fontSize: 11, color: '#dc2626', marginTop: 5 }}>{couponError}</div>}
       </div>
       <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {[{ icon: <IconLock size={13} color="#555" />, text: 'תשלום מאובטח' }, { icon: <IconTruck size={13} color="#555" />, text: 'משלוח חינם' }, { icon: <IconReturn size={13} color="#555" />, text: 'ביטול 24 שעות' }, { icon: <IconShield size={13} color="#555" />, text: 'אחריות מלאה' }].map(item => (
+        {[{ icon: <IconLock size={13} color="#555" />, text: 'תשלום מאובטח' }, { icon: <IconTruck size={13} color="#555" />, text: 'משלוח לכל הארץ' }, { icon: <IconReturn size={13} color="#555" />, text: 'ביטול 24 שעות' }, { icon: <IconShield size={13} color="#555" />, text: 'אחריות מלאה' }].map(item => (
           <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#777' }}>{item.icon} {item.text}</div>
         ))}
       </div>

@@ -12,7 +12,7 @@ const BENEFITS = [
   },
   {
     title: 'משלוח והחזרות',
-    desc: 'משלוח חינם לכל הארץ תוך 7–14 ימי עסקים. ניתן להחזיר מוצר תוך 14 יום ממועד הקבלה.',
+    desc: 'משלוח לכל הארץ תוך 7–14 ימי עסקים. הזמנות מעל ₪350 זכאיות למשלוח חינם (לא כולל קלפי מזוזה/תפילין). ניתן להחזיר מוצר תוך 14 יום.',
     svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>),
   },
   {

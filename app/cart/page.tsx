@@ -106,7 +106,7 @@ export default function CartPage() {
                               style={{ fontSize: 14, fontWeight: 600, color: '#0f1111', lineHeight: 1.4, cursor: 'pointer', marginBottom: 4 }}>
                               {item.name}
                             </div>
-                            <div style={{ fontSize: 11, color: '#1a6b3c', marginBottom: 2 }}>✓ במלאי · משלוח חינם</div>
+                            <div style={{ fontSize: 11, color: '#1a6b3c', marginBottom: 2 }}>✓ במלאי</div>
                           {item.embroideryText && (
                             <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ ריקמה: {item.embroideryText}</div>
                           )}
@@ -167,7 +167,7 @@ export default function CartPage() {
                             onMouseLeave={e => (e.currentTarget.style.color = '#0f1111')}>
                             {item.name}
                           </div>
-                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText ? 4 : 10 }}>✓ במלאי · משלוח חינם</div>
+                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText ? 4 : 10 }}>✓ במלאי</div>
                           {item.embroideryText && (
                             <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6 }}>✍️ ריקמה: {item.embroideryText}</div>
                           )}
@@ -236,14 +236,14 @@ export default function CartPage() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
                   <span style={{ color: '#555' }}>משלוח:</span>
-                  <span style={{ fontWeight: 700, color: '#1a6b3c' }}>חינם</span>
+                  <span style={{ fontWeight: 700, color: '#555' }}>יחושב בקופה</span>
                 </div>
                 <div style={{ borderTop: '1px solid #eee', paddingTop: 12, marginTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 900 }}>
-                    <span>סה"כ לתשלום:</span>
+                    <span>סכום ביניים:</span>
                     <span style={{ color: '#0c1a35' }}>{formatPrice(total)}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע"מ</div>
+                  <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע״מ · עלות משלוח תחושב בקופה</div>
                 </div>
               </div>
 
@@ -267,7 +267,7 @@ export default function CartPage() {
 
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eee', fontSize: 11, color: '#888', lineHeight: 2 }}>
                 <div>🔒 תשלום מאובטח ומוצפן</div>
-                <div>🚚 משלוח חינם לכל הארץ</div>
+                <div>🚚 משלוח לכל הארץ</div>
                 <div>↩️ ביטול עד 24 שעות</div>
                 <div>🛡️ אחריות פלטפורמה מלאה</div>
               </div>
