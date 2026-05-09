@@ -1,7 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection, getDocs, query, where,
+  doc, getDoc, addDoc, serverTimestamp, updateDoc,
+} from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { formatPrice } from '@/app/lib/utils';
@@ -30,6 +33,15 @@ interface OrderItem {
   customerName?: string;
 }
 
+type StoreStatus = 'loading' | 'none' | 'pending' | 'rejected' | 'approved';
+
+interface StoreDoc {
+  refCode: string;
+  bannerImage: string;
+  commissionPercent: number;
+  name: string;
+}
+
 export default function SoferDashboard() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -37,6 +49,14 @@ export default function SoferDashboard() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview');
+
+  const [storeStatus, setStoreStatus] = useState<StoreStatus>('loading');
+  const [storeDoc, setStoreDoc] = useState<StoreDoc | null>(null);
+  const [topTab, setTopTab] = useState<'sofer' | 'store'>('sofer');
+  const [bannerUploading, setBannerUploading] = useState(false);
+  const [storeOrdersCount, setStoreOrdersCount] = useState(0);
+  const [submittingRequest, setSubmittingRequest] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) router.push('/');
@@ -51,10 +71,17 @@ export default function SoferDashboard() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (!user?.uid || user.role !== 'sofer') {
+      setStoreStatus('none');
+      return;
+    }
+    loadStoreStatus();
+  }, [user]);
+
   async function loadData() {
     if (!user?.soferId) return;
     try {
-      // טען מוצרים של הסופר
       const productsSnap = await getDocs(
         query(collection(db, 'products'), where('soferId', '==', user.soferId))
       );
@@ -62,7 +89,6 @@ export default function SoferDashboard() {
       productsSnap.forEach(d => productsData.push({ id: d.id, ...d.data() } as Product));
       setProducts(productsData);
 
-      // טען פריטי הזמנות של הסופר
       const ordersSnap = await getDocs(
         query(collection(db, 'orderItems'), where('soferId', '==', user.soferId))
       );
@@ -76,6 +102,76 @@ export default function SoferDashboard() {
     }
   }
 
+  async function loadStoreStatus() {
+    if (!user?.uid) return;
+    try {
+      const shluchimSnap = await getDoc(doc(db, 'shluchim', user.uid));
+      if (shluchimSnap.exists() && shluchimSnap.data().isPersonalStore) {
+        const d = shluchimSnap.data();
+        setStoreDoc({
+          refCode: d.refCode,
+          bannerImage: d.bannerImage || '',
+          commissionPercent: d.commissionPercent ?? 10,
+          name: d.name,
+        });
+        setStoreStatus('approved');
+        const ordSnap = await getDocs(query(collection(db, 'orders'), where('shaliachId', '==', user.uid)));
+        setStoreOrdersCount(ordSnap.size);
+        return;
+      }
+      const reqSnap = await getDocs(query(collection(db, 'rabbi_requests'), where('soferUid', '==', user.uid)));
+      if (!reqSnap.empty) {
+        const status = reqSnap.docs[0].data().status as string;
+        setStoreStatus(status === 'rejected' ? 'rejected' : 'pending');
+      } else {
+        setStoreStatus('none');
+      }
+    } catch {
+      setStoreStatus('none');
+    }
+  }
+
+  async function submitStoreRequest() {
+    if (!user?.uid) return;
+    setSubmittingRequest(true);
+    try {
+      await addDoc(collection(db, 'rabbi_requests'), {
+        soferUid: user.uid,
+        soferName: user.displayName || '',
+        soferEmail: user.email || '',
+        status: 'pending',
+        createdAt: serverTimestamp(),
+      });
+      setStoreStatus('pending');
+    } finally {
+      setSubmittingRequest(false);
+    }
+  }
+
+  async function uploadBanner(file: File) {
+    if (!user?.uid) return;
+    setBannerUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'yoursofer_upload');
+      const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      const url = data.secure_url as string;
+      await updateDoc(doc(db, 'shluchim', user.uid), { bannerImage: url });
+      setStoreDoc(prev => prev ? { ...prev, bannerImage: url } : prev);
+    } finally {
+      setBannerUploading(false);
+    }
+  }
+
+  function copyStoreLink() {
+    if (!storeDoc) return;
+    navigator.clipboard.writeText(`https://your-sofer.com/sofer-store/${storeDoc.refCode}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   if (loading || dataLoading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
       <div style={{ fontSize: 22 }}>טוען...</div>
@@ -84,7 +180,6 @@ export default function SoferDashboard() {
 
   if (!user || (user.role !== 'sofer' && user.role !== 'admin')) return null;
 
-  // אם אין soferId עדיין
   if (!user.soferId) return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ background: '#fff', borderRadius: 16, padding: 48, maxWidth: 480, textAlign: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
@@ -101,10 +196,10 @@ export default function SoferDashboard() {
     </div>
   );
 
-  // חישובים
   const totalSold = orderItems.reduce((sum, i) => sum + (i.quantity || 0), 0);
   const totalRevenue = orderItems.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0);
   const activeProducts = products.filter(p => p.status === 'active').length;
+  const storeUrl = storeDoc ? `https://your-sofer.com/sofer-store/${storeDoc.refCode}` : '';
 
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
@@ -131,181 +226,306 @@ export default function SoferDashboard() {
 
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 16px' }}>
 
-        {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <div style={{ fontSize: 32, fontWeight: 900, color: '#1a3a2a' }}>{products.length}</div>
-            <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>סה"כ מוצרים</div>
-          </div>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <div style={{ fontSize: 32, fontWeight: 900, color: '#2980b9' }}>{activeProducts}</div>
-            <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>מוצרים פעילים</div>
-          </div>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <div style={{ fontSize: 32, fontWeight: 900, color: '#8e44ad' }}>{totalSold}</div>
-            <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>יחידות שנמכרו</div>
-          </div>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <div style={{ fontSize: 32, fontWeight: 900, color: '#27ae60' }}>{formatPrice(totalRevenue)}</div>
-            <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>סה"כ מכירות</div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-          {[
-            { key: 'overview', label: '📊 סקירה' },
-            { key: 'products', label: '📜 המוצרים שלי' },
-            { key: 'orders', label: '📦 הזמנות' },
-          ].map(t => (
-            <button key={t.key}
-              onClick={() => setActiveTab(t.key as any)}
-              style={{
-                padding: '8px 18px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', border: 'none',
-                background: activeTab === t.key ? '#1a3a2a' : '#fff',
-                color: activeTab === t.key ? '#fff' : '#555',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-              }}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Overview */}
-        {activeTab === 'overview' && (
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 16, color: '#1a3a2a' }}>הזמנות אחרונות</h3>
-            {orderItems.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
-                <div>אין הזמנות עדיין</div>
-              </div>
-            ) : (
-              <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #f0f0f0' }}>
-                    <th style={{ padding: '8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>מוצר</th>
-                    <th style={{ padding: '8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>כמות</th>
-                    <th style={{ padding: '8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>מחיר</th>
-                    <th style={{ padding: '8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>סטטוס</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orderItems.slice(0, 10).map(item => (
-                    <tr key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                      <td style={{ padding: '10px 8px', fontWeight: 600 }}>{item.productTitle}</td>
-                      <td style={{ padding: '10px 8px', color: '#555' }}>{item.quantity}</td>
-                      <td style={{ padding: '10px 8px', color: '#27ae60', fontWeight: 700 }}>{formatPrice(item.price)}</td>
-                      <td style={{ padding: '10px 8px' }}>
-                        <span style={{
-                          background: item.orderStatus === 'delivered' ? '#d5f5e3' : '#fef9e7',
-                          color: item.orderStatus === 'delivered' ? '#1e8449' : '#b7950b',
-                          padding: '2px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700
-                        }}>
-                          {item.orderStatus === 'delivered' ? '✅ נמסר' : '⏳ בתהליך'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+        {/* Top-level tabs — only when store is approved */}
+        {storeStatus === 'approved' && (
+          <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+            {([
+              { key: 'sofer', label: '✍️ דשבורד סופר' },
+              { key: 'store', label: '🏪 דשבורד החנות שלי' },
+            ] as const).map(t => (
+              <button key={t.key} onClick={() => setTopTab(t.key)}
+                style={{
+                  padding: '10px 22px', borderRadius: 10, fontSize: 14, fontWeight: 800,
+                  cursor: 'pointer', border: 'none',
+                  background: topTab === t.key ? '#1a3a2a' : '#fff',
+                  color: topTab === t.key ? '#fff' : '#555',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                }}>
+                {t.label}
+              </button>
+            ))}
           </div>
         )}
 
-        {/* Products */}
-        {activeTab === 'products' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ fontSize: 16, fontWeight: 900, color: '#1a3a2a' }}>המוצרים שלי ({products.length})</div>
-              <button onClick={() => router.push('/sofer/upload')} style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 14, fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                ➕ הוסף מוצר חדש
-              </button>
-            </div>
-            {products.length === 0 ? (
-              <div style={{ background: '#fff', borderRadius: 12, padding: 48, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-                <div style={{ fontSize: 48, marginBottom: 16 }}>📜</div>
-                <div style={{ fontSize: 18, color: '#555', marginBottom: 8 }}>אין מוצרים עדיין</div>
-                <div style={{ fontSize: 14, color: '#888', marginBottom: 20 }}>העלה את המוצר הראשון שלך ותתחיל למכור!</div>
-                <button onClick={() => router.push('/sofer/upload')} style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 900, cursor: 'pointer' }}>
-                  ➕ העלה מוצר ראשון
+        {/* ── Store Tab Content ── */}
+        {storeStatus === 'approved' && topTab === 'store' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+            {/* Store link */}
+            <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#1a3a2a', marginBottom: 12 }}>🔗 קישור החנות שלך</div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ background: '#f3f4f4', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#333', flex: 1, wordBreak: 'break-all', direction: 'ltr', textAlign: 'left' }}>
+                  {storeUrl}
+                </div>
+                <button onClick={copyStoreLink}
+                  style={{ background: copied ? '#1a3a2a' : '#e8f4ec', color: copied ? '#fff' : '#1a3a2a', border: 'none', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  {copied ? '✅ הועתק' : '📋 העתק'}
+                </button>
+                <button onClick={() => window.open(storeUrl, '_blank')}
+                  style={{ background: '#e8f4ec', color: '#1a3a2a', border: 'none', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  🔗 פתח
                 </button>
               </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-                {products.map(p => (
-                  <div key={p.id} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-                    <div style={{ height: 120, background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {p.imageUrl || p.imgUrl ? (
-                        <img src={p.imageUrl || p.imgUrl} alt={p.name}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <span style={{ fontSize: 40 }}>📜</span>
-                      )}
-                    </div>
-                    <div style={{ padding: 14 }}>
-                      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{p.name}</div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: 16, fontWeight: 900, color: '#1a3a2a' }}>{formatPrice(p.price)}</span>
-                        <span style={{
-                          fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 10,
-                          background: p.status === 'active' ? '#d5f5e3' : p.status === 'pending' ? '#fef9c3' : '#fde8e8',
-                          color: p.status === 'active' ? '#1e8449' : p.status === 'pending' ? '#92400e' : '#c0392b',
-                        }}>
-                          {p.status === 'active' ? '● פעיל' : p.status === 'pending' ? '⏳ ממתין לאישור' : '● לא פעיל'}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{p.category}</div>
-                    </div>
-                  </div>
-                ))}
+            </div>
+
+            {/* Stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
+              <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                <div style={{ fontSize: 32, fontWeight: 900, color: '#27ae60' }}>{storeOrdersCount}</div>
+                <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>הזמנות דרך החנות</div>
               </div>
-            )}
+              <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                <div style={{ fontSize: 32, fontWeight: 900, color: '#1a3a2a' }}>{storeDoc?.commissionPercent ?? 10}%</div>
+                <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>עמלה על מכירות</div>
+              </div>
+            </div>
+
+            {/* Banner upload */}
+            <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#1a3a2a', marginBottom: 12 }}>🖼️ תמונת כותרת לחנות</div>
+              {storeDoc?.bannerImage ? (
+                <img src={storeDoc.bannerImage} alt="באנר"
+                  style={{ width: '100%', borderRadius: 10, maxHeight: 200, objectFit: 'cover', marginBottom: 12 }} />
+              ) : (
+                <div style={{ background: '#f3f4f4', borderRadius: 10, height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, color: '#aaa', fontSize: 14 }}>
+                  אין תמונת כותרת עדיין
+                </div>
+              )}
+              <label style={{ display: 'inline-block', background: '#1a3a2a', color: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 800, cursor: bannerUploading ? 'not-allowed' : 'pointer', opacity: bannerUploading ? 0.7 : 1 }}>
+                {bannerUploading ? '⏳ מעלה...' : '📤 העלה תמונה'}
+                <input type="file" accept="image/*" style={{ display: 'none' }} disabled={bannerUploading}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) uploadBanner(f); e.target.value = ''; }} />
+              </label>
+              <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>מומלץ: 1200×400 פיקסלים</div>
+            </div>
           </div>
         )}
 
-        {/* Orders */}
-        {activeTab === 'orders' && (
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            {orderItems.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
-                <div>אין הזמנות עדיין</div>
+        {/* ── Sofer Dashboard Content ── */}
+        {(storeStatus !== 'approved' || topTab === 'sofer') && (
+          <>
+            {/* Stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
+              <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                <div style={{ fontSize: 32, fontWeight: 900, color: '#1a3a2a' }}>{products.length}</div>
+                <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>סה"כ מוצרים</div>
               </div>
-            ) : (
-              <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #f0f0f0' }}>
-                    <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>מוצר</th>
-                    <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>לקוח</th>
-                    <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>כמות</th>
-                    <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>סכום</th>
-                    <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>סטטוס</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orderItems.map(item => (
-                    <tr key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                      <td style={{ padding: '10px 8px', fontWeight: 600 }}>{item.productTitle}</td>
-                      <td style={{ padding: '10px 8px', color: '#555' }}>{item.customerName || '-'}</td>
-                      <td style={{ padding: '10px 8px' }}>{item.quantity}</td>
-                      <td style={{ padding: '10px 8px', color: '#27ae60', fontWeight: 700 }}>{formatPrice(item.price * (item.quantity || 1))}</td>
-                      <td style={{ padding: '10px 8px' }}>
-                        <span style={{
-                          background: item.orderStatus === 'delivered' ? '#d5f5e3' : '#fef9e7',
-                          color: item.orderStatus === 'delivered' ? '#1e8449' : '#b7950b',
-                          padding: '3px 10px', borderRadius: 10, fontSize: 12, fontWeight: 700
-                        }}>
-                          {item.orderStatus === 'delivered' ? '✅ נמסר' :
-                           item.orderStatus === 'processing' ? '🔄 בעיבוד' : '⏳ חדש'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                <div style={{ fontSize: 32, fontWeight: 900, color: '#2980b9' }}>{activeProducts}</div>
+                <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>מוצרים פעילים</div>
+              </div>
+              <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                <div style={{ fontSize: 32, fontWeight: 900, color: '#8e44ad' }}>{totalSold}</div>
+                <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>יחידות שנמכרו</div>
+              </div>
+              <div style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                <div style={{ fontSize: 32, fontWeight: 900, color: '#27ae60' }}>{formatPrice(totalRevenue)}</div>
+                <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>סה"כ מכירות</div>
+              </div>
+            </div>
+
+            {/* Inner Tabs */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              {[
+                { key: 'overview', label: '📊 סקירה' },
+                { key: 'products', label: '📜 המוצרים שלי' },
+                { key: 'orders',   label: '📦 הזמנות' },
+              ].map(t => (
+                <button key={t.key}
+                  onClick={() => setActiveTab(t.key as 'overview' | 'products' | 'orders')}
+                  style={{
+                    padding: '8px 18px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', border: 'none',
+                    background: activeTab === t.key ? '#1a3a2a' : '#fff',
+                    color: activeTab === t.key ? '#fff' : '#555',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                  }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Overview */}
+            {activeTab === 'overview' && (
+              <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 16, color: '#1a3a2a' }}>הזמנות אחרונות</h3>
+                {orderItems.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>
+                    <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
+                    <div>אין הזמנות עדיין</div>
+                  </div>
+                ) : (
+                  <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #f0f0f0' }}>
+                        <th style={{ padding: '8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>מוצר</th>
+                        <th style={{ padding: '8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>כמות</th>
+                        <th style={{ padding: '8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>מחיר</th>
+                        <th style={{ padding: '8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>סטטוס</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orderItems.slice(0, 10).map(item => (
+                        <tr key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                          <td style={{ padding: '10px 8px', fontWeight: 600 }}>{item.productTitle}</td>
+                          <td style={{ padding: '10px 8px', color: '#555' }}>{item.quantity}</td>
+                          <td style={{ padding: '10px 8px', color: '#27ae60', fontWeight: 700 }}>{formatPrice(item.price)}</td>
+                          <td style={{ padding: '10px 8px' }}>
+                            <span style={{
+                              background: item.orderStatus === 'delivered' ? '#d5f5e3' : '#fef9e7',
+                              color: item.orderStatus === 'delivered' ? '#1e8449' : '#b7950b',
+                              padding: '2px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700,
+                            }}>
+                              {item.orderStatus === 'delivered' ? '✅ נמסר' : '⏳ בתהליך'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             )}
-          </div>
+
+            {/* Products */}
+            {activeTab === 'products' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#1a3a2a' }}>המוצרים שלי ({products.length})</div>
+                  <button onClick={() => router.push('/sofer/upload')}
+                    style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 14, fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    ➕ הוסף מוצר חדש
+                  </button>
+                </div>
+                {products.length === 0 ? (
+                  <div style={{ background: '#fff', borderRadius: 12, padding: 48, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                    <div style={{ fontSize: 48, marginBottom: 16 }}>📜</div>
+                    <div style={{ fontSize: 18, color: '#555', marginBottom: 8 }}>אין מוצרים עדיין</div>
+                    <div style={{ fontSize: 14, color: '#888', marginBottom: 20 }}>העלה את המוצר הראשון שלך ותתחיל למכור!</div>
+                    <button onClick={() => router.push('/sofer/upload')}
+                      style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 900, cursor: 'pointer' }}>
+                      ➕ העלה מוצר ראשון
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
+                    {products.map(p => (
+                      <div key={p.id} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                        <div style={{ height: 120, background: 'linear-gradient(135deg, #1a3a2a, #3d7a52)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {p.imageUrl || p.imgUrl ? (
+                            <img src={p.imageUrl || p.imgUrl} alt={p.name}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          ) : (
+                            <span style={{ fontSize: 40 }}>📜</span>
+                          )}
+                        </div>
+                        <div style={{ padding: 14 }}>
+                          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{p.name}</div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: 16, fontWeight: 900, color: '#1a3a2a' }}>{formatPrice(p.price)}</span>
+                            <span style={{
+                              fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 10,
+                              background: p.status === 'active' ? '#d5f5e3' : p.status === 'pending' ? '#fef9c3' : '#fde8e8',
+                              color: p.status === 'active' ? '#1e8449' : p.status === 'pending' ? '#92400e' : '#c0392b',
+                            }}>
+                              {p.status === 'active' ? '● פעיל' : p.status === 'pending' ? '⏳ ממתין לאישור' : '● לא פעיל'}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{p.category}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Orders */}
+            {activeTab === 'orders' && (
+              <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+                {orderItems.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>
+                    <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
+                    <div>אין הזמנות עדיין</div>
+                  </div>
+                ) : (
+                  <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #f0f0f0' }}>
+                        <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>מוצר</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>לקוח</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>כמות</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>סכום</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'right', color: '#888', fontWeight: 600 }}>סטטוס</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orderItems.map(item => (
+                        <tr key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                          <td style={{ padding: '10px 8px', fontWeight: 600 }}>{item.productTitle}</td>
+                          <td style={{ padding: '10px 8px', color: '#555' }}>{item.customerName || '-'}</td>
+                          <td style={{ padding: '10px 8px' }}>{item.quantity}</td>
+                          <td style={{ padding: '10px 8px', color: '#27ae60', fontWeight: 700 }}>{formatPrice(item.price * (item.quantity || 1))}</td>
+                          <td style={{ padding: '10px 8px' }}>
+                            <span style={{
+                              background: item.orderStatus === 'delivered' ? '#d5f5e3' : '#fef9e7',
+                              color: item.orderStatus === 'delivered' ? '#1e8449' : '#b7950b',
+                              padding: '3px 10px', borderRadius: 10, fontSize: 12, fontWeight: 700,
+                            }}>
+                              {item.orderStatus === 'delivered' ? '✅ נמסר' :
+                               item.orderStatus === 'processing' ? '🔄 בעיבוד' : '⏳ חדש'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+
+            {/* Store request widget — states A / B / C */}
+            {user.role === 'sofer' && storeStatus !== 'loading' && storeStatus !== 'approved' && (
+              <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', marginTop: 24, border: '1.5px solid rgba(26,58,42,0.12)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                  <span style={{ fontSize: 24 }}>🏪</span>
+                  <div style={{ fontSize: 17, fontWeight: 900, color: '#1a3a2a' }}>חנות אישית לסופר</div>
+                </div>
+
+                {storeStatus === 'none' && (
+                  <>
+                    <p style={{ fontSize: 14, color: '#555', lineHeight: 1.7, marginBottom: 16 }}>
+                      פתח חנות אישית עם קישור ייחודי שלך. לקוחות שירכשו דרך הקישור יזוכו לך ב-10% עמלה.
+                    </p>
+                    <button onClick={submitStoreRequest} disabled={submittingRequest}
+                      style={{ background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 24px', fontSize: 14, fontWeight: 800, cursor: submittingRequest ? 'not-allowed' : 'pointer', opacity: submittingRequest ? 0.7 : 1 }}>
+                      {submittingRequest ? 'שולח...' : '📩 בקש לפתוח חנות אישית'}
+                    </button>
+                  </>
+                )}
+
+                {storeStatus === 'pending' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#fef9c3', borderRadius: 10, padding: '12px 16px' }}>
+                    <span style={{ fontSize: 20 }}>⏳</span>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#92400e' }}>הבקשה שלך בבדיקה</div>
+                      <div style={{ fontSize: 12, color: '#78350f', marginTop: 2 }}>נחזור אליך בהקדם עם תשובה</div>
+                    </div>
+                  </div>
+                )}
+
+                {storeStatus === 'rejected' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#fde8e8', borderRadius: 10, padding: '12px 16px' }}>
+                    <span style={{ fontSize: 20 }}>❌</span>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#c0392b' }}>הבקשה לא אושרה</div>
+                      <div style={{ fontSize: 12, color: '#922b21', marginTop: 2 }}>ניתן לפנות אלינו לפרטים נוספים</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -137,7 +137,9 @@
       "WebFetch(domain:medium.com)",
       "WebFetch(domain:clarity.microsoft.com)",
       "WebFetch(domain:www.npmjs.com)",
-      "WebFetch(domain:www.willfox.dev)"
+      "WebFetch(domain:www.willfox.dev)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\\\\app\\\\soferim\" -Recurse)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

@@ -174,7 +174,16 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads';
+
+interface RabbiRequest {
+  id: string;
+  soferUid: string;
+  soferName: string;
+  soferEmail: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt?: { seconds: number };
+}
 
 interface Lead {
   id: string;
@@ -1203,6 +1212,8 @@ export default function AdminPage() {
   const [importStatus, setImportStatus] = useState('');
   const [shluchimApps, setShluchimApps] = useState<ShluchimApplication[]>([]);
   const [shluchimAppsLoading, setShluchimAppsLoading] = useState(true);
+  const [rabbiRequests, setRabbiRequests] = useState<RabbiRequest[]>([]);
+  const [rabbiRequestsLoading, setRabbiRequestsLoading] = useState(true);
   const [showAddShliach, setShowAddShliach] = useState(false);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [testimonialsLoading, setTestimonialsLoading] = useState(true);
@@ -1229,7 +1240,7 @@ export default function AdminPage() {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
       loadReviews(); loadShluchimApplications(); loadTestimonials(); loadEditRequests();
-      loadAbandonedCarts(); loadCustomers(); loadLeads();
+      loadAbandonedCarts(); loadCustomers(); loadLeads(); loadRabbiRequests();
     }
   }, [user]);
 
@@ -1304,6 +1315,53 @@ export default function AdminPage() {
       setShluchimApps(data);
     } catch (e) { console.error(e); }
     finally { setShluchimAppsLoading(false); }
+  }
+
+  async function loadRabbiRequests() {
+    try {
+      const snap = await getDocs(query(collection(db, 'rabbi_requests'), orderBy('createdAt', 'desc')));
+      const data: RabbiRequest[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as RabbiRequest));
+      setRabbiRequests(data);
+    } catch (e) { console.error(e); }
+    finally { setRabbiRequestsLoading(false); }
+  }
+
+  async function approveRabbiRequest(req: RabbiRequest) {
+    setActionLoading(req.id);
+    try {
+      const refCode = req.soferUid.slice(0, 8);
+      // Create shluchim doc with document ID = soferUid for ShaliachContext compatibility
+      await setDoc(doc(db, 'shluchim', req.soferUid), {
+        name: req.soferName,
+        email: req.soferEmail,
+        uid: req.soferUid,
+        refCode,
+        commissionPercent: 10,
+        status: 'active',
+        isRabbi: false,
+        isPersonalStore: true,
+        bannerImage: '',
+        createdAt: serverTimestamp(),
+      });
+      // Add shaliachId to user doc without changing role
+      const usersSnap = await getDocs(query(collection(db, 'users'), where('uid', '==', req.soferUid)));
+      if (!usersSnap.empty) {
+        await updateDoc(doc(db, 'users', usersSnap.docs[0].id), { shaliachId: req.soferUid });
+      }
+      await updateDoc(doc(db, 'rabbi_requests', req.id), { status: 'approved', approvedAt: serverTimestamp() });
+      setRabbiRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'approved' } : r));
+    } catch (e) { console.error(e); }
+    finally { setActionLoading(null); }
+  }
+
+  async function rejectRabbiRequest(id: string) {
+    setActionLoading(id);
+    try {
+      await updateDoc(doc(db, 'rabbi_requests', id), { status: 'rejected', rejectedAt: serverTimestamp() });
+      setRabbiRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r));
+    } catch (e) { console.error(e); }
+    finally { setActionLoading(null); }
   }
 
   async function approveShluchimApplication(app: ShluchimApplication) {
@@ -1834,6 +1892,7 @@ export default function AdminPage() {
   const shaliachOrders = orders.filter(o => o.shaliachName);
   const pendingApps = applications.filter(a => a.status === 'pending');
   const pendingShluchimApps = shluchimApps.filter(a => a.status === 'pending');
+  const pendingRabbiRequests = rabbiRequests.filter(r => r.status === 'pending');
   const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
   const visibleProducts = products.filter(p => p.hidden !== true);
   const hiddenProducts  = products.filter(p => p.hidden === true);
@@ -1867,6 +1926,7 @@ export default function AdminPage() {
           { key: 'soferim_list',   label: '✍️ סופרים',           color: 'bg-amber-700' },
           { key: 'soferim',        label: '📋 בקשות סופרים',     color: 'bg-amber-600',  badge: pendingApps.length },
           { key: 'shluchim',       label: '🟦 בקשות שלוחים',     color: 'bg-blue-700',   badge: pendingShluchimApps.length },
+          { key: 'rabbi_requests', label: '🏪 חנויות סופרים',    color: 'bg-green-800',  badge: pendingRabbiRequests.length },
           { key: 'users',          label: '👥 משתמשים',          color: 'bg-purple-600' },
           { key: 'content',        label: '✏️ תוכן',             color: 'bg-pink-600' },
           { key: 'categories',     label: '🖼️ קטגוריות',        color: 'bg-indigo-600' },
@@ -2334,6 +2394,59 @@ export default function AdminPage() {
                         <button onClick={() => rejectShluchimApplication(app.id)} disabled={actionLoading === app.id} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 disabled:opacity-50">❌ דחה</button>
                       </div>
                     )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'rabbi_requests' && (
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-black">🏪 בקשות חנות אישית לסופרים ({rabbiRequests.length})</h2>
+          </div>
+          {rabbiRequestsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
+          : rabbiRequests.length === 0 ? <div className="p-10 text-center text-gray-400">אין בקשות עדיין</div>
+          : (
+            <div className="grid gap-4">
+              {rabbiRequests.map(req => (
+                <div key={req.id} className="bg-white rounded-xl shadow p-5">
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div>
+                      <div className="text-lg font-black mb-1">{req.soferName || '—'}</div>
+                      <div className="text-sm text-gray-500">{req.soferEmail}</div>
+                      {req.createdAt && (
+                        <div className="text-xs text-gray-400 mt-1">
+                          {new Date(req.createdAt.seconds * 1000).toLocaleDateString('he-IL')}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {req.status === 'pending' ? (
+                        <>
+                          <button
+                            onClick={() => approveRabbiRequest(req)}
+                            disabled={actionLoading === req.id}
+                            className="bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm"
+                            style={{ opacity: actionLoading === req.id ? 0.6 : 1, cursor: actionLoading === req.id ? 'not-allowed' : 'pointer' }}>
+                            {actionLoading === req.id ? '...' : '✅ אשר'}
+                          </button>
+                          <button
+                            onClick={() => rejectRabbiRequest(req.id)}
+                            disabled={actionLoading === req.id}
+                            className="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-bold text-sm"
+                            style={{ cursor: actionLoading === req.id ? 'not-allowed' : 'pointer' }}>
+                            ❌ דחה
+                          </button>
+                        </>
+                      ) : (
+                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${req.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'}`}>
+                          {req.status === 'approved' ? '✅ אושר' : '❌ נדחה'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
