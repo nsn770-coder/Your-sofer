@@ -596,6 +596,7 @@ export default function SoferDashboard() {
                           <option value="מורשה">עוסק מורשה</option>
                           <option value="עמותה">עמותה</option>
                           <option value="שכיר">שכיר</option>
+                          <option value="שובר_זיכוי">אין לי עוסק — מעוניין בשובר זיכוי לרכישה באתר / באושר עד</option>
                         </select>
                       </div>
                       <div>
