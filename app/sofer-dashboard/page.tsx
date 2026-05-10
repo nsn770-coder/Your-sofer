@@ -40,6 +40,7 @@ interface StoreDoc {
   bannerImage: string;
   commissionPercent: number;
   name: string;
+  logoUrl: string;
 }
 
 export default function SoferDashboard() {
@@ -54,6 +55,7 @@ export default function SoferDashboard() {
   const [storeDoc, setStoreDoc] = useState<StoreDoc | null>(null);
   const [topTab, setTopTab] = useState<'sofer' | 'store'>('sofer');
   const [bannerUploading, setBannerUploading] = useState(false);
+  const [storeLogoUploading, setStoreLogoUploading] = useState(false);
   const [storeOrdersCount, setStoreOrdersCount] = useState(0);
   const [submittingRequest, setSubmittingRequest] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -126,6 +128,7 @@ export default function SoferDashboard() {
           bannerImage: d.bannerImage || '',
           commissionPercent: d.commissionPercent ?? 10,
           name: d.name,
+          logoUrl: d.logoUrl || '',
         });
         // Set approved BEFORE the orders query so a permission error there
         // cannot overwrite this state via the outer catch block.
@@ -215,6 +218,23 @@ export default function SoferDashboard() {
     }
   }
 
+  async function uploadStoreLogo(file: File) {
+    if (!user?.uid) return;
+    setStoreLogoUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'yoursofer_upload');
+      const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      const url = data.secure_url as string;
+      await updateDoc(doc(db, 'shluchim', user.uid), { logoUrl: url });
+      setStoreDoc(prev => prev ? { ...prev, logoUrl: url } : prev);
+    } finally {
+      setStoreLogoUploading(false);
+    }
+  }
+
   function copyStoreLink() {
     navigator.clipboard.writeText(storeUrl);
     setCopied(true);
@@ -301,20 +321,37 @@ export default function SoferDashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
             {/* Store link — prominent hero card */}
-            <div style={{ background: 'linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 100%)', borderRadius: 16, padding: '28px 24px', boxShadow: '0 4px 20px rgba(26,58,42,0.25)' }}>
-              <div style={{ fontSize: 13, color: '#a8c8b4', fontWeight: 700, marginBottom: 6, letterSpacing: 1 }}>🔗 הקישור האישי שלך</div>
-              <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 10, padding: '12px 16px', fontSize: 14, color: '#fff', wordBreak: 'break-all', direction: 'ltr', textAlign: 'left', marginBottom: 16, letterSpacing: 0.3 }}>
-                {storeUrl}
+            <div style={{ background: 'linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 100%)', borderRadius: 16, padding: '28px 24px', boxShadow: '0 4px 20px rgba(26,58,42,0.25)', position: 'relative' }}>
+
+              {/* Logo — top-right corner */}
+              <div style={{ position: 'absolute', top: 20, left: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                <div style={{ width: 72, height: 72, borderRadius: '50%', overflow: 'hidden', background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {storeDoc?.logoUrl
+                    ? <img src={storeDoc.logoUrl} alt="לוגו" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <span style={{ fontSize: 28 }}>🏪</span>}
+                </div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.75)', cursor: storeLogoUploading ? 'not-allowed' : 'pointer', background: 'rgba(255,255,255,0.12)', borderRadius: 6, padding: '3px 8px', whiteSpace: 'nowrap' }}>
+                  {storeLogoUploading ? '⏳...' : '📷 העלה לוגו'}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} disabled={storeLogoUploading}
+                    onChange={e => { const f = e.target.files?.[0]; if (f) uploadStoreLogo(f); e.target.value = ''; }} />
+                </label>
               </div>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <button onClick={copyStoreLink}
-                  style={{ flex: 1, minWidth: 140, background: copied ? '#27ae60' : '#fff', color: copied ? '#fff' : '#1a3a2a', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'background 0.2s' }}>
-                  {copied ? '✅ הועתק!' : '📋 העתק קישור'}
-                </button>
-                <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('הקישור האישי שלי לחנות: ' + storeUrl)}`, '_blank')}
-                  style={{ flex: 1, minWidth: 140, background: '#25D366', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
-                  💬 שתף בוואטסאפ
-                </button>
+
+              <div style={{ paddingLeft: 92 }}>
+                <div style={{ fontSize: 13, color: '#a8c8b4', fontWeight: 700, marginBottom: 6, letterSpacing: 1 }}>🔗 הקישור האישי שלך</div>
+                <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 10, padding: '12px 16px', fontSize: 14, color: '#fff', wordBreak: 'break-all', direction: 'ltr', textAlign: 'left', marginBottom: 16, letterSpacing: 0.3 }}>
+                  {storeUrl}
+                </div>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <button onClick={copyStoreLink}
+                    style={{ flex: 1, minWidth: 140, background: copied ? '#27ae60' : '#fff', color: copied ? '#fff' : '#1a3a2a', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'background 0.2s' }}>
+                    {copied ? '✅ הועתק!' : '📋 העתק קישור'}
+                  </button>
+                  <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('הקישור האישי שלי לחנות: ' + storeUrl)}`, '_blank')}
+                    style={{ flex: 1, minWidth: 140, background: '#25D366', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+                    💬 שתף בוואטסאפ
+                  </button>
+                </div>
               </div>
             </div>
 
