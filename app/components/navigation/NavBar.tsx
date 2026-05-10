@@ -357,8 +357,8 @@ function NavBarContent() {
         <div style={{ background: "linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)", borderBottom: "3px solid #b8972a", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {shaliach.logoUrl
-              ? <img src={shaliach.logoUrl} alt="" style={{ width: isMobile ? 40 : 52, height: isMobile ? 40 : 52, borderRadius: 0, objectFit: "cover", border: "2px solid #b8972a" }} />
-              : <div style={{ width: 48, height: 48, borderRadius: 0, background: "#b8972a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>✡</div>
+              ? <img src={shaliach.logoUrl} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "2px solid #b8972a", flexShrink: 0 }} />
+              : <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#b8972a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>✡</div>
             }
             <div>
               <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: "#fff" }}>
