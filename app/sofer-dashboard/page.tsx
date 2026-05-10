@@ -228,8 +228,10 @@ export default function SoferDashboard() {
       const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
       const data = await res.json();
       const url = data.secure_url as string;
-      await updateDoc(doc(db, 'shluchim', user.uid), { logoUrl: url });
+      if (!url) return;
+      // Update UI immediately, then persist to Firestore
       setStoreDoc(prev => prev ? { ...prev, logoUrl: url } : prev);
+      await updateDoc(doc(db, 'shluchim', user.uid), { logoUrl: url });
     } finally {
       setStoreLogoUploading(false);
     }
@@ -367,24 +369,6 @@ export default function SoferDashboard() {
               </div>
             </div>
 
-            {/* Banner upload */}
-            <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#1a3a2a', marginBottom: 12 }}>🖼️ תמונת כותרת לחנות</div>
-              {storeDoc?.bannerImage ? (
-                <img src={storeDoc.bannerImage} alt="באנר"
-                  style={{ width: '100%', borderRadius: 10, maxHeight: 200, objectFit: 'cover', marginBottom: 12 }} />
-              ) : (
-                <div style={{ background: '#f3f4f4', borderRadius: 10, height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, color: '#aaa', fontSize: 14 }}>
-                  אין תמונת כותרת עדיין
-                </div>
-              )}
-              <label style={{ display: 'inline-block', background: '#1a3a2a', color: '#fff', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 800, cursor: bannerUploading ? 'not-allowed' : 'pointer', opacity: bannerUploading ? 0.7 : 1 }}>
-                {bannerUploading ? '⏳ מעלה...' : '📤 העלה תמונה'}
-                <input type="file" accept="image/*" style={{ display: 'none' }} disabled={bannerUploading}
-                  onChange={e => { const f = e.target.files?.[0]; if (f) uploadBanner(f); e.target.value = ''; }} />
-              </label>
-              <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>מומלץ: 1200×400 פיקסלים</div>
-            </div>
           </div>
         )}
 
