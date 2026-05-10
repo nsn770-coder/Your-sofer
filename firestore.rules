@@ -107,7 +107,10 @@ service cloud.firestore {
                     || resource.data.guestId is string
                     || (isShaliach()
                         && resource.data.shaliachId ==
-                           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shaliachId);
+                           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shaliachId)
+                    || (isSignedIn()
+                        && resource.data.shaliachId == request.auth.uid
+                        && exists(/databases/$(database)/documents/shluchim/$(request.auth.uid)));
       allow update: if isAdmin()
                     || resource.data.guestId is string;
       allow delete: if isAdmin();

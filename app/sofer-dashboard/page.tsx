@@ -127,9 +127,15 @@ export default function SoferDashboard() {
           commissionPercent: d.commissionPercent ?? 10,
           name: d.name,
         });
+        // Set approved BEFORE the orders query so a permission error there
+        // cannot overwrite this state via the outer catch block.
         setStoreStatus('approved');
-        const ordSnap = await getDocs(query(collection(db, 'orders'), where('shaliachId', '==', user.uid)));
-        setStoreOrdersCount(ordSnap.size);
+        try {
+          const ordSnap = await getDocs(query(collection(db, 'orders'), where('shaliachId', '==', user.uid)));
+          setStoreOrdersCount(ordSnap.size);
+        } catch {
+          // Orders count is non-critical; storeStatus already set to 'approved'
+        }
         return;
       }
       const reqSnap = await getDocs(query(collection(db, 'rabbi_requests'), where('soferUid', '==', user.uid)));
