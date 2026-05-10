@@ -181,6 +181,15 @@ interface RabbiRequest {
   soferUid: string;
   soferName: string;
   soferEmail: string;
+  businessName?: string;
+  city?: string;
+  businessType?: string;
+  businessId?: string;
+  bankName?: string;
+  bankBranch?: string;
+  bankAccount?: string;
+  accountHolder?: string;
+  logoUrl?: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt?: { seconds: number };
 }
@@ -2411,17 +2420,23 @@ export default function AdminPage() {
             <div className="grid gap-4">
               {rabbiRequests.map(req => (
                 <div key={req.id} className="bg-white rounded-xl shadow p-5">
-                  <div className="flex items-center justify-between gap-4 flex-wrap">
-                    <div>
-                      <div className="text-lg font-black mb-1">{req.soferName || '—'}</div>
-                      <div className="text-sm text-gray-500">{req.soferEmail}</div>
-                      {req.createdAt && (
-                        <div className="text-xs text-gray-400 mt-1">
-                          {new Date(req.createdAt.seconds * 1000).toLocaleDateString('he-IL')}
-                        </div>
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="flex gap-3 items-start">
+                      {req.logoUrl && (
+                        <img src={req.logoUrl} alt="לוגו" className="w-14 h-14 rounded-lg object-cover border border-gray-100 flex-shrink-0" />
                       )}
+                      <div>
+                        <div className="text-lg font-black mb-0.5">{req.businessName || req.soferName || '—'}</div>
+                        <div className="text-sm font-semibold text-gray-600">{req.soferName} · {req.city}</div>
+                        <div className="text-xs text-gray-400">{req.soferEmail}</div>
+                        {req.createdAt && (
+                          <div className="text-xs text-gray-400 mt-1">
+                            {new Date(req.createdAt.seconds * 1000).toLocaleDateString('he-IL')}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-shrink-0">
                       {req.status === 'pending' ? (
                         <>
                           <button
@@ -2444,6 +2459,27 @@ export default function AdminPage() {
                           {req.status === 'approved' ? '✅ אושר' : '❌ נדחה'}
                         </span>
                       )}
+                    </div>
+                  </div>
+                  {/* Business + bank details */}
+                  <div className="mt-4 grid grid-cols-2 gap-3 text-sm border-t pt-4">
+                    <div>
+                      <span className="text-gray-400 text-xs block">סוג עוסק</span>
+                      <span className="font-semibold">{req.businessType || '—'}</span>
+                      {req.businessId && <span className="text-gray-500 text-xs mr-2">({req.businessId})</span>}
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-xs block">בנק</span>
+                      <span className="font-semibold">{req.bankName || '—'}</span>
+                      {req.bankBranch && <span className="text-gray-500 text-xs mr-1">סניף {req.bankBranch}</span>}
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-xs block">מספר חשבון</span>
+                      <span className="font-semibold font-mono">{req.bankAccount || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-xs block">שם בעל החשבון</span>
+                      <span className="font-semibold">{req.accountHolder || '—'}</span>
                     </div>
                   </div>
                 </div>

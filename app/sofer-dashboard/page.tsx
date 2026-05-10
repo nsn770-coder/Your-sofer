@@ -57,6 +57,19 @@ export default function SoferDashboard() {
   const [storeOrdersCount, setStoreOrdersCount] = useState(0);
   const [submittingRequest, setSubmittingRequest] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showStoreForm, setShowStoreForm] = useState(false);
+  const [logoUrl, setLogoUrl] = useState('');
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [storeForm, setStoreForm] = useState({
+    businessName: '',
+    city: '',
+    businessType: 'פטור',
+    businessId: '',
+    bankName: '',
+    bankBranch: '',
+    bankAccount: '',
+    accountHolder: '',
+  });
 
   useEffect(() => {
     if (!loading && !user) router.push('/');
@@ -133,20 +146,49 @@ export default function SoferDashboard() {
 
   async function submitStoreRequest() {
     if (!user?.uid) return;
+    const { businessName, city, businessType, businessId, bankName, bankBranch, bankAccount, accountHolder } = storeForm;
+    if (!businessName || !city || !bankName || !bankBranch || !bankAccount || !accountHolder) {
+      alert('נא למלא את כל שדות החובה');
+      return;
+    }
     setSubmittingRequest(true);
     try {
       await addDoc(collection(db, 'rabbi_requests'), {
         soferUid: user.uid,
         soferName: user.displayName || '',
         soferEmail: user.email || '',
+        businessName,
+        city,
+        businessType,
+        businessId,
+        bankName,
+        bankBranch,
+        bankAccount,
+        accountHolder,
+        logoUrl,
         status: 'pending',
         createdAt: serverTimestamp(),
       });
       setStoreStatus('pending');
+      setShowStoreForm(false);
     } catch {
-      // Firestore error — rules may not yet be deployed; show pending state anyway
+      alert('שגיאה בשליחת הבקשה, נסה שוב');
     } finally {
       setSubmittingRequest(false);
+    }
+  }
+
+  async function uploadLogo(file: File) {
+    setLogoUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'yoursofer_upload');
+      const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      setLogoUrl(data.secure_url as string);
+    } finally {
+      setLogoUploading(false);
     }
   }
 
@@ -168,8 +210,7 @@ export default function SoferDashboard() {
   }
 
   function copyStoreLink() {
-    if (!storeDoc) return;
-    navigator.clipboard.writeText(`https://your-sofer.com/sofer-store/${storeDoc.refCode}`);
+    navigator.clipboard.writeText(storeUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -201,7 +242,7 @@ export default function SoferDashboard() {
   const totalSold = orderItems.reduce((sum, i) => sum + (i.quantity || 0), 0);
   const totalRevenue = orderItems.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0);
   const activeProducts = products.filter(p => p.status === 'active').length;
-  const storeUrl = storeDoc ? `https://your-sofer.com/sofer-store/${storeDoc.refCode}` : '';
+  const storeUrl = user?.uid ? `https://your-sofer.com/?ref=${user.uid}` : '';
 
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
@@ -255,7 +296,7 @@ export default function SoferDashboard() {
 
             {/* Store link */}
             <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#1a3a2a', marginBottom: 12 }}>🔗 קישור החנות שלך</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#1a3a2a', marginBottom: 12 }}>🔗 הקישור האישי שלך</div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ background: '#f3f4f4', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#333', flex: 1, wordBreak: 'break-all', direction: 'ltr', textAlign: 'left' }}>
                   {storeUrl}
@@ -494,16 +535,125 @@ export default function SoferDashboard() {
                   <div style={{ fontSize: 17, fontWeight: 900, color: '#1a3a2a' }}>חנות אישית לסופר</div>
                 </div>
 
-                {storeStatus === 'none' && (
+                {storeStatus === 'none' && !showStoreForm && (
                   <>
                     <p style={{ fontSize: 14, color: '#555', lineHeight: 1.7, marginBottom: 16 }}>
                       פתח חנות אישית עם קישור ייחודי שלך. לקוחות שירכשו דרך הקישור יזוכו לך ב-10% עמלה.
                     </p>
-                    <button onClick={submitStoreRequest} disabled={submittingRequest}
-                      style={{ background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 24px', fontSize: 14, fontWeight: 800, cursor: submittingRequest ? 'not-allowed' : 'pointer', opacity: submittingRequest ? 0.7 : 1 }}>
-                      {submittingRequest ? 'שולח...' : '📩 בקש לפתוח חנות אישית'}
+                    <button onClick={() => setShowStoreForm(true)}
+                      style={{ background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 24px', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+                      📩 בקש לפתוח חנות אישית
                     </button>
                   </>
+                )}
+
+                {storeStatus === 'none' && showStoreForm && (
+                  <form onSubmit={e => { e.preventDefault(); submitStoreRequest(); }} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+                    <div>
+                      <label style={{ fontSize: 13, fontWeight: 700, color: '#333', display: 'block', marginBottom: 4 }}>שם העסק / עמותה / קהילה *</label>
+                      <input value={storeForm.businessName}
+                        onChange={e => setStoreForm(p => ({ ...p, businessName: e.target.value }))}
+                        placeholder='לדוג׳: קהילת אנשי מעמד ת"א'
+                        required
+                        style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 8, padding: '9px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 13, fontWeight: 700, color: '#333', display: 'block', marginBottom: 4 }}>עיר *</label>
+                      <input value={storeForm.city}
+                        onChange={e => setStoreForm(p => ({ ...p, city: e.target.value }))}
+                        placeholder='ת"א, ירושלים...'
+                        required
+                        style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 8, padding: '9px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 13, fontWeight: 700, color: '#333', display: 'block', marginBottom: 4 }}>לוגו (אופציונלי)</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        {logoUrl && <img src={logoUrl} alt="לוגו" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', border: '1px solid #eee' }} />}
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f0f0f0', borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: logoUploading ? 'not-allowed' : 'pointer', color: '#333' }}>
+                          {logoUploading ? '⏳ מעלה...' : '📤 העלה לוגו'}
+                          <input type="file" accept="image/*" style={{ display: 'none' }} disabled={logoUploading}
+                            onChange={e => { const f = e.target.files?.[0]; if (f) uploadLogo(f); e.target.value = ''; }} />
+                        </label>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 13, fontWeight: 700, color: '#333', display: 'block', marginBottom: 4 }}>סוג עוסק *</label>
+                        <select value={storeForm.businessType}
+                          onChange={e => setStoreForm(p => ({ ...p, businessType: e.target.value }))}
+                          style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 8, padding: '9px 12px', fontSize: 14, boxSizing: 'border-box', background: '#fff' }}>
+                          <option value="פטור">עוסק פטור</option>
+                          <option value="מורשה">עוסק מורשה</option>
+                          <option value="עמותה">עמותה</option>
+                          <option value="שכיר">שכיר</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 13, fontWeight: 700, color: '#333', display: 'block', marginBottom: 4 }}>
+                          {storeForm.businessType === 'עמותה' ? 'מספר עמותה (ח.פ)' : 'מספר עוסק'} (אופציונלי)
+                        </label>
+                        <input value={storeForm.businessId}
+                          onChange={e => setStoreForm(p => ({ ...p, businessId: e.target.value }))}
+                          placeholder="123456789"
+                          style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 8, padding: '9px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#f8f9fa', borderRadius: 10, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: '#1a3a2a' }}>🏦 פרטי חשבון בנק</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 3 }}>שם הבנק *</label>
+                          <input value={storeForm.bankName}
+                            onChange={e => setStoreForm(p => ({ ...p, bankName: e.target.value }))}
+                            placeholder="בנק הפועלים"
+                            required
+                            style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 3 }}>סניף *</label>
+                          <input value={storeForm.bankBranch}
+                            onChange={e => setStoreForm(p => ({ ...p, bankBranch: e.target.value }))}
+                            placeholder="123"
+                            required
+                            style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
+                        </div>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 3 }}>מספר חשבון *</label>
+                          <input value={storeForm.bankAccount}
+                            onChange={e => setStoreForm(p => ({ ...p, bankAccount: e.target.value }))}
+                            placeholder="123456"
+                            required
+                            style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 3 }}>שם בעל החשבון *</label>
+                          <input value={storeForm.accountHolder}
+                            onChange={e => setStoreForm(p => ({ ...p, accountHolder: e.target.value }))}
+                            placeholder="ישראל ישראלי"
+                            required
+                            style={{ width: '100%', border: '1.5px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' }} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button type="submit" disabled={submittingRequest}
+                        style={{ flex: 1, background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 24px', fontSize: 14, fontWeight: 800, cursor: submittingRequest ? 'not-allowed' : 'pointer', opacity: submittingRequest ? 0.7 : 1 }}>
+                        {submittingRequest ? '⏳ שולח...' : '📩 שלח בקשה'}
+                      </button>
+                      <button type="button" onClick={() => setShowStoreForm(false)}
+                        style={{ background: '#f0f0f0', color: '#555', border: 'none', borderRadius: 10, padding: '11px 20px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                        ביטול
+                      </button>
+                    </div>
+                  </form>
                 )}
 
                 {storeStatus === 'pending' && (
