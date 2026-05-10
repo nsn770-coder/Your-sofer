@@ -1344,11 +1344,9 @@ export default function AdminPage() {
         bannerImage: '',
         createdAt: serverTimestamp(),
       });
-      // Add shaliachId to user doc without changing role
-      const usersSnap = await getDocs(query(collection(db, 'users'), where('uid', '==', req.soferUid)));
-      if (!usersSnap.empty) {
-        await updateDoc(doc(db, 'users', usersSnap.docs[0].id), { shaliachId: req.soferUid });
-      }
+      // Add shaliachId to user doc without changing role.
+      // User document ID = uid (set by AuthContext via setDoc(doc(db,'users',uid), ...))
+      await updateDoc(doc(db, 'users', req.soferUid), { shaliachId: req.soferUid });
       await updateDoc(doc(db, 'rabbi_requests', req.id), { status: 'approved', approvedAt: serverTimestamp() });
       setRabbiRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'approved' } : r));
     } catch (e) { console.error(e); }

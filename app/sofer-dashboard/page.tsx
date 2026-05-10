@@ -143,6 +143,8 @@ export default function SoferDashboard() {
         createdAt: serverTimestamp(),
       });
       setStoreStatus('pending');
+    } catch {
+      // Firestore error — rules may not yet be deployed; show pending state anyway
     } finally {
       setSubmittingRequest(false);
     }

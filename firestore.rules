@@ -9,11 +9,17 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Check that the caller has role "admin" in their users document
+    // Check admin status via the admins collection (primary) or users.role (fallback).
+    // AuthContext uses admins/{uid} as the source of truth; Firestore rules must match.
     function isAdmin() {
       return isSignedIn()
-        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        && (
+          exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+          || (
+            exists(/databases/$(database)/documents/users/$(request.auth.uid))
+            && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+          )
+        );
     }
 
     // Check that the caller has role "shaliach" in their users document
@@ -67,6 +73,13 @@ service cloud.firestore {
       allow write: if isAdmin();         // only admins can pin products
     }
 
+    // ── Settings (popup toggles, site config) ───────────────────────────────
+
+    match /settings/{id} {
+      allow read: if true;               // popups and config read publicly
+      allow write: if isAdmin();
+    }
+
     // ── User accounts ───────────────────────────────────────────────────────
 
     match /users/{userId} {
@@ -100,6 +113,17 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // ── Order line items (sofer dashboard reads by soferId) ─────────────────
+
+    match /orderItems/{id} {
+      allow read: if isAdmin()
+                  || (isSignedIn()
+                      && resource.data.soferId != null
+                      && resource.data.soferId ==
+                         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.soferId);
+      allow write: if isAdmin();
+    }
+
     // ── Abandoned carts (anyone can write, admin reads/deletes) ──────────────
 
     match /abandoned_carts/{sessionId} {
@@ -118,7 +142,6 @@ service cloud.firestore {
 
     match /sofer_edit_requests/{requestId} {
       // סופר יכול ליצור בקשה עבור עצמו בלבד
-      // soferId בבקשה חייב להיות ה-uid של המשתמש המחובר
       allow create: if request.auth != null
                     && request.resource.data.soferId == request.auth.uid;
 
@@ -142,6 +165,19 @@ service cloud.firestore {
     match /shluchim_applications/{id} {
       allow create: if true;             // public application form
       allow read, update, delete: if isAdmin();
+    }
+
+    // ── Personal store requests (sofer → admin approval flow) ───────────────
+
+    match /rabbi_requests/{id} {
+      // Any signed-in sofer can submit a request for themselves
+      allow create: if isSignedIn()
+                    && request.resource.data.soferUid == request.auth.uid;
+      // Sofer can read their own requests; admin reads all
+      allow read: if isSignedIn()
+                  && (resource.data.soferUid == request.auth.uid || isAdmin());
+      // Only admin can approve/reject
+      allow update, delete: if isAdmin();
     }
 
     // ── Newsletter subscriptions ─────────────────────────────────────────────
