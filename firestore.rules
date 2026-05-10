@@ -48,6 +48,10 @@ service cloud.firestore {
     match /shluchim/{id} {
       allow read: if true;
       allow write: if isAdmin();
+      // Shluchim document owner can update only their own logoUrl
+      allow update: if isSignedIn()
+                    && request.auth.uid == id
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['logoUrl']);
     }
 
     match /categories/{id} {
