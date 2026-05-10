@@ -300,20 +300,20 @@ export default function SoferDashboard() {
         {storeStatus === 'approved' && topTab === 'store' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-            {/* Store link */}
-            <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#1a3a2a', marginBottom: 12 }}>🔗 הקישור האישי שלך</div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ background: '#f3f4f4', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#333', flex: 1, wordBreak: 'break-all', direction: 'ltr', textAlign: 'left' }}>
-                  {storeUrl}
-                </div>
+            {/* Store link — prominent hero card */}
+            <div style={{ background: 'linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 100%)', borderRadius: 16, padding: '28px 24px', boxShadow: '0 4px 20px rgba(26,58,42,0.25)' }}>
+              <div style={{ fontSize: 13, color: '#a8c8b4', fontWeight: 700, marginBottom: 6, letterSpacing: 1 }}>🔗 הקישור האישי שלך</div>
+              <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 10, padding: '12px 16px', fontSize: 14, color: '#fff', wordBreak: 'break-all', direction: 'ltr', textAlign: 'left', marginBottom: 16, letterSpacing: 0.3 }}>
+                {storeUrl}
+              </div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 <button onClick={copyStoreLink}
-                  style={{ background: copied ? '#1a3a2a' : '#e8f4ec', color: copied ? '#fff' : '#1a3a2a', border: 'none', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  {copied ? '✅ הועתק' : '📋 העתק'}
+                  style={{ flex: 1, minWidth: 140, background: copied ? '#27ae60' : '#fff', color: copied ? '#fff' : '#1a3a2a', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'background 0.2s' }}>
+                  {copied ? '✅ הועתק!' : '📋 העתק קישור'}
                 </button>
-                <button onClick={() => window.open(storeUrl, '_blank')}
-                  style={{ background: '#e8f4ec', color: '#1a3a2a', border: 'none', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  🔗 פתח
+                <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('הקישור האישי שלי לחנות: ' + storeUrl)}`, '_blank')}
+                  style={{ flex: 1, minWidth: 140, background: '#25D366', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+                  💬 שתף בוואטסאפ
                 </button>
               </div>
             </div>
