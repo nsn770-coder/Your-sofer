@@ -1,0 +1,20 @@
+import { writeFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0c1a35"/>
+  <rect x="0" y="0" width="1200" height="4" fill="#b8972a" opacity="0.6"/>
+  <rect x="0" y="626" width="1200" height="4" fill="#b8972a" opacity="0.6"/>
+  <text x="600" y="240" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-2">Your</text>
+  <text x="600" y="350" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="900" fill="#b8972a" text-anchor="middle" letter-spacing="-2">Sofer</text>
+  <rect x="480" y="375" width="240" height="3" fill="#b8972a" opacity="0.7"/>
+  <text x="600" y="440" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="600" fill="rgba(255,255,255,0.7)" text-anchor="middle">&#x05D7;&#x05E0;&#x05D5;&#x05EA; &#x05E1;&#x05EA;&#x05F4;&#x05DE; &#x05D5;&#x05D9;&#x05D5;&#x05D3;&#x05D0;&#x05D9;&#x05E7;&#x05D4; &#x05DE;&#x05D0;&#x05D5;&#x05DE;&#x05EA;&#x05EA;</text>
+  <text x="600" y="490" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="rgba(255,255,255,0.35)" text-anchor="middle" letter-spacing="4">your-sofer.com</text>
+</svg>`;
+
+const outPath = join(__dirname, '../../public/og-default.png');
+writeFileSync(outPath, svg, 'utf8');
+console.log('✓ og-default.png (SVG) created at', outPath);

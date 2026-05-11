@@ -139,7 +139,18 @@
       "WebFetch(domain:www.npmjs.com)",
       "WebFetch(domain:www.willfox.dev)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\\\\app\\\\soferim\" -Recurse)",
-      "Bash(Select-Object FullName)"
+      "Bash(Select-Object FullName)",
+      "Bash(kill -9 17176)",
+      "Bash(kill -9 1205)",
+      "Bash(kill -9 13608)",
+      "Bash(xargs sed *)",
+      "Bash(git reset *)",
+      "Bash(New-Item -ItemType Directory -Path \"app\\\\collections\" -Force)",
+      "Bash(Out-Null)",
+      "Bash(git rm *)",
+      "Bash(node app/scripts/aiMediaPipeline.mjs --provider=gemini --cat=כיפות)",
+      "Bash(echo \"Pipeline PID: $!\")",
+      "Bash(python -m json.tool)"
     ]
   }
 }

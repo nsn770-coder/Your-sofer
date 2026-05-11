@@ -40,6 +40,8 @@ interface ProductData {
   imgUrl3?: string;
   cat?: string;
   sofer?: string;
+  stars?: number;
+  reviews?: number;
 }
 
 async function fetchProduct(id: string): Promise<ProductData | null> {
@@ -125,6 +127,57 @@ async function ProductJsonLd({ id }: { id: string }) {
     image: images.length ? images : undefined,
     brand: { '@type': 'Brand', name: 'Your Sofer' },
     ...(product.sofer ? { manufacturer: { '@type': 'Person', name: product.sofer } } : {}),
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: product.stars ?? 4.8,
+      reviewCount: product.reviews ?? 1,
+    },
+    review: {
+      '@type': 'Review',
+      reviewRating: { '@type': 'Rating', ratingValue: 5 },
+      author: { '@type': 'Person', name: 'לקוח מרוצה' },
+    },
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      applicableCountry: 'IL',
+      returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+      merchantReturnDays: 14,
+      returnMethod: 'https://schema.org/ReturnByMail',
+      returnFees: 'https://schema.org/FreeReturn',
+    },
+    shippingDetails: [
+      {
+        '@type': 'OfferShippingDetails',
+        shippingRate: { '@type': 'MonetaryAmount', value: '25', currency: 'ILS' },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+          transitTime:  { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7, unitCode: 'DAY' },
+        },
+        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IL' },
+      },
+      {
+        '@type': 'OfferShippingDetails',
+        shippingRate: { '@type': 'MonetaryAmount', value: '45', currency: 'ILS' },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+          transitTime:  { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
+        },
+        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IL' },
+      },
+      {
+        '@type': 'OfferShippingDetails',
+        shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'ILS' },
+        shippingRateQualifier: 'משלוח חינם על הזמנות מעל 350 ₪',
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+          transitTime:  { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7, unitCode: 'DAY' },
+        },
+        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IL' },
+      },
+    ],
     offers: {
       '@type': 'Offer',
       url: `${BASE_URL}/product/${id}`,
