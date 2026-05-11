@@ -8,16 +8,18 @@ const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
 // ── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'הסופרים שלנו - סופרי סת"מ מוסמכים ומאומתים',
-  description: 'הכירו את סופרי סת"מ המוסמכים של Your Sofer. כל סופר עבר בדיקה קפדנית עם פיקוח רבני, תעודת כשרות, ובדיקת מחשב. מזוזות, תפילין, מגילות וספרי תורה.',
+  title: 'סופרי סת"מ מוסמכים בישראל | YourSofer',
+  description: 'מאגר סופרי סת"מ מוסמכים מכל רחבי ישראל. מצא סופר קרוב אליך לרכישת מזוזות, תפילין, מגילות וספרי תורה.',
+  keywords: ['סופר סת"מ', 'סופרי סת"מ', 'מזוזה', 'תפילין', 'מגילה', 'ספר תורה', 'סת"מ ישראל', 'Your Sofer'],
   alternates: { canonical: `${BASE_URL}/soferim` },
   openGraph: {
     type: 'website',
     locale: 'he_IL',
     url: `${BASE_URL}/soferim`,
     siteName: 'Your Sofer',
-    title: 'הסופרים שלנו - סופרי סת"מ מוסמכים | Your Sofer',
-    description: 'הכירו את סופרי סת"מ המוסמכים של Your Sofer. כל סופר עבר בדיקה קפדנית עם פיקוח רבני ותעודת כשרות.',
+    title: 'סופרי סת"מ מוסמכים בישראל | YourSofer',
+    description: 'מאגר סופרי סת"מ מוסמכים מכל רחבי ישראל. מצא סופר קרוב אליך לרכישת מזוזות, תפילין ומגילות.',
+    images: [{ url: `${BASE_URL}/og-default.png`, width: 1200, height: 630, alt: 'סופרי סת"מ | Your Sofer' }],
   },
 };
 

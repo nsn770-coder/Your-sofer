@@ -106,20 +106,27 @@ export async function generateMetadata(
   }
 
   const name = sofer.name;
-  const cityPart = sofer.city ? ` מ${sofer.city}` : '';
-  const stylePart = sofer.style ? `, כתב ${sofer.style}` : '';
-  const catsPart = sofer.categories?.length ? ` - מתמחה ב${sofer.categories.join(', ')}` : '';
+  const cityPart = sofer.city ? ` ב${sofer.city}` : '';
+  const catsStr = sofer.categories?.length ? sofer.categories.join(', ') : '';
 
-  const title = `${name} - סופר סת"מ מוסמך${cityPart}`;
+  const title = `${name} - סופר סת"מ${cityPart} | YourSofer`;
   const description =
-    sofer.description?.slice(0, 155) ||
-    `${name}${cityPart}${stylePart}${catsPart}. סופר סת"מ מאושר ומאומת על ידי Your Sofer עם פיקוח רבני ותעודת כשרות.`;
+    `${name}, סופר סת"מ מוסמך${cityPart}.${catsStr ? ` מתמחה ב${catsStr}.` : ''} לרכישת מזוזות, תפילין ומגילות מוסמכות.`;
 
   const pageUrl = `${BASE_URL}/soferim/${id}`;
+
+  const keywords = [
+    name,
+    'סופר סת"מ',
+    ...(sofer.city ? [sofer.city, `סופר סת"מ ${sofer.city}`] : []),
+    ...(sofer.categories ?? []),
+    'מזוזה', 'תפילין', 'מגילה', 'Your Sofer',
+  ];
 
   return {
     title,
     description,
+    keywords,
     alternates: { canonical: pageUrl },
     openGraph: {
       type: 'profile',
@@ -154,7 +161,10 @@ async function SoferJsonLd({ id }: { id: string }) {
     url: pageUrl,
     jobTitle: 'סופר סת"מ',
     description: sofer.description || undefined,
-    ...(sofer.city ? { address: { '@type': 'PostalAddress', addressLocality: sofer.city, addressCountry: 'IL' } } : {}),
+    ...(sofer.city ? {
+      address: { '@type': 'PostalAddress', addressLocality: sofer.city, addressCountry: 'IL' },
+      areaServed: sofer.city,
+    } : {}),
     ...(sofer.phone ? { telephone: sofer.phone } : {}),
     ...(sofer.imageUrl ? { image: sofer.imageUrl } : {}),
     knowsAbout: sofer.categories ?? [],
