@@ -22,6 +22,7 @@ interface Props {
   hidden?: boolean;
   aboveFold?: boolean;
   hasKlafSelection?: boolean;
+  cat?: string;
 }
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
@@ -102,7 +103,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProductCard({
-  id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold, hasKlafSelection,
+  id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -329,6 +330,9 @@ export default function ProductCard({
         <p className="text-xs sm:text-sm font-semibold text-gray-800 leading-snug line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
           {name}
         </p>
+        {(cat === 'מזוזות' || cat === 'קלפי מזוזה') && (
+          <p style={{ fontSize: 11, color: '#b8972a', margin: 0, lineHeight: 1.4 }}>✍️ נכתב ע״י סופר מוסמך — אפשר לראות מי כתב</p>
+        )}
 
         <div className="flex flex-col gap-0.5">
           {hasSale && (

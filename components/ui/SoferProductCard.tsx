@@ -21,6 +21,7 @@ interface Props {
   sofer?: SoferData;
   soferName?: string;
   hasKlafSelection?: boolean;
+  cat?: string;
 }
 
 function IconCart({ size = 14 }: { size?: number }) {
@@ -49,7 +50,7 @@ function IconUser({ size = 36 }: { size?: number }) {
   );
 }
 
-export default function SoferProductCard({ id, name, price, imgUrl, badge, was, sofer, soferName, hasKlafSelection }: Props) {
+export default function SoferProductCard({ id, name, price, imgUrl, badge, was, sofer, soferName, hasKlafSelection, cat }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
 
@@ -142,6 +143,9 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
 
         <div className="p-3 flex flex-col gap-2 flex-1">
           <p className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2">{name}</p>
+          {(cat === 'מזוזות' || cat === 'קלפי מזוזה') && (
+            <p style={{ fontSize: 11, color: '#b8972a', margin: 0, lineHeight: 1.4 }}>✍️ נכתב ע״י סופר מוסמך — אפשר לראות מי כתב</p>
+          )}
 
           <div className="flex items-baseline gap-2 mt-auto">
             <span className="text-lg font-black text-[#0c1a35]">{formatPrice(price)}</span>

@@ -1569,6 +1569,7 @@ export default function CategoryClient({ category }: { category: string }) {
                       sofer={p.soferId ? soferMap[p.soferId] : undefined}
                       soferName={p.soferName ?? p.sofer}
                       hasKlafSelection={p.hasKlafSelection}
+                      cat={p.cat}
                     />
                   ))}
                 </div>
@@ -1599,6 +1600,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               createdAt={p.createdAt}
                               aboveFold={start === 0 && idx < 4}
                               hasKlafSelection={p.hasKlafSelection}
+                              cat={p.cat}
                             />
                           ))}
                         </div>
