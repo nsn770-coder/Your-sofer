@@ -267,28 +267,22 @@ const STAM_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי תפי
 const RABBINICAL_CATEGORIES = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
 
 function TrustBlock({ isStam }: { isStam: boolean }) {
-  const items = isStam
-    ? [
-        'נבדק ע״י סופר מוסמך',
-        'כשרות מלאה',
-        'בדיקה הלכתית',
-        'אפשרות להחזר כספי מלא',
-        'משלוח מאובטח',
-        'זמן אספקה ברור',
-      ]
-    : [
-        'איכות גבוהה ועיצוב מוקפד',
-        'מתנה מושלמת לשבת או לחג',
-        'חומרים איכותיים וגימור יוקרתי',
-        'אפשרות להחזר כספי מלא',
-        'משלוח מאובטח',
-        'זמן אספקה ברור',
-      ];
+  void isStam;
+  const rows = [
+    'כאן רואים בדיוק מי כתב',
+    'כל קלף מצולם ומאומת לפני מכירה',
+    'בדיקת מגיה מוסמך לכל מוצר',
+    'אפשר לדבר עם אדם אמיתי — לא בוט',
+  ];
   return (
-    <div dir="rtl" style={{ borderRight: '3px solid #27ae60', background: '#f0fdf4', borderRadius: 8, padding: '10px 12px 6px 10px', marginTop: 14 }}>
-      {items.map(item => (
-        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#1a6b3c', marginBottom: 5 }}>
-          <Icon.Check size={12} color="#27ae60" /> {item}
+    <div dir="rtl" style={{ background: '#0c1a35', borderRadius: 12, padding: '18px 20px', marginTop: 14, textAlign: 'center' }}>
+      <p style={{ fontSize: 14, fontWeight: 900, color: '#f59e0b', marginBottom: 12, lineHeight: 1.4 }}>
+        ⚠️ רוב האנשים בכלל לא יודעים מי כתב את המזוזה שלהם
+      </p>
+      {rows.map(row => (
+        <div key={row} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: '#fff', marginBottom: 8, textAlign: 'right' }}>
+          <span style={{ color: '#25D366', fontWeight: 900, flexShrink: 0 }}>✔️</span>
+          <span>{row}</span>
         </div>
       ))}
     </div>

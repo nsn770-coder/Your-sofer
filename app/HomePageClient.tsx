@@ -1059,6 +1059,28 @@ export default function HomePageClient() {
       {/* ── Rabbinical Supervision ── */}
       <RabbinicalSupervision isMobile={isMobile} />
 
+      {/* ── Why Your Sofer trust block ── */}
+      <div style={{ background: '#0c1a35', padding: isMobile ? '36px 20px' : '52px 16px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: isMobile ? 16 : 19, fontWeight: 900, color: '#f59e0b', marginBottom: 20, lineHeight: 1.5 }}>
+            ⚠️ רוב האנשים בכלל לא יודעים מי כתב את המזוזה שלהם
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'right' }}>
+            {[
+              'כאן רואים בדיוק מי כתב',
+              'כל קלף מצולם ומאומת לפני מכירה',
+              'בדיקת מגיה מוסמך לכל מוצר',
+              'אפשר לדבר עם אדם אמיתי — לא בוט',
+            ].map(row => (
+              <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '12px 16px' }}>
+                <span style={{ color: '#25D366', fontSize: 18, flexShrink: 0 }}>✔️</span>
+                <span style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, color: '#fff' }}>{row}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── Collections section ── */}
       <div style={{ background: '#0c1a35', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
