@@ -142,7 +142,8 @@
       "Bash(Select-Object FullName)",
       "Bash(npx firebase-tools *)",
       "Bash(powershell -Command ' *)",
-      "Bash(Remove-Item *)"
+      "Bash(Remove-Item *)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\\\\app\\\\components\\\\\" -Recurse | Where-Object { $_.Name -match \"navBar|navbar|Header|Navigation\" -and $_.PSIsContainer -eq $false } | Select-Object FullName)"
     ]
   }
 }

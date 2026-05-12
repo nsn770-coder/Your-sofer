@@ -1,127 +1,81 @@
-﻿'use client';
+'use client';
 import { useRouter } from 'next/navigation';
 
-const TEAM = [
-  {
-    initials: 'נב',
-    name: 'הרב ניסים בוארון',
-    role: 'מנהל ומייסד | סופר סת"מ מומחה',
-    desc: 'סופר סת"מ מוסמך עם שנות ניסיון בכתיבת קלפים ברמה הגבוהה ביותר. מוביל את החזון של Your Sofer להנגיש סת"מ איכותי לכל יהודי.',
-    imageUrl: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777926225/FB_IMG_1777926117765_rbw8ny.jpg',
-  },
-  {
-    initials: 'שב',
-    name: 'הרב שמחה בונים ברג\'יקובסקי',
-    role: 'רב מגיה ובודק מוסמך',
-    desc: 'עם נסיון של 12 שנה בתחום ההגהה קיבל הסמכה מגדולי הרבנים בארץ וממכון יד רפאל המוכר',
-    imageUrl: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778136770/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2026-05-07_095231_wojjah.png',
-  },
-  {
-    initials: 'ימ',
-    name: 'יוסף חיים מנחם',
-    role: 'שירות לקוחות ולוגיסטיקה',
-    desc: 'אחראי על חווית הלקוח ותהליך המשלוח. זמין לכל שאלה ובקשה לפני ואחרי הרכישה.',
-  },
-];
-
 const VALUES = [
-  { icon: '🔍', title: 'שקיפות מלאה', desc: 'אתם יודעים מי כתב את המזוזה שלכם' },
-  { icon: '✡️', title: 'כשרות ללא פשרות', desc: 'כל מוצר כשר לכתחילה 100%' },
-  { icon: '💛', title: 'מטרה חברתית', desc: 'כל רכישה תורמת לנוער בדימונה' },
+  {
+    title: 'כשרות אמיתית',
+    desc: 'יש אנשים שלא יודעים מה הם קונים. אנחנו דואגים שכל מוצר יעבור בדיקת מגיה מוסמך לפני שמגיע אליך.',
+  },
+  {
+    title: 'שקיפות מלאה',
+    desc: 'אתה יודע מי כתב את הקלף שלך, מאיפה הוא, כמה שנות ניסיון יש לו. אין אצלנו מוצרים אנונימיים.',
+  },
+  {
+    title: 'מחיר הוגן',
+    desc: 'בלי מתווכים מיותרים. הכסף שלך מגיע לסופר, והסופר יכול להשקיע אותו בכתיבה טובה יותר.',
+  },
 ];
 
-export default function AboutPage() {
+const STATS = [
+  { value: '+4,400 מוצרים', label: 'קלפים, בתי מזוזה, תפילין ועוד' },
+  { value: '+20 סופרים', label: 'מוסמכים ומאומתים' },
+  { value: 'מגיה מוסמך', label: 'על כל מוצר לפני משלוח' },
+];
+
+export default function AboutClient() {
   const router = useRouter();
 
   return (
-    <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#f7f4ef', minHeight: '100vh' }}>
+    <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#F5F2EC', minHeight: '100vh' }}>
 
       {/* Hero */}
       <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
-        <div style={{ fontSize: 40, marginBottom: 10 }}>✡️</div>
-        <h1 style={{ color: '#fff', fontSize: 32, fontWeight: 900, margin: '0 0 10px' }}>מי אנחנו</h1>
+        <h1 style={{ color: '#fff', fontSize: 34, fontWeight: 900, margin: '0 0 10px' }}>הסיפור שלנו</h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, margin: 0 }}>
-          החזון, האנשים והערכים שמאחורי Your Sofer
+          למה הקמנו את YourSofer ומה מנחה אותנו
         </p>
       </div>
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 16px 60px' }}>
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '40px 16px 60px' }}>
 
-        {/* Our story */}
-        <div style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '32px', marginBottom: 24 }}>
-          <h2 style={{ color: '#0c1a35', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>הסיפור שלנו</h2>
-          <p style={{ color: '#444', fontSize: 15, lineHeight: 1.85, margin: 0 }}>
-            Your Sofer נוסדה מתוך חזון אחד — להנגיש סת"מ ויודאיקה איכותית לכל יהודי, בשקיפות מלאה ובמחירים הוגנים.
-            <br /><br />
-            כל הכנסות החנות מועברות לעמותת סודות התורה — עמותה המפעילה פעילות חינוכית וקהילתית לנוער בדימונה.
+        {/* Section 1 */}
+        <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
+          <h2 style={{ color: '#0c1a35', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>למה נוסד YourSofer</h2>
+          <p style={{ color: '#444', fontSize: 15, lineHeight: 1.9, margin: 0 }}>
+            הייתי סופר סת״ם. ראיתי מקרוב איך הסוחר באמצע לוקח 50% מהמחיר — וכל זה על חשבון הלקוח. ההפרש הזה לא הולך לסופר ולא משפר את הכשרות. הוא פשוט נעלם בדרך. הקמתי את YourSofer כדי לשנות את זה: לחבר בין לקוחות לסופרים ישירות, בשקיפות מלאה, כך שבאותו תקציב — תוכל לקנות משהו הרבה יותר מהודר.
           </p>
         </div>
 
-        {/* Charity highlight */}
-        <div style={{ background: 'rgba(184,151,42,0.08)', border: '2px solid #C5A028', padding: '24px 28px', marginBottom: 32, textAlign: 'center' }}>
-          <div style={{ fontSize: 28, marginBottom: 8 }}>💛</div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: '#0c1a35', marginBottom: 6 }}>
-            100% מהרווחים עוברים לעמותת סודות התורה
-          </div>
-          <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>
-            עמותה רשומה המפעילה פעילות חינוכית לנוער בדימונה
-          </div>
-        </div>
-
-        {/* Team */}
-        <h2 style={{ color: '#0c1a35', fontSize: 20, fontWeight: 800, margin: '0 0 20px' }}>הצוות שלנו</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16, marginBottom: 12 }}>
-          {TEAM.map(member => (
-            <div key={member.name} style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '24px 20px', textAlign: 'center' }}>
-              {member.imageUrl ? (
-                <img
-                  src={member.imageUrl}
-                  alt={member.name}
-                  style={{
-                    width: 64, height: 64, borderRadius: '50%', objectFit: 'cover',
-                    margin: '0 auto 16px', display: 'block',
-                    border: '3px solid #C5A028',
-                  }}
-                />
-              ) : (
-                <div style={{
-                  width: 64, height: 64, borderRadius: '50%', background: '#C5A028', color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 22, fontWeight: 900, margin: '0 auto 16px',
-                }}>
-                  {member.initials}
-                </div>
-              )}
-              <div style={{ fontWeight: 800, fontSize: 15, color: '#0c1a35', marginBottom: 4 }}>{member.name}</div>
-              <div style={{ fontSize: 12, color: '#C5A028', fontWeight: 600, marginBottom: 10 }}>{member.role}</div>
-              <p style={{ fontSize: 13, color: '#555', lineHeight: 1.65, margin: 0 }}>{member.desc}</p>
-            </div>
-          ))}
-        </div>
-        <p style={{ fontSize: 12, color: '#999', textAlign: 'center', marginBottom: 36 }}>תמונות הצוות יעודכנו בקרוב</p>
-
-        {/* Values */}
-        <h2 style={{ color: '#0c1a35', fontSize: 20, fontWeight: 800, margin: '0 0 20px' }}>הערכים שלנו</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 40 }}>
+        {/* Section 2 — Values */}
+        <h2 style={{ color: '#0c1a35', fontSize: 20, fontWeight: 800, margin: '0 0 18px' }}>מה שחשוב לנו</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16, marginBottom: 40 }}>
           {VALUES.map(v => (
-            <div key={v.title} style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '24px 20px', textAlign: 'center' }}>
-              <div style={{ fontSize: 32, marginBottom: 10 }}>{v.icon}</div>
-              <div style={{ fontWeight: 800, fontSize: 15, color: '#0c1a35', marginBottom: 6 }}>{v.title}</div>
-              <div style={{ fontSize: 13, color: '#666', lineHeight: 1.6 }}>{v.desc}</div>
+            <div key={v.title} style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '24px 20px', textAlign: 'center' }}>
+              <div style={{ fontWeight: 800, fontSize: 16, color: '#0c1a35', marginBottom: 10 }}>{v.title}</div>
+              <div style={{ fontSize: 13.5, color: '#555', lineHeight: 1.75 }}>{v.desc}</div>
             </div>
           ))}
         </div>
 
-        {/* CTA */}
-        <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', padding: '32px', textAlign: 'center' }}>
-          <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 16, margin: '0 0 20px', fontWeight: 600 }}>
-            רוצה לדעת עוד? צור איתנו קשר
-          </p>
+        {/* Section 3 — Stats */}
+        <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', borderRadius: 14, padding: '32px 24px', marginBottom: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 24 }}>
+            {STATS.map(s => (
+              <div key={s.value} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 26, fontWeight: 900, color: '#C5A028', marginBottom: 6 }}>{s.value}</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Section 4 — CTA */}
+        <div style={{ textAlign: 'center' }}>
           <button
-            onClick={() => router.push('/contact')}
-            style={{ background: '#C5A028', color: '#fff', border: 'none', padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer', borderRadius: 0, fontFamily: 'inherit' }}
+            onClick={() => router.push('/')}
+            style={{ background: '#C5A028', color: '#0c1a35', border: 'none', padding: '14px 32px', fontSize: 16, fontWeight: 800, cursor: 'pointer', borderRadius: 8, fontFamily: 'inherit' }}
           >
-            לדף צור קשר ←
+            לחנות המלאה ←
           </button>
         </div>
 
