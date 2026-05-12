@@ -170,6 +170,8 @@ export default function ProductCard({
 
   if (removed) return null;
 
+  console.log('hasKlafSelection:', hasKlafSelection, 'product id:', id);
+
   // ── Bar Mitzva wizard nudge bar ───────────────────────────────────────────
   const WizardNudge = wizardBar ? (
     <div
