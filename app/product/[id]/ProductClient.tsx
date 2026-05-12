@@ -269,7 +269,7 @@ const RABBINICAL_CATEGORIES = new Set(['קלפי מזוזה', 'קלפי תפיל
 function TrustBlock({ isStam }: { isStam: boolean }) {
   void isStam;
   const rows = [
-    'כאן רואים בדיוק מי כתב',
+    'ונמצא עובר את המבחנים שלנו',
     'כל קלף מצולם ומאומת לפני מכירה',
     'בדיקת מגיה מוסמך לכל מוצר',
     'ניתן לתקשר ישירות עם הסופר סת"מ',

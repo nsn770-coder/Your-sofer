@@ -1067,7 +1067,7 @@ export default function HomePageClient() {
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'right' }}>
             {[
-              'כאן רואים בדיוק מי כתב',
+              'ונמצא עובר את המבחנים שלנו',
               'כל קלף מצולם ומאומת לפני מכירה',
               'בדיקת מגיה מוסמך לכל מוצר',
               'ניתן לתקשר ישירות עם הסופר סת"מ',
