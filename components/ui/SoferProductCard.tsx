@@ -20,6 +20,7 @@ interface Props {
   was?: number | null;
   sofer?: SoferData;
   soferName?: string;
+  hasKlafSelection?: boolean;
 }
 
 function IconCart({ size = 14 }: { size?: number }) {
@@ -48,7 +49,7 @@ function IconUser({ size = 36 }: { size?: number }) {
   );
 }
 
-export default function SoferProductCard({ id, name, price, imgUrl, badge, was, sofer, soferName }: Props) {
+export default function SoferProductCard({ id, name, price, imgUrl, badge, was, sofer, soferName, hasKlafSelection }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
 
@@ -120,6 +121,22 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
             <span className="absolute top-2 right-2 bg-[#b8972a] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
               {badge}
             </span>
+          )}
+          {hasKlafSelection && (
+            <span style={{
+              background: '#b8972a',
+              color: '#0c1a35',
+              borderRadius: 6,
+              fontSize: 11,
+              fontWeight: 700,
+              padding: '3px 8px',
+              lineHeight: 1.3,
+              whiteSpace: 'nowrap',
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              zIndex: 10
+            }}>✨ בחר את הקלף שלך</span>
           )}
         </div>
 
