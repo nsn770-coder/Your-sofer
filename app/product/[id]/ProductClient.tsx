@@ -1105,18 +1105,38 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
         </div>
       </div>
 
-      {/* Why different */}
-      <div style={{ marginBottom: 24, background: '#f8faff', borderRadius: 10, padding: '14px 16px' }}>
-        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35', marginBottom: 10, margin: '0 0 10px' }}>למה Your Sofer ולא חנות אחרת?</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {whyDifferent.map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: '#444' }}>
-              <span style={{ color: '#b8972a', fontWeight: 900, flexShrink: 0, marginTop: 1 }}>✓</span>
-              <span style={{ lineHeight: 1.6 }}>{item}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Why different — USP block for STAM categories */}
+      {(() => {
+        const cat = product.cat;
+        const isMezuzah = cat === 'קלפי מזוזה';
+        const isTefillin = cat === 'קלפי תפילין' || cat === 'תפילין קומפלט';
+        if (!isMezuzah && !isTefillin) return null;
+        const title = 'Your Sofer - בטוח שזה כשר';
+        const rows = isMezuzah ? [
+          'אצלנו תדע בדיוק מי כתב את המזוזה שלך - שם, תמונה, יצירת קשר פרטי',
+          'כל קלף נבדק ע״י מגיה מוסמך',
+          'קונים ישירות מהסופר - בלי פערי תיווך',
+          'רואים את הקלף האמיתי לפני הקנייה',
+          'מזוזה כשרה - שמירה וברכה לבית יהודי',
+        ] : [
+          'אצלנו תדע בדיוק מי כתב את התפילין שלך - שם, תמונה, יצירת קשר פרטי',
+          'כל קלף נבדק ע״י מגיה מוסמך',
+          'קונים ישירות מהסופר - בלי פערי תיווך',
+          'רואים את הקלף האמיתי לפני הקנייה',
+          'תפילין כשרות - שמירה וברכה תמידית',
+        ];
+        return (
+          <div style={{ marginBottom: 24, background: '#0c1a35', border: '1px solid #b8972a', borderRadius: 12, padding: 20 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 900, color: '#b8972a', margin: '0 0 14px' }}>{title}</h3>
+            {rows.map((row, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#fff', marginBottom: 8 }}>
+                <span style={{ color: '#b8972a', fontWeight: 900, flexShrink: 0, marginTop: 2 }}>✓</span>
+                <span style={{ lineHeight: 1.5 }}>{row}</span>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
 
       {/* Benefits */}
       <div style={{ marginBottom: 24 }}>
