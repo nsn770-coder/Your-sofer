@@ -2017,24 +2017,26 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         </div>
       )}
 
-      {/* Kashrut floating badge */}
-      <a
-        href="/kashrut"
-        style={{
-          position: 'fixed',
-          bottom: isMobile ? 90 : 24,
-          left: 16,
-          zIndex: 190,
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          background: '#16a34a', color: '#fff',
-          borderRadius: 20, padding: '7px 14px',
-          fontSize: 12, fontWeight: 700, textDecoration: 'none',
-          boxShadow: '0 3px 14px rgba(22,163,74,0.45)',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        ✓ מגיה מוסמך | צפה בתעודה
-      </a>
+      {/* Kashrut floating badge — set SHOW_KASHRUT_BADGE=true to restore */}
+      {false && (
+        <a
+          href="/kashrut"
+          style={{
+            position: 'fixed',
+            bottom: isMobile ? 90 : 24,
+            left: 16,
+            zIndex: 190,
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: '#16a34a', color: '#fff',
+            borderRadius: 20, padding: '7px 14px',
+            fontSize: 12, fontWeight: 700, textDecoration: 'none',
+            boxShadow: '0 3px 14px rgba(22,163,74,0.45)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          ✓ מגיה מוסמך | צפה בתעודה
+        </a>
+      )}
 
       {/* Sticky mobile CTA bar */}
       {isMobile && (
