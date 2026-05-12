@@ -136,7 +136,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
               top: 8,
               left: 8,
               zIndex: 10
-            }}>✨ בחר את הקלף שלך</span>
+            }}>✨ בחירת קלף אישית</span>
           )}
         </div>
 

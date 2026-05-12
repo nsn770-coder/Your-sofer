@@ -318,7 +318,7 @@ export default function ProductCard({
           )}
           {hasKlafSelection && (
             <span style={{ background: '#b8972a', color: '#0c1a35', borderRadius: 6, fontSize: 11, fontWeight: 700, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
-              ✨ בחר את הקלף שלך
+              ✨ בחירת קלף אישית
             </span>
           )}
         </div>
