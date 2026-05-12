@@ -1418,7 +1418,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
     pixel.addToCart({ id: product!.id, name: product!.name, price: product!.price, quantity: qty });
     setAdded(true);
-    setTimeout(() => setAdded(false), 2500);
+    setTimeout(() => setAdded(false), 2000);
     if (fromWizardParam || fromWizardLS) setShowWizardModal(true);
   }
 
@@ -1509,8 +1509,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
 
       {/* SECONDARY: Add to Cart */}
       <button onClick={handleAddToCart}
-        style={{ width: '100%', background: added ? '#f0fdf4' : '#b8972a', color: added ? '#15803d' : '#0c1a35', border: added ? '1.5px solid #86efac' : 'none', borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-        {added ? <><Icon.Check size={15} color="#15803d" /> נוסף לסל!</> : addToCartLabel}
+        style={{ width: '100%', background: added ? '#22c55e' : '#b8972a', color: added ? '#fff' : '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+        {added ? '✓ נוסף לעגלה!' : addToCartLabel}
       </button>
 
       {/* Inspector trust badge — mezuzah / tefillin */}
