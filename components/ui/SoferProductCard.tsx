@@ -123,13 +123,13 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
               {badge}
             </span>
           )}
-          {hasKlafSelection && (
+          {(hasKlafSelection || (cat === 'קלפי מזוזה' && !!imgUrl)) && (
             <span style={{
-              background: '#b8972a',
+              background: 'linear-gradient(90deg, #b8972a, #d4a832)',
               color: '#0c1a35',
               borderRadius: 6,
               fontSize: 11,
-              fontWeight: 700,
+              fontWeight: 800,
               padding: '3px 8px',
               lineHeight: 1.3,
               whiteSpace: 'nowrap',
@@ -137,7 +137,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
               top: 8,
               left: 8,
               zIndex: 10
-            }}>✨ בחירת קלף אישית</span>
+            }}>✦ בחר את הקלף שלך</span>
           )}
         </div>
 

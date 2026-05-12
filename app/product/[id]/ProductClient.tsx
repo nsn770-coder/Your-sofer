@@ -1497,6 +1497,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         </div>
       )}
 
+      {/* Klaf selection prompt */}
+      {product.hasKlafSelection && (
+        <div style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', borderRadius: 10, padding: '10px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35', lineHeight: 1.4 }}>✦ בחר את הקלף המדויק שלך — לא קונים עיוור</span>
+        </div>
+      )}
+
       {/* PRIMARY: Buy Now */}
       <button onClick={() => { handleAddToCart(); router.push('/cart'); }}
         style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>

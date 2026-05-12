@@ -171,8 +171,6 @@ export default function ProductCard({
 
   if (removed) return null;
 
-  console.log('hasKlafSelection:', hasKlafSelection, 'product id:', id);
-
   // ── Bar Mitzva wizard nudge bar ───────────────────────────────────────────
   const WizardNudge = wizardBar ? (
     <div
@@ -317,9 +315,9 @@ export default function ProductCard({
               <IconSparkle /> חדש
             </span>
           )}
-          {hasKlafSelection && (
-            <span style={{ background: '#b8972a', color: '#0c1a35', borderRadius: 6, fontSize: 11, fontWeight: 700, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
-              ✨ בחירת קלף אישית
+          {(hasKlafSelection || (cat === 'קלפי מזוזה' && !!images[0])) && (
+            <span style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', color: '#0c1a35', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+              ✦ בחר את הקלף שלך
             </span>
           )}
         </div>
