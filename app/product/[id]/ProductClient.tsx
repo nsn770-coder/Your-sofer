@@ -1183,7 +1183,7 @@ export default function ProductClient() {
   const searchParams = useSearchParams();
   const fromWizardParam = searchParams.get('from') === 'bar-mitzva';
   const [fromWizardLS, setFromWizardLS] = useState(false);
-  const { addItem } = useCart();
+  const { addItem, removeItem, updateQty } = useCart();
   const { user } = useAuth();
 
   const [product, setProduct]           = useState<Product | null>(null);
@@ -1195,7 +1195,7 @@ export default function ProductClient() {
   const [embroideryText, setEmbroideryText] = useState('');
   const [loading, setLoading]           = useState(true);
   const [activeImg, setActiveImg]       = useState(0);
-  const [added, setAdded]               = useState(false);
+  const [cartQty, setCartQty]           = useState(0);
   const [qty, setQty]                   = useState(1);
   const [zoomVisible, setZoomVisible]   = useState(false);
   const [showWizardModal, setShowWizardModal] = useState(false);
@@ -1417,8 +1417,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
     pixel.addToCart({ id: product!.id, name: product!.name, price: product!.price, quantity: qty });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    const initialQty = selectedKlafIds.length > 0 ? selectedKlafIds.length : qty;
+    setCartQty(initialQty);
     if (fromWizardParam || fromWizardLS) setShowWizardModal(true);
   }
 
@@ -1507,11 +1507,35 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         ⚡ אני רוצה לקנות עכשיו
       </button>
 
-      {/* SECONDARY: Add to Cart */}
-      <button onClick={handleAddToCart}
-        style={{ width: '100%', background: added ? '#22c55e' : '#b8972a', color: added ? '#fff' : '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-        {added ? '✓ נוסף לעגלה!' : addToCartLabel}
-      </button>
+      {/* SECONDARY: Add to Cart / Quantity control */}
+      {cartQty === 0 ? (
+        <button onClick={handleAddToCart}
+          style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+          {addToCartLabel}
+        </button>
+      ) : (
+        <div style={{ width: '100%', background: '#b8972a', borderRadius: 14, marginBottom: 12, display: 'flex', alignItems: 'stretch', overflow: 'hidden' }}>
+          <button
+            onClick={() => {
+              if (cartQty === 1) { removeItem(product!.id); setCartQty(0); }
+              else { updateQty(product!.id, cartQty - 1); setCartQty(c => c - 1); }
+            }}
+            style={{ flex: '0 0 48px', background: 'rgba(0,0,0,0.12)', border: 'none', color: '#0c1a35', fontSize: 22, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            −
+          </button>
+          <span style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: compact ? 15 : 17, fontWeight: 900, color: '#0c1a35' }}>
+            {cartQty}
+          </span>
+          <button
+            onClick={() => {
+              addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, embroideryText: embroideryText || undefined });
+              setCartQty(c => c + 1);
+            }}
+            style={{ flex: '0 0 48px', background: 'rgba(0,0,0,0.12)', border: 'none', color: '#0c1a35', fontSize: 22, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            +
+          </button>
+        </div>
+      )}
 
       {/* Inspector trust badge — mezuzah / tefillin */}
       {productCerts && (
