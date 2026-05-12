@@ -166,7 +166,7 @@ export default function ShiraChat() {
             100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
           }
           .wa-float-wrap {
-            position: fixed; bottom: 24px; left: 24px;
+            position: fixed; bottom: 80px; left: 24px;
             display: flex; flex-direction: column; align-items: center; gap: 4px;
             z-index: 9999;
           }
