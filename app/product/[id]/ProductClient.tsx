@@ -1425,6 +1425,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
     product?.cat === 'קלפי תפילין' || product?.cat === 'תפילין קומפלט' || product?.cat === 'תפילין' ? 'אני רוצה את התפילין האלה' :
     null;
 
+  const addToCartLabel: string =
+    product?.cat === 'קלפי מזוזה' || product?.cat === 'מזוזות'
+      ? '🛒 אני אוסיף לעגלה את המזוזה'
+      : product?.cat === 'קלפי תפילין' || product?.cat === 'תפילין קומפלט'
+      ? '🛒 אני אוסיף לעגלה את התפילין'
+      : '🛒 הוסף לעגלה';
+
   const BuyBox = ({ compact = false }: { compact?: boolean }) => (
     <div style={{ background: '#fff', borderRadius: compact ? 0 : 12, padding: compact ? '12px 16px' : '20px 18px' }}>
       {!compact && (
@@ -1500,14 +1507,14 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
 
       {/* PRIMARY: Buy Now */}
       <button onClick={() => { handleAddToCart(); router.push('/cart'); }}
-        style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
-        {ctaLabel ?? <><Icon.Zap /> הוסף לעגלה</>}
+        style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
+        ⚡ אני רוצה לקנות עכשיו
       </button>
 
       {/* SECONDARY: Add to Cart */}
       <button onClick={handleAddToCart}
-        style={{ width: '100%', background: added ? '#f0fdf4' : 'transparent', color: added ? '#15803d' : '#0c1a35', border: `1.5px solid ${added ? '#86efac' : '#0c1a35'}`, borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-        {added ? <><Icon.Check size={15} color="#15803d" /> נוסף לסל!</> : ctaLabel ?? <><Icon.Cart size={15} color="#0c1a35" /> הוסף לסל</>}
+        style={{ width: '100%', background: added ? '#f0fdf4' : '#b8972a', color: added ? '#15803d' : '#0c1a35', border: added ? '1.5px solid #86efac' : 'none', borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+        {added ? <><Icon.Check size={15} color="#15803d" /> נוסף לסל!</> : addToCartLabel}
       </button>
 
       {/* Inspector trust badge — mezuzah / tefillin */}
