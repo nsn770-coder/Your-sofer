@@ -6,6 +6,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ShaliachProvider } from "./contexts/ShaliachContext";
 import NavBar from "@/app/components/navigation/NavBar";
+import TrustBar from "@/app/components/TrustBar";
 import Footer from "@/app/components/Footer";
 import ShiraChat from "@/app/components/chat/ShiraChat";
 import { ChatPersonaProvider } from "@/app/components/chat/ChatPersonaContext";
@@ -100,6 +101,7 @@ export default function RootLayout({
             <ShaliachProvider>
               <CartProvider>
                 <NavBar />
+                <TrustBar />
                 {children}
                 <Footer />
               </CartProvider>
