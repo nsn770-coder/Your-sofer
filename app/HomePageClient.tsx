@@ -643,7 +643,7 @@ export default function HomePageClient() {
       `}</style>
 
       {/* ── Newsletter popup ── */}
-      {false && (
+      {newsletterPopupOpen && (
         <NewsletterPopup
           email={newsletterEmail}
           setEmail={setNewsletterEmail}

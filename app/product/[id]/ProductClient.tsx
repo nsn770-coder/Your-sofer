@@ -310,7 +310,7 @@ function SoferCard({ soferId }: { soferId: string }) {
   useEffect(() => {
     getDoc(doc(db, 'soferim', soferId)).then(snap => {
       if (snap.exists()) setSofer(snap.data() as SoferProfile);
-    });
+    }).catch(() => {});
   }, [soferId]);
 
   if (!sofer) return null;
@@ -1270,7 +1270,6 @@ export default function ProductClient() {
   }, [id]);
 
   useEffect(() => {
-    console.log('[sizeMatch] product.size:', product?.size, '| cat:', product?.cat);
     if (!product?.size) return;
     const isKlaf = product.cat?.includes('קלפי מזוזה');
     const isBayit = product.cat?.includes('מזוזות');
@@ -1278,7 +1277,6 @@ export default function ProductClient() {
     const targetCat = isKlaf ? 'מזוזות' : 'קלפי מזוזה';
     getDocs(query(collection(db, 'products'), where('cat', '==', targetCat), where('size', '==', product.size), limit(50)))
       .then(snap => {
-        console.log('[sizeMatch] results count:', snap.size, '| targetCat:', targetCat, '| size:', product.size);
         const results: Product[] = [];
         snap.forEach(d => results.push({ id: d.id, ...d.data() } as Product));
         setSizeMatchProducts(results);
