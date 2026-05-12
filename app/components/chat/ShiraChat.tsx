@@ -144,37 +144,42 @@ export default function ShiraChat() {
   if (SHOW_WHATSAPP_ONLY) {
     return (
       <>
-        <a
-          href="https://wa.me/972584877770?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A0%D7%99%20%D7%9E%D7%A2%D7%95%D7%A0%D7%99%D7%99%D7%9F%20%D7%9C%D7%91%D7%A8%D7%A8%20%D7%A2%D7%9C%20%D7%9E%D7%95%D7%A6%D7%A8%20%D7%91%D7%90%D7%AA%D7%A8"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="wa-float-btn"
-          aria-label="דבר עם הרב ניסים בוואטסאפ"
-        >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.859L.057 23.286a.75.75 0 00.92.92l5.427-1.476A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.5-5.25-1.377l-.376-.217-3.898 1.059 1.059-3.898-.217-.376A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-          </svg>
-          <span>💬 דבר עם הרב ניסים</span>
-        </a>
+        <div className="wa-float-wrap">
+          <a
+            href="https://wa.me/972584877770?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A0%D7%99%20%D7%9E%D7%A2%D7%95%D7%A0%D7%99%D7%99%D7%9F%20%D7%9C%D7%91%D7%A8%D7%A8%20%D7%A2%D7%9C%20%D7%9E%D7%95%D7%A6%D7%A8%20%D7%91%D7%90%D7%AA%D7%A8"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="wa-float-icon"
+            aria-label="דבר עם הרב ניסים בוואטסאפ"
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.859L.057 23.286a.75.75 0 00.92.92l5.427-1.476A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.5-5.25-1.377l-.376-.217-3.898 1.059 1.059-3.898-.217-.376A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+            </svg>
+          </a>
+          <span className="wa-float-label">נציג אנושי זמין</span>
+        </div>
         <style jsx global>{`
-          .wa-float-btn {
+          .wa-float-wrap {
             position: fixed; bottom: 24px; left: 24px;
-            display: inline-flex; align-items: center; gap: 10px;
-            background: #25D366; color: white;
-            border-radius: 28px; padding: 0 20px;
-            height: 56px; font-size: 14px; font-weight: 700;
-            text-decoration: none; z-index: 9999;
-            box-shadow: 0 4px 20px rgba(37,211,102,0.45);
-            direction: rtl; white-space: nowrap;
-            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            z-index: 9999;
           }
-          .wa-float-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 28px rgba(37,211,102,0.55);
+          .wa-float-icon {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: #25D366;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+            transition: transform 0.2s;
+          }
+          .wa-float-icon:hover { transform: scale(1.08); }
+          .wa-float-label {
+            font-size: 10px; color: #25D366; font-weight: 600;
+            white-space: nowrap; direction: rtl;
           }
           @media (max-width: 480px) {
-            .wa-float-btn { left: 14px; bottom: 120px; font-size: 13px; padding: 0 16px; }
+            .wa-float-wrap { left: 14px; bottom: 120px; }
           }
         `}</style>
       </>
