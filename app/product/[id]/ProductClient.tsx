@@ -47,6 +47,7 @@ interface Product {
   stockCount?: number;
   stockVisible?: boolean;
   hasKlafSelection?: boolean;
+  priority?: number;
   marketingIntro?: string;
   whoIsItFor?: { emoji: string; text: string }[];
   whyUs?: string[];
