@@ -104,7 +104,7 @@ export default function CertificatePage() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         gap: 12, flexWrap: 'wrap',
       }}>
-        <span style={{ color: '#b8972a', fontWeight: 700, fontFamily: 'Heebo, Arial, sans-serif', fontSize: 14 }}>
+        <span style={{ color: '#C5A028', fontWeight: 700, fontFamily: 'Heebo, Arial, sans-serif', fontSize: 14 }}>
           תעודת כשרות — {cert.certId}
         </span>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -115,7 +115,7 @@ export default function CertificatePage() {
               disabled={sendingEmail}
               style={{
                 background: emailSent ? '#15803d' : '#1a2744',
-                color: emailSent ? '#fff' : '#b8972a',
+                color: emailSent ? '#fff' : '#C5A028',
                 border: '1.5px solid rgba(184,151,42,0.4)',
                 borderRadius: 8, padding: '8px 18px', fontWeight: 700,
                 fontSize: 13, cursor: sendingEmail ? 'default' : 'pointer',
@@ -134,7 +134,7 @@ export default function CertificatePage() {
           <button
             onClick={() => window.print()}
             style={{
-              background: '#b8972a', color: '#0c1a35', border: 'none',
+              background: '#C5A028', color: '#0c1a35', border: 'none',
               borderRadius: 8, padding: '8px 22px', fontWeight: 800,
               fontSize: 14, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif',
               whiteSpace: 'nowrap',
@@ -162,15 +162,15 @@ export default function CertificatePage() {
           boxShadow: '0 8px 40px rgba(0,0,0,0.18)',
           boxSizing: 'border-box',
           // Double gold border
-          border: '3px solid #b8972a',
+          border: '3px solid #C5A028',
           outline: '8px solid rgba(184,151,42,0.15)',
           outlineOffset: '-12px',
         }}>
 
           {/* ── Header ── */}
-          <div style={{ textAlign: 'center', paddingBottom: 14, marginBottom: 18, borderBottom: '2.5px solid #b8972a' }}>
+          <div style={{ textAlign: 'center', paddingBottom: 14, marginBottom: 18, borderBottom: '2.5px solid #C5A028' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 8 }}>
-              <span style={{ fontSize: 26, color: '#b8972a' }}>✡</span>
+              <span style={{ fontSize: 26, color: '#C5A028' }}>✡</span>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.22em', color: '#0c1a35', textTransform: 'uppercase' }}>
                   Your Sofer · יואר סופר
@@ -179,7 +179,7 @@ export default function CertificatePage() {
                   your-sofer.com
                 </div>
               </div>
-              <span style={{ fontSize: 26, color: '#b8972a' }}>✡</span>
+              <span style={{ fontSize: 26, color: '#C5A028' }}>✡</span>
             </div>
             <div style={{ fontSize: 30, fontWeight: 900, color: '#0c1a35', letterSpacing: '0.02em' }}>
               תעודת כשרות סת״מ
@@ -258,7 +258,7 @@ export default function CertificatePage() {
 
           {/* ── Footer ── */}
           <div style={{
-            borderTop: '2px solid #b8972a',
+            borderTop: '2px solid #C5A028',
             paddingTop: 14,
             display: 'flex',
             justifyContent: 'space-between',

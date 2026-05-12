@@ -54,7 +54,7 @@ export default function VerifyPage() {
     }}>
       {/* Brand */}
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <div style={{ fontSize: 28, color: '#b8972a', marginBottom: 4 }}>✡</div>
+        <div style={{ fontSize: 28, color: '#C5A028', marginBottom: 4 }}>✡</div>
         <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.2em', color: '#fff', textTransform: 'uppercase' }}>
           Your Sofer
         </div>
@@ -258,7 +258,7 @@ export default function VerifyPage() {
                 href={`/certificate/${cert.certId}`}
                 style={{
                   display: 'block', textAlign: 'center',
-                  background: '#0c1a35', color: '#b8972a',
+                  background: '#0c1a35', color: '#C5A028',
                   borderRadius: 10, padding: '12px', fontWeight: 700, fontSize: 14,
                   textDecoration: 'none',
                 }}
