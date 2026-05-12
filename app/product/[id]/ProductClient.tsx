@@ -2048,7 +2048,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       )}
 
       {/* Kashrut floating badge — set SHOW_KASHRUT_BADGE=true to restore */}
-      {true && (
+      {false && (
         <a
           href="/kashrut"
           style={{
