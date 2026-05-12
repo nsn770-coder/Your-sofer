@@ -123,7 +123,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
               {badge}
             </span>
           )}
-          {(hasKlafSelection || (cat === 'קלפי מזוזה' && !!imgUrl)) && (
+          {(hasKlafSelection || (['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט'].includes(cat ?? '') && !!imgUrl)) && (
             <span style={{
               background: 'linear-gradient(90deg, #b8972a, #d4a832)',
               color: '#0c1a35',

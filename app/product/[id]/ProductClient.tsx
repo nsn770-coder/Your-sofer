@@ -1498,7 +1498,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       )}
 
       {/* Klaf selection prompt */}
-      {product.hasKlafSelection && (
+      {(product.hasKlafSelection || ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט'].includes(product.cat ?? '')) && (
         <div style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', borderRadius: 10, padding: '10px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35', lineHeight: 1.4 }}>✦ בחר את הקלף המדויק שלך — לא קונים עיוור</span>
         </div>

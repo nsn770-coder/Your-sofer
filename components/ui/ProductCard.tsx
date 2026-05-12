@@ -315,7 +315,7 @@ export default function ProductCard({
               <IconSparkle /> חדש
             </span>
           )}
-          {(hasKlafSelection || (cat === 'קלפי מזוזה' && !!images[0])) && (
+          {(hasKlafSelection || (['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט'].includes(cat ?? '') && !!images[0])) && (
             <span style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', color: '#0c1a35', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
               ✦ בחר את הקלף שלך
             </span>
