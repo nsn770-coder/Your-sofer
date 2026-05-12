@@ -185,7 +185,7 @@ export default function ShiraChat() {
             text-shadow: 0 1px 3px rgba(0,0,0,0.9);
           }
           @media (max-width: 480px) {
-            .wa-float-wrap { left: 14px; bottom: 120px; }
+            .wa-float-wrap { left: 14px; bottom: 24px; }
           }
         `}</style>
       </>
