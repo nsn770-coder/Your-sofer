@@ -1535,7 +1535,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
           {/* Products grid / loading / empty */}
           {loading ? (
-            <div className={SOFER_LAYOUT_CATS.has(category) ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4'}>
+            <div className={SOFER_LAYOUT_CATS.has(category) ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : filtered.length === 0 ? (
@@ -1558,7 +1558,7 @@ export default function CategoryClient({ category }: { category: string }) {
               {(['מזוזות', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
                 (() => {
                   const isSofer = SOFER_LAYOUT_CATS.has(category);
-                  const gridCls = isSofer ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4';
+                  const gridCls = isSofer ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
                   const renderCard = (p: Product, idx: number) => isSofer ? (
                     <SoferProductCard key={p.id} id={p.id} name={p.name} price={p.price}
                       imgUrl={p.imgUrl || p.image_url} badge={p.badge} was={p.was}
@@ -1655,7 +1655,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     for (let start = 0; start < paginated.length; start += BANNER_EVERY) {
                       const chunk = paginated.slice(start, start + BANNER_EVERY);
                       result.push(
-                        <div key={`chunk-${start}`} className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+                        <div key={`chunk-${start}`} className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
                           {chunk.map((p, idx) => (
                             <ProductCard
                               key={p.id}

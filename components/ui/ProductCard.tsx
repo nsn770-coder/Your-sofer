@@ -228,12 +228,13 @@ export default function ProductCard({
       dir="rtl"
       onClick={() => router.push(`/product/${id}`)}
       className={`
-        group relative flex flex-col bg-white rounded-2xl
-        shadow-sm border border-gray-100 overflow-hidden cursor-pointer
+        group relative flex flex-col bg-white rounded-[14px]
+        overflow-hidden cursor-pointer
         transition-all duration-300
-        hover:shadow-md hover:-translate-y-0.5
+        hover:-translate-y-0.5
         ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''}
       `}
+      style={{ border: '1px solid #e8e0d0', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
     >
       {/* ── Admin toolbar ── */}
       {isAdmin && (
@@ -325,7 +326,8 @@ export default function ProductCard({
 
       {/* ── Content ── */}
       <div className="flex flex-col flex-1 px-2 py-2 sm:p-3 gap-1 sm:gap-2">
-        <p className="text-xs sm:text-sm font-semibold text-gray-800 leading-snug line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
+        {cat && <span style={{ fontSize: 11, color: '#b8972a', fontWeight: 700, lineHeight: 1.2 }}>{cat}</span>}
+        <p className="text-[15px] sm:text-sm font-semibold text-gray-800 leading-snug line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
           {name}
         </p>
         {(cat === 'מזוזות' || cat === 'קלפי מזוזה') && (
@@ -339,7 +341,7 @@ export default function ProductCard({
               <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full">חסכת {savePct}%</span>
             </div>
           )}
-          <p className="text-base sm:text-lg font-black text-[#0c1a35]">
+          <p className="text-[18px] sm:text-lg font-black text-[#0c1a35]">
             {formatPrice(price)}
           </p>
         </div>
@@ -349,7 +351,7 @@ export default function ProductCard({
           {qty === 0 ? (
             <button
               onClick={handleAdd}
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#0c1a35] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg py-[14px] sm:py-2 text-[15px] sm:text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#0c1a35] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
             >
               <IconCart size={13} />
               הוסף לסל

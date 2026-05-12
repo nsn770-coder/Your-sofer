@@ -74,7 +74,8 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
     <div
       dir="rtl"
       onClick={() => router.push(`/product/${id}`)}
-      className="group relative flex flex-col sm:flex-row bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+      className="group relative flex flex-col sm:flex-row bg-white rounded-[14px] overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-0.5"
+      style={{ border: '1px solid #e8e0d0', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
     >
       {/* ── Sofer side (40%) ── */}
       <div className="flex flex-row sm:flex-col items-center sm:justify-center gap-3 p-4 sm:w-[40%] bg-gradient-to-b from-[#f8f6f2] to-white border-b sm:border-b-0 sm:border-l border-gray-100 flex-shrink-0">
@@ -142,13 +143,14 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
         </div>
 
         <div className="p-3 flex flex-col gap-2 flex-1">
-          <p className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2">{name}</p>
+          {cat && <span style={{ fontSize: 11, color: '#b8972a', fontWeight: 700, lineHeight: 1.2 }}>{cat}</span>}
+          <p className="text-[15px] sm:text-sm font-semibold text-gray-800 leading-snug line-clamp-2">{name}</p>
           {(cat === 'מזוזות' || cat === 'קלפי מזוזה') && (
             <p style={{ fontSize: 11, color: '#b8972a', margin: 0, lineHeight: 1.4 }}>✍️ נכתב ע״י סופר מוסמך — אפשר לראות מי כתב</p>
           )}
 
           <div className="flex items-baseline gap-2 mt-auto">
-            <span className="text-lg font-black text-[#0c1a35]">{formatPrice(price)}</span>
+            <span className="text-[18px] sm:text-lg font-black text-[#0c1a35]">{formatPrice(price)}</span>
             {hasSale && (
               <>
                 <span className="text-xs text-gray-400 line-through">{formatPrice(was!)}</span>
@@ -160,7 +162,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
           {qty === 0 ? (
             <button
               onClick={handleAdd}
-              className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-[#0c1a35] text-white text-sm font-bold hover:bg-[#1a3060] transition-colors"
+              className="flex items-center justify-center gap-2 w-full py-[14px] sm:py-2 rounded-xl bg-[#0c1a35] text-white text-[15px] sm:text-sm font-bold hover:bg-[#1a3060] transition-colors"
             >
               <IconCart size={13} />
               הוסף לסל
