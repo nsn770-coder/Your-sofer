@@ -272,7 +272,7 @@ function TrustBlock({ isStam }: { isStam: boolean }) {
     'כאן רואים בדיוק מי כתב',
     'כל קלף מצולם ומאומת לפני מכירה',
     'בדיקת מגיה מוסמך לכל מוצר',
-    'ניתן לתקשר ישירות עם הסופר',
+    'ניתן לתקשר ישירות עם הסופר סת"מ',
   ];
   return (
     <div dir="rtl" style={{ background: '#0c1a35', borderRadius: 12, padding: '18px 20px', marginTop: 14, textAlign: 'center' }}>
