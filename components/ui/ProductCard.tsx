@@ -21,6 +21,7 @@ interface Props {
   createdAt?: { seconds: number } | null;
   hidden?: boolean;
   aboveFold?: boolean;
+  hasKlafSelection?: boolean;
 }
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
@@ -101,7 +102,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProductCard({
-  id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold,
+  id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold, hasKlafSelection,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -301,7 +302,7 @@ export default function ProductCard({
           <ProductBadge isBestSeller={isBestSeller} priority={priority} badge={badge} />
         </div>
 
-        {/* Top-left: sale or new badge */}
+        {/* Top-left: sale / new / klaf-selection badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {hasSale && (
             <span className="flex items-center gap-1 text-white text-[10px] font-bold px-2 py-0.5 rounded-full leading-tight" style={{ background: '#e53e3e' }}>
@@ -311,6 +312,11 @@ export default function ProductCard({
           {isNew && (
             <span className="flex items-center gap-1 text-white text-[10px] font-bold px-2 py-0.5 rounded-full leading-tight" style={{ background: '#3182ce' }}>
               <IconSparkle /> חדש
+            </span>
+          )}
+          {hasKlafSelection && (
+            <span style={{ background: '#b8972a', color: '#0c1a35', borderRadius: 6, fontSize: 11, fontWeight: 700, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+              ✨ בחר את הקלף שלך
             </span>
           )}
         </div>

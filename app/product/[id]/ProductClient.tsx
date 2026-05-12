@@ -46,6 +46,7 @@ interface Product {
   closeupImageUrl?: string;
   stockCount?: number;
   stockVisible?: boolean;
+  hasKlafSelection?: boolean;
   marketingIntro?: string;
   whoIsItFor?: { emoji: string; text: string }[];
   whyUs?: string[];
@@ -487,6 +488,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [closeupImageUrl, setCloseupImageUrl] = useState(product.closeupImageUrl || '');
   const [stockCount, setStockCount]           = useState(String(product.stockCount || ''));
   const [stockVisible, setStockVisible]       = useState(product.stockVisible !== false);
+  const [hasKlafSelection, setHasKlafSelection] = useState(product.hasKlafSelection ?? false);
   const [soferId, setSoferId]                 = useState(product.soferId || '');
   const [soferOptions, setSoferOptions]       = useState<{ id: string; name: string }[]>([]);
   const [saving, setSaving]                   = useState(false);
@@ -568,6 +570,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         closeupImageUrl: isStam ? (closeupImageUrl || undefined) : undefined,
         stockCount: stockCount ? Number(stockCount) : undefined,
         stockVisible,
+        hasKlafSelection: hasKlafSelection || undefined,
         soferId: soferId || undefined,
         ...(saveGlobal ? {} : textData),
       });
@@ -722,6 +725,11 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
               הצג
             </label>
           </div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
+            <input type="checkbox" checked={hasKlafSelection} onChange={e => setHasKlafSelection(e.target.checked)} />
+            אפשר בחירת קלף אישית
+            <span style={{ fontSize: 9, color: '#b8972a', fontWeight: 700 }}>hasKlafSelection</span>
+          </label>
           {(SOFER_EDIT_CATS.includes(cat) || !!soferId) && (
             <div>
               <label style={lS}>סופר</label>

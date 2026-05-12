@@ -46,6 +46,7 @@ interface Product {
   styleTag?: string[];
   lookTag?: string;
   collection?: string;
+  hasKlafSelection?: boolean;
 }
 
 interface Curation {
@@ -1596,6 +1597,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               was={p.was}
                               createdAt={p.createdAt}
                               aboveFold={start === 0 && idx < 4}
+                              hasKlafSelection={p.hasKlafSelection}
                             />
                           ))}
                         </div>
