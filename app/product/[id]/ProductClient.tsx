@@ -401,7 +401,10 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
           נבחרו {selected.length} קלפים
         </span>
       </div>
-      <div style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>{klafImages.length} קלפים זמינים - כל קלף כתוב ביד</div>
+      <div style={{ fontSize: 12, color: '#888', marginBottom: 10 }}>{klafImages.length} קלפים זמינים - כל קלף כתוב ביד</div>
+      <div style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', borderRadius: 10, padding: '10px 14px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35', lineHeight: 1.4 }}>✦ בחר את הקלף המדויק שלך — לא קונים עיוור</span>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 8 }}>
         {klafImages.map(img => {
           const isSelected = selected.includes(img.id);
@@ -1495,13 +1498,6 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       {!compact && (
         <div style={{ fontSize: 12, color: '#c0392b', fontWeight: 600, textAlign: 'center', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
           <Icon.Lightning /> לקוחות מזמינים את המוצר הזה השבוע
-        </div>
-      )}
-
-      {/* Klaf selection prompt */}
-      {(product.hasKlafSelection || ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט'].includes(product.cat ?? '')) && (
-        <div style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', borderRadius: 10, padding: '10px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35', lineHeight: 1.4 }}>✦ בחר את הקלף המדויק שלך — לא קונים עיוור</span>
         </div>
       )}
 
