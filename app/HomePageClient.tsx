@@ -1070,7 +1070,7 @@ export default function HomePageClient() {
               'כאן רואים בדיוק מי כתב',
               'כל קלף מצולם ומאומת לפני מכירה',
               'בדיקת מגיה מוסמך לכל מוצר',
-              'אפשר לדבר עם אדם אמיתי — לא בוט',
+              'אפשר לדבר עם הסופר ישירות — לא בוט',
             ].map(row => (
               <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '12px 16px' }}>
                 <span style={{ color: '#25D366', fontSize: 18, flexShrink: 0 }}>✔️</span>
