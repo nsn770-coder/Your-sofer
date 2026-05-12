@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useState } from 'react';
@@ -160,7 +160,7 @@ function CollectionCard({ col }: { col: Collection }) {
           </p>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#b8972a', letterSpacing: '0.01em' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#C5A028', letterSpacing: '0.01em' }}>
               לצפייה בקולקציה ←
             </span>
           </div>
@@ -180,7 +180,7 @@ export default function CollectionsPage() {
         padding: '52px 20px 44px',
         textAlign: 'center',
       }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: '#b8972a', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 10 }}>
+        <p style={{ fontSize: 12, fontWeight: 700, color: '#C5A028', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 10 }}>
           YOUR SOFER
         </p>
         <h1 style={{ fontSize: 'clamp(26px,5vw,42px)', fontWeight: 900, color: '#fff', marginBottom: 12, lineHeight: 1.2 }}>

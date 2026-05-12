@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 
@@ -45,10 +45,10 @@ export async function POST(req: NextRequest) {
   <div style="max-width:600px;margin:32px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1);">
 
     <!-- Header -->
-    <div style="background:linear-gradient(135deg,#0c1a35 0%,#18274a 100%);padding:28px 32px;text-align:center;border-bottom:3px solid #b8972a;">
-      <div style="font-size:28px;color:#b8972a;margin-bottom:6px;">✡</div>
+    <div style="background:linear-gradient(135deg,#0c1a35 0%,#18274a 100%);padding:28px 32px;text-align:center;border-bottom:3px solid #C5A028;">
+      <div style="font-size:28px;color:#C5A028;margin-bottom:6px;">✡</div>
       <div style="font-size:13px;font-weight:700;letter-spacing:0.2em;color:#fff;text-transform:uppercase;">Your Sofer</div>
-      <div style="font-size:22px;font-weight:900;color:#b8972a;margin-top:10px;">תעודת כשרות סת״מ</div>
+      <div style="font-size:22px;font-weight:900;color:#C5A028;margin-top:10px;">תעודת כשרות סת״מ</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px;">Certificate of Kashrut</div>
     </div>
 
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
       <!-- CTA buttons -->
       <div style="text-align:center;margin-bottom:24px;">
-        <a href="${certUrl}" style="display:inline-block;background:#b8972a;color:#0c1a35;text-decoration:none;border-radius:10px;padding:13px 32px;font-weight:900;font-size:15px;margin-left:8px;">
+        <a href="${certUrl}" style="display:inline-block;background:#C5A028;color:#0c1a35;text-decoration:none;border-radius:10px;padding:13px 32px;font-weight:900;font-size:15px;margin-left:8px;">
           📜 צפייה בתעודה המלאה
         </a>
       </div>

@@ -2,7 +2,7 @@
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard, Step } from '../InfoComponents';
 
 const BASE_URL = 'https://your-sofer.com';
-const C = { navy: '#0c1a35', gold: '#b8972a', muted: '#666', border: '#e0e0e0', white: '#fff' };
+const C = { navy: '#0c1a35', gold: '#C5A028', muted: '#666', border: '#e0e0e0', white: '#fff' };
 
 export const metadata: Metadata = {
   title: 'מזוזה זולה יכולה לעלות לך ביוקר',

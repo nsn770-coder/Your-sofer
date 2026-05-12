@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 const ITEMS = [
   'סופרים מוסמכים בלבד',
@@ -34,7 +34,7 @@ export default function TrustBar() {
             className={i >= 2 ? 'tb-item tb-hide-mobile' : 'tb-item'}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: '#4A3728', whiteSpace: 'nowrap' }}
           >
-            <span style={{ color: '#B8943F', fontWeight: 700 }}>✓</span>
+            <span style={{ color: '#C5A028', fontWeight: 700 }}>✓</span>
             {item}
           </span>
         </div>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -8,22 +8,22 @@ const BENEFITS = [
   {
     title: 'כשרות מוסמכת',
     desc: 'כל מוצרי סת"מ נבדקים על ידי מגיה מוסמך. כל יחידה מגיעה עם תעודת כשרות ופיקוח רבני.',
-    svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l7 4v5c0 5-3.5 9.7-7 11-3.5-1.3-7-6-7-11V6l7-4z"/><polyline points="9 12 11 14 15 10"/></svg>),
+    svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l7 4v5c0 5-3.5 9.7-7 11-3.5-1.3-7-6-7-11V6l7-4z"/><polyline points="9 12 11 14 15 10"/></svg>),
   },
   {
     title: 'משלוח והחזרות',
     desc: 'משלוח לכל הארץ תוך 7–14 ימי עסקים. הזמנות מעל ₪350 זכאיות למשלוח חינם (לא כולל קלפי מזוזה/תפילין). ניתן להחזיר מוצר תוך 14 יום.',
-    svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>),
+    svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>),
   },
   {
     title: 'תשלום מאובטח',
     desc: 'כל העסקאות מוצפנות בתקן SSL. אנו תומכים בכרטיסי אשראי, ביט ופייפאל - בצורה בטוחה לחלוטין.',
-    svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>),
+    svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>),
   },
   {
     title: 'שירות לקוחות אישי',
     desc: 'צוות מומחי סת"מ זמין בוואטסאפ ובמייל לענות על כל שאלה - לפני ואחרי הרכישה.',
-    svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>),
+    svg: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>),
   },
 ];
 
@@ -158,7 +158,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 18, fontWeight: 900, color: '#b8972a' }}>Your Sofer</span>
+          <span style={{ fontSize: 18, fontWeight: 900, color: '#C5A028' }}>Your Sofer</span>
           <span style={{ fontSize: 11, color: '#555' }}>© 2025 Your Sofer - כל הזכויות שמורות</span>
         </div>
       </footer>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useRouter } from 'next/navigation';
 
 export default function TakanonPage() {
@@ -6,7 +6,7 @@ export default function TakanonPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
       <div style={{ background: '#0c1a35', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: '#b8972a', fontSize: 20, cursor: 'pointer' }}>←</button>
+        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: '#C5A028', fontSize: 20, cursor: 'pointer' }}>←</button>
         <span style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>Your Sofer</span>
       </div>
       <div style={{ maxWidth: 820, margin: '32px auto', padding: '0 16px 48px' }}>
@@ -58,7 +58,7 @@ export default function TakanonPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 24 }}>
-      <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0c1a35', marginBottom: 8, borderRight: '3px solid #b8972a', paddingRight: 10 }}>{title}</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0c1a35', marginBottom: 8, borderRight: '3px solid #C5A028', paddingRight: 10 }}>{title}</h2>
       <p style={{ fontSize: 14, color: '#444', lineHeight: 1.8, margin: 0 }}>{children}</p>
     </div>
   );

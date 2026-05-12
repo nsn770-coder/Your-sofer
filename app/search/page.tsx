@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
@@ -80,7 +80,7 @@ export default function SearchPage() {
 
       {loading && (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#b8972a]" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C5A028]" />
         </div>
       )}
 

@@ -12,6 +12,7 @@ html, body {
 :root {
   --background: #FFFFFF;
   --foreground: #171717;
+  --bg-page: #F5F2EC;
 }
 
 @theme inline {

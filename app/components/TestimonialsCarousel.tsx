@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { useState, useEffect } from 'react';
@@ -38,9 +38,9 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
         <div key={testIdx} style={{ background: '#fff', borderRadius: 0, boxShadow: '0 4px 28px rgba(0,0,0,0.09)', padding: isMobile ? '24px 20px' : '36px 44px', display: 'flex', alignItems: 'flex-start', gap: 28, flexDirection: isMobile ? 'column' : 'row', animation: 'testFadeIn 0.55s ease' }}>
           <div style={{ flexShrink: 0, alignSelf: isMobile ? 'center' : 'flex-start' }}>
             {t.imageUrl ? (
-              <img src={optimizeCloudinaryUrl(t.imageUrl, 200)} alt={t.name} width={84} height={84} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '3px solid #b8972a' }} />
+              <img src={optimizeCloudinaryUrl(t.imageUrl, 200)} alt={t.name} width={84} height={84} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '3px solid #C5A028' }} />
             ) : (
-              <div style={{ width: 84, height: 84, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #b8972a' }}>
+              <div style={{ width: 84, height: 84, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #C5A028' }}>
                 <span style={{ fontSize: 34, color: '#fff', fontWeight: 900 }}>{t.name.charAt(0)}</span>
               </div>
             )}
@@ -48,7 +48,7 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
           <div style={{ flex: 1, textAlign: 'right' }}>
             <div style={{ marginBottom: 10 }}>
               {Array.from({ length: 5 }).map((_, si) => (
-                <span key={si} style={{ color: si < (t.rating ?? 5) ? '#f5c518' : '#ddd', fontSize: 22 }}>★</span>
+                <span key={si} style={{ color: si < (t.rating ?? 5) ? '#C5A028' : '#ddd', fontSize: 22 }}>★</span>
               ))}
             </div>
             <p style={{ fontSize: isMobile ? 15 : 17, color: '#444', lineHeight: 1.75, marginBottom: 16, fontStyle: 'italic' }}>&ldquo;{t.text}&rdquo;</p>
@@ -60,11 +60,11 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
         </div>
         {testimonials.length > 1 && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 20 }}>
-            <button onClick={() => setTestIdx(i => (i - 1 + testimonials.length) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#b8972a', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label="הקודם">‹</button>
+            <button onClick={() => setTestIdx(i => (i - 1 + testimonials.length) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#C5A028', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label="הקודם">‹</button>
             {testimonials.map((_, i) => (
-              <button key={i} onClick={() => setTestIdx(i)} style={{ width: i === testIdx ? 24 : 10, height: 10, borderRadius: 0, border: 'none', cursor: 'pointer', background: i === testIdx ? '#b8972a' : '#ccc', padding: 0, transition: 'width 0.3s, background 0.3s' }} />
+              <button key={i} onClick={() => setTestIdx(i)} style={{ width: i === testIdx ? 24 : 10, height: 10, borderRadius: 0, border: 'none', cursor: 'pointer', background: i === testIdx ? '#C5A028' : '#ccc', padding: 0, transition: 'width 0.3s, background 0.3s' }} />
             ))}
-            <button onClick={() => setTestIdx(i => (i + 1) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#b8972a', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label="הבא">›</button>
+            <button onClick={() => setTestIdx(i => (i + 1) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: '#C5A028', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label="הבא">›</button>
           </div>
         )}
       </div>

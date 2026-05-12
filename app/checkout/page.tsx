@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
@@ -60,7 +60,7 @@ function Input({ label, name, value, onChange, placeholder, type = 'text', requi
       <input
         name={name} value={value} onChange={onChange} placeholder={placeholder} type={type}
         onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
-        style={{ width: '100%', border: `1.5px solid ${focused ? '#b8972a' : '#e0e0e0'}`, borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.15s', background: '#fafafa' }}
+        style={{ width: '100%', border: `1.5px solid ${focused ? '#C5A028' : '#e0e0e0'}`, borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.15s', background: '#fafafa' }}
       />
     </div>
   );
@@ -163,7 +163,7 @@ export default function CheckoutPage() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, color: '#ccc' }}><IconCart size={48} /></div>
           <div style={{ fontSize: 18, color: '#888', marginBottom: 20 }}>הסל ריק</div>
-          <button onClick={() => router.push('/')} style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 24, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
+          <button onClick={() => router.push('/')} style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 24, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
         </div>
       </div>
     );
@@ -306,11 +306,11 @@ export default function CheckoutPage() {
           <div style={{ fontSize: 13 }}>
             <div style={{ color: '#777', marginBottom: 6 }}>משלוח</div>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, cursor: 'pointer' }}>
-              <input type="radio" name="shipping" value="regular" checked={shippingOption === 'regular'} onChange={() => setShippingOption('regular')} style={{ accentColor: '#b8972a' }} />
+              <input type="radio" name="shipping" value="regular" checked={shippingOption === 'regular'} onChange={() => setShippingOption('regular')} style={{ accentColor: '#C5A028' }} />
               <span>רגיל (3–7 ימים) — {formatPrice(SHIPPING_REGULAR)}</span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-              <input type="radio" name="shipping" value="express" checked={shippingOption === 'express'} onChange={() => setShippingOption('express')} style={{ accentColor: '#b8972a' }} />
+              <input type="radio" name="shipping" value="express" checked={shippingOption === 'express'} onChange={() => setShippingOption('express')} style={{ accentColor: '#C5A028' }} />
               <span>מהיר — שליח עד הבית (1–3 ימים) — {formatPrice(SHIPPING_EXPRESS)}</span>
             </label>
           </div>
@@ -363,30 +363,30 @@ export default function CheckoutPage() {
       <div style={{ background: '#0c1a35', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -0.5 }}>Your Sofer</div>
-          <div style={{ fontSize: 9, color: '#b8972a', fontWeight: 700, letterSpacing: 1 }}>ישראל ✡</div>
+          <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700, letterSpacing: 1 }}>ישראל ✡</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 22, height: 22, borderRadius: '50%', background: step === 'shipping' ? '#b8972a' : '#1a6b3c', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>
+            <div style={{ width: 22, height: 22, borderRadius: '50%', background: step === 'shipping' ? '#C5A028' : '#1a6b3c', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>
               {step === 'review' ? <IconCheck size={11} color="#fff" /> : '1'}
             </div>
-            <span style={{ color: step === 'shipping' ? '#b8972a' : '#fff', fontWeight: step === 'shipping' ? 700 : 400 }}>פרטי משלוח</span>
+            <span style={{ color: step === 'shipping' ? '#C5A028' : '#fff', fontWeight: step === 'shipping' ? 700 : 400 }}>פרטי משלוח</span>
           </div>
           <IconChevron size={10} color="#555" />
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 22, height: 22, borderRadius: '50%', background: step === 'review' ? '#b8972a' : 'rgba(255,255,255,0.15)', color: step === 'review' ? '#0c1a35' : '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>2</div>
-            <span style={{ color: step === 'review' ? '#b8972a' : '#555', fontWeight: step === 'review' ? 700 : 400 }}>אישור ותשלום</span>
+            <div style={{ width: 22, height: 22, borderRadius: '50%', background: step === 'review' ? '#C5A028' : 'rgba(255,255,255,0.15)', color: step === 'review' ? '#0c1a35' : '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>2</div>
+            <span style={{ color: step === 'review' ? '#C5A028' : '#555', fontWeight: step === 'review' ? 700 : 400 }}>אישור ותשלום</span>
           </div>
         </div>
         <button onClick={() => router.push('/cart')} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: '#aaa', fontSize: 12, cursor: 'pointer', borderRadius: 8, padding: '5px 12px' }}>חזרה לסל</button>
       </div>
 
       {shaliach && (
-        <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a3a6a)', borderBottom: '2px solid #b8972a', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <IconHandshake size={16} color="#b8972a" />
+        <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a3a6a)', borderBottom: '2px solid #C5A028', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <IconHandshake size={16} color="#C5A028" />
           <div style={{ fontSize: 13, color: '#a8c0d8' }}>
             הזמנה זו מיוחסת לרב הקהילה: <strong style={{ color: '#fff' }}>{shaliach.chabadName || shaliach.name}</strong>
-            {shaliach.city && <span style={{ color: '#b8972a' }}> · {shaliach.city}</span>}
+            {shaliach.city && <span style={{ color: '#C5A028' }}> · {shaliach.city}</span>}
           </div>
         </div>
       )}
@@ -403,7 +403,7 @@ export default function CheckoutPage() {
           {step === 'shipping' ? (
             <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', overflow: 'hidden' }}>
               <div style={{ background: '#f8f6f2', borderBottom: '1px solid #e8e2d8', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#b8972a', color: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>1</div>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#C5A028', color: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>1</div>
                 <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0c1a35', margin: 0 }}>פרטי משלוח</h2>
               </div>
               <div style={{ padding: '24px' }}>
@@ -422,11 +422,11 @@ export default function CheckoutPage() {
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>הערות למשלוח</label>
                   <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="הוראות מיוחדות, קומה, דירה..." rows={2}
                     style={{ width: '100%', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', resize: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa', transition: 'border-color 0.15s' }}
-                    onFocus={e => (e.currentTarget.style.borderColor = '#b8972a')}
+                    onFocus={e => (e.currentTarget.style.borderColor = '#C5A028')}
                     onBlur={e => (e.currentTarget.style.borderColor = '#e0e0e0')} />
                 </div>
                 <button onClick={() => isShippingValid && setStep('review')}
-                  style={{ width: '100%', background: isShippingValid ? '#b8972a' : '#e0e0e0', color: isShippingValid ? '#0c1a35' : '#999', border: 'none', borderRadius: 24, padding: '14px', fontSize: 15, fontWeight: 800, cursor: isShippingValid ? 'pointer' : 'not-allowed', transition: 'background 0.2s' }}>
+                  style={{ width: '100%', background: isShippingValid ? '#C5A028' : '#e0e0e0', color: isShippingValid ? '#0c1a35' : '#999', border: 'none', borderRadius: 24, padding: '14px', fontSize: 15, fontWeight: 800, cursor: isShippingValid ? 'pointer' : 'not-allowed', transition: 'background 0.2s' }}>
                   המשך לאישור ←
                 </button>
               </div>
@@ -439,7 +439,7 @@ export default function CheckoutPage() {
                     <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#1a6b3c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCheck size={12} color="#fff" /></div>
                     <h3 style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', margin: 0 }}>פרטי משלוח</h3>
                   </div>
-                  <button onClick={() => setStep('shipping')} style={{ background: 'none', border: 'none', color: '#b8972a', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>עריכה</button>
+                  <button onClick={() => setStep('shipping')} style={{ background: 'none', border: 'none', color: '#C5A028', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>עריכה</button>
                 </div>
                 <div style={{ fontSize: 13, color: '#555', lineHeight: 1.8 }}>
                   <div><strong style={{ color: '#0c1a35' }}>{form.name}</strong> · {form.phone}</div>

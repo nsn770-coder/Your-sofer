@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { useState, useRef, useCallback, useEffect } from "react";
@@ -254,7 +254,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
           <div style={{ display: "flex", flexDirection: "row-reverse", padding: "24px 24px 16px" }}>
             {item.columns.map((col, ci) => (
               <div key={ci} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-                <div style={{ fontSize: 15, fontWeight: 900, color: "#0c1a35", textAlign: "right", marginBottom: 10, paddingBottom: 6, borderBottom: "2px solid #b8972a" }}>{col.title}</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: "#0c1a35", textAlign: "right", marginBottom: 10, paddingBottom: 6, borderBottom: "2px solid #C5A028" }}>{col.title}</div>
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {col.items.map((sub, si) => (
                     <li key={si}>
@@ -264,7 +264,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
                         onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}
                       >
                         {sub.label}
-                        <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#b8972a", flexShrink: 0, opacity: 0.6 }} />
+                        <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#C5A028", flexShrink: 0, opacity: 0.6 }} />
                       </button>
                     </li>
                   ))}
@@ -273,7 +273,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
             ))}
           </div>
           <div style={{ padding: "10px 24px", background: "rgba(0,0,0,0.2)", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "flex-end" }}>
-            <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "#b8972a", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>הכל {item.label} ←</button>
+            <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "#C5A028", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>הכל {item.label} ←</button>
           </div>
         </div>
       </div>
@@ -354,11 +354,11 @@ function NavBarContent() {
       `}</style>
 
       {shaliach && (
-        <div style={{ background: "linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)", borderBottom: "3px solid #b8972a", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ background: "linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)", borderBottom: "3px solid #C5A028", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {shaliach.logoUrl
-              ? <img src={shaliach.logoUrl} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "2px solid #b8972a", flexShrink: 0 }} />
-              : <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#b8972a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>✡</div>
+              ? <img src={shaliach.logoUrl} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A028", flexShrink: 0 }} />
+              : <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#C5A028", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>✡</div>
             }
             <div>
               <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: "#fff" }}>
@@ -400,7 +400,7 @@ function NavBarContent() {
               onKeyDown={e => e.key === "Enter" && handleSearch()}
               placeholder={isMobile ? "חיפוש..." : "חיפוש סת\"מ ויודאיקה..."}
               style={{ flex: 1, border: "none", padding: "10px", fontSize: isMobile ? 13 : 14, color: "#fff", background: "rgba(255,255,255,0.12)", outline: "none", minWidth: 0 }} />
-            <button onClick={handleSearch} style={{ background: "#b8972a", border: "none", padding: "0 14px", cursor: "pointer" }}>
+            <button onClick={handleSearch} style={{ background: "#C5A028", border: "none", padding: "0 14px", cursor: "pointer" }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
             </button>
           </div>
@@ -408,11 +408,11 @@ function NavBarContent() {
           <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexShrink: 0 }}>
             {user ? (
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                {user.photoURL && !isMobile && <img src={user.photoURL} alt="" style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid #b8972a" }} />}
+                {user.photoURL && !isMobile && <img src={user.photoURL} alt="" style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid #C5A028" }} />}
                 {!isMobile && <div style={{ fontSize: 11 }}><div style={{ color: "#ccc", fontSize: 10 }}>שלום,</div><div style={{ fontWeight: 700 }}>{user.displayName?.split(" ")[0]}</div></div>}
-                {user.role === "admin" && <button onClick={() => router.push("/admin")} style={{ background: "#b8972a", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>ניהול</button>}
+                {user.role === "admin" && <button onClick={() => router.push("/admin")} style={{ background: "#C5A028", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>ניהול</button>}
                 {user.role === "sofer" && <button onClick={() => router.push("/sofer-dashboard")} style={{ background: "#1a3a2a", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>סופר</button>}
-                {user.role === "shaliach" && <button onClick={() => router.push("/shaliach-dashboard")} style={{ background: "none", color: "#fff", border: "1px solid #b8972a", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>שלוחה</button>}
+                {user.role === "shaliach" && <button onClick={() => router.push("/shaliach-dashboard")} style={{ background: "none", color: "#fff", border: "1px solid #C5A028", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>שלוחה</button>}
                 {!isMobile && <button onClick={logout} style={{ background: "none", border: "none", color: "#aaa", fontSize: 11, cursor: "pointer" }}>יציאה</button>}
               </div>
             ) : (
@@ -424,7 +424,7 @@ function NavBarContent() {
             <div onClick={() => router.push("/cart")} style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
               <div style={{ position: "relative" }}>
                 <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                {count > 0 && <span style={{ position: "absolute", top: -4, left: -4, background: "#b8972a", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
+                {count > 0 && <span style={{ position: "absolute", top: -4, left: -4, background: "#C5A028", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
               </div>
               <div style={{ fontSize: 11, color: "#fff", fontWeight: 700 }}>סל ({count})</div>
             </div>
@@ -439,9 +439,9 @@ function NavBarContent() {
                   onMouseEnter={() => handleEnter(item.id)}
                   onMouseLeave={handleLeave}
                 >
-                  <button onClick={() => handleSelect(item.cat)} style={{ background: "none", border: "none", color: activeId === item.id ? "#b8972a" : "#fff", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 400, borderBottom: activeId === item.id ? "2px solid #b8972a" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
+                  <button onClick={() => handleSelect(item.cat)} style={{ background: "none", border: "none", color: activeId === item.id ? "#C5A028" : "#fff", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 400, borderBottom: activeId === item.id ? "2px solid #C5A028" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
                     {item.label}
-                    <span style={{ fontSize: 9, color: "#b8972a", display: "inline-block", transition: "transform 0.2s ease", transform: activeId === item.id ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
+                    <span style={{ fontSize: 9, color: "#C5A028", display: "inline-block", transition: "transform 0.2s ease", transform: activeId === item.id ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
                   </button>
                   {activeId === item.id && <MegaPanel item={item} onSelect={handleSelect} />}
                 </div>

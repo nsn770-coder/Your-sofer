@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -80,9 +80,9 @@ export default function KlafimIndexPage() {
   return (
     <div dir="rtl" style={{ minHeight: '100vh', background: '#f5f5f5', fontFamily: 'Heebo, Arial, sans-serif' }}>
       {/* Header */}
-      <div style={{ background: '#0c1a35', borderBottom: '3px solid #b8972a', padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+      <div style={{ background: '#0c1a35', borderBottom: '3px solid #C5A028', padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a' }}>📜 ניהול קלפים</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: '#C5A028' }}>📜 ניהול קלפים</div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>בחר מוצר לניהול הקלפים שלו</div>
         </div>
         <Link href="/admin" style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}>
@@ -140,7 +140,7 @@ export default function KlafimIndexPage() {
                     </div>
                     <div style={{ fontSize: 11, color: '#888' }}>{p.cat ?? p.category}</div>
                     <div style={{
-                      marginTop: 10, background: '#0c1a35', color: '#b8972a',
+                      marginTop: 10, background: '#0c1a35', color: '#C5A028',
                       borderRadius: 7, padding: '6px 0', textAlign: 'center',
                       fontSize: 12, fontWeight: 700,
                     }}>

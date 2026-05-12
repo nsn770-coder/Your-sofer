@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 
@@ -106,14 +106,14 @@ export default function KashrutPage() {
               alt="הרב שמחה בונים ברג׳יקובסקי"
               style={{
                 width: 64, height: 64, borderRadius: '50%', objectFit: 'cover',
-                border: '3px solid #b8972a', flexShrink: 0,
+                border: '3px solid #C5A028', flexShrink: 0,
               }}
             />
             <div>
               <div style={{ fontWeight: 800, fontSize: 16, color: '#0c1a35', marginBottom: 3 }}>
                 הרב שמחה בונים ברג׳יקובסקי
               </div>
-              <div style={{ fontSize: 13, color: '#b8972a', fontWeight: 700, marginBottom: 10 }}>
+              <div style={{ fontSize: 13, color: '#C5A028', fontWeight: 700, marginBottom: 10 }}>
                 רב מגיה מוסמך
               </div>
               <p style={{ fontSize: 13, color: '#555', lineHeight: 1.7, margin: 0 }}>
@@ -123,7 +123,7 @@ export default function KashrutPage() {
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 12,
                 background: 'rgba(184,151,42,0.1)', border: '1px solid rgba(184,151,42,0.4)',
-                borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 700, color: '#b8972a',
+                borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 700, color: '#C5A028',
               }}>
                 <span>✓</span> הסמכה מוכרת — מכון יד רפאל
               </div>
@@ -132,7 +132,7 @@ export default function KashrutPage() {
         </div>
 
         {/* Commitment box */}
-        <div style={{ background: 'rgba(184,151,42,0.08)', border: '2px solid #b8972a', borderRadius: 10, padding: '24px 28px', textAlign: 'center' }}>
+        <div style={{ background: 'rgba(184,151,42,0.08)', border: '2px solid #C5A028', borderRadius: 10, padding: '24px 28px', textAlign: 'center' }}>
           <div style={{ fontSize: 28, marginBottom: 8 }}>✡️</div>
           <div style={{ fontSize: 17, fontWeight: 800, color: '#0c1a35', marginBottom: 6 }}>
             אנו מחויבים לסטנדרט הכשרות הגבוה ביותר

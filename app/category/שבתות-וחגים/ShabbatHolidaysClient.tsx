@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -120,7 +120,7 @@ export default function ShabbatHolidaysClient() {
   }
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', background: '#f8f8f6', fontFamily: "'Heebo', Arial, sans-serif" }}>
+    <div dir="rtl" style={{ minHeight: '100vh', background: '#F5F2EC', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
       {/* Page header */}
       <div style={{ background: '#0c1a35', padding: isMobile ? '32px 20px 28px' : '48px 24px 40px', textAlign: 'center' }}>
@@ -131,7 +131,7 @@ export default function ShabbatHolidaysClient() {
           מוצרים נבחרים לשבת, חג ואירוח יהודי
         </p>
         {products.length > 0 && (
-          <p style={{ fontSize: 13, color: '#b8972a', marginTop: 12, fontWeight: 600 }}>
+          <p style={{ fontSize: 13, color: '#C5A028', marginTop: 12, fontWeight: 600 }}>
             {products.length} מוצרים
           </p>
         )}

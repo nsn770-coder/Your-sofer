@@ -140,7 +140,9 @@
       "WebFetch(domain:www.willfox.dev)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\\\\app\\\\soferim\" -Recurse)",
       "Bash(Select-Object FullName)",
-      "Bash(npx firebase-tools *)"
+      "Bash(npx firebase-tools *)",
+      "Bash(powershell -Command ' *)",
+      "Bash(Remove-Item *)"
     ]
   }
 }

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -175,7 +175,7 @@ export default function AnalyticsDashboard() {
   if (user?.role !== 'admin') return null;
 
   const navy = '#0c1a35';
-  const gold = '#b8972a';
+  const gold = '#C5A028';
 
   return (
     <div dir="rtl" style={{ minHeight: '100vh', background: '#f3f4f6', fontFamily: 'Heebo, Arial, sans-serif' }}>
@@ -204,7 +204,7 @@ export default function AnalyticsDashboard() {
             {/* ── Summary cards ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 28 }}>
               <Card icon="📦" label="הזמנות היום" value={stats.ordersToday} color="#16a34a" />
-              <Card icon="₪"  label="סכום היום"   value={formatPrice(stats.revenueToday)} color="#b8972a" />
+              <Card icon="₪"  label="סכום היום"   value={formatPrice(stats.revenueToday)} color="#C5A028" />
               <Card icon="👤" label="משתמשים חדשים" value={stats.newUsersToday} color="#7c3aed" />
               <Card icon="✍️" label="סופרים חדשים" value={stats.newSoferimToday} color="#0c1a35" />
             </div>

@@ -75,7 +75,7 @@ export default function BechiraPage() {
             'מה עושים אם מתגלה בעיה?',
           ].map(q => (
             <div key={q} style={{ display: 'flex', gap: 10, marginBottom: 12, alignItems: 'flex-start' }}>
-              <span style={{ color: '#b8972a', fontWeight: 900, fontSize: 16, flexShrink: 0 }}>✓</span>
+              <span style={{ color: '#C5A028', fontWeight: 900, fontSize: 16, flexShrink: 0 }}>✓</span>
               <span style={{ fontSize: 15, color: '#333' }}>{q}</span>
             </div>
           ))}

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 <body style="font-family:Arial,sans-serif;padding:20px;background:#f5f5f5;">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
     <div style="background:#0c1a35;padding:24px;text-align:center;">
-      <h1 style="color:#b8972a;margin:0;font-size:22px;">✡ Your Sofer — פנייה חדשה</h1>
+      <h1 style="color:#C5A028;margin:0;font-size:22px;">✡ Your Sofer — פנייה חדשה</h1>
     </div>
     <div style="padding:28px;">
       <p><strong>שם:</strong> ${name}</p>

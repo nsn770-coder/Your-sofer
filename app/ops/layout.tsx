@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { OpsAuthProvider, useOpsAuth } from '@/app/contexts/OpsAuthContext';
@@ -25,7 +25,7 @@ function OpsLayoutContent({ children }: { children: React.ReactNode }) {
         style={{ background: '#0c1a35' }}
       >
         <div className="text-center text-white">
-          <div className="text-3xl font-black mb-3" style={{ color: '#b8972a' }}>✡ Your Sofer</div>
+          <div className="text-3xl font-black mb-3" style={{ color: '#C5A028' }}>✡ Your Sofer</div>
           <div className="text-sm opacity-60">טוען מערכת...</div>
         </div>
       </div>

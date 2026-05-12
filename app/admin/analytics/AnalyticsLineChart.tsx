@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
@@ -11,7 +11,7 @@ interface DayStat {
 }
 
 const navy = '#0c1a35';
-const gold = '#b8972a';
+const gold = '#C5A028';
 
 export default function AnalyticsLineChart({ data }: { data: DayStat[] }) {
   return (

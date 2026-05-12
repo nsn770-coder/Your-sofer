@@ -18,7 +18,6 @@ import { FacebookPixel } from "@/components/FacebookPixel";
 import { TidioChat } from "@/components/TidioChat";
 import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
-import WhatsAppSticky from "@/app/components/WhatsAppSticky";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
@@ -112,7 +111,6 @@ export default function RootLayout({
         </AuthProvider>
         <WizardStickyBar />
         <ShiraChat />
-        <WhatsAppSticky />
         <ShavuotPopupWrapper />
         </ChatPersonaProvider>
         <SpeedInsights />

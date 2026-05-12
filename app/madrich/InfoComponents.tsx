@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 export const C = {
   navy: '#0c1a35',
   navyLight: '#162444',
-  gold: '#b8972a',
-  goldLight: '#d4aa40',
+  gold: '#C5A028',
+  goldLight: '#C5A028',
   bg: '#f3f4f4',
   white: '#fff',
   text: '#1a1a2e',

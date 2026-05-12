@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useRouter } from 'next/navigation';
 
 export default function JoinPage() {
@@ -11,7 +11,7 @@ export default function JoinPage() {
       <div style={{ background: '#0c1a35', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -1 }}>Your Sofer</div>
-          <div style={{ fontSize: 9, color: '#b8972a', fontWeight: 700 }}>ישראל ✡</div>
+          <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>ישראל ✡</div>
         </div>
         <div style={{ fontSize: 12, color: '#aaa' }}>› הצטרף לפלטפורמה</div>
       </div>
@@ -20,9 +20,9 @@ export default function JoinPage() {
       <div style={{ background: 'linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 50%, #1a3a2a 100%)', padding: '50px 20px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e6a817'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E\")" }} />
         <div style={{ position: 'relative', zIndex: 2, maxWidth: 700, margin: '0 auto' }}>
-          <div style={{ fontSize: 14, color: '#b8972a', fontWeight: 700, marginBottom: 12, letterSpacing: 2 }}>YOUR SOFER PLATFORM</div>
+          <div style={{ fontSize: 14, color: '#C5A028', fontWeight: 700, marginBottom: 12, letterSpacing: 2 }}>YOUR SOFER PLATFORM</div>
           <h1 style={{ fontSize: 36, fontWeight: 900, color: '#fff', marginBottom: 12, lineHeight: 1.2 }}>
-            הצטרף למשפחת<br /><span style={{ color: '#b8972a' }}>Your Sofer</span>
+            הצטרף למשפחת<br /><span style={{ color: '#C5A028' }}>Your Sofer</span>
           </h1>
           <p style={{ color: '#a8c8b4', fontSize: 16, maxWidth: 500, margin: '0 auto', lineHeight: 1.7 }}>
             פלטפורמה ייחודית המחברת בין סופרי סת"מ מוסמכים לבין קהל לקוחות רחב - עם כלים מתקדמים לניהול ומכירה
@@ -142,7 +142,7 @@ export default function JoinPage() {
             ← חזרה לחנות
           </button>
           <a href="mailto:info@your-sofer.com"
-            style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
+            style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
             📧 צור קשר
           </a>
         </div>
@@ -150,7 +150,7 @@ export default function JoinPage() {
 
       {/* Footer */}
       <footer style={{ background: '#0f1111', color: '#fff', padding: '20px', textAlign: 'center' }}>
-        <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>✡ Your Sofer</div>
+        <div style={{ fontSize: 18, fontWeight: 900, color: '#C5A028', marginBottom: 4 }}>✡ Your Sofer</div>
         <div style={{ fontSize: 12, color: '#666' }}>© 2025 Your Sofer - כל הזכויות שמורות</div>
       </footer>
     </div>

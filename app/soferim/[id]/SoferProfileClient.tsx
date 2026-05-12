@@ -34,7 +34,7 @@ interface Product {
 }
 
 const navy = '#0c1a35';
-const gold = '#b8972a';
+const gold = '#C5A028';
 const green = '#1a3a2a';
 
 function Stars({ n = 5 }: { n?: number }) {

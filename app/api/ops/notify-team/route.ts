@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import twilio from 'twilio';
 
 const TEAM = [
@@ -154,7 +154,7 @@ function buildBody(payload: NotifyPayload): string {
 <body style="font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:20px;">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
     <div style="background:${headerColor};padding:24px;text-align:center;">
-      <h1 style="color:#b8972a;margin:0;font-size:22px;">✡ Your Sofer — מערכת פנימית</h1>
+      <h1 style="color:#C5A028;margin:0;font-size:22px;">✡ Your Sofer — מערכת פנימית</h1>
       <p style="color:#fff;margin:10px 0 0;font-size:18px;font-weight:bold;">${headerText}</p>
     </div>
     <div style="padding:32px;">
@@ -180,7 +180,7 @@ function buildBody(payload: NotifyPayload): string {
       </table>` : ''}
 
       <div style="text-align:center;margin-top:24px;">
-        <a href="${orderLink}" style="background:#0c1a35;color:#b8972a;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
+        <a href="${orderLink}" style="background:#0c1a35;color:#C5A028;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
           פתח הזמנה במערכת
         </a>
       </div>

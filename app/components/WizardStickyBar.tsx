@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -44,7 +44,7 @@ export default function WizardStickyBar() {
         right: 0,
         zIndex: 950,
         background: '#0c1a35',
-        borderTop: '2px solid #b8972a',
+        borderTop: '2px solid #C5A028',
         padding: '10px 16px',
         display: 'flex',
         alignItems: 'center',
@@ -60,7 +60,7 @@ export default function WizardStickyBar() {
             <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="3" />
             <circle
               cx="22" cy="22" r="18" fill="none"
-              stroke="#b8972a" strokeWidth="3"
+              stroke="#C5A028" strokeWidth="3"
               strokeDasharray={circumference}
               strokeDashoffset={circumference * (1 - pct / 100)}
               strokeLinecap="round"
@@ -70,7 +70,7 @@ export default function WizardStickyBar() {
           <span style={{
             position: 'absolute', inset: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 11, fontWeight: 700, color: '#b8972a',
+            fontSize: 11, fontWeight: 700, color: '#C5A028',
           }}>
             {step}/{BAR_MITZVA_TOTAL}
           </span>
@@ -91,7 +91,7 @@ export default function WizardStickyBar() {
         onClick={() => router.push('/?wizard=bar-mitzva#bar-mitzva-wizard')}
         style={{
           flexShrink: 0,
-          background: '#b8972a',
+          background: '#C5A028',
           color: '#0c1a35',
           border: 'none',
           borderRadius: 0,

@@ -376,7 +376,7 @@ export default function OrderDetailPage() {
                   <button
                     onClick={saveStatus}
                     disabled={saving || newStatus === order.status}
-                    style={{ background: '#0c1a35', color: '#b8972a' }}
+                    style={{ background: '#0c1a35', color: '#C5A028' }}
                     className="px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80 disabled:opacity-50"
                   >
                     שמור
@@ -400,7 +400,7 @@ export default function OrderDetailPage() {
                   <button
                     onClick={savePriority}
                     disabled={saving || newPriority === order.priority}
-                    style={{ background: '#0c1a35', color: '#b8972a' }}
+                    style={{ background: '#0c1a35', color: '#C5A028' }}
                     className="px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80 disabled:opacity-50"
                   >
                     שמור
@@ -438,7 +438,7 @@ export default function OrderDetailPage() {
               <button
                 onClick={saveAssignment}
                 disabled={saving}
-                style={{ background: '#0c1a35', color: '#b8972a' }}
+                style={{ background: '#0c1a35', color: '#C5A028' }}
                 className="mt-3 px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80 disabled:opacity-50"
               >
                 {saving ? 'שומר...' : 'שמור שיוך'}
@@ -459,7 +459,7 @@ export default function OrderDetailPage() {
               <button
                 onClick={saveTracking}
                 disabled={saving || tracking === order.shipmentTracking}
-                style={{ background: '#0c1a35', color: '#b8972a' }}
+                style={{ background: '#0c1a35', color: '#C5A028' }}
                 className="px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80 disabled:opacity-50"
               >
                 שמור
@@ -516,7 +516,7 @@ export default function OrderDetailPage() {
               <button
                 onClick={saveFlags}
                 disabled={saving}
-                style={{ background: '#0c1a35', color: '#b8972a' }}
+                style={{ background: '#0c1a35', color: '#C5A028' }}
                 className="px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80 disabled:opacity-50"
               >
                 {saving ? 'שומר...' : 'שמור דגלים'}
@@ -552,7 +552,7 @@ export default function OrderDetailPage() {
               <button
                 onClick={addNote}
                 disabled={saving || !noteText.trim()}
-                style={{ background: '#0c1a35', color: '#b8972a' }}
+                style={{ background: '#0c1a35', color: '#C5A028' }}
                 className="px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80 disabled:opacity-50 self-end"
               >
                 הוסף
@@ -601,7 +601,7 @@ export default function OrderDetailPage() {
               <button
                 onClick={addComm}
                 disabled={saving || !commText.trim()}
-                style={{ background: '#0c1a35', color: '#b8972a' }}
+                style={{ background: '#0c1a35', color: '#C5A028' }}
                 className="px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-80 disabled:opacity-50"
               >
                 הוסף
@@ -675,7 +675,7 @@ export default function OrderDetailPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 text-center py-2 rounded-lg text-sm font-semibold"
-                      style={{ background: '#0c1a35', color: '#b8972a' }}
+                      style={{ background: '#0c1a35', color: '#C5A028' }}
                     >
                       הצג תעודה ↗
                     </a>
@@ -705,7 +705,7 @@ export default function OrderDetailPage() {
                     onClick={generateCertificate}
                     disabled={generatingCert}
                     className="w-full py-2.5 rounded-lg text-sm font-bold"
-                    style={{ background: '#0c1a35', color: '#b8972a' }}
+                    style={{ background: '#0c1a35', color: '#C5A028' }}
                   >
                     {generatingCert ? 'מייצר תעודה...' : '📜 צור תעודת כשרות'}
                   </button>

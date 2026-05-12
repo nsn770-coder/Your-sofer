@@ -116,7 +116,7 @@ export default function MehudarPage() {
           { title: 'תגים ועיטורים', desc: 'האותיות שדורשות תגים - יש להן תגים יפים ומדויקים.' },
         ].map(item => (
           <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-            <span style={{ color: '#b8972a', fontSize: 20, flexShrink: 0 }}>✦</span>
+            <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
             <div>
               <div style={{ fontWeight: 800, fontSize: 16, color: '#0c1a35', marginBottom: 4 }}>{item.title}</div>
               <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>

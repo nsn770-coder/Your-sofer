@@ -229,9 +229,9 @@ export default function KlafimProductPage() {
   return (
     <div dir="rtl" style={{ minHeight: '100vh', background: '#f5f5f5', fontFamily: 'Heebo, Arial, sans-serif' }}>
       {/* Header */}
-      <div style={{ background: '#0c1a35', borderBottom: '3px solid #b8972a', padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+      <div style={{ background: '#0c1a35', borderBottom: '3px solid #C5A028', padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 900, color: '#b8972a' }}>📜 ניהול קלפים — {product?.name ?? productId}</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: '#C5A028' }}>📜 ניהול קלפים — {product?.name ?? productId}</div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
             {availableCount} זמינים · {reservedCount} שמורים · {soldCount} נמכרו
           </div>
@@ -254,7 +254,7 @@ export default function KlafimProductPage() {
             onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
             style={{
-              border: `2px dashed ${isDragOver ? '#b8972a' : '#d0c8b8'}`,
+              border: `2px dashed ${isDragOver ? '#C5A028' : '#d0c8b8'}`,
               borderRadius: 10, padding: '28px 20px',
               textAlign: 'center', cursor: 'pointer',
               background: isDragOver ? '#fffbf0' : '#faf9f7',
@@ -307,7 +307,7 @@ export default function KlafimProductPage() {
                     {p.file.name}
                   </div>
                   {p.uploading ? (
-                    <div style={{ fontSize: 12, color: '#b8972a', fontWeight: 700, flexShrink: 0 }}>מעלה...</div>
+                    <div style={{ fontSize: 12, color: '#C5A028', fontWeight: 700, flexShrink: 0 }}>מעלה...</div>
                   ) : (
                     <button
                       onClick={() => removePending(i)}
@@ -325,7 +325,7 @@ export default function KlafimProductPage() {
                   onClick={handleSave}
                   disabled={saving}
                   style={{
-                    background: saving ? '#888' : '#b8972a', color: '#0c1a35',
+                    background: saving ? '#888' : '#C5A028', color: '#0c1a35',
                     border: 'none', borderRadius: 9, padding: '10px 28px',
                     fontWeight: 800, fontSize: 14, cursor: saving ? 'default' : 'pointer',
                     opacity: saving ? 0.7 : 1,

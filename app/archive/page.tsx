@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
@@ -50,11 +50,11 @@ export default function ArchivePage() {
       {/* Header */}
       <div style={{
         background: 'linear-gradient(135deg, #0c1a35 0%, #18274a 100%)',
-        borderBottom: '3px solid #b8972a',
+        borderBottom: '3px solid #C5A028',
         padding: '36px 24px 28px',
         textAlign: 'center',
       }}>
-        <div style={{ fontSize: 26, color: '#b8972a', marginBottom: 8 }}>✡</div>
+        <div style={{ fontSize: 26, color: '#C5A028', marginBottom: 8 }}>✡</div>
         <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: '0 0 6px' }}>
           קלפים שנמכרו לאחרונה
         </h1>

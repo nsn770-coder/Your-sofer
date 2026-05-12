@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -65,7 +65,7 @@ const guidanceStyle: React.CSSProperties = {
 };
 
 const tipStyle: React.CSSProperties = {
-  fontSize: 12, color: '#b8972a', marginTop: 5, lineHeight: 1.5,
+  fontSize: 12, color: '#C5A028', marginTop: 5, lineHeight: 1.5,
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -379,19 +379,19 @@ export default function SoferApplyPage() {
                 { value: 'salary',       label: '📄 אני מעדיף תלוש שכר' },
               ].map(opt => (
                 <label key={opt.value} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
-                  <input type="radio" name="taxStatus" value={opt.value} checked={taxStatus === opt.value} onChange={() => setTaxStatus(opt.value)} style={{ marginTop: 3, flexShrink: 0, accentColor: '#b8972a' }} />
+                  <input type="radio" name="taxStatus" value={opt.value} checked={taxStatus === opt.value} onChange={() => setTaxStatus(opt.value)} style={{ marginTop: 3, flexShrink: 0, accentColor: '#C5A028' }} />
                   <span style={{ fontSize: 14, color: '#0c1a35', fontWeight: taxStatus === opt.value ? 700 : 400 }}>{opt.label}</span>
                 </label>
               ))}
             </div>
 
             {taxStatus === 'no_osek' && (
-              <div style={{ background: 'rgba(197,160,40,0.1)', border: '1.5px solid #b8972a', borderRadius: 10, padding: '14px 16px' }}>
+              <div style={{ background: 'rgba(197,160,40,0.1)', border: '1.5px solid #C5A028', borderRadius: 10, padding: '14px 16px' }}>
                 <div style={{ fontSize: 13, color: '#888', textDecoration: 'line-through', marginBottom: 4 }}>עלות רגילה: ₪499</div>
                 <div style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>🎉 לרגל ההשקה — הצטרפות חינם!</div>
                 <div style={{ fontSize: 13, color: '#555', marginBottom: 12 }}>פתיחת עוסק פטור דרכנו עם 10% הנחה על השירות</div>
                 <a href="https://mycount.co.il/הסופר-שלך/" target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'inline-block', background: '#b8972a', color: '#0c1a35', fontWeight: 900, fontSize: 14, padding: '10px 20px', borderRadius: 8, textDecoration: 'none' }}>
+                  style={{ display: 'inline-block', background: '#C5A028', color: '#0c1a35', fontWeight: 900, fontSize: 14, padding: '10px 20px', borderRadius: 8, textDecoration: 'none' }}>
                   פתחו לי עוסק פטור ←
                 </a>
               </div>
@@ -579,7 +579,7 @@ export default function SoferApplyPage() {
 
             {products.length < 4 && (
               <button type="button" onClick={addProduct}
-                style={{ width: '100%', border: '2px dashed #b8972a', borderRadius: 10, padding: '12px', fontSize: 14, fontWeight: 700, color: '#b8972a', background: '#fffbf0', cursor: 'pointer' }}>
+                style={{ width: '100%', border: '2px dashed #C5A028', borderRadius: 10, padding: '12px', fontSize: 14, fontWeight: 700, color: '#C5A028', background: '#fffbf0', cursor: 'pointer' }}>
                 ➕ הוסף מוצר ({products.length}/4)
               </button>
             )}
@@ -588,7 +588,7 @@ export default function SoferApplyPage() {
           {/* ── Submit ── */}
           <button type="submit" disabled={loading}
             style={{
-              width: '100%', background: loading ? '#888' : '#b8972a',
+              width: '100%', background: loading ? '#888' : '#C5A028',
               color: '#0c1a35', border: 'none', borderRadius: 10,
               padding: '16px 0', fontSize: 17, fontWeight: 900,
               cursor: loading ? 'not-allowed' : 'pointer',

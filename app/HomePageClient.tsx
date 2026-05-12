@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useLayoutEffect, useRef, useMemo, memo } from 'react';
 import { useRouter } from 'next/navigation';
@@ -30,21 +30,21 @@ import type { CardDef, SubItem } from './constants/homepageCards';
 // Activity bar icons
 function IconActivityCheck() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
 function IconActivityPen() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
     </svg>
   );
 }
 function IconActivityBox() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
       <polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
     </svg>
@@ -52,7 +52,7 @@ function IconActivityBox() {
 }
 function IconActivityUsers() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" />
       <path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" />
     </svg>
@@ -60,7 +60,7 @@ function IconActivityUsers() {
 }
 function IconActivityShield() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 2l7 4v5c0 5-3.5 9.7-7 11-3.5-1.3-7-6-7-11V6l7-4z" />
       <polyline points="9 12 11 14 15 10" />
     </svg>
@@ -70,14 +70,14 @@ function IconActivityShield() {
 // Counter icons
 function IconCounterPen({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
     </svg>
   );
 }
 function IconCounterBox({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
       <polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
     </svg>
@@ -85,14 +85,14 @@ function IconCounterBox({ isMobile }: { isMobile: boolean }) {
 }
 function IconCounterCheck({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#b8972a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
 function IconCounterStar({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="#b8972a" stroke="none">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="#C5A028" stroke="none">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </svg>
   );
@@ -207,7 +207,7 @@ function CategoryCard({
       <Link
         href={card.href}
         className="mt-4 block text-right hover:underline"
-        style={{ fontSize: 13, fontWeight: 700, color: '#b8972a' }}
+        style={{ fontSize: 13, fontWeight: 700, color: '#C5A028' }}
       >
         {card.ctaLabel}
       </Link>
@@ -662,7 +662,7 @@ export default function HomePageClient() {
             onClick={e => e.stopPropagation()}>
             <div style={{ background: '#0c1a35', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontSize: 11, color: '#b8972a', fontWeight: 700, marginBottom: 2 }}>
+                <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, marginBottom: 2 }}>
                   {wizardStep < 3 ? `שאלה ${wizardStep + 1} מתוך 3` : '✨ ההמלצות שלנו'}
                 </div>
                 <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>
@@ -676,7 +676,7 @@ export default function HomePageClient() {
             </div>
             {wizardStep < 3 && (
               <div style={{ height: 3, background: '#f0f0f0' }}>
-                <div style={{ height: '100%', width: `${((wizardStep + 1) / 3) * 100}%`, background: '#b8972a', transition: 'width 0.4s ease' }} />
+                <div style={{ height: '100%', width: `${((wizardStep + 1) / 3) * 100}%`, background: '#C5A028', transition: 'width 0.4s ease' }} />
               </div>
             )}
             <div style={{ padding: 24 }}>
@@ -687,7 +687,7 @@ export default function HomePageClient() {
                     {[{ val: 'self' as const, label: '👤 לי עצמי' }, { val: 'gift' as const, label: '🎁 מתנה לאחר' }].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardFor(opt.val); setWizardStep(1); }}
                         style={{ padding: '18px 12px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         {opt.label}
                       </button>
@@ -706,7 +706,7 @@ export default function HomePageClient() {
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardBudget(opt.val); setWizardStep(2); }}
                         style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
                         <span style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>{opt.sub}</span>
@@ -726,7 +726,7 @@ export default function HomePageClient() {
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardKashrut(opt.val); setWizardStep(3); fetchWizardResults(wizardBudget, opt.val); }}
                         style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
                         <span style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>{opt.sub}</span>
@@ -751,16 +751,16 @@ export default function HomePageClient() {
                       {wizardResults.map(p => (
                         <div key={p.id} onClick={() => { closeWizard(); router.push(`/product/${p.id}`); }}
                           style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 14px', borderRadius: 0, border: '1px solid #eee', cursor: 'pointer', background: '#fafafa', transition: 'all 0.15s' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#b8972a'; (e.currentTarget as HTMLDivElement).style.background = '#fffbf0'; }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLDivElement).style.background = '#fffbf0'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#eee'; (e.currentTarget as HTMLDivElement).style.background = '#fafafa'; }}>
                           {(p.imgUrl || p.image_url) && (
                             <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 100)} alt={p.name} loading="lazy" style={{ width: 60, height: 60, borderRadius: 0, objectFit: 'cover', flexShrink: 0 }} />
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                            <div style={{ fontSize: 15, fontWeight: 900, color: '#b8972a' }}>{formatPrice(p.price)}</div>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: '#C5A028' }}>{formatPrice(p.price)}</div>
                           </div>
-                          <span style={{ color: '#b8972a', fontSize: 18, flexShrink: 0 }}>←</span>
+                          <span style={{ color: '#C5A028', fontSize: 18, flexShrink: 0 }}>←</span>
                         </div>
                       ))}
                     </div>
@@ -849,22 +849,22 @@ export default function HomePageClient() {
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ color: '#b8972a', display: 'flex', alignItems: 'center' }}><IconCounterBox isMobile={isMobile} /></span>
-              <span ref={productsValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>0+</span>
+              <span style={{ color: '#C5A028', display: 'flex', alignItems: 'center' }}><IconCounterBox isMobile={isMobile} /></span>
+              <span ref={productsValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#C5A028', lineHeight: 1 }}>0+</span>
             </div>
             <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>מוצרים באתר</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ color: '#b8972a', display: 'flex', alignItems: 'center' }}><IconCounterPen isMobile={isMobile} /></span>
-              <span ref={soferimValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>0</span>
+              <span style={{ color: '#C5A028', display: 'flex', alignItems: 'center' }}><IconCounterPen isMobile={isMobile} /></span>
+              <span ref={soferimValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#C5A028', lineHeight: 1 }}>0</span>
             </div>
             <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>סופרים מאושרים</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ color: '#b8972a', display: 'flex', alignItems: 'center' }}><IconCounterCheck isMobile={isMobile} /></span>
-              <span ref={customersValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#b8972a', lineHeight: 1 }}>0+</span>
+              <span style={{ color: '#C5A028', display: 'flex', alignItems: 'center' }}><IconCounterCheck isMobile={isMobile} /></span>
+              <span ref={customersValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#C5A028', lineHeight: 1 }}>0+</span>
             </div>
             <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>לקוחות מרוצים</span>
           </div>
@@ -944,13 +944,13 @@ export default function HomePageClient() {
                   </div>
                   <div style={{ padding: '8px 10px 10px' }}>
                     <p style={{ fontSize: 12, fontWeight: 600, color: '#0c1a35', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>{p.name}</p>
-                    <p style={{ fontSize: 14, fontWeight: 800, color: '#b8972a', marginBottom: 8 }}>{formatPrice(p.price)}</p>
+                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C5A028', marginBottom: 8 }}>{formatPrice(p.price)}</p>
                     <button
                       onClick={e => {
                         e.stopPropagation();
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
                       }}
-                      style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
+                      style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
                     >
                       הוסף לסל
                     </button>
@@ -1004,13 +1004,13 @@ export default function HomePageClient() {
           onClick={() => router.push('/soferim')}
           style={{
             marginTop: 16,
-            background: 'linear-gradient(135deg, #b8972a, #d4af37, #b8972a)',
+            background: 'linear-gradient(135deg, #C5A028, #C5A028, #C5A028)',
             color: '#0c1a35',
             fontWeight: 900,
             fontSize: 16,
             padding: '16px 48px',
             borderRadius: 0,
-            border: '2px solid #d4af37',
+            border: '2px solid #C5A028',
             letterSpacing: 1,
             boxShadow: '0 4px 20px rgba(184,151,42,0.4)',
             cursor: 'pointer',
@@ -1084,7 +1084,7 @@ export default function HomePageClient() {
       {/* ── Collections section ── */}
       <div style={{ background: '#0c1a35', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#b8972a', letterSpacing: '0.15em', textAlign: 'center', marginBottom: 8 }}>COLLECTIONS</p>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.15em', textAlign: 'center', marginBottom: 8 }}>COLLECTIONS</p>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 28, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הקולקציות שלנו</h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 28 }}>שישה קוים עיצוביים — מצאו את הסגנון שמדבר אליכם</p>
 
@@ -1143,7 +1143,7 @@ export default function HomePageClient() {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <a href="/collections" style={{ display: 'inline-block', border: '1.5px solid rgba(184,151,42,0.5)', color: '#b8972a', background: 'none', padding: '10px 28px', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+            <a href="/collections" style={{ display: 'inline-block', border: '1.5px solid rgba(184,151,42,0.5)', color: '#C5A028', background: 'none', padding: '10px 28px', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
               לכל הקולקציות ←
             </a>
           </div>
@@ -1179,7 +1179,7 @@ export default function HomePageClient() {
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ color: '#b8972a', fontWeight: 900, fontSize: 14 }}>{q.name.charAt(0)}</span>
+                    <span style={{ color: '#C5A028', fontWeight: 900, fontSize: 14 }}>{q.name.charAt(0)}</span>
                   </div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>{q.name}</div>

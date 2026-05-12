@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useRouter } from 'next/navigation';
 
 const TEAM = [
@@ -58,7 +58,7 @@ export default function AboutPage() {
         </div>
 
         {/* Charity highlight */}
-        <div style={{ background: 'rgba(184,151,42,0.08)', border: '2px solid #b8972a', padding: '24px 28px', marginBottom: 32, textAlign: 'center' }}>
+        <div style={{ background: 'rgba(184,151,42,0.08)', border: '2px solid #C5A028', padding: '24px 28px', marginBottom: 32, textAlign: 'center' }}>
           <div style={{ fontSize: 28, marginBottom: 8 }}>💛</div>
           <div style={{ fontSize: 17, fontWeight: 800, color: '#0c1a35', marginBottom: 6 }}>
             100% מהרווחים עוברים לעמותת סודות התורה
@@ -80,12 +80,12 @@ export default function AboutPage() {
                   style={{
                     width: 64, height: 64, borderRadius: '50%', objectFit: 'cover',
                     margin: '0 auto 16px', display: 'block',
-                    border: '3px solid #b8972a',
+                    border: '3px solid #C5A028',
                   }}
                 />
               ) : (
                 <div style={{
-                  width: 64, height: 64, borderRadius: '50%', background: '#b8972a', color: '#fff',
+                  width: 64, height: 64, borderRadius: '50%', background: '#C5A028', color: '#fff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 22, fontWeight: 900, margin: '0 auto 16px',
                 }}>
@@ -93,7 +93,7 @@ export default function AboutPage() {
                 </div>
               )}
               <div style={{ fontWeight: 800, fontSize: 15, color: '#0c1a35', marginBottom: 4 }}>{member.name}</div>
-              <div style={{ fontSize: 12, color: '#b8972a', fontWeight: 600, marginBottom: 10 }}>{member.role}</div>
+              <div style={{ fontSize: 12, color: '#C5A028', fontWeight: 600, marginBottom: 10 }}>{member.role}</div>
               <p style={{ fontSize: 13, color: '#555', lineHeight: 1.65, margin: 0 }}>{member.desc}</p>
             </div>
           ))}
@@ -119,7 +119,7 @@ export default function AboutPage() {
           </p>
           <button
             onClick={() => router.push('/contact')}
-            style={{ background: '#b8972a', color: '#fff', border: 'none', padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer', borderRadius: 0, fontFamily: 'inherit' }}
+            style={{ background: '#C5A028', color: '#fff', border: 'none', padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer', borderRadius: 0, fontFamily: 'inherit' }}
           >
             לדף צור קשר ←
           </button>

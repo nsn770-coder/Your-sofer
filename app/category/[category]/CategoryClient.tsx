@@ -182,7 +182,7 @@ function LookBreakBanner({ col, onSelect }: { col: string; onSelect: (c: string)
           <button
             onClick={() => { onSelect(col); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             style={{
-              background: '#b8972a', color: '#0c1a35',
+              background: '#C5A028', color: '#0c1a35',
               border: 'none', borderRadius: 8,
               padding: '10px 22px', fontSize: 14, fontWeight: 900,
               cursor: 'pointer',
@@ -253,7 +253,7 @@ function IconSearch({ size = 40 }: { size?: number }) {
 
 function IconStar({ size = 12, filled = true }: { size?: number; filled?: boolean }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#b8972a' : 'none'} stroke="#b8972a" strokeWidth="1.5">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#C5A028' : 'none'} stroke="#C5A028" strokeWidth="1.5">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </svg>
   );
@@ -423,7 +423,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
               flexShrink: 0, width: 88, height: 114, borderRadius: 0, overflow: 'hidden',
               position: 'relative', display: 'block', textDecoration: 'none',
               background: img ? '#000' : 'linear-gradient(135deg, #0c1a35, #1a3060)',
-              boxShadow: isActive ? '0 0 0 2.5px #b8972a, 0 4px 12px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.12)',
+              boxShadow: isActive ? '0 0 0 2.5px #C5A028, 0 4px 12px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.12)',
               transition: 'transform 0.18s ease, box-shadow 0.18s ease',
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; }}
@@ -432,7 +432,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
             {img && <img src={optimizeCloudinaryUrl(img, 200)} alt={label} width={88} height={114} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
             {isActive && (
-              <div style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: '50%', background: '#b8972a', boxShadow: '0 0 0 2px rgba(255,255,255,0.6)' }} />
+              <div style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: '50%', background: '#C5A028', boxShadow: '0 0 0 2px rgba(255,255,255,0.6)' }} />
             )}
             <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '8px 4px 7px', textAlign: 'center' }}>
               <span style={{ color: '#fff', fontSize: 10, fontWeight: 800, lineHeight: 1.3, display: 'block', textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>
@@ -576,7 +576,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                   onClick={() => onCollectionFilter(opt === 'הכל' ? '' : opt)}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 0,
-                    border: isActive ? '2px solid #b8972a' : '1.5px solid #d1d5db',
+                    border: isActive ? '2px solid #C5A028' : '1.5px solid #d1d5db',
                     borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
                     background: isActive ? '#fffbf0' : '#fff',
                     transition: 'border-color 0.15s, background 0.15s',
@@ -1170,7 +1170,7 @@ export default function CategoryClient({ category }: { category: string }) {
   };
 
   return (
-    <div dir="rtl" className="min-h-screen" style={{ background: '#f8f6f2' }}>
+    <div dir="rtl" className="min-h-screen" style={{ background: '#F5F2EC' }}>
 
       {/* ── Breadcrumb ── */}
       <div className="bg-white border-b border-gray-100 px-4 py-2.5" dir="rtl">
@@ -1199,9 +1199,9 @@ export default function CategoryClient({ category }: { category: string }) {
           </div>
           {/* Active filter count badge */}
           {anyActive && (
-            <div className="flex items-center gap-2 bg-[#b8972a]/20 border border-[#b8972a]/40 rounded-xl px-3 py-2">
+            <div className="flex items-center gap-2 bg-[#C5A028]/20 border border-[#C5A028]/40 rounded-xl px-3 py-2">
               <IconFilter size={13} />
-              <span className="text-[#b8972a] text-xs font-bold">סינון פעיל</span>
+              <span className="text-[#C5A028] text-xs font-bold">סינון פעיל</span>
             </div>
           )}
         </div>
@@ -1305,7 +1305,7 @@ export default function CategoryClient({ category }: { category: string }) {
         >
           <IconFilter size={14} />
           סינון
-          {anyActive && <span className="w-2 h-2 rounded-full bg-[#b8972a]" />}
+          {anyActive && <span className="w-2 h-2 rounded-full bg-[#C5A028]" />}
         </button>
 
         <div className="flex items-center gap-1.5 flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2" style={{ direction: 'rtl' }}>
@@ -1498,7 +1498,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     onClick={() => setCollectionFilter(isActive ? '' : col)}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 0,
-                      border: isActive ? '2px solid #b8972a' : '1.5px solid #e5e7eb',
+                      border: isActive ? '2px solid #C5A028' : '1.5px solid #e5e7eb',
                       borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
                       background: isActive ? '#fffbf0' : '#fff',
                       transition: 'border-color 0.15s, background 0.15s',
@@ -1601,8 +1601,8 @@ export default function CategoryClient({ category }: { category: string }) {
                         if (prods.length === 0) return null;
                         return (
                           <div key={g.key} style={{ marginBottom: 40 }}>
-                            <div style={{ background: '#0c1a35', borderRadius: 12, padding: '16px 20px', marginBottom: 16, borderRight: '4px solid #b8972a' }}>
-                              <span style={{ background: '#b8972a', color: '#0c1a35', borderRadius: 20, fontSize: 11, fontWeight: 800, padding: '2px 10px', display: 'inline-block', marginBottom: 8 }}>{g.key}</span>
+                            <div style={{ background: '#0c1a35', borderRadius: 12, padding: '16px 20px', marginBottom: 16, borderRight: '4px solid #C5A028' }}>
+                              <span style={{ background: '#C5A028', color: '#0c1a35', borderRadius: 20, fontSize: 11, fontWeight: 800, padding: '2px 10px', display: 'inline-block', marginBottom: 8 }}>{g.key}</span>
                               <h2 style={{ fontSize: 20, fontWeight: 900, color: '#fff', margin: '0 0 6px', lineHeight: 1.3 }}>{g.title}</h2>
                               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', margin: 0, lineHeight: 1.6 }}>{g.desc}</p>
                             </div>

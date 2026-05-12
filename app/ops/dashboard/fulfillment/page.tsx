@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState } from 'react';
 import { collection, getDocs, orderBy, query, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
@@ -161,7 +161,7 @@ export default function FulfillmentDashboard() {
                     <StatusBadge status={order.status} />
                     <a
                       href={`/ops/orders/${order.id}`}
-                      style={{ background: '#0c1a35', color: '#b8972a' }}
+                      style={{ background: '#0c1a35', color: '#C5A028' }}
                       className="px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80"
                     >
                       פרטים מלאים
@@ -206,7 +206,7 @@ export default function FulfillmentDashboard() {
                         <button
                           onClick={() => saveTracking(order)}
                           disabled={saving[order.id] || !trackingInputs[order.id]}
-                          style={{ background: '#0c1a35', color: '#b8972a' }}
+                          style={{ background: '#0c1a35', color: '#C5A028' }}
                           className="px-3 py-2 rounded-lg text-sm font-semibold hover:opacity-80 disabled:opacity-50"
                         >
                           {saving[order.id] ? '...' : 'שמור'}
@@ -285,7 +285,7 @@ export default function FulfillmentDashboard() {
                   <StatusBadge status={order.status} />
                   <a
                     href={`/ops/orders/${order.id}`}
-                    style={{ background: '#0c1a35', color: '#b8972a' }}
+                    style={{ background: '#0c1a35', color: '#C5A028' }}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80"
                   >
                     פרטים

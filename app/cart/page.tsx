@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
@@ -33,7 +33,7 @@ export default function CartPage() {
       <div style={{ background: '#0c1a35', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 16 }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -1 }}>Your Sofer</div>
-          <div style={{ fontSize: 9, color: '#b8972a', fontWeight: 700 }}>ישראל ✡</div>
+          <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>ישראל ✡</div>
         </div>
         <h1 style={{ fontSize: 20, fontWeight: 700, color: '#fff', marginRight: 16 }}>🛒 סל הקניות</h1>
       </div>
@@ -57,7 +57,7 @@ export default function CartPage() {
             <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>הסל שלך ריק</div>
             <div style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>הוסף מוצרים מהחנות כדי להתחיל</div>
             <button onClick={() => router.push('/')}
-              style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer', width: isMobile ? '100%' : 'auto' }}>
+              style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer', width: isMobile ? '100%' : 'auto' }}>
               המשך לקנות
             </button>
           </div>
@@ -256,7 +256,7 @@ export default function CartPage() {
                   });
                   router.push('/checkout');
                 }}
-                style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 20, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 10 }}>
+                style={{ width: '100%', background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 20, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 10 }}>
                 המשך לתשלום →
               </button>
 

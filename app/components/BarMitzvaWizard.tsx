@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -78,7 +78,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
   const bg           = isPage ? '#fff' : 'transparent';
   const textPrimary  = isPage ? '#0c1a35' : '#fff';
   const textMuted    = isPage ? '#6b7280' : 'rgba(255,252,240,0.6)';
-  const accentGold   = '#b8972a';
+  const accentGold   = '#C5A028';
   const green        = '#22c55e';
   const borderColor  = isPage ? '#e5e7eb' : 'rgba(255,252,240,0.15)';
   const currentBg    = isPage ? '#f0f4ff' : 'rgba(184,151,42,0.15)';

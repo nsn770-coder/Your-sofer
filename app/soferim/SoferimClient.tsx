@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, where } from 'firebase/firestore';
@@ -62,7 +62,7 @@ export default function SoferimClient() {
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="חפש סופר לפי שם, עיר או סגנון..."
               style={{ flex: 1, border: 'none', padding: '12px 16px', fontSize: 14, outline: 'none', color: '#333' }} />
-            <button style={{ background: '#b8972a', border: 'none', padding: '0 20px', cursor: 'pointer' }}>
+            <button style={{ background: '#C5A028', border: 'none', padding: '0 20px', cursor: 'pointer' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
@@ -70,7 +70,7 @@ export default function SoferimClient() {
           </div>
 
           <button onClick={() => router.push('/soferim/apply')}
-            style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             ✍️ הצטרף כסופר לפלטפורמה
           </button>
         </div>
@@ -194,7 +194,7 @@ export default function SoferimClient() {
       </div>
 
       <footer style={{ background: '#0f1111', color: '#fff', padding: '20px', textAlign: 'center' }}>
-        <div style={{ fontSize: 18, fontWeight: 900, color: '#b8972a', marginBottom: 4 }}>✡ Your Sofer</div>
+        <div style={{ fontSize: 18, fontWeight: 900, color: '#C5A028', marginBottom: 4 }}>✡ Your Sofer</div>
         <div style={{ fontSize: 12, color: '#666' }}>© 2025 Your Sofer - סת"מ מסופרים מוסמכים</div>
       </footer>
     </div>

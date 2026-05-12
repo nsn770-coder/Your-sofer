@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOpsAuth } from '@/app/contexts/OpsAuthContext';
@@ -33,7 +33,7 @@ export default function OpsLoginPage() {
       <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-sm text-center">
         {/* Logo */}
         <div className="mb-6">
-          <div style={{ color: '#b8972a' }} className="text-4xl font-black mb-1">✡ Your Sofer</div>
+          <div style={{ color: '#C5A028' }} className="text-4xl font-black mb-1">✡ Your Sofer</div>
           <div className="text-gray-500 text-sm">מערכת ניהול פנימית</div>
         </div>
 

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 <body style="font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:20px;">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
     <div style="background:#0c1a35;padding:24px;text-align:center;">
-      <h1 style="color:#b8972a;margin:0;font-size:24px;">✡ Your Sofer</h1>
+      <h1 style="color:#C5A028;margin:0;font-size:24px;">✡ Your Sofer</h1>
       <p style="color:#fff;margin:8px 0 0;font-size:14px;">סת"מ ישירות מהסופר</p>
     </div>
     <div style="padding:32px;">
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
       ${address ? `<p style="color:#555;"><strong>כתובת למשלוח:</strong> ${address}</p>` : ''}
       
-      <p style="color:#555;line-height:1.6;">לשאלות ניתן לפנות אלינו בוואטסאפ: <a href="https://wa.me/972584877770" style="color:#b8972a;">058-4877770</a></p>
+      <p style="color:#555;line-height:1.6;">לשאלות ניתן לפנות אלינו בוואטסאפ: <a href="https://wa.me/972584877770" style="color:#C5A028;">058-4877770</a></p>
     </div>
     <div style="background:#f0f0f0;padding:16px;text-align:center;font-size:12px;color:#888;">
       © 2025 Your Sofer · your-sofer.com
