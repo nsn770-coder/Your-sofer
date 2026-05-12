@@ -316,7 +316,7 @@ export default function ProductCard({
               <IconSparkle /> חדש
             </span>
           )}
-          {(hasKlafSelection || (['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט'].includes(cat ?? '') && !!images[0])) && (
+          {hasKlafSelection && (
             <span style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', color: '#0c1a35', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
               ✦ בחר את הקלף שלך
             </span>
@@ -330,7 +330,7 @@ export default function ProductCard({
         <p className="text-[15px] sm:text-sm font-semibold text-gray-800 leading-snug line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
           {name}
         </p>
-        {(cat === 'מזוזות' || cat === 'קלפי מזוזה') && (
+        {(cat === 'קלפי מזוזה' || cat === 'קלפי תפילין') && (
           <p style={{ fontSize: 11, color: '#b8972a', margin: 0, lineHeight: 1.4 }}>✍️ נכתב ע״י סופר מוסמך — אפשר לראות מי כתב</p>
         )}
 

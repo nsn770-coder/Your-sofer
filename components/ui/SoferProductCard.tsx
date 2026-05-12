@@ -124,7 +124,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
               {badge}
             </span>
           )}
-          {(hasKlafSelection || (['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט'].includes(cat ?? '') && !!imgUrl)) && (
+          {hasKlafSelection && (
             <span style={{
               background: 'linear-gradient(90deg, #b8972a, #d4a832)',
               color: '#0c1a35',
@@ -145,7 +145,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
         <div className="p-3 flex flex-col gap-2 flex-1">
           {cat && <span style={{ fontSize: 11, color: '#b8972a', fontWeight: 700, lineHeight: 1.2 }}>{cat}</span>}
           <p className="text-[15px] sm:text-sm font-semibold text-gray-800 leading-snug line-clamp-2">{name}</p>
-          {(cat === 'מזוזות' || cat === 'קלפי מזוזה') && (
+          {(cat === 'קלפי מזוזה' || cat === 'קלפי תפילין') && (
             <p style={{ fontSize: 11, color: '#b8972a', margin: 0, lineHeight: 1.4 }}>✍️ נכתב ע״י סופר מוסמך — אפשר לראות מי כתב</p>
           )}
 
