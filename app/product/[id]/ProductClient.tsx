@@ -1441,7 +1441,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
             <span style={{ fontSize: 32, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(product.price)}</span>
-            {product.was && <span style={{ fontSize: 16, textDecoration: 'line-through', color: '#bbb' }}>{formatPrice(product.was)}</span>}
+            {product.was && <span style={{ fontSize: 32, fontWeight: 400, textDecoration: 'line-through', color: '#999', marginRight: 8 }}>{formatPrice(product.was)}</span>}
             {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
           </div>
           <div style={{ fontSize: 12, color: '#888', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
