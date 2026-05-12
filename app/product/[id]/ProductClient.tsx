@@ -1891,7 +1891,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         {related.length > 0 && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
             <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Icon.Cart size={18} color="#0f1111" /> לקוחות שקנו זאת קנו גם
+              <Icon.Cart size={18} color="#0f1111" /> משלים את הרכישה שלך
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: isMobile ? 10 : 14 }}>
               {related.map(r => {
@@ -1927,7 +1927,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       {lookProducts.length > 0 && (
         <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
           <div style={{ marginBottom: 16 }}>
-            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0c1a35', margin: 0 }}>השלם את הלוק ✨</h2>
+            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0c1a35', margin: 0 }}>אולי תאהב גם</h2>
             <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>מוצרים באותו סגנון מקטגוריות שונות</p>
           </div>
           <div style={{ display: 'flex', gap: isMobile ? 10 : 14, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>

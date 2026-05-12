@@ -543,7 +543,7 @@ export default function HomePageClient() {
     const timer = setTimeout(() => {
       setNewsletterPopupOpen(true);
       sessionStorage.setItem('newsletter_popup_shown', '1');
-    }, 20000);
+    }, 120000);
     return () => clearTimeout(timer);
   }, []);
 

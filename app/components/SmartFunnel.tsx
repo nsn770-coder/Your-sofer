@@ -221,7 +221,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   };
 
   return (
-    <div id="bar-mitzva-wizard" style={{ background: '#F5F0E8', padding: isMobile ? '24px 12px' : '40px 24px' }}>
+    <div id="bar-mitzva-wizard" style={{ background: '#FAF8F4', padding: isMobile ? '24px 12px' : '40px 24px' }}>
       <div
         style={{
           background: '#1a2744',

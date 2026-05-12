@@ -31,7 +31,7 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
   if (!t) return null;
 
   return (
-    <div style={{ background: '#F5F0E8', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
+    <div style={{ background: '#FAF8F4', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 28, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>מה הלקוחות אומרים</h2>
         <p style={{ textAlign: 'center', fontSize: 14, color: '#888', marginBottom: 36 }}>אלפי לקוחות מרוצים ברחבי הארץ</p>

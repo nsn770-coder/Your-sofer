@@ -25,7 +25,7 @@ export default function HeroSwiper({ isMobile, onScrollToProducts, onSelectCat }
   useEffect(() => { setMounted(true); }, []);
 
   return (
-    <div style={{ background: '#F5F0E8', padding: '12px 0' }}>
+    <div style={{ background: '#FAF8F4', padding: '12px 0' }}>
       <style>{`
         .ys-hero-wrap { height: 580px; }
         @media (max-width: 767px) { .ys-hero-wrap { height: calc(100vw * 2 / 3); } }
