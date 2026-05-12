@@ -489,6 +489,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [stockCount, setStockCount]           = useState(String(product.stockCount || ''));
   const [stockVisible, setStockVisible]       = useState(product.stockVisible !== false);
   const [hasKlafSelection, setHasKlafSelection] = useState(product.hasKlafSelection ?? false);
+  const [priority, setPriority]               = useState(String(product.priority ?? 0));
   const [soferId, setSoferId]                 = useState(product.soferId || '');
   const [soferOptions, setSoferOptions]       = useState<{ id: string; name: string }[]>([]);
   const [saving, setSaving]                   = useState(false);
@@ -570,7 +571,8 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         closeupImageUrl: isStam ? (closeupImageUrl || undefined) : undefined,
         stockCount: stockCount ? Number(stockCount) : undefined,
         stockVisible,
-        hasKlafSelection: hasKlafSelection || undefined,
+        hasKlafSelection: hasKlafSelection === true ? true : false,
+        priority: priority !== '' ? Number(priority) : 0,
         soferId: soferId || undefined,
         ...(saveGlobal ? {} : textData),
       });
@@ -602,6 +604,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
             <div><label style={lS}>מחיר ₪</label><input type="number" value={price} onChange={e => setPrice(e.target.value)} style={iS} /></div>
             <div><label style={lS}>לפני הנחה ₪</label><input type="number" value={was} onChange={e => setWas(e.target.value)} placeholder="–" style={iS} /></div>
           </div>
+          <div><label style={lS}>priority</label><input type="number" value={priority} onChange={e => setPriority(e.target.value)} placeholder="0" style={iS} /></div>
           <div>
             <label style={lS}>קטגוריה</label>
             <select value={cat} onChange={e => setCat(e.target.value)} style={{ ...iS, background: '#152040' }}>

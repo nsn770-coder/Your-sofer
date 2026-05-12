@@ -104,6 +104,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 export default function ProductCard({
   id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold, hasKlafSelection,
 }: Props) {
+  console.log('PRODUCT CARD RENDERED:', id, 'hasKlaf:', hasKlafSelection);
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
   const { user } = useAuth();
