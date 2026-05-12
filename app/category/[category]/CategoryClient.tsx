@@ -951,7 +951,10 @@ export default function CategoryClient({ category }: { category: string }) {
           }
         }
       }
-      setAllLoaded(merged.filter(p => p.hidden !== true));
+      const _loaded1 = merged.filter(p => p.hidden !== true);
+      console.log('first product fields:', JSON.stringify(Object.keys(_loaded1[0] || {})));
+      console.log('first product hasKlaf:', _loaded1[0]?.hasKlafSelection);
+      setAllLoaded(_loaded1);
       return;
     }
 
@@ -960,7 +963,10 @@ export default function CategoryClient({ category }: { category: string }) {
       const snap = await getDocs(
         query(collection(db, 'products'), where('subCategory', '==', subcatOverrideForFetch), limit(500))
       );
-      setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true));
+      const _loaded2 = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true);
+      console.log('first product fields:', JSON.stringify(Object.keys(_loaded2[0] || {})));
+      console.log('first product hasKlaf:', _loaded2[0]?.hasKlafSelection);
+      setAllLoaded(_loaded2);
       return;
     }
 
@@ -976,7 +982,10 @@ export default function CategoryClient({ category }: { category: string }) {
           if (!seen.has(d.id)) { seen.add(d.id); merged.push({ id: d.id, ...d.data() } as Product); }
         }
       }
-      setAllLoaded(merged.filter(p => p.hidden !== true));
+      const _loaded3 = merged.filter(p => p.hidden !== true);
+      console.log('first product fields:', JSON.stringify(Object.keys(_loaded3[0] || {})));
+      console.log('first product hasKlaf:', _loaded3[0]?.hasKlafSelection);
+      setAllLoaded(_loaded3);
       return;
     }
 
@@ -990,7 +999,10 @@ export default function CategoryClient({ category }: { category: string }) {
       const fetchLimit = LARGE_CATS.has(category) ? 2000 : 1000;
       snap = await getDocs(query(collection(db, 'products'), where('cat', '==', category), orderBy('priority', 'desc'), limit(fetchLimit)));
     }
-    setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true));
+    const _loaded4 = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true);
+    console.log('first product fields:', JSON.stringify(Object.keys(_loaded4[0] || {})));
+    console.log('first product hasKlaf:', _loaded4[0]?.hasKlafSelection);
+    setAllLoaded(_loaded4);
   }
 
   useEffect(() => {
