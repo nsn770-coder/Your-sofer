@@ -1475,13 +1475,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       {/* PRIMARY: Buy Now */}
       <button onClick={() => { handleAddToCart(); router.push('/cart'); }}
         style={{ width: '100%', background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
-        <Icon.Zap /> הוסף לעגלה
+        {product.cat === 'קלפי מזוזה' ? '← אני רוצה את המזוזה הזאת' : <><Icon.Zap /> הוסף לעגלה</>}
       </button>
 
       {/* SECONDARY: Add to Cart */}
       <button onClick={handleAddToCart}
         style={{ width: '100%', background: added ? '#f0fdf4' : 'transparent', color: added ? '#15803d' : '#0c1a35', border: `1.5px solid ${added ? '#86efac' : '#0c1a35'}`, borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-        {added ? <><Icon.Check size={15} color="#15803d" /> נוסף לסל!</> : <><Icon.Cart size={15} color="#0c1a35" /> הוסף לסל</>}
+        {added ? <><Icon.Check size={15} color="#15803d" /> נוסף לסל!</> : product.cat === 'קלפי מזוזה' ? '← אני רוצה את המזוזה הזאת' : <><Icon.Cart size={15} color="#0c1a35" /> הוסף לסל</>}
       </button>
 
       {/* Inspector trust badge — mezuzah / tefillin */}
@@ -2021,7 +2021,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
             onClick={() => { handleAddToCart(); router.push('/cart'); }}
             style={{ background: '#b8972a', color: '#0c1a35', border: 'none', borderRadius: 12, padding: '12px 24px', fontSize: 15, fontWeight: 900, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}
           >
-            הוסף לעגלה ←
+            {product.cat === 'קלפי מזוזה' ? '← אני רוצה את המזוזה הזאת' : 'הוסף לעגלה ←'}
           </button>
         </div>
       )}
