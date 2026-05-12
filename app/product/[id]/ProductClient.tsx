@@ -1441,7 +1441,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
             <span style={{ fontSize: 32, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(product.price)}</span>
-            {product.was && <span style={{ fontSize: 32, fontWeight: 400, textDecoration: 'line-through', color: '#999', marginRight: 8 }}>{formatPrice(product.was)}</span>}
+            {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
             {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
           </div>
           <div style={{ fontSize: 12, color: '#888', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -1709,8 +1709,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
             {/* Mobile price */}
             {isMobile && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f0f0f0' }}>
-                {product.was && <div style={{ fontSize: 12, color: '#888' }}>מחיר רגיל: <span style={{ textDecoration: 'line-through' }}>{formatPrice(product.was)}</span> <span style={{ color: '#c0392b', fontWeight: 700 }}>({discount}% הנחה)</span></div>}
-                <div style={{ fontSize: 30, fontWeight: 900, color: '#0c1a35', marginTop: 2 }}>{formatPrice(product.price)}</div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
+                  <span style={{ fontSize: 32, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(product.price)}</span>
+                  {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
+                  {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
+                </div>
                 <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Truck /> כולל מע״מ · משלוח לכל הארץ</div>
                 <InstallmentBadge price={product.price} />
               </div>
