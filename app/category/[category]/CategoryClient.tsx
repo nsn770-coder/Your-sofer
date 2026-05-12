@@ -1555,7 +1555,77 @@ export default function CategoryClient({ category }: { category: string }) {
             />
           ) : (
             <>
-              {SOFER_LAYOUT_CATS.has(category) ? (
+              {(['מזוזות', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
+                (() => {
+                  const isSofer = SOFER_LAYOUT_CATS.has(category);
+                  const gridCls = isSofer ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4';
+                  const renderCard = (p: Product, idx: number) => isSofer ? (
+                    <SoferProductCard key={p.id} id={p.id} name={p.name} price={p.price}
+                      imgUrl={p.imgUrl || p.image_url} badge={p.badge} was={p.was}
+                      sofer={p.soferId ? soferMap[p.soferId] : undefined}
+                      soferName={p.soferName ?? p.sofer}
+                      hasKlafSelection={p.hasKlafSelection} cat={p.cat} />
+                  ) : (
+                    <ProductCard key={p.id} id={p.id} name={p.name} price={p.price}
+                      images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                      priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
+                      was={p.was} createdAt={p.createdAt} aboveFold={idx < 4}
+                      hasKlafSelection={p.hasKlafSelection} cat={p.cat} />
+                  );
+                  const LEVEL_GROUPS = [
+                    {
+                      key: 'כשר לכתחילה',
+                      title: 'מומלץ לרוב הבתים',
+                      desc: 'מזוזה כשרה לפי כל השיטות, עם בדיקת מגיה מוסמך לפני שיגור. מתאימה לרוב הבתים היהודיים.',
+                      match: (l?: string) => l === 'כשר לכתחילה' || l === 'פשוט',
+                    },
+                    {
+                      key: 'מהודר',
+                      title: 'למי שרוצה הידור גבוה יותר',
+                      desc: 'כתיבה מהודרת עם הקפדה מיוחדת על יופי האותיות. כשרה לפי מהדרין ולפי שיטות מדוקדקות יותר.',
+                      match: (l?: string) => l === 'מהודר',
+                    },
+                    {
+                      key: 'מהודר בתכלית',
+                      title: 'מהודר בתכלית — ללא פשרות',
+                      desc: 'הרמה הגבוהה ביותר — כל אות נכתבת בהידור מרבי, בהתאם לכל השיטות והדעות, ללא שום ויתור.',
+                      match: (l?: string) => l === 'מהודר בתכלית',
+                    },
+                  ];
+                  const leveledSet = new Set(['כשר לכתחילה', 'פשוט', 'מהודר', 'מהודר בתכלית']);
+                  const rest = filtered.filter(p => !p.level || !leveledSet.has(p.level));
+                  return (
+                    <div>
+                      {LEVEL_GROUPS.map(g => {
+                        const prods = filtered.filter(p => g.match(p.level));
+                        if (prods.length === 0) return null;
+                        return (
+                          <div key={g.key} style={{ marginBottom: 40 }}>
+                            <div style={{ background: '#0c1a35', borderRadius: 12, padding: '16px 20px', marginBottom: 16, borderRight: '4px solid #b8972a' }}>
+                              <span style={{ background: '#b8972a', color: '#0c1a35', borderRadius: 20, fontSize: 11, fontWeight: 800, padding: '2px 10px', display: 'inline-block', marginBottom: 8 }}>{g.key}</span>
+                              <h2 style={{ fontSize: 20, fontWeight: 900, color: '#fff', margin: '0 0 6px', lineHeight: 1.3 }}>{g.title}</h2>
+                              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', margin: 0, lineHeight: 1.6 }}>{g.desc}</p>
+                            </div>
+                            <div className={gridCls}>
+                              {prods.map((p, idx) => renderCard(p, idx))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {rest.length > 0 && (
+                        <div style={{ marginBottom: 40 }}>
+                          <div style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: 10, marginBottom: 16 }}>
+                            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#374151', margin: 0 }}>מוצרים נוספים</h2>
+                          </div>
+                          <div className={gridCls}>
+                            {rest.map((p, idx) => renderCard(p, idx))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()
+              ) : SOFER_LAYOUT_CATS.has(category) ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {paginated.map(p => (
                     <SoferProductCard
