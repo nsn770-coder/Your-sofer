@@ -1024,7 +1024,7 @@ export default function CategoryClient({ category }: { category: string }) {
   useEffect(() => {
     if (!SOFER_FETCH_CATS.has(category)) { setSoferMap({}); return; }
     getDocs(collection(db, 'soferim')).then(snap => {
-      const map: Record<string, { name: string; profileImage?: string }> = {};
+      const map: Record<string, { name: string; imageUrl?: string }> = {};
       snap.forEach(d => {
         const data = d.data();
         map[d.id] = { name: data.name as string, imageUrl: data.imageUrl as string | undefined };
