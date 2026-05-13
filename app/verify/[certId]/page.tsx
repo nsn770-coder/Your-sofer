@@ -92,7 +92,7 @@ export default function VerifyPage() {
                 לבירור ניתן לפנות אלינו בוואטסאפ.
               </p>
               <a
-                href="https://wa.me/972584877770"
+                href="https://wa.me/972552722228"
                 style={{ display: 'inline-block', marginTop: 16, background: '#25D366', color: '#fff', borderRadius: 8, padding: '10px 24px', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}
               >
                 💬 צרו קשר

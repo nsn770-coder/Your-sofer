@@ -7,7 +7,7 @@ import RabbinicalSupervision from '../components/RabbinicalSupervision';
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
 const NAVY_CARD = '#18274a';
-const WA = 'https://wa.me/972584877770';
+const WA = 'https://wa.me/972552722228';
 
 const PACKAGES = [
   {

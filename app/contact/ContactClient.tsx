@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-const WA_URL = 'https://wa.me/972584877770';
+const WA_URL = 'https://wa.me/972552722228';
 
 export default function ContactPage() {
   const [name, setName] = useState('');

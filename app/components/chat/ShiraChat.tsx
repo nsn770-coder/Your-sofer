@@ -146,7 +146,7 @@ export default function ShiraChat() {
       <>
         <div className="wa-float-wrap">
           <a
-            href="https://wa.me/972584877770?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A0%D7%99%20%D7%9E%D7%A2%D7%95%D7%A0%D7%99%D7%99%D7%9F%20%D7%9C%D7%91%D7%A8%D7%A8%20%D7%A2%D7%9C%20%D7%9E%D7%95%D7%A6%D7%A8%20%D7%91%D7%90%D7%AA%D7%A8"
+            href="https://wa.me/972552722228?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A0%D7%99%20%D7%9E%D7%A2%D7%95%D7%A0%D7%99%D7%99%D7%9F%20%D7%9C%D7%91%D7%A8%D7%A8%20%D7%A2%D7%9C%20%D7%9E%D7%95%D7%A6%D7%A8%20%D7%91%D7%90%D7%AA%D7%A8"
             target="_blank"
             rel="noopener noreferrer"
             className="wa-float-icon"

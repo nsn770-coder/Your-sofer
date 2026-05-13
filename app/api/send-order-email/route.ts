@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
       ${address ? `<p style="color:#555;"><strong>כתובת למשלוח:</strong> ${address}</p>` : ''}
       
-      <p style="color:#555;line-height:1.6;">לשאלות ניתן לפנות אלינו בוואטסאפ: <a href="https://wa.me/972584877770" style="color:#C5A028;">058-4877770</a></p>
+      <p style="color:#555;line-height:1.6;">לשאלות ניתן לפנות אלינו בוואטסאפ: <a href="https://wa.me/972552722228" style="color:#C5A028;">058-4877770</a></p>
     </div>
     <div style="background:#f0f0f0;padding:16px;text-align:center;font-size:12px;color:#888;">
       © 2025 Your Sofer · your-sofer.com
