@@ -163,7 +163,7 @@ export default function CheckoutPage() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, color: '#ccc' }}><IconCart size={48} /></div>
           <div style={{ fontSize: 18, color: '#888', marginBottom: 20 }}>הסל ריק</div>
-          <button onClick={() => router.push('/')} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 24, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
+          <button onClick={() => router.push('/')} style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
         </div>
       </div>
     );
@@ -336,7 +336,7 @@ export default function CheckoutPage() {
         ) : (
           <div style={{ display: 'flex', gap: 6 }}>
             <input value={couponInput} onChange={e => { setCouponInput(e.target.value.toUpperCase()); setCouponError(''); }} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }} />
-            <button onClick={applyCoupon} disabled={couponLoading || !couponInput.trim()} style={{ background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: couponLoading || !couponInput.trim() ? 0.5 : 1, whiteSpace: 'nowrap' }}>
+            <button onClick={applyCoupon} disabled={couponLoading || !couponInput.trim()} style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: couponLoading || !couponInput.trim() ? 0.5 : 1, whiteSpace: 'nowrap' }}>
               {couponLoading ? '...' : 'החל'}
             </button>
           </div>
@@ -426,7 +426,7 @@ export default function CheckoutPage() {
                     onBlur={e => (e.currentTarget.style.borderColor = '#e0e0e0')} />
                 </div>
                 <button onClick={() => isShippingValid && setStep('review')}
-                  style={{ width: '100%', background: isShippingValid ? '#C5A028' : '#e0e0e0', color: isShippingValid ? '#1E3A8A' : '#999', border: 'none', borderRadius: 24, padding: '14px', fontSize: 15, fontWeight: 800, cursor: isShippingValid ? 'pointer' : 'not-allowed', transition: 'background 0.2s' }}>
+                  style={{ width: '100%', background: isShippingValid ? '#C9A227' : '#e0e0e0', color: isShippingValid ? '#1F3D8F' : '#999', border: 'none', borderRadius: 14, height: 52, fontSize: 15, fontWeight: 800, cursor: isShippingValid ? 'pointer' : 'not-allowed', transition: 'background 0.2s' }}>
                   המשך לאישור ←
                 </button>
               </div>
@@ -474,8 +474,8 @@ export default function CheckoutPage() {
                 </div>
               </div>
               <button onClick={handleSubmit} disabled={loading}
-                style={{ width: '100%', background: loading ? '#888' : '#1E3A8A', color: '#fff', border: 'none', borderRadius: 24, padding: '15px', fontSize: 16, fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s' }}>
-                {loading ? <><IconLoader /> מכין תשלום...</> : <><IconCreditCard size={16} color="#fff" /> המשך לתשלום ←</>}
+                style={{ width: '100%', background: loading ? '#888' : '#C9A227', color: loading ? '#fff' : '#1F3D8F', border: 'none', borderRadius: 14, height: 52, fontSize: 16, fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s' }}>
+                {loading ? <><IconLoader /> מכין תשלום...</> : <><IconCreditCard size={16} color="#1F3D8F" /> המשך לתשלום ←</>}
               </button>
               <div style={{ fontSize: 11, color: '#aaa', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
                 <IconLock size={11} color="#aaa" /> תשלום מאובטח · ויזה · מסטרקארד · ביט

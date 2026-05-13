@@ -57,7 +57,7 @@ export default function CartPage() {
             <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>הסל שלך ריק</div>
             <div style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>הוסף מוצרים מהחנות כדי להתחיל</div>
             <button onClick={() => router.push('/')}
-              style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer', width: isMobile ? '100%' : 'auto' }}>
+              style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 32px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
               המשך לקנות
             </button>
           </div>
@@ -256,12 +256,12 @@ export default function CartPage() {
                   });
                   router.push('/checkout');
                 }}
-                style={{ width: '100%', background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 20, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 10 }}>
+                style={{ width: '100%', background: '#C9A227', color: '#1F3D8F', border: 'none', borderRadius: 14, height: 52, fontSize: 15, fontWeight: 800, cursor: 'pointer', marginBottom: 10 }}>
                 המשך לתשלום →
               </button>
 
               <button onClick={() => router.push('/')}
-                style={{ width: '100%', background: '#fff', color: '#1E3A8A', border: '1px solid #ddd', borderRadius: 20, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                style={{ width: '100%', background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                 המשך לקנות
               </button>
 

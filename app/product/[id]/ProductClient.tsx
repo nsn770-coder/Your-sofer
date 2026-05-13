@@ -343,7 +343,7 @@ function SoferCard({ soferId }: { soferId: string }) {
       ) : null}
       <button
         onClick={() => { trackOpenSoferProfile(soferId); router.push(`/soferim/${soferId}`); }}
-        style={{ background: '#EEF3FF', color: '#1F3D8F', border: '1.5px solid #C5D5F0', borderRadius: 20, padding: '7px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+        style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
       >
         ראה פרופיל מלא
       </button>

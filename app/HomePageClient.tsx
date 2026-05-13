@@ -986,7 +986,7 @@ export default function HomePageClient() {
                 height: 48,
                 padding: '0 28px',
                 fontWeight: 700,
-                fontSize: 15,
+                fontSize: 14,
                 textDecoration: 'none',
               }}
             >
@@ -1045,7 +1045,7 @@ export default function HomePageClient() {
       <div style={{ background: '#F8F6F1', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
         <a
           href="/category"
-          style={{ display: 'inline-block', background: '#1E3A8A', color: '#fff', borderRadius: 8, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 32px', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}
         >
           לכל המוצרים ←
         </a>
@@ -1056,25 +1056,16 @@ export default function HomePageClient() {
         <button
           onClick={() => router.push('/soferim')}
           style={{
-            background: 'linear-gradient(135deg, #C5A028, #C5A028, #C5A028)',
-            color: '#1E3A8A',
-            fontWeight: 900,
-            fontSize: 16,
-            padding: '16px 48px',
-            borderRadius: 8,
-            border: '2px solid #C5A028',
-            letterSpacing: 1,
-            boxShadow: '0 4px 20px rgba(184,151,42,0.4)',
+            background: '#C9A227',
+            color: '#1F3D8F',
+            fontWeight: 800,
+            fontSize: 15,
+            padding: '0 48px',
+            height: 52,
+            borderRadius: 14,
+            border: 'none',
             cursor: 'pointer',
             whiteSpace: 'nowrap',
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)';
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 28px rgba(184,151,42,0.6)';
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.filter = '';
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 20px rgba(184,151,42,0.4)';
           }}
         >
           לצפייה במאגר הסופרים שלנו ←
@@ -1256,7 +1247,7 @@ export default function HomePageClient() {
                 height: 48,
                 padding: '0 28px',
                 fontWeight: 700,
-                fontSize: 15,
+                fontSize: 14,
                 textDecoration: 'none',
               }}
             >
