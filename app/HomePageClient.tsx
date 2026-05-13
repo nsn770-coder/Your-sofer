@@ -1017,21 +1017,27 @@ export default function HomePageClient() {
       <RabbinicalSupervision isMobile={isMobile} />
 
       {/* ── Why Your Sofer trust block ── */}
-      <div style={{ background: '#1E3A8A', padding: isMobile ? '36px 20px' : '52px 16px', direction: 'rtl' }}>
-        <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontSize: isMobile ? 16 : 19, fontWeight: 900, color: '#f59e0b', marginBottom: 20, lineHeight: 1.5 }}>
-            ⚠️ רוב האנשים בכלל לא יודעים מי כתב את המזוזה שלהם
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 16px' : '40px 24px', direction: 'rtl' }}>
+        <div style={{
+          maxWidth: 680, margin: '0 auto',
+          background: '#EEF3FF',
+          borderRadius: 22,
+          padding: isMobile ? '32px 20px' : '40px 36px',
+          textAlign: 'center',
+        }}>
+          <p style={{ fontSize: isMobile ? 26 : 26, fontWeight: 800, color: '#1F2937', marginBottom: 24, lineHeight: 1.4 }}>
+            רוב האנשים בכלל לא יודעים מי כתב את המזוזה שלהם
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'right' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'right' }}>
             {[
               'ונמצא עובר את המבחנים שלנו',
               'כל קלף מצולם ומאומת לפני מכירה',
               'בדיקת מגיה מוסמך לכל מוצר',
               'ניתן לתקשר ישירות עם הסופר סת"מ',
             ].map(row => (
-              <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '12px 16px' }}>
-                <span style={{ color: '#25D366', fontSize: 18, flexShrink: 0 }}>✔️</span>
-                <span style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, color: '#fff' }}>{row}</span>
+              <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 12, padding: '14px 16px' }}>
+                <span style={{ color: '#C9A227', fontSize: 16, flexShrink: 0, fontWeight: 900 }}>✓</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: '#1F2937' }}>{row}</span>
               </div>
             ))}
           </div>
