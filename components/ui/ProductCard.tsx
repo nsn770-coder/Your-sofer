@@ -227,14 +227,23 @@ export default function ProductCard({
     <div
       dir="rtl"
       onClick={() => router.push(`/product/${id}`)}
-      className={`
-        group relative flex flex-col bg-white rounded-[14px]
-        overflow-hidden cursor-pointer
-        transition-all duration-300
-        hover:-translate-y-0.5
-        ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''}
-      `}
-      style={{ border: '1px solid #e8e0d0', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+      className={`group relative flex flex-col cursor-pointer ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''}`}
+      style={{
+        background: '#FFFFFF',
+        border: '1px solid #E7E2D8',
+        borderRadius: 16,
+        overflow: 'hidden',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+        transition: 'all 0.2s ease',
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.10)';
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)';
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+      }}
     >
       {/* ── Admin toolbar ── */}
       {isAdmin && (
@@ -280,11 +289,8 @@ export default function ProductCard({
         </div>
       )}
 
-      {/* ── Image ──
-          CLS FIX: Use aspect-square always (no h-36 breakpoint switch).
-          The container reserves space via padding-top trick so layout never shifts.
-      ── */}
-      <div className="relative w-full bg-gray-50 overflow-hidden" style={{ aspectRatio: '1 / 1' }}>
+      {/* ── Image ── */}
+      <div className="relative w-full overflow-hidden" style={{ aspectRatio: '1 / 1', background: '#F8F6F1' }}>
         {imgSrc ? (
           <img
             src={imgSrc} alt={name}
@@ -325,39 +331,62 @@ export default function ProductCard({
       </div>
 
       {/* ── Content ── */}
-      <div className="flex flex-col flex-1 px-2 py-2 sm:p-3 gap-1 sm:gap-2">
-        {cat && <span style={{ fontSize: 11, color: '#b8972a', fontWeight: 700, lineHeight: 1.2 }}>{cat}</span>}
-        <p className="text-[15px] sm:text-sm font-semibold text-gray-800 leading-snug line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
-          {name}
-        </p>
-        {(cat === 'קלפי מזוזה' || cat === 'קלפי תפילין') && (
-          <p style={{ fontSize: 11, color: '#b8972a', margin: 0, lineHeight: 1.4 }}>✍️ נכתב ע״י סופר מוסמך — אפשר לראות מי כתב</p>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '12px 14px 16px', gap: 4 }}>
+        {cat && (
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#C9A227', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
+            {cat}
+          </span>
         )}
 
-        <div className="flex flex-col gap-0.5">
+        <p style={{
+          fontSize: 15, fontWeight: 700, color: '#1F2937', lineHeight: 1.4,
+          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+          overflow: 'hidden', marginBottom: 6,
+        } as React.CSSProperties}>
+          {name}
+        </p>
+
+        {(cat === 'קלפי מזוזה' || cat === 'קלפי תפילין') && (
+          <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 8, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+            ✍️ נכתב ע״י סופר מוסמך — אפשר לראות מי כתב
+          </p>
+        )}
+
+        {/* Price */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{ fontSize: 22, fontWeight: 800, color: '#2446A6', lineHeight: 1 }}>
+            {formatPrice(price)}
+          </span>
           {hasSale && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-red-500 line-through font-medium">{formatPrice(was!)}</span>
-              <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full">חסכת {savePct}%</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 13, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(was!)}</span>
+              <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 11, fontWeight: 700, borderRadius: 6, padding: '2px 6px' }}>
+                חסכת {savePct}%
+              </span>
             </div>
           )}
-          <p className="text-[18px] sm:text-lg font-black text-[#1E3A8A]">
-            {formatPrice(price)}
-          </p>
         </div>
 
         {/* Cart button */}
-        <div className="mt-auto" onClick={e => e.stopPropagation()}>
+        <div style={{ marginTop: 'auto', paddingTop: 10 }} onClick={e => e.stopPropagation()}>
           {qty === 0 ? (
             <button
               onClick={handleAdd}
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg py-[14px] sm:py-2 text-[15px] sm:text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#1E3A8A] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                background: '#C9A227', color: '#1F3D8F',
+                height: 44, borderRadius: 12, border: 'none',
+                fontWeight: 800, fontSize: 14, cursor: 'pointer',
+                transition: 'filter 0.15s',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.08)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; }}
             >
               <IconCart size={13} />
               הוסף לסל
             </button>
           ) : (
-            <div className="flex items-center justify-between bg-green-500 rounded-lg overflow-hidden w-full">
+            <div className="flex items-center justify-between bg-green-500 overflow-hidden w-full" style={{ borderRadius: 12 }}>
               <button onClick={handleDecrement} className="px-3 py-1.5 sm:px-4 sm:py-2 text-white text-lg sm:text-xl font-bold hover:bg-green-600 transition-colors leading-none">−</button>
               <span className="text-white font-bold text-sm sm:text-base">{qty}</span>
               <button onClick={handleAdd} className="px-3 py-1.5 sm:px-4 sm:py-2 text-white text-lg sm:text-xl font-bold hover:bg-green-600 transition-colors leading-none">+</button>
