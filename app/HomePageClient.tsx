@@ -790,7 +790,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Hero text + CTA ── */}
-      <div dir="rtl" style={{ background: '#F5F2EC', padding: isMobile ? '28px 20px 24px' : '44px 24px 36px', textAlign: 'center' }}>
+      <div dir="rtl" style={{ background: '#fff', padding: isMobile ? '28px 20px 24px' : '44px 24px 36px', textAlign: 'center' }}>
         <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: '#1E3A8A', margin: '0 0 12px', lineHeight: 1.3 }}>
           הסת״מ שלך — מוסמך, מהודר, ומוכן למסירה
         </h1>
@@ -800,26 +800,28 @@ export default function HomePageClient() {
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a
             href="/bar-mitzvah"
-            style={{ background: '#C5A028', color: '#1E3A8A', fontWeight: 900, fontSize: isMobile ? 14 : 15, padding: isMobile ? '12px 28px' : '14px 36px', borderRadius: 8, textDecoration: 'none', display: 'inline-block', lineHeight: 1 }}
+            style={{ background: '#fafaf8', color: '#1E3A8A', fontWeight: 900, fontSize: isMobile ? 14 : 15, padding: isMobile ? '12px 28px' : '14px 36px', borderRadius: 8, textDecoration: 'none', display: 'inline-block', lineHeight: 1, border: '1.5px solid #ede8df' }}
           >
             סט בר מצווה ←
           </a>
           <a
-            href="/category/כל המוצרים"
-            style={{ background: '#fff', color: '#1E3A8A', fontWeight: 700, fontSize: isMobile ? 14 : 15, padding: isMobile ? '12px 28px' : '14px 36px', borderRadius: 8, textDecoration: 'none', display: 'inline-block', border: '2px solid #1E3A8A', lineHeight: 1 }}
+            href="/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94"
+            style={{ background: '#fafaf8', color: '#1E3A8A', fontWeight: 700, fontSize: isMobile ? 14 : 15, padding: isMobile ? '12px 28px' : '14px 36px', borderRadius: 8, textDecoration: 'none', display: 'inline-block', lineHeight: 1, border: '1.5px solid #ede8df' }}
           >
-            לכל המוצרים
+            קלפי מזוזה ←
           </a>
         </div>
       </div>
 
-      {/* ── Smart Funnel ── */}
-      <div style={{ background: '#FFFFFF', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
-        <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '10px 0 6px', fontWeight: 500 }}>
-          בחר מה אתה מחפש - נמצא לך את המתאים ביותר
-        </p>
-        <SmartFunnel isMobile={isMobile} />
-      </div>
+      {/* ── Smart Funnel — hidden on homepage ── */}
+      {false && (
+        <div style={{ background: '#FFFFFF', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
+          <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '10px 0 6px', fontWeight: 500 }}>
+            בחר מה אתה מחפש - נמצא לך את המתאים ביותר
+          </p>
+          <SmartFunnel isMobile={isMobile} />
+        </div>
+      )}
 
       {/* ── Bar Mitzvah Banner ── */}
       <Link href="/bar-mitzvah" style={{ textDecoration: 'none', display: 'block' }}>
@@ -894,7 +896,7 @@ export default function HomePageClient() {
       <div className="ys-cats-section" style={{ background: '#FFFFFF', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>קטגוריות נבחרות</h2>
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלו את מגוון מוצרי הסת&quot;מ שלנו</p>
+          <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלה עוד מגוון מוצרים</p>
           <div style={{ display: 'grid', gap: 12 }}
             className="ys-cats-grid md:grid-cols-3 lg:grid-cols-6">
             {categoryGridItems.map(cat => (
@@ -929,14 +931,8 @@ export default function HomePageClient() {
       <div style={{ minHeight: isMobile ? 290 : 330 }}>
       {featuredProducts.length > 0 && (
         <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', marginBottom: 14 }}>
             <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
-            <button
-              onClick={() => router.push('/category/יודאיקה')}
-              style={{ background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: isMobile ? '9px 18px' : '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
-            >
-              צפה במוצרים הנמכרים ביותר ←
-            </button>
           </div>
           <div style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 16px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
             {featuredProducts.map(p => {
@@ -963,7 +959,7 @@ export default function HomePageClient() {
                         e.stopPropagation();
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
                       }}
-                      style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
+                      style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
                     >
                       הוסף לסל
                     </button>
@@ -979,8 +975,8 @@ export default function HomePageClient() {
       {/* ── Shop All CTA ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
         <a
-          href="/category/יודאיקה"
-          style={{ display: 'inline-block', background: '#1E3A8A', color: '#fff', borderRadius: 0, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
+          href="/category"
+          style={{ display: 'inline-block', background: '#1E3A8A', color: '#fff', borderRadius: 8, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
         >
           לכל המוצרים ←
         </a>
@@ -999,7 +995,7 @@ export default function HomePageClient() {
                 background: '#1E3A8A',
                 color: '#fff',
                 border: 'none',
-                borderRadius: 0,
+                borderRadius: 8,
                 padding: isMobile ? '12px 22px' : '13px 28px',
                 fontSize: isMobile ? 14 : 15,
                 fontWeight: 700,
@@ -1022,7 +1018,7 @@ export default function HomePageClient() {
             fontWeight: 900,
             fontSize: 16,
             padding: '16px 48px',
-            borderRadius: 0,
+            borderRadius: 8,
             border: '2px solid #C5A028',
             letterSpacing: 1,
             boxShadow: '0 4px 20px rgba(184,151,42,0.4)',

@@ -1,7 +1,7 @@
 'use client';
 
 const GOLD = '#C5A028';
-const NAVY = '#111d3a';
+const NAVY = '#1E3A8A';
 const NAVY_CARD = '#1E40AF';
 const GOLD_LIGHT = 'rgba(197,160,40,0.15)';
 
@@ -85,7 +85,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
     <section
       dir="rtl"
       style={{
-        background: `linear-gradient(160deg, ${NAVY} 0%, #0e1a36 60%, #0a1428 100%)`,
+        background: NAVY,
         padding: isMobile ? '44px 16px' : '60px 24px',
         position: 'relative',
         overflow: 'hidden',
