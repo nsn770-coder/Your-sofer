@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
   collection, query, where, orderBy, limit,
   getDocs, getDoc, doc,
@@ -10,6 +10,8 @@ import Link from 'next/link';
 import ProductCard from '@/components/ui/ProductCard';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
+import { useCart } from '@/app/contexts/CartContext';
+import { formatPrice } from '@/app/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -869,6 +871,134 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
 
 // Pagination replaced by infinite scroll - see IntersectionObserver in main component
 
+// ─── STAM single-column card ─────────────────────────────────────────────────
+
+function StamCard({
+  product,
+  soferName,
+  soferPhoto,
+  aboveFold,
+}: {
+  product: Product;
+  soferName?: string;
+  soferPhoto?: string;
+  aboveFold?: boolean;
+}) {
+  const router = useRouter();
+  const { items, addItem, updateQty } = useCart();
+  const itemInCart = items.find(i => i.id === product.id);
+  const qty = itemInCart?.quantity ?? 0;
+  const imgSrc = optimizeCloudinaryUrl(product.imgUrl || product.image_url || '', 300) || null;
+  const hasSale = typeof product.was === 'number' && product.was > product.price;
+  const savePct = hasSale ? Math.round((1 - product.price / product.was!) * 100) : 0;
+
+  function handleAdd(e: React.MouseEvent) {
+    e.stopPropagation();
+    addItem({ id: product.id, name: product.name, price: product.price, imgUrl: imgSrc ?? undefined, quantity: 1 });
+  }
+  function handleDecrement(e: React.MouseEvent) {
+    e.stopPropagation();
+    updateQty(product.id, qty - 1);
+  }
+
+  return (
+    <div
+      dir="rtl"
+      onClick={() => router.push(`/product/${product.id}`)}
+      style={{
+        display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 14,
+        padding: 16, background: '#FFFFFF', border: '1px solid #E7E2D8',
+        borderRadius: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+        marginBottom: 12, cursor: 'pointer',
+      }}
+    >
+      {/* Klaf image */}
+      <div style={{ width: 110, height: 110, borderRadius: 12, overflow: 'hidden', flexShrink: 0, background: '#F8F6F1' }}>
+        {imgSrc ? (
+          <img src={imgSrc} alt={product.name} loading={aboveFold ? 'eager' : 'lazy'}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, color: '#d1d5db' }}>✍</div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
+
+        {/* Category label + sale badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {product.cat && (
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#C9A227', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {product.cat}
+            </span>
+          )}
+          {hasSale && (
+            <span style={{ background: '#e53e3e', color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '2px 8px' }}>מבצע</span>
+          )}
+        </div>
+
+        {/* Title */}
+        <p style={{
+          fontSize: 16, fontWeight: 700, color: '#1F2937', lineHeight: 1.4, margin: 0,
+          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+        } as React.CSSProperties}>
+          {product.name}
+        </p>
+
+        {/* Sofer row */}
+        {(soferName || soferPhoto || product.soferId) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {soferPhoto ? (
+              <img src={soferPhoto} alt={soferName ?? 'סופר'}
+                style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid #C9A227', objectFit: 'cover', flexShrink: 0 }} />
+            ) : (
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#EEF3FF', border: '2px solid #C9A227', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>✍</div>
+            )}
+            <span style={{ fontSize: 13, color: '#6B7280' }}>
+              נכתב ע״י {soferName ?? 'סופר מוסמך'}
+            </span>
+          </div>
+        )}
+
+        {/* Price */}
+        <div>
+          <span style={{ fontSize: 20, fontWeight: 800, color: '#2446A6', lineHeight: 1, display: 'block' }}>
+            {formatPrice(product.price)}
+          </span>
+          {hasSale && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+              <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(product.was!)}</span>
+              <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 11, fontWeight: 700, borderRadius: 6, padding: '2px 6px' }}>חסכת {savePct}%</span>
+            </div>
+          )}
+        </div>
+
+        {/* Cart button */}
+        <div onClick={e => e.stopPropagation()}>
+          {qty === 0 ? (
+            <button
+              onClick={handleAdd}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                background: '#EEF3FF', color: '#1F3D8F', height: 40, borderRadius: 10,
+                border: '1.5px solid #C5D5F0', fontWeight: 700, fontSize: 14, cursor: 'pointer', marginTop: 8,
+              }}
+            >
+              הוסף לסל
+            </button>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FDF8EC', borderRadius: 10, width: '100%', height: 40, border: '1.5px solid #E8D48A', marginTop: 8 }}>
+              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
+              <span style={{ color: '#C9A227', fontWeight: 700, fontSize: 15 }}>{qty}</span>
+              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function CategoryClient({ category }: { category: string }) {
@@ -1168,16 +1298,6 @@ export default function CategoryClient({ category }: { category: string }) {
 
   return (
     <div dir="rtl" className="min-h-screen" style={{ background: '#F5F2EC' }}>
-
-      {isStamCat && (
-        <style dangerouslySetInnerHTML={{ __html: `
-          @media (max-width: 639px) {
-            .pc-horizontal { flex-direction: row !important; align-items: flex-start !important; gap: 0 !important; }
-            .pc-horizontal .pc-img { width: 100px !important; max-width: 100px !important; min-width: 100px !important; height: 100px !important; aspect-ratio: unset !important; flex-shrink: 0 !important; }
-            .pc-horizontal .pc-content { padding: 10px 12px 12px !important; flex: 1 !important; min-width: 0 !important; }
-          }
-        `}} />
-      )}
 
       {/* ── Breadcrumb ── */}
       <div className="bg-white border-b border-gray-100 px-4 py-2.5" dir="rtl">
@@ -1516,7 +1636,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
           {/* Products grid / loading / empty */}
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : filtered.length === 0 ? (
@@ -1538,10 +1658,16 @@ export default function CategoryClient({ category }: { category: string }) {
             <>
               {(['מזוזות', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
                 (() => {
-                  const gridCls = isStamCat
-                    ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4'
-                    : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
-                  const renderCard = (p: Product, idx: number) => (
+                  const gridCls = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
+                  const renderCard = (p: Product, idx: number) => isStamCat ? (
+                    <StamCard
+                      key={p.id}
+                      product={p}
+                      soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                      soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                      aboveFold={idx < 4}
+                    />
+                  ) : (
                     <ProductCard key={p.id} id={p.id} name={p.name} price={p.price}
                       images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
                       priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
@@ -1549,8 +1675,7 @@ export default function CategoryClient({ category }: { category: string }) {
                       hasKlafSelection={p.hasKlafSelection} cat={p.cat}
                       soferId={p.soferId}
                       soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                      soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                      horizontal={isStamCat} />
+                      soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined} />
                   );
                   const LEVEL_GROUPS = [
                     {
@@ -1586,7 +1711,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               <h2 style={{ fontSize: 17, fontWeight: 700, color: '#1F2937', margin: '0 0 6px', lineHeight: 1.3 }}>{g.title}</h2>
                               <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>{g.desc}</p>
                             </div>
-                            <div className={gridCls}>
+                            <div className={isStamCat ? '' : gridCls}>
                               {prods.map((p, idx) => renderCard(p, idx))}
                             </div>
                           </div>
@@ -1606,29 +1731,42 @@ export default function CategoryClient({ category }: { category: string }) {
                   );
                 })()
               ) : SOFER_LAYOUT_CATS.has(category) ? (
-                <div className={isStamCat ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
-                  {paginated.map((p, idx) => (
-                    <ProductCard
-                      key={p.id}
-                      id={p.id}
-                      name={p.name}
-                      price={p.price}
-                      images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                      priority={p.priority}
-                      isBestSeller={p.isBestSeller}
-                      badge={p.badge}
-                      was={p.was}
-                      createdAt={p.createdAt}
-                      aboveFold={idx < 4}
-                      hasKlafSelection={p.hasKlafSelection}
-                      cat={p.cat}
-                      soferId={p.soferId}
-                      soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                      soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                      horizontal={isStamCat}
-                    />
-                  ))}
-                </div>
+                isStamCat ? (
+                  <div>
+                    {paginated.map((p, idx) => (
+                      <StamCard
+                        key={p.id}
+                        product={p}
+                        soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                        soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                        aboveFold={idx < 4}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {paginated.map((p, idx) => (
+                      <ProductCard
+                        key={p.id}
+                        id={p.id}
+                        name={p.name}
+                        price={p.price}
+                        images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                        priority={p.priority}
+                        isBestSeller={p.isBestSeller}
+                        badge={p.badge}
+                        was={p.was}
+                        createdAt={p.createdAt}
+                        aboveFold={idx < 4}
+                        hasKlafSelection={p.hasKlafSelection}
+                        cat={p.cat}
+                        soferId={p.soferId}
+                        soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                        soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
                 <>
                   {(() => {
@@ -1641,8 +1779,16 @@ export default function CategoryClient({ category }: { category: string }) {
                     for (let start = 0; start < paginated.length; start += BANNER_EVERY) {
                       const chunk = paginated.slice(start, start + BANNER_EVERY);
                       result.push(
-                        <div key={`chunk-${start}`} className={isStamCat ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
-                          {chunk.map((p, idx) => (
+                        <div key={`chunk-${start}`} className={isStamCat ? '' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
+                          {chunk.map((p, idx) => isStamCat ? (
+                            <StamCard
+                              key={p.id}
+                              product={p}
+                              soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                              soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                              aboveFold={start === 0 && idx < 4}
+                            />
+                          ) : (
                             <ProductCard
                               key={p.id}
                               id={p.id}
@@ -1660,12 +1806,11 @@ export default function CategoryClient({ category }: { category: string }) {
                               soferId={p.soferId}
                               soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                               soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                              horizontal={isStamCat}
                             />
                           ))}
                         </div>
                       );
-                      if (start + BANNER_EVERY < paginated.length && bannerPool.length > 0) {
+                      if (!isStamCat && start + BANNER_EVERY < paginated.length && bannerPool.length > 0) {
                         const col = bannerPool[bannerIdx % bannerPool.length];
                         bannerIdx++;
                         result.push(
