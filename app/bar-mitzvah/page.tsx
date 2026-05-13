@@ -11,33 +11,6 @@ const WA_ICON = (
   </svg>
 );
 
-const TIERS = [
-  {
-    id: 'mehudar',
-    name: 'מהודר',
-    desc: 'כתיבה מדויקת ברמה גבוהה, קלף מוכשר, בדיקת מחשב ומגיה מוסמך. הרמה הכשרה לכתחילה לפי כל הפוסקים.',
-    price: '₪1,200 – ₪1,800',
-    featured: false,
-    level: 'mehudar',
-  },
-  {
-    id: 'mehudar-betachlit',
-    name: 'מהודר בתכלית',
-    desc: 'כתיבה ברמה עילית, בדיקה כפולה, קלף גוויל מובחר. הבחירה הפופולרית ביותר לבר מצווה.',
-    price: '₪2,200 – ₪3,200',
-    featured: true,
-    badge: 'הכי נמכר',
-    level: 'mehudar-betachlit',
-  },
-  {
-    id: 'premium',
-    name: 'מהודר פרימיום',
-    desc: 'הרמה הגבוהה ביותר בשוק. סופר מומחה בעל שם, קלף עילי, ותיעוד מלא של הכתיבה. מתנה לכל החיים.',
-    price: '₪3,800 – ₪6,500',
-    featured: false,
-    level: 'premium',
-  },
-];
 
 const TESTIMONIALS = [
   {
@@ -165,65 +138,28 @@ export default function BarMitzvahPage() {
         </div>
       </div>
 
-      {/* ── 3. Three tiers ───────────────────────────────────────────────── */}
-      <section id="tiers" className="max-w-5xl mx-auto px-4 py-14">
-        <h2 className="text-center text-[#0c1a35] text-2xl sm:text-3xl font-black mb-3">
-          בחר את הרמה שמתאימה לך
-        </h2>
-        <p className="text-center text-gray-500 text-sm mb-12">
-          כל הרמות כוללות תפילין מלאים, שקית, תעודת כשרות ואריזת מתנה
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-stretch">
-          {TIERS.map(tier => (
-            <div
-              key={tier.id}
-              className={[
-                'bg-white rounded-2xl p-6 flex flex-col relative',
-                tier.featured
-                  ? 'border-2 border-[#2563EB] shadow-xl'
-                  : 'border border-[#E0D8CC] shadow-sm',
-              ].join(' ')}
-            >
-              {tier.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#2563EB] text-white text-xs font-black px-4 py-1 rounded-full whitespace-nowrap">
-                  {tier.badge}
-                </div>
-              )}
-              <h3
-                className={`text-xl font-black mb-2 mt-2 ${
-                  tier.featured ? 'text-[#2563EB]' : 'text-[#0c1a35]'
-                }`}
-              >
-                {tier.name}
-              </h3>
-              <p className="text-gray-500 text-sm leading-relaxed mb-5 flex-1">{tier.desc}</p>
-              <div className="text-[#0c1a35] text-2xl font-black mb-6">{tier.price}</div>
-              <a
-                href={`/products?category=%D7%A1%D7%98+%D7%91%D7%A8+%D7%9E%D7%A6%D7%95%D7%95%D7%94&level=${tier.level}`}
-                className={[
-                  'block text-center font-bold text-base py-3 rounded-lg no-underline',
-                  tier.featured
-                    ? 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white'
-                    : 'bg-[#0c1a35] hover:bg-[#1a2a4a] text-white',
-                ].join(' ')}
-              >
-                בחר רמה זו
-              </a>
-            </div>
-          ))}
-        </div>
-        <p className="text-center text-gray-400 text-xs mt-8">
-          לא בטוח איזה לבחור?{' '}
+      {/* ── 3. Single tier card ──────────────────────────────────────────── */}
+      <section id="tiers" className="max-w-lg mx-auto px-4 py-14">
+        <div className="bg-white rounded-2xl border border-[#E0D8CC] shadow-sm p-8 flex flex-col items-center text-center">
+          <h3 className="text-2xl font-black text-[#0c1a35] mb-3">מהודר</h3>
+          <p className="text-gray-500 text-sm leading-relaxed mb-6 max-w-sm">
+            כתיבה ברמה גבוהה בכתיבת סופר מוסמך, קלף מוכשר, בדיקת מחשב ומגיה מוסמך. כולל שקית תפילין, מדריך הנחה ותעודת כשרות.
+          </p>
+          <div className="text-[#0c1a35] text-3xl font-black mb-8">₪2,800 – ₪3,700</div>
           <a
-            href={WA_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#2563EB] underline"
+            href="/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98"
+            className="w-full block text-center bg-[#0c1a35] hover:bg-[#1a2a4a] text-white font-bold text-base py-4 rounded-lg no-underline"
           >
-            שוחח איתנו בוואטסאפ
-          </a>{' '}
-          ונעזור לך לבחור.
-        </p>
+            לצפייה בסטים ←
+          </a>
+          <p className="text-gray-400 text-xs mt-5">
+            לא בטוח?{' '}
+            <a href={WA_URL} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] underline">
+              שוחח איתנו בוואטסאפ
+            </a>{' '}
+            ונעזור לך לבחור.
+          </p>
+        </div>
       </section>
 
       {/* ── 4. Testimonials ──────────────────────────────────────────────── */}
