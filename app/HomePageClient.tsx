@@ -623,7 +623,7 @@ export default function HomePageClient() {
     <div
       dir="rtl"
       style={{
-        background: '#ffffff',
+        background: '#F8F6F1',
         fontFamily: "'Heebo', Arial, sans-serif",
         overflowX: 'hidden',
         maxWidth: '100vw',
@@ -790,12 +790,12 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Hero text + CTA ── */}
-      <div dir="rtl" style={{ background: '#fff', padding: isMobile ? '28px 20px 24px' : '44px 24px 36px', textAlign: 'center' }}>
+      <div dir="rtl" style={{ background: '#F8F6F1', padding: isMobile ? '28px 20px 24px' : '44px 24px 36px', textAlign: 'center' }}>
         <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: '#1E3A8A', margin: '0 0 12px', lineHeight: 1.3 }}>
-          הסת״מ שלך — מוסמך, מהודר, ומוכן למסירה
+          מוצרי סת״מ ישירות מהסופר
         </h1>
         <p style={{ fontSize: isMobile ? 13 : 15, color: '#555', margin: '0 auto 24px', lineHeight: 1.65, maxWidth: 540 }}>
-          מחברים אותך עם סופרי סת״מ מוסמכים. תפילין, מזוזות, ספרי תורה — עם תעודה, בדיקת מחשב, ואחריות מלאה.
+          מחברים אותך עם סופרי סת״מ מוסמכים. תפילין, מזוזות, ספרי תורה, עם תעודה, בדיקת מחשב, ואחריות מלאה.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a
@@ -860,7 +860,7 @@ export default function HomePageClient() {
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
 
       {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#FFFFFF', padding: isMobile ? '16px 12px' : '20px 24px', borderBottom: '1px solid #f0ece4' }}>
+      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '16px 12px' : '20px 24px', borderBottom: '1px solid #f0ece4' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -893,7 +893,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 4. Category grid ── */}
-      <div className="ys-cats-section" style={{ background: '#FFFFFF', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
+      <div className="ys-cats-section" style={{ background: '#F8F6F1', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלה עוד מגוון מוצרים</p>
@@ -930,7 +930,7 @@ export default function HomePageClient() {
       {/* ── 5. Featured products horizontal scroll ── */}
       <div style={{ minHeight: isMobile ? 290 : 330 }}>
       {featuredProducts.length > 0 && (
-        <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
+        <div style={{ background: '#F8F6F1', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', marginBottom: 14 }}>
             <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
           </div>
@@ -973,7 +973,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Shop All CTA ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
         <a
           href="/category"
           style={{ display: 'inline-block', background: '#1E3A8A', color: '#fff', borderRadius: 8, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
@@ -983,7 +983,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Soferim CTA ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '20px 16px 32px' : '24px 16px 40px', direction: 'rtl', textAlign: 'center' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '20px 16px 32px' : '24px 16px 40px', direction: 'rtl', textAlign: 'center' }}>
         <button
           onClick={() => router.push('/soferim')}
           style={{
@@ -1013,7 +1013,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 6. More categories horizontal scroll ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
           <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', marginBottom: 14 }}>עוד קטגוריות</h2>
         </div>
@@ -1134,7 +1134,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Static Social Proof ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>
             לקוחות שכבר קנו - מה הם אומרים
