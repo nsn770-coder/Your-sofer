@@ -1,4 +1,5 @@
 ﻿'use client';
+import { usePathname } from 'next/navigation';
 
 const ITEMS = [
   'סופרים מוסמכים בלבד',
@@ -8,6 +9,8 @@ const ITEMS = [
 ];
 
 export default function TrustBar() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/bar-mitzvah')) return null;
   return (
     <div style={{
       width: '100%',

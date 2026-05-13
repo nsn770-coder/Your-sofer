@@ -141,6 +141,8 @@ export default function ShiraChat() {
   const persona = stamPage ? PERSONAS.nissim : PERSONAS.shira;
   const pathname = usePathname();
 
+  if (pathname?.startsWith('/bar-mitzvah')) return null;
+
   if (SHOW_WHATSAPP_ONLY) {
     return (
       <>

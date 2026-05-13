@@ -1,6 +1,6 @@
 ﻿'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 const WA_LINK = 'https://wa.me/972552722228?text=שלום אני מעוניין בעזרה ופרטים נוספים';
 
@@ -28,9 +28,12 @@ const BENEFITS = [
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [benefitOpen, setBenefitOpen] = useState<number | null>(null);
   const router = useRouter();
+
+  if (pathname?.startsWith('/bar-mitzvah')) return null;
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);

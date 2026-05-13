@@ -484,6 +484,6 @@ function NavBarContent() {
 
 export default function NavBar() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/ops')) return null;
+  if (pathname?.startsWith('/ops') || pathname?.startsWith('/bar-mitzvah')) return null;
   return <NavBarContent />;
 }
