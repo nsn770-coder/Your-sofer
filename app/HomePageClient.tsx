@@ -791,7 +791,7 @@ export default function HomePageClient() {
 
       {/* ── Hero text + CTA ── */}
       <div dir="rtl" style={{ background: '#F8F6F1', padding: isMobile ? '28px 20px 24px' : '44px 24px 36px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: '#1E3A8A', margin: '0 0 12px', lineHeight: 1.3 }}>
+        <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: '#111111', margin: '0 0 12px', lineHeight: 1.3 }}>
           מוצרי סת״מ ישירות מהסופר
         </h1>
         <p style={{ fontSize: isMobile ? 13 : 15, color: '#555', margin: '0 auto 24px', lineHeight: 1.65, maxWidth: 540 }}>
@@ -860,7 +860,7 @@ export default function HomePageClient() {
       {/* ── 4. Category grid ── */}
       <div className="ys-cats-section" style={{ background: '#F8F6F1', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>קטגוריות נבחרות</h2>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#111111', marginBottom: 6 }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלה עוד מגוון מוצרים</p>
           <div style={{ display: 'grid', gap: 12 }}
             className="ys-cats-grid md:grid-cols-3 lg:grid-cols-6">
@@ -897,7 +897,7 @@ export default function HomePageClient() {
       {featuredProducts.length > 0 && (
         <div style={{ background: '#F8F6F1', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', marginBottom: 14 }}>
-            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
+            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#111111', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
           </div>
           <div style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 16px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
             {featuredProducts.map(p => {
@@ -980,7 +980,7 @@ export default function HomePageClient() {
       {/* ── 6. More categories horizontal scroll ── */}
       <div style={{ background: '#F8F6F1', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
-          <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', marginBottom: 14 }}>עוד קטגוריות</h2>
+          <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#111111', marginBottom: 14 }}>עוד קטגוריות</h2>
         </div>
         <div style={{ display: 'flex', overflowX: 'auto', gap: 10, padding: '0 12px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
           {MORE_CAT_DEFS.map(cat => {
@@ -1101,7 +1101,7 @@ export default function HomePageClient() {
       {/* ── Static Social Proof ── */}
       <div style={{ background: '#F8F6F1', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#111111', marginBottom: 6 }}>
             לקוחות שכבר קנו - מה הם אומרים
           </h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#999', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
