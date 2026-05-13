@@ -42,7 +42,16 @@ const COLUMNS: Column[] = [
       { label: 'מדריך לקניית מזוזה', path: '/madrich' },
       { label: 'תקנון האתר',          path: '/legal/takanon' },
       { label: 'מדיניות פרטיות',      path: '/legal/privacy' },
+      { label: 'משלוחים',              path: '/legal/shipping' },
       { label: 'נגישות',               path: '/legal/accessibility' },
+      { label: 'שאלות נפוצות',         path: '/madrich/faq' },
+    ],
+  },
+  {
+    title: 'הצטרפו אלינו',
+    links: [
+      { label: 'הצטרף כסופר',     path: '/soferim/apply' },
+      { label: 'הצטרף כרב קהילה', path: '/join/apply' },
     ],
   },
 ];
@@ -118,7 +127,7 @@ export default function Footer() {
     <>
       <style>{`
         @keyframes ys-footer-slide { from { opacity: 0; } to { opacity: 1; } }
-        .ys-footer-cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+        .ys-footer-cols { display: grid; grid-template-columns: repeat(5, 1fr); gap: 32px; }
         @media (max-width: 767px) { .ys-footer-cols { grid-template-columns: 1fr; gap: 0; } }
       `}</style>
 
