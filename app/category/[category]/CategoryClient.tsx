@@ -90,6 +90,9 @@ const SOFER_LAYOUT_CATS = new Set(['קלפי מזוזה', 'תפילין קומפ
 // Categories that show nusach + kashrut-level filter controls
 const STAM_FILTER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'תפילין']);
 
+// Categories that fetch sofer name+photo for product cards
+const SOFER_FETCH_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות']);
+
 // ─── Category-specific name-based filters ────────────────────────────────────
 
 interface NameFilterSpec {
@@ -887,6 +890,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [catImages, setCatImages]               = useState<Record<string, string>>({});
   const [curation, setCuration]                 = useState<Curation | null>(null);
   const [collectionFilter, setCollectionFilter] = useState<string>('');
+  const [soferMap, setSoferMap] = useState<Record<string, { name: string; profileImage?: string }>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { setStamPage } = useChatPersona();
 
@@ -1015,6 +1019,18 @@ export default function CategoryClient({ category }: { category: string }) {
     }
     fetchCatImages();
   }, []);
+
+  useEffect(() => {
+    if (!SOFER_FETCH_CATS.has(category)) { setSoferMap({}); return; }
+    getDocs(collection(db, 'soferim')).then(snap => {
+      const map: Record<string, { name: string; profileImage?: string }> = {};
+      snap.forEach(d => {
+        const data = d.data();
+        map[d.id] = { name: data.name as string, profileImage: data.profileImage as string | undefined };
+      });
+      setSoferMap(map);
+    }).catch(() => {});
+  }, [category]);
 
   // Fetch curation for this category or sub-category
   useEffect(() => {
@@ -1518,7 +1534,9 @@ export default function CategoryClient({ category }: { category: string }) {
                       priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
                       was={p.was} createdAt={p.createdAt} aboveFold={idx < 4}
                       hasKlafSelection={p.hasKlafSelection} cat={p.cat}
-                      soferId={p.soferId} soferName={p.soferName ?? p.sofer} />
+                      soferId={p.soferId}
+                      soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                      soferPhoto={p.soferId ? soferMap[p.soferId]?.profileImage : undefined} />
                   );
                   const LEVEL_GROUPS = [
                     {
@@ -1591,7 +1609,8 @@ export default function CategoryClient({ category }: { category: string }) {
                       hasKlafSelection={p.hasKlafSelection}
                       cat={p.cat}
                       soferId={p.soferId}
-                      soferName={p.soferName ?? p.sofer}
+                      soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                      soferPhoto={p.soferId ? soferMap[p.soferId]?.profileImage : undefined}
                     />
                   ))}
                 </div>
@@ -1624,7 +1643,8 @@ export default function CategoryClient({ category }: { category: string }) {
                               hasKlafSelection={p.hasKlafSelection}
                               cat={p.cat}
                               soferId={p.soferId}
-                              soferName={p.soferName ?? p.sofer}
+                              soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                              soferPhoto={p.soferId ? soferMap[p.soferId]?.profileImage : undefined}
                             />
                           ))}
                         </div>
