@@ -790,20 +790,18 @@ export default function HomePageClient() {
           borderRadius: '0 0 28px 28px',
         }}
       >
-        {/* Background image */}
-        <Image
-          src={isMobile
-            ? 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777365682/%D7%91%D7%90%D7%A0%D7%A8_2_wovsve.png'
-            : 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1280,q_auto:best,f_auto/v1777452503/%D7%9E%D7%97%D7%A9%D7%91_dmat7m.png'
-          }
-          alt="Your Sofer - סת״מ ויודאיקה מהודרים"
-          fill
-          unoptimized
-          priority
-          fetchPriority="high"
-          sizes="100vw"
-          style={{ objectFit: 'cover', objectPosition: 'center' }}
-        />
+        {/* Background video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+        >
+          <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/q_auto,f_auto/v1778695037/download_ft8kbz.mp4" type="video/mp4" />
+          <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/v1778695037/download_ft8kbz.mp4" type="video/mp4" />
+        </video>
 
         {/* Overlay */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.38)', zIndex: 1 }} />
