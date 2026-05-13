@@ -26,6 +26,7 @@ interface Props {
   soferId?: string;
   soferName?: string;
   soferPhoto?: string;
+  horizontal?: boolean;
 }
 
 const SOFER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות']);
@@ -109,7 +110,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 
 export default function ProductCard({
   id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
-  soferId, soferName, soferPhoto,
+  soferId, soferName, soferPhoto, horizontal,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -233,7 +234,7 @@ export default function ProductCard({
     <div
       dir="rtl"
       onClick={() => router.push(`/product/${id}`)}
-      className={`group relative flex flex-col cursor-pointer ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''}`}
+      className={`group relative flex flex-col cursor-pointer ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''} ${horizontal ? 'pc-horizontal' : ''}`}
       style={{
         background: '#FFFFFF',
         border: '1px solid #E7E2D8',
@@ -296,7 +297,7 @@ export default function ProductCard({
       )}
 
       {/* ── Image ── */}
-      <div className="relative w-full overflow-hidden" style={{ aspectRatio: '1 / 1', background: '#F8F6F1' }}>
+      <div className={`relative w-full overflow-hidden${horizontal ? ' pc-img' : ''}`} style={{ aspectRatio: '1 / 1', background: '#F8F6F1' }}>
         {imgSrc ? (
           <img
             src={imgSrc} alt={name}
@@ -337,7 +338,7 @@ export default function ProductCard({
       </div>
 
       {/* ── Content ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '12px 14px 16px', gap: 4 }}>
+      <div className={horizontal ? 'pc-content' : ''} style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '12px 14px 16px', gap: 4 }}>
         {cat && (
           <span style={{ fontSize: 11, fontWeight: 600, color: '#C9A227', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
             {cat}

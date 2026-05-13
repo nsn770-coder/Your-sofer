@@ -890,9 +890,10 @@ export default function CategoryClient({ category }: { category: string }) {
   const [catImages, setCatImages]               = useState<Record<string, string>>({});
   const [curation, setCuration]                 = useState<Curation | null>(null);
   const [collectionFilter, setCollectionFilter] = useState<string>('');
-  const [soferMap, setSoferMap] = useState<Record<string, { name: string; profileImage?: string }>>({});
+  const [soferMap, setSoferMap] = useState<Record<string, { name: string; imageUrl?: string }>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { setStamPage } = useChatPersona();
+  const isStamCat = SOFER_FETCH_CATS.has(category);
 
   useEffect(() => {
     const STAM_CHAT_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
@@ -1026,7 +1027,7 @@ export default function CategoryClient({ category }: { category: string }) {
       const map: Record<string, { name: string; profileImage?: string }> = {};
       snap.forEach(d => {
         const data = d.data();
-        map[d.id] = { name: data.name as string, profileImage: data.profileImage as string | undefined };
+        map[d.id] = { name: data.name as string, imageUrl: data.imageUrl as string | undefined };
       });
       setSoferMap(map);
     }).catch(() => {});
@@ -1167,6 +1168,16 @@ export default function CategoryClient({ category }: { category: string }) {
 
   return (
     <div dir="rtl" className="min-h-screen" style={{ background: '#F5F2EC' }}>
+
+      {isStamCat && (
+        <style dangerouslySetInnerHTML={{ __html: `
+          @media (max-width: 639px) {
+            .pc-horizontal { flex-direction: row !important; align-items: flex-start !important; gap: 0 !important; }
+            .pc-horizontal .pc-img { width: 100px !important; max-width: 100px !important; min-width: 100px !important; height: 100px !important; aspect-ratio: unset !important; flex-shrink: 0 !important; }
+            .pc-horizontal .pc-content { padding: 10px 12px 12px !important; flex: 1 !important; min-width: 0 !important; }
+          }
+        `}} />
+      )}
 
       {/* ── Breadcrumb ── */}
       <div className="bg-white border-b border-gray-100 px-4 py-2.5" dir="rtl">
@@ -1527,7 +1538,9 @@ export default function CategoryClient({ category }: { category: string }) {
             <>
               {(['מזוזות', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
                 (() => {
-                  const gridCls = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
+                  const gridCls = isStamCat
+                    ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4'
+                    : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
                   const renderCard = (p: Product, idx: number) => (
                     <ProductCard key={p.id} id={p.id} name={p.name} price={p.price}
                       images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
@@ -1536,7 +1549,8 @@ export default function CategoryClient({ category }: { category: string }) {
                       hasKlafSelection={p.hasKlafSelection} cat={p.cat}
                       soferId={p.soferId}
                       soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                      soferPhoto={p.soferId ? soferMap[p.soferId]?.profileImage : undefined} />
+                      soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                      horizontal={isStamCat} />
                   );
                   const LEVEL_GROUPS = [
                     {
@@ -1592,7 +1606,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   );
                 })()
               ) : SOFER_LAYOUT_CATS.has(category) ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className={isStamCat ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
                   {paginated.map((p, idx) => (
                     <ProductCard
                       key={p.id}
@@ -1610,7 +1624,8 @@ export default function CategoryClient({ category }: { category: string }) {
                       cat={p.cat}
                       soferId={p.soferId}
                       soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                      soferPhoto={p.soferId ? soferMap[p.soferId]?.profileImage : undefined}
+                      soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                      horizontal={isStamCat}
                     />
                   ))}
                 </div>
@@ -1626,7 +1641,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     for (let start = 0; start < paginated.length; start += BANNER_EVERY) {
                       const chunk = paginated.slice(start, start + BANNER_EVERY);
                       result.push(
-                        <div key={`chunk-${start}`} className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <div key={`chunk-${start}`} className={isStamCat ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
                           {chunk.map((p, idx) => (
                             <ProductCard
                               key={p.id}
@@ -1644,7 +1659,8 @@ export default function CategoryClient({ category }: { category: string }) {
                               cat={p.cat}
                               soferId={p.soferId}
                               soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                              soferPhoto={p.soferId ? soferMap[p.soferId]?.profileImage : undefined}
+                              soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                              horizontal={isStamCat}
                             />
                           ))}
                         </div>
