@@ -374,22 +374,22 @@ export default function ProductCard({
               onClick={handleAdd}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: '#FFFFFF', color: '#1F2937',
-                height: 44, borderRadius: 12, border: '1.5px solid #D8D2C4',
+                background: '#EEF3FF', color: '#1F3D8F',
+                height: 44, borderRadius: 12, border: '1.5px solid #C5D5F0',
                 fontWeight: 700, fontSize: 14, cursor: 'pointer',
                 transition: 'background 0.15s, border-color 0.15s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#F8F6F1'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#C9A227'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#D8D2C4'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#dce8fb'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#2446A6'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#EEF3FF'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5D5F0'; }}
             >
               <IconCart size={13} />
               הוסף לסל
             </button>
           ) : (
-            <div className="flex items-center justify-between bg-green-500 overflow-hidden w-full" style={{ borderRadius: 12 }}>
-              <button onClick={handleDecrement} className="px-3 py-1.5 sm:px-4 sm:py-2 text-white text-lg sm:text-xl font-bold hover:bg-green-600 transition-colors leading-none">−</button>
-              <span className="text-white font-bold text-sm sm:text-base">{qty}</span>
-              <button onClick={handleAdd} className="px-3 py-1.5 sm:px-4 sm:py-2 text-white text-lg sm:text-xl font-bold hover:bg-green-600 transition-colors leading-none">+</button>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#C9A227', borderRadius: 12, overflow: 'hidden', width: '100%', height: 44, border: 'none' }}>
+              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#1F3D8F', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
+              <span style={{ color: '#1F3D8F', fontWeight: 800, fontSize: 15 }}>{qty}</span>
+              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#1F3D8F', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
             </div>
           )}
         </div>
