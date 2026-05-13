@@ -30,7 +30,6 @@ export default function BarMitzvahLayout({ children }: { children: React.ReactNo
               width={40}
               height={40}
               className="h-8 w-auto"
-              onError={() => {}}
             />
             <span className="font-bold text-base hidden sm:block">Your Sofer</span>
           </a>
