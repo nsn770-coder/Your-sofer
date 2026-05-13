@@ -23,7 +23,12 @@ interface Props {
   aboveFold?: boolean;
   hasKlafSelection?: boolean;
   cat?: string;
+  soferId?: string;
+  soferName?: string;
+  soferPhoto?: string;
 }
+
+const SOFER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות']);
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
 
@@ -104,6 +109,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 
 export default function ProductCard({
   id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
+  soferId, soferName, soferPhoto,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -346,10 +352,23 @@ export default function ProductCard({
           {name}
         </p>
 
-        {(cat === 'קלפי מזוזה' || cat === 'קלפי תפילין') && (
-          <p style={{ fontSize: 12, color: '#6B7280', marginBottom: 8, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-            ✍️ נכתב ע״י סופר מוסמך — אפשר לראות מי כתב
-          </p>
+        {(soferId || soferName || (cat && SOFER_CATS.has(cat))) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            {soferPhoto ? (
+              <img
+                src={soferPhoto}
+                alt={soferName ?? 'סופר'}
+                style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #E7E2D8', flexShrink: 0 }}
+              />
+            ) : (
+              <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, flexShrink: 0, border: '1.5px solid #E7E2D8' }}>
+                ✍
+              </div>
+            )}
+            <span style={{ fontSize: 12, color: '#6B7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              נכתב ע״י {soferName ?? 'סופר מוסמך'}
+            </span>
+          </div>
         )}
 
         {/* Price */}

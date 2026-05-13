@@ -1517,7 +1517,8 @@ export default function CategoryClient({ category }: { category: string }) {
                       images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
                       priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
                       was={p.was} createdAt={p.createdAt} aboveFold={idx < 4}
-                      hasKlafSelection={p.hasKlafSelection} cat={p.cat} />
+                      hasKlafSelection={p.hasKlafSelection} cat={p.cat}
+                      soferId={p.soferId} soferName={p.soferName ?? p.sofer} />
                   );
                   const LEVEL_GROUPS = [
                     {
@@ -1589,6 +1590,8 @@ export default function CategoryClient({ category }: { category: string }) {
                       aboveFold={idx < 4}
                       hasKlafSelection={p.hasKlafSelection}
                       cat={p.cat}
+                      soferId={p.soferId}
+                      soferName={p.soferName ?? p.sofer}
                     />
                   ))}
                 </div>
@@ -1620,6 +1623,8 @@ export default function CategoryClient({ category }: { category: string }) {
                               aboveFold={start === 0 && idx < 4}
                               hasKlafSelection={p.hasKlafSelection}
                               cat={p.cat}
+                              soferId={p.soferId}
+                              soferName={p.soferName ?? p.sofer}
                             />
                           ))}
                         </div>
