@@ -781,35 +781,100 @@ export default function HomePageClient() {
       )}
 
       {/* ── 1. Hero ── */}
-      <div className="ys-hero-clip" style={{ width: '100%', overflow: 'hidden' }}>
-        <HeroSwiper
-          isMobile={isMobile}
-          onScrollToProducts={() => cardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
-          onSelectCat={() => {}}
+      <div
+        dir="rtl"
+        style={{
+          position: 'relative',
+          minHeight: isMobile ? 420 : 520,
+          overflow: 'hidden',
+          borderRadius: '0 0 28px 28px',
+        }}
+      >
+        {/* Background image */}
+        <Image
+          src={isMobile
+            ? 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777365682/%D7%91%D7%90%D7%A0%D7%A8_2_wovsve.png'
+            : 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1280,q_auto:best,f_auto/v1777452503/%D7%9E%D7%97%D7%A9%D7%91_dmat7m.png'
+          }
+          alt="Your Sofer - סת״מ ויודאיקה מהודרים"
+          fill
+          unoptimized
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
         />
-      </div>
 
-      {/* ── Hero text + CTA ── */}
-      <div dir="rtl" style={{ background: '#F8F6F1', padding: isMobile ? '28px 20px 24px' : '44px 24px 36px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: '#111111', margin: '0 0 12px', lineHeight: 1.3 }}>
-          מוצרי סת״מ ישירות מהסופר
-        </h1>
-        <p style={{ fontSize: isMobile ? 13 : 15, color: '#555', margin: '0 auto 24px', lineHeight: 1.65, maxWidth: 540 }}>
-          מחברים אותך עם סופרי סת״מ מוסמכים. תפילין, מזוזות, ספרי תורה, עם תעודה, בדיקת מחשב, ואחריות מלאה.
-        </p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a
-            href="/bar-mitzvah"
-            style={{ background: '#fafaf8', color: '#1E3A8A', fontWeight: 900, fontSize: isMobile ? 14 : 15, padding: isMobile ? '12px 28px' : '14px 36px', borderRadius: 8, textDecoration: 'none', display: 'inline-block', lineHeight: 1, border: '1.5px solid #ede8df' }}
-          >
-            סט בר מצווה ←
-          </a>
-          <a
-            href="/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94"
-            style={{ background: '#fafaf8', color: '#1E3A8A', fontWeight: 700, fontSize: isMobile ? 14 : 15, padding: isMobile ? '12px 28px' : '14px 36px', borderRadius: 8, textDecoration: 'none', display: 'inline-block', lineHeight: 1, border: '1.5px solid #ede8df' }}
-          >
-            קלפי מזוזה ←
-          </a>
+        {/* Overlay */}
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.38)', zIndex: 1 }} />
+
+        {/* Content */}
+        <div style={{
+          position: 'relative', zIndex: 2,
+          padding: isMobile ? '60px 24px 40px' : '80px 48px 60px',
+          minHeight: isMobile ? 420 : 520,
+          display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        }}>
+          <h1 style={{
+            fontSize: isMobile ? 32 : 48,
+            fontWeight: 800,
+            color: '#FFFFFF',
+            lineHeight: 1.2,
+            maxWidth: '90%',
+            textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            margin: 0,
+          }}>
+            היחידים שמראים לך את הסופר
+          </h1>
+
+          <p style={{
+            fontSize: isMobile ? 16 : 18,
+            fontWeight: 400,
+            color: 'rgba(255,255,255,0.92)',
+            marginTop: 12,
+            maxWidth: '85%',
+            lineHeight: 1.6,
+          }}>
+            מזוזות ותפילין מסופרים מוסמכים — עם צילום הקלף, בדיקת מגיה ואחריות מלאה.
+          </p>
+
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 28 }}>
+            <a
+              href="/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94"
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                background: '#C9A227',
+                color: '#1F3D8F',
+                height: 52,
+                padding: '0 28px',
+                borderRadius: 14,
+                fontWeight: 800,
+                fontSize: 16,
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              בחרו מזוזה
+            </a>
+            <a
+              href="/bar-mitzva"
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(255,255,255,0.15)',
+                color: '#FFFFFF',
+                border: '1.5px solid rgba(255,255,255,0.6)',
+                height: 52,
+                padding: '0 28px',
+                borderRadius: 14,
+                fontWeight: 700,
+                fontSize: 16,
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              סט בר מצווה
+            </a>
+          </div>
         </div>
       </div>
 
