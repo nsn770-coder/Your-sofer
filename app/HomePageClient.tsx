@@ -932,36 +932,68 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 4. Category grid ── */}
-      <div className="ys-cats-section" style={{ background: '#F8F6F1', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 20px' : '40px 24px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#111111', marginBottom: 6 }}>קטגוריות נבחרות</h2>
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלה עוד מגוון מוצרים</p>
-          <div style={{ display: 'grid', gap: 12 }}
-            className="ys-cats-grid md:grid-cols-3 lg:grid-cols-6">
-            {categoryGridItems.map(cat => (
+          <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 800, color: '#1F2937', marginBottom: 8 }}>קטגוריות נבחרות</h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#6B7280', marginBottom: 24 }}>גלה עוד מגוון מוצרים</p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+            gap: isMobile ? 12 : 20,
+          }}>
+            {([
+              categoryGridItems.find(c => c.name === 'קלף מזוזה'),
+              categoryGridItems.find(c => c.name === 'תפילין קומפלט'),
+              { name: 'סט בר מצווה', emoji: '✡️', img: catImages['סט בר מצווה'] || '', href: '/bar-mitzva' },
+              categoryGridItems.find(c => c.name === 'בתי מזוזה'),
+              categoryGridItems.find(c => c.name === 'סט טלית תפילין'),
+              categoryGridItems.find(c => c.name === 'יודאיקה'),
+            ].filter(Boolean) as { name: string; emoji: string; img: string; href: string; fallback?: string }[]).map(cat => (
               <div key={cat.name}
                 onClick={() => router.push(cat.href)}
                 style={{
-                  borderRadius: 0, overflow: 'hidden', cursor: 'pointer',
-                  background: '#fff',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
+                  borderRadius: 18,
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  background: '#FFFFFF',
+                  border: '1px solid #E7E2D8',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.14)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 10px rgba(0,0,0,0.07)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; }}
               >
-                <div style={{ height: isMobile ? 180 : 220, overflow: 'hidden', borderRadius: 0, position: 'relative' }}>
+                <div style={{ height: 160, overflow: 'hidden', position: 'relative' }}>
                   {cat.img ? (
-                    <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 220px" />
+                    <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4', borderRadius: 0 }}>{cat.emoji}</div>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4' }}>{cat.emoji}</div>
                   )}
                 </div>
-                <div style={{ padding: 10, background: '#fff', textAlign: 'center' }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A' }}>{cat.name}</span>
+                <div style={{ padding: '12px 16px', background: '#FFFFFF', textAlign: 'center' }}>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}>{cat.name}</span>
                 </div>
               </div>
             ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <a
+              href="/category"
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                background: '#FFFFFF',
+                border: '1.5px solid #E7E2D8',
+                color: '#2446A6',
+                borderRadius: 12,
+                height: 48,
+                padding: '0 28px',
+                fontWeight: 700,
+                fontSize: 15,
+                textDecoration: 'none',
+              }}
+            >
+              לכל הקטגוריות ←
+            </a>
           </div>
         </div>
       </div>
