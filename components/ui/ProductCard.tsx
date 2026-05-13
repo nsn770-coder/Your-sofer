@@ -386,10 +386,10 @@ export default function ProductCard({
               הוסף לסל
             </button>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#C9A227', borderRadius: 12, overflow: 'hidden', width: '100%', height: 44, border: 'none' }}>
-              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#1F3D8F', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
-              <span style={{ color: '#1F3D8F', fontWeight: 800, fontSize: 15 }}>{qty}</span>
-              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#1F3D8F', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FDF8EC', borderRadius: 12, overflow: 'hidden', width: '100%', height: 44, border: '1.5px solid #E8D48A' }}>
+              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
+              <span style={{ color: '#C9A227', fontWeight: 700, fontSize: 15 }}>{qty}</span>
+              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
             </div>
           )}
         </div>
