@@ -85,7 +85,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
     <section
       dir="rtl"
       style={{
-        background: '#ffffff',
+        background: '#F8F6F1',
         padding: isMobile ? '44px 16px' : '60px 24px',
         position: 'relative',
         overflow: 'hidden',
