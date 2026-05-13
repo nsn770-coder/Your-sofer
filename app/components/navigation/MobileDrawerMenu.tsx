@@ -140,6 +140,28 @@ export default function MobileDrawerMenu({
           {menuData.map(item => (
             <MobileAccordion key={item.id} item={item} onSelect={onSelect} />
           ))}
+          <div className="px-4 py-3">
+            <a
+              href="/soferim"
+              onClick={onClose}
+              style={{
+                display: 'block',
+                width: '100%',
+                background: '#EEF3FF',
+                color: '#2446A6',
+                border: '1.5px solid #C5D5F0',
+                borderRadius: 12,
+                padding: '12px 16px',
+                fontWeight: 700,
+                fontSize: 15,
+                textAlign: 'right',
+                textDecoration: 'none',
+                boxSizing: 'border-box',
+              }}
+            >
+              הכירו את הסופרים שלנו ←
+            </a>
+          </div>
           <div className="border-t border-gray-200 mt-2">
             {simpleNav.map(nav => (
               <button

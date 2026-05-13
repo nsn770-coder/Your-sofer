@@ -480,6 +480,13 @@ function NavBarContent() {
                   {nav.label}
                 </button>
               ))}
+              <div style={{ marginRight: 'auto' }} />
+              <button
+                onClick={() => router.push('/soferim')}
+                style={{ background: '#EEF3FF', color: '#2446A6', border: '1.5px solid #C5D5F0', borderRadius: 12, padding: '6px 14px', fontWeight: 700, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', flexShrink: 0 }}
+              >
+                הכירו את הסופרים שלנו ←
+              </button>
             </div>
           </div>
         )}
