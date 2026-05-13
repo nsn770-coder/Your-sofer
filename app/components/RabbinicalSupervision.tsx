@@ -116,15 +116,14 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
 
           <h2 style={{
             fontSize: isMobile ? 22 : 28,
-            fontWeight: 900, color: '#fff',
+            fontWeight: 900, color: '#1E3A8A',
             lineHeight: 1.35, margin: '0 0 12px',
-            textShadow: '0 2px 12px rgba(0,0,0,0.4)',
           }}>
             כל מוצר סת״מ באתר עובר בדיקה ואישור רבני
           </h2>
           <p style={{
             fontSize: isMobile ? 14 : 15,
-            color: 'rgba(255,255,255,0.65)',
+            color: '#444444',
             margin: 0, fontWeight: 400,
           }}>
             אנו מחויבים לסטנדרט הכשרות הגבוה ביותר
@@ -190,10 +189,10 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
           ].map(item => (
             <div key={item} style={{
               display: 'flex', alignItems: 'center', gap: 7,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              background: '#f5f5f5',
+              border: '1px solid #e0e0e0',
               borderRadius: 20, padding: '7px 14px',
-              fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: 600,
+              fontSize: 12, color: '#1E3A8A', fontWeight: 600,
             }}>
               <span style={{ color: GOLD, fontSize: 13 }}>✓</span> {item}
             </div>
