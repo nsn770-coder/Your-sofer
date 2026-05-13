@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -20,13 +20,11 @@ export default function WizardStickyBar() {
     }
     sync();
     setMounted(true);
-    // Keep in sync when another tab or component changes localStorage
     window.addEventListener('storage', sync);
     return () => window.removeEventListener('storage', sync);
   }, []);
 
-  // Wait for mount (localStorage is client-only) and validate state
-  if (!mounted || !active || step <= 0 || step >= BAR_MITZVA_TOTAL) return <div aria-hidden="true" style={{ height: 66 }} />;
+  if (!mounted || !active || step <= 0 || step >= BAR_MITZVA_TOTAL) return null;
 
   const nextStep = BAR_MITZVA_STEPS[step];
   if (!nextStep) return null;
@@ -38,22 +36,18 @@ export default function WizardStickyBar() {
     <div
       dir="rtl"
       style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 950,
         background: '#1E3A8A',
-        borderTop: '2px solid #C5A028',
-        padding: '10px 16px',
+        borderRadius: 12,
+        border: '2px solid #C5A028',
+        padding: '12px 16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 12,
-        boxShadow: '0 -4px 24px rgba(0,0,0,0.28)',
+        boxShadow: '0 4px 20px rgba(30,58,138,0.18)',
+        marginBottom: 16,
       }}
     >
-      {/* Circular progress + text */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
         <div style={{ flexShrink: 0, position: 'relative', width: 44, height: 44 }}>
           <svg width="44" height="44" style={{ transform: 'rotate(-90deg)' }}>
@@ -86,7 +80,6 @@ export default function WizardStickyBar() {
         </div>
       </div>
 
-      {/* CTA */}
       <button
         onClick={() => router.push('/?wizard=bar-mitzva#bar-mitzva-wizard')}
         style={{
@@ -94,7 +87,7 @@ export default function WizardStickyBar() {
           background: '#C5A028',
           color: '#1E3A8A',
           border: 'none',
-          borderRadius: 0,
+          borderRadius: 8,
           padding: '10px 18px',
           fontSize: 13,
           fontWeight: 700,

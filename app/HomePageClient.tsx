@@ -825,35 +825,44 @@ export default function HomePageClient() {
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
 
       {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '16px 12px' : '20px 24px', borderBottom: '1px solid #f0ece4' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ color: '#C5A028', display: 'flex', alignItems: 'center' }}><IconCounterBox isMobile={isMobile} /></span>
-              <span ref={productsValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#C5A028', lineHeight: 1 }}>0+</span>
-            </div>
-            <span style={{ fontSize: isMobile ? 11 : 12, color: '#1E3A8A', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>מוצרים באתר</span>
+      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '12px 12px' : '16px 24px', borderBottom: '1px solid #f0ece4' }}>
+        <div style={{
+          maxWidth: 900, margin: '0 auto',
+          background: '#fff',
+          padding: isMobile ? '14px 12px' : '20px 24px',
+          borderRadius: 14,
+          boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+          border: '1px solid #E7E2D8',
+          display: 'flex',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          gap: 0,
+          overflowX: isMobile ? 'auto' : 'visible',
+        }}>
+          {/* לקוחות מרוצים */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
+            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterCheck isMobile={false} /></span>
+            <span ref={customersValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0+</span>
+            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>לקוחות מרוצים</span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ color: '#C5A028', display: 'flex', alignItems: 'center' }}><IconCounterPen isMobile={isMobile} /></span>
-              <span ref={soferimValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#C5A028', lineHeight: 1 }}>0</span>
-            </div>
-            <span style={{ fontSize: isMobile ? 11 : 12, color: '#1E3A8A', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>סופרים מאושרים</span>
+          {/* סופרים מוסמכים */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
+            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterPen isMobile={false} /></span>
+            <span ref={soferimValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0</span>
+            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>סופרים מוסמכים</span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ color: '#C5A028', display: 'flex', alignItems: 'center' }}><IconCounterCheck isMobile={isMobile} /></span>
-              <span ref={customersValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#C5A028', lineHeight: 1 }}>0+</span>
-            </div>
-            <span style={{ fontSize: isMobile ? 11 : 12, color: '#1E3A8A', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>לקוחות מרוצים</span>
+          {/* מוצרים באתר */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
+            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterBox isMobile={false} /></span>
+            <span ref={productsValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0+</span>
+            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>מוצרים באתר</span>
           </div>
-        </div>
-        {/* Rating row */}
-        <div style={{ maxWidth: 900, margin: '10px auto 0', textAlign: 'center' }}>
-          <span style={{ fontSize: isMobile ? 15 : 17, color: '#c8962a', letterSpacing: 2 }}>★★★★★</span>
-          <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#c8962a', marginRight: 6 }}>4.8</span>
-          <span style={{ fontSize: isMobile ? 11 : 12, color: '#888', fontWeight: 500 }}>דירוג ממוצע</span>
+          {/* דירוג ממוצע */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', flex: 1 }}>
+            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterStar isMobile={false} /></span>
+            <span style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>4.8</span>
+            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>דירוג ממוצע</span>
+          </div>
         </div>
       </div>
 

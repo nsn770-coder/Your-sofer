@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import RabbinicalSupervision from '../components/RabbinicalSupervision';
+import WizardStickyBar from '../components/WizardStickyBar';
 
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
@@ -130,6 +131,11 @@ export default function BarMitzvaPage() {
           </a>
         </div>
       </section>
+
+      {/* ── Wizard resume bar ── */}
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '16px 20px 0' }}>
+        <WizardStickyBar />
+      </div>
 
       {/* ── Package cards ── */}
       <section style={{ padding: isMobile ? '44px 16px 32px' : '64px 24px 48px' }}>

@@ -12,7 +12,6 @@ import ShiraChat from "@/app/components/chat/ShiraChat";
 import { ChatPersonaProvider } from "@/app/components/chat/ChatPersonaContext";
 import GTMLoader from "@/app/components/GTMLoader";
 import MetaPixelPageView from "@/app/components/MetaPixelPageView";
-import WizardStickyBar from "@/app/components/WizardStickyBar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FacebookPixel } from "@/components/FacebookPixel";
 import { TidioChat } from "@/components/TidioChat";
@@ -109,7 +108,6 @@ export default function RootLayout({
           </Suspense>
           <GTMLoader />
         </AuthProvider>
-        <WizardStickyBar />
         <ShiraChat />
         <ShavuotPopupWrapper />
         </ChatPersonaProvider>

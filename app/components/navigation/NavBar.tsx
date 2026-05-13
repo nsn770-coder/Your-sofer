@@ -289,6 +289,8 @@ function NavBarContent() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
@@ -304,10 +306,16 @@ function NavBarContent() {
   }, []);
 
   useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape") { setActiveId(null); setMobileOpen(false); } };
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") { setActiveId(null); setMobileOpen(false); setSearchOpen(false); } };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, []);
+
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [searchOpen]);
 
   const clearTimers = () => {
     if (openTimer.current) clearTimeout(openTimer.current);
@@ -394,22 +402,32 @@ function NavBarContent() {
             <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 
-          <div style={{ flex: 1, display: "flex", borderRadius: 0, overflow: "hidden", minWidth: 0 }}>
-            {!isMobile && (
+          {isMobile ? (
+            <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setSearchOpen(o => !o)}
+                style={{ background: "none", border: "none", color: "#fff", padding: "6px 8px", cursor: "pointer", display: "flex", alignItems: "center" }}
+                aria-label="חיפוש"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              </button>
+            </div>
+          ) : (
+            <div style={{ flex: 1, display: "flex", borderRadius: 0, overflow: "hidden", minWidth: 0 }}>
               <select style={{ background: "#e8e8e8", border: "none", padding: "10px 8px", fontSize: 12, color: "#333", cursor: "pointer", borderRadius: 0, minWidth: 110 }}>
                 <option>כל הקטגוריות</option>
               </select>
-            )}
-            <input
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleSearch()}
-              placeholder={isMobile ? "חיפוש..." : "חיפוש סת\"מ ויודאיקה..."}
-              style={{ flex: 1, border: "none", padding: "10px", fontSize: isMobile ? 13 : 14, color: "#fff", background: "rgba(255,255,255,0.12)", outline: "none", minWidth: 0 }} />
-            <button onClick={handleSearch} style={{ background: "#C5A028", border: "none", padding: "0 14px", cursor: "pointer" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-            </button>
-          </div>
+              <input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleSearch()}
+                placeholder="חיפוש סת\"מ ויודאיקה..."
+                style={{ flex: 1, border: "none", padding: "10px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.12)", outline: "none", minWidth: 0 }} />
+              <button onClick={handleSearch} style={{ background: "#C5A028", border: "none", padding: "0 14px", cursor: "pointer" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              </button>
+            </div>
+          )}
 
           <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexShrink: 0 }}>
             {user ? (
@@ -466,6 +484,43 @@ function NavBarContent() {
           </div>
         )}
       </header>
+
+      {isMobile && searchOpen && (
+        <div style={{
+          position: "sticky",
+          top: 57,
+          zIndex: 99,
+          background: "#fff",
+          borderBottom: "1px solid #E7E2D8",
+          display: "flex",
+          alignItems: "center",
+          padding: "0",
+          width: "100%",
+        }}>
+          <input
+            ref={searchInputRef}
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") { handleSearch(); setSearchOpen(false); } }}
+            placeholder="חיפוש סת\"מ ויודאיקה..."
+            style={{ flex: 1, border: "none", padding: "12px 20px", fontSize: 14, color: "#111", outline: "none", background: "transparent", minWidth: 0 }}
+          />
+          <button
+            onClick={() => { handleSearch(); setSearchOpen(false); }}
+            style={{ background: "none", border: "none", padding: "12px 12px", cursor: "pointer", display: "flex", alignItems: "center" }}
+            aria-label="חפש"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+          </button>
+          <button
+            onClick={() => setSearchOpen(false)}
+            style={{ background: "none", border: "none", padding: "12px 14px", cursor: "pointer", display: "flex", alignItems: "center", color: "#888", fontSize: 20, lineHeight: 1 }}
+            aria-label="סגור חיפוש"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <MobileDrawerMenu
         isOpen={mobileOpen}
