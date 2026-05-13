@@ -1207,8 +1207,8 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       </div>
 
-      {/* ── Bar Mitzva Wizard ── */}
-      {(category === 'בר מצווה' || category === 'בר-מצווה') && (
+      {/* ── Bar Mitzva Wizard — hidden on בר מצווה (has its own landing page) ── */}
+      {category !== 'בר מצווה' && category !== 'בר-מצווה' && (
         <div className="max-w-7xl mx-auto px-4 pt-6" dir="rtl">
           <BarMitzvaWizard variant="page" />
         </div>
