@@ -252,8 +252,8 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
         style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 520, maxWidth: 860, animation: "navMegaIn 0.2s ease-out" }}
         onMouseDown={e => e.preventDefault()}
       >
-        <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "#1a2a4a", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
-        <div style={{ background: "linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)", borderRadius: 0, border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(184,151,42,0.15)", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "#1E40AF", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
+        <div style={{ background: "linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)", borderRadius: 0, border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(184,151,42,0.15)", overflow: "hidden" }}>
           <div style={{ display: "flex", flexDirection: "row-reverse", padding: "24px 24px 16px" }}>
             {item.columns.map((col, ci) => (
               <div key={ci} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
@@ -360,7 +360,7 @@ function NavBarContent() {
       `}</style>
 
       {shaliach && (
-        <div style={{ background: "linear-gradient(135deg, #0c1a35 0%, #1a3a6a 100%)", borderBottom: "3px solid #C5A028", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ background: "linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)", borderBottom: "3px solid #C5A028", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {shaliach.logoUrl
               ? <img src={shaliach.logoUrl} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A028", flexShrink: 0 }} />
@@ -381,7 +381,7 @@ function NavBarContent() {
         </div>
       )}
 
-      <header style={{ background: "#0c1a35", color: "#fff", position: "sticky", top: 0, zIndex: 100 }}>
+      <header style={{ background: "#1E3A8A", color: "#fff", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center", gap: isMobile ? 6 : 12 }}>
           <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "#fff", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
             <div style={{ width: 20, height: 2, background: "#fff", borderRadius: 0 }} />
@@ -438,7 +438,7 @@ function NavBarContent() {
         </div>
 
         {!isMobile && (
-          <div style={{ background: "#162444", borderTop: "1px solid rgba(255,255,255,0.08)", position: "relative" }}>
+          <div style={{ background: "#1D4ED8", borderTop: "1px solid rgba(255,255,255,0.08)", position: "relative" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
               {MEGA_MENU_DATA.map(item => (
                 <div key={item.id} style={{ position: "relative" }}

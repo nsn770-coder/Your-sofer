@@ -69,7 +69,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         className="w-full flex items-center justify-between gap-4 py-4 px-5 bg-transparent border-0 cursor-pointer text-right"
         style={{ fontFamily: 'inherit' }}
       >
-        <span className="text-[15px] font-semibold text-[#0c1a35] flex-1 text-right">{q}</span>
+        <span className="text-[15px] font-semibold text-[#1E3A8A] flex-1 text-right">{q}</span>
         <span className="text-[#C5A028] font-bold text-base shrink-0 leading-none">
           {open ? '▴' : '▾'}
         </span>
@@ -90,7 +90,7 @@ export default function BarMitzvahPage() {
     >
 
       {/* ── 1. Hero ─────────────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-[#0c1a35] to-[#1a2a4a] py-16 sm:py-24 px-4 text-center">
+      <section className="bg-gradient-to-br from-[#1E3A8A] to-[#1E40AF] py-16 sm:py-24 px-4 text-center">
         <p className="text-[#C5A028] text-xs sm:text-sm font-bold tracking-widest mb-4 uppercase">
           Your Sofer — סת״מ בשקיפות מלאה
         </p>
@@ -104,7 +104,7 @@ export default function BarMitzvahPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <a
             href="#tiers"
-            className="bg-[#C5A028] text-[#0c1a35] font-black text-base px-8 py-4 rounded-lg w-full sm:w-auto text-center no-underline"
+            className="bg-[#C5A028] text-[#1E3A8A] font-black text-base px-8 py-4 rounded-lg w-full sm:w-auto text-center no-underline"
           >
             בחר את הסט שלך ←
           </a>
@@ -141,14 +141,14 @@ export default function BarMitzvahPage() {
       {/* ── 3. Single tier card ──────────────────────────────────────────── */}
       <section id="tiers" className="max-w-lg mx-auto px-4 py-14">
         <div className="bg-white rounded-2xl border border-[#E0D8CC] shadow-sm p-8 flex flex-col items-center text-center">
-          <h3 className="text-2xl font-black text-[#0c1a35] mb-3">מהודר</h3>
+          <h3 className="text-2xl font-black text-[#1E3A8A] mb-3">מהודר</h3>
           <p className="text-gray-500 text-sm leading-relaxed mb-6 max-w-sm">
             כתיבה ברמה גבוהה בכתיבת סופר מוסמך, קלף מוכשר, בדיקת מחשב ומגיה מוסמך. כולל שקית תפילין, מדריך הנחה ותעודת כשרות.
           </p>
-          <div className="text-[#0c1a35] text-3xl font-black mb-8">₪2,800 – ₪3,700</div>
+          <div className="text-[#1E3A8A] text-3xl font-black mb-8">₪2,800 – ₪3,700</div>
           <a
             href="/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94"
-            className="w-full block text-center bg-[#0c1a35] hover:bg-[#1a2a4a] text-white font-bold text-base py-4 rounded-lg no-underline"
+            className="w-full block text-center bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-base py-4 rounded-lg no-underline"
           >
             בחר את הסט שלך
           </a>
@@ -163,7 +163,7 @@ export default function BarMitzvahPage() {
       </section>
 
       {/* ── 4. Testimonials ──────────────────────────────────────────────── */}
-      <section className="bg-[#0c1a35] py-14 px-4">
+      <section className="bg-[#1E3A8A] py-14 px-4">
         <h2 className="text-center text-white text-2xl sm:text-3xl font-black mb-10">
           מה משפחות אומרות עלינו
         </h2>
@@ -188,7 +188,7 @@ export default function BarMitzvahPage() {
 
       {/* ── 5. FAQ ───────────────────────────────────────────────────────── */}
       <section className="max-w-3xl mx-auto px-4 py-14">
-        <h2 className="text-center text-[#0c1a35] text-2xl sm:text-3xl font-black mb-8">
+        <h2 className="text-center text-[#1E3A8A] text-2xl sm:text-3xl font-black mb-8">
           שאלות נפוצות
         </h2>
         <div className="bg-white rounded-2xl border border-[#E0D8CC] overflow-hidden">
@@ -199,7 +199,7 @@ export default function BarMitzvahPage() {
       </section>
 
       {/* ── 6. Final CTA ─────────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-[#0c1a35] to-[#1a2a4a] py-16 px-4 text-center">
+      <section className="bg-gradient-to-br from-[#1E3A8A] to-[#1E40AF] py-16 px-4 text-center">
         <h2 className="text-white text-2xl sm:text-3xl font-black mb-3">
           בחר את הסט שלך עכשיו
         </h2>
@@ -209,7 +209,7 @@ export default function BarMitzvahPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <a
             href="#tiers"
-            className="bg-[#C5A028] text-[#0c1a35] font-black text-base px-10 py-4 rounded-lg w-full sm:w-auto text-center no-underline"
+            className="bg-[#C5A028] text-[#1E3A8A] font-black text-base px-10 py-4 rounded-lg w-full sm:w-auto text-center no-underline"
           >
             ראה את הסטים ←
           </a>

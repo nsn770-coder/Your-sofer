@@ -1,5 +1,25 @@
 @import "tailwindcss";
 
+/* ─── Brand color scale (Tailwind v4 @theme) ────────────────────────────────
+   primary = Royal Blue  |  gold = warm gold accent
+──────────────────────────────────────────────────────────────────────────── */
+@theme {
+  --color-primary-50:  #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+
+  --color-gold-400: #FBBF24;
+  --color-gold-500: #D97706;
+  --color-gold-600: #B45309;
+}
+
 html, body {
   overflow-x: hidden;
   max-width: 100%;
@@ -83,7 +103,7 @@ body {
 
 /* Category banner placeholder: reserve space even when image is loading */
 .category-banner-placeholder {
-  background: #1a2d50;
+  background: #1E40AF;
   min-height: 120px;
   contain: layout size;
 }
