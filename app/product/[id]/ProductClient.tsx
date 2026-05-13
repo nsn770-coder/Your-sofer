@@ -312,24 +312,24 @@ function SoferCard({ soferId }: { soferId: string }) {
   if (!sofer) return null;
 
   return (
-    <div dir="rtl" style={{ marginTop: 20, background: 'linear-gradient(135deg, #f8faff, #eef3fb)', border: '1px solid #bcd0ee', borderRadius: 12, padding: '14px 16px' }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', marginBottom: 6, letterSpacing: '0.06em', textTransform: 'uppercase' }}>הסופר שכתב</div>
-      <p style={{ fontSize: 11, color: '#555', lineHeight: 1.65, margin: '0 0 10px' }}>
+    <div dir="rtl" style={{ marginTop: 20, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRight: '3px solid #C9A227', borderRadius: 16, padding: 20, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: '#C9A227', marginBottom: 6, letterSpacing: '0.06em', textTransform: 'uppercase' }}>הסופר שכתב</div>
+      <p style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.65, margin: '0 0 10px' }}>
         כל סופר סת״מ באתר עובר תהליך קבלה קפדני - ראיון אישי, בדיקת כתב ואימות רמת יראת שמים. אנו מכירים אישית כל סופר ומוודאים שהוא ראוי ומתאים. לא כל אחד מתקבל.
       </p>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
         {sofer.profileImage
-          ? <NextImage src={sofer.profileImage!} alt={sofer.name ?? ''} width={52} height={52} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #C5A028', flexShrink: 0 }} />
-          : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A028', fontSize: 22, flexShrink: 0 }}>✍️</div>
+          ? <NextImage src={sofer.profileImage!} alt={sofer.name ?? ''} width={52} height={52} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #C9A227', flexShrink: 0 }} />
+          : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2446A6', fontSize: 22, flexShrink: 0 }}>✍️</div>
         }
         <div>
-          <div style={{ fontWeight: 800, fontSize: 15, color: '#1E3A8A' }}>{sofer.name}</div>
+          <div style={{ fontWeight: 800, fontSize: 15, color: '#1F2937' }}>{sofer.name}</div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 3 }}>
             {sofer.yearsOfExperience != null && (
-              <span style={{ fontSize: 11, color: '#555' }}>{sofer.yearsOfExperience} שנות ניסיון</span>
+              <span style={{ fontSize: 11, color: '#6B7280' }}>{sofer.yearsOfExperience} שנות ניסיון</span>
             )}
             {sofer.scriptType && (
-              <span style={{ fontSize: 11, color: '#555' }}>כתב {sofer.scriptType}</span>
+              <span style={{ fontSize: 11, color: '#6B7280' }}>כתב {sofer.scriptType}</span>
             )}
           </div>
         </div>
@@ -337,13 +337,13 @@ function SoferCard({ soferId }: { soferId: string }) {
       {sofer.certifications?.length ? (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
           {sofer.certifications.map(cert => (
-            <span key={cert} style={{ background: '#e8f0fb', color: '#1a3a6b', fontSize: 11, fontWeight: 600, borderRadius: 20, padding: '3px 9px' }}>{cert}</span>
+            <span key={cert} style={{ background: '#EEF3FF', color: '#2446A6', fontSize: 11, fontWeight: 600, borderRadius: 20, padding: '3px 9px' }}>{cert}</span>
           ))}
         </div>
       ) : null}
       <button
         onClick={() => { trackOpenSoferProfile(soferId); router.push(`/soferim/${soferId}`); }}
-        style={{ background: '#1E3A8A', color: '#C5A028', border: 'none', borderRadius: 20, padding: '7px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+        style={{ background: '#EEF3FF', color: '#1F3D8F', border: '1.5px solid #C5D5F0', borderRadius: 20, padding: '7px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
       >
         ראה פרופיל מלא
       </button>
@@ -1441,7 +1441,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       {!compact && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-            <span style={{ fontSize: 32, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(product.price)}</span>
+            <span style={{ fontSize: 28, fontWeight: 800, color: '#2446A6' }}>{formatPrice(product.price)}</span>
             {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
             {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
           </div>
@@ -1504,27 +1504,27 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
 
       {/* PRIMARY: Buy Now */}
       <button onClick={() => { handleAddToCart(); router.push('/cart'); }}
-        style={{ width: '100%', background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
-        ⚡ אני רוצה לקנות עכשיו
+        style={{ width: '100%', height: 52, background: '#C9A227', color: '#1F3D8F', border: 'none', borderRadius: 14, fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
+        קנה עכשיו
       </button>
 
       {/* SECONDARY: Add to Cart / Quantity control */}
       {cartQty === 0 ? (
         <button onClick={handleAddToCart}
-          style={{ width: '100%', background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-          {addToCartLabel}
+          style={{ width: '100%', height: 52, background: '#EEF3FF', color: '#1F3D8F', border: '1.5px solid #C5D5F0', borderRadius: 14, fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+          הוסף לסל
         </button>
       ) : (
-        <div style={{ width: '100%', background: '#C5A028', borderRadius: 14, marginBottom: 12, display: 'flex', alignItems: 'stretch', overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: 52, background: '#FDF8EC', border: '1.5px solid #E8D48A', borderRadius: 14, marginBottom: 12, display: 'flex', alignItems: 'stretch', overflow: 'hidden' }}>
           <button
             onClick={() => {
               if (cartQty === 1) { removeItem(product!.id); setCartQty(0); }
               else { updateQty(product!.id, cartQty - 1); setCartQty(c => c - 1); }
             }}
-            style={{ flex: '0 0 48px', background: 'rgba(0,0,0,0.12)', border: 'none', color: '#1E3A8A', fontSize: 22, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ flex: '0 0 48px', background: 'transparent', border: 'none', color: '#C9A227', fontSize: 22, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             −
           </button>
-          <span style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: compact ? 15 : 17, fontWeight: 900, color: '#1E3A8A' }}>
+          <span style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: compact ? 15 : 17, fontWeight: 700, color: '#C9A227' }}>
             {cartQty}
           </span>
           <button
@@ -1532,7 +1532,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
               addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, embroideryText: embroideryText || undefined });
               setCartQty(c => c + 1);
             }}
-            style={{ flex: '0 0 48px', background: 'rgba(0,0,0,0.12)', border: 'none', color: '#1E3A8A', fontSize: 22, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ flex: '0 0 48px', background: 'transparent', border: 'none', color: '#C9A227', fontSize: 22, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             +
           </button>
         </div>
@@ -1648,7 +1648,6 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         </div>
       )}
 
-      {!compact && <TrustBlock isStam={!!product.cat && STAM_CATEGORIES.includes(product.cat)} />}
     </div>
   );
 
@@ -1669,7 +1668,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F2EC', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', paddingBottom: isMobile ? 80 : 0 }}>
+    <div style={{ minHeight: '100vh', background: '#F5F2EC', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
 
       {/* Save toast */}
       {saveSuccess && (
@@ -1752,7 +1751,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
 
           {/* ── Column 2: Details ── */}
           <div style={{ background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', marginTop: isMobile ? 8 : 0 }}>
-            <h1 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: '#0f1111', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1F2937', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f0f0f0', flexWrap: 'wrap' }}>
               <Stars n={product.stars || 4.5} size={15} />
@@ -1778,7 +1777,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
             {isMobile && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f0f0f0' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-                  <span style={{ fontSize: 32, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(product.price)}</span>
+                  <span style={{ fontSize: 28, fontWeight: 800, color: '#2446A6' }}>{formatPrice(product.price)}</span>
                   {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
                   {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
                 </div>
@@ -1787,17 +1786,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
               </div>
             )}
 
-            {/* Sofer badge */}
+            {/* Sofer line */}
             {product.sofer && (
-              <div style={{ background: 'linear-gradient(135deg, #f0faf4, #e8f5ed)', border: '1px solid #b7e4c7', borderRadius: 10, padding: '12px 14px', marginBottom: 16 }}>
-                <div style={{ fontSize: 13, color: '#1a6b3c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Icon.Pen /> נכתב בידי {product.sofer}
-                </div>
-                <div style={{ fontSize: 11, color: '#555', marginTop: 6, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  {['בדיקת מחשב', 'תעודת כשרות', 'פיקוח רבני'].map(t => (
-                    <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Icon.Check size={11} color="#1a6b3c" /> {t}</span>
-                  ))}
-                </div>
+              <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Icon.Pen /> נכתב בידי {product.sofer}
               </div>
             )}
 
@@ -2149,27 +2141,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         </a>
       )}
 
-      {/* Sticky mobile CTA bar */}
-      {isMobile && (
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200, background: '#fff', borderTop: '1.5px solid #e8e8e8', padding: '10px 16px 14px', display: 'flex', gap: 12, alignItems: 'center', boxShadow: '0 -4px 20px rgba(0,0,0,0.1)', direction: 'rtl' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 11, color: '#999', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</div>
-            <div style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A', lineHeight: 1.2 }}>{formatPrice(product.price)}</div>
-          </div>
-          <button
-            onClick={() => { handleAddToCart(); router.push('/cart'); }}
-            style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 12, padding: '12px 24px', fontSize: 15, fontWeight: 900, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}
-          >
-            {ctaLabel ?? 'הוסף לעגלה ←'}
-          </button>
-        </div>
-      )}
 
       {/* Mobile FAB — admin only */}
       {user?.role === 'admin' && isMobile && !adminOpen && (
         <button
           onClick={() => setAdminOpen(true)}
-          style={{ position: 'fixed', bottom: 82, left: 16, zIndex: 1040, background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: '50%', width: 48, height: 48, fontSize: 18, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'fixed', bottom: 20, left: 16, zIndex: 1040, background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: '50%', width: 48, height: 48, fontSize: 18, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           title="עריכת מוצר"
         >
           ✏️
