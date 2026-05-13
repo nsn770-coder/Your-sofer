@@ -177,7 +177,7 @@ export default function ProductCard({
       onClick={e => e.stopPropagation()}
       style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-        background: '#0c1a35',
+        background: '#1E3A8A',
         borderTop: '2px solid rgba(184,151,42,0.5)',
         padding: '16px 20px 20px',
         direction: 'rtl',
@@ -317,7 +317,7 @@ export default function ProductCard({
             </span>
           )}
           {hasKlafSelection && (
-            <span style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', color: '#0c1a35', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+            <span style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', color: '#1E3A8A', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
               ✦ בחר את הקלף שלך
             </span>
           )}
@@ -341,7 +341,7 @@ export default function ProductCard({
               <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full">חסכת {savePct}%</span>
             </div>
           )}
-          <p className="text-[18px] sm:text-lg font-black text-[#0c1a35]">
+          <p className="text-[18px] sm:text-lg font-black text-[#1E3A8A]">
             {formatPrice(price)}
           </p>
         </div>
@@ -351,7 +351,7 @@ export default function ProductCard({
           {qty === 0 ? (
             <button
               onClick={handleAdd}
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg py-[14px] sm:py-2 text-[15px] sm:text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#0c1a35] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg py-[14px] sm:py-2 text-[15px] sm:text-sm font-bold transition-all duration-200 bg-[#b8972a] text-[#1E3A8A] border border-[#b8972a] hover:bg-[#a07d20] hover:border-[#a07d20]"
             >
               <IconCart size={13} />
               הוסף לסל

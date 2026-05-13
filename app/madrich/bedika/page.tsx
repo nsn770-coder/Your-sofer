@@ -50,7 +50,7 @@ export default function BedikaPage() {
 
         <QuoteBlock text="אצלנו המזוזה לא הולכת ישר למדף - היא עוברת קודם דרך בדיקה." />
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 20px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 20px' }}>
           התהליך שלב אחר שלב
         </h2>
 
@@ -61,7 +61,7 @@ export default function BedikaPage() {
         <Step num={5} title="צילום הקלף" desc="כל מזוזה שעברה בדיקה מצולמת - קדמי ואחורי - ותמונה אמיתית שלה מועלית לאתר." />
         <Step num={6} title="מכירה ספציפית" desc="אתם בוחרים קלף ספציפי מהגלריה - לא קונים עיוור. אתם יודעים בדיוק מה מגיע אליכם." />
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '40px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>
           מה זה אומר עבורכם?
         </h2>
 
@@ -74,7 +74,7 @@ export default function BedikaPage() {
           ].map(b => (
             <div key={b.title} style={{ background: '#fff', border: '1px solid #e0e0e0', borderRadius: 10, padding: '20px', textAlign: 'center' }}>
               <div style={{ fontSize: 32, marginBottom: 10 }}>{b.icon}</div>
-              <div style={{ fontWeight: 800, fontSize: 15, color: '#0c1a35', marginBottom: 8 }}>{b.title}</div>
+              <div style={{ fontWeight: 800, fontSize: 15, color: '#1E3A8A', marginBottom: 8 }}>{b.title}</div>
               <div style={{ fontSize: 13, color: '#666', lineHeight: 1.5 }}>{b.desc}</div>
             </div>
           ))}
@@ -82,7 +82,7 @@ export default function BedikaPage() {
 
         <QuoteBlock text="אתם יכולים לשלוח את תמונת הקלף לרב שלכם לפני הקנייה. אנחנו מעודדים את זה." />
 
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <RelatedCard emoji="⭐" title="מה זה מהודר באמת" desc="ההבדל בין כשר למהודר" href="/madrich/mehudar" />
           <RelatedCard emoji="✍️" title="מי הסופרים שלנו" desc="הקריטריונים לבחירת סופר" href="/madrich/soferim" />

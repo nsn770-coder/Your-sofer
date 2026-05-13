@@ -33,7 +33,7 @@ interface Product {
   days?: string;
 }
 
-const navy = '#0c1a35';
+const navy = '#1E3A8A';
 const gold = '#C5A028';
 const green = '#1a3a2a';
 
@@ -275,7 +275,7 @@ export default function SoferProfileClient({ id }: { id: string }) {
           </div>
 
           {/* Trust card */}
-          <div style={{ background: `linear-gradient(135deg, ${navy} 0%, #1a3060 100%)`, borderRadius: 12, padding: 20 }}>
+          <div style={{ background: `linear-gradient(135deg, ${navy} 0%, #1E40AF 100%)`, borderRadius: 12, padding: 20 }}>
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', lineHeight: 1.8 }}>
               <div style={{ fontWeight: 800, color: gold, marginBottom: 10, fontSize: 14 }}>ערבות Your Sofer</div>
               {['פיקוח רבני על כל סופר', 'בדיקת מחשב לכל מוצר', 'תעודת כשרות מאושרת', 'אחריות פלטפורמה מלאה'].map(t => (

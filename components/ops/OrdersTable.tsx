@@ -204,7 +204,7 @@ export default function OrdersTable({
       {/* Table */}
       <div className="overflow-x-auto rounded-xl border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead style={{ background: '#0c1a35' }}>
+          <thead style={{ background: '#1E3A8A' }}>
             <tr>
               <th className="px-4 py-3 text-right text-xs font-semibold text-yellow-300 uppercase tracking-wider">מספר</th>
               <th className="px-4 py-3 text-right text-xs font-semibold text-yellow-300 uppercase tracking-wider">לקוח</th>
@@ -274,7 +274,7 @@ export default function OrdersTable({
                     <td className="px-4 py-3">
                       <button
                         onClick={() => router.push(`/ops/orders/${order.id}`)}
-                        style={{ background: '#0c1a35', color: '#b8972a' }}
+                        style={{ background: '#1E3A8A', color: '#b8972a' }}
                         className="px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80 transition-opacity"
                       >
                         פתח

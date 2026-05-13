@@ -29,7 +29,7 @@ export default function AboutClient() {
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#F5F2EC', minHeight: '100vh' }}>
 
       {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
         <h1 style={{ color: '#fff', fontSize: 34, fontWeight: 900, margin: '0 0 10px' }}>הסיפור שלנו</h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, margin: 0 }}>
           למה הקמנו את YourSofer ומה מנחה אותנו
@@ -40,25 +40,25 @@ export default function AboutClient() {
 
         {/* Section 1 */}
         <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
-          <h2 style={{ color: '#0c1a35', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>למה נוסד YourSofer</h2>
+          <h2 style={{ color: '#1E3A8A', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>למה נוסד YourSofer</h2>
           <p style={{ color: '#444', fontSize: 15, lineHeight: 1.9, margin: 0 }}>
             הייתי סופר סת״ם. ראיתי מקרוב איך הסוחר באמצע לוקח 50% מהמחיר — וכל זה על חשבון הלקוח. ההפרש הזה לא הולך לסופר ולא משפר את הכשרות. הוא פשוט נעלם בדרך. הקמתי את YourSofer כדי לשנות את זה: לחבר בין לקוחות לסופרים ישירות, בשקיפות מלאה, כך שבאותו תקציב — תוכל לקנות משהו הרבה יותר מהודר.
           </p>
         </div>
 
         {/* Section 2 — Values */}
-        <h2 style={{ color: '#0c1a35', fontSize: 20, fontWeight: 800, margin: '0 0 18px' }}>מה שחשוב לנו</h2>
+        <h2 style={{ color: '#1E3A8A', fontSize: 20, fontWeight: 800, margin: '0 0 18px' }}>מה שחשוב לנו</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16, marginBottom: 40 }}>
           {VALUES.map(v => (
             <div key={v.title} style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '24px 20px', textAlign: 'center' }}>
-              <div style={{ fontWeight: 800, fontSize: 16, color: '#0c1a35', marginBottom: 10 }}>{v.title}</div>
+              <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 10 }}>{v.title}</div>
               <div style={{ fontSize: 13.5, color: '#555', lineHeight: 1.75 }}>{v.desc}</div>
             </div>
           ))}
         </div>
 
         {/* Section 3 — Stats */}
-        <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', borderRadius: 14, padding: '32px 24px', marginBottom: 32 }}>
+        <div style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)', borderRadius: 14, padding: '32px 24px', marginBottom: 32 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 24 }}>
             {STATS.map(s => (
               <div key={s.value} style={{ textAlign: 'center' }}>
@@ -73,7 +73,7 @@ export default function AboutClient() {
         <div style={{ textAlign: 'center' }}>
           <button
             onClick={() => router.push('/')}
-            style={{ background: '#C5A028', color: '#0c1a35', border: 'none', padding: '14px 32px', fontSize: 16, fontWeight: 800, cursor: 'pointer', borderRadius: 8, fontFamily: 'inherit' }}
+            style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', padding: '14px 32px', fontSize: 16, fontWeight: 800, cursor: 'pointer', borderRadius: 8, fontFamily: 'inherit' }}
           >
             לחנות המלאה ←
           </button>

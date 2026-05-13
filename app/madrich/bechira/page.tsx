@@ -50,7 +50,7 @@ export default function BechiraPage() {
 
         <QuoteBlock text="לא קונים מזוזה בעיניים עצומות. שאלו שאלות. בקשו לראות. ודאו שאתם יודעים בדיוק מה אתם מקבלים." />
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 20px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 20px' }}>
           6 שלבים לבחירה נכונה
         </h2>
 
@@ -61,7 +61,7 @@ export default function BechiraPage() {
         <Step num={5} title="הכירו את רמות האיכות" desc='יש הבדל בין "כשר" ל"מהודר". כשר פירושו עמידה בדרישות המינימליות. מהודר פירושו כתיבה בסטנדרט גבוה יותר עם קפידה מיוחדת.' />
         <Step num={6} title="קנו ממקום שאפשר לסמוך עליו" desc="שקיפות, גלוי לב, ומוכנות לענות על שאלות - אלה הסימנים הטובים ביותר לספק אמין." />
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '40px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>
           שאלות שכדאי לשאול לפני הקנייה
         </h2>
 
@@ -83,7 +83,7 @@ export default function BechiraPage() {
 
         <QuoteBlock text="אתם לא צריכים להבין בכל הפרטים הטכניים. אתם צריכים מקור שמוכן לענות על כל שאלה - ואם הוא לא רוצה לענות, זה כבר אומר משהו." />
 
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <RelatedCard emoji="💸" title="למה לא לקנות מזוזה זולה" desc="מה ההבדל האמיתי בין מחירים" href="/madrich/mezuza-zola" />
           <RelatedCard emoji="⭐" title="מה זה מהודר באמת" desc="ההבדל בין כשר למהודר" href="/madrich/mehudar" />

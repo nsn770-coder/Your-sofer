@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 
 const C = {
-  navy: '#0c1a35',
+  navy: '#1E3A8A',
   gold: '#C5A028',
   bg: '#f3f4f4',
   white: '#fff',
@@ -69,7 +69,7 @@ export default function MadrichPageClient() {
       </nav>
 
       {/* Hero */}
-      <div style={{ background: `linear-gradient(135deg, ${C.navy} 0%, #1a3060 100%)`, padding: '60px 24px 52px', textAlign: 'center', color: '#fff' }}>
+      <div style={{ background: `linear-gradient(135deg, ${C.navy} 0%, #1E40AF 100%)`, padding: '60px 24px 52px', textAlign: 'center', color: '#fff' }}>
         <div style={{ display: 'inline-block', background: C.gold, color: C.navy, fontSize: 12, fontWeight: 800, padding: '4px 14px', borderRadius: 20, marginBottom: 16 }}>
           מידע חשוב לפני קניית מזוזה
         </div>

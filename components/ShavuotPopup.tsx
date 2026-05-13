@@ -68,7 +68,7 @@ export default function ShavuotPopup() {
           position: 'fixed', top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',
           zIndex: 9001,
-          background: '#0c1a35',
+          background: '#1E3A8A',
           border: '1px solid rgba(184,151,42,0.45)',
           borderRadius: 20,
           padding: '36px 32px 32px',
@@ -123,7 +123,7 @@ export default function ShavuotPopup() {
                 type="submit"
                 disabled={loading}
                 style={{
-                  background: '#b8972a', color: '#0c1a35',
+                  background: '#b8972a', color: '#1E3A8A',
                   border: 'none', borderRadius: 24,
                   padding: '13px', fontSize: 15, fontWeight: 800,
                   cursor: loading ? 'not-allowed' : 'pointer',
@@ -159,7 +159,7 @@ export default function ShavuotPopup() {
             <button
               onClick={close}
               style={{
-                background: '#b8972a', color: '#0c1a35',
+                background: '#b8972a', color: '#1E3A8A',
                 border: 'none', borderRadius: 24,
                 padding: '12px 32px', fontSize: 14, fontWeight: 800,
                 cursor: 'pointer',

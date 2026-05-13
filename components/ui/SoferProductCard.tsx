@@ -79,7 +79,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
     >
       {/* ── Sofer side (40%) ── */}
       <div className="flex flex-row sm:flex-col items-center sm:justify-center gap-3 p-4 sm:w-[40%] bg-gradient-to-b from-[#f8f6f2] to-white border-b sm:border-b-0 sm:border-l border-gray-100 flex-shrink-0">
-        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border-2 border-[#0c1a35]/10 flex items-center justify-center">
+        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border-2 border-[#1E3A8A]/10 flex items-center justify-center">
           {sofer?.imageUrl ? (
             <img src={optimizeCloudinaryUrl(sofer.imageUrl, 200)} alt={sofer.name} className="w-full h-full object-cover" />
           ) : (
@@ -89,7 +89,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
         <div className="text-right sm:text-center sm:mt-2">
           {displayName ? (
             <>
-              <p className="font-bold text-[#0c1a35] text-sm leading-tight">{displayName}</p>
+              <p className="font-bold text-[#1E3A8A] text-sm leading-tight">{displayName}</p>
               {sofer?.city && <p className="text-xs text-gray-500 mt-0.5">{sofer.city}</p>}
               {sofer?.style && (
                 <p className="text-xs text-gray-400 mt-1 leading-snug line-clamp-3 sm:max-w-[140px]">{sofer.style}</p>
@@ -127,7 +127,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
           {hasKlafSelection && (
             <span style={{
               background: 'linear-gradient(90deg, #b8972a, #d4a832)',
-              color: '#0c1a35',
+              color: '#1E3A8A',
               borderRadius: 6,
               fontSize: 11,
               fontWeight: 800,
@@ -150,7 +150,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
           )}
 
           <div className="flex items-baseline gap-2 mt-auto">
-            <span className="text-[18px] sm:text-lg font-black text-[#0c1a35]">{formatPrice(price)}</span>
+            <span className="text-[18px] sm:text-lg font-black text-[#1E3A8A]">{formatPrice(price)}</span>
             {hasSale && (
               <>
                 <span className="text-xs text-gray-400 line-through">{formatPrice(was!)}</span>
@@ -162,7 +162,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
           {qty === 0 ? (
             <button
               onClick={handleAdd}
-              className="flex items-center justify-center gap-2 w-full py-[14px] sm:py-2 rounded-xl bg-[#0c1a35] text-white text-[15px] sm:text-sm font-bold hover:bg-[#1a3060] transition-colors"
+              className="flex items-center justify-center gap-2 w-full py-[14px] sm:py-2 rounded-xl bg-[#1E3A8A] text-white text-[15px] sm:text-sm font-bold hover:bg-[#1D4ED8] transition-colors"
             >
               <IconCart size={13} />
               הוסף לסל
@@ -171,7 +171,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
             <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
               <button
                 onClick={handleAdd}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#0c1a35] text-white text-sm font-bold hover:bg-[#1a3060] transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#1E3A8A] text-white text-sm font-bold hover:bg-[#1D4ED8] transition-colors"
               >
                 <IconCheck size={10} />
                 בסל ({qty})

@@ -23,19 +23,19 @@ export async function POST(req: NextRequest) {
 <head><meta charset="UTF-8"></head>
 <body style="font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:20px;">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-    <div style="background:#0c1a35;padding:24px;text-align:center;">
+    <div style="background:#1E3A8A;padding:24px;text-align:center;">
       <h1 style="color:#C5A028;margin:0;font-size:24px;">✡ Your Sofer</h1>
       <p style="color:#fff;margin:8px 0 0;font-size:14px;">סת"מ ישירות מהסופר</p>
     </div>
     <div style="padding:32px;">
-      <h2 style="color:#0c1a35;margin:0 0 16px;">שלום ${customerName},</h2>
+      <h2 style="color:#1E3A8A;margin:0 0 16px;">שלום ${customerName},</h2>
       <p style="color:#555;line-height:1.6;">תודה על הזמנתך! קיבלנו את הזמנה מספר <strong>${orderNumber}</strong> ונטפל בה בהקדם.</p>
       
       <div style="background:#f9f9f9;border-radius:8px;padding:20px;margin:24px 0;">
-        <h3 style="color:#0c1a35;margin:0 0 16px;font-size:16px;">פרטי ההזמנה</h3>
+        <h3 style="color:#1E3A8A;margin:0 0 16px;font-size:16px;">פרטי ההזמנה</h3>
         <table style="width:100%;border-collapse:collapse;">
           <thead>
-            <tr style="background:#0c1a35;color:#fff;">
+            <tr style="background:#1E3A8A;color:#fff;">
               <th style="padding:10px;text-align:right;">מוצר</th>
               <th style="padding:10px;text-align:center;">כמות</th>
               <th style="padding:10px;text-align:left;">מחיר</th>
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
           </thead>
           <tbody>${itemsHtml}</tbody>
         </table>
-        <div style="text-align:left;margin-top:16px;font-size:18px;font-weight:bold;color:#0c1a35;">
+        <div style="text-align:left;margin-top:16px;font-size:18px;font-weight:bold;color:#1E3A8A;">
           סה"כ: ₪${total}
         </div>
       </div>

@@ -232,7 +232,7 @@ function InstallmentBadge({ price }: { price: number }) {
   if (price <= 99) return null;
   const monthly3 = Math.ceil(price / 3);
   return (
-    <div style={{ background: '#f0f7ff', border: '1px solid #bde0ff', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#0c1a35', display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ background: '#f0f7ff', border: '1px solid #bde0ff', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 8 }}>
       <span style={{ color: '#0e6ba8', flexShrink: 0 }}><Icon.CreditCard /></span>
       <span><strong>3 תשלומים של {formatPrice(monthly3)}</strong> ללא ריבית</span>
       {price >= 400 && <span style={{ color: '#888', fontSize: 11, marginRight: 'auto' }}>· עד 12 תשלומים בתוספת ריבית</span>}
@@ -253,7 +253,7 @@ function TrustIcons({ hasSofer }: { hasSofer?: boolean }) {
     <div style={{ display: 'grid', gridTemplateColumns: `repeat(${items.length},1fr)`, gap: 6, textAlign: 'center', borderTop: '1px solid #eee', paddingTop: 14, marginTop: 10 }}>
       {items.map(item => (
         <div key={item.text} style={{ fontSize: 11, color: '#666', lineHeight: 1.4 }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4, color: '#0c1a35', opacity: 0.7 }}>{item.icon}</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4, color: '#1E3A8A', opacity: 0.7 }}>{item.icon}</div>
           {item.text}
         </div>
       ))}
@@ -275,7 +275,7 @@ function TrustBlock({ isStam }: { isStam: boolean }) {
     'ניתן לתקשר ישירות עם הסופר סת"מ',
   ];
   return (
-    <div dir="rtl" style={{ background: '#0c1a35', borderRadius: 12, padding: '18px 20px', marginTop: 14, textAlign: 'center' }}>
+    <div dir="rtl" style={{ background: '#1E3A8A', borderRadius: 12, padding: '18px 20px', marginTop: 14, textAlign: 'center' }}>
       <p style={{ fontSize: 14, fontWeight: 900, color: '#f59e0b', marginBottom: 12, lineHeight: 1.4 }}>
         ⚠️ רוב האנשים בכלל לא יודעים מי כתב את המזוזה שלהם
       </p>
@@ -320,10 +320,10 @@ function SoferCard({ soferId }: { soferId: string }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
         {sofer.profileImage
           ? <NextImage src={sofer.profileImage!} alt={sofer.name ?? ''} width={52} height={52} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #C5A028', flexShrink: 0 }} />
-          : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A028', fontSize: 22, flexShrink: 0 }}>✍️</div>
+          : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A028', fontSize: 22, flexShrink: 0 }}>✍️</div>
         }
         <div>
-          <div style={{ fontWeight: 800, fontSize: 15, color: '#0c1a35' }}>{sofer.name}</div>
+          <div style={{ fontWeight: 800, fontSize: 15, color: '#1E3A8A' }}>{sofer.name}</div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 3 }}>
             {sofer.yearsOfExperience != null && (
               <span style={{ fontSize: 11, color: '#555' }}>{sofer.yearsOfExperience} שנות ניסיון</span>
@@ -343,7 +343,7 @@ function SoferCard({ soferId }: { soferId: string }) {
       ) : null}
       <button
         onClick={() => { trackOpenSoferProfile(soferId); router.push(`/soferim/${soferId}`); }}
-        style={{ background: '#0c1a35', color: '#C5A028', border: 'none', borderRadius: 20, padding: '7px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+        style={{ background: '#1E3A8A', color: '#C5A028', border: 'none', borderRadius: 20, padding: '7px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
       >
         ראה פרופיל מלא
       </button>
@@ -403,7 +403,7 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
       </div>
       <div style={{ fontSize: 12, color: '#888', marginBottom: 10 }}>{klafImages.length} קלפים זמינים - כל קלף כתוב ביד</div>
       <div style={{ background: 'linear-gradient(90deg, #C5A028, #C5A028)', borderRadius: 10, padding: '10px 14px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35', lineHeight: 1.4 }}>✦ בחר את הקלף המדויק שלך — לא קונים עיוור</span>
+        <span style={{ fontSize: 15, fontWeight: 900, color: '#1E3A8A', lineHeight: 1.4 }}>✦ בחר את הקלף המדויק שלך — לא קונים עיוור</span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 8 }}>
         {klafImages.map(img => {
@@ -431,7 +431,7 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
         })}
       </div>
       {selected.length > 0 && (
-        <div style={{ marginTop: 10, background: '#fffbf0', border: '1px solid #C5A028', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#0c1a35', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ marginTop: 10, background: '#fffbf0', border: '1px solid #C5A028', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#1E3A8A', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Icon.Check size={14} color="#C5A028" />
           {selected.length === 1
             ? `קלף נבחר: ${klafImages.find(k => k.id === selected[0])?.name ?? ''}`
@@ -579,9 +579,9 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
     } finally { setSaving(false); }
   }
 
-  const iS: React.CSSProperties = { width: '100%', border: '1px solid #243a62', borderRadius: 6, padding: '6px 9px', fontSize: 12, boxSizing: 'border-box', fontFamily: 'inherit', background: '#152040', color: '#ddd5c0', outline: 'none' };
+  const iS: React.CSSProperties = { width: '100%', border: '1px solid #243a62', borderRadius: 6, padding: '6px 9px', fontSize: 12, boxSizing: 'border-box', fontFamily: 'inherit', background: '#1E3A8A', color: '#ddd5c0', outline: 'none' };
   const lS: React.CSSProperties = { fontSize: 9, fontWeight: 800, color: '#C5A028', display: 'block', marginBottom: 2, letterSpacing: '0.1em', textTransform: 'uppercase' };
-  const secS: React.CSSProperties = { borderBottom: '1px solid #152040', paddingBottom: 12, marginBottom: 12 };
+  const secS: React.CSSProperties = { borderBottom: '1px solid #1E3A8A', paddingBottom: 12, marginBottom: 12 };
   const secTitleS: React.CSSProperties = { fontSize: 9, fontWeight: 900, color: 'rgba(184,151,42,0.65)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 };
   const isStam = STAM_ADMIN_CATS.has(cat);
 
@@ -605,7 +605,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
           <div><label style={lS}>priority</label><input type="number" value={priority} onChange={e => setPriority(e.target.value)} placeholder="0" style={iS} /></div>
           <div>
             <label style={lS}>קטגוריה</label>
-            <select value={cat} onChange={e => setCat(e.target.value)} style={{ ...iS, background: '#152040' }}>
+            <select value={cat} onChange={e => setCat(e.target.value)} style={{ ...iS, background: '#1E3A8A' }}>
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
@@ -613,7 +613,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
             <div><label style={lS}>זמן אספקה</label><input value={days} onChange={e => setDays(e.target.value)} placeholder="7-14" style={iS} /></div>
             <div>
               <label style={lS}>תווית</label>
-              <select value={badge} onChange={e => setBadge(e.target.value)} style={{ ...iS, background: '#152040' }}>
+              <select value={badge} onChange={e => setBadge(e.target.value)} style={{ ...iS, background: '#1E3A8A' }}>
                 <option value="">ללא</option>
                 <option value="חדש">חדש</option>
                 <option value="מבצע">מבצע</option>
@@ -627,7 +627,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
       {['קלפי מזוזה', 'בתי מזוזה', 'מזוזות'].some(c => cat.includes(c)) && (
         <div>
           <label style={lS}>גודל</label>
-          <select value={size} onChange={e => setSize(e.target.value)} style={{ ...iS, background: '#152040' }}>
+          <select value={size} onChange={e => setSize(e.target.value)} style={{ ...iS, background: '#1E3A8A' }}>
             <option value="">— בחר גודל —</option>
             <option value="6">6 ס"מ</option>
             <option value="7">7 ס"מ</option>
@@ -684,7 +684,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
           <div style={{ display: 'grid', gap: 7 }}>
             <div>
               <label style={lS}>רמת כשרות</label>
-              <select value={level} onChange={e => setLevel(e.target.value)} style={{ ...iS, background: '#152040' }}>
+              <select value={level} onChange={e => setLevel(e.target.value)} style={{ ...iS, background: '#1E3A8A' }}>
                 <option value="">לא מוגדר</option>
                 <option value="כשר לכתחילה">כשר לכתחילה</option>
                 <option value="מהודר">מהודר</option>
@@ -693,7 +693,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
             </div>
             <div>
               <label style={lS}>נוסח</label>
-              <select value={nusach} onChange={e => setNusach(e.target.value)} style={{ ...iS, background: '#152040' }}>
+              <select value={nusach} onChange={e => setNusach(e.target.value)} style={{ ...iS, background: '#1E3A8A' }}>
                 <option value="">לא מוגדר</option>
                 <option value="אשכנזי">אשכנזי</option>
                 <option value="ספרדי">ספרדי</option>
@@ -734,7 +734,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
           {(SOFER_EDIT_CATS.includes(cat) || !!soferId) && (
             <div>
               <label style={lS}>סופר</label>
-              <select value={soferId} onChange={e => setSoferId(e.target.value)} style={{ ...iS, background: '#152040' }}>
+              <select value={soferId} onChange={e => setSoferId(e.target.value)} style={{ ...iS, background: '#1E3A8A' }}>
                 <option value="">ללא סופר</option>
                 {soferOptions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
@@ -799,7 +799,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
       <button
         onClick={handleSave}
         disabled={saving}
-        style={{ width: '100%', padding: '11px', background: saving ? '#5a4a18' : '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 900, cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+        style={{ width: '100%', padding: '11px', background: saving ? '#5a4a18' : '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 900, cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
       >
         {saving ? 'שומר...' : '💾 שמור שינויים'}
       </button>
@@ -807,7 +807,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   );
 
   const panelHeader = (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 12px', borderBottom: '1px solid #152040', position: 'sticky', top: 0, background: '#0c1a35', zIndex: 2 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 12px', borderBottom: '1px solid #1E3A8A', position: 'sticky', top: 0, background: '#1E3A8A', zIndex: 2 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
         <span style={{ fontSize: 12 }}>✏️</span>
         <span style={{ fontSize: 13, fontWeight: 900, color: '#e8e0d0' }}>עריכת מוצר</span>
@@ -831,7 +831,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
     return (
       <>
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1048 }} onClick={onClose} />
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, maxHeight: '88vh', overflowY: 'auto', background: '#0c1a35', borderTop: '2px solid #C5A028', borderRadius: '14px 14px 0 0', zIndex: 1050, direction: 'rtl', boxShadow: '0 -6px 30px rgba(0,0,0,0.4)' }}>
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, maxHeight: '88vh', overflowY: 'auto', background: '#1E3A8A', borderTop: '2px solid #C5A028', borderRadius: '14px 14px 0 0', zIndex: 1050, direction: 'rtl', boxShadow: '0 -6px 30px rgba(0,0,0,0.4)' }}>
           <div style={{ width: 32, height: 3, background: '#243a62', borderRadius: 2, margin: '8px auto 0' }} />
           {panelHeader}
           {panelContent}
@@ -841,7 +841,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   }
 
   return (
-    <div style={{ position: 'fixed', top: 0, right: 0, width: 300, height: '100vh', overflowY: 'auto', background: '#0c1a35', borderLeft: '2px solid #C5A028', zIndex: 1050, direction: 'rtl', boxShadow: '-4px 0 24px rgba(0,0,0,0.4)' }}>
+    <div style={{ position: 'fixed', top: 0, right: 0, width: 300, height: '100vh', overflowY: 'auto', background: '#1E3A8A', borderLeft: '2px solid #C5A028', zIndex: 1050, direction: 'rtl', boxShadow: '-4px 0 24px rgba(0,0,0,0.4)' }}>
       {panelHeader}
       {panelContent}
     </div>
@@ -942,7 +942,7 @@ function ReviewsSection({ productId, productName }: { productId: string; product
               </div>
             )}
           </div>
-          <button onClick={() => setShowForm(true)} style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 20, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, whiteSpace: 'nowrap' }}>
+          <button onClick={() => setShowForm(true)} style={{ background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 20, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, whiteSpace: 'nowrap' }}>
             <Icon.Pen /> כתוב ביקורת
           </button>
         </div>
@@ -954,10 +954,10 @@ function ReviewsSection({ productId, productName }: { productId: string; product
         )}
         {submitted === 'with_coupon' && (
           <div style={{ background: '#fffbeb', border: '2px solid #C5A028', borderRadius: 12, padding: '16px 20px', marginBottom: 16 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#0c1a35', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Icon.Coupon /> תודה על הביקורת! קיבלת קוד הנחה:
             </div>
-            <div style={{ background: '#0c1a35', color: '#C5A028', fontFamily: 'monospace', fontSize: 22, fontWeight: 900, letterSpacing: 3, padding: '10px 16px', borderRadius: 8, display: 'inline-block', marginBottom: 8 }}>{earnedCoupon}</div>
+            <div style={{ background: '#1E3A8A', color: '#C5A028', fontFamily: 'monospace', fontSize: 22, fontWeight: 900, letterSpacing: 3, padding: '10px 16px', borderRadius: 8, display: 'inline-block', marginBottom: 8 }}>{earnedCoupon}</div>
             <div style={{ fontSize: 13, color: '#555' }}>5% הנחה על הזמנה הבאה · הזן את הקוד בעמוד התשלום</div>
           </div>
         )}
@@ -971,7 +971,7 @@ function ReviewsSection({ productId, productName }: { productId: string; product
             {reviews.map(r => (
               <div key={r.id} style={{ borderBottom: '1px solid #f0f0f0', paddingBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#0c1a35', color: '#C5A028', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, flexShrink: 0 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#1E3A8A', color: '#C5A028', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, flexShrink: 0 }}>
                     {r.reviewerName.charAt(0)}
                   </div>
                   <div>
@@ -998,8 +998,8 @@ function ReviewsSection({ productId, productName }: { productId: string; product
             <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 480, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl', boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }} onClick={e => e.stopPropagation()}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A028' }}><Icon.Pen /></div>
-                  <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35', margin: 0 }}>כתוב ביקורת</h2>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A028' }}><Icon.Pen /></div>
+                  <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>כתוב ביקורת</h2>
                 </div>
                 <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', display: 'flex' }}><Icon.X size={20} /></button>
               </div>
@@ -1042,7 +1042,7 @@ function ReviewsSection({ productId, productName }: { productId: string; product
                   )}
                 </div>
               </div>
-              <button onClick={handleSubmit} disabled={submitting || uploading} style={{ width: '100%', background: submitting ? '#aaa' : '#0c1a35', color: '#fff', border: 'none', borderRadius: 24, padding: '13px', fontSize: 15, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <button onClick={handleSubmit} disabled={submitting || uploading} style={{ width: '100%', background: submitting ? '#aaa' : '#1E3A8A', color: '#fff', border: 'none', borderRadius: 24, padding: '13px', fontSize: 15, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 {submitting ? <><Icon.Loader /> שולח...</> : <><Icon.Send /> שלח ביקורת</>}
               </button>
             </div>
@@ -1091,7 +1091,7 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
 
       {/* Who is this for */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35', marginBottom: 12, margin: '0 0 12px' }}>למי זה מתאים?</h3>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E3A8A', marginBottom: 12, margin: '0 0 12px' }}>למי זה מתאים?</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
           {useCases.map((item, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13, color: '#444' }}>
@@ -1123,7 +1123,7 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
           'תפילין כשרות - שמירה וברכה תמידית',
         ];
         return (
-          <div style={{ marginBottom: 24, background: '#0c1a35', border: '1px solid #C5A028', borderRadius: 12, padding: 20 }}>
+          <div style={{ marginBottom: 24, background: '#1E3A8A', border: '1px solid #C5A028', borderRadius: 12, padding: 20 }}>
             <h3 style={{ fontSize: 18, fontWeight: 900, color: '#C5A028', margin: '0 0 14px' }}>{title}</h3>
             {rows.map((row, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#fff', marginBottom: 8 }}>
@@ -1137,7 +1137,7 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
 
       {/* Benefits */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35', marginBottom: 10, margin: '0 0 10px' }}>מה מקבלים עם המוצר</h3>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E3A8A', marginBottom: 10, margin: '0 0 10px' }}>מה מקבלים עם המוצר</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px' }}>
           {benefits.map((b, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: 12, color: '#444' }}>
@@ -1150,13 +1150,13 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
 
       {/* FAQ accordion */}
       <div>
-        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35', marginBottom: 10, margin: '0 0 10px' }}>שאלות נפוצות</h3>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E3A8A', marginBottom: 10, margin: '0 0 10px' }}>שאלות נפוצות</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {faqs.map((faq, i) => (
             <div key={i} style={{ border: '1px solid #e8e8e8', borderRadius: 8, overflow: 'hidden' }}>
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                style={{ width: '100%', background: openFaq === i ? '#f8f9fa' : '#fff', border: 'none', padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', direction: 'rtl', textAlign: 'right' }}
+                style={{ width: '100%', background: openFaq === i ? '#f8f9fa' : '#fff', border: 'none', padding: '12px 14px', fontSize: 13, fontWeight: 700, color: '#1E3A8A', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', direction: 'rtl', textAlign: 'right' }}
               >
                 <span>{faq.q}</span>
                 <span style={{ color: '#C5A028', fontSize: 18, fontWeight: 400, flexShrink: 0, marginRight: 8, display: 'inline-block', transform: openFaq === i ? 'rotate(45deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>+</span>
@@ -1350,7 +1350,7 @@ export default function ProductClient() {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16, fontFamily: 'Heebo, Arial, sans-serif' }}>
       <Icon.Sad />
       <div style={{ fontSize: 20, fontWeight: 700, color: '#333' }}>מוצר לא נמצא</div>
-      <button onClick={() => router.push('/')} style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
+      <button onClick={() => router.push('/')} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
     </div>
   );
 
@@ -1441,7 +1441,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       {!compact && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-            <span style={{ fontSize: 32, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(product.price)}</span>
+            <span style={{ fontSize: 32, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(product.price)}</span>
             {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
             {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
           </div>
@@ -1504,14 +1504,14 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
 
       {/* PRIMARY: Buy Now */}
       <button onClick={() => { handleAddToCart(); router.push('/cart'); }}
-        style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
+        style={{ width: '100%', background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 14, padding: compact ? '11px' : '14px', fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
         ⚡ אני רוצה לקנות עכשיו
       </button>
 
       {/* SECONDARY: Add to Cart / Quantity control */}
       {cartQty === 0 ? (
         <button onClick={handleAddToCart}
-          style={{ width: '100%', background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+          style={{ width: '100%', background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 14, padding: compact ? '10px' : '12px', fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
           {addToCartLabel}
         </button>
       ) : (
@@ -1521,10 +1521,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
               if (cartQty === 1) { removeItem(product!.id); setCartQty(0); }
               else { updateQty(product!.id, cartQty - 1); setCartQty(c => c - 1); }
             }}
-            style={{ flex: '0 0 48px', background: 'rgba(0,0,0,0.12)', border: 'none', color: '#0c1a35', fontSize: 22, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ flex: '0 0 48px', background: 'rgba(0,0,0,0.12)', border: 'none', color: '#1E3A8A', fontSize: 22, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             −
           </button>
-          <span style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: compact ? 15 : 17, fontWeight: 900, color: '#0c1a35' }}>
+          <span style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: compact ? 15 : 17, fontWeight: 900, color: '#1E3A8A' }}>
             {cartQty}
           </span>
           <button
@@ -1532,7 +1532,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
               addItem({ id: product!.id, name: product!.name, price: product!.price, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, embroideryText: embroideryText || undefined });
               setCartQty(c => c + 1);
             }}
-            style={{ flex: '0 0 48px', background: 'rgba(0,0,0,0.12)', border: 'none', color: '#0c1a35', fontSize: 22, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            style={{ flex: '0 0 48px', background: 'rgba(0,0,0,0.12)', border: 'none', color: '#1E3A8A', fontSize: 22, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             +
           </button>
         </div>
@@ -1544,7 +1544,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
           background: '#F0EBE0', borderRadius: 10, padding: '12px 14px',
           marginBottom: 8, direction: 'rtl',
         }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: '#0c1a35', marginBottom: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: '#1E3A8A', marginBottom: 8 }}>
             מה אתה מקבל:
           </div>
           {[
@@ -1575,7 +1575,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
           </div>
           <div>
             <div style={{ fontSize: 11, color: '#888', fontWeight: 600 }}>נכתב על ידי הסופר</div>
-            <a href={`/soferim/${product.soferId}`} style={{ fontSize: 13, fontWeight: 800, color: '#0c1a35', textDecoration: 'none' }}>
+            <a href={`/soferim/${product.soferId}`} style={{ fontSize: 13, fontWeight: 800, color: '#1E3A8A', textDecoration: 'none' }}>
               {product.sofer}
             </a>
           </div>
@@ -1605,7 +1605,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       {!compact && product.cat && RABBINICAL_CATEGORIES.has(product.cat) && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          background: 'linear-gradient(90deg, #111d3a 0%, #18274a 100%)',
+          background: 'linear-gradient(90deg, #111d3a 0%, #1E40AF 100%)',
           border: '1px solid rgba(197,160,40,0.35)',
           borderRadius: 10, padding: '9px 14px', marginBottom: 4,
           direction: 'rtl',
@@ -1631,7 +1631,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
 
   // ── Kashrut tab rows ─────────────────────────────────────────────────────────
   const kashrutRows = [
-    { icon: <Icon.Check size={16} color="#0c1a35" />, title: 'בדיקת מחשב',         desc: 'כל מוצר עובר בדיקה ממוחשבת לאיתור שגיאות כתיב' },
+    { icon: <Icon.Check size={16} color="#1E3A8A" />, title: 'בדיקת מחשב',         desc: 'כל מוצר עובר בדיקה ממוחשבת לאיתור שגיאות כתיב' },
     { icon: <Icon.Search />,                          title: 'פיקוח מגיה מוסמך',   desc: 'מגיה מוסמך בודק כל יחידה לפני משלוח' },
     { icon: <Icon.Tag />,                             title: 'תעודת כשרות',         desc: 'כל מוצר מגיע עם תעודת כשרות מוסמכת' },
     { icon: <Icon.ShieldCheck />,                     title: 'עמידה בתקן הלכתי',   desc: 'כל מוצר סת״מ באתר כשר לכתחילה ב-100%. איננו מוכרים מוצרים בדיעבד או כשרות מופחתת - רק המהודר ביותר.' },
@@ -1657,11 +1657,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
 
       {/* Bar Mitzva wizard context banner */}
       {(fromWizardParam || fromWizardLS) && (
-        <div style={{ background: '#0c1a35', color: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', direction: 'rtl', position: 'sticky', top: 0, zIndex: 40 }}>
+        <div style={{ background: '#1E3A8A', color: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', direction: 'rtl', position: 'sticky', top: 0, zIndex: 40 }}>
           <span style={{ fontSize: 13, fontWeight: 600 }}>אתה במדריך בר מצווה</span>
           <button
             onClick={() => router.back()}
-            style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+            style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 0, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
           >
             חזור למדריך ←
           </button>
@@ -1672,17 +1672,17 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       <div style={{ background: '#fff', borderBottom: '1px solid #e8e8e8', padding: isMobile ? '8px 14px' : '10px 20px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#888', flexWrap: 'wrap' }}>
-            <span onClick={() => router.push('/')} style={{ cursor: 'pointer', color: '#0c1a35', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
+            <span onClick={() => router.push('/')} style={{ cursor: 'pointer', color: '#1E3A8A', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
               <Icon.Home /> דף הבית
             </span>
             <Icon.Chevron />
             {product.cat && (
-              <><span onClick={() => router.push(`/category/${encodeURIComponent(product.cat!)}`)} style={{ cursor: 'pointer', color: '#0c1a35', fontWeight: 500 }}>{product.cat}</span><Icon.Chevron /></>
+              <><span onClick={() => router.push(`/category/${encodeURIComponent(product.cat!)}`)} style={{ cursor: 'pointer', color: '#1E3A8A', fontWeight: 500 }}>{product.cat}</span><Icon.Chevron /></>
             )}
             <span style={{ color: '#555', fontWeight: 500 }}>{product.name.slice(0, isMobile ? 28 : 48)}{product.name.length > (isMobile ? 28 : 48) ? '…' : ''}</span>
           </div>
           {user?.role === 'admin' && (
-            <button onClick={() => setAdminOpen(prev => !prev)} style={{ background: adminOpen ? '#C5A028' : '#0c1a35', color: adminOpen ? '#0c1a35' : '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
+            <button onClick={() => setAdminOpen(prev => !prev)} style={{ background: adminOpen ? '#C5A028' : '#1E3A8A', color: adminOpen ? '#1E3A8A' : '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
               <Icon.Edit /> {adminOpen ? 'סגור עריכה' : 'עריכת מוצר'}
             </button>
           )}
@@ -1755,7 +1755,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
             {isMobile && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f0f0f0' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-                  <span style={{ fontSize: 32, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(product.price)}</span>
+                  <span style={{ fontSize: 32, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(product.price)}</span>
                   {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
                   {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
                 </div>
@@ -1788,7 +1788,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                   ...(product.closeupImageUrl && product.cat && KASHRUT_CATEGORIES.includes(product.cat) ? [{ key: 'closeup' as const, label: 'תמונת מקרוב' }] : []),
                 ] as { key: typeof activeTab; label: string }[]).map(tab => (
                   <button key={tab.key} onClick={() => { setActiveTab(tab.key); if (tab.key === 'kashrut') trackOpenKashrutCertificate(product.id); }}
-                    style={{ flex: 1, background: 'none', border: 'none', padding: '9px 6px', fontSize: isMobile ? 12 : 13, fontWeight: activeTab === tab.key ? 800 : 600, color: activeTab === tab.key ? '#0c1a35' : '#888', borderBottom: `2px solid ${activeTab === tab.key ? '#C5A028' : 'transparent'}`, marginBottom: -2, cursor: 'pointer', transition: 'color 0.15s', whiteSpace: 'nowrap' }}>
+                    style={{ flex: 1, background: 'none', border: 'none', padding: '9px 6px', fontSize: isMobile ? 12 : 13, fontWeight: activeTab === tab.key ? 800 : 600, color: activeTab === tab.key ? '#1E3A8A' : '#888', borderBottom: `2px solid ${activeTab === tab.key ? '#C5A028' : 'transparent'}`, marginBottom: -2, cursor: 'pointer', transition: 'color 0.15s', whiteSpace: 'nowrap' }}>
                     {tab.label}
                   </button>
                 ))}
@@ -1831,9 +1831,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                 <div style={{ display: 'grid', gap: 8 }}>
                   {kashrutRows.map(row => (
                     <div key={row.title} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: '#f8f9fa', borderRadius: 10, padding: '10px 12px' }}>
-                      <span style={{ color: '#0c1a35', flexShrink: 0, marginTop: 1 }}>{row.icon}</span>
+                      <span style={{ color: '#1E3A8A', flexShrink: 0, marginTop: 1 }}>{row.icon}</span>
                       <div>
-                        <div style={{ fontWeight: 700, color: '#0c1a35', fontSize: 13 }}>{row.title}</div>
+                        <div style={{ fontWeight: 700, color: '#1E3A8A', fontSize: 13 }}>{row.title}</div>
                         <div style={{ fontSize: 12, color: '#666', marginTop: 2 }}>{row.desc}</div>
                       </div>
                     </div>
@@ -1842,7 +1842,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                     href="/kashrut"
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                      background: '#0c1a35', color: '#C5A028',
+                      background: '#1E3A8A', color: '#C5A028',
                       borderRadius: 10, padding: '10px 16px',
                       fontSize: 13, fontWeight: 800, textDecoration: 'none',
                       marginTop: 4,
@@ -1857,7 +1857,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                 <div style={{ fontSize: 13 }}>
                   {shippingRows.map(row => (
                     <div key={row.k} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '9px 0', borderBottom: '1px solid #f0f0f0' }}>
-                      <span style={{ color: '#0c1a35', flexShrink: 0 }}>{row.icon}</span>
+                      <span style={{ color: '#1E3A8A', flexShrink: 0 }}>{row.icon}</span>
                       <span style={{ fontWeight: 700, color: '#333', minWidth: 55 }}>{row.k}</span>
                       <span style={{ color: '#555' }}>{row.v}</span>
                     </div>
@@ -1900,7 +1900,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         {collectionProducts.length >= 2 && product.collection && !['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'].some(c => product.cat?.includes(c)) && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
             <div style={{ marginBottom: 16 }}>
-              <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0c1a35', margin: 0 }}>
+              <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>
                 השלם את המראה — קולקציית {product.collection}
               </h2>
               <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>לקוחות שרכשו מוצר זה הוסיפו גם:</p>
@@ -1930,10 +1930,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                     <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{cp.name}</div>
                       <Stars n={cp.stars || 4.5} size={11} />
-                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(cp.price)}</div>
+                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(cp.price)}</div>
                       <button
                         onClick={e => { e.stopPropagation(); addItem({ id: cp.id, name: cp.name, price: cp.price, imgUrl: cpImg ?? undefined, quantity: 1 }); }}
-                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
+                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1E3A8A', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
                       >
                         הוסף לסל
                       </button>
@@ -1967,9 +1967,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                     <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.name}</div>
                       <Stars n={r.stars || 4.5} size={11} />
-                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(r.price)}</div>
+                      <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(r.price)}</div>
                       <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 }); }}
-                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
+                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1E3A8A', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
                         הוסף לסל
                       </button>
                     </div>
@@ -1985,7 +1985,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       {lookProducts.length > 0 && (
         <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
           <div style={{ marginBottom: 16 }}>
-            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0c1a35', margin: 0 }}>אולי תאהב גם</h2>
+            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>אולי תאהב גם</h2>
             <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>מוצרים באותו סגנון מקטגוריות שונות</p>
           </div>
           <div style={{ display: 'flex', gap: isMobile ? 10 : 14, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>
@@ -2011,10 +2011,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                   </div>
                   <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{lp.name}</div>
-                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(lp.price)}</div>
+                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(lp.price)}</div>
                     <button
                       onClick={e => { e.stopPropagation(); addItem({ id: lp.id, name: lp.name, price: lp.price, imgUrl: lpImg ?? undefined, quantity: 1 }); }}
-                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
+                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1E3A8A', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
                     >
                       הוסף לסל
                     </button>
@@ -2049,9 +2049,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                   <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.name}</div>
                     <Stars n={r.stars || 4.5} size={11} />
-                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#0c1a35' }}>{formatPrice(r.price)}</div>
+                    <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(r.price)}</div>
                     <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 }); }}
-                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#0c1a35', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
+                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1E3A8A', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
                       הוסף לסל
                     </button>
                   </div>
@@ -2085,12 +2085,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setShowWizardModal(false)}>
           <div style={{ background: '#fff', width: '100%', maxWidth: 380, padding: 28, direction: 'rtl', boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 36, textAlign: 'center', marginBottom: 12 }}>✅</div>
-            <h3 style={{ fontSize: 17, fontWeight: 900, color: '#0c1a35', textAlign: 'center', marginBottom: 8 }}>נוסף לסל!</h3>
+            <h3 style={{ fontSize: 17, fontWeight: 900, color: '#1E3A8A', textAlign: 'center', marginBottom: 8 }}>נוסף לסל!</h3>
             <p style={{ fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 24, lineHeight: 1.5 }}>רוצה לחזור למדריך בר המצווה לבחור את המוצר הבא?</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <button
                 onClick={() => { setShowWizardModal(false); router.push('/?wizard=bar-mitzva#bar-mitzva-wizard'); }}
-                style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
+                style={{ background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
               >
                 כן, חזור למדריך ←
               </button>
@@ -2131,11 +2131,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200, background: '#fff', borderTop: '1.5px solid #e8e8e8', padding: '10px 16px 14px', display: 'flex', gap: 12, alignItems: 'center', boxShadow: '0 -4px 20px rgba(0,0,0,0.1)', direction: 'rtl' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 11, color: '#999', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</div>
-            <div style={{ fontSize: 20, fontWeight: 900, color: '#0c1a35', lineHeight: 1.2 }}>{formatPrice(product.price)}</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A', lineHeight: 1.2 }}>{formatPrice(product.price)}</div>
           </div>
           <button
             onClick={() => { handleAddToCart(); router.push('/cart'); }}
-            style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 12, padding: '12px 24px', fontSize: 15, fontWeight: 900, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}
+            style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 12, padding: '12px 24px', fontSize: 15, fontWeight: 900, cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }}
           >
             {ctaLabel ?? 'הוסף לעגלה ←'}
           </button>
@@ -2146,7 +2146,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       {user?.role === 'admin' && isMobile && !adminOpen && (
         <button
           onClick={() => setAdminOpen(true)}
-          style={{ position: 'fixed', bottom: 82, left: 16, zIndex: 1040, background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: '50%', width: 48, height: 48, fontSize: 18, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'fixed', bottom: 82, left: 16, zIndex: 1040, background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: '50%', width: 48, height: 48, fontSize: 18, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           title="עריכת מוצר"
         >
           ✏️

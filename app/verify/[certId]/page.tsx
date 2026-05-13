@@ -47,7 +47,7 @@ export default function VerifyPage() {
   return (
     <div dir="rtl" style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0c1a35 0%, #18274a 100%)',
+      background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       justifyContent: 'flex-start', padding: '48px 16px 48px',
       fontFamily: 'Heebo, Arial, sans-serif',
@@ -145,13 +145,13 @@ export default function VerifyPage() {
               }}>
                 <div>
                   <div style={{ fontSize: 10, color: '#888', marginBottom: 2 }}>מספר תעודה</div>
-                  <div style={{ fontSize: 15, fontWeight: 900, fontFamily: 'monospace', color: '#0c1a35', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: 15, fontWeight: 900, fontFamily: 'monospace', color: '#1E3A8A', letterSpacing: '0.04em' }}>
                     {cert.certId}
                   </div>
                 </div>
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ fontSize: 10, color: '#888', marginBottom: 2 }}>תאריך הנפקה</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>{formatDate(cert.issuedAt)}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A' }}>{formatDate(cert.issuedAt)}</div>
                 </div>
               </div>
 
@@ -160,7 +160,7 @@ export default function VerifyPage() {
                 <div style={{ fontSize: 10, color: '#888', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                   שם הלקוח
                 </div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: '#0c1a35' }}>{cert.customerName}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: '#1E3A8A' }}>{cert.customerName}</div>
               </div>
 
               {/* Items */}
@@ -198,7 +198,7 @@ export default function VerifyPage() {
                       {/* Item details */}
                       <div style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 700, color: '#0c1a35', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <div style={{ fontWeight: 700, color: '#1E3A8A', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {item.productName}
                           </div>
                           <div style={{ fontSize: 11, color: '#666', marginTop: 3 }}>
@@ -221,7 +221,7 @@ export default function VerifyPage() {
                           )}
                         </div>
                         <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                          <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#0c1a35', fontWeight: 700 }}>
+                          <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#1E3A8A', fontWeight: 700 }}>
                             {item.serialNumber}
                           </div>
                           <div style={{ fontSize: 10, color: '#15803d', fontWeight: 600, marginTop: 2 }}>
@@ -236,7 +236,7 @@ export default function VerifyPage() {
 
               {/* Magia */}
               <div style={{
-                background: 'linear-gradient(90deg, #111d3a 0%, #18274a 100%)',
+                background: 'linear-gradient(90deg, #111d3a 0%, #1E40AF 100%)',
                 border: '1px solid rgba(197,160,40,0.3)',
                 borderRadius: 10, padding: '12px 16px',
                 display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20,
@@ -258,7 +258,7 @@ export default function VerifyPage() {
                 href={`/certificate/${cert.certId}`}
                 style={{
                   display: 'block', textAlign: 'center',
-                  background: '#0c1a35', color: '#C5A028',
+                  background: '#1E3A8A', color: '#C5A028',
                   borderRadius: 10, padding: '12px', fontWeight: 700, fontSize: 14,
                   textDecoration: 'none',
                 }}

@@ -19,7 +19,7 @@ export default function KashrutPage() {
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#f7f4ef', minHeight: '100vh' }}>
 
       {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 10 }}>📜</div>
         <h1 style={{ color: '#fff', fontSize: 32, fontWeight: 900, margin: '0 0 10px' }}>כשרות ופיקוח רבני</h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, margin: 0 }}>
@@ -33,7 +33,7 @@ export default function KashrutPage() {
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
           <div style={{ padding: '24px 24px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 20 }}>📜</span>
-            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0c1a35', margin: 0 }}>תעודת כשרות</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>תעודת כשרות</h2>
           </div>
 
           <div
@@ -74,7 +74,7 @@ export default function KashrutPage() {
               onClick={() => setLightbox(true)}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-                background: '#0c1a35', color: '#fff',
+                background: '#1E3A8A', color: '#fff',
                 border: 'none', borderRadius: 8,
                 padding: '10px 20px', fontSize: 14, fontWeight: 700,
                 cursor: 'pointer',
@@ -86,12 +86,12 @@ export default function KashrutPage() {
         </div>
 
         {/* Kashrut process steps */}
-        <h2 style={{ color: '#0c1a35', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>תהליך הבדיקה</h2>
+        <h2 style={{ color: '#1E3A8A', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>תהליך הבדיקה</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 14, marginBottom: 32 }}>
           {PROCESS.map(step => (
             <div key={step.title} style={{ background: '#fff', border: '1px solid #e8e0d0', borderRadius: 10, padding: '20px 16px', textAlign: 'center' }}>
               <div style={{ fontSize: 30, marginBottom: 10 }}>{step.icon}</div>
-              <div style={{ fontWeight: 800, fontSize: 14, color: '#0c1a35', marginBottom: 6 }}>{step.title}</div>
+              <div style={{ fontWeight: 800, fontSize: 14, color: '#1E3A8A', marginBottom: 6 }}>{step.title}</div>
               <div style={{ fontSize: 12, color: '#666', lineHeight: 1.65 }}>{step.desc}</div>
             </div>
           ))}
@@ -99,7 +99,7 @@ export default function KashrutPage() {
 
         {/* Magiah credentials */}
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', borderRadius: 12, padding: '28px 24px', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0c1a35', margin: '0 0 20px' }}>המגיה שלנו</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: '#1E3A8A', margin: '0 0 20px' }}>המגיה שלנו</h2>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 18 }}>
             <img
               src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_200/v1778136770/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2026-05-07_095231_wojjah.png"
@@ -110,7 +110,7 @@ export default function KashrutPage() {
               }}
             />
             <div>
-              <div style={{ fontWeight: 800, fontSize: 16, color: '#0c1a35', marginBottom: 3 }}>
+              <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 3 }}>
                 הרב שמחה בונים ברג׳יקובסקי
               </div>
               <div style={{ fontSize: 13, color: '#C5A028', fontWeight: 700, marginBottom: 10 }}>
@@ -134,7 +134,7 @@ export default function KashrutPage() {
         {/* Commitment box */}
         <div style={{ background: 'rgba(184,151,42,0.08)', border: '2px solid #C5A028', borderRadius: 10, padding: '24px 28px', textAlign: 'center' }}>
           <div style={{ fontSize: 28, marginBottom: 8 }}>✡️</div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: '#0c1a35', marginBottom: 6 }}>
+          <div style={{ fontSize: 17, fontWeight: 800, color: '#1E3A8A', marginBottom: 6 }}>
             אנו מחויבים לסטנדרט הכשרות הגבוה ביותר
           </div>
           <div style={{ fontSize: 14, color: '#555', lineHeight: 1.65 }}>

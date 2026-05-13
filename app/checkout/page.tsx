@@ -163,7 +163,7 @@ export default function CheckoutPage() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, color: '#ccc' }}><IconCart size={48} /></div>
           <div style={{ fontSize: 18, color: '#888', marginBottom: 20 }}>הסל ריק</div>
-          <button onClick={() => router.push('/')} style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 24, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
+          <button onClick={() => router.push('/')} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 24, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
         </div>
       </div>
     );
@@ -277,8 +277,8 @@ export default function CheckoutPage() {
 
   const OrderSummary = () => (
     <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: 20, position: isMobile ? 'static' : 'sticky', top: 20 }}>
-      <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0c1a35', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
-        <IconCart size={15} color="#0c1a35" /> סיכום הזמנה
+      <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <IconCart size={15} color="#1E3A8A" /> סיכום הזמנה
       </h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
         {items.map(item => (
@@ -287,11 +287,11 @@ export default function CheckoutPage() {
               {item.imgUrl ? <img src={optimizeCloudinaryUrl(item.imgUrl, 100)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCart size={18} color="#ccc" /></div>}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#0c1a35', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
               <div style={{ fontSize: 11, color: '#999' }}>כמות: {item.quantity}</div>
               {item.selectedKlafName && <div style={{ fontSize: 10, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 3 }}><IconCheck size={9} color="#1a6b3c" /> {item.selectedKlafName}</div>}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35', flexShrink: 0 }}>{formatPrice(item.price * item.quantity)}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', flexShrink: 0 }}>{formatPrice(item.price * item.quantity)}</div>
           </div>
         ))}
       </div>
@@ -321,7 +321,7 @@ export default function CheckoutPage() {
             <span>-{formatPrice(discountAmount)}</span>
           </div>
         )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17, fontWeight: 900, color: '#0c1a35', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17, fontWeight: 900, color: '#1E3A8A', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
           <span>סה"כ לתשלום</span><span>{formatPrice(finalTotal)}</span>
         </div>
         <div style={{ fontSize: 11, color: '#aaa' }}>כולל מע"מ</div>
@@ -336,7 +336,7 @@ export default function CheckoutPage() {
         ) : (
           <div style={{ display: 'flex', gap: 6 }}>
             <input value={couponInput} onChange={e => { setCouponInput(e.target.value.toUpperCase()); setCouponError(''); }} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }} />
-            <button onClick={applyCoupon} disabled={couponLoading || !couponInput.trim()} style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: couponLoading || !couponInput.trim() ? 0.5 : 1, whiteSpace: 'nowrap' }}>
+            <button onClick={applyCoupon} disabled={couponLoading || !couponInput.trim()} style={{ background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: couponLoading || !couponInput.trim() ? 0.5 : 1, whiteSpace: 'nowrap' }}>
               {couponLoading ? '...' : 'החל'}
             </button>
           </div>
@@ -360,7 +360,7 @@ export default function CheckoutPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
       {/* Header */}
-      <div style={{ background: '#0c1a35', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
+      <div style={{ background: '#1E3A8A', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -0.5 }}>Your Sofer</div>
           <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700, letterSpacing: 1 }}>ישראל ✡</div>
@@ -374,7 +374,7 @@ export default function CheckoutPage() {
           </div>
           <IconChevron size={10} color="#555" />
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 22, height: 22, borderRadius: '50%', background: step === 'review' ? '#C5A028' : 'rgba(255,255,255,0.15)', color: step === 'review' ? '#0c1a35' : '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>2</div>
+            <div style={{ width: 22, height: 22, borderRadius: '50%', background: step === 'review' ? '#C5A028' : 'rgba(255,255,255,0.15)', color: step === 'review' ? '#1E3A8A' : '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900 }}>2</div>
             <span style={{ color: step === 'review' ? '#C5A028' : '#555', fontWeight: step === 'review' ? 700 : 400 }}>אישור ותשלום</span>
           </div>
         </div>
@@ -382,7 +382,7 @@ export default function CheckoutPage() {
       </div>
 
       {shaliach && (
-        <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a3a6a)', borderBottom: '2px solid #C5A028', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ background: 'linear-gradient(135deg, #1E3A8A, #2563EB)', borderBottom: '2px solid #C5A028', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <IconHandshake size={16} color="#C5A028" />
           <div style={{ fontSize: 13, color: '#a8c0d8' }}>
             הזמנה זו מיוחסת לרב הקהילה: <strong style={{ color: '#fff' }}>{shaliach.chabadName || shaliach.name}</strong>
@@ -403,8 +403,8 @@ export default function CheckoutPage() {
           {step === 'shipping' ? (
             <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', overflow: 'hidden' }}>
               <div style={{ background: '#f8f6f2', borderBottom: '1px solid #e8e2d8', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#C5A028', color: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>1</div>
-                <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0c1a35', margin: 0 }}>פרטי משלוח</h2>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#C5A028', color: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>1</div>
+                <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>פרטי משלוח</h2>
               </div>
               <div style={{ padding: '24px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
@@ -426,7 +426,7 @@ export default function CheckoutPage() {
                     onBlur={e => (e.currentTarget.style.borderColor = '#e0e0e0')} />
                 </div>
                 <button onClick={() => isShippingValid && setStep('review')}
-                  style={{ width: '100%', background: isShippingValid ? '#C5A028' : '#e0e0e0', color: isShippingValid ? '#0c1a35' : '#999', border: 'none', borderRadius: 24, padding: '14px', fontSize: 15, fontWeight: 800, cursor: isShippingValid ? 'pointer' : 'not-allowed', transition: 'background 0.2s' }}>
+                  style={{ width: '100%', background: isShippingValid ? '#C5A028' : '#e0e0e0', color: isShippingValid ? '#1E3A8A' : '#999', border: 'none', borderRadius: 24, padding: '14px', fontSize: 15, fontWeight: 800, cursor: isShippingValid ? 'pointer' : 'not-allowed', transition: 'background 0.2s' }}>
                   המשך לאישור ←
                 </button>
               </div>
@@ -437,19 +437,19 @@ export default function CheckoutPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#1a6b3c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCheck size={12} color="#fff" /></div>
-                    <h3 style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', margin: 0 }}>פרטי משלוח</h3>
+                    <h3 style={{ fontSize: 14, fontWeight: 700, color: '#1E3A8A', margin: 0 }}>פרטי משלוח</h3>
                   </div>
                   <button onClick={() => setStep('shipping')} style={{ background: 'none', border: 'none', color: '#C5A028', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>עריכה</button>
                 </div>
                 <div style={{ fontSize: 13, color: '#555', lineHeight: 1.8 }}>
-                  <div><strong style={{ color: '#0c1a35' }}>{form.name}</strong> · {form.phone}</div>
+                  <div><strong style={{ color: '#1E3A8A' }}>{form.name}</strong> · {form.phone}</div>
                   <div>{form.email}</div>
                   <div>{form.address}, {form.city}</div>
                   {form.notes && <div style={{ color: '#888' }}>{form.notes}</div>}
                 </div>
               </div>
               <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: '16px 20px' }}>
-                <h3 style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><IconCart size={14} color="#0c1a35" /> פריטים בהזמנה</h3>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: '#1E3A8A', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}><IconCart size={14} color="#1E3A8A" /> פריטים בהזמנה</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {items.map(item => (
                     <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -457,11 +457,11 @@ export default function CheckoutPage() {
                         {item.imgUrl ? <img src={optimizeCloudinaryUrl(item.imgUrl, 100)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCart size={18} color="#ccc" /></div>}
                       </div>
                       <div style={{ flex: 1, fontSize: 13 }}>
-                        <div style={{ fontWeight: 600, color: '#0c1a35' }}>{item.name}</div>
+                        <div style={{ fontWeight: 600, color: '#1E3A8A' }}>{item.name}</div>
                         <div style={{ color: '#888', fontSize: 12 }}>כמות: {item.quantity}</div>
                         {item.selectedKlafName && <div style={{ color: '#1a6b3c', fontSize: 11, display: 'flex', alignItems: 'center', gap: 3 }}><IconCheck size={9} color="#1a6b3c" /> קלף: {item.selectedKlafName}</div>}
                       </div>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: '#0c1a35' }}>{formatPrice(item.price * item.quantity)}</div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: '#1E3A8A' }}>{formatPrice(item.price * item.quantity)}</div>
                     </div>
                   ))}
                 </div>
@@ -474,7 +474,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
               <button onClick={handleSubmit} disabled={loading}
-                style={{ width: '100%', background: loading ? '#888' : '#0c1a35', color: '#fff', border: 'none', borderRadius: 24, padding: '15px', fontSize: 16, fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s' }}>
+                style={{ width: '100%', background: loading ? '#888' : '#1E3A8A', color: '#fff', border: 'none', borderRadius: 24, padding: '15px', fontSize: 16, fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s' }}>
                 {loading ? <><IconLoader /> מכין תשלום...</> : <><IconCreditCard size={16} color="#fff" /> המשך לתשלום ←</>}
               </button>
               <div style={{ fontSize: 11, color: '#aaa', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>

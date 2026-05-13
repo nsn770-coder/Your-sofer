@@ -30,7 +30,7 @@ export default function CartPage() {
     }}>
 
       {/* Header */}
-      <div style={{ background: '#0c1a35', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ background: '#1E3A8A', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 16 }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -1 }}>Your Sofer</div>
           <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>ישראל ✡</div>
@@ -57,7 +57,7 @@ export default function CartPage() {
             <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>הסל שלך ריק</div>
             <div style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>הוסף מוצרים מהחנות כדי להתחיל</div>
             <button onClick={() => router.push('/')}
-              style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer', width: isMobile ? '100%' : 'auto' }}>
+              style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer', width: isMobile ? '100%' : 'auto' }}>
               המשך לקנות
             </button>
           </div>
@@ -110,7 +110,7 @@ export default function CartPage() {
                           {item.embroideryText && (
                             <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ ריקמה: {item.embroideryText}</div>
                           )}
-                            <div style={{ fontSize: 17, fontWeight: 900, color: '#0c1a35' }}>
+                            <div style={{ fontSize: 17, fontWeight: 900, color: '#1E3A8A' }}>
                               {formatPrice(item.price * item.quantity)}
                             </div>
                             {item.quantity > 1 && (
@@ -197,7 +197,7 @@ export default function CartPage() {
 
                         {/* Price */}
                         <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                          <div style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35' }}>
+                          <div style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A' }}>
                             {formatPrice(item.price * item.quantity)}
                           </div>
                           {item.quantity > 1 && (
@@ -241,7 +241,7 @@ export default function CartPage() {
                 <div style={{ borderTop: '1px solid #eee', paddingTop: 12, marginTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 900 }}>
                     <span>סכום ביניים:</span>
-                    <span style={{ color: '#0c1a35' }}>{formatPrice(total)}</span>
+                    <span style={{ color: '#1E3A8A' }}>{formatPrice(total)}</span>
                   </div>
                   <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע״מ · עלות משלוח תחושב בקופה</div>
                 </div>
@@ -256,12 +256,12 @@ export default function CartPage() {
                   });
                   router.push('/checkout');
                 }}
-                style={{ width: '100%', background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 20, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 10 }}>
+                style={{ width: '100%', background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 20, padding: '13px', fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 10 }}>
                 המשך לתשלום →
               </button>
 
               <button onClick={() => router.push('/')}
-                style={{ width: '100%', background: '#fff', color: '#0c1a35', border: '1px solid #ddd', borderRadius: 20, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                style={{ width: '100%', background: '#fff', color: '#1E3A8A', border: '1px solid #ddd', borderRadius: 20, padding: '11px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                 המשך לקנות
               </button>
 

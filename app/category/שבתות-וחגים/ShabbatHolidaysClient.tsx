@@ -123,7 +123,7 @@ export default function ShabbatHolidaysClient() {
     <div dir="rtl" style={{ minHeight: '100vh', background: '#F5F2EC', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
       {/* Page header */}
-      <div style={{ background: '#0c1a35', padding: isMobile ? '32px 20px 28px' : '48px 24px 40px', textAlign: 'center' }}>
+      <div style={{ background: '#1E3A8A', padding: isMobile ? '32px 20px 28px' : '48px 24px 40px', textAlign: 'center' }}>
         <h1 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 900, color: '#ffffff', marginBottom: 10, lineHeight: 1.3 }}>
           שבתות וחגים
         </h1>

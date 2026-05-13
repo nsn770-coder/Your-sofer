@@ -97,7 +97,7 @@ export default function FulfillmentDashboard() {
   return (
     <div dir="rtl">
       <div className="mb-6">
-        <h1 className="text-2xl font-black" style={{ color: '#0c1a35' }}>
+        <h1 className="text-2xl font-black" style={{ color: '#1E3A8A' }}>
           שלום {opsUser?.name} 👋
         </h1>
         <p className="text-gray-500 text-sm mt-1">דשבורד מילוי הזמנות</p>
@@ -161,7 +161,7 @@ export default function FulfillmentDashboard() {
                     <StatusBadge status={order.status} />
                     <a
                       href={`/ops/orders/${order.id}`}
-                      style={{ background: '#0c1a35', color: '#C5A028' }}
+                      style={{ background: '#1E3A8A', color: '#C5A028' }}
                       className="px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80"
                     >
                       פרטים מלאים
@@ -206,7 +206,7 @@ export default function FulfillmentDashboard() {
                         <button
                           onClick={() => saveTracking(order)}
                           disabled={saving[order.id] || !trackingInputs[order.id]}
-                          style={{ background: '#0c1a35', color: '#C5A028' }}
+                          style={{ background: '#1E3A8A', color: '#C5A028' }}
                           className="px-3 py-2 rounded-lg text-sm font-semibold hover:opacity-80 disabled:opacity-50"
                         >
                           {saving[order.id] ? '...' : 'שמור'}
@@ -285,7 +285,7 @@ export default function FulfillmentDashboard() {
                   <StatusBadge status={order.status} />
                   <a
                     href={`/ops/orders/${order.id}`}
-                    style={{ background: '#0c1a35', color: '#C5A028' }}
+                    style={{ background: '#1E3A8A', color: '#C5A028' }}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80"
                   >
                     פרטים

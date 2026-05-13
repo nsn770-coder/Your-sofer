@@ -151,7 +151,7 @@ function CollectionCard({ col }: { col: Collection }) {
           padding: '18px 22px 20px',
           display: 'flex', flexDirection: 'column', gap: 10, flexGrow: 1,
         }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#1E3A8A', margin: 0, lineHeight: 1.4 }}>
             {col.tagline}
           </p>
 
@@ -175,7 +175,7 @@ export default function CollectionsPage() {
     <div dir="rtl" style={{ background: '#f8f6f2', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
       <div style={{
-        background: 'linear-gradient(135deg, #0c1a35 0%, #18274a 100%)',
+        background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)',
         borderBottom: '3px solid rgba(184,151,42,0.5)',
         padding: '52px 20px 44px',
         textAlign: 'center',

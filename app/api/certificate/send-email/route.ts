@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     const itemsHtml = cert.items.map(item => `
       <tr>
-        <td style="padding:8px 12px;border-bottom:1px solid #f0ece0;font-family:monospace;font-weight:700;color:#0c1a35;white-space:nowrap;">${item.serialNumber}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0ece0;font-family:monospace;font-weight:700;color:#1E3A8A;white-space:nowrap;">${item.serialNumber}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #f0ece0;">${item.productName}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #f0ece0;white-space:nowrap;">${item.type}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #f0ece0;color:#15803d;font-weight:600;">${item.qualityLevel}</td>
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
   <div style="max-width:600px;margin:32px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1);">
 
     <!-- Header -->
-    <div style="background:linear-gradient(135deg,#0c1a35 0%,#18274a 100%);padding:28px 32px;text-align:center;border-bottom:3px solid #C5A028;">
+    <div style="background:linear-gradient(135deg,#1E3A8A 0%,#1E40AF 100%);padding:28px 32px;text-align:center;border-bottom:3px solid #C5A028;">
       <div style="font-size:28px;color:#C5A028;margin-bottom:6px;">✡</div>
       <div style="font-size:13px;font-weight:700;letter-spacing:0.2em;color:#fff;text-transform:uppercase;">Your Sofer</div>
       <div style="font-size:22px;font-weight:900;color:#C5A028;margin-top:10px;">תעודת כשרות סת״מ</div>
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     <!-- Body -->
     <div style="padding:32px;">
-      <p style="font-size:16px;color:#0c1a35;font-weight:700;margin:0 0 6px;">שלום ${cert.customerName},</p>
+      <p style="font-size:16px;color:#1E3A8A;font-weight:700;margin:0 0 6px;">שלום ${cert.customerName},</p>
       <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 24px;">
         תעודת הכשרות עבור הזמנתך מספר <strong>${cert.externalOrderId?.slice(-8)?.toUpperCase() ?? certId.slice(-8)}</strong> מוכנה.
         כל הפריטים נבדקו ואושרו כדת וכדין על ידי מגיה מוסמך.
@@ -62,10 +62,10 @@ export async function POST(req: NextRequest) {
 
       <!-- Items table -->
       <div style="margin-bottom:24px;">
-        <div style="font-size:12px;font-weight:700;color:#0c1a35;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;">פריטים מאושרים</div>
+        <div style="font-size:12px;font-weight:700;color:#1E3A8A;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;">פריטים מאושרים</div>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead>
-            <tr style="background:#0c1a35;color:#fff;">
+            <tr style="background:#1E3A8A;color:#fff;">
               <th style="padding:8px 12px;text-align:right;font-weight:700;">מס׳ סידורי</th>
               <th style="padding:8px 12px;text-align:right;font-weight:700;">מוצר</th>
               <th style="padding:8px 12px;text-align:right;font-weight:700;">סוג</th>
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       </div>
 
       <!-- Magia badge -->
-      <div style="background:linear-gradient(90deg,#111d3a,#18274a);border:1px solid rgba(197,160,40,0.35);border-radius:10px;padding:12px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
+      <div style="background:linear-gradient(90deg,#111d3a,#1E40AF);border:1px solid rgba(197,160,40,0.35);border-radius:10px;padding:12px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
         <span style="font-size:18px;color:#C5A028;">✓</span>
         <div>
           <div style="font-size:11px;color:rgba(255,255,255,0.6);">נבדק ואושר על ידי</div>
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
       <!-- CTA buttons -->
       <div style="text-align:center;margin-bottom:24px;">
-        <a href="${certUrl}" style="display:inline-block;background:#C5A028;color:#0c1a35;text-decoration:none;border-radius:10px;padding:13px 32px;font-weight:900;font-size:15px;margin-left:8px;">
+        <a href="${certUrl}" style="display:inline-block;background:#C5A028;color:#1E3A8A;text-decoration:none;border-radius:10px;padding:13px 32px;font-weight:900;font-size:15px;margin-left:8px;">
           📜 צפייה בתעודה המלאה
         </a>
       </div>
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
       <!-- Cert ID -->
       <div style="background:#f8f6f2;border-radius:8px;padding:12px 16px;text-align:center;">
         <div style="font-size:10px;color:#aaa;margin-bottom:4px;">מספר תעודה</div>
-        <div style="font-family:monospace;font-size:15px;font-weight:900;color:#0c1a35;letter-spacing:0.06em;">${certId}</div>
+        <div style="font-family:monospace;font-size:15px;font-weight:900;color:#1E3A8A;letter-spacing:0.06em;">${certId}</div>
       </div>
     </div>
 

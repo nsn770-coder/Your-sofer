@@ -145,7 +145,7 @@ export default function ShaliachDashboard() {
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
 
       {/* Header */}
-      <div style={{ background: '#0c1a35', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: '#1E3A8A', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           {profile?.logoUrl && (
             <img src={profile.logoUrl} alt="לוגו"
@@ -185,7 +185,7 @@ export default function ShaliachDashboard() {
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
           {[
-            { value: orders.length, label: 'סה"כ הזמנות', color: '#0c1a35' },
+            { value: orders.length, label: 'סה"כ הזמנות', color: '#1E3A8A' },
             { value: formatPrice(totalRevenue), label: 'סה"כ מכירות', color: '#27ae60' },
             { value: formatPrice(totalCommissions), label: 'עמלות שלך', color: '#C5A028' },
             { value: deliveredOrders, label: 'הזמנות שנמסרו', color: '#8e44ad' },
@@ -207,7 +207,7 @@ export default function ShaliachDashboard() {
             <button key={t.key} onClick={() => setActiveTab(t.key as any)}
               style={{
                 padding: '8px 18px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', border: 'none',
-                background: activeTab === t.key ? '#0c1a35' : '#fff',
+                background: activeTab === t.key ? '#1E3A8A' : '#fff',
                 color: activeTab === t.key ? '#fff' : '#555',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
               }}>
@@ -261,7 +261,7 @@ export default function ShaliachDashboard() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadLoading}
                 style={{
-                  background: uploadLoading ? '#888' : '#0c1a35',
+                  background: uploadLoading ? '#888' : '#1E3A8A',
                   color: '#fff', border: 'none', borderRadius: 8,
                   padding: '12px 28px', fontSize: 15, fontWeight: 700,
                   cursor: uploadLoading ? 'not-allowed' : 'pointer'

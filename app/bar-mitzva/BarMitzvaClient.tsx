@@ -6,7 +6,7 @@ import RabbinicalSupervision from '../components/RabbinicalSupervision';
 
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
-const NAVY_CARD = '#18274a';
+const NAVY_CARD = '#1E40AF';
 const WA = 'https://wa.me/972552722228';
 
 const PACKAGES = [
@@ -135,7 +135,7 @@ export default function BarMitzvaPage() {
       <section style={{ padding: isMobile ? '44px 16px 32px' : '64px 24px 48px' }}>
         <div style={{ maxWidth: 920, margin: '0 auto' }}>
           <h2 style={{
-            fontSize: isMobile ? 21 : 27, fontWeight: 900, color: '#0c1a35',
+            fontSize: isMobile ? 21 : 27, fontWeight: 900, color: '#1E3A8A',
             textAlign: 'center', margin: '0 0 8px',
           }}>
             בחר את החבילה שלך
@@ -187,7 +187,7 @@ export default function BarMitzvaPage() {
                   {pkg.badge && (
                     <div style={{
                       position: 'absolute', top: -13, right: 20,
-                      background: GOLD, color: '#0c1a35',
+                      background: GOLD, color: '#1E3A8A',
                       fontSize: 11, fontWeight: 900,
                       padding: '4px 14px', borderRadius: 20,
                       boxShadow: '0 2px 10px rgba(0,0,0,0.25)',
@@ -216,7 +216,7 @@ export default function BarMitzvaPage() {
                   <div style={{
                     background: pkg.featured ? GOLD : 'rgba(197,160,40,0.13)',
                     border: `1px solid ${pkg.featured ? GOLD : 'rgba(197,160,40,0.38)'}`,
-                    color: pkg.featured ? '#0c1a35' : GOLD,
+                    color: pkg.featured ? '#1E3A8A' : GOLD,
                     padding: '11px 16px',
                     fontSize: 13, fontWeight: 800,
                     textAlign: 'center',
@@ -239,7 +239,7 @@ export default function BarMitzvaPage() {
         padding: isMobile ? '36px 16px' : '52px 24px',
       }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: '0 0 8px' }}>
+          <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', margin: '0 0 8px' }}>
             השלם את הסט שלך
           </h2>
           <p style={{ fontSize: 14, color: '#888', margin: '0 0 32px', lineHeight: 1.65 }}>
@@ -272,7 +272,7 @@ export default function BarMitzvaPage() {
                   }}
                 >
                   <div style={{ fontSize: 34, marginBottom: 10 }}>{item.emoji}</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: '#0c1a35', marginBottom: 4 }}>{item.label}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1E3A8A', marginBottom: 4 }}>{item.label}</div>
                   <div style={{ fontSize: 11, color: GOLD, fontWeight: 700 }}>לצפייה ←</div>
                 </div>
               </Link>

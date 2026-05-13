@@ -70,7 +70,7 @@ export default function SoferimClient() {
           </div>
 
           <button onClick={() => router.push('/soferim/apply')}
-            style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             ✍️ הצטרף כסופר לפלטפורמה
           </button>
         </div>
@@ -150,7 +150,7 @@ export default function SoferimClient() {
                 {/* תוכן */}
                 <div style={{ padding: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                    <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35', margin: 0 }}>{s.name}</h2>
+                    <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>{s.name}</h2>
                     <div style={{ display: 'flex', gap: 2 }}>
                       {'★★★★★'.split('').map((star, i) => (
                         <span key={i} style={{ color: '#e6a817', fontSize: 13 }}>{star}</span>
@@ -182,7 +182,7 @@ export default function SoferimClient() {
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button
                       onClick={e => { e.stopPropagation(); router.push(`/soferim/${s.id}`); }}
-                      style={{ flex: 1, background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                      style={{ flex: 1, background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                       📜 לפרופיל הסופר
                     </button>
                   </div>

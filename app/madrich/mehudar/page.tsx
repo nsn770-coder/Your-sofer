@@ -50,14 +50,14 @@ export default function MehudarPage() {
 
         <QuoteBlock text="כשר פירושו עמידה בדרישות. מהודר פירושו שמישהו שם לב גם כשלא היה חייב." />
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
           מה הופך מזוזה לכשרה?
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
           מזוזה כשרה היא כזו שעמדה בכל דרישות ההלכה: האותיות תקינות, הסדר נכון, הכוונה הייתה כראוי. זה הבסיס. בלי זה - אין מזוזה.
         </p>
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
           מה מוסיף ה"הידור"?
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -104,7 +104,7 @@ export default function MehudarPage() {
           ))}
         </div>
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
           מה בדיוק בודקים במזוזה מהודרת?
         </h2>
 
@@ -118,13 +118,13 @@ export default function MehudarPage() {
           <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
             <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 16, color: '#0c1a35', marginBottom: 4 }}>{item.title}</div>
+              <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
               <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
             </div>
           </div>
         ))}
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
           האם אני צריך מהודרת?
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -136,7 +136,7 @@ export default function MehudarPage() {
 
         <QuoteBlock text="לא חשוב מה תבחרו - חשוב שתדעו בדיוק מה אתם מקבלים." />
 
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <RelatedCard emoji="💸" title="למה לא לקנות מזוזה זולה" desc="הקשר בין מחיר ואיכות" href="/madrich/mezuza-zola" />
           <RelatedCard emoji="🔍" title="איך אנחנו בודקים" desc="תהליך הבדיקה שלנו" href="/madrich/bedika" />

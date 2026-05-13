@@ -50,7 +50,7 @@ export default function ShukPage() {
 
         <QuoteBlock text="הבעיה הכי גדולה בשוק הסת״ם היא שהלקוח לא באמת יודע מה הוא קונה." />
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
           בלבול שמתחיל מהמינוח
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -60,7 +60,7 @@ export default function ShukPage() {
           הלקוח לא יכול באמת לדעת. הוא בוטח במוכר. ואם המוכר לא יודע מה הוא מוכר - הבטחון הזה נבנה על אוויר.
         </p>
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
           שרשרת הסיטונאים
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -94,7 +94,7 @@ export default function ShukPage() {
           </div>
         </div>
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0c1a35', margin: '36px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
           הבעיה היא לא שאין מקומות טובים
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -106,7 +106,7 @@ export default function ShukPage() {
 
         <QuoteBlock text="מזוזה כשרה באמת - עם שקיפות מלאה. זה הדבר שאנחנו בנינו כאן." />
 
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <RelatedCard emoji="✍️" title="מי הסופרים שלנו" desc="איך אנחנו בוחרים עם מי לעבוד" href="/madrich/soferim" />
           <RelatedCard emoji="🔍" title="איך אנחנו בודקים" desc="התהליך המלא לפני כל מכירה" href="/madrich/bedika" />

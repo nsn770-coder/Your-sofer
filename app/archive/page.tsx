@@ -49,7 +49,7 @@ export default function ArchivePage() {
     }}>
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #0c1a35 0%, #18274a 100%)',
+        background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)',
         borderBottom: '3px solid #C5A028',
         padding: '36px 24px 28px',
         textAlign: 'center',
@@ -117,7 +117,7 @@ export default function ArchivePage() {
 
                 {/* Info */}
                 <div style={{ padding: '14px 16px' }}>
-                  <div style={{ fontWeight: 800, fontSize: 14, color: '#0c1a35', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontWeight: 800, fontSize: 14, color: '#1E3A8A', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {klaf.name ?? klaf.productName ?? 'קלף סת״מ'}
                   </div>
                   {klaf.serialNumber && (
@@ -137,7 +137,7 @@ export default function ArchivePage() {
         <div style={{ marginTop: 40, textAlign: 'center' }}>
           <Link
             href="/"
-            style={{ fontSize: 13, color: '#0c1a35', textDecoration: 'underline', opacity: 0.6 }}
+            style={{ fontSize: 13, color: '#1E3A8A', textDecoration: 'underline', opacity: 0.6 }}
           >
             חזרה לדף הראשי
           </Link>

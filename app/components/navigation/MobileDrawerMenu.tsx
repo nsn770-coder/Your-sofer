@@ -51,7 +51,7 @@ function MobileAccordion({ item, onSelect }: { item: NavMenuItem; onSelect: (cat
           <div className="pb-4 bg-gray-50">
             {item.columns.map((col, ci) => (
               <div key={ci} className="pt-3">
-                <p className="px-6 pt-1 text-right" style={{ fontSize: 16, fontWeight: 900, color: '#0c1a35', marginBottom: 8, paddingBottom: 6, borderBottom: '2px solid #C5A028' }}>
+                <p className="px-6 pt-1 text-right" style={{ fontSize: 16, fontWeight: 900, color: '#1E3A8A', marginBottom: 8, paddingBottom: 6, borderBottom: '2px solid #C5A028' }}>
                   {col.title}
                 </p>
                 <ul>

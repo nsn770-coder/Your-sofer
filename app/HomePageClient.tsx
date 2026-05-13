@@ -190,7 +190,7 @@ function CategoryCard({
     >
       <h3
         className="text-right mb-3"
-        style={{ fontSize: 17, fontWeight: 900, color: '#0c1a35', lineHeight: 1.2 }}
+        style={{ fontSize: 17, fontWeight: 900, color: '#1E3A8A', lineHeight: 1.2 }}
       >
         {card.title}
       </h3>
@@ -660,7 +660,7 @@ export default function HomePageClient() {
           onClick={closeWizard}>
           <div style={{ background: '#fff', borderRadius: 0, width: '100%', maxWidth: 480, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden' }}
             onClick={e => e.stopPropagation()}>
-            <div style={{ background: '#0c1a35', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ background: '#1E3A8A', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, marginBottom: 2 }}>
                   {wizardStep < 3 ? `שאלה ${wizardStep + 1} מתוך 3` : '✨ ההמלצות שלנו'}
@@ -686,7 +686,7 @@ export default function HomePageClient() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     {[{ val: 'self' as const, label: '👤 לי עצמי' }, { val: 'gift' as const, label: '🎁 מתנה לאחר' }].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardFor(opt.val); setWizardStep(1); }}
-                        style={{ padding: '18px 12px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', transition: 'all 0.15s' }}
+                        style={{ padding: '18px 12px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1E3A8A', cursor: 'pointer', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         {opt.label}
@@ -705,7 +705,7 @@ export default function HomePageClient() {
                       { val: 'high' as const, label: 'מעל 1,000 ₪',  sub: 'מוצרים מהדרין מובחרים' },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardBudget(opt.val); setWizardStep(2); }}
-                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1E3A8A', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
@@ -725,7 +725,7 @@ export default function HomePageClient() {
                       { val: 'mehudar_plus' as const, label: 'מהודר בתכלית', sub: 'רמת הכשרות הגבוהה ביותר' },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardKashrut(opt.val); setWizardStep(3); fetchWizardResults(wizardBudget, opt.val); }}
-                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#0c1a35', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1E3A8A', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
@@ -743,7 +743,7 @@ export default function HomePageClient() {
                     <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
                     לא נמצאו מוצרים מתאימים לפי הסינון.
                     <br />
-                    <button onClick={() => router.push('/')} style={{ marginTop: 16, background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
+                    <button onClick={() => router.push('/')} style={{ marginTop: 16, background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
                   </div>
                 ) : (
                   <>
@@ -757,14 +757,14 @@ export default function HomePageClient() {
                             <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 100)} alt={p.name} loading="lazy" style={{ width: 60, height: 60, borderRadius: 0, objectFit: 'cover', flexShrink: 0 }} />
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: '#1E3A8A', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
                             <div style={{ fontSize: 15, fontWeight: 900, color: '#C5A028' }}>{formatPrice(p.price)}</div>
                           </div>
                           <span style={{ color: '#C5A028', fontSize: 18, flexShrink: 0 }}>←</span>
                         </div>
                       ))}
                     </div>
-                    <button onClick={closeWizard} style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                    <button onClick={closeWizard} style={{ width: '100%', background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                       המשך לגלישה
                     </button>
                   </>
@@ -802,13 +802,13 @@ export default function HomePageClient() {
         <div
           dir="rtl"
           style={{
-            background: 'linear-gradient(135deg, #0c1a35 0%, #18274a 100%)',
+            background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)',
             borderBottom: '3px solid rgba(197,160,40,0.45)',
             padding: isMobile ? '14px 16px' : '16px 28px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
           }}
           onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'linear-gradient(135deg, #111d3a 0%, #1e2f56 100%)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'linear-gradient(135deg, #0c1a35 0%, #18274a 100%)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)'; }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 14 }}>
             <span style={{
@@ -852,21 +852,21 @@ export default function HomePageClient() {
               <span style={{ color: '#C5A028', display: 'flex', alignItems: 'center' }}><IconCounterBox isMobile={isMobile} /></span>
               <span ref={productsValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#C5A028', lineHeight: 1 }}>0+</span>
             </div>
-            <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>מוצרים באתר</span>
+            <span style={{ fontSize: isMobile ? 11 : 12, color: '#1E3A8A', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>מוצרים באתר</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ color: '#C5A028', display: 'flex', alignItems: 'center' }}><IconCounterPen isMobile={isMobile} /></span>
               <span ref={soferimValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#C5A028', lineHeight: 1 }}>0</span>
             </div>
-            <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>סופרים מאושרים</span>
+            <span style={{ fontSize: isMobile ? 11 : 12, color: '#1E3A8A', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>סופרים מאושרים</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, padding: isMobile ? '14px 8px' : '16px 12px', background: '#fafaf8', borderRadius: 0, border: '1.5px solid #ede8df', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ color: '#C5A028', display: 'flex', alignItems: 'center' }}><IconCounterCheck isMobile={isMobile} /></span>
               <span ref={customersValRef} style={{ fontSize: isMobile ? 22 : 26, fontWeight: 900, color: '#C5A028', lineHeight: 1 }}>0+</span>
             </div>
-            <span style={{ fontSize: isMobile ? 11 : 12, color: '#0c1a35', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>לקוחות מרוצים</span>
+            <span style={{ fontSize: isMobile ? 11 : 12, color: '#1E3A8A', fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>לקוחות מרוצים</span>
           </div>
         </div>
         {/* Rating row */}
@@ -880,7 +880,7 @@ export default function HomePageClient() {
       {/* ── 4. Category grid ── */}
       <div className="ys-cats-section" style={{ background: '#FFFFFF', padding: isMobile ? '28px 12px' : '40px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>קטגוריות נבחרות</h2>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#888', marginBottom: 24 }}>גלו את מגוון מוצרי הסת&quot;מ שלנו</p>
           <div style={{ display: 'grid', gap: 12 }}
             className="ys-cats-grid md:grid-cols-3 lg:grid-cols-6">
@@ -904,7 +904,7 @@ export default function HomePageClient() {
                   )}
                 </div>
                 <div style={{ padding: 10, background: '#fff', textAlign: 'center' }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>{cat.name}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A' }}>{cat.name}</span>
                 </div>
               </div>
             ))}
@@ -917,10 +917,10 @@ export default function HomePageClient() {
       {featuredProducts.length > 0 && (
         <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
-            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
+            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
             <button
               onClick={() => router.push('/category/יודאיקה')}
-              style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 0, padding: isMobile ? '9px 18px' : '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+              style={{ background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: isMobile ? '9px 18px' : '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
             >
               צפה במוצרים הנמכרים ביותר ←
             </button>
@@ -943,14 +943,14 @@ export default function HomePageClient() {
                     )}
                   </div>
                   <div style={{ padding: '8px 10px 10px' }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: '#0c1a35', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>{p.name}</p>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>{p.name}</p>
                     <p style={{ fontSize: 14, fontWeight: 800, color: '#C5A028', marginBottom: 8 }}>{formatPrice(p.price)}</p>
                     <button
                       onClick={e => {
                         e.stopPropagation();
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
                       }}
-                      style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
+                      style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
                     >
                       הוסף לסל
                     </button>
@@ -967,7 +967,7 @@ export default function HomePageClient() {
       <div style={{ background: '#FFFFFF', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
         <a
           href="/category/יודאיקה"
-          style={{ display: 'inline-block', background: '#0c1a35', color: '#fff', borderRadius: 0, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
+          style={{ display: 'inline-block', background: '#1E3A8A', color: '#fff', borderRadius: 0, padding: isMobile ? '12px 32px' : '14px 40px', fontSize: isMobile ? 15 : 17, fontWeight: 900, textDecoration: 'none' }}
         >
           לכל המוצרים ←
         </a>
@@ -975,7 +975,7 @@ export default function HomePageClient() {
 
       {/* ── Clear Path CTA ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 16px' : '40px 16px', direction: 'rtl', textAlign: 'center' }}>
-        <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>לא בטוח מה לבחור?</h2>
+        <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', marginBottom: 8 }}>לא בטוח מה לבחור?</h2>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>הכירו את הסופרים שלנו - סופרים מוסמכים, מאומתים ומדורגים</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
           {CLEAR_PATH_ITEMS.map(item => (
@@ -983,7 +983,7 @@ export default function HomePageClient() {
               key={item.label}
               onClick={() => router.push(item.href)}
               style={{
-                background: '#0c1a35',
+                background: '#1E3A8A',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 0,
@@ -993,8 +993,8 @@ export default function HomePageClient() {
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a2d50'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#0c1a35'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1E40AF'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1E3A8A'; }}
             >
               {item.label} ←
             </button>
@@ -1005,7 +1005,7 @@ export default function HomePageClient() {
           style={{
             marginTop: 16,
             background: 'linear-gradient(135deg, #C5A028, #C5A028, #C5A028)',
-            color: '#0c1a35',
+            color: '#1E3A8A',
             fontWeight: 900,
             fontSize: 16,
             padding: '16px 48px',
@@ -1032,7 +1032,7 @@ export default function HomePageClient() {
       {/* ── 6. More categories horizontal scroll ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
-          <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#0c1a35', marginBottom: 14 }}>עוד קטגוריות</h2>
+          <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', marginBottom: 14 }}>עוד קטגוריות</h2>
         </div>
         <div style={{ display: 'flex', overflowX: 'auto', gap: 10, padding: '0 12px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
           {MORE_CAT_DEFS.map(cat => {
@@ -1049,7 +1049,7 @@ export default function HomePageClient() {
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{cat.emoji}</div>
                   )}
                 </div>
-                <p style={{ fontSize: 11, textAlign: 'center', color: '#0c1a35', fontWeight: 600, marginTop: 6 }}>{cat.slug}</p>
+                <p style={{ fontSize: 11, textAlign: 'center', color: '#1E3A8A', fontWeight: 600, marginTop: 6 }}>{cat.slug}</p>
               </div>
             );
           })}
@@ -1060,7 +1060,7 @@ export default function HomePageClient() {
       <RabbinicalSupervision isMobile={isMobile} />
 
       {/* ── Why Your Sofer trust block ── */}
-      <div style={{ background: '#0c1a35', padding: isMobile ? '36px 20px' : '52px 16px', direction: 'rtl' }}>
+      <div style={{ background: '#1E3A8A', padding: isMobile ? '36px 20px' : '52px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
           <p style={{ fontSize: isMobile ? 16 : 19, fontWeight: 900, color: '#f59e0b', marginBottom: 20, lineHeight: 1.5 }}>
             ⚠️ רוב האנשים בכלל לא יודעים מי כתב את המזוזה שלהם
@@ -1082,7 +1082,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Collections section ── */}
-      <div style={{ background: '#0c1a35', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+      <div style={{ background: '#1E3A8A', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.15em', textAlign: 'center', marginBottom: 8 }}>COLLECTIONS</p>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 28, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הקולקציות שלנו</h2>
@@ -1153,7 +1153,7 @@ export default function HomePageClient() {
       {/* ── Static Social Proof ── */}
       <div style={{ background: '#FFFFFF', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>
             לקוחות שכבר קנו - מה הם אומרים
           </h2>
           <p style={{ textAlign: 'center', fontSize: 13, color: '#999', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
@@ -1178,11 +1178,11 @@ export default function HomePageClient() {
                   &ldquo;{q.text}&rdquo;
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span style={{ color: '#C5A028', fontWeight: 900, fontSize: 14 }}>{q.name.charAt(0)}</span>
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#0c1a35' }}>{q.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A' }}>{q.name}</div>
                     <div style={{ fontSize: 11, color: '#999' }}>{q.city}</div>
                   </div>
                 </div>

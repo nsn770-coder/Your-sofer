@@ -2,7 +2,7 @@
 
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
-const NAVY_CARD = '#18274a';
+const NAVY_CARD = '#1E40AF';
 const GOLD_LIGHT = 'rgba(197,160,40,0.15)';
 
 function InitialsAvatar({ initials, size = 88 }: { initials: string; size?: number }) {

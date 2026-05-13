@@ -51,13 +51,13 @@ export default function FaqPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
-      <div style={{ background: '#0c1a35', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: '#1E3A8A', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: '#C5A028', fontSize: 20, cursor: 'pointer' }}>←</button>
         <span style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>Your Sofer</span>
       </div>
       <div style={{ maxWidth: 820, margin: '32px auto', padding: '0 16px 48px' }}>
         <div style={{ background: '#fff', borderRadius: 14, padding: '32px 28px', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
-          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>שאלות נפוצות</h1>
+          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>שאלות נפוצות</h1>
           <p style={{ fontSize: 13, color: '#888', marginBottom: 28 }}>כל מה שרצית לדעת על Your Sofer</p>
 
           <div style={{ display: 'grid', gap: 10 }}>
@@ -66,7 +66,7 @@ export default function FaqPage() {
                 <button
                   onClick={() => setOpen(open === i ? null : i)}
                   style={{ width: '100%', background: open === i ? '#f8f4ec' : '#fff', border: 'none', padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', textAlign: 'right', gap: 12 }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#0c1a35' }}>{faq.q}</span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#1E3A8A' }}>{faq.q}</span>
                   <span style={{ fontSize: 18, color: '#C5A028', flexShrink: 0, transform: open === i ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▾</span>
                 </button>
                 {open === i && (
@@ -79,7 +79,7 @@ export default function FaqPage() {
           </div>
 
           <div style={{ marginTop: 32, padding: '18px 20px', background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 10 }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#0c1a35', margin: '0 0 6px' }}>לא מצאת תשובה?</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#1E3A8A', margin: '0 0 6px' }}>לא מצאת תשובה?</p>
             <p style={{ fontSize: 13, color: '#555', margin: 0 }}>
               טלפון: 055-272-2228 | אימייל: nsn770@gmail.com
             </p>

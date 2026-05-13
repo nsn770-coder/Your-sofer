@@ -380,7 +380,7 @@ export default function SoferApplyPage() {
               ].map(opt => (
                 <label key={opt.value} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
                   <input type="radio" name="taxStatus" value={opt.value} checked={taxStatus === opt.value} onChange={() => setTaxStatus(opt.value)} style={{ marginTop: 3, flexShrink: 0, accentColor: '#C5A028' }} />
-                  <span style={{ fontSize: 14, color: '#0c1a35', fontWeight: taxStatus === opt.value ? 700 : 400 }}>{opt.label}</span>
+                  <span style={{ fontSize: 14, color: '#1E3A8A', fontWeight: taxStatus === opt.value ? 700 : 400 }}>{opt.label}</span>
                 </label>
               ))}
             </div>
@@ -388,10 +388,10 @@ export default function SoferApplyPage() {
             {taxStatus === 'no_osek' && (
               <div style={{ background: 'rgba(197,160,40,0.1)', border: '1.5px solid #C5A028', borderRadius: 10, padding: '14px 16px' }}>
                 <div style={{ fontSize: 13, color: '#888', textDecoration: 'line-through', marginBottom: 4 }}>עלות רגילה: ₪499</div>
-                <div style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>🎉 לרגל ההשקה — הצטרפות חינם!</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>🎉 לרגל ההשקה — הצטרפות חינם!</div>
                 <div style={{ fontSize: 13, color: '#555', marginBottom: 12 }}>פתיחת עוסק פטור דרכנו עם 10% הנחה על השירות</div>
                 <a href="https://mycount.co.il/הסופר-שלך/" target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'inline-block', background: '#C5A028', color: '#0c1a35', fontWeight: 900, fontSize: 14, padding: '10px 20px', borderRadius: 8, textDecoration: 'none' }}>
+                  style={{ display: 'inline-block', background: '#C5A028', color: '#1E3A8A', fontWeight: 900, fontSize: 14, padding: '10px 20px', borderRadius: 8, textDecoration: 'none' }}>
                   פתחו לי עוסק פטור ←
                 </a>
               </div>
@@ -419,7 +419,7 @@ export default function SoferApplyPage() {
                   <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#5a4a18', flexWrap: 'wrap' }}>
                     <span>+ עמלה (15%): {formatPrice(calcData.commission)}</span>
                     <span>+ מע"מ (18%): {formatPrice(calcData.vat)}</span>
-                    <span style={{ fontWeight: 900, fontSize: 13, color: '#0c1a35' }}>= {formatPrice(calcData.total)} ללקוח</span>
+                    <span style={{ fontWeight: 900, fontSize: 13, color: '#1E3A8A' }}>= {formatPrice(calcData.total)} ללקוח</span>
                   </div>
                 )}
               </div>
@@ -529,7 +529,7 @@ export default function SoferApplyPage() {
                           <div style={{ display: 'flex', justifyContent: 'space-between', color: '#666', marginBottom: 8 }}>
                             <span>+ מע"מ (18%)</span><span>{formatPrice(prices.vat)}</span>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, color: '#0c1a35', fontSize: 14, borderTop: '1px solid #e0d9c8', paddingTop: 8 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, color: '#1E3A8A', fontSize: 14, borderTop: '1px solid #e0d9c8', paddingTop: 8 }}>
                             <span>מחיר ללקוח</span><span>{formatPrice(prices.total)}</span>
                           </div>
                           {LARGE_CATS.has(product.type) && (
@@ -589,7 +589,7 @@ export default function SoferApplyPage() {
           <button type="submit" disabled={loading}
             style={{
               width: '100%', background: loading ? '#888' : '#C5A028',
-              color: '#0c1a35', border: 'none', borderRadius: 10,
+              color: '#1E3A8A', border: 'none', borderRadius: 10,
               padding: '16px 0', fontSize: 17, fontWeight: 900,
               cursor: loading ? 'not-allowed' : 'pointer',
               marginBottom: 32,

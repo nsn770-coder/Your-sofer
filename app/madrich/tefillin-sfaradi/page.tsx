@@ -2,7 +2,7 @@
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard, Step } from '../InfoComponents';
 
 const BASE_URL = 'https://your-sofer.com';
-const C = { navy: '#0c1a35', gold: '#C5A028', border: '#e0e0e0', white: '#fff' };
+const C = { navy: '#1E3A8A', gold: '#C5A028', border: '#e0e0e0', white: '#fff' };
 
 export const metadata: Metadata = {
   title: 'תפילין ספרדי – מה חשוב לדעת לפני שקונים? | YourSofer',

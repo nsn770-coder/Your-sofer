@@ -27,7 +27,7 @@ export default function OpsNavbar() {
 
   return (
     <nav
-      style={{ background: '#0c1a35', borderBottom: '2px solid #b8972a' }}
+      style={{ background: '#1E3A8A', borderBottom: '2px solid #b8972a' }}
       className="sticky top-0 z-50 px-4 py-3"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between" dir="rtl">

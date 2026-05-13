@@ -5,13 +5,13 @@ export default function PrivacyPage() {
   const router = useRouter();
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
-      <div style={{ background: '#0c1a35', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: '#1E3A8A', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: '#C5A028', fontSize: 20, cursor: 'pointer' }}>←</button>
         <span style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>Your Sofer</span>
       </div>
       <div style={{ maxWidth: 820, margin: '32px auto', padding: '0 16px 48px' }}>
         <div style={{ background: '#fff', borderRadius: 14, padding: '32px 28px', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
-          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>מדיניות פרטיות</h1>
+          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>מדיניות פרטיות</h1>
           <p style={{ fontSize: 13, color: '#888', marginBottom: 28 }}>עדכון אחרון: אפריל 2025</p>
 
           <Section title="1. אילו מידע אנו אוספים?">
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 24 }}>
-      <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0c1a35', marginBottom: 8, borderRight: '3px solid #C5A028', paddingRight: 10 }}>{title}</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', marginBottom: 8, borderRight: '3px solid #C5A028', paddingRight: 10 }}>{title}</h2>
       <p style={{ fontSize: 14, color: '#444', lineHeight: 1.8, margin: 0 }}>{children}</p>
     </div>
   );

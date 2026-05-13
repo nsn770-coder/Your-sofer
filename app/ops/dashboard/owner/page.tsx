@@ -12,7 +12,7 @@ function StatCard({ label, value, sub, color }: { label: string; value: string |
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
       <div className="text-sm text-gray-500 mb-1">{label}</div>
-      <div className="text-3xl font-black mb-1" style={{ color: color || '#0c1a35' }}>{value}</div>
+      <div className="text-3xl font-black mb-1" style={{ color: color || '#1E3A8A' }}>{value}</div>
       {sub && <div className="text-xs text-gray-400">{sub}</div>}
     </div>
   );
@@ -105,7 +105,7 @@ export default function OwnerDashboard() {
     <div dir="rtl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-black" style={{ color: '#0c1a35' }}>
+          <h1 className="text-2xl font-black" style={{ color: '#1E3A8A' }}>
             שלום {opsUser?.name} 👋
           </h1>
           <p className="text-gray-500 text-sm mt-1">דשבורד בעלים - סקירה מלאה</p>

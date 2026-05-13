@@ -18,7 +18,7 @@ export default function OpsLoginPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0c1a35' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#1E3A8A' }}>
         <div className="text-white text-lg">טוען...</div>
       </div>
     );
@@ -27,7 +27,7 @@ export default function OpsLoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center"
-      style={{ background: '#0c1a35' }}
+      style={{ background: '#1E3A8A' }}
       dir="rtl"
     >
       <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-sm text-center">

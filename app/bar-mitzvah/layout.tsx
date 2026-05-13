@@ -18,7 +18,7 @@ const WA_ICON = (
 export default function BarMitzvahLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <header className="bg-[#0c1a35] sticky top-0 z-50 border-b border-white/10">
+      <header className="bg-[#1E3A8A] sticky top-0 z-50 border-b border-white/10">
         <div
           className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between"
           dir="rtl"

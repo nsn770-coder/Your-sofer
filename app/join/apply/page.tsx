@@ -77,12 +77,12 @@ export default function ShaliachApplyPage() {
       <div style={{ minHeight: '100vh', background: '#f3f4f4', display: 'flex', alignItems: 'center', justifyContent: 'center', direction: 'rtl' }}>
         <div style={{ background: '#fff', borderRadius: 16, padding: 48, maxWidth: 480, textAlign: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
           <div style={{ fontSize: 64, marginBottom: 16 }}>✅</div>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0c1a35', marginBottom: 12 }}>הבקשה נשלחה!</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#1E3A8A', marginBottom: 12 }}>הבקשה נשלחה!</h2>
           <p style={{ color: '#555', fontSize: 15, lineHeight: 1.6, marginBottom: 24 }}>
             קיבלנו את פרטיך. צוות YourSofer יבדוק ויחזור אליך בהקדם.
           </p>
           <button onClick={() => router.push('/')}
-            style={{ background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
             חזרה לדף הבית
           </button>
         </div>
@@ -94,7 +94,7 @@ export default function ShaliachApplyPage() {
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
 
       {/* Header */}
-      <div style={{ background: '#0c1a35', padding: '24px 20px', textAlign: 'center' }}>
+      <div style={{ background: '#1E3A8A', padding: '24px 20px', textAlign: 'center' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer', display: 'inline-block', marginBottom: 12 }}>
           <span style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>Your Sofer</span>
         </div>
@@ -158,14 +158,14 @@ export default function ShaliachApplyPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               {form.logoUrl ? (
                 <img src={form.logoUrl} alt="לוגו"
-                  style={{ width: 80, height: 80, borderRadius: 10, objectFit: 'cover', border: '2px solid #0c1a35', flexShrink: 0 }} />
+                  style={{ width: 80, height: 80, borderRadius: 10, objectFit: 'cover', border: '2px solid #1E3A8A', flexShrink: 0 }} />
               ) : (
                 <div style={{ width: 80, height: 80, borderRadius: 10, background: '#e8eef8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, flexShrink: 0 }}>
                   🏛️
                 </div>
               )}
               <div>
-                <label style={{ display: 'inline-block', background: '#0c1a35', color: '#fff', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                <label style={{ display: 'inline-block', background: '#1E3A8A', color: '#fff', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                   {uploadingLogo ? '⏳ מעלה...' : '📷 העלה לוגו'}
                   <input type="file" accept="image/*" style={{ display: 'none' }}
                     onChange={handleLogoUpload} />
@@ -183,7 +183,7 @@ export default function ShaliachApplyPage() {
 
           {/* מידע על תרומות */}
           <div style={{ background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 12, padding: 20, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0c1a35', marginBottom: 10 }}>💰 מידע על תרומות</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', marginBottom: 10 }}>💰 מידע על תרומות</h3>
             <div style={{ fontSize: 14, color: '#333', lineHeight: 1.8 }}>
               <div>• <strong>10%</strong> מכל הזמנה דרך הלינק שלך יועברו לעמותה</div>
               <div>• תשלום חודשי ישירות לחשבון העמותה</div>
@@ -195,7 +195,7 @@ export default function ShaliachApplyPage() {
           {/* Submit */}
           <button type="submit" disabled={loading}
             style={{
-              width: '100%', background: loading ? '#888' : '#0c1a35',
+              width: '100%', background: loading ? '#888' : '#1E3A8A',
               color: '#fff', border: 'none', borderRadius: 10,
               padding: '16px 0', fontSize: 17, fontWeight: 900,
               cursor: loading ? 'not-allowed' : 'pointer',
@@ -216,7 +216,7 @@ const cardStyle: React.CSSProperties = {
 };
 
 const sectionTitle: React.CSSProperties = {
-  fontSize: 17, fontWeight: 800, color: '#0c1a35', marginBottom: 20,
+  fontSize: 17, fontWeight: 800, color: '#1E3A8A', marginBottom: 20,
   borderBottom: '2px solid #f0f0f0', paddingBottom: 10,
 };
 

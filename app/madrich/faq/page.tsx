@@ -101,7 +101,7 @@ export default function FAQPage() {
 
         {FAQS.map(faq => <FAQItem key={faq.q} q={faq.q} a={faq.a} />)}
 
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0c1a35', margin: '48px 0 16px' }}>מאמרים מומלצים</h3>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '48px 0 16px' }}>מאמרים מומלצים</h3>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <RelatedCard emoji="💸" title="למה לא לקנות מזוזה זולה" desc="הסבר מפורט על פערי מחירים" href="/madrich/mezuza-zola" />
           <RelatedCard emoji="🎯" title="איך לבחור מזוזה נכון" desc="מדריך מעשי לבחירה" href="/madrich/bechira" />

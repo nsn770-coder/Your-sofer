@@ -25,7 +25,7 @@ const stats = [
 export default function ReviewsClient() {
   return (
     <div dir="rtl" style={{ backgroundColor: '#F5F2EC', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
-      <section style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
+      <section style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
         <h1 style={{ color: '#fff', fontSize: 32, fontWeight: 900, margin: '0 0 10px' }}>מה הלקוחות אומרים</h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, margin: '0 0 32px' }}>אלפי לקוחות מרוצים ברחבי הארץ שקונים סת״מ בראש שקט</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 40, flexWrap: 'wrap' }}>
@@ -47,7 +47,7 @@ export default function ReviewsClient() {
                   {r.name.charAt(0)}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: '#0C1A35' }}>{r.name}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: '#1E3A8A' }}>{r.name}</div>
                   <div style={{ fontSize: 12, color: '#888' }}>{r.city} • {r.category}</div>
                 </div>
               </div>
@@ -63,10 +63,10 @@ export default function ReviewsClient() {
 
       <section style={{ maxWidth: 800, margin: '0 auto 60px', padding: '0 16px' }}>
         <div style={{ background: '#F0EBE0', borderRadius: 14, padding: '40px 24px', textAlign: 'center', border: '1px solid #E0D8CC' }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0C1A35', margin: '0 0 8px' }}>גם לך יש חוויה לשתף?</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1E3A8A', margin: '0 0 8px' }}>גם לך יש חוויה לשתף?</h2>
           <p style={{ fontSize: 14, color: '#666', margin: '0 0 24px' }}>הביקורת שלך עוזרת לאחרים לקנות סת״ם כשר בביטחון ובשקיפות</p>
           <a href="https://wa.me/972552722228?text=אני%20רוצה%20לכתוב%20ביקורת%20על%20Your%20Sofer" target="_blank" rel="noopener noreferrer"
-            style={{ display: 'inline-block', background: '#C5A028', color: '#0C1A35', fontWeight: 700, fontSize: 15, padding: '13px 32px', borderRadius: 8, textDecoration: 'none' }}>
+            style={{ display: 'inline-block', background: '#C5A028', color: '#1E3A8A', fontWeight: 700, fontSize: 15, padding: '13px 32px', borderRadius: 8, textDecoration: 'none' }}>
             כתוב ביקורת בוואטסאפ
           </a>
         </div>

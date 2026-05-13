@@ -8,7 +8,7 @@ export default function JoinPage() {
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
       {/* Navbar */}
-      <div style={{ background: '#0c1a35', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: '#1E3A8A', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -1 }}>Your Sofer</div>
           <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>ישראל ✡</div>
@@ -73,7 +73,7 @@ export default function JoinPage() {
 
         {/* רב קהילה */}
         <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', border: '1px solid #eee' }}>
-          <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a3a6a)', padding: '32px 28px', textAlign: 'center' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1E3A8A, #2563EB)', padding: '32px 28px', textAlign: 'center' }}>
             <div style={{ fontSize: 56, marginBottom: 12 }}>🏛️</div>
             <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הצטרף כרב קהילה</h2>
             <p style={{ color: '#a8c0d8', fontSize: 14, lineHeight: 1.6 }}>
@@ -91,19 +91,19 @@ export default function JoinPage() {
                 'הצגה בדף רבני הקהילה',
               ].map(item => (
                 <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 14, color: '#333' }}>
-                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#0c1a35', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>✓</div>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#1E3A8A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>✓</div>
                   {item}
                 </div>
               ))}
             </div>
 
             <div style={{ background: '#f0f4ff', borderRadius: 8, padding: '14px 16px', marginBottom: 20, fontSize: 13 }}>
-              <div style={{ fontWeight: 700, marginBottom: 4, color: '#0c1a35' }}>תרומה: 10% מכל הזמנה לעמותה</div>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: '#1E3A8A' }}>תרומה: 10% מכל הזמנה לעמותה</div>
               <div style={{ color: '#888' }}>הכסף מועבר ישירות לעמותה שלך מדי חודש</div>
             </div>
 
             <button onClick={() => router.push('/join/apply')}
-              style={{ width: '100%', background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 10, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+              style={{ width: '100%', background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 10, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
               שלח בקשת הצטרפות ←
             </button>
           </div>
@@ -142,7 +142,7 @@ export default function JoinPage() {
             ← חזרה לחנות
           </button>
           <a href="mailto:info@your-sofer.com"
-            style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
+            style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
             📧 צור קשר
           </a>
         </div>

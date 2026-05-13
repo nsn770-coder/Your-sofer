@@ -485,7 +485,7 @@ export default function ShiraChat() {
         }
         .shira-badge {
           position: fixed; bottom: 94px; left: 8px; z-index: 9999;
-          background: white; color: #0c1a35;
+          background: white; color: #1E3A8A;
           font-size: 11.5px; font-weight: 700;
           padding: 5px 11px; border-radius: 20px;
           box-shadow: 0 2px 14px rgba(0,0,0,0.13);
@@ -586,7 +586,7 @@ export default function ShiraChat() {
           background: rgba(17,29,58,0.05);
           border: 1.5px solid rgba(197,160,40,0.5);
           border-radius: 18px; padding: 8px 14px;
-          font-size: 12.5px; font-weight: 600; color: #0c1a35;
+          font-size: 12.5px; font-weight: 600; color: #1E3A8A;
           cursor: pointer; text-align: right; direction: rtl;
           transition: background 0.15s, border-color 0.15s;
           font-family: inherit;
@@ -631,7 +631,7 @@ export default function ShiraChat() {
           flex-shrink: 0; text-align: left;
           display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
         }
-        .shira-product-price { font-size: 14px; font-weight: 900; color: #0c1a35; white-space: nowrap; }
+        .shira-product-price { font-size: 14px; font-weight: 900; color: #1E3A8A; white-space: nowrap; }
         .shira-product-cta {
           font-size: 10px; font-weight: 700;
           background: linear-gradient(135deg, #111d3a, #1a2d5a);

@@ -40,7 +40,7 @@ export default function ContactPage() {
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#f7f4ef', minHeight: '100vh' }}>
 
       {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
         <div style={{ fontSize: 38, marginBottom: 10 }}>✉️</div>
         <h1 style={{ color: '#fff', fontSize: 32, fontWeight: 900, margin: '0 0 10px' }}>צור קשר</h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, margin: 0 }}>
@@ -52,7 +52,7 @@ export default function ContactPage() {
 
         {/* Contact details */}
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '28px', marginBottom: 24 }}>
-          <h2 style={{ color: '#0c1a35', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
+          <h2 style={{ color: '#1E3A8A', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
               { icon: '📍', label: 'כתובת', value: 'האורן 18, דימונה' },
@@ -72,7 +72,7 @@ export default function ContactPage() {
 
         {/* WhatsApp section */}
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '28px', marginBottom: 24 }}>
-          <h2 style={{ color: '#0c1a35', fontSize: 18, fontWeight: 800, margin: '0 0 12px' }}>
+          <h2 style={{ color: '#1E3A8A', fontSize: 18, fontWeight: 800, margin: '0 0 12px' }}>
             💬 שירות לקוחות מהיר בוואטסאפ
           </h2>
           <p style={{ color: '#555', fontSize: 14, lineHeight: 1.7, margin: '0 0 20px' }}>
@@ -99,7 +99,7 @@ export default function ContactPage() {
 
         {/* Contact form */}
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '28px' }}>
-          <h2 style={{ color: '#0c1a35', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>שלחו לנו הודעה</h2>
+          <h2 style={{ color: '#1E3A8A', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>שלחו לנו הודעה</h2>
 
           {status === 'sent' ? (
             <div style={{ background: '#f0fdf4', border: '1px solid #86efac', padding: '20px', textAlign: 'center', color: '#166534', fontSize: 15, fontWeight: 600 }}>
@@ -146,7 +146,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                style={{ background: '#0c1a35', color: '#fff', border: 'none', padding: '13px 28px', fontSize: 15, fontWeight: 700, cursor: status === 'sending' ? 'not-allowed' : 'pointer', opacity: status === 'sending' ? 0.7 : 1, alignSelf: 'flex-start', borderRadius: 0, fontFamily: 'inherit' }}
+                style={{ background: '#1E3A8A', color: '#fff', border: 'none', padding: '13px 28px', fontSize: 15, fontWeight: 700, cursor: status === 'sending' ? 'not-allowed' : 'pointer', opacity: status === 'sending' ? 0.7 : 1, alignSelf: 'flex-start', borderRadius: 0, fontFamily: 'inherit' }}
               >
                 {status === 'sending' ? 'שולח...' : 'שלח הודעה ←'}
               </button>

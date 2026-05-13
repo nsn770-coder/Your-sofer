@@ -33,14 +33,14 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
   return (
     <div style={{ background: '#FAF8F4', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl' }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
-        <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 28, fontWeight: 900, color: '#0c1a35', marginBottom: 8 }}>מה הלקוחות אומרים</h2>
+        <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 28, fontWeight: 900, color: '#1E3A8A', marginBottom: 8 }}>מה הלקוחות אומרים</h2>
         <p style={{ textAlign: 'center', fontSize: 14, color: '#888', marginBottom: 36 }}>אלפי לקוחות מרוצים ברחבי הארץ</p>
         <div key={testIdx} style={{ background: '#fff', borderRadius: 0, boxShadow: '0 4px 28px rgba(0,0,0,0.09)', padding: isMobile ? '24px 20px' : '36px 44px', display: 'flex', alignItems: 'flex-start', gap: 28, flexDirection: isMobile ? 'column' : 'row', animation: 'testFadeIn 0.55s ease' }}>
           <div style={{ flexShrink: 0, alignSelf: isMobile ? 'center' : 'flex-start' }}>
             {t.imageUrl ? (
               <img src={optimizeCloudinaryUrl(t.imageUrl, 200)} alt={t.name} width={84} height={84} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '3px solid #C5A028' }} />
             ) : (
-              <div style={{ width: 84, height: 84, borderRadius: '50%', background: '#0c1a35', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #C5A028' }}>
+              <div style={{ width: 84, height: 84, borderRadius: '50%', background: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #C5A028' }}>
                 <span style={{ fontSize: 34, color: '#fff', fontWeight: 900 }}>{t.name.charAt(0)}</span>
               </div>
             )}
@@ -53,7 +53,7 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
             </div>
             <p style={{ fontSize: isMobile ? 15 : 17, color: '#444', lineHeight: 1.75, marginBottom: 16, fontStyle: 'italic' }}>&ldquo;{t.text}&rdquo;</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: 15, fontWeight: 900, color: '#0c1a35' }}>{t.name}</span>
+              <span style={{ fontSize: 15, fontWeight: 900, color: '#1E3A8A' }}>{t.name}</span>
               {t.city && <span style={{ fontSize: 13, color: '#999' }}>· {t.city}</span>}
             </div>
           </div>

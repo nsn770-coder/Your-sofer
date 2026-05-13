@@ -71,7 +71,7 @@ export default function BundlesPage() {
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#F5F2EC', minHeight: '100vh' }}>
 
       {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
         <h1 style={{ color: '#fff', fontSize: 34, fontWeight: 900, margin: '0 0 10px' }}>ערכות מומלצות</h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, margin: 0 }}>
           הכול במקום אחד — חסכון אמיתי, כשרות מובטחת
@@ -99,7 +99,7 @@ export default function BundlesPage() {
                 top: 16,
                 left: 16,
                 background: '#C5A028',
-                color: '#0c1a35',
+                color: '#1E3A8A',
                 fontSize: 11,
                 fontWeight: 800,
                 padding: '4px 10px',
@@ -108,7 +108,7 @@ export default function BundlesPage() {
                 {bundle.badge}
               </div>
 
-              <h2 style={{ color: '#0c1a35', fontSize: 17, fontWeight: 800, margin: '28px 0 12px', lineHeight: 1.4 }}>
+              <h2 style={{ color: '#1E3A8A', fontSize: 17, fontWeight: 800, margin: '28px 0 12px', lineHeight: 1.4 }}>
                 {bundle.title}
               </h2>
               <p style={{ fontSize: 14, color: '#555', lineHeight: 1.8, margin: '0 0 18px', flex: 1 }}>
@@ -131,7 +131,7 @@ export default function BundlesPage() {
                   display: 'block',
                   textAlign: 'center',
                   background: '#C5A028',
-                  color: '#0c1a35',
+                  color: '#1E3A8A',
                   padding: '12px 20px',
                   borderRadius: 8,
                   fontSize: 15,

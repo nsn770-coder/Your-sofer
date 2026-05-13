@@ -174,7 +174,7 @@ export default function AnalyticsDashboard() {
   if (loading || (!user && !loading)) return null;
   if (user?.role !== 'admin') return null;
 
-  const navy = '#0c1a35';
+  const navy = '#1E3A8A';
   const gold = '#C5A028';
 
   return (
@@ -206,7 +206,7 @@ export default function AnalyticsDashboard() {
               <Card icon="📦" label="הזמנות היום" value={stats.ordersToday} color="#16a34a" />
               <Card icon="₪"  label="סכום היום"   value={formatPrice(stats.revenueToday)} color="#C5A028" />
               <Card icon="👤" label="משתמשים חדשים" value={stats.newUsersToday} color="#7c3aed" />
-              <Card icon="✍️" label="סופרים חדשים" value={stats.newSoferimToday} color="#0c1a35" />
+              <Card icon="✍️" label="סופרים חדשים" value={stats.newSoferimToday} color="#1E3A8A" />
             </div>
 
             {/* ── Line chart ── */}

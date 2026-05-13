@@ -125,7 +125,7 @@ function buildBody(payload: NotifyPayload): string {
     mixed: 'מעורב',
   };
 
-  let headerColor = '#0c1a35';
+  let headerColor = '#1E3A8A';
   let headerText = '';
   let alertBox = '';
 
@@ -167,10 +167,10 @@ function buildBody(payload: NotifyPayload): string {
       </table>
 
       ${products && products.length > 0 ? `
-      <h3 style="color:#0c1a35;margin:0 0 12px;font-size:16px;">מוצרים</h3>
+      <h3 style="color:#1E3A8A;margin:0 0 12px;font-size:16px;">מוצרים</h3>
       <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
         <thead>
-          <tr style="background:#0c1a35;color:#fff;">
+          <tr style="background:#1E3A8A;color:#fff;">
             <th style="padding:8px 12px;text-align:right;">שם</th>
             <th style="padding:8px 12px;text-align:center;">כמות</th>
             <th style="padding:8px 12px;text-align:right;">מחיר</th>
@@ -180,7 +180,7 @@ function buildBody(payload: NotifyPayload): string {
       </table>` : ''}
 
       <div style="text-align:center;margin-top:24px;">
-        <a href="${orderLink}" style="background:#0c1a35;color:#C5A028;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
+        <a href="${orderLink}" style="background:#1E3A8A;color:#C5A028;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
           פתח הזמנה במערכת
         </a>
       </div>

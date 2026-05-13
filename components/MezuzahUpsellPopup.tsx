@@ -30,7 +30,7 @@ export default function MezuzahUpsellPopup() {
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
           zIndex: 8000,
-          background: '#0c1a35',
+          background: '#1E3A8A',
           borderTop: '2px solid rgba(184,151,42,0.5)',
           borderRadius: '18px 18px 0 0',
           padding: '20px 20px 28px',
@@ -77,7 +77,7 @@ export default function MezuzahUpsellPopup() {
                 router.push(`/category/${encodeURIComponent('בתי-מזוזה')}`);
               }}
               style={{
-                background: '#b8972a', color: '#0c1a35',
+                background: '#b8972a', color: '#1E3A8A',
                 border: 'none', borderRadius: 20,
                 padding: '10px 22px', fontSize: 13, fontWeight: 800,
                 cursor: 'pointer',

@@ -44,7 +44,7 @@ export default function AllOrdersPage() {
     <div dir="rtl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-black" style={{ color: '#0c1a35' }}>כל ההזמנות</h1>
+          <h1 className="text-2xl font-black" style={{ color: '#1E3A8A' }}>כל ההזמנות</h1>
           <p className="text-gray-500 text-sm mt-1">{orders.length} הזמנות במערכת</p>
         </div>
       </div>

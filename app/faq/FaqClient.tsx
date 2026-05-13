@@ -55,7 +55,7 @@ function FaqItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean
           textAlign: 'right', fontFamily: 'inherit',
         }}
       >
-        <span style={{ fontSize: 15, fontWeight: 600, color: '#0C1A35', flex: 1, textAlign: 'right' }}>{q}</span>
+        <span style={{ fontSize: 15, fontWeight: 600, color: '#1E3A8A', flex: 1, textAlign: 'right' }}>{q}</span>
         <span style={{ color: '#C5A028', fontSize: 16, fontWeight: 700, marginRight: 12, flexShrink: 0 }}>
           {open ? '▴' : '▾'}
         </span>
@@ -80,7 +80,7 @@ export default function FaqClient() {
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#F5F2EC', minHeight: '100vh' }}>
 
       {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0c1a35 0%, #1a2a4a 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
         <h1 style={{ color: '#fff', fontSize: 34, fontWeight: 900, margin: '0 0 10px' }}>שאלות ותשובות</h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, margin: 0 }}>
           כל מה שרצית לדעת לפני שקונים סת״מ
@@ -101,7 +101,7 @@ export default function FaqClient() {
         </div>
 
         <div style={{ marginTop: 40, textAlign: 'center', background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '28px 24px' }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#0c1a35', marginBottom: 8 }}>לא מצאת תשובה?</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#1E3A8A', marginBottom: 8 }}>לא מצאת תשובה?</div>
           <div style={{ fontSize: 14, color: '#666', marginBottom: 16 }}>צור איתנו קשר בוואטסאפ ונענה תוך דקות</div>
           <a
             href="https://wa.me/972552722228"

@@ -43,7 +43,7 @@ export default function WizardStickyBar() {
         left: 0,
         right: 0,
         zIndex: 950,
-        background: '#0c1a35',
+        background: '#1E3A8A',
         borderTop: '2px solid #C5A028',
         padding: '10px 16px',
         display: 'flex',
@@ -92,7 +92,7 @@ export default function WizardStickyBar() {
         style={{
           flexShrink: 0,
           background: '#C5A028',
-          color: '#0c1a35',
+          color: '#1E3A8A',
           border: 'none',
           borderRadius: 0,
           padding: '10px 18px',

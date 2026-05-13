@@ -21,7 +21,7 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
         style={{ background: '#fff', borderRadius: 0, width: '100%', maxWidth: 440, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden', direction: 'rtl' }}
         onClick={e => e.stopPropagation()}
       >
-        <div style={{ background: 'linear-gradient(135deg, #0c1a35, #1a2d50)', padding: '22px 24px', position: 'relative', textAlign: 'center' }}>
+        <div style={{ background: 'linear-gradient(135deg, #1E3A8A, #1E40AF)', padding: '22px 24px', position: 'relative', textAlign: 'center' }}>
           <button
             onClick={onClose}
             style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -29,15 +29,15 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
           <div style={{ fontSize: 36, marginBottom: 8 }}>🏆</div>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#C5A028', marginBottom: 4 }}>קבל חינם: מדריך הקנייה המלא</div>
           <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>5 שאלות שכל אחד חייב לשאול לפני שקונה סת״מ</div>
-          <div style={{ marginTop: 10, background: '#C5A028', color: '#0c1a35', borderRadius: 0, padding: '5px 16px', fontSize: 13, fontWeight: 900, display: 'inline-block' }}>קבל 5% הנחה על ההזמנה הראשונה</div>
+          <div style={{ marginTop: 10, background: '#C5A028', color: '#1E3A8A', borderRadius: 0, padding: '5px 16px', fontSize: 13, fontWeight: 900, display: 'inline-block' }}>קבל 5% הנחה על ההזמנה הראשונה</div>
         </div>
         <div style={{ padding: '24px 24px 28px' }}>
           {status === 'success' ? (
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
               <div style={{ fontSize: 40, marginBottom: 10 }}>🎉</div>
-              <div style={{ fontSize: 16, fontWeight: 900, color: '#0c1a35', marginBottom: 6 }}>נרשמתם בהצלחה!</div>
+              <div style={{ fontSize: 16, fontWeight: 900, color: '#1E3A8A', marginBottom: 6 }}>נרשמתם בהצלחה!</div>
               <div style={{ fontSize: 13, color: '#666' }}>נעדכן אתכם ראשונים על מוצרים חדשים ומבצעים.</div>
-              <button onClick={onClose} style={{ marginTop: 18, background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '10px 28px', fontSize: 14, fontWeight: 900, cursor: 'pointer' }}>סגור</button>
+              <button onClick={onClose} style={{ marginTop: 18, background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 0, padding: '10px 28px', fontSize: 14, fontWeight: 900, cursor: 'pointer' }}>סגור</button>
             </div>
           ) : (
             <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -54,7 +54,7 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                style={{ background: '#C5A028', color: '#0c1a35', border: 'none', borderRadius: 0, padding: '13px', fontSize: 15, fontWeight: 900, cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.7 : 1 }}
+                style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 0, padding: '13px', fontSize: 15, fontWeight: 900, cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.7 : 1 }}
               >
                 {status === 'loading' ? '⏳ שולח...' : 'שלח לי את המדריך'}
               </button>

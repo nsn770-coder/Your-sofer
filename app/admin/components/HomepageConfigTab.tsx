@@ -293,7 +293,7 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
           onClick={saveAll}
           disabled={saving}
           className="px-5 py-2 rounded-xl font-bold text-white transition"
-          style={{ background: saved ? '#16a34a' : '#0c1a35', minWidth: 120 }}
+          style={{ background: saved ? '#16a34a' : '#1E3A8A', minWidth: 120 }}
         >
           {saving ? '...' : saved ? '✅ נשמר!' : '💾 שמור הכל'}
         </button>
@@ -350,7 +350,7 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
           onClick={saveAll}
           disabled={saving}
           className="px-6 py-2.5 rounded-xl font-bold text-white transition"
-          style={{ background: saved ? '#16a34a' : '#0c1a35' }}
+          style={{ background: saved ? '#16a34a' : '#1E3A8A' }}
         >
           {saving ? 'שומר...' : saved ? '✅ נשמר!' : '💾 שמור הכל'}
         </button>
@@ -367,7 +367,7 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
             onClick={saveHeroImages}
             disabled={heroSaving}
             className="px-5 py-2 rounded-xl font-bold text-white transition"
-            style={{ background: heroSaved ? '#16a34a' : '#0c1a35', minWidth: 110 }}
+            style={{ background: heroSaved ? '#16a34a' : '#1E3A8A', minWidth: 110 }}
           >
             {heroSaving ? '...' : heroSaved ? '✅ נשמר!' : '💾 שמור'}
           </button>
@@ -390,7 +390,7 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
                 <div
                   style={{
                     width: 160, height: 100, flexShrink: 0, borderRadius: 10,
-                    overflow: 'hidden', background: url ? '#000' : 'linear-gradient(135deg,#0c1a35,#1a3a2a)',
+                    overflow: 'hidden', background: url ? '#000' : 'linear-gradient(135deg,#1E3A8A,#1a3a2a)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     border: '2px solid #e5e7eb',
                   }}
@@ -425,7 +425,7 @@ export default function HomepageConfigTab({ products }: { products: AdminProduct
                       onClick={() => heroFileRefs.current[slide.key]?.click()}
                       disabled={isUploading}
                       style={{
-                        background: '#0c1a35', color: '#fff', border: 'none',
+                        background: '#1E3A8A', color: '#fff', border: 'none',
                         borderRadius: 8, padding: '8px 16px', fontSize: 13,
                         fontWeight: 700, cursor: isUploading ? 'not-allowed' : 'pointer',
                         opacity: isUploading ? 0.7 : 1,

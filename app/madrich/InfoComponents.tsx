@@ -3,8 +3,8 @@ import { useRouter } from 'next/navigation';
 
 // ══ צבעים ══
 export const C = {
-  navy: '#0c1a35',
-  navyLight: '#162444',
+  navy: '#1E3A8A',
+  navyLight: '#1D4ED8',
   gold: '#C5A028',
   goldLight: '#C5A028',
   bg: '#f3f4f4',
@@ -118,7 +118,7 @@ export function RelatedCard({ title, desc, href, emoji }: { title: string; desc:
 export function PageHero({ title, subtitle, badge }: { title: string; subtitle: string; badge?: string }) {
   return (
     <div style={{
-      background: `linear-gradient(135deg, ${C.navy} 0%, #1a3060 100%)`,
+      background: `linear-gradient(135deg, ${C.navy} 0%, #1E40AF 100%)`,
       padding: '56px 24px 48px',
       textAlign: 'center',
       color: '#fff',

@@ -66,12 +66,12 @@ export default function SearchPage() {
 
   return (
     <main className="max-w-6xl mx-auto px-3 sm:px-6 py-8" dir="rtl">
-      <h1 className="text-xl sm:text-2xl font-black text-[#0c1a35] mb-1">
+      <h1 className="text-xl sm:text-2xl font-black text-[#1E3A8A] mb-1">
         תוצאות חיפוש
       </h1>
       {q && (
         <p className="text-sm text-gray-500 mb-6">
-          חיפוש: <span className="font-bold text-[#0c1a35]">{q}</span>
+          חיפוש: <span className="font-bold text-[#1E3A8A]">{q}</span>
           {!loading && (
             <span className="mr-2 text-gray-400">({results.length} תוצאות)</span>
           )}
@@ -123,7 +123,7 @@ export default function SearchPage() {
               <button
                 onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 disabled={page === 1}
-                className="px-5 py-2 rounded-lg border border-[#0c1a35] text-[#0c1a35] font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#0c1a35] hover:text-white transition-colors"
+                className="px-5 py-2 rounded-lg border border-[#1E3A8A] text-[#1E3A8A] font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#1E3A8A] hover:text-white transition-colors"
               >
                 ← הקודם
               </button>
@@ -135,7 +135,7 @@ export default function SearchPage() {
               <button
                 onClick={() => { setPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 disabled={page === totalPages}
-                className="px-5 py-2 rounded-lg border border-[#0c1a35] text-[#0c1a35] font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#0c1a35] hover:text-white transition-colors"
+                className="px-5 py-2 rounded-lg border border-[#1E3A8A] text-[#1E3A8A] font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#1E3A8A] hover:text-white transition-colors"
               >
                 הבא ←
               </button>
