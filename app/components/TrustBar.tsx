@@ -2,10 +2,10 @@
 import { usePathname } from 'next/navigation';
 
 const ITEMS = [
+  '500+ משפחות בחרו בנו',
   'סופרים מוסמכים בלבד',
-  'מגיה מוסמך על כל מוצר',
-  'משלוח מהיר לכל הארץ',
-  'החזר כספי מובטח',
+  'בדיקת מחשב לכל מוצר',
+  'משלוח מהיר עם אחריות',
 ];
 
 export default function TrustBar() {

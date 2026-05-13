@@ -789,6 +789,30 @@ export default function HomePageClient() {
         />
       </div>
 
+      {/* ── Hero text + CTA ── */}
+      <div dir="rtl" style={{ background: '#F5F2EC', padding: isMobile ? '28px 20px 24px' : '44px 24px 36px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: '#1E3A8A', margin: '0 0 12px', lineHeight: 1.3 }}>
+          הסת״מ שלך — מוסמך, מהודר, ומוכן למסירה
+        </h1>
+        <p style={{ fontSize: isMobile ? 13 : 15, color: '#555', margin: '0 auto 24px', lineHeight: 1.65, maxWidth: 540 }}>
+          מחברים אותך עם סופרי סת״מ מוסמכים. תפילין, מזוזות, ספרי תורה — עם תעודה, בדיקת מחשב, ואחריות מלאה.
+        </p>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <a
+            href="/bar-mitzvah"
+            style={{ background: '#C5A028', color: '#1E3A8A', fontWeight: 900, fontSize: isMobile ? 14 : 15, padding: isMobile ? '12px 28px' : '14px 36px', borderRadius: 8, textDecoration: 'none', display: 'inline-block', lineHeight: 1 }}
+          >
+            סט בר מצווה ←
+          </a>
+          <a
+            href="/category/כל המוצרים"
+            style={{ background: '#fff', color: '#1E3A8A', fontWeight: 700, fontSize: isMobile ? 14 : 15, padding: isMobile ? '12px 28px' : '14px 36px', borderRadius: 8, textDecoration: 'none', display: 'inline-block', border: '2px solid #1E3A8A', lineHeight: 1 }}
+          >
+            לכל המוצרים
+          </a>
+        </div>
+      </div>
+
       {/* ── Smart Funnel ── */}
       <div style={{ background: '#FFFFFF', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
         <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '10px 0 6px', fontWeight: 500 }}>
@@ -797,46 +821,35 @@ export default function HomePageClient() {
         <SmartFunnel isMobile={isMobile} />
       </div>
 
-      {/* ── Bar Mitzva Banner ── */}
-      <Link href="/bar-mitzva" style={{ textDecoration: 'none', display: 'block' }}>
+      {/* ── Bar Mitzvah Banner ── */}
+      <Link href="/bar-mitzvah" style={{ textDecoration: 'none', display: 'block' }}>
         <div
           dir="rtl"
           style={{
-            background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)',
-            borderBottom: '3px solid rgba(197,160,40,0.45)',
-            padding: isMobile ? '14px 16px' : '16px 28px',
+            background: '#1E3A8A',
+            padding: isMobile ? '20px 16px' : '24px 32px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'linear-gradient(135deg, #111d3a 0%, #1e2f56 100%)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)'; }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 14 }}>
-            <span style={{
-              fontSize: isMobile ? 20 : 24,
-              width: isMobile ? 38 : 44, height: isMobile ? 38 : 44,
-              borderRadius: '50%',
-              background: 'rgba(197,160,40,0.15)',
-              border: '1.5px solid rgba(197,160,40,0.4)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>✡</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 16 }}>
+            <span style={{ fontSize: isMobile ? 26 : 32, flexShrink: 0, lineHeight: 1 }}>🎉</span>
             <div>
-              <div style={{ fontSize: isMobile ? 13 : 15, fontWeight: 900, color: '#fff', lineHeight: 1.3 }}>
-                סט בר מצווה - תפילין קומפלט + טלית
+              <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: '#fff', lineHeight: 1.3 }}>
+                קונים סט בר מצווה?
               </div>
-              <div style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
-                שלוש חבילות מוכנות · החל מ-₪2,700
+              <div style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.65)', marginTop: 4, lineHeight: 1.4 }}>
+                בנינו עבורכם מדריך פשוט — 3 דקות ותדעו בדיוק מה לקנות
               </div>
             </div>
           </div>
           <span style={{
-            fontSize: isMobile ? 12 : 13, fontWeight: 800, color: '#C5A028',
-            background: 'rgba(197,160,40,0.12)',
-            border: '1px solid rgba(197,160,40,0.35)',
-            padding: isMobile ? '6px 12px' : '7px 16px',
+            fontSize: isMobile ? 12 : 14, fontWeight: 800, color: '#1E3A8A',
+            background: '#C5A028',
+            borderRadius: 6,
+            padding: isMobile ? '8px 14px' : '10px 20px',
             whiteSpace: 'nowrap', flexShrink: 0,
           }}>
-            לבחירת חבילה ←
+            למדריך בר מצווה ←
           </span>
         </div>
       </Link>
