@@ -1216,7 +1216,7 @@ export default function HomePageClient() {
           <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 800, color: '#1F2937', marginBottom: 8 }}>
             מה הלקוחות אומרים
           </h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#6B7280', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#6B7280', marginBottom: 32 }}>אלפי לקוחות מרוצים ברחבי הארץ</p>
           <div className="ys-quotes-grid" style={{ display: 'grid', gap: 16 }}>
             {STATIC_QUOTES.slice(0, 3).map((q, i) => (
               <div key={i} style={{
