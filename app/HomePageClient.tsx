@@ -1211,43 +1211,59 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Static Social Proof ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '36px 20px' : '52px 24px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 26, fontWeight: 900, color: '#111111', marginBottom: 6 }}>
-            לקוחות שכבר קנו - מה הם אומרים
+          <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 800, color: '#1F2937', marginBottom: 8 }}>
+            מה הלקוחות אומרים
           </h2>
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#999', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
-          <div className="ys-quotes-grid" style={{
-            display: 'grid',
-            gap: 16,
-          }}>
-            {STATIC_QUOTES.map((q, i) => (
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#6B7280', marginBottom: 32 }}>ביקורות אמיתיות מלקוחות אמיתיים</p>
+          <div className="ys-quotes-grid" style={{ display: 'grid', gap: 16 }}>
+            {STATIC_QUOTES.slice(0, 3).map((q, i) => (
               <div key={i} style={{
-                background: '#fff',
-                border: '1px solid #ebebeb',
-                borderRadius: 0,
-                padding: isMobile ? '18px 16px' : '22px 24px',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                background: '#FFFFFF',
+                border: '1px solid #E7E2D8',
+                borderRadius: 16,
+                padding: 20,
+                boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
               }}>
                 <div style={{ marginBottom: 10, display: 'flex', gap: 2 }}>
                   {Array.from({ length: q.stars }).map((_, si) => (
-                    <span key={si} style={{ color: '#e6a817', fontSize: 15 }}>★</span>
+                    <span key={si} style={{ color: '#C9A227', fontSize: 16 }}>★</span>
                   ))}
                 </div>
-                <p style={{ fontSize: 13, color: '#444', lineHeight: 1.75, marginBottom: 14, fontStyle: 'italic' }}>
+                <p style={{ fontSize: 15, color: '#4B5563', lineHeight: 1.6, marginBottom: 16, fontStyle: 'italic' }}>
                   &ldquo;{q.text}&rdquo;
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ color: '#C5A028', fontWeight: 900, fontSize: 14 }}>{q.name.charAt(0)}</span>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ color: '#2446A6', fontWeight: 700, fontSize: 14 }}>{q.name.charAt(0)}</span>
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A' }}>{q.name}</div>
-                    <div style={{ fontSize: 11, color: '#999' }}>{q.city}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: '#1F2937' }}>{q.name}</div>
+                    <div style={{ fontSize: 13, color: '#6B7280' }}>{q.city}</div>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <a
+              href="/reviews"
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                background: '#FFFFFF',
+                border: '1.5px solid #E7E2D8',
+                color: '#2446A6',
+                borderRadius: 12,
+                height: 48,
+                padding: '0 28px',
+                fontWeight: 700,
+                fontSize: 15,
+                textDecoration: 'none',
+              }}
+            >
+              לכל הביקורות ←
+            </a>
           </div>
         </div>
       </div>
