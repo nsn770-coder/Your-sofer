@@ -982,37 +982,11 @@ export default function HomePageClient() {
         </a>
       </div>
 
-      {/* ── Clear Path CTA ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 16px' : '40px 16px', direction: 'rtl', textAlign: 'center' }}>
-        <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#1E3A8A', marginBottom: 8 }}>לא בטוח מה לבחור?</h2>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>הכירו את הסופרים שלנו - סופרים מוסמכים, מאומתים ומדורגים</p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
-          {CLEAR_PATH_ITEMS.map(item => (
-            <button
-              key={item.label}
-              onClick={() => router.push(item.href)}
-              style={{
-                background: '#1E3A8A',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                padding: isMobile ? '12px 22px' : '13px 28px',
-                fontSize: isMobile ? 14 : 15,
-                fontWeight: 700,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1E40AF'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1E3A8A'; }}
-            >
-              {item.label} ←
-            </button>
-          ))}
-        </div>
+      {/* ── Soferim CTA ── */}
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '20px 16px 32px' : '24px 16px 40px', direction: 'rtl', textAlign: 'center' }}>
         <button
           onClick={() => router.push('/soferim')}
           style={{
-            marginTop: 16,
             background: 'linear-gradient(135deg, #C5A028, #C5A028, #C5A028)',
             color: '#1E3A8A',
             fontWeight: 900,
