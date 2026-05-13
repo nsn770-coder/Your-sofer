@@ -1,4 +1,5 @@
-﻿'use client';
+'use client';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 const ITEMS = [
@@ -9,7 +10,22 @@ const ITEMS = [
 
 export default function TrustBar() {
   const pathname = usePathname();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setCurrentIndex(i => (i + 1) % ITEMS.length);
+        setVisible(true);
+      }, 300);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   if (pathname?.startsWith('/bar-mitzvah')) return null;
+
   return (
     <div style={{
       width: '100%',
@@ -19,33 +35,38 @@ export default function TrustBar() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 20,
       direction: 'rtl',
       boxSizing: 'border-box',
       padding: '0 16px',
     }}>
-      {ITEMS.map((item, i) => (
-        <div key={item} style={{ display: 'contents' }}>
-          {i > 0 && (
-            <span
-              className={i >= 2 ? 'tb-divider tb-hide-mobile' : 'tb-divider'}
-              style={{ display: 'inline-block', width: 1, height: 16, background: '#B8A88A', flexShrink: 0 }}
-            />
-          )}
-          <span
-            className={i >= 2 ? 'tb-item tb-hide-mobile' : 'tb-item'}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: '#4A3728', whiteSpace: 'nowrap' }}
-          >
-            <span style={{ color: '#C5A028', fontWeight: 700 }}>✓</span>
-            {item}
-          </span>
-        </div>
-      ))}
-      <style jsx global>{`
-        @media (max-width: 640px) {
-          .tb-hide-mobile { display: none !important; }
-        }
-      `}</style>
+      {/* Mobile: single rotating message with fade */}
+      <span
+        className="lg:hidden"
+        style={{
+          opacity: visible ? 1 : 0,
+          transition: 'opacity 0.3s ease',
+          fontSize: 13,
+          fontWeight: 500,
+          color: '#4A3728',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {ITEMS[currentIndex]}
+      </span>
+
+      {/* Desktop: all messages with separators */}
+      <div className="hidden lg:flex" style={{ alignItems: 'center', gap: 20 }}>
+        {ITEMS.map((item, i) => (
+          <div key={item} style={{ display: 'contents' }}>
+            {i > 0 && (
+              <span style={{ display: 'inline-block', width: 1, height: 16, background: '#B8A88A', flexShrink: 0 }} />
+            )}
+            <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 600, color: '#4A3728', whiteSpace: 'nowrap' }}>
+              {item}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
