@@ -421,7 +421,7 @@ function NavBarContent() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSearch()}
-                placeholder="חיפוש סת\"מ ויודאיקה..."
+                placeholder='חיפוש סת"מ ויודאיקה...'
                 style={{ flex: 1, border: "none", padding: "10px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.12)", outline: "none", minWidth: 0 }} />
               <button onClick={handleSearch} style={{ background: "#C5A028", border: "none", padding: "0 14px", cursor: "pointer" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
@@ -502,7 +502,7 @@ function NavBarContent() {
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") { handleSearch(); setSearchOpen(false); } }}
-            placeholder="חיפוש סת\"מ ויודאיקה..."
+            placeholder='חיפוש סת"מ ויודאיקה...'
             style={{ flex: 1, border: "none", padding: "12px 20px", fontSize: 14, color: "#111", outline: "none", background: "transparent", minWidth: 0 }}
           />
           <button
