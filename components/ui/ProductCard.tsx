@@ -374,13 +374,13 @@ export default function ProductCard({
               onClick={handleAdd}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: '#C9A227', color: '#1F3D8F',
-                height: 44, borderRadius: 12, border: 'none',
-                fontWeight: 800, fontSize: 14, cursor: 'pointer',
-                transition: 'filter 0.15s',
+                background: '#FFFFFF', color: '#1F2937',
+                height: 44, borderRadius: 12, border: '1.5px solid #D8D2C4',
+                fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                transition: 'background 0.15s, border-color 0.15s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.08)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#F8F6F1'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#C9A227'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#D8D2C4'; }}
             >
               <IconCart size={13} />
               הוסף לסל
