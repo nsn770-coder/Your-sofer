@@ -3,12 +3,11 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   collection, query, where, orderBy, limit,
-  getDocs, documentId, getDoc, doc,
+  getDocs, getDoc, doc,
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Link from 'next/link';
 import ProductCard from '@/components/ui/ProductCard';
-import SoferProductCard, { type SoferData } from '@/components/ui/SoferProductCard';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 
@@ -886,7 +885,6 @@ export default function CategoryClient({ category }: { category: string }) {
   const [catFilter, setCatFilter]               = useState('הכל');
   const [subCategoryFilter, setSubCategoryFilter] = useState('');
   const [catImages, setCatImages]               = useState<Record<string, string>>({});
-  const [soferMap, setSoferMap]                 = useState<Record<string, SoferData>>({});
   const [curation, setCuration]                 = useState<Curation | null>(null);
   const [collectionFilter, setCollectionFilter] = useState<string>('');
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -1017,23 +1015,6 @@ export default function CategoryClient({ category }: { category: string }) {
     }
     fetchCatImages();
   }, []);
-
-  useEffect(() => {
-    if (!SOFER_LAYOUT_CATS.has(category) || allLoaded.length === 0) return;
-    const ids = [...new Set(allLoaded.map(p => p.soferId).filter(Boolean) as string[])];
-    if (ids.length === 0) return;
-
-    async function fetchSoferim() {
-      const map: Record<string, SoferData> = {};
-      for (let i = 0; i < ids.length; i += 10) {
-        const chunk = ids.slice(i, i + 10);
-        const snap = await getDocs(query(collection(db, 'soferim'), where(documentId(), 'in', chunk)));
-        snap.forEach(d => { map[d.id] = d.data() as SoferData; });
-      }
-      setSoferMap(map);
-    }
-    fetchSoferim();
-  }, [allLoaded, category]);
 
   // Fetch curation for this category or sub-category
   useEffect(() => {
@@ -1184,24 +1165,15 @@ export default function CategoryClient({ category }: { category: string }) {
       </div>
 
       {/* ── Header ── */}
-      <div className="bg-[#1E3A8A] relative overflow-hidden">
-        {/* Decorative background pattern */}
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(184,151,42,0.08) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 50%)' }} />
-        <div className="relative max-w-7xl mx-auto px-6 py-10 flex items-end justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-white mb-1 tracking-tight">
-              {category === 'מתנות' ? 'מתנות ומוצרי בית' : category}
-            </h1>
-            <p className="text-white/50 text-sm font-medium">
-              {loading ? 'טוען מוצרים...' : `${filtered.length.toLocaleString('he-IL')} מוצרים`}
-            </p>
-          </div>
-          {/* Active filter count badge */}
-          {anyActive && (
-            <div className="flex items-center gap-2 bg-[#C5A028]/20 border border-[#C5A028]/40 rounded-xl px-3 py-2">
-              <IconFilter size={13} />
-              <span className="text-[#C5A028] text-xs font-bold">סינון פעיל</span>
-            </div>
+      <div style={{ background: '#FAF8F3', padding: '20px 20px 0' }}>
+        <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#1F2937', margin: 0 }}>
+            {category === 'מתנות' ? 'מתנות ומוצרי בית' : category}
+          </h1>
+          {!loading && (
+            <span style={{ fontSize: 13, color: '#6B7280', marginRight: 8 }}>
+              {filtered.length.toLocaleString('he-IL')} מוצרים
+            </span>
           )}
         </div>
       </div>
@@ -1257,26 +1229,22 @@ export default function CategoryClient({ category }: { category: string }) {
       {/* ── Rabbinical trust banner - STaM categories only ── */}
       {['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה'].includes(category) && (
         <div dir="rtl" style={{
-          background: 'linear-gradient(90deg, #111d3a 0%, #1E40AF 100%)',
-          borderBottom: '2px solid rgba(197,160,40,0.35)',
-          padding: '10px 20px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          background: '#EEF3FF',
+          border: '1px solid #C5D5F0',
+          borderRadius: 12,
+          margin: '12px 20px',
+          padding: '10px 16px',
+          display: 'flex', alignItems: 'center', gap: 10,
           flexWrap: 'wrap',
         }}>
-          <span style={{
-            width: 20, height: 20, borderRadius: '50%',
-            background: 'rgba(197,160,40,0.18)',
-            border: '1.5px solid rgba(197,160,40,0.7)',
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 11, color: '#C5A028', fontWeight: 900, flexShrink: 0,
-          }}>✓</span>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>
+          <span style={{ fontSize: 14, color: '#2446A6', fontWeight: 700, flexShrink: 0 }}>✓</span>
+          <span style={{ fontSize: 13, color: '#2446A6', fontWeight: 600 }}>
             כל המוצרים בקטגוריה זו עברו בדיקת מגיה רבנית
           </span>
           <span style={{
-            fontSize: 11, color: '#C5A028', fontWeight: 700,
-            background: 'rgba(197,160,40,0.12)',
-            border: '1px solid rgba(197,160,40,0.35)',
+            fontSize: 11, color: '#2446A6', fontWeight: 700,
+            background: '#fff',
+            border: '1px solid #C5D5F0',
             borderRadius: 20, padding: '3px 10px',
           }}>
             הרב שמחה בונים ברג'יקובסקי · מגיה מוסמך
@@ -1285,36 +1253,30 @@ export default function CategoryClient({ category }: { category: string }) {
       )}
 
       {/* ── Mobile toolbar ── */}
-      <div className="lg:hidden sticky top-0 z-20 bg-white border-b border-gray-100 shadow-sm px-3 py-2.5 flex items-center gap-2">
-        <button
-          onClick={() => setDrawerOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm flex-shrink-0 transition-all"
-          style={{
-            background: anyActive ? '#1E3A8A' : '#f3f4f6',
-            color: anyActive ? '#fff' : '#374151',
-            border: anyActive ? '1.5px solid #1E3A8A' : '1.5px solid #e5e7eb',
-          }}
-        >
-          <IconFilter size={14} />
-          סינון
-          {anyActive && <span className="w-2 h-2 rounded-full bg-[#C5A028]" />}
-        </button>
+      <div className="lg:hidden sticky top-0 z-20" style={{ background: '#FAF8F3', borderBottom: '1px solid #E7E2D8', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
+        {!loading && (
+          <span style={{ fontSize: 13, color: '#6B7280', flex: 1 }}>{filtered.length} מוצרים</span>
+        )}
 
-        <div className="flex items-center gap-1.5 flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2" style={{ direction: 'rtl' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 10, padding: '8px 14px' }}>
           <IconSort size={13} />
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as SortBy)}
-            className="flex-1 bg-transparent text-sm font-semibold text-gray-700 focus:outline-none cursor-pointer"
-            style={{ direction: 'rtl' }}
+            style={{ background: 'transparent', border: 'none', fontSize: 13, color: '#1F2937', cursor: 'pointer', direction: 'rtl', outline: 'none', fontFamily: 'inherit' }}
           >
             {Object.entries(SORT_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select>
         </div>
 
-        {!loading && (
-          <span className="text-xs text-gray-400 flex-shrink-0 font-medium">{filtered.length}</span>
-        )}
+        <button
+          onClick={() => setDrawerOpen(true)}
+          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 10, padding: '8px 14px', fontSize: 13, color: '#1F2937', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
+        >
+          <IconFilter size={14} />
+          סינון
+          {anyActive && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#C9A227', flexShrink: 0, display: 'inline-block' }} />}
+        </button>
       </div>
 
       {/* ── Mobile drawer ── */}
@@ -1527,7 +1489,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
           {/* Products grid / loading / empty */}
           {loading ? (
-            <div className={SOFER_LAYOUT_CATS.has(category) ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : filtered.length === 0 ? (
@@ -1549,15 +1511,8 @@ export default function CategoryClient({ category }: { category: string }) {
             <>
               {(['מזוזות', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
                 (() => {
-                  const isSofer = SOFER_LAYOUT_CATS.has(category);
-                  const gridCls = isSofer ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
-                  const renderCard = (p: Product, idx: number) => isSofer ? (
-                    <SoferProductCard key={p.id} id={p.id} name={p.name} price={p.price}
-                      imgUrl={p.imgUrl || p.image_url} badge={p.badge} was={p.was}
-                      sofer={p.soferId ? soferMap[p.soferId] : undefined}
-                      soferName={p.soferName ?? p.sofer}
-                      hasKlafSelection={p.hasKlafSelection} cat={p.cat} />
-                  ) : (
+                  const gridCls = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
+                  const renderCard = (p: Product, idx: number) => (
                     <ProductCard key={p.id} id={p.id} name={p.name} price={p.price}
                       images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
                       priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
@@ -1593,10 +1548,10 @@ export default function CategoryClient({ category }: { category: string }) {
                         if (prods.length === 0) return null;
                         return (
                           <div key={g.key} style={{ marginBottom: 40 }}>
-                            <div style={{ background: '#1E3A8A', borderRadius: 12, padding: '16px 20px', marginBottom: 16, borderRight: '4px solid #C5A028' }}>
-                              <span style={{ background: '#C5A028', color: '#1E3A8A', borderRadius: 20, fontSize: 11, fontWeight: 800, padding: '2px 10px', display: 'inline-block', marginBottom: 8 }}>{g.key}</span>
-                              <h2 style={{ fontSize: 20, fontWeight: 900, color: '#fff', margin: '0 0 6px', lineHeight: 1.3 }}>{g.title}</h2>
-                              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', margin: 0, lineHeight: 1.6 }}>{g.desc}</p>
+                            <div style={{ background: '#EEF3FF', border: '1px solid #C5D5F0', borderRadius: 14, padding: '16px 20px', marginBottom: 16 }}>
+                              <span style={{ background: '#C9A227', color: '#1F3D8F', borderRadius: 20, fontSize: 12, fontWeight: 700, padding: '4px 12px', display: 'inline-block', marginBottom: 8 }}>{g.key}</span>
+                              <h2 style={{ fontSize: 17, fontWeight: 700, color: '#1F2937', margin: '0 0 6px', lineHeight: 1.3 }}>{g.title}</h2>
+                              <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>{g.desc}</p>
                             </div>
                             <div className={gridCls}>
                               {prods.map((p, idx) => renderCard(p, idx))}
@@ -1618,18 +1573,20 @@ export default function CategoryClient({ category }: { category: string }) {
                   );
                 })()
               ) : SOFER_LAYOUT_CATS.has(category) ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {paginated.map(p => (
-                    <SoferProductCard
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {paginated.map((p, idx) => (
+                    <ProductCard
                       key={p.id}
                       id={p.id}
                       name={p.name}
                       price={p.price}
-                      imgUrl={p.imgUrl || p.image_url}
+                      images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                      priority={p.priority}
+                      isBestSeller={p.isBestSeller}
                       badge={p.badge}
                       was={p.was}
-                      sofer={p.soferId ? soferMap[p.soferId] : undefined}
-                      soferName={p.soferName ?? p.sofer}
+                      createdAt={p.createdAt}
+                      aboveFold={idx < 4}
                       hasKlafSelection={p.hasKlafSelection}
                       cat={p.cat}
                     />
