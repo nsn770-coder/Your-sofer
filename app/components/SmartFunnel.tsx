@@ -257,7 +257,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
               <ImageCard
                 img="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg"
                 label="צפה במזוזות"
-                onClick={() => { setPath('mezuzah'); go(1); }}
+                onClick={() => router.push(`/category/${encodeURIComponent('קלפי מזוזה')}`)}
                 height={140}
                 isMobile={isMobile}
                 noOverlay
@@ -265,7 +265,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
               <ImageCard
                 img="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1777033362/vrknd4v6jp9z7fyrcbyf_rqnydd.webp"
                 label="צפה בתפילין"
-                onClick={() => { setPath('tefillin'); go(2); }}
+                onClick={() => router.push(`/category/${encodeURIComponent('תפילין קומפלט')}`)}
                 height={140}
                 isMobile={isMobile}
                 noOverlay
@@ -273,7 +273,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
             </div>
             {/* Third card - Bar Mitzva wizard */}
             <div
-              onClick={() => { setAnimating(true); setTimeout(() => { setPath('barMitzva'); setAnimating(false); }, 200); }}
+              onClick={() => router.push('/bar-mitzvah')}
               style={{
                 marginTop: 12,
                 height: 67,

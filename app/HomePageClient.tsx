@@ -813,48 +813,13 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── Smart Funnel — hidden on homepage ── */}
-      {false && (
-        <div style={{ background: '#FFFFFF', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
-          <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '10px 0 6px', fontWeight: 500 }}>
-            בחר מה אתה מחפש - נמצא לך את המתאים ביותר
-          </p>
-          <SmartFunnel isMobile={isMobile} />
-        </div>
-      )}
-
-      {/* ── Bar Mitzvah Banner ── */}
-      <Link href="/bar-mitzvah" style={{ textDecoration: 'none', display: 'block' }}>
-        <div
-          dir="rtl"
-          style={{
-            background: '#1E3A8A',
-            padding: isMobile ? '20px 16px' : '24px 32px',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 16 }}>
-            <span style={{ fontSize: isMobile ? 26 : 32, flexShrink: 0, lineHeight: 1 }}>🎉</span>
-            <div>
-              <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: '#fff', lineHeight: 1.3 }}>
-                קונים סט בר מצווה?
-              </div>
-              <div style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.65)', marginTop: 4, lineHeight: 1.4 }}>
-                בנינו עבורכם מדריך פשוט — 3 דקות ותדעו בדיוק מה לקנות
-              </div>
-            </div>
-          </div>
-          <span style={{
-            fontSize: isMobile ? 12 : 14, fontWeight: 800, color: '#1E3A8A',
-            background: '#C5A028',
-            borderRadius: 6,
-            padding: isMobile ? '8px 14px' : '10px 20px',
-            whiteSpace: 'nowrap', flexShrink: 0,
-          }}>
-            למדריך בר מצווה ←
-          </span>
-        </div>
-      </Link>
+      {/* ── Smart Funnel ── */}
+      <div style={{ background: '#F8F6F1', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
+        <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '10px 0 6px', fontWeight: 500 }}>
+          בחר מה אתה מחפש - נמצא לך את המתאים ביותר
+        </p>
+        <SmartFunnel isMobile={isMobile} />
+      </div>
 
       {/* ── Live Activity Bar - isolated component, re-renders independently ── */}
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
