@@ -147,10 +147,10 @@ export default function BarMitzvahPage() {
           </p>
           <div className="text-[#0c1a35] text-3xl font-black mb-8">₪2,800 – ₪3,700</div>
           <a
-            href="/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98"
+            href="/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94"
             className="w-full block text-center bg-[#0c1a35] hover:bg-[#1a2a4a] text-white font-bold text-base py-4 rounded-lg no-underline"
           >
-            לצפייה בסטים ←
+            בחר את הסט שלך
           </a>
           <p className="text-gray-400 text-xs mt-5">
             לא בטוח?{' '}
