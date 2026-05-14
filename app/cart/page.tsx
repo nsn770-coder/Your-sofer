@@ -310,15 +310,12 @@ export default function CartPage() {
               </div>
               <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 10, color: '#aaa' }}>אמצעי תשלום:</span>
-                <div style={{ background: '#1a1f71', borderRadius: 4, padding: '3px 8px' }}>
-                  <span style={{ fontSize: 11, fontWeight: 900, color: '#fff', letterSpacing: 1 }}>VISA</span>
-                </div>
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/visa.svg" alt="Visa" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/mastercard.svg" alt="Mastercard" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
                 <div style={{ background: '#f5f5f5', borderRadius: 4, padding: '3px 8px' }}>
                   <span style={{ fontSize: 11, fontWeight: 900, color: '#6b21a8' }}>bit</span>
                 </div>
-                <div style={{ background: '#f5f5f5', borderRadius: 4, padding: '3px 8px' }}>
-                  <span style={{ fontSize: 10, fontWeight: 900 }}><span style={{ color: '#003087' }}>Pay</span><span style={{ color: '#009cde' }}>Pal</span></span>
-                </div>
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/paypal.svg" alt="PayPal" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
               </div>
             </div>
           </>
