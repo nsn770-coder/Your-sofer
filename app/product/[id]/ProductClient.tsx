@@ -2000,10 +2000,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                     </div>
                     {r.sofer && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', background: '#f8f6f1', borderTop: '1px solid #ede9df' }}>
-                        {r.imgUrl2 && (
-                          <img src={r.imgUrl2} alt={r.sofer} style={{ width: 28, height: 28, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} onError={e => (e.currentTarget.style.display = 'none')} />
-                        )}
-                        <span style={{ fontSize: 10, color: '#666', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{r.sofer}</span>
+                        <div style={{ width: 28, height: 28, borderRadius: 4, background: '#e5e0d5', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>
+                          ✍️
+                        </div>
+                        <span style={{ fontSize: 10, color: '#666', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                          {r.sofer}
+                        </span>
                       </div>
                     )}
                     <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
