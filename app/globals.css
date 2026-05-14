@@ -20,6 +20,14 @@
   --color-gold-600: #B45309;
 }
 
+:root {
+  --font-frank: 'Frank Ruhl Libre', serif;
+}
+
+.brand-story {
+  font-family: var(--font-frank), serif !important;
+}
+
 html, body {
   overflow-x: hidden;
   max-width: 100%;

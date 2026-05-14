@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Heebo } from "next/font/google";
+import { Geist, Heebo, Frank_Ruhl_Libre } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { CartProvider } from "./contexts/CartContext";
@@ -20,6 +20,12 @@ import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
+const frankRuhl = Frank_Ruhl_Libre({
+  subsets: ['hebrew', 'latin'],
+  weight: ['300', '400', '500', '700', '900'],
+  display: 'swap',
+  variable: '--font-frank',
+});
 
 const BASE_URL = 'https://your-sofer.com';
 
@@ -66,7 +72,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className="overflow-x-hidden">
+    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className={`overflow-x-hidden ${frankRuhl.variable}`}>
       <head>
         <meta name="facebook-domain-verification" content="xuwtu57l434nldfe7p4s8l2sr829jw" />
         <CanonicalTag />
