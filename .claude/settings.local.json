@@ -147,7 +147,9 @@
       "Bash(Get-ChildItem -Recurse -Directory -Name)",
       "Bash(Select-Object -First 20)",
       "Bash(git show *)",
-      "Bash(not exist *)"
+      "Bash(not exist *)",
+      "Bash(Select-String -Path \"C:\\\\Users\\\\Owner\\\\.claude\\\\projects\\\\C--Users-Owner-Downloads-projects-Your-sofer\\\\49dd72c7-005b-4f60-9cdd-ce90cbac093f.jsonl\" -Pattern \"BarMitzvaClient\")",
+      "Bash(Select-Object -Last 5)"
     ]
   }
 }

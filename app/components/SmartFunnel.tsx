@@ -273,7 +273,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
             </div>
             {/* Third card - Bar Mitzva wizard */}
             <div
-              onClick={() => router.push('/bar-mitzvah')}
+              onClick={() => router.push(`/category/${encodeURIComponent('בר מצווה')}`)}
               style={{
                 marginTop: 12,
                 height: 67,
