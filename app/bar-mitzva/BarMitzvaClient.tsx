@@ -32,12 +32,6 @@ interface Sofer {
   image?: string;
 }
 
-const COMPLETE_SET = [
-  { label: 'טלית', emoji: '🟦', href: '/category/טליתות וציציות' },
-  { label: 'כיסוי תפילין', emoji: '🎒', href: '/category/סט טלית תפילין' },
-  { label: 'כיפה', emoji: '🎩', href: '/category/כיפות' },
-  { label: 'סידור', emoji: '📖', href: '/category/סידור' },
-];
 
 export default function BarMitzvaPage() {
   const [isMobile, setIsMobile] = useState(false);
@@ -175,25 +169,6 @@ export default function BarMitzvaPage() {
             })}
           </div>
         )}
-      </section>
-
-      {/* Complete set */}
-      <section style={{ background: '#fff', borderTop: '1px solid #eee', padding: isMobile ? '28px 16px' : '40px 24px' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 800, color: NAVY, marginBottom: 6 }}>השלימו את הסט</h2>
-          <p style={{ fontSize: 13, color: '#777', marginBottom: 20 }}>הוסיפו טלית, כיסוי תפילין, כיפה וסידור</p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            {COMPLETE_SET.map(item => (
-              <a key={item.label} href={item.href}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                  background: '#f8f6f2', border: '1px solid #e8e4da', borderRadius: 12,
-                  padding: '14px 20px', textDecoration: 'none', minWidth: 80 }}>
-                <span style={{ fontSize: 24 }}>{item.emoji}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: NAVY }}>{item.label}</span>
-              </a>
-            ))}
-          </div>
-        </div>
       </section>
 
     </div>
