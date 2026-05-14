@@ -19,6 +19,12 @@ const CATEGORIES = [
   { name: 'ספרי תורה',        slug: 'ספרי תורה',         emoji: '📜', href: '/category/ספרי תורה',         staticImg: '' },
   { name: 'פסח',              slug: 'פסח',               emoji: '🍷', href: '/category/פסח',               staticImg: '' },
   { name: 'שבתות וחגים',     slug: 'שבתות וחגים',      emoji: '🕯️', href: '/category/שבתות וחגים',      staticImg: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png' },
+  { name: 'קלפי תפילין',     slug: 'קלפי תפילין',       emoji: '📄', href: '/category/קלפי תפילין',       staticImg: '' },
+  { name: 'כיסוי תפילין',   slug: 'כיסוי תפילין',     emoji: '🎒', href: '/category/כיסוי תפילין',     staticImg: '' },
+  { name: 'חנוכה',            slug: 'חנוכה',             emoji: '🕎', href: '/category/חנוכה',             staticImg: '' },
+  { name: 'נטלות',            slug: 'נטלות וכלים',      emoji: '🫙', href: '/category/נטלות',             staticImg: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776283325/eolm1mte2d2q1zjaijsn.png' },
+  { name: 'כלי שולחן והגשה', slug: 'כלי שולחן והגשה',  emoji: '🍽️', href: '/category/כלי שולחן והגשה', staticImg: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png' },
+  { name: 'עיצוב הבית',      slug: 'עיצוב הבית',        emoji: '🏡', href: '/category/עיצוב הבית',        staticImg: '' },
 ];
 
 export default function CategoriesPage() {
