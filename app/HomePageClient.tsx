@@ -986,7 +986,7 @@ export default function HomePageClient() {
           </div>
           <div style={{ textAlign: 'center', marginTop: 24 }}>
             <a
-              href="/category"
+              href="/search"
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 background: '#FFFFFF',
