@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebaseAdmin';
+import { getAdminDb } from '@/lib/firebaseAdmin';
 
 export async function GET() {
   try {
-    const snap = await adminDb.collection('products')
+    const db = await getAdminDb();
+    const snap = await db.collection('products')
       .where('sofer', '==', 'הרב יעקב קורנפלד')
       .get();
 
