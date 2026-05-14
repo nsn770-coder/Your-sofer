@@ -93,7 +93,7 @@ const SOFER_LAYOUT_CATS = new Set(['קלפי מזוזה', 'תפילין קומפ
 const STAM_FILTER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'תפילין']);
 
 // Categories that fetch sofer name+photo for product cards
-const SOFER_FETCH_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות']);
+const SOFER_FETCH_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות', 'בר מצווה']);
 
 // ─── Category-specific name-based filters ────────────────────────────────────
 
@@ -913,12 +913,24 @@ function StamCard({
       }}
     >
       {/* Klaf image */}
-      <div style={{ width: 110, height: 110, borderRadius: 12, overflow: 'hidden', flexShrink: 0, background: '#F8F6F1' }}>
-        {imgSrc ? (
-          <img src={imgSrc} alt={product.name} loading={aboveFold ? 'eager' : 'lazy'}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, color: '#d1d5db' }}>✍</div>
+      <div style={{ width: 110, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ width: 110, height: 110, borderRadius: 12, overflow: 'hidden', background: '#F8F6F1' }}>
+          {imgSrc ? (
+            <img src={imgSrc} alt={product.name} loading={aboveFold ? 'eager' : 'lazy'}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, color: '#d1d5db' }}>✍</div>
+          )}
+        </div>
+        {(soferName || product.sofer) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 6px', background: '#f8f6f1', borderTop: '1px solid #ede9df', borderRadius: '0 0 8px 8px' }}>
+            {soferPhoto ? (
+              <img src={soferPhoto} alt={soferName || product.sofer} style={{ width: 18, height: 18, borderRadius: 3, objectFit: 'cover', flexShrink: 0 }} />
+            ) : (
+              <div style={{ width: 18, height: 18, borderRadius: 3, background: '#e5e0d5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>✍️</div>
+            )}
+            <span style={{ fontSize: 9, color: '#666', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: 76 }}>{soferName || product.sofer}</span>
+          </div>
         )}
       </div>
 
