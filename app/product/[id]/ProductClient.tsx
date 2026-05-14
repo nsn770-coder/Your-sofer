@@ -569,7 +569,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         closeupImageUrl: isStam ? (closeupImageUrl || undefined) : undefined,
         stockCount: stockCount ? Number(stockCount) : undefined,
         stockVisible,
-        hasKlafSelection: hasKlafSelection === true ? true : false,
+        hasKlafSelection: hasKlafSelection,
         priority: priority !== '' ? Number(priority) : 0,
         soferId: soferId || undefined,
         ...(saveGlobal ? {} : textData),
@@ -1330,7 +1330,7 @@ export default function ProductClient() {
   async function handleSave(updated: Partial<Product>) {
     if (!product) return;
     try {
-      await updateDoc(doc(db, 'products', product.id), Object.fromEntries(Object.entries(updated).filter(([, v]) => v !== undefined)));
+      await updateDoc(doc(db, 'products', product.id), Object.fromEntries(Object.entries(updated).filter(([, v]) => v !== undefined && v !== null)));
       setProduct(prev => prev ? { ...prev, ...updated } : prev);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
