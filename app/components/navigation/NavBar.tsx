@@ -389,7 +389,7 @@ function NavBarContent() {
         </div>
       )}
 
-      <header style={{ background: "#ffffff", color: "#1E3A8A", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E7E2D8" }}>
+      <header style={{ background: "#FAF8F3", color: "#1E3A8A", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E7E2D8" }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center", gap: isMobile ? 6 : 12 }}>
           <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "#1E3A8A", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
             <div style={{ width: 20, height: 2, background: "#1E3A8A", borderRadius: 0 }} />
@@ -398,7 +398,7 @@ function NavBarContent() {
           </button>
 
           <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
-            <Image src="/logo.png" alt="logo" width={56} height={56} className="ys-nav-logo" style={{ width: "auto", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
+            <Image src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778746370/%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_L_ecatchila_1_hrlkhj.png" alt="logo" width={200} height={48} className="ys-nav-logo" style={{ height: 48, width: "auto", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
             <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "#1E3A8A", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 
@@ -456,7 +456,7 @@ function NavBarContent() {
         </div>
 
         {!isMobile && (
-          <div style={{ background: "#ffffff", borderTop: "1px solid #E7E2D8", position: "relative" }}>
+          <div style={{ background: "#FAF8F3", borderTop: "1px solid #E7E2D8", position: "relative" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
               {MEGA_MENU_DATA.map(item => (
                 <div key={item.id} style={{ position: "relative" }}
