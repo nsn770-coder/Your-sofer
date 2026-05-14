@@ -60,8 +60,7 @@ export default function BarMitzvaPage() {
       try {
         const snap = await getDocs(query(
           collection(db, 'products'),
-          where('cat', '==', 'תפילין קומפלט'),
-          where('hidden', '!=', true)
+          where('cat', '==', 'בר מצווה')
         ));
         const prods = snap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
@@ -120,7 +119,7 @@ export default function BarMitzvaPage() {
       {/* Products */}
       <section style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '32px 16px' : '48px 24px' }}>
         <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, color: NAVY, marginBottom: 8, textAlign: 'center' }}>
-          תפילין קומפלט מהודר
+          סט בר מצווה
         </h2>
         <p style={{ textAlign: 'center', color: '#666', fontSize: 14, marginBottom: 28 }}>
           {products.length} מוצרים זמינים — כל קלף כתוב ביד
