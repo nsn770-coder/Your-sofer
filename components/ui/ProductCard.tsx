@@ -337,6 +337,18 @@ export default function ProductCard({
         </div>
       </div>
 
+      {/* ── Sofer strip ── */}
+      {soferName && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', background: '#f8f6f1', borderTop: '1px solid #ede9df' }}>
+          <div style={{ width: 24, height: 24, borderRadius: 3, background: '#e5e0d5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
+            ✍️
+          </div>
+          <span style={{ fontSize: 10, color: '#666', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+            {soferName}
+          </span>
+        </div>
+      )}
+
       {/* ── Content ── */}
       <div className={horizontal ? 'pc-content' : ''} style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '12px 14px 16px', gap: 4 }}>
         {cat && (
