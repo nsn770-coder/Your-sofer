@@ -1514,9 +1514,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
             <Icon.Pen /> טקסט לריקמה אישית
           </label>
           <p style={{ fontSize: 11, color: '#888', marginTop: 2, marginBottom: 6 }}>* כל אות עולה 5 ש״ח</p>
-          <input type="text" defaultValue={embroideryText} onBlur={e => setEmbroideryText(e.target.value)} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
+          <input type="text" defaultValue={embroideryText} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
             style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
-            onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => (e.target.style.borderColor = '#e0e0e0')} />
+            onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { setEmbroideryText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
           <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>הטקסט יירקם על המוצר - עד 30 תווים</p>
         </div>
       )}
