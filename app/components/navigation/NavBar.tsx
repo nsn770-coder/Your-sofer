@@ -389,27 +389,27 @@ function NavBarContent() {
         </div>
       )}
 
-      <header style={{ background: "#1E3A8A", color: "#fff", position: "sticky", top: 0, zIndex: 100 }}>
+      <header style={{ background: "#ffffff", color: "#1E3A8A", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E7E2D8" }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center", gap: isMobile ? 6 : 12 }}>
-          <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "#fff", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
-            <div style={{ width: 20, height: 2, background: "#fff", borderRadius: 0 }} />
-            <div style={{ width: 20, height: 2, background: "#fff", borderRadius: 0 }} />
-            <div style={{ width: 20, height: 2, background: "#fff", borderRadius: 0 }} />
+          <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "#1E3A8A", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
+            <div style={{ width: 20, height: 2, background: "#1E3A8A", borderRadius: 0 }} />
+            <div style={{ width: 20, height: 2, background: "#1E3A8A", borderRadius: 0 }} />
+            <div style={{ width: 20, height: 2, background: "#1E3A8A", borderRadius: 0 }} />
           </button>
 
           <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
             <Image src="/logo.png" alt="logo" width={56} height={56} className="ys-nav-logo" style={{ width: "auto", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
-            <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
+            <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "#1E3A8A", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 
           {isMobile ? (
             <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
               <button
                 onClick={() => setSearchOpen(o => !o)}
-                style={{ background: "none", border: "none", color: "#fff", padding: "6px 8px", cursor: "pointer", display: "flex", alignItems: "center" }}
+                style={{ background: "none", border: "none", color: "#1E3A8A", padding: "6px 8px", cursor: "pointer", display: "flex", alignItems: "center" }}
                 aria-label="חיפוש"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
               </button>
             </div>
           ) : (
@@ -422,7 +422,7 @@ function NavBarContent() {
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSearch()}
                 placeholder='חיפוש סת"מ ויודאיקה...'
-                style={{ flex: 1, border: "none", padding: "10px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.12)", outline: "none", minWidth: 0 }} />
+                style={{ flex: 1, border: "none", padding: "10px", fontSize: 14, color: "#111", background: "#f3f4f6", outline: "none", minWidth: 0 }} />
               <button onClick={handleSearch} style={{ background: "#C5A028", border: "none", padding: "0 14px", cursor: "pointer" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
               </button>
@@ -433,49 +433,49 @@ function NavBarContent() {
             {user ? (
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 {user.photoURL && !isMobile && <img src={user.photoURL} alt="" style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid #C5A028" }} />}
-                {!isMobile && <div style={{ fontSize: 11 }}><div style={{ color: "#ccc", fontSize: 10 }}>שלום,</div><div style={{ fontWeight: 700 }}>{user.displayName?.split(" ")[0]}</div></div>}
-                {user.role === "admin" && <button onClick={() => router.push("/admin")} style={{ background: "#C5A028", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>ניהול</button>}
+                {!isMobile && <div style={{ fontSize: 11 }}><div style={{ color: "#888", fontSize: 10 }}>שלום,</div><div style={{ fontWeight: 700, color: "#1E3A8A" }}>{user.displayName?.split(" ")[0]}</div></div>}
+                {user.role === "admin" && <button onClick={() => router.push("/admin")} style={{ background: "#1E3A8A", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>ניהול</button>}
                 {user.role === "sofer" && <button onClick={() => router.push("/sofer-dashboard")} style={{ background: "#1a3a2a", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>סופר</button>}
-                {user.role === "shaliach" && <button onClick={() => router.push("/shaliach-dashboard")} style={{ background: "none", color: "#fff", border: "1px solid #C5A028", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>שלוחה</button>}
-                {!isMobile && <button onClick={logout} style={{ background: "none", border: "none", color: "#aaa", fontSize: 11, cursor: "pointer" }}>יציאה</button>}
+                {user.role === "shaliach" && <button onClick={() => router.push("/shaliach-dashboard")} style={{ background: "none", color: "#1E3A8A", border: "1px solid #1E3A8A", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>שלוחה</button>}
+                {!isMobile && <button onClick={logout} style={{ background: "none", border: "none", color: "#888", fontSize: 11, cursor: "pointer" }}>יציאה</button>}
               </div>
             ) : (
-              <button onClick={signInWithGoogle} style={{ background: "none", border: "1px solid #444", borderRadius: 0, padding: isMobile ? "4px 7px" : "5px 8px", color: "#fff", fontSize: isMobile ? 10 : 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
+              <button onClick={signInWithGoogle} style={{ background: "none", border: "1px solid #1E3A8A", borderRadius: 0, padding: isMobile ? "4px 7px" : "5px 8px", color: "#1E3A8A", fontSize: isMobile ? 10 : 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
                 <svg width="11" height="11" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
                 {isMobile ? "כניסה" : "התחבר"}
               </button>
             )}
             <div onClick={() => router.push("/cart")} style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
               <div style={{ position: "relative" }}>
-                <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                {count > 0 && <span style={{ position: "absolute", top: -4, left: -4, background: "#C5A028", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
+                <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                {count > 0 && <span style={{ position: "absolute", top: -4, left: -4, background: "#C5A028", color: "#1E3A8A", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
               </div>
-              <div style={{ fontSize: 11, color: "#fff", fontWeight: 700 }}>סל ({count})</div>
+              <div style={{ fontSize: 11, color: "#1E3A8A", fontWeight: 700 }}>סל ({count})</div>
             </div>
           </div>
         </div>
 
         {!isMobile && (
-          <div style={{ background: "#1D4ED8", borderTop: "1px solid rgba(255,255,255,0.08)", position: "relative" }}>
+          <div style={{ background: "#ffffff", borderTop: "1px solid #E7E2D8", position: "relative" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
               {MEGA_MENU_DATA.map(item => (
                 <div key={item.id} style={{ position: "relative" }}
                   onMouseEnter={() => handleEnter(item.id)}
                   onMouseLeave={handleLeave}
                 >
-                  <button onClick={() => handleSelect(item.cat)} style={{ background: "none", border: "none", color: activeId === item.id ? "#C5A028" : "#fff", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 400, borderBottom: activeId === item.id ? "2px solid #C5A028" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
+                  <button onClick={() => handleSelect(item.cat)} style={{ background: "none", border: "none", color: activeId === item.id ? "#C5A028" : "#1E3A8A", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 500, borderBottom: activeId === item.id ? "2px solid #C5A028" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
                     {item.label}
                     <span style={{ fontSize: 9, color: "#C5A028", display: "inline-block", transition: "transform 0.2s ease", transform: activeId === item.id ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
                   </button>
                   {activeId === item.id && <MegaPanel item={item} onSelect={handleSelect} />}
                 </div>
               ))}
-              <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.15)", margin: "0 4px" }} />
+              <div style={{ width: 1, height: 20, background: "#E7E2D8", margin: "0 4px" }} />
               {SIMPLE_NAV.map(nav => (
                 <button key={nav.action} onClick={() => handleAction(nav.action)}
-                  style={{ background: "none", border: "none", color: "rgba(255,255,255,0.7)", padding: "9px 11px", fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", borderBottom: "2px solid transparent", transition: "all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.color = "#fff"; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
+                  style={{ background: "none", border: "none", color: "#555", padding: "9px 11px", fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", borderBottom: "2px solid transparent", transition: "all 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "#1E3A8A"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = "#555"; }}
                 >
                   {nav.label}
                 </button>
