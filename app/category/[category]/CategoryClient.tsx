@@ -957,6 +957,16 @@ function StamCard({
           {product.name}
         </p>
 
+        {((product as any).stars || (product as any).rating) > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
+            {Array.from({ length: 5 }).map((_, i) => {
+              const s = (product as any).stars || (product as any).rating || 0;
+              return <span key={i} style={{ color: i < Math.round(s) ? '#C9A227' : '#E5E7EB', fontSize: 11 }}>★</span>;
+            })}
+            <span style={{ fontSize: 10, color: '#9CA3AF', marginRight: 2 }}>{((product as any).stars || (product as any).rating || 0).toFixed(1)}</span>
+          </div>
+        )}
+
         {/* Sofer row */}
         {(soferName || soferPhoto || product.soferId) && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1687,7 +1697,8 @@ export default function CategoryClient({ category }: { category: string }) {
                       hasKlafSelection={p.hasKlafSelection} cat={p.cat}
                       soferId={p.soferId}
                       soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                      soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined} />
+                      soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                      stars={p.stars || p.rating || undefined} />
                   );
                   const LEVEL_GROUPS = [
                     {
@@ -1775,6 +1786,7 @@ export default function CategoryClient({ category }: { category: string }) {
                         soferId={p.soferId}
                         soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                         soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                        stars={p.stars || p.rating || undefined}
                       />
                     ))}
                   </div>
@@ -1818,6 +1830,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               soferId={p.soferId}
                               soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                               soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                              stars={p.stars || p.rating || undefined}
                             />
                           ))}
                         </div>

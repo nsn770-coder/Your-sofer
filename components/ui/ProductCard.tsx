@@ -27,6 +27,7 @@ interface Props {
   soferName?: string;
   soferPhoto?: string;
   horizontal?: boolean;
+  stars?: number;
 }
 
 const SOFER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות']);
@@ -110,7 +111,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 
 export default function ProductCard({
   id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
-  soferId, soferName, soferPhoto, horizontal,
+  soferId, soferName, soferPhoto, horizontal, stars,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -364,6 +365,15 @@ export default function ProductCard({
         } as React.CSSProperties}>
           {name}
         </p>
+
+        {(stars && stars > 0) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} style={{ color: i < Math.round(stars) ? '#C9A227' : '#E5E7EB', fontSize: 11 }}>★</span>
+            ))}
+            <span style={{ fontSize: 10, color: '#9CA3AF', marginRight: 2 }}>{stars.toFixed(1)}</span>
+          </div>
+        )}
 
         {(soferId || soferName || (cat && SOFER_CATS.has(cat))) && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
