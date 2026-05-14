@@ -24,7 +24,7 @@ export default function WizardStickyBar() {
     return () => window.removeEventListener('storage', sync);
   }, []);
 
-  if (!mounted || !active || step <= 0 || step >= BAR_MITZVA_TOTAL) return null;
+  return null;
 
   const nextStep = BAR_MITZVA_STEPS[step];
   if (!nextStep) return null;

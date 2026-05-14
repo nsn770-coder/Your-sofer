@@ -527,25 +527,9 @@ export default function HomePageClient() {
     return () => cancelAnimationFrame(rafId);
   }, [countersVisible, soferimCount, productsCount]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (localStorage.getItem('wizard_shown')) return;
-    const timer = setTimeout(() => {
-      setWizardOpen(true);
-      localStorage.setItem('wizard_shown', '1');
-    }, 30000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (sessionStorage.getItem('newsletter_popup_shown')) return;
-    const timer = setTimeout(() => {
-      setNewsletterPopupOpen(true);
-      sessionStorage.setItem('newsletter_popup_shown', '1');
-    }, 120000);
-    return () => clearTimeout(timer);
-  }, []);
+  // popups disabled
+  useEffect(() => {}, []);
+  useEffect(() => {}, []);
 
   // ── Memoized arrays that depend on catImages ───────────────────────────────
 

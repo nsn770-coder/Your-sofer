@@ -11,16 +11,7 @@ export default function ShavuotPopup() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (sessionStorage.getItem('shavuot_popup_seen')) return;
-    const timer = setTimeout(async () => {
-      try {
-        const snap = await getDoc(doc(db, 'settings', 'popups'));
-        if (snap.exists() && snap.data().shavuotPopupActive === true) {
-          setVisible(true);
-        }
-      } catch { /* fail silently */ }
-    }, 3000);
-    return () => clearTimeout(timer);
+    // popup disabled
   }, []);
 
   function close() {
