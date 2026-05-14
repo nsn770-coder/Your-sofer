@@ -5,6 +5,43 @@ import { useCart } from '../contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 
+function IconLock() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+function IconTruck() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="1" y="3" width="15" height="13" rx="1" />
+      <path d="M16 8h4l3 5v4h-7V8z" />
+      <circle cx="5.5" cy="18.5" r="2.5" />
+      <circle cx="18.5" cy="18.5" r="2.5" />
+    </svg>
+  );
+}
+
+function IconReturn() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="1 4 1 10 7 10" />
+      <path d="M3.51 15a9 9 0 1 0 .49-4.5" />
+    </svg>
+  );
+}
+
+function IconShield() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
 export default function CartPage() {
   const router = useRouter();
   const { items, removeItem, updateQty, total } = useCart();
@@ -265,11 +302,11 @@ export default function CartPage() {
                 המשך לקנות
               </button>
 
-              <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eee', fontSize: 11, color: '#888', lineHeight: 2 }}>
-                <div>🔒 תשלום מאובטח ומוצפן</div>
-                <div>🚚 משלוח לכל הארץ</div>
-                <div>↩️ ביטול עד 24 שעות</div>
-                <div>🛡️ אחריות פלטפורמה מלאה</div>
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eee', fontSize: 11, color: '#888', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconLock /> תשלום מאובטח ומוצפן</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconTruck /> משלוח לכל הארץ</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconReturn /> ביטול עד 24 שעות</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconShield /> אחריות פלטפורמה מלאה</div>
               </div>
             </div>
           </>
