@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Heebo, Frank_Ruhl_Libre } from "next/font/google";
+import { Geist, Heebo, Frank_Ruhl_Libre, Cormorant_Garamond } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { CartProvider } from "./contexts/CartContext";
@@ -25,6 +25,12 @@ const frankRuhl = Frank_Ruhl_Libre({
   weight: ['300', '400', '500', '700', '900'],
   display: 'swap',
   variable: '--font-frank',
+});
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-cormorant',
 });
 
 const BASE_URL = 'https://your-sofer.com';
@@ -72,7 +78,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className={`overflow-x-hidden ${frankRuhl.variable}`}>
+    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className={`overflow-x-hidden ${frankRuhl.variable} ${cormorant.variable}`}>
       <head>
         <meta name="facebook-domain-verification" content="xuwtu57l434nldfe7p4s8l2sr829jw" />
         <CanonicalTag />

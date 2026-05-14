@@ -22,10 +22,17 @@
 
 :root {
   --font-frank: 'Frank Ruhl Libre', serif;
+  --font-cormorant: 'Cormorant Garamond', serif;
 }
 
 .brand-story {
   font-family: var(--font-frank), serif !important;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-cormorant), serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 html, body {

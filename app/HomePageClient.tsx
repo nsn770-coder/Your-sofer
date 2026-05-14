@@ -1160,7 +1160,7 @@ export default function HomePageClient() {
       </div>
 
       <div dir="rtl" style={{ padding: '34px 20px 22px', maxWidth: 720, margin: '0 auto', textAlign: 'center', fontFamily: "'Frank Ruhl Libre', serif" }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1F2937', marginBottom: 16, lineHeight: 1.4 }}>
+        <h2 style={{ fontSize: isMobile ? 28 : 32, fontWeight: 600, color: '#1F2937', marginBottom: 16, lineHeight: 1.4, fontFamily: "'Cormorant Garamond', serif" }}>
           הקמנו את Your Sofer.
         </h2>
         <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#4B5563', fontWeight: 300 }}>
