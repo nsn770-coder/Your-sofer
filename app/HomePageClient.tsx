@@ -1006,6 +1006,75 @@ export default function HomePageClient() {
         </div>
       </div>
 
+      {/* ── Collections section ── */}
+      <div style={{ background: '#1E3A8A', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.15em', textAlign: 'center', marginBottom: 8 }}>COLLECTIONS</p>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 28, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הקולקציות שלנו</h2>
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 28 }}>שישה קוים עיצוביים — מצאו את הסגנון שמדבר אליכם</p>
+
+          {/* Horizontal scroll on mobile, grid on desktop */}
+          <div style={isMobile
+            ? { display: 'flex', overflowX: 'auto', gap: 12, paddingBottom: 8, scrollbarWidth: 'none' } as React.CSSProperties
+            : { display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 14 }
+          }>
+            {[
+              { id: 'יהלום',  tagline: 'הקו השקוף והמודרני',     dot: '#87CEEB', href: '/category/מזוזות?collection=יהלום',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919873/1777913222083_ibossf.png' },
+              { id: 'ישפה',   tagline: 'הקו האומנותי והצבעוני',  dot: 'rainbow', href: '/category/כלי שולחן והגשה?collection=ישפה',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png' },
+              { id: 'ברקת',   tagline: 'הקו החגיגי והיוקרתי',    dot: '#15803d', href: '/category/כלי שולחן והגשה?collection=ברקת',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919689931_fkb8c6.png' },
+              { id: 'תרשיש',  tagline: 'הקו הזהוב והמאיר',       dot: '#b45309', href: '/category/יודאיקה?collection=תרשיש',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919932/1777919910394_olu4mi.png' },
+              { id: 'ספיר',   tagline: 'הקו המתכתי והקריר',      dot: '#94a3b8', href: '/category/יודאיקה?collection=ספיר',                      img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919702083_vflhuc.png' },
+              { id: 'שוהם',   tagline: 'הקו הטבעי והכהה',        dot: '#78350f', href: '/category/מזוזות?collection=שוהם',                       img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777920809/1777920771814_vikmum.png' },
+            ].map(col => (
+              <a
+                key={col.id}
+                href={col.href}
+                style={{
+                  textDecoration: 'none',
+                  display: 'block',
+                  flexShrink: 0,
+                  width: isMobile ? 160 : 'auto',
+                  backgroundImage: `url(${col.img})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 0,
+                  padding: '18px 16px',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  minHeight: isMobile ? 140 : 160,
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = 'none'; }}
+              >
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 0 }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <span style={{
+                      width: 10, height: 10, borderRadius: '50%', flexShrink: 0, display: 'inline-block',
+                      background: col.dot === 'rainbow'
+                        ? 'linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)'
+                        : col.dot,
+                    }} />
+                    <span style={{ fontSize: isMobile ? 16 : 17, fontWeight: 900, color: '#fff' }}>{col.id}</span>
+                  </div>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.5 }}>{col.tagline}</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#fff', margin: '10px 0 0' }}>לצפייה ←</p>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <a href="/collections" style={{ display: 'inline-block', border: '1.5px solid rgba(184,151,42,0.5)', color: '#C5A028', background: 'none', padding: '10px 28px', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+              לכל הקולקציות ←
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* ── 5. Featured products horizontal scroll ── */}
       <div style={{ minHeight: isMobile ? 290 : 330 }}>
       {featuredProducts.length > 0 && (
@@ -1175,75 +1244,6 @@ export default function HomePageClient() {
           כי כשמדובר בדברים שמלווים את החיים עצמם —<br/>
           לא מתפשרים על הדבר האמיתי.
         </p>
-      </div>
-
-      {/* ── Collections section ── */}
-      <div style={{ background: '#1E3A8A', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.15em', textAlign: 'center', marginBottom: 8 }}>COLLECTIONS</p>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 28, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הקולקציות שלנו</h2>
-          <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 28 }}>שישה קוים עיצוביים — מצאו את הסגנון שמדבר אליכם</p>
-
-          {/* Horizontal scroll on mobile, grid on desktop */}
-          <div style={isMobile
-            ? { display: 'flex', overflowX: 'auto', gap: 12, paddingBottom: 8, scrollbarWidth: 'none' } as React.CSSProperties
-            : { display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 14 }
-          }>
-            {[
-              { id: 'יהלום',  tagline: 'הקו השקוף והמודרני',     dot: '#87CEEB', href: '/category/מזוזות?collection=יהלום',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919873/1777913222083_ibossf.png' },
-              { id: 'ישפה',   tagline: 'הקו האומנותי והצבעוני',  dot: 'rainbow', href: '/category/כלי שולחן והגשה?collection=ישפה',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png' },
-              { id: 'ברקת',   tagline: 'הקו החגיגי והיוקרתי',    dot: '#15803d', href: '/category/כלי שולחן והגשה?collection=ברקת',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919689931_fkb8c6.png' },
-              { id: 'תרשיש',  tagline: 'הקו הזהוב והמאיר',       dot: '#b45309', href: '/category/יודאיקה?collection=תרשיש',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919932/1777919910394_olu4mi.png' },
-              { id: 'ספיר',   tagline: 'הקו המתכתי והקריר',      dot: '#94a3b8', href: '/category/יודאיקה?collection=ספיר',                      img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919702083_vflhuc.png' },
-              { id: 'שוהם',   tagline: 'הקו הטבעי והכהה',        dot: '#78350f', href: '/category/מזוזות?collection=שוהם',                       img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777920809/1777920771814_vikmum.png' },
-            ].map(col => (
-              <a
-                key={col.id}
-                href={col.href}
-                style={{
-                  textDecoration: 'none',
-                  display: 'block',
-                  flexShrink: 0,
-                  width: isMobile ? 160 : 'auto',
-                  backgroundImage: `url(${col.img})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  borderRadius: 0,
-                  padding: '18px 16px',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  minHeight: isMobile ? 140 : 160,
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = 'none'; }}
-              >
-                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 0 }} />
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                    <span style={{
-                      width: 10, height: 10, borderRadius: '50%', flexShrink: 0, display: 'inline-block',
-                      background: col.dot === 'rainbow'
-                        ? 'linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)'
-                        : col.dot,
-                    }} />
-                    <span style={{ fontSize: isMobile ? 16 : 17, fontWeight: 900, color: '#fff' }}>{col.id}</span>
-                  </div>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.5 }}>{col.tagline}</p>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: '#fff', margin: '10px 0 0' }}>לצפייה ←</p>
-                </div>
-              </a>
-            ))}
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <a href="/collections" style={{ display: 'inline-block', border: '1.5px solid rgba(184,151,42,0.5)', color: '#C5A028', background: 'none', padding: '10px 28px', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
-              לכל הקולקציות ←
-            </a>
-          </div>
-        </div>
       </div>
 
       {/* ── Static Social Proof ── */}
