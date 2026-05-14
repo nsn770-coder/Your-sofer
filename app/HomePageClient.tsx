@@ -1151,7 +1151,7 @@ export default function HomePageClient() {
         </button>
       </div>
 
-      <div dir="rtl" style={{ padding: '34px 20px', background: '#F5F2EC', margin: '32px 0', fontFamily: "'Frank Ruhl Libre', serif" }}>
+      <div dir="rtl" style={{ padding: '16px 20px', background: '#F5F2EC', margin: '0', fontFamily: "'Frank Ruhl Libre', serif" }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
           <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300 }}>
             כי קל להשקיע במה שמרשים אחרים.
@@ -1175,13 +1175,13 @@ export default function HomePageClient() {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
           <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#111111', marginBottom: 14 }}>עוד קטגוריות</h2>
         </div>
-        <div style={{ display: 'flex', overflowX: 'auto', gap: 10, padding: '0 12px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, padding: '0 12px' }}>
           {MORE_CAT_DEFS.map(cat => {
             const img = catImages[cat.slug] ? optimizeCloudinaryUrl(catImages[cat.slug], 300) : '';
             return (
               <div key={cat.slug}
                 onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
-                style={{ width: 130, flexShrink: 0, cursor: 'pointer' }}
+                style={{ cursor: 'pointer' }}
               >
                 <div style={{ height: 100, width: '100%', borderRadius: 0, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
                   {img ? (

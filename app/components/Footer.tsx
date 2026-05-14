@@ -201,8 +201,8 @@ export default function Footer() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
             <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/visa.svg" alt="Visa" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
             <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/mastercard.svg" alt="Mastercard" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
-            <div style={{ background: 'rgba(255,255,255,0.9)', borderRadius: 4, padding: '3px 8px' }}>
-              <span style={{ fontSize: 11, fontWeight: 900, color: '#6b21a8' }}>bit</span>
+            <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 4, padding: '3px 8px' }}>
+              <span style={{ fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.7)' }}>bit</span>
             </div>
             <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/paypal.svg" alt="PayPal" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 4, padding: '3px 10px' }}>

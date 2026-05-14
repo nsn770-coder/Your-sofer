@@ -198,9 +198,9 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   }
 
   const btnStyle: React.CSSProperties = {
-    background: 'rgba(255,252,240,0.15)',
-    border: '2px solid rgba(255,252,240,0.6)',
-    color: '#fff',
+    background: 'rgba(30,58,138,0.08)',
+    border: '2px solid rgba(30,58,138,0.3)',
+    color: '#1E3A8A',
     borderRadius: 0,
     padding: '14px 20px',
     fontSize: isMobile ? 15 : 16,
@@ -215,7 +215,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   const titleStyle: React.CSSProperties = {
     fontSize: isMobile ? 18 : 22,
     fontWeight: 700,
-    color: '#fff',
+    color: '#1E3A8A',
     marginBottom: 20,
     textAlign: 'right',
   };
@@ -224,7 +224,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
     <div id="bar-mitzva-wizard" style={{ background: '#FAF8F4', padding: isMobile ? '24px 12px' : '40px 24px' }}>
       <div
         style={{
-          background: '#1a2744',
+          background: '#F5F0E8',
           borderRadius: 0,
           padding: isMobile ? '24px 16px' : '32px 40px',
           direction: 'rtl',
@@ -240,7 +240,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
             onClick={back}
             style={{
               background: 'none', border: 'none',
-              color: 'rgba(255,252,240,0.7)', fontSize: 13,
+              color: 'rgba(30,58,138,0.6)', fontSize: 13,
               cursor: 'pointer', marginBottom: 16,
               display: 'flex', alignItems: 'center', gap: 4, padding: 0,
             }}
@@ -374,11 +374,11 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
                   key={opt.label}
                   style={{ ...btnStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                   onClick={() => navigate(opt.label)}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,252,240,0.25)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,252,240,0.15)'; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(30,58,138,0.15)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(30,58,138,0.08)'; }}
                 >
                   <span>{opt.label}</span>
-                  <span style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(255,252,240,0.6)', fontWeight: 400 }}>{opt.desc}</span>
+                  <span style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(30,58,138,0.5)', fontWeight: 400 }}>{opt.desc}</span>
                 </button>
               ))}
             </div>
