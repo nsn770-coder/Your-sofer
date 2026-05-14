@@ -198,6 +198,21 @@ export default function Footer() {
           fontSize: 12,
           color: 'rgba(255,255,255,0.4)',
         }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+            <div style={{ background: '#1a1f71', borderRadius: 4, padding: '3px 8px' }}>
+              <span style={{ fontSize: 11, fontWeight: 900, color: '#fff', letterSpacing: 1 }}>VISA</span>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.9)', borderRadius: 4, padding: '3px 8px' }}>
+              <span style={{ fontSize: 11, fontWeight: 900, color: '#6b21a8' }}>bit</span>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.9)', borderRadius: 4, padding: '3px 8px' }}>
+              <span style={{ fontSize: 10, fontWeight: 900 }}><span style={{ color: '#003087' }}>Pay</span><span style={{ color: '#009cde' }}>Pal</span></span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 4, padding: '3px 10px' }}>
+              <svg width="10" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <span style={{ fontSize: 10, color: '#4ade80', fontWeight: 700 }}>SSL מאובטח</span>
+            </div>
+          </div>
           © 2025 Your Sofer — כל הזכויות שמורות
         </div>
 

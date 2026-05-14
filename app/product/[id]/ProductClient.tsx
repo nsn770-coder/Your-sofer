@@ -1538,6 +1538,25 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         </div>
       )}
 
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '4px 0 12px', padding: '12px 14px', background: '#FAFAF8', border: '1px solid #EDE9DF', borderRadius: 12, direction: 'rtl' }}>
+        {[
+          { icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', title: 'רכישה מאובטחת לחלוטין', sub: 'כל העברות מוצפנות ומאובטחות' },
+          { icon: 'M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2zM9 22V12h6v10', title: 'החזרה תוך 14 יום', sub: 'לא מרוצה? נחזיר לך את הכסף' },
+          { icon: 'M1 3h15a1 1 0 011 1v13H1V4a1 1 0 011-1zM16 8h4l3 5v4h-7V8zM5.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM18.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5z', title: 'משלוח לכל הארץ', sub: 'עם מספר מעקב — ישירות אליך הביתה' },
+          { icon: 'M12 22C6 17 4 13 4 9a8 8 0 1116 0c0 4-2 8-8 13z', title: 'תמיכה אישית 24/7', sub: 'נציג אנושי זמין בוואטסאפ' },
+        ].map(item => (
+          <div key={item.title} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A227" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+              <path d={item.icon}/>
+            </svg>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: '#1F2937' }}>{item.title}</div>
+              <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>{item.sub}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <a
         href={`https://wa.me/972552722228?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + (product.name || ''))}`}
         target="_blank"
