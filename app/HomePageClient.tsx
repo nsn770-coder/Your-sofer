@@ -929,6 +929,16 @@ export default function HomePageClient() {
         </div>
       </div>
 
+      <div dir="rtl" style={{ padding: '40px 20px 32px', maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
+        <p style={{ fontSize: 15, lineHeight: 1.9, color: '#4B5563', fontWeight: 400 }}>
+          יש אנשים שמבינים שהדברים הכי חשובים בחיים — הם דווקא אלה שלא תמיד רואים.
+        </p>
+        <p style={{ fontSize: 15, lineHeight: 1.9, color: '#4B5563', fontWeight: 400, marginTop: 12 }}>
+          מזוזה ותפילין הם לא עוד מוצר.<br/>
+          הם הקדושה והברכה שנכנסת לבית שלך, והחיבור השקט שלך לדבר אמיתי וגדול יותר.
+        </p>
+      </div>
+
       {/* ── 4. Category grid ── */}
       <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 20px' : '40px 24px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
@@ -1072,6 +1082,25 @@ export default function HomePageClient() {
         </button>
       </div>
 
+      <div dir="rtl" style={{ padding: '48px 20px', background: '#F5F2EC', margin: '32px 0' }}>
+        <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#4B5563' }}>
+            כי קל להשקיע במה שמרשים אחרים.
+          </p>
+          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#4B5563', marginTop: 12 }}>
+            אבל אנשים עם יראת שמים אמיתית משקיעים גם בדברים שנמצאים בתוך המזוזה שעל הדלת — אפילו שאף אחד אחר לא יראה אותם לעולם.
+          </p>
+          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#1F2937', fontWeight: 600, marginTop: 20 }}>
+            אלו אנשים שלא מחפשים "בערך".<br/>
+            הם מחפשים אמת, דיוק ואמון.
+          </p>
+          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#4B5563', marginTop: 16 }}>
+            לכן הקמנו את Your Sofer — לאנשים שמבינים את החשיבות של סת״מ מהודר, רוצים לדעת בדיוק:<br/>
+            מי כתב את הקלף שלהם, מי בדק אותו, ושרוצים לדעת שיש על מי לסמוך.
+          </p>
+        </div>
+      </div>
+
       {/* ── 6. More categories horizontal scroll ── */}
       <div style={{ background: '#F8F6F1', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
@@ -1128,6 +1157,24 @@ export default function HomePageClient() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div dir="rtl" style={{ padding: '48px 20px 32px', maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1F2937', marginBottom: 16, lineHeight: 1.4 }}>
+          הקמנו את Your Sofer.
+        </h2>
+        <p style={{ fontSize: 15, lineHeight: 1.9, color: '#4B5563' }}>
+          מקום שמאפשר לך לקנות סת״מ בצורה אחרת.
+        </p>
+        <p style={{ fontSize: 15, lineHeight: 1.9, color: '#4B5563', marginTop: 14 }}>
+          לראות את הקלף האמיתי.<br/>
+          להכיר את הסופר שכתב אותו.<br/>
+          לקבל תיעוד, בדיקה ושקיפות מלאה — ברמה שלא הייתה קיימת עד היום בעולם הסת״מ.
+        </p>
+        <p style={{ fontSize: 16, lineHeight: 1.9, color: '#1F2937', fontWeight: 700, marginTop: 20, fontStyle: 'italic' }}>
+          כי כשמדובר בדברים שמלווים את החיים עצמם —<br/>
+          לא מתפשרים על הדבר האמיתי.
+        </p>
       </div>
 
       {/* ── Collections section ── */}
