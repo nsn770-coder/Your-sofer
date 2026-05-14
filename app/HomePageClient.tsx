@@ -511,7 +511,7 @@ export default function HomePageClient() {
   // Counter animation - writes directly to DOM refs, zero React re-renders
   useEffect(() => {
     if (!countersVisible) return;
-    const targets = { soferim: soferimCount || 12, products: productsCount || 180, customers: 247 };
+    const targets = { soferim: soferimCount || 12, products: productsCount || 180, customers: 1000 };
     const duration = 1200;
     const start = performance.now();
     let rafId: number;
@@ -855,7 +855,7 @@ export default function HomePageClient() {
               בחרו מזוזה
             </a>
             <a
-              href="/bar-mitzva"
+              href={`/category/${encodeURIComponent('בר מצווה')}`}
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 background: 'rgba(255,255,255,0.15)',
@@ -1210,14 +1210,15 @@ export default function HomePageClient() {
           textAlign: 'center',
         }}>
           <p style={{ fontSize: isMobile ? 26 : 26, fontWeight: 800, color: '#1F2937', marginBottom: 24, lineHeight: 1.4 }}>
-            רוב האנשים בכלל לא יודעים מי כתב את המזוזה שלהם
+            רוב האנשים לא יודעים מי כתב את המזוזה שלהם — אבל אצלנו:
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'right' }}>
             {[
-              'ונמצא עובר את המבחנים שלנו',
               'כל קלף מצולם ומאומת לפני מכירה',
               'בדיקת מגיה מוסמך לכל מוצר',
               'ניתן לתקשר ישירות עם הסופר סת"מ',
+              'ניתן לבחור קלף ספציפי',
+              'כל סופר עובר אצלנו אבחון',
             ].map(row => (
               <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 12, padding: '14px 16px' }}>
                 <span style={{ color: '#C9A227', fontSize: 16, flexShrink: 0, fontWeight: 900 }}>✓</span>
