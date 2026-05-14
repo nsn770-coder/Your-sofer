@@ -787,7 +787,10 @@ export default function HomePageClient() {
           position: 'relative',
           minHeight: isMobile ? 420 : 520,
           overflow: 'hidden',
-          borderRadius: '0 0 28px 28px',
+          borderRadius: 0,
+          width: '100%',
+          marginLeft: 0,
+          marginRight: 0,
         }}
       >
         {/* Background video */}
