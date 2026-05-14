@@ -1980,7 +1980,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         )}
 
         {/* Related products */}
-        {related.length > 0 && product.cat !== 'קלפי מזוזה' && (
+        {related.length > 0 && !['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט'].includes(product.cat || '') && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
             <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Icon.Cart size={18} color="#0f1111" /> משלים את הרכישה שלך
