@@ -1256,7 +1256,9 @@ export default function ProductClient() {
             const relSnap = await getDocs(query(collection(db, 'products'), where('cat', '==', p.cat), orderBy('priority', 'desc'), limit(5)));
             const relData: Product[] = [];
             relSnap.forEach(d => { if (d.id !== p.id) relData.push({ id: d.id, ...d.data() } as Product); });
-            setRelated(relData.slice(0, 4));
+            const STAM_CATS = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה'];
+            const filtered = relData.filter(p => !STAM_CATS.includes(p.cat || ''));
+            setRelated(filtered.slice(0, 4));
 
             // "השלם את הלוק" - same lookTag, different category
             if (p.lookTag) {
