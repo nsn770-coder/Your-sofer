@@ -940,7 +940,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 4. Category grid ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 20px' : '40px 24px', direction: 'rtl' }}>
+      <div id="categories" style={{ background: '#F8F6F1', padding: isMobile ? '28px 20px' : '40px 24px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 800, color: '#1F2937', marginBottom: 8 }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#6B7280', marginBottom: 24 }}>גלה עוד מגוון מוצרים</p>
@@ -986,7 +986,7 @@ export default function HomePageClient() {
           </div>
           <div style={{ textAlign: 'center', marginTop: 24 }}>
             <a
-              href="/search"
+              href="/#categories"
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 background: '#FFFFFF',
