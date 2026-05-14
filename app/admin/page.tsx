@@ -1,5 +1,5 @@
 ﻿'use client';
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, orderBy, query, where,
@@ -1182,6 +1182,116 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
   );
 }
 
+const ORDER_STATUSES: { value: string; label: string; color: string }[] = [
+  { value: 'new',        label: '⏳ חדש',            color: 'bg-yellow-100 text-yellow-700' },
+  { value: 'pending',    label: '🕐 ממתין',           color: 'bg-orange-100 text-orange-700' },
+  { value: 'magiah',     label: '✅ מגיע',             color: 'bg-teal-100 text-teal-700' },
+  { value: 'sofer',      label: '✍️ אצל הסופר',       color: 'bg-blue-100 text-blue-700' },
+  { value: 'packing',    label: '📦 באריזה',           color: 'bg-purple-100 text-purple-700' },
+  { value: 'shipped',    label: '🚚 נשלח',             color: 'bg-indigo-100 text-indigo-700' },
+  { value: 'delivered',  label: '✅ נמסר',             color: 'bg-green-100 text-green-700' },
+  { value: 'completed',  label: '🏁 הושלם',            color: 'bg-green-200 text-green-800' },
+  { value: 'needs_care', label: '⚠️ דורש טיפול',      color: 'bg-red-100 text-red-700' },
+  { value: 'abandoned',  label: '🚫 בוטל',             color: 'bg-gray-200 text-gray-600' },
+];
+
+function OrdersTab({ orders, setOrders }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>> }) {
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  async function handleStatusChange(orderId: string, newStatus: string) {
+    setUpdatingId(orderId);
+    try {
+      await updateDoc(doc(db, 'orders', orderId), { status: newStatus });
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    } catch (e) { console.error(e); }
+    finally { setUpdatingId(null); }
+  }
+
+  function getStatusMeta(val: string) {
+    return ORDER_STATUSES.find(s => s.value === val) ?? { label: val, color: 'bg-gray-100 text-gray-600' };
+  }
+
+  if (orders.length === 0) {
+    return <div className="bg-white rounded-xl shadow p-10 text-center text-gray-400">אין הזמנות עדיין</div>;
+  }
+
+  return (
+    <div className="bg-white rounded-xl shadow overflow-hidden" dir="rtl">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="p-3 text-right">מספר הזמנה</th>
+            <th className="p-3 text-right">לקוח</th>
+            <th className="p-3 text-right">סכום</th>
+            <th className="p-3 text-right">שליח</th>
+            <th className="p-3 text-right">סטטוס</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map(o => {
+            const meta = getStatusMeta(o.status);
+            const isExpanded = expandedId === o.id;
+            return (
+              <React.Fragment key={o.id}>
+                <tr
+                  className="border-t hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setExpandedId(isExpanded ? null : o.id)}
+                >
+                  <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
+                  <td className="p-3 font-bold">{o.customerName}</td>
+                  <td className="p-3 text-green-700 font-bold">{formatPrice(o.total)}</td>
+                  <td className="p-3 text-blue-600">{o.shaliachName || '-'}</td>
+                  <td className="p-3" onClick={e => e.stopPropagation()}>
+                    <select
+                      value={o.status}
+                      disabled={updatingId === o.id}
+                      onChange={e => handleStatusChange(o.id, e.target.value)}
+                      className={`text-xs font-bold px-2 py-1 rounded-full border-0 cursor-pointer outline-none ${meta.color}`}
+                      style={{ fontFamily: 'inherit' }}
+                    >
+                      {ORDER_STATUSES.map(s => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                      ))}
+                    </select>
+                    {updatingId === o.id && <span className="ml-2 text-xs text-gray-400">שומר...</span>}
+                  </td>
+                </tr>
+                {isExpanded && o.items && o.items.length > 0 && (
+                  <tr className="bg-blue-50 border-t border-blue-100">
+                    <td colSpan={5} className="px-5 py-3">
+                      <p className="text-xs font-bold text-gray-500 mb-2">פריטים בהזמנה:</p>
+                      <div className="flex flex-col gap-1">
+                        {o.items.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-3 text-xs text-gray-700">
+                            <span className="font-bold">{item.name}</span>
+                            <span className="text-gray-400">×{item.quantity}</span>
+                            <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
+                            {item.embroideryText && (
+                              <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
+                                ✍️ ריקמה: <strong>{item.embroideryText}</strong>
+                              </span>
+                            )}
+                            {item.selectedKlafName && (
+                              <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                                📜 קלף: <strong>{item.selectedKlafName}</strong>
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -2073,36 +2183,7 @@ export default function AdminPage() {
       )}
 
       {activeTab === 'orders' && (
-        <div className="bg-white rounded-xl shadow overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50"><tr><th className="p-3 text-right">מספר הזמנה</th><th className="p-3 text-right">לקוח</th><th className="p-3 text-right">סכום</th><th className="p-3 text-right">שליח</th><th className="p-3 text-right">סטטוס</th></tr></thead>
-            <tbody>
-              {orders.length === 0 ? <tr><td colSpan={5} className="p-10 text-center text-gray-400">אין הזמנות עדיין</td></tr>
-              : orders.map(o => (
-                <>
-                  <tr key={o.id} className="border-t hover:bg-gray-50">
-                    <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
-                    <td className="p-3 font-bold">{o.customerName}</td>
-                    <td className="p-3 text-green-700 font-bold">{formatPrice(o.total)}</td>
-                    <td className="p-3 text-blue-600">{o.shaliachName || '-'}</td>
-                    <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-bold ${o.status === 'new' ? 'bg-yellow-100 text-yellow-700' : o.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{o.status === 'new' ? '⏳ חדש' : o.status === 'processing' ? '🔄 בעיבוד' : o.status === 'delivered' ? '✅ נמסר' : o.status}</span></td>
-                  </tr>
-                  {o.items && o.items.some(i => i.embroideryText) && (
-                    <tr key={`${o.id}-emb`} className="bg-yellow-50 border-t border-yellow-100">
-                      <td colSpan={5} className="px-4 py-2">
-                        {o.items.filter(i => i.embroideryText).map((i, idx) => (
-                          <span key={idx} className="inline-flex items-center gap-1 text-xs text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5 mr-2">
-                            ✍️ {i.name} - ריקמה: <strong>{i.embroideryText}</strong>
-                          </span>
-                        ))}
-                      </td>
-                    </tr>
-                  )}
-                </>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <OrdersTab orders={orders} setOrders={setOrders} />
       )}
 
       {activeTab === 'commissions' && (
