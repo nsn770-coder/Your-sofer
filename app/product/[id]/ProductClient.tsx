@@ -263,8 +263,8 @@ function TrustIcons({ hasSofer }: { hasSofer?: boolean }) {
 
 // ─── Trust Block ─────────────────────────────────────────────────────────────
 
-const STAM_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
-const RABBINICAL_CATEGORIES = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
+const STAM_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'בר מצווה'];
+const RABBINICAL_CATEGORIES = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה']);
 
 function TrustBlock({ isStam }: { isStam: boolean }) {
   void isStam;
@@ -456,7 +456,7 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
 // ─── Admin Panel ──────────────────────────────────────────────────────────────
 
 const SOFER_EDIT_CATS = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
-const STAM_ADMIN_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
+const STAM_ADMIN_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה']);
 
 function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onClose }: {
   product: Product;
