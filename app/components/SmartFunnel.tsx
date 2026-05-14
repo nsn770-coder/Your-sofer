@@ -255,8 +255,8 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
             <div style={titleStyle}>מה אתה מחפש?</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <ImageCard
-                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1777032728/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap_xkykpw.jpg"
-                label="צפה במזוזות"
+                img="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778075549/ixuyvcddxmnuyvk8bbgi.jpg"
+                label="צפה בקלף למזוזה"
                 onClick={() => router.push(`/category/${encodeURIComponent('קלפי מזוזה')}`)}
                 height={140}
                 isMobile={isMobile}
