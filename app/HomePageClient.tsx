@@ -930,10 +930,10 @@ export default function HomePageClient() {
       </div>
 
       <div dir="rtl" style={{ padding: '28px 20px 22px', maxWidth: 680, margin: '0 auto', textAlign: 'center', fontFamily: "'Frank Ruhl Libre', serif" }}>
-        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#4B5563', fontWeight: 300 }}>
+        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300 }}>
           יש אנשים שמבינים שהדברים הכי חשובים בחיים — הם דווקא אלה שלא תמיד רואים.
         </p>
-        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#4B5563', fontWeight: 300, marginTop: 12 }}>
+        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300, marginTop: 12 }}>
           מזוזה ותפילין הם לא עוד מוצר.<br/>
           הם הקדושה והברכה שנכנסת לבית שלך, והחיבור השקט שלך לדבר אמיתי וגדול יותר.
         </p>
@@ -1084,17 +1084,17 @@ export default function HomePageClient() {
 
       <div dir="rtl" style={{ padding: '34px 20px', background: '#F5F2EC', margin: '32px 0', fontFamily: "'Frank Ruhl Libre', serif" }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#4B5563', fontWeight: 300 }}>
+          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300 }}>
             כי קל להשקיע במה שמרשים אחרים.
           </p>
-          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#4B5563', fontWeight: 300, marginTop: 12 }}>
+          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300, marginTop: 12 }}>
             אבל אנשים עם יראת שמים אמיתית משקיעים גם בדברים שנמצאים בתוך המזוזה שעל הדלת — אפילו שאף אחד אחר לא יראה אותם לעולם.
           </p>
           <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 500, marginTop: 20 }}>
             אלו אנשים שלא מחפשים "בערך".<br/>
             הם מחפשים אמת, דיוק ואמון.
           </p>
-          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#4B5563', fontWeight: 300, marginTop: 16 }}>
+          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300, marginTop: 16 }}>
             לכן הקמנו את Your Sofer — לאנשים שמבינים את החשיבות של סת״מ מהודר, רוצים לדעת בדיוק:<br/>
             מי כתב את הקלף שלהם, מי בדק אותו, ושרוצים לדעת שיש על מי לסמוך.
           </p>
@@ -1163,10 +1163,10 @@ export default function HomePageClient() {
         <h2 style={{ fontSize: isMobile ? 28 : 32, fontWeight: 600, color: '#1F2937', marginBottom: 16, lineHeight: 1.4, fontFamily: "'Cormorant Garamond', serif" }}>
           הקמנו את Your Sofer.
         </h2>
-        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#4B5563', fontWeight: 300 }}>
+        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300 }}>
           מקום שמאפשר לך לקנות סת״מ בצורה אחרת.
         </p>
-        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#4B5563', fontWeight: 300, marginTop: 14 }}>
+        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300, marginTop: 14 }}>
           לראות את הקלף האמיתי.<br/>
           להכיר את הסופר שכתב אותו.<br/>
           לקבל תיעוד, בדיקה ושקיפות מלאה — ברמה שלא הייתה קיימת עד היום בעולם הסת״מ.
