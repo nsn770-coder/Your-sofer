@@ -1983,17 +1983,17 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         )}
 
         {/* Related products */}
-        {showRelated && (
+        {related.length > 0 && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
             <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Icon.Cart size={18} color="#0f1111" /> משלים את הרכישה שלך
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: isMobile ? 10 : 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: isMobile ? 10 : 14, overflow: 'hidden', width: '100%' }}>
               {related.map(r => {
                 const rImg = optimizeCloudinaryUrl(r.imgUrl || r.image_url || '', 400) || undefined;
                 return (
                   <div key={r.id} onClick={() => router.push(`/product/${r.id}`)}
-                    style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', minWidth: 0 }}
+                    style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%', boxSizing: 'border-box' as const }}
                     onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)')}
                     onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}>
                     <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
@@ -2012,11 +2012,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                       </div>
                     )}
                     <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0, overflow: 'hidden' }}>
-                      <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordBreak: 'break-word', overflowWrap: 'break-word' }}>{r.name}</div>
+                      <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, wordBreak: 'break-word', overflowWrap: 'break-word', maxWidth: '100%' }}>{r.name}</div>
                       <Stars n={r.stars || 4.5} size={11} />
-                      <div style={{ fontSize: 14, fontWeight: 900, color: '#1E3A8A', overflow: 'hidden' }}>{formatPrice(r.price)}</div>
+                      <div style={{ fontSize: 14, fontWeight: 900, color: '#1E3A8A', overflow: 'hidden', maxWidth: '100%' }}>{formatPrice(r.price)}</div>
                       <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 }); }}
-                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1E3A8A', border: 'none', fontWeight: 700, fontSize: 11, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1E3A8A', border: 'none', fontWeight: 700, fontSize: 11, cursor: 'pointer', whiteSpace: 'nowrap', boxSizing: 'border-box' as const, overflow: 'hidden' }}>
                         הוסף לסל
                       </button>
                     </div>
