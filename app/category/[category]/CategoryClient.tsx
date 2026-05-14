@@ -1698,7 +1698,7 @@ export default function CategoryClient({ category }: { category: string }) {
                       soferId={p.soferId}
                       soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                       soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                      stars={p.stars || p.rating || undefined} />
+                      stars={p.stars || undefined} />
                   );
                   const LEVEL_GROUPS = [
                     {
@@ -1786,7 +1786,7 @@ export default function CategoryClient({ category }: { category: string }) {
                         soferId={p.soferId}
                         soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                         soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                        stars={p.stars || p.rating || undefined}
+                        stars={p.stars || undefined}
                       />
                     ))}
                   </div>
@@ -1830,7 +1830,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               soferId={p.soferId}
                               soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                               soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                              stars={p.stars || p.rating || undefined}
+                              stars={p.stars || undefined}
                             />
                           ))}
                         </div>
