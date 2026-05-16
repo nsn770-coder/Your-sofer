@@ -1106,13 +1106,6 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
   return (
     <div dir="rtl" style={{ marginTop: 28 }}>
 
-      {/* Emotional hook */}
-      <div style={{ borderRight: '3px solid #C5A028', paddingRight: 14, marginBottom: 24 }}>
-        <p style={{ fontSize: 14, color: '#555', lineHeight: 1.9, margin: 0, fontStyle: 'italic' }}>
-          {emotionalHook}
-        </p>
-      </div>
-
       {/* Who is this for */}
       <div style={{ marginBottom: 24 }}>
         <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E3A8A', marginBottom: 12, margin: '0 0 12px' }}>למי זה מתאים?</h3>
