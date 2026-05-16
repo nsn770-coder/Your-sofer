@@ -138,7 +138,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
             initials="נ״ב"
             name="הרב ניסים בוארון"
             title='סופר סת"מ מוסמך'
-            description='סופר מוסמך עם שנות ניסיון בכתיבת סת"מ ברמה הגבוהה ביותר'
+            description='סופר סת״מ מומחה מעל 15 שנה ויועץ בתחום. הרב ניסים משמש כשליח חב״ד לנוער בדימונה.'
             badge='סופר מוסמך'
             isMobile={isMobile}
             imageUrl="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_200/v1777926225/FB_IMG_1777926117765_rbw8ny.jpg"

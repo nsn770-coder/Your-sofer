@@ -149,7 +149,8 @@
       "Bash(git show *)",
       "Bash(not exist *)",
       "Bash(Select-String -Path \"C:\\\\Users\\\\Owner\\\\.claude\\\\projects\\\\C--Users-Owner-Downloads-projects-Your-sofer\\\\49dd72c7-005b-4f60-9cdd-ce90cbac093f.jsonl\" -Pattern \"BarMitzvaClient\")",
-      "Bash(Select-Object -Last 5)"
+      "Bash(Select-Object -Last 5)",
+      "Bash(powershell -Command \"\\(Get-Content 'app\\\\product\\\\[id]\\\\ProductClient.tsx'\\) -replace 'value=\\\\{embroideryText\\\\} onChange=\\\\{e => setEmbroideryText\\\\\\(e\\\\.target\\\\.value\\\\\\)\\\\}', 'defaultValue={embroideryText} onBlur={e => setEmbroideryText\\(e.target.value\\)}' | Set-Content 'app\\\\product\\\\[id]\\\\ProductClient.tsx' -Encoding utf8\")"
     ]
   }
 }
