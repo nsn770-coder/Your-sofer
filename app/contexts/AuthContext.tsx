@@ -38,8 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Check for pending redirect result FIRST — catches signInWithRedirect fallback returns
       try {
-        await getRedirectResult(auth);
-        // If a redirect result exists, onAuthStateChanged will fire automatically below
+        const redirectResult = await getRedirectResult(auth);
+        if (redirectResult?.user) {
+          // onAuthStateChanged below will fire with this user and handle Firestore doc creation
+          console.log('[AuthContext] Redirect sign-in result received for:', redirectResult.user.email);
+        }
       } catch (e: any) {
         if (e?.code !== 'auth/null-provider' && e?.code !== 'auth/no-auth-event') {
           console.error('[getRedirectResult]', e);
