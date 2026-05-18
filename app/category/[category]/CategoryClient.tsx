@@ -1118,6 +1118,12 @@ export default function CategoryClient({ category }: { category: string }) {
       return;
     }
 
+    if (category === 'הכל') {
+      const snap = await getDocs(query(collection(db, 'products'), orderBy('priority', 'desc'), limit(2000)));
+      setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true));
+      return;
+    }
+
     if (category === 'מתנות') {
       const MATANOT_CATS = ['מתנות', 'כלי שולחן והגשה', 'עיצוב הבית', 'יודאיקה'];
       const snaps = await Promise.all(
