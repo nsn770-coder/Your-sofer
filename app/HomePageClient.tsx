@@ -727,7 +727,7 @@ export default function HomePageClient() {
                     <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
                     לא נמצאו מוצרים מתאימים לפי הסינון.
                     <br />
-                    <button onClick={() => router.push('/')} style={{ marginTop: 16, background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
+                    <button onClick={() => router.push('/category/הכל')} style={{ marginTop: 16, background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
                   </div>
                 ) : (
                   <>
@@ -1110,7 +1110,7 @@ export default function HomePageClient() {
       {/* ── Shop All CTA ── */}
       <div style={{ background: '#F8F6F1', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
         <a
-          href="/category"
+          href="/category/הכל"
           style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 32px', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}
         >
           לכל המוצרים ←
