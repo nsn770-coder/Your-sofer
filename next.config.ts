@@ -21,27 +21,7 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   async headers() {
-    const csp = [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.google.com https://*.gstatic.com https://www.googletagmanager.com https://www.clarity.ms https://connect.facebook.net",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' data: https://fonts.gstatic.com",
-      "img-src 'self' data: blob: https:",
-      "media-src 'self' blob: https://res.cloudinary.com",
-      "object-src 'none'",
-      "frame-src https://your-sofer.firebaseapp.com https://accounts.google.com https://*.google.com",
-      "frame-ancestors 'self'",
-      "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://your-sofer.firebaseapp.com https://accounts.google.com https://*.google.com https://res.cloudinary.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.clarity.ms https://connect.facebook.net",
-    ].join('; ');
-
     return [
-      {
-        // CSP — applied to all routes
-        source: '/(.*)',
-        headers: [
-          { key: 'Content-Security-Policy', value: csp },
-        ],
-      },
       {
         // Hashed filenames — safe to cache for 1 year
         source: '/_next/static/:path*',
