@@ -36,8 +36,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const auth = await getAuthLazy();
       if (cancelled) return;
 
-      // Process any pending redirect sign-in; onAuthStateChanged fires automatically on success
-      getRedirectResult(auth).catch(() => {});
+      // Check for pending redirect result FIRST — catches signInWithRedirect fallback returns
+      try {
+        await getRedirectResult(auth);
+        // If a redirect result exists, onAuthStateChanged will fire automatically below
+      } catch (e: any) {
+        if (e?.code !== 'auth/null-provider' && e?.code !== 'auth/no-auth-event') {
+          console.error('[getRedirectResult]', e);
+        }
+      }
+
+      if (cancelled) return;
 
       unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
         if (cancelled) return;
@@ -146,13 +155,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signInWithGoogle() {
     try {
-      const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = await import('firebase/auth');
+      const { GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged } = await import('firebase/auth');
       const auth = await getAuthLazy();
       const provider = new GoogleAuthProvider();
       try {
         await signInWithPopup(auth, provider);
+        // Popup resolved — verify auth state updates within 5 seconds.
+        // COOP can allow the popup to close but block the credential from being passed back.
+        await new Promise<void>((resolve) => {
+          if (auth.currentUser) { resolve(); return; }
+          const timer = setTimeout(() => {
+            unsub();
+            // Auth state didn't update after popup — fall back to redirect
+            signInWithRedirect(auth, provider).finally(resolve);
+          }, 5000);
+          const unsub = onAuthStateChanged(auth, (u) => {
+            if (u) { clearTimeout(timer); unsub(); resolve(); }
+          });
+        });
       } catch (popupError: any) {
-        // If popup blocked, fall back to redirect
+        // If popup was blocked, fall back to redirect
         if (
           popupError.code === 'auth/popup-blocked' ||
           popupError.code === 'auth/cancelled-popup-request' ||
