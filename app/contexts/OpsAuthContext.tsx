@@ -103,10 +103,30 @@ export function OpsAuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signInWithGoogle() {
     setAccessDenied(false);
-    const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
-    const auth = await getAuthLazy();
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = await import('firebase/auth');
+      const auth = await getAuthLazy();
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (popupError: any) {
+        // If popup blocked, fall back to redirect
+        if (
+          popupError.code === 'auth/popup-blocked' ||
+          popupError.code === 'auth/cancelled-popup-request' ||
+          popupError.message?.includes('Cross-Origin-Opener-Policy')
+        ) {
+          await signInWithRedirect(auth, provider);
+        } else {
+          throw popupError;
+        }
+      }
+    } catch (err: any) {
+      if (err.code !== 'auth/popup-closed-by-user') {
+        alert('שגיאה בהתחברות עם Google. אנא נסה שנית.');
+        console.error('[signInWithGoogle]', err);
+      }
+    }
   }
 
   async function logout() {
