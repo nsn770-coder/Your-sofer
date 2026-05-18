@@ -809,7 +809,7 @@ export default function HomePageClient() {
             textShadow: '0 2px 8px rgba(0,0,0,0.3)',
             margin: 0,
           }}>
-            לקנות ישירות מסופרי סת"מ
+            לקנות ישירות מסופרי סת"ם
           </h1>
 
           <p style={{
