@@ -29,6 +29,10 @@ export async function GET() {
       const desc: string = d.desc ?? d.description ?? name;
       const badge: string = d.badge ?? '';
 
+      // Skip hidden or inactive/draft products
+      if (d.hidden === true) return;
+      if (d.status === 'inactive' || d.status === 'draft') return;
+
       // Skip products with no name or price
       if (!name || !price) return;
 
@@ -55,11 +59,11 @@ export async function GET() {
         normalizeImg(d.imgUrl4),
       ].filter((u): u is string => u !== null);
 
-      const imageLink = allImages.length >= 2 ? allImages[1] : (allImages[0] ?? '');
-      const additionalImages: string[] =
-        allImages.length >= 2
-          ? [allImages[0], ...allImages.slice(2)]
-          : [];
+      // Skip products with no image
+      if (allImages.length === 0) return;
+
+      const imageLink = allImages[0];
+      const additionalImages: string[] = allImages.slice(1);
 
       items.push(`    <item>
       <g:id>${esc(id)}</g:id>
@@ -69,7 +73,7 @@ export async function GET() {
       ${imageLink ? `<g:image_link>${esc(imageLink)}</g:image_link>` : ''}
       ${additionalImages.map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('\n      ')}
       <g:availability>${esc(availability)}</g:availability>
-      <g:price>${price.toFixed(2)} ILS</g:price>
+      <g:price>${d.was ? (d.was as number).toFixed(2) : price.toFixed(2)} ILS</g:price>
       ${d.was ? `<g:sale_price>${price.toFixed(2)} ILS</g:sale_price>` : ''}
       <g:brand>${esc(brand)}</g:brand>
       <g:condition>${esc(condition)}</g:condition>

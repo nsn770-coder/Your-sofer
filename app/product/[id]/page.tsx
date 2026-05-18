@@ -127,16 +127,13 @@ async function ProductJsonLd({ id }: { id: string }) {
     image: images.length ? images : undefined,
     brand: { '@type': 'Brand', name: 'Your Sofer' },
     ...(product.sofer ? { manufacturer: { '@type': 'Person', name: product.sofer } } : {}),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: product.stars ?? 4.8,
-      reviewCount: product.reviews ?? 1,
-    },
-    review: {
-      '@type': 'Review',
-      reviewRating: { '@type': 'Rating', ratingValue: 5 },
-      author: { '@type': 'Person', name: 'לקוח מרוצה' },
-    },
+    ...(product.reviews && product.reviews > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: product.stars,
+        reviewCount: product.reviews,
+      },
+    } : {}),
     hasMerchantReturnPolicy: {
       '@type': 'MerchantReturnPolicy',
       applicableCountry: 'IL',
