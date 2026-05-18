@@ -809,7 +809,7 @@ export default function HomePageClient() {
             textShadow: '0 2px 8px rgba(0,0,0,0.3)',
             margin: 0,
           }}>
-            היחידים שמראים לך את הסופר
+            לקנות ישירות מסופרי סת"מ
           </h1>
 
           <p style={{
