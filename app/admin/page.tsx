@@ -1738,7 +1738,7 @@ export default function AdminPage() {
     setActionLoading(userId);
     try {
       const _auth = await getAuthLazy();
-      const idToken = await _auth.currentUser?.getIdToken();
+      const idToken = await _auth.currentUser?.getIdToken(true);
       if (!idToken) throw new Error('Not authenticated');
       const res = await fetch('/api/admin/update-role', {
         method: 'POST',
