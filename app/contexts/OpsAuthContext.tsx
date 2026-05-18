@@ -100,10 +100,10 @@ export function OpsAuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signInWithGoogle() {
     setAccessDenied(false);
-    const { GoogleAuthProvider, signInWithRedirect } = await import('firebase/auth');
+    const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
     const auth = await getAuthLazy();
     const provider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, provider);
+    await signInWithPopup(auth, provider);
   }
 
   async function logout() {
