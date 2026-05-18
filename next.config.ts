@@ -23,6 +23,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // COOP/COEP — allows Firebase Auth popup to communicate with opener
+        source: '/(.*)',
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'unsafe-none' },
+        ],
+      },
+      {
         // Hashed filenames — safe to cache for 1 year
         source: '/_next/static/:path*',
         headers: [
