@@ -86,6 +86,7 @@ interface AppUser {
   status: string;
   soferId?: string;
   shaliachId?: string;
+  neverLoggedIn?: boolean;
 }
 
 interface Product {
@@ -1520,9 +1521,30 @@ export default function AdminPage() {
 
   async function loadUsers() {
     try {
-      const snap = await getDocs(collection(db, 'users'));
+      const [usersSnap, soferimSnap] = await Promise.all([
+        getDocs(collection(db, 'users')),
+        getDocs(collection(db, 'soferim')),
+      ]);
       const data: AppUser[] = [];
-      snap.forEach(d => data.push({ id: d.id, ...d.data() } as AppUser));
+      usersSnap.forEach(d => data.push({ id: d.id, ...d.data() } as AppUser));
+      // Add soferim that have no matching users doc (never logged in)
+      const linkedSoferIds = new Set(data.map(u => u.soferId).filter(Boolean));
+      const userEmails = new Set(data.map(u => u.email?.trim().toLowerCase()).filter(Boolean));
+      soferimSnap.forEach(d => {
+        const s = d.data();
+        if (linkedSoferIds.has(d.id)) return;
+        const soferEmail = s.email?.trim().toLowerCase();
+        if (soferEmail && userEmails.has(soferEmail)) return;
+        data.push({
+          id: d.id,
+          email: s.email || '',
+          displayName: s.name || '',
+          role: 'sofer',
+          status: 'active',
+          soferId: d.id,
+          neverLoggedIn: true,
+        });
+      });
       setUsers(data);
     } catch (e) { console.error(e); }
     finally { setUsersLoading(false); }
@@ -1767,6 +1789,8 @@ export default function AdminPage() {
         taxStatus: app.taxStatus || null,
         status: 'active', createdAt: serverTimestamp(),
       });
+      // Store soferId in the application so AuthContext can link on first login
+      await updateDoc(doc(db, 'soferim_applications', app.id), { soferId: soferRef.id });
       // Create a product document for each submitted product
       if (app.products?.length) {
         await Promise.all(app.products.map((p: ProductEntry) =>
@@ -1802,6 +1826,20 @@ export default function AdminPage() {
             taxStatus: app.taxStatus || null,
           });
           setUsers(prev => prev.map(u => u.id === usersSnap.docs[0].id ? { ...u, role: 'sofer', soferId: soferRef.id } : u));
+        } else {
+          // No users doc yet — create one so role='sofer' is set when they first log in
+          const newUserRef = doc(collection(db, 'users'));
+          await setDoc(newUserRef, {
+            email: normalizedEmail,
+            displayName: app.name,
+            role: 'sofer' as UserRole,
+            soferId: soferRef.id,
+            taxStatus: app.taxStatus || null,
+            status: 'active',
+            createdAt: serverTimestamp(),
+          });
+          const newUser: AppUser = { id: newUserRef.id, email: normalizedEmail, displayName: app.name, role: 'sofer', soferId: soferRef.id, status: 'active' };
+          setUsers(prev => [...prev, newUser]);
         }
       }
       setApplications(prev => prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a));
@@ -2585,12 +2623,15 @@ export default function AdminPage() {
                 <thead className="bg-gray-50"><tr><th className="p-3 text-right">משתמש</th><th className="p-3 text-right">אימייל</th><th className="p-3 text-right">תפקיד נוכחי</th><th className="p-3 text-right">שנה תפקיד</th><th className="p-3 text-right">קישור הפניה</th></tr></thead>
                 <tbody>
                   {filteredUsers.map(u => (
-                    <tr key={u.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3 font-bold">{u.displayName || '-'}</td>
+                    <tr key={u.id} className={`border-t hover:bg-gray-50 ${u.neverLoggedIn ? 'bg-yellow-50' : ''}`}>
+                      <td className="p-3 font-bold">
+                        {u.displayName || '-'}
+                        {u.neverLoggedIn && <span className="mr-2 px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">לא התחבר עדיין</span>}
+                      </td>
                       <td className="p-3 text-gray-500 text-xs">{u.email}</td>
                       <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span></td>
                       <td className="p-3">
-                        <select value={u.role} disabled={actionLoading === u.id} onChange={e => changeUserRole(u.id, e.target.value as UserRole)} className="border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer">
+                        <select value={u.role} disabled={actionLoading === u.id || !!u.neverLoggedIn} onChange={e => changeUserRole(u.id, e.target.value as UserRole)} className="border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                           <option value="customer">👤 לקוח</option><option value="sofer">✍️ סופר</option><option value="shaliach">🟦 שליח</option><option value="admin">👑 מנהל</option>
                         </select>
                         {actionLoading === u.id && <span className="text-xs text-gray-400 mr-2">שומר...</span>}

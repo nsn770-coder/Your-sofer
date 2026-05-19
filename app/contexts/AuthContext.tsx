@@ -88,6 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // בדוק אם האימייל אושר כשליח לפני ההרשמה
                 let newRole: UserRole = 'customer';
                 let approvedShaliachId: string | undefined;
+                let approvedSoferId: string | undefined;
                 if (firebaseUser.email) {
                   const appSnap = await getDocs(
                     query(
@@ -106,6 +107,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   }
                 }
 
+                // בדוק אם האימייל אושר כסופר לפני ההרשמה
+                if (firebaseUser.email && newRole === 'customer') {
+                  const soferAppSnap = await getDocs(
+                    query(
+                      collection(db, 'soferim_applications'),
+                      where('email', '==', firebaseUser.email.trim().toLowerCase()),
+                      where('status', '==', 'approved'),
+                    )
+                  );
+                  if (!soferAppSnap.empty) {
+                    const soferAppData = soferAppSnap.docs[0].data();
+                    const approvedSoferDocId: string = soferAppData.soferId || soferAppSnap.docs[0].id;
+                    newRole = 'sofer';
+                    approvedSoferId = approvedSoferDocId;
+                    // קשר את מסמך הסופר ל-uid האמיתי
+                    await updateDoc(doc(db, 'soferim', approvedSoferDocId), { uid: firebaseUser.uid });
+                  }
+                }
+
                 await setDoc(userRef, {
                   email: firebaseUser.email,
                   displayName: firebaseUser.displayName,
@@ -118,10 +138,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     : referredByShaliach
                     ? { shaliachId: referredByShaliach }
                     : {}),
+                  ...(approvedSoferId ? { soferId: approvedSoferId } : {}),
                 });
 
                 role = newRole;
                 shaliachId = approvedShaliachId;
+                soferId = approvedSoferId;
               }
             }
 
