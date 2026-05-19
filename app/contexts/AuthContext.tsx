@@ -118,11 +118,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   );
                   if (!soferAppSnap.empty) {
                     const soferAppData = soferAppSnap.docs[0].data();
-                    const approvedSoferDocId: string = soferAppData.soferId || soferAppSnap.docs[0].id;
+                    // soferAppData.soferId is set for approvals after the back-write fix.
+                    // For older approvals it's missing — fall back to an email lookup in soferim.
+                    let resolvedSoferId: string = soferAppData.soferId || '';
+                    if (!resolvedSoferId) {
+                      const soferimSnap = await getDocs(
+                        query(collection(db, 'soferim'), where('email', '==', firebaseUser.email.trim().toLowerCase()))
+                      );
+                      if (!soferimSnap.empty) resolvedSoferId = soferimSnap.docs[0].id;
+                    }
                     newRole = 'sofer';
-                    approvedSoferId = approvedSoferDocId;
-                    // קשר את מסמך הסופר ל-uid האמיתי
-                    await updateDoc(doc(db, 'soferim', approvedSoferDocId), { uid: firebaseUser.uid });
+                    approvedSoferId = resolvedSoferId || undefined;
+                    // Link soferim doc to real Firebase uid — non-critical, never abort auth if this fails
+                    if (resolvedSoferId) {
+                      try {
+                        await updateDoc(doc(db, 'soferim', resolvedSoferId), { uid: firebaseUser.uid });
+                      } catch {
+                        console.warn('[AuthContext] Could not link uid to soferim doc:', resolvedSoferId);
+                      }
+                    }
                   }
                 }
 
