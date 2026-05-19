@@ -1301,6 +1301,7 @@ export default function AdminPage() {
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
   const [createdProductLinks, setCreatedProductLinks] = useState<Record<string, { id: string; name: string }[]>>({});
   const [users, setUsers] = useState<AppUser[]>([]);
+  const [soferIdsWithProducts, setSoferIdsWithProducts] = useState<Set<string>>(new Set());
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
   const [soferimFull, setSoferimFull] = useState<SoferFull[]>([]);
@@ -1521,9 +1522,10 @@ export default function AdminPage() {
 
   async function loadUsers() {
     try {
-      const [usersSnap, soferimSnap] = await Promise.all([
+      const [usersSnap, soferimSnap, productsSnap] = await Promise.all([
         getDocs(collection(db, 'users')),
         getDocs(collection(db, 'soferim')),
+        getDocs(collection(db, 'products')),
       ]);
       const data: AppUser[] = [];
       usersSnap.forEach(d => data.push({ id: d.id, ...d.data() } as AppUser));
@@ -1545,6 +1547,9 @@ export default function AdminPage() {
           neverLoggedIn: true,
         });
       });
+      const withProducts = new Set<string>();
+      productsSnap.forEach(d => { const sid = d.data().soferId; if (sid) withProducts.add(sid); });
+      setSoferIdsWithProducts(withProducts);
       setUsers(data);
     } catch (e) { console.error(e); }
     finally { setUsersLoading(false); }
@@ -2620,7 +2625,7 @@ export default function AdminPage() {
           : (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50"><tr><th className="p-3 text-right">משתמש</th><th className="p-3 text-right">אימייל</th><th className="p-3 text-right">תפקיד נוכחי</th><th className="p-3 text-right">שנה תפקיד</th><th className="p-3 text-right">קישור הפניה</th></tr></thead>
+                <thead className="bg-gray-50"><tr><th className="p-3 text-right">משתמש</th><th className="p-3 text-right">אימייל</th><th className="p-3 text-right">תפקיד נוכחי</th><th className="p-3 text-right">שנה תפקיד</th><th className="p-3 text-right">קישור הפניה</th><th className="p-3 text-right">חנות</th></tr></thead>
                 <tbody>
                   {filteredUsers.map(u => (
                     <tr key={u.id} className={`border-t hover:bg-gray-50 ${u.neverLoggedIn ? 'bg-yellow-50' : ''}`}>
@@ -2645,6 +2650,18 @@ export default function AdminPage() {
                               {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
                             </button>
                           ) : <span className="text-xs text-gray-400">אין מזהה שליח</span>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        {u.role === 'sofer' && u.soferId && (
+                          soferIdsWithProducts.has(u.soferId) ? (
+                            <span className="inline-flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">פעילה ✓</span>
+                              <a href={`/soferim/${u.soferId}`} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-800 transition" title="פתח חנות">🔗</a>
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-500">לא פתח</span>
+                          )
                         )}
                       </td>
                     </tr>
