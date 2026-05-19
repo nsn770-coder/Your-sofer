@@ -82,7 +82,7 @@ export default function AboutClient() {
               <strong>מייל: </strong>
               <a href="mailto:shop@your-sofer.com" style={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none' }}>shop@your-sofer.com</a>
             </div>
-            <div><strong>כתובת:</strong> פרופ׳ עדיה תנוי 19/2, דימונה</div>
+            <div><strong>כתובת:</strong> פרופ׳ עדה יונת 19/2, דימונה, ישראל</div>
             <div><strong>שעות פעילות:</strong> א׳–ה׳, 09:00–18:00</div>
           </div>
         </div>
