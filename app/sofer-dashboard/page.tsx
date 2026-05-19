@@ -18,6 +18,7 @@ interface Product {
   imgUrl?: string;
   status: string;
   inventoryCount?: number;
+  uploadedBySofer?: boolean;
 }
 
 interface OrderItem {
@@ -502,6 +503,13 @@ export default function SoferDashboard() {
                             </span>
                           </div>
                           <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{p.category}</div>
+                          {p.uploadedBySofer && (
+                            <button
+                              onClick={() => router.push(`/sofer-dashboard/edit-product/${p.id}`)}
+                              style={{ marginTop: 10, width: '100%', background: '#eff6ff', color: '#1e40af', border: '1px solid #bfdbfe', borderRadius: 8, padding: '7px 0', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                              עריכה ✏️
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}

@@ -376,6 +376,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
         imgUrl2: imgUrl2 || null,
         imgUrl3: imgUrl3 || null,
         status: 'active',
+        uploadedBySofer: false,
         createdAt: serverTimestamp(),
       });
       onSave();
@@ -1822,6 +1823,7 @@ export default function AdminPage() {
             days: p.days,
             priority: 0,
             status: 'active',
+            uploadedBySofer: true,
             createdAt: serverTimestamp(),
           })
         ));
