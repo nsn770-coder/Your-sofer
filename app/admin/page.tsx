@@ -1302,6 +1302,7 @@ export default function AdminPage() {
   const [createdProductLinks, setCreatedProductLinks] = useState<Record<string, { id: string; name: string }[]>>({});
   const [users, setUsers] = useState<AppUser[]>([]);
   const [soferIdsWithProducts, setSoferIdsWithProducts] = useState<Set<string>>(new Set());
+  const [soferUidsWithStore, setSoferUidsWithStore] = useState<Set<string>>(new Set());
   const [products, setProducts] = useState<Product[]>([]);
   const [soferim, setSoferim] = useState<Sofer[]>([]);
   const [soferimFull, setSoferimFull] = useState<SoferFull[]>([]);
@@ -1522,10 +1523,11 @@ export default function AdminPage() {
 
   async function loadUsers() {
     try {
-      const [usersSnap, soferimSnap, productsSnap] = await Promise.all([
+      const [usersSnap, soferimSnap, productsSnap, shluchimSnap] = await Promise.all([
         getDocs(collection(db, 'users')),
         getDocs(collection(db, 'soferim')),
         getDocs(collection(db, 'products')),
+        getDocs(query(collection(db, 'shluchim'), where('isPersonalStore', '==', true))),
       ]);
       const data: AppUser[] = [];
       usersSnap.forEach(d => data.push({ id: d.id, ...d.data() } as AppUser));
@@ -1550,6 +1552,9 @@ export default function AdminPage() {
       const withProducts = new Set<string>();
       productsSnap.forEach(d => { const sid = d.data().soferId; if (sid) withProducts.add(sid); });
       setSoferIdsWithProducts(withProducts);
+      const withStore = new Set<string>();
+      shluchimSnap.forEach(d => withStore.add(d.id));
+      setSoferUidsWithStore(withStore);
       setUsers(data);
     } catch (e) { console.error(e); }
     finally { setUsersLoading(false); }
@@ -2655,20 +2660,22 @@ export default function AdminPage() {
                       <td className="p-3">
                         {u.role === 'sofer' && (
                           <div className="flex flex-col gap-1">
-                            {u.soferId && (
-                              soferIdsWithProducts.has(u.soferId)
+                            {soferUidsWithStore.has(u.id)
+                              ? (
+                                <>
+                                  <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 w-fit">פעילה ✓</span>
+                                  <button
+                                    onClick={() => { navigator.clipboard.writeText(`https://your-sofer.com/?ref=${u.id}`); setCopiedUserId(u.id); setTimeout(() => setCopiedUserId(null), 2000); }}
+                                    title={`https://your-sofer.com/?ref=${u.id}`}
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition w-fit"
+                                  >
+                                    {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
+                                  </button>
+                                </>
+                              ) : u.soferId && soferIdsWithProducts.has(u.soferId)
                                 ? <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 w-fit">פעילה ✓</span>
                                 : <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-500 w-fit">לא פתח</span>
-                            )}
-                            {u.shaliachId && (
-                              <button
-                                onClick={() => { navigator.clipboard.writeText(`https://your-sofer.com/?ref=${u.shaliachId}`); setCopiedUserId(u.id); setTimeout(() => setCopiedUserId(null), 2000); }}
-                                title={`https://your-sofer.com/?ref=${u.shaliachId}`}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition w-fit"
-                              >
-                                {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
-                              </button>
-                            )}
+                            }
                           </div>
                         )}
                       </td>
