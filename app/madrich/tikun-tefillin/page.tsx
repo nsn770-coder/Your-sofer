@@ -39,7 +39,7 @@ export default function TikunTefillinPage() {
         <PageHero
           badge="תחזוקה וטיפול"
           title="תיקון ושיקום תפילין"
-          subtitle="מתי כדאי לשפץ ומתי להחליף – המדריך לתחזוקת ציוד הסת"ם שלכם"
+          subtitle="מתי כדאי לשפץ ומתי להחליף - המדריך לתחזוקת ציוד הסת&quot;ם שלכם"
         />
 
         <div style={{ padding: '40px 0' }}>

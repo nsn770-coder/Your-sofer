@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'מחירי סופרי סת"ם – למה יש הבדלים גדולים ואיך להימנע מחובבנים',
+  headline: 'מחירי סופרי סת"ם - למה יש הבדלים גדולים ואיך להימנע מחובבנים',
   description: 'הסבר מקיף על רכיבי מחיר הסת"ם וכיצד לזהות מחיר הוגן.',
   url: `${BASE_URL}/madrich/michrei-soferim`,
   publisher: { '@type': 'Organization', name: 'Your Sofer', url: BASE_URL },
@@ -37,7 +37,7 @@ export default function MichreiSoferimPage() {
       />
       <ArticleLayout>
         <PageHero
-          badge="מחירי סת"ם"
+          badge="מחירי סת&quot;ם"
           title='מחירי סופרי סת"ם'
           subtitle='למה יש הבדלים כה גדולים ואיך להימנע ממחיר זול שמסתיר פשרה'
         />
@@ -55,7 +55,7 @@ export default function MichreiSoferimPage() {
           </h2>
 
           {[
-            { title: 'חומרי הגלם', desc: 'קלף עבודת יד איכותי עולה פי כמה מקלף מכונה פשוט. הדיו, הקולמוס, ואיכות העור – כולם משפיעים על המחיר הסופי.' },
+            { title: 'חומרי הגלם', desc: 'קלף עבודת יד איכותי עולה פי כמה מקלף מכונה פשוט. הדיו, הקולמוס, ואיכות העור - כולם משפיעים על המחיר הסופי.' },
             { title: 'זמן הכתיבה', desc: 'כתיבת מזוזה מהודרת לוקחת בין 3 ל-5 שעות עבודה רצופות בריכוז עילאי. מחיר הוגן לשעת עבודה של איש מקצוע מיומן – לא יכול להיות נמוך.' },
             { title: 'עלויות הגהה', desc: 'כל מוצר חייב לעבור הגהת אדם ובדיקה ממוחשבת. עלות הבדיקות משולבת במחיר המוצר.' },
             { title: 'ניסיון הסופר', desc: 'סופר מומחה בעל שנות ניסיון רבות מייצר יצירת אמנות. הכתב שלו אחיד, מדויק ויפה – ומתומחר בהתאם.' },
@@ -75,8 +75,8 @@ export default function MichreiSoferimPage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, margin: '20px 0 32px' }}>
             {[
-              { title: 'כשר בסיסי', price: '150–250 ש"ח', color: '#0e6ba8', bg: '#e8f4fd', desc: 'עומד בדרישות המינימליות. כשרות בדיעבד. מתאים לתקציב מוגבל.' },
-              { title: 'מהודר', price: '350–600 ש"ח', color: '#1a5c3a', bg: '#f0fff5', desc: 'הידורים מעבר לדין. כתב יפה ואחיד. הבחירה המומלצת לרוב.' },
+              { title: 'כשר בסיסי', price: '150-250 ש"ח', color: '#0e6ba8', bg: '#e8f4fd', desc: 'עומד בדרישות המינימליות. כשרות בדיעבד. מתאים לתקציב מוגבל.' },
+              { title: 'מהודר', price: '350-600 ש"ח', color: '#1a5c3a', bg: '#f0fff5', desc: 'הידורים מעבר לדין. כתב יפה ואחיד. הבחירה המומלצת לרוב.' },
               { title: 'מהודר מאוד', price: '600+ ש"ח', color: '#7c3a00', bg: '#fff8f0', desc: 'רמה עילאית. בדיקות מרובות. למהדרים ולמתנות ייצוגיות.' },
             ].map(c => (
               <div key={c.title} style={{ background: c.bg, border: `1px solid ${c.color}33`, borderRadius: 10, padding: '20px' }}>
