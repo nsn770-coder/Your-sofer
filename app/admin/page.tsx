@@ -2653,15 +2653,23 @@ export default function AdminPage() {
                         )}
                       </td>
                       <td className="p-3">
-                        {u.role === 'sofer' && u.soferId && (
-                          soferIdsWithProducts.has(u.soferId) ? (
-                            <span className="inline-flex items-center gap-1.5">
-                              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">פעילה ✓</span>
-                              <a href={`/soferim/${u.soferId}`} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-800 transition" title="פתח חנות">🔗</a>
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-500">לא פתח</span>
-                          )
+                        {u.role === 'sofer' && (
+                          <div className="flex flex-col gap-1">
+                            {u.soferId && (
+                              soferIdsWithProducts.has(u.soferId)
+                                ? <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 w-fit">פעילה ✓</span>
+                                : <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-500 w-fit">לא פתח</span>
+                            )}
+                            {u.shaliachId && (
+                              <button
+                                onClick={() => { navigator.clipboard.writeText(`https://your-sofer.com/?ref=${u.shaliachId}`); setCopiedUserId(u.id); setTimeout(() => setCopiedUserId(null), 2000); }}
+                                title={`https://your-sofer.com/?ref=${u.shaliachId}`}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition w-fit"
+                              >
+                                {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
+                              </button>
+                            )}
+                          </div>
                         )}
                       </td>
                     </tr>
