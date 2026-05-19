@@ -1717,6 +1717,15 @@ export default function AdminPage() {
     finally { setActionLoading(null); }
   }
 
+  async function approvePendingProduct(productId: string) {
+    setActionLoading(productId + '_status');
+    try {
+      await updateDoc(doc(db, 'products', productId), { status: 'active' });
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, status: 'active' } : p));
+    } catch (e) { console.error(e); alert('שגיאה באישור מוצר'); }
+    finally { setActionLoading(null); }
+  }
+
   async function toggleProductStatus(productId: string, currentStatus: string) {
     setActionLoading(productId + '_status');
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
@@ -2157,7 +2166,16 @@ export default function AdminPage() {
                       <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
                       <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '-'}</td>
                       <td className="p-3 font-bold text-green-700">{formatPrice(p.price)}</td>
-                      <td className="p-3"><button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'} className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>{p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}</button></td>
+                      <td className="p-3">
+                        {p.status === 'pending' ? (
+                          <div className="flex items-center gap-1">
+                            <span className="px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">⏳ ממתין לאישור</span>
+                            <button onClick={() => approvePendingProduct(p.id)} disabled={actionLoading === p.id + '_status'} className="px-2 py-1 rounded-full text-xs font-bold bg-green-600 text-white hover:bg-green-700 disabled:opacity-50">אשר</button>
+                          </div>
+                        ) : (
+                          <button onClick={() => toggleProductStatus(p.id, p.status || 'active')} disabled={actionLoading === p.id + '_status'} className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.status === 'inactive' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>{p.status === 'inactive' ? '● לא פעיל' : '● פעיל'}</button>
+                        )}
+                      </td>
                       <td className="p-3"><select value={p.soferId || ''} disabled={actionLoading === p.id} onChange={e => assignSoferToProduct(p.id, e.target.value)} className={`border rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer ${!p.soferId ? 'border-red-300 text-red-500' : 'border-gray-200 text-gray-700'}`}><option value="">⚠️ ללא סופר</option>{soferim.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></td>
                       <td className="p-3">
                         <input type="number" min={1} max={99} value={p.priority ?? 50}

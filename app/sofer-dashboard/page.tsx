@@ -463,7 +463,7 @@ export default function SoferDashboard() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <div style={{ fontSize: 16, fontWeight: 900, color: '#1a3a2a' }}>המוצרים שלי ({products.length})</div>
-                  <button onClick={() => router.push('/sofer-dashboard/edit')}
+                  <button onClick={() => router.push('/sofer-dashboard/add-product')}
                     style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '10px 18px', fontSize: 14, fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                     ➕ הוסף מוצר חדש
                   </button>
@@ -473,7 +473,7 @@ export default function SoferDashboard() {
                     <div style={{ fontSize: 48, marginBottom: 16 }}>📜</div>
                     <div style={{ fontSize: 18, color: '#555', marginBottom: 8 }}>אין מוצרים עדיין</div>
                     <div style={{ fontSize: 14, color: '#888', marginBottom: 20 }}>העלה את המוצר הראשון שלך ותתחיל למכור!</div>
-                    <button onClick={() => router.push('/sofer-dashboard/edit')}
+                    <button onClick={() => router.push('/sofer-dashboard/add-product')}
                       style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 900, cursor: 'pointer' }}>
                       ➕ העלה מוצר ראשון
                     </button>
