@@ -54,6 +54,43 @@ const ARTICLES = [
     desc: 'תשובות ברורות לשאלות הנפוצות ביותר על מזוזות, בדיקות ורכישה',
     href: '/madrich/faq',
   },
+  {
+    emoji: '📜',
+    title: 'ההבדלים בין נוסחי הסת"ם',
+    desc: 'אשכנזי, ספרדי והאר"י – מה ההבדל ואיזה נוסח מתאים לך',
+    href: '/madrich/nosachim',
+  },
+  {
+    emoji: '📿',
+    title: 'תפילין לבר מצווה',
+    desc: 'המדריך המלא להורים – מה לקנות, מתי, ומה חשוב לבדוק',
+    href: '/madrich/bar-mitzva-tefillin',
+  },
+  {
+    emoji: '📖',
+    title: 'ספר תורה – כל מה שצריך לדעת',
+    desc: 'לפני שמזמינים – תהליך, עלות, ובחירת הסופר הנכון',
+    href: '/madrich/sefer-torah',
+  },
+  {
+    emoji: '🔬',
+    title: 'סודות האותיות והתגים',
+    desc: 'כתרים, שינויי צורה, ולמה כל פרט קטן יכול להפוך אות לפסולה',
+    href: '/madrich/otiyot-vetaguim',
+  },
+  {
+    emoji: '🖐️',
+    title: 'קלף עבודת יד מול קלף מכונה',
+    desc: 'למה הבחירה בחומר הגלם משפיעה על הכשרות ואורך החיים',
+    href: '/madrich/klaf-ivduat-yad',
+  },
+  {
+    emoji: '💬',
+    title: 'שאלות ותשובות מקיף',
+    desc: 'כל מה שרצית לדעת על סת"ם במקום אחד',
+    href: '/madrich/ultimate-faq',
+    badge: 'חדש',
+  },
 ];
 
 export default function MadrichPageClient() {
