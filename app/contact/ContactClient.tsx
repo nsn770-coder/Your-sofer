@@ -55,15 +55,20 @@ export default function ContactPage() {
           <h2 style={{ color: '#1E3A8A', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
-              { icon: '📍', label: 'כתובת', value: 'האורן 18, דימונה' },
-              { icon: '📧', label: 'מייל', value: 'cteend7@gmail.com' },
-              { icon: '🕐', label: 'שעות פעילות', value: 'ימים א\'–ו\', 8:00–22:00' },
-            ].map(({ icon, label, value }) => (
+              { icon: '📍', label: 'כתובת', value: 'פרופ׳ עדיה תנוי 19/2, דימונה' },
+              { icon: '📞', label: 'טלפון', value: '055-272-2228', href: 'tel:0552722228' },
+              { icon: '📧', label: 'מייל', value: 'shop@your-sofer.com', href: 'mailto:shop@your-sofer.com' },
+              { icon: '🕐', label: 'שעות פעילות', value: 'ימים א\'–ה\', 09:00–18:00' },
+            ].map(({ icon, label, value, href }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ fontSize: 20, flexShrink: 0 }}>{icon}</span>
                 <div>
                   <div style={{ fontSize: 12, color: '#888', fontWeight: 600 }}>{label}</div>
-                  <div style={{ fontSize: 15, color: '#1a1a1a', fontWeight: 500 }}>{value}</div>
+                  {href ? (
+                    <a href={href} style={{ fontSize: 15, color: '#1E3A8A', fontWeight: 700, textDecoration: 'none' }}>{value}</a>
+                  ) : (
+                    <div style={{ fontSize: 15, color: '#1a1a1a', fontWeight: 500 }}>{value}</div>
+                  )}
                 </div>
               </div>
             ))}

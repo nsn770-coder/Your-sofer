@@ -69,7 +69,25 @@ export default function AboutClient() {
           </div>
         </div>
 
-        {/* Section 4 — CTA */}
+        {/* Section 4 — Contact */}
+        <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
+          <h2 style={{ color: '#1E3A8A', fontSize: 20, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 15, color: '#444' }}>
+            <div><strong>שם העסק:</strong> YourSofer</div>
+            <div>
+              <strong>טלפון: </strong>
+              <a href="tel:0552722228" style={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none' }}>055-272-2228</a>
+            </div>
+            <div>
+              <strong>מייל: </strong>
+              <a href="mailto:shop@your-sofer.com" style={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none' }}>shop@your-sofer.com</a>
+            </div>
+            <div><strong>כתובת:</strong> פרופ׳ עדיה תנוי 19/2, דימונה</div>
+            <div><strong>שעות פעילות:</strong> א׳–ה׳, 09:00–18:00</div>
+          </div>
+        </div>
+
+        {/* Section 5 — CTA */}
         <div style={{ textAlign: 'center' }}>
           <button
             onClick={() => router.push('/')}
