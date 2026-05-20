@@ -1355,7 +1355,7 @@ export default function ProductClient() {
   }, []);
 
   useEffect(() => {
-    if (!product?.cat?.includes('בר מצ')) return;
+    if (!product?.cat?.includes('בר מצו')) return;
     Promise.all([
       getDocs(query(collection(db, 'products'), where('cat', '==', 'סט טלית תפילין'), limit(100))),
       getDocs(query(collection(db, 'products'), where('category', '==', 'סט טלית תפילין'), limit(100))),
@@ -1560,7 +1560,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       )}
 
       {/* Cover selector — bar mitzvah sets */}
-      {product.cat?.includes('בר מצ') && (
+      {product.cat?.includes('בר מצו') && (
         <div style={{ marginBottom: 12, padding: '10px 12px', background: '#f8f5ef', border: '1px solid #e5d9c3', borderRadius: 10 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 6 }}>כיסוי תפילין בסט:</div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
