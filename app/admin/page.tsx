@@ -20,6 +20,7 @@ interface OrderItem {
   quantity: number;
   embroideryText?: string | null;
   selectedKlafName?: string | null;
+  selectedCover?: { id: string; name: string; imgUrl: string } | null;
 }
 
 interface Order {
@@ -1296,6 +1297,11 @@ function OrdersTab({ orders, setOrders }: { orders: Order[]; setOrders: React.Di
                             {item.selectedKlafName && (
                               <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
                                 📜 קלף: <strong>{item.selectedKlafName}</strong>
+                              </span>
+                            )}
+                            {item.selectedCover && (
+                              <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
+                                כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
                               </span>
                             )}
                           </div>
