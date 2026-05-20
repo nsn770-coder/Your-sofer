@@ -1305,12 +1305,17 @@ export default function CategoryClient({ category }: { category: string }) {
     [allLoaded]
   );
 
-  const recommendedProducts = useMemo(() => {
+  const LEVEL_ORDER = ['כשר לכתחילה', 'מהודר', 'מהודר בתכלית'];
+
+  const recommendedByLevel = useMemo(() => {
     if (!EXPERT_REC_CATS.has(category)) return [];
-    return allLoaded.filter(p => p.isExpertRecommended === true);
+    const recs = allLoaded.filter(p => p.isExpertRecommended === true);
+    return LEVEL_ORDER
+      .map(lvl => ({ level: lvl, products: recs.filter(p => p.level === lvl) }))
+      .filter(g => g.products.length > 0);
   }, [allLoaded, category]);
 
-  const hasExpertRec = recommendedProducts.length > 0;
+  const hasExpertRec = recommendedByLevel.length > 0;
 
   const active      = hasActiveFilters(filters);
   const anyActive   = active || !!collectionFilter;
@@ -1494,39 +1499,42 @@ export default function CategoryClient({ category }: { category: string }) {
           {/* ── Expert Recommended Section — ABOVE sort/filter bar ── */}
           {!loading && hasExpertRec && (
             <div dir="rtl" style={{ marginBottom: 24 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                <span style={{ fontSize: 20 }}>⭐</span>
-                <h2 style={{ fontSize: 17, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>מומלץ על ידי המומחים שלנו</h2>
-              </div>
-              <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
-                {recommendedProducts.map((p, idx) => (
-                  <div key={p.id} style={{ border: '2px solid #1D4ED8', borderRadius: 18, overflow: 'hidden', background: '#EFF4FF' }}>
-                    <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
-                      ⭐ מומלץ על ידי המומחים שלנו
-                    </div>
-                    {isStamCat ? (
-                      <StamCard
-                        product={p}
-                        soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                        soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                        aboveFold={idx < 2}
-                      />
-                    ) : (
-                      <ProductCard
-                        id={p.id} name={p.name} price={p.price}
-                        images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                        priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
-                        was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
-                        hasKlafSelection={p.hasKlafSelection} cat={p.cat}
-                        soferId={p.soferId}
-                        soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                        soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                        stars={p.stars || undefined}
-                      />
-                    )}
+              {recommendedByLevel.map(({ level: lvl, products: recs }) => (
+                <div key={lvl} style={{ marginBottom: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                    <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>⭐ מומלץ לרמת {lvl}</h2>
                   </div>
-                ))}
-              </div>
+                  <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
+                    {recs.map((p, idx) => (
+                      <div key={p.id} style={{ border: '2px solid #1D4ED8', borderRadius: 18, overflow: 'hidden', background: '#EFF4FF' }}>
+                        <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
+                          ⭐ מומלץ לרמת {lvl}
+                        </div>
+                        {isStamCat ? (
+                          <StamCard
+                            product={p}
+                            soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                            soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                            aboveFold={idx < 2}
+                          />
+                        ) : (
+                          <ProductCard
+                            id={p.id} name={p.name} price={p.price}
+                            images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                            priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
+                            was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
+                            hasKlafSelection={p.hasKlafSelection} cat={p.cat}
+                            soferId={p.soferId}
+                            soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                            soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                            stars={p.stars || undefined}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
               <div style={{ textAlign: 'center', marginTop: 20 }}>
                 <button
                   onClick={() => setShowAllProducts(v => !v)}
