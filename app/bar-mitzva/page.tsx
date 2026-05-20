@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function BarMitzvaPage() {
-  redirect('/category/בר מצוה');
+  redirect('/category/בר מצווה');
 }

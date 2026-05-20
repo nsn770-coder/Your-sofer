@@ -97,7 +97,7 @@ const STAM_FILTER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין'
 const SOFER_FETCH_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות', 'בר מצווה']);
 
 // Categories where expert-recommended products feature is active
-const EXPERT_REC_CATS = new Set(['קלפי מזוזה', 'תפילין קומפלט', 'בר מצוה', 'בר מצווה', 'סט בר מצוה', 'סט בר מצווה']);
+const EXPERT_REC_CATS = new Set(['קלפי מזוזה', 'תפילין קומפלט', 'בר מצווה', 'סט בר מצווה']);
 
 // ─── Category-specific name-based filters ────────────────────────────────────
 
