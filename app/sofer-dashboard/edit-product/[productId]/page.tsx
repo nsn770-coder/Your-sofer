@@ -20,12 +20,7 @@ interface ProductDoc {
   level?: string;
   soferId?: string;
   uploadedBySofer?: boolean;
-  cat?: string;
-  category?: string;
-  isExpertRecommended?: boolean;
 }
-
-const EXPERT_REC_CATS_SOFER = ['קלפי מזוזה', 'תפילין קומפלט', 'סט בר מצוה', 'סט בר מצווה'];
 
 const CLOUDINARY_CLOUD  = 'dyxzq3ucy';
 const CLOUDINARY_PRESET = 'yoursofer_upload';
@@ -61,8 +56,6 @@ export default function EditProductPage() {
   const [nusach, setNusach]           = useState('');
   const [size, setSize]               = useState('');
   const [level, setLevel]             = useState('');
-  const [cat, setCat]                 = useState('');
-  const [isExpertRecommended, setIsExpertRecommended] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) router.push('/');
@@ -93,8 +86,6 @@ export default function EditProductPage() {
       setNusach(d.nusach ?? '');
       setSize(d.size ?? '');
       setLevel(d.level ?? '');
-      setCat(d.cat ?? d.category ?? '');
-      setIsExpertRecommended(d.isExpertRecommended ?? false);
     } catch (e) {
       console.error(e);
       setError('שגיאה בטעינת המוצר');
@@ -135,7 +126,6 @@ export default function EditProductPage() {
         nusach,
         size,
         level,
-        isExpertRecommended: EXPERT_REC_CATS_SOFER.includes(cat) ? isExpertRecommended : false,
       });
       setSaved(true);
       setTimeout(() => router.push('/sofer-dashboard'), 1500);
@@ -279,21 +269,6 @@ export default function EditProductPage() {
               </select>
             </div>
           </div>
-
-          {/* Expert recommended checkbox — STaM categories only */}
-          {EXPERT_REC_CATS_SOFER.includes(cat) && (
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: '#EFF4FF', border: '1.5px solid #93C5FD', borderRadius: 10, padding: '12px 14px' }}>
-              <input
-                type="checkbox"
-                checked={isExpertRecommended}
-                onChange={e => setIsExpertRecommended(e.target.checked)}
-                style={{ width: 17, height: 17, cursor: 'pointer', accentColor: '#1E3A8A' }}
-              />
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#1E3A8A' }}>
-                ⭐ המוצר הכי מומלץ על ידי המומחים שלנו
-              </span>
-            </label>
-          )}
 
           {error && (
             <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#991b1b' }}>
