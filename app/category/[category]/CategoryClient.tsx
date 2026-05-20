@@ -1049,6 +1049,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [soferMap, setSoferMap] = useState<Record<string, { name: string; imageUrl?: string }>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { setStamPage } = useChatPersona();
+  const { addItem } = useCart();
   const isStamCat = SOFER_FETCH_CATS.has(category);
   const [showAllProducts, setShowAllProducts] = useState(false);
 

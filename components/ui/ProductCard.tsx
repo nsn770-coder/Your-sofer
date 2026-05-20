@@ -238,18 +238,17 @@ export default function ProductCard({
       className={`group relative flex flex-col cursor-pointer ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''} ${horizontal ? 'pc-horizontal' : ''}`}
       style={{
         background: '#FFFFFF',
-        border: '1px solid #E7E2D8',
-        borderRadius: 16,
+        borderRadius: 0,
         overflow: 'hidden',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
-        transition: 'all 0.2s ease',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
+        transition: 'all 0.25s ease',
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.10)';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 32px rgba(0,0,0,0.11)';
         (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
       }}
       onMouseLeave={e => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.07)';
         (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
       }}
     >
@@ -402,7 +401,7 @@ export default function ProductCard({
           {hasSale && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontSize: 13, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(was!)}</span>
-              <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 11, fontWeight: 700, borderRadius: 6, padding: '2px 6px' }}>
+              <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 11, fontWeight: 700, borderRadius: 0, padding: '2px 6px' }}>
                 חסכת {savePct}%
               </span>
             </div>
@@ -416,19 +415,19 @@ export default function ProductCard({
               onClick={handleAdd}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: '#EEF3FF', color: '#1F3D8F',
-                height: 44, borderRadius: 12, border: '1.5px solid #C5D5F0',
+                background: 'transparent', color: '#1F3D8F',
+                height: 44, borderRadius: 0, border: '1.5px solid #1F3D8F',
                 fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                transition: 'background 0.15s, border-color 0.15s',
+                transition: 'background 0.2s, color 0.2s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#dce8fb'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#2446A6'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#EEF3FF'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5D5F0'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1F3D8F'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1F3D8F'; }}
             >
               <IconCart size={13} />
               הוסף לסל
             </button>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FDF8EC', borderRadius: 12, overflow: 'hidden', width: '100%', height: 44, border: '1.5px solid #E8D48A' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FDF8EC', borderRadius: 0, overflow: 'hidden', width: '100%', height: 44, border: '1.5px solid #E8D48A' }}>
               <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
               <span style={{ color: '#C9A227', fontWeight: 700, fontSize: 15 }}>{qty}</span>
               <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
