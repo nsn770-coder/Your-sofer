@@ -115,6 +115,7 @@ interface Product {
   soferName?: string;
   soferPrice?: number;
   createdAt?: { seconds: number };
+  isExpertRecommended?: boolean;
 }
 
 interface Sofer {
@@ -520,6 +521,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
 
 const STAM_CATS_ADMIN_EDIT = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'תפילין'];
 const LEVEL_CATS_EDIT = STAM_CATS_ADMIN_EDIT;
+const EXPERT_REC_CATS_ADMIN = ['קלפי מזוזה', 'תפילין קומפלט', 'סט בר מצוה', 'סט בר מצווה'];
 
 const TYPE_TO_CAT: Record<string, string> = {
   'קלף מזוזה':  'קלפי מזוזה',
@@ -566,6 +568,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
     if (product.stockVisible !== undefined) return product.stockVisible;
     return !['מגילות', 'ספרי תורה'].includes(product.cat || product.category || '');
   });
+  const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [stockCountInput, setStockCountInput] = useState(
     product.stockCount != null ? String(product.stockCount) : ''
   );
@@ -643,6 +646,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         imgUrl3: imgUrl3 || null,
         stockVisible,
         stockCount: stockCountInput !== '' ? Number(stockCountInput) : null,
+        isExpertRecommended: EXPERT_REC_CATS_ADMIN.includes(cat) ? isExpertRecommended : false,
       });
       onSave();
       onClose();
@@ -741,6 +745,19 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
                 </select>
               </div>
             </div>
+          )}
+          {EXPERT_REC_CATS_ADMIN.includes(cat) && (
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: '#EFF4FF', border: '1.5px solid #93C5FD', borderRadius: 8, padding: '10px 14px' }}>
+              <input
+                type="checkbox"
+                checked={isExpertRecommended}
+                onChange={e => setIsExpertRecommended(e.target.checked)}
+                style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#1E3A8A' }}
+              />
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A' }}>
+                ⭐ המוצר הכי מומלץ על ידי המומחים שלנו
+              </span>
+            </label>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>

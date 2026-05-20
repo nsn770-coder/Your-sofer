@@ -154,7 +154,14 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\" -Recurse -Directory)",
       "Bash(Get-ChildItem *)",
       "Bash(git rm *)",
-      "Bash(firebase *)"
+      "Bash(firebase *)",
+      "Bash(node app/scripts/aiMediaPipeline.mjs --provider=gemini --cat=כיפות)",
+      "Bash(echo \"Pipeline PID: $!\")",
+      "Bash(python -m json.tool)",
+      "Bash(npx puppeteer *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Nissan\\\\your-sofer\" -Recurse -Directory -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Read(//c/Users/Nissan/**)"
     ]
   }
 }

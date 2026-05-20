@@ -47,6 +47,7 @@ interface Product {
   lookTag?: string;
   collection?: string;
   hasKlafSelection?: boolean;
+  isExpertRecommended?: boolean;
 }
 
 interface Curation {
@@ -94,6 +95,9 @@ const STAM_FILTER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין'
 
 // Categories that fetch sofer name+photo for product cards
 const SOFER_FETCH_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות', 'בר מצווה']);
+
+// Categories where expert-recommended products feature is active
+const EXPERT_REC_CATS = new Set(['קלפי מזוזה', 'תפילין קומפלט', 'סט בר מצוה', 'סט בר מצווה']);
 
 // ─── Category-specific name-based filters ────────────────────────────────────
 
@@ -1046,6 +1050,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { setStamPage } = useChatPersona();
   const isStamCat = SOFER_FETCH_CATS.has(category);
+  const [showAllProducts, setShowAllProducts] = useState(false);
 
   useEffect(() => {
     const STAM_CHAT_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
@@ -1300,6 +1305,13 @@ export default function CategoryClient({ category }: { category: string }) {
     [allLoaded]
   );
 
+  const recommendedProducts = useMemo(() => {
+    if (!EXPERT_REC_CATS.has(category)) return [];
+    return allLoaded.filter(p => p.isExpertRecommended === true);
+  }, [allLoaded, category]);
+
+  const hasExpertRec = recommendedProducts.length > 0;
+
   const active      = hasActiveFilters(filters);
   const anyActive   = active || !!collectionFilter;
   const visibleCount = currentPage * PAGE_SIZE;
@@ -1478,6 +1490,60 @@ export default function CategoryClient({ category }: { category: string }) {
 
         {/* Products area */}
         <div className="flex-1 min-w-0">
+
+          {/* ── Expert Recommended Section — ABOVE sort/filter bar ── */}
+          {!loading && hasExpertRec && (
+            <div dir="rtl" style={{ marginBottom: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <span style={{ fontSize: 20 }}>⭐</span>
+                <h2 style={{ fontSize: 17, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>מומלץ על ידי המומחים שלנו</h2>
+              </div>
+              <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
+                {recommendedProducts.map((p, idx) => (
+                  <div key={p.id} style={{ border: '2px solid #1D4ED8', borderRadius: 18, overflow: 'hidden', background: '#EFF4FF' }}>
+                    <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
+                      ⭐ מומלץ על ידי המומחים שלנו
+                    </div>
+                    {isStamCat ? (
+                      <StamCard
+                        product={p}
+                        soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                        soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                        aboveFold={idx < 2}
+                      />
+                    ) : (
+                      <ProductCard
+                        id={p.id} name={p.name} price={p.price}
+                        images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                        priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
+                        was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
+                        hasKlafSelection={p.hasKlafSelection} cat={p.cat}
+                        soferId={p.soferId}
+                        soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                        soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                        stars={p.stars || undefined}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div style={{ textAlign: 'center', marginTop: 20 }}>
+                <button
+                  onClick={() => setShowAllProducts(v => !v)}
+                  style={{
+                    background: showAllProducts ? '#1E3A8A' : '#fff',
+                    color: showAllProducts ? '#fff' : '#1E3A8A',
+                    border: '2px solid #1E3A8A',
+                    borderRadius: 12, padding: '10px 28px',
+                    fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                    fontFamily: 'inherit', direction: 'rtl', transition: 'all 0.2s',
+                  }}
+                >
+                  {showAllProducts ? '↑ הסתר מוצרים' : 'צפה בעוד מוצרים ←'}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Desktop sort + filter bar */}
           <div className="hidden lg:flex items-center gap-2 mb-5 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3" style={{ direction: 'rtl' }}>
@@ -1667,7 +1733,8 @@ export default function CategoryClient({ category }: { category: string }) {
             <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
-          ) : filtered.length === 0 ? (
+          ) : hasExpertRec && !showAllProducts ? null
+          : filtered.length === 0 ? (
             <EmptyState
               active={active}
               onClear={() => setFilters(EMPTY_FILTERS)}
