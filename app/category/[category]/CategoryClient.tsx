@@ -1358,9 +1358,9 @@ export default function CategoryClient({ category }: { category: string }) {
       </div>
 
       {/* ── Header ── */}
-      <div style={{ background: '#FAF8F3', padding: '20px 20px 0' }}>
+      <div style={{ background: '#FAF8F3', padding: '40px 20px 24px' }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#1F2937', margin: 0 }}>
+          <h1 style={{ fontSize: 26, fontWeight: 400, color: '#1F2937', margin: 0, letterSpacing: '-0.01em' }}>
             {category === 'מתנות' ? 'מתנות ומוצרי בית' : category}
           </h1>
           {!loading && (
@@ -1424,7 +1424,7 @@ export default function CategoryClient({ category }: { category: string }) {
         <div dir="rtl" style={{
           background: '#EEF3FF',
           border: '1px solid #C5D5F0',
-          borderRadius: 12,
+          borderRadius: 8,
           margin: '12px 20px',
           padding: '10px 16px',
           display: 'flex', alignItems: 'center', gap: 10,
@@ -1438,7 +1438,7 @@ export default function CategoryClient({ category }: { category: string }) {
             fontSize: 11, color: '#2446A6', fontWeight: 700,
             background: '#fff',
             border: '1px solid #C5D5F0',
-            borderRadius: 20, padding: '3px 10px',
+            borderRadius: 4, padding: '3px 10px',
           }}>
             הרב שמחה בונים ברג'יקובסקי · מגיה מוסמך
           </span>
@@ -1451,7 +1451,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <span style={{ fontSize: 13, color: '#6B7280', flex: 1 }}>{filtered.length} מוצרים</span>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 10, padding: '8px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 8, padding: '8px 14px' }}>
           <IconSort size={13} />
           <select
             value={sortBy}
@@ -1464,7 +1464,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
         <button
           onClick={() => setDrawerOpen(true)}
-          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 10, padding: '8px 14px', fontSize: 13, color: '#1F2937', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
+          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 8, padding: '8px 14px', fontSize: 13, color: '#1F2937', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
         >
           <IconFilter size={14} />
           סינון
@@ -1487,7 +1487,7 @@ export default function CategoryClient({ category }: { category: string }) {
       )}
 
       {/* ── Main layout ── */}
-      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6 items-start">
+      <div className="max-w-7xl mx-auto px-4 py-10 flex gap-6 items-start">
 
         {/* Desktop sidebar */}
         <aside className="hidden lg:block w-60 flex-shrink-0 sticky top-4">
@@ -1508,7 +1508,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
                     {recs.map((p, idx) => (
                       <div key={p.id}
-                        style={{ border: '2px solid #1D4ED8', borderRadius: 18, overflow: 'hidden', background: (category.includes('מצווה') || category.includes('מצוה')) ? '#fff' : '#EFF4FF', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
+                        style={{ border: '2px solid #1D4ED8', borderRadius: 12, overflow: 'hidden', background: (category.includes('מצווה') || category.includes('מצוה')) ? '#fff' : '#EFF4FF', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
                         onClick={() => { if (category.includes('מצווה') || category.includes('מצוה')) window.location.href = `/product/${p.id}`; }}>
 
                         {(category.includes('מצווה') || category.includes('מצוה')) ? (
@@ -1536,7 +1536,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                   <span style={{ fontSize: 13, color: '#666', marginRight: 4 }}>({p.stars})</span>
                                 </div>
                               )}
-                              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a', margin: '0 0 10px', lineHeight: 1.4, textAlign: 'right' }}>
+                              <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a', margin: '0 0 10px', lineHeight: 1.4, textAlign: 'right' }}>
                                 {p.name}
                               </h3>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
@@ -1558,7 +1558,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                   e.stopPropagation();
                                   addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl || p.image_url, quantity: 1 });
                                 }}
-                                style={{ width: '100%', padding: '11px', background: '#C5A028', color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                style={{ width: '100%', padding: '11px', background: '#C5A028', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                                 הוסף לסל 🛒
                               </button>
                             </div>
@@ -1602,7 +1602,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     background: showAllProducts ? '#1E3A8A' : '#fff',
                     color: showAllProducts ? '#fff' : '#1E3A8A',
                     border: '2px solid #1E3A8A',
-                    borderRadius: 12, padding: '10px 28px',
+                    borderRadius: 8, padding: '10px 28px',
                     fontSize: 14, fontWeight: 700, cursor: 'pointer',
                     fontFamily: 'inherit', direction: 'rtl', transition: 'all 0.2s',
                   }}

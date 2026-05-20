@@ -238,7 +238,7 @@ export default function ProductCard({
       className={`group relative flex flex-col cursor-pointer ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''} ${horizontal ? 'pc-horizontal' : ''}`}
       style={{
         background: '#FFFFFF',
-        borderRadius: 0,
+        borderRadius: 12,
         overflow: 'hidden',
         boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
         transition: 'all 0.25s ease',
@@ -358,7 +358,7 @@ export default function ProductCard({
         )}
 
         <p style={{
-          fontSize: 15, fontWeight: 700, color: '#1F2937', lineHeight: 1.4,
+          fontSize: 15, fontWeight: 500, color: '#1F2937', lineHeight: 1.4,
           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
           overflow: 'hidden', marginBottom: 6,
         } as React.CSSProperties}>
@@ -395,7 +395,7 @@ export default function ProductCard({
 
         {/* Price */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ fontSize: 22, fontWeight: 800, color: '#2446A6', lineHeight: 1 }}>
+          <span style={{ fontSize: 22, fontWeight: 600, color: '#1E3A8A', lineHeight: 1 }}>
             {formatPrice(price)}
           </span>
           {hasSale && (
@@ -409,25 +409,25 @@ export default function ProductCard({
         </div>
 
         {/* Cart button */}
-        <div style={{ marginTop: 'auto', paddingTop: 10 }} onClick={e => e.stopPropagation()}>
+        <div className={qty === 0 ? 'lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200' : ''} style={{ marginTop: 'auto', paddingTop: 10 }} onClick={e => e.stopPropagation()}>
           {qty === 0 ? (
             <button
               onClick={handleAdd}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: 'transparent', color: '#1F3D8F',
-                height: 44, borderRadius: 0, border: '1.5px solid #1F3D8F',
+                background: 'transparent', color: '#1E3A8A',
+                height: 44, borderRadius: 8, border: '1.5px solid #1E3A8A',
                 fontWeight: 700, fontSize: 14, cursor: 'pointer',
                 transition: 'background 0.2s, color 0.2s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1F3D8F'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1F3D8F'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1E3A8A'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1E3A8A'; }}
             >
               <IconCart size={13} />
               הוסף לסל
             </button>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FDF8EC', borderRadius: 0, overflow: 'hidden', width: '100%', height: 44, border: '1.5px solid #E8D48A' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FDF8EC', borderRadius: 8, overflow: 'hidden', width: '100%', height: 44, border: '1.5px solid #E8D48A' }}>
               <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
               <span style={{ color: '#C9A227', fontWeight: 700, fontSize: 15 }}>{qty}</span>
               <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
