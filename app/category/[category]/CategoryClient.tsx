@@ -1506,29 +1506,85 @@ export default function CategoryClient({ category }: { category: string }) {
                   </div>
                   <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
                     {recs.map((p, idx) => (
-                      <div key={p.id} style={{ border: '2px solid #1D4ED8', borderRadius: 18, overflow: 'hidden', background: '#EFF4FF' }}>
-                        <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
-                          ⭐ מומלץ לרמת {lvl}
-                        </div>
-                        {isStamCat ? (
-                          <StamCard
-                            product={p}
-                            soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                            soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                            aboveFold={idx < 2}
-                          />
+                      <div key={p.id}
+                        style={{ border: '2px solid #1D4ED8', borderRadius: 18, overflow: 'hidden', background: (category.includes('מצווה') || category.includes('מצוה')) ? '#fff' : '#EFF4FF', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
+                        onClick={() => { if (category.includes('מצווה') || category.includes('מצוה')) window.location.href = `/product/${p.id}`; }}>
+
+                        {(category.includes('מצווה') || category.includes('מצוה')) ? (
+                          <>
+                            {/* Large image */}
+                            <div style={{ width: '100%', aspectRatio: '4/3', overflow: 'hidden', background: '#f5f5f5' }}>
+                              <img
+                                src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 600)}
+                                alt={p.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                loading={idx < 2 ? 'eager' : 'lazy'}
+                              />
+                            </div>
+                            {/* Blue banner */}
+                            <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
+                              ⭐ מומלץ לרמת {lvl}
+                            </div>
+                            {/* Content */}
+                            <div style={{ padding: '14px 16px', direction: 'rtl' }}>
+                              {p.stars && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 8 }}>
+                                  {Array.from({ length: 5 }).map((_, i) => (
+                                    <span key={i} style={{ fontSize: 20, color: i < Math.round(p.stars!) ? '#F59E0B' : '#ddd' }}>★</span>
+                                  ))}
+                                  <span style={{ fontSize: 13, color: '#666', marginRight: 4 }}>({p.stars})</span>
+                                </div>
+                              )}
+                              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a', margin: '0 0 10px', lineHeight: 1.4, textAlign: 'right' }}>
+                                {p.name}
+                              </h3>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A' }}>₪{p.price?.toLocaleString()}</span>
+                                {p.was && p.was > p.price && (
+                                  <>
+                                    <span style={{ fontSize: 13, color: '#999', textDecoration: 'line-through' }}>₪{p.was?.toLocaleString()}</span>
+                                    <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>
+                                      {Math.round((1 - p.price / p.was) * 100)}% הנחה
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                              <div style={{ fontSize: 12, color: '#1E3A8A', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, padding: '6px 10px', marginBottom: 10, textAlign: 'right' }}>
+                                🎒 ניתן לבחור כיסוי תפילין בדף המוצר
+                              </div>
+                              <button
+                                onClick={e => { e.stopPropagation(); window.location.href = `/product/${p.id}`; }}
+                                style={{ width: '100%', padding: '11px', background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                לדף המוצר ←
+                              </button>
+                            </div>
+                          </>
                         ) : (
-                          <ProductCard
-                            id={p.id} name={p.name} price={p.price}
-                            images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                            priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
-                            was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
-                            hasKlafSelection={p.hasKlafSelection} cat={p.cat}
-                            soferId={p.soferId}
-                            soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                            soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                            stars={p.stars || undefined}
-                          />
+                          <>
+                            <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
+                              ⭐ מומלץ לרמת {lvl}
+                            </div>
+                            {isStamCat ? (
+                              <StamCard
+                                product={p}
+                                soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                                soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                                aboveFold={idx < 2}
+                              />
+                            ) : (
+                              <ProductCard
+                                id={p.id} name={p.name} price={p.price}
+                                images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                                priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
+                                was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
+                                hasKlafSelection={p.hasKlafSelection} cat={p.cat}
+                                soferId={p.soferId}
+                                soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                                soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                                stars={p.stars || undefined}
+                              />
+                            )}
+                          </>
                         )}
                       </div>
                     ))}
