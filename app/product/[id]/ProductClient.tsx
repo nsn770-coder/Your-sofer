@@ -1356,7 +1356,7 @@ export default function ProductClient() {
 
   useEffect(() => {
     if (!product?.cat?.includes('בר מצ')) return;
-    getDocs(query(collection(db, 'products'), where('cat', '==', 'כיסויי תפילין'), limit(100)))
+    getDocs(query(collection(db, 'products'), where('cat', '==', 'סט טלית תפילין'), limit(100)))
       .then(snap => setCovers(snap.docs.map(d => ({ id: d.id, ...d.data() } as CoverProduct))))
       .catch(() => {});
   }, [product?.cat]);
