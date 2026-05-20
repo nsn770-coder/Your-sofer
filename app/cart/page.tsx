@@ -147,6 +147,14 @@ export default function CartPage() {
                           {item.embroideryText && (
                             <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ ריקמה: {item.embroideryText}</div>
                           )}
+                          {item.selectedCover && (
+                            <div style={{ fontSize: 11, color: '#5B4B12', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              כיסוי נבחר:
+                              <img src={optimizeCloudinaryUrl(item.selectedCover.imgUrl, 40)} alt={item.selectedCover.name}
+                                style={{ width: 28, height: 28, borderRadius: 3, objectFit: 'cover', border: '1px solid #ddd' }} />
+                              {item.selectedCover.name}
+                            </div>
+                          )}
                             <div style={{ fontSize: 17, fontWeight: 900, color: '#1E3A8A' }}>
                               {formatPrice(item.price * item.quantity)}
                             </div>
@@ -204,9 +212,17 @@ export default function CartPage() {
                             onMouseLeave={e => (e.currentTarget.style.color = '#0f1111')}>
                             {item.name}
                           </div>
-                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText ? 4 : 10 }}>✓ במלאי</div>
+                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText || item.selectedCover ? 4 : 10 }}>✓ במלאי</div>
                           {item.embroideryText && (
                             <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6 }}>✍️ ריקמה: {item.embroideryText}</div>
+                          )}
+                          {item.selectedCover && (
+                            <div style={{ fontSize: 11, color: '#5B4B12', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              כיסוי נבחר:
+                              <img src={optimizeCloudinaryUrl(item.selectedCover.imgUrl, 40)} alt={item.selectedCover.name}
+                                style={{ width: 28, height: 28, borderRadius: 3, objectFit: 'cover', border: '1px solid #ddd' }} />
+                              {item.selectedCover.name}
+                            </div>
                           )}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                             <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 6, overflow: 'hidden' }}>

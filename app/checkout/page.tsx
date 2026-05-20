@@ -207,7 +207,7 @@ export default function CheckoutPage() {
       const orderRef = await addDoc(collection(db, 'orders'), {
         orderNumber, customerName: form.name, email: form.email, phone: form.phone,
         address: `${form.address}, ${form.city}`, notes: form.notes || '',
-        items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null })),
+        items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null })),
         total: finalTotal, couponCode: appliedCoupon?.code || null, couponDiscount: appliedCoupon ? discountAmount : null,
         shippingCost, shippingType: isFreeShipping ? 'free' : shippingOption,
         status: 'pending_payment', createdAt: serverTimestamp(),

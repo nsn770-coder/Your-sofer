@@ -57,6 +57,7 @@ interface Product {
 }
 
 interface KlafItem { id: string; name: string; imageUrl: string; status: string; }
+interface CoverProduct { id: string; name: string; imgUrl?: string; image_url?: string; color?: string; cat?: string; }
 interface ReviewItem {
   id: string; productId: string; productName: string;
   reviewerName: string; stars: number; text: string;
@@ -1228,6 +1229,12 @@ export default function ProductClient() {
   const [saveSuccess, setSaveSuccess]   = useState(false);
   const [selectedKlafIds, setSelectedKlafIds]     = useState<string[]>([]);
   const [selectedKlafNames, setSelectedKlafNames] = useState<string[]>([]);
+  const [selectedCover, setSelectedCover]         = useState<{ id: string; name: string; imgUrl: string } | null>(null);
+  const [showCoverModal, setShowCoverModal]       = useState(false);
+  const [covers, setCovers]                       = useState<CoverProduct[]>([]);
+  const [coverColorFilter, setCoverColorFilter]   = useState('הכל');
+  const [coverPage, setCoverPage]                 = useState(0);
+  const [tempCover, setTempCover]                 = useState<{ id: string; name: string; imgUrl: string } | null>(null);
   const [isMobile, setIsMobile]         = useState(false);
   const [showVideo, setShowVideo]       = useState(false);
   const [activeTab, setActiveTab]       = useState<'details' | 'kashrut' | 'shipping' | 'closeup'>('details');
@@ -1347,6 +1354,13 @@ export default function ProductClient() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (!product?.cat?.includes('בר מצ')) return;
+    getDocs(query(collection(db, 'products'), where('cat', '==', 'כיסויי תפילין'), limit(100)))
+      .then(snap => setCovers(snap.docs.map(d => ({ id: d.id, ...d.data() } as CoverProduct))))
+      .catch(() => {});
+  }, [product?.cat]);
+
   async function handleSaveGlobal(data: Partial<PageDefaults>) {
     try {
       await setDoc(doc(db, 'siteConfig', 'productPageDefaults'), data, { merge: true });
@@ -1433,14 +1447,25 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
     ? TEFILLIN_CERTS
     : null;
 
+  function matchesCoverColor(cover: CoverProduct, filter: string) {
+    if (filter === 'הכל') return true;
+    const text = (cover.color || cover.name || '').toLowerCase();
+    if (filter === 'שחור') return text.includes('שחור') || text.includes('black');
+    if (filter === 'כחול') return text.includes('כחול') || text.includes('blue');
+    if (filter === 'חום')  return text.includes('חום')  || text.includes('brown');
+    if (filter === 'לבן')  return text.includes('לבן')  || text.includes('white');
+    if (filter === 'אחר')  return !['שחור','black','כחול','blue','חום','brown','לבן','white'].some(k => text.includes(k));
+    return true;
+  }
+
   function handleAddToCart() {
     if (selectedKlafIds.length > 0) {
       for (let i = 0; i < selectedKlafIds.length; i++) {
-        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined });
+        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined });
       }
     } else {
       for (let i = 0; i < qty; i++) {
-        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, embroideryText: embroideryText || undefined });
+        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined });
       }
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
@@ -1524,6 +1549,30 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
               תוספת ריקמה: {embroideryText.length} אותיות × ₪5 = ₪{embroideryText.length * 5}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Cover selector — bar mitzvah sets */}
+      {product.cat?.includes('בר מצ') && (
+        <div style={{ marginBottom: 12, padding: '10px 12px', background: '#f8f5ef', border: '1px solid #e5d9c3', borderRadius: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 6 }}>כיסוי תפילין בסט:</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+              {selectedCover ? (
+                <>
+                  <img src={optimizeCloudinaryUrl(selectedCover.imgUrl, 40)} alt={selectedCover.name}
+                    style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', border: '1px solid #ddd', flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedCover.name}</span>
+                </>
+              ) : (
+                <span style={{ fontSize: 12, color: '#888' }}>ברירת מחדל – כיסוי הסט</span>
+              )}
+            </div>
+            <button onClick={() => { setTempCover(selectedCover); setShowCoverModal(true); }}
+              style={{ background: 'none', border: 'none', color: '#1E3A8A', fontSize: 12, fontWeight: 700, cursor: 'pointer', padding: '4px 8px', flexShrink: 0, whiteSpace: 'nowrap' }}>
+              החלף כיסוי ←
+            </button>
+          </div>
         </div>
       )}
 
@@ -2223,6 +2272,94 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
       )}
 
       {product.cat === 'קלפי מזוזה' && <MezuzahUpsellPopup />}
+
+      {/* Cover selector modal */}
+      {showCoverModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          onClick={() => setShowCoverModal(false)}>
+          <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 480, maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', direction: 'rtl' }}
+            onClick={e => e.stopPropagation()}>
+
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #eee' }}>
+              <span style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A' }}>בחר כיסוי לתפילין</span>
+              <button onClick={() => setShowCoverModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon.X size={18} />
+              </button>
+            </div>
+
+            {/* Color chips */}
+            <div style={{ display: 'flex', gap: 6, padding: '10px 16px', flexWrap: 'wrap', borderBottom: '1px solid #eee' }}>
+              {['הכל', 'שחור', 'כחול', 'חום', 'לבן', 'אחר'].map(color => (
+                <button key={color} onClick={() => { setCoverColorFilter(color); setCoverPage(0); }}
+                  style={{ padding: '5px 13px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: coverColorFilter === color ? '#1E3A8A' : '#f0f0f0', color: coverColorFilter === color ? '#fff' : '#333' }}>
+                  {color}
+                </button>
+              ))}
+            </div>
+
+            {/* Grid + pagination */}
+            {(() => {
+              const filtered = covers.filter(c => matchesCoverColor(c, coverColorFilter));
+              const pageSize = 9;
+              const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+              const paginated = filtered.slice(coverPage * pageSize, (coverPage + 1) * pageSize);
+              return (
+                <>
+                  <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
+                    {filtered.length === 0 ? (
+                      <div style={{ textAlign: 'center', color: '#888', padding: '32px 0', fontSize: 14 }}>לא נמצאו כיסויים בצבע זה</div>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                        {paginated.map(cover => {
+                          const imgSrc = cover.imgUrl || cover.image_url || '';
+                          const isSel = tempCover?.id === cover.id;
+                          return (
+                            <div key={cover.id} onClick={() => setTempCover({ id: cover.id, name: cover.name, imgUrl: imgSrc })}
+                              style={{ borderRadius: 10, border: `2px solid ${isSel ? '#C5A028' : '#e0e0e0'}`, overflow: 'hidden', cursor: 'pointer', background: isSel ? '#fffbf0' : '#fff' }}>
+                              <div style={{ aspectRatio: '1', background: '#f7f7f7', overflow: 'hidden' }}>
+                                {imgSrc ? (
+                                  <img src={optimizeCloudinaryUrl(imgSrc, 200)} alt={cover.name}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    onError={e => (e.currentTarget.style.display = 'none')} />
+                                ) : (
+                                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>🎁</div>
+                                )}
+                              </div>
+                              <div style={{ padding: '6px 6px', fontSize: 11, color: '#333', fontWeight: isSel ? 700 : 400, textAlign: 'center', lineHeight: 1.3 }}>{cover.name}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                  {totalPages > 1 && (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderTop: '1px solid #eee' }}>
+                      <button onClick={() => setCoverPage(p => Math.max(0, p - 1))} disabled={coverPage === 0}
+                        style={{ background: 'none', border: 'none', color: coverPage === 0 ? '#ccc' : '#1E3A8A', fontSize: 13, fontWeight: 600, cursor: coverPage === 0 ? 'default' : 'pointer', padding: '4px 8px' }}>הקודם</button>
+                      <span style={{ fontSize: 12, color: '#888' }}>{coverPage + 1} / {totalPages}</span>
+                      <button onClick={() => setCoverPage(p => Math.min(totalPages - 1, p + 1))} disabled={coverPage === totalPages - 1}
+                        style={{ background: 'none', border: 'none', color: coverPage === totalPages - 1 ? '#ccc' : '#1E3A8A', fontSize: 13, fontWeight: 600, cursor: coverPage === totalPages - 1 ? 'default' : 'pointer', padding: '4px 8px' }}>הבא</button>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+
+            {/* Confirm button */}
+            <div style={{ padding: '12px 16px', borderTop: '1px solid #eee' }}>
+              <button
+                onClick={() => {
+                  if (tempCover) setSelectedCover(tempCover);
+                  setShowCoverModal(false);
+                }}
+                style={{ width: '100%', height: 46, background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+                אשר בחירה
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

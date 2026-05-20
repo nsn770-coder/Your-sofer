@@ -11,6 +11,7 @@ interface CartItem {
   selectedKlafId?: string;   // ← חדש: ID של קלף נבחר מ-Google Drive
   selectedKlafName?: string; // ← חדש: שם הקלף לתצוגה
   embroideryText?: string;   // ← טקסט לריקמה אישית
+  selectedCover?: { id: string; name: string; imgUrl: string };
 }
 
 interface CartContextType {
@@ -48,6 +49,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               quantity: x.quantity + 1,
               selectedKlafId: product.selectedKlafId ?? x.selectedKlafId,
               selectedKlafName: product.selectedKlafName ?? x.selectedKlafName,
+              selectedCover: product.selectedCover ?? x.selectedCover,
             }
           : x
         );
