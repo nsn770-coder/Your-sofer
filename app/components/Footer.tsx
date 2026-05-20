@@ -39,7 +39,7 @@ const COLUMNS: Column[] = [
   {
     title: 'מידע',
     links: [
-      { label: 'מדריך לקניית מזוזה', path: '/madrich' },
+      { label: 'מדריך לעולם הסת״ם', path: '/madrich' },
       { label: 'תקנון האתר',          path: '/legal/takanon' },
       { label: 'מדיניות פרטיות',      path: '/legal/privacy' },
       { label: 'משלוחים',              path: '/legal/shipping' },
