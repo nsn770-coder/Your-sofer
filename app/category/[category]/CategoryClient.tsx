@@ -2009,3 +2009,4 @@ export default function CategoryClient({ category }: { category: string }) {
     </div>
   );
 }
+
