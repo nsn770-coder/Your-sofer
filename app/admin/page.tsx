@@ -660,6 +660,8 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const inputStyle: React.CSSProperties = { width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' };
   const labelStyle: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 };
 
+  console.log('[EditProductModal] cat:', cat, 'EXPERT_REC_CATS_ADMIN:', EXPERT_REC_CATS_ADMIN);
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
       onClick={onClose}>
@@ -746,7 +748,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               </div>
             </div>
           )}
-          {EXPERT_REC_CATS_ADMIN.includes(cat) && (
+          {(
             <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: '#EFF4FF', border: '1.5px solid #93C5FD', borderRadius: 8, padding: '10px 14px' }}>
               <input
                 type="checkbox"
