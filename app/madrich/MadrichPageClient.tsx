@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useRouter } from 'next/navigation';
 
 const C = {
@@ -307,70 +307,43 @@ export default function MadrichPageClient() {
       {/* Hero */}
       <div style={{ background: `linear-gradient(135deg, ${C.navy} 0%, #1E40AF 100%)`, padding: '60px 24px 52px', textAlign: 'center', color: '#fff' }}>
         <div style={{ display: 'inline-block', background: C.gold, color: C.navy, fontSize: 12, fontWeight: 800, padding: '4px 14px', borderRadius: 20, marginBottom: 16 }}>
-          מידע חשוב לפני קניית מזוזה
+          מידע חשוב לפני קניית סת״ם
         </div>
-        <h1 style={{ fontSize: 'clamp(26px, 5vw, 42px)', fontWeight: 900, margin: '0 0 16px' }}>מדריך למזוזות</h1>
+        <h1 style={{ fontSize: 'clamp(26px, 5vw, 42px)', fontWeight: 900, margin: '0 0 16px' }}>מדריך לעולם הסת״ם</h1>
         <p style={{ fontSize: 'clamp(15px, 2.5vw, 19px)', color: 'rgba(255,255,255,0.8)', maxWidth: 580, margin: '0 auto 28px', lineHeight: 1.6 }}>
-          לא קונים מזוזה בעיניים עצומות.<br />
+          לא קונים סת״ם בעיניים עצומות.<br />
           כאן תמצאו את כל מה שצריך לדעת לפני שבוחרים.
         </p>
         <button
           onClick={() => router.push('/')}
           style={{ background: C.gold, color: C.navy, border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: 15, fontWeight: 800, cursor: 'pointer' }}
         >
-          ← צפה במזוזות זמינות
+          ← צפה במוצרים זמינים
         </button>
       </div>
 
       {/* Brand Promise */}
       <div style={{ background: '#fdf8ee', borderTop: `3px solid ${C.gold}`, padding: '24px', textAlign: 'center' }}>
         <p style={{ fontSize: 17, fontWeight: 700, color: C.navy, margin: 0 }}>
-          ״שתקבל מזוזה כשרה - ותדע בדיוק מה אתה קונה״
+          ״שתקבל סת״ם כשר - ותדע בדיוק מה אתה קונה״
         </p>
       </div>
 
-      {/* Articles Grid */}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 16px' }}>
+      {/* Articles List */}
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '48px 16px' }}>
         <h2 style={{ fontSize: 22, fontWeight: 900, color: C.navy, marginBottom: 8, textAlign: 'center' }}>מאמרים ומדריכים</h2>
         <p style={{ textAlign: 'center', color: C.muted, fontSize: 15, marginBottom: 36 }}>
           בחרו נושא שמעניין אתכם - כל מאמר נכתב כדי לעזור לכם לקבל החלטה מושכלת
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
-          {ARTICLES.map(a => (
-            <div
+        <div style={{ background: C.white, border: `1px solid ${C.border}` }}>
+          {ARTICLES.map((a, i) => (
+            <ArticleRow
               key={a.href}
+              article={a}
+              isLast={i === ARTICLES.length - 1}
               onClick={() => router.push(a.href)}
-              style={{
-                background: C.white,
-                borderRadius: 12,
-                border: `1px solid ${C.border}`,
-                padding: '28px 24px',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                position: 'relative',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 24px rgba(0,0,0,0.1)';
-                (e.currentTarget as HTMLDivElement).style.borderColor = C.gold;
-                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
-                (e.currentTarget as HTMLDivElement).style.borderColor = C.border;
-                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-              }}
-            >
-              {a.badge && (
-                <span style={{ position: 'absolute', top: 16, left: 16, background: '#e8f4fd', color: '#0e6ba8', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>
-                  {a.badge}
-                </span>
-              )}
-              <div style={{ fontSize: 36, marginBottom: 14 }}>{a.emoji}</div>
-              <h3 style={{ fontSize: 18, fontWeight: 900, color: C.navy, marginBottom: 10 }}>{a.title}</h3>
-              <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.6, marginBottom: 16 }}>{a.desc}</p>
-              <span style={{ color: C.gold, fontWeight: 700, fontSize: 13 }}>קרא עוד →</span>
-            </div>
+            />
           ))}
         </div>
       </div>
@@ -396,18 +369,58 @@ export default function MadrichPageClient() {
       {/* CTA */}
       <div style={{ padding: '48px 24px', textAlign: 'center', background: C.white }}>
         <h3 style={{ fontSize: 22, fontWeight: 900, color: C.navy, marginBottom: 12 }}>מוכנים לבחור?</h3>
-        <p style={{ color: C.muted, fontSize: 15, marginBottom: 24 }}>צפו בגלריית הקלפים הזמינים - עם תמונה אמיתית של כל מזוזה</p>
+        <p style={{ color: C.muted, fontSize: 15, marginBottom: 24 }}>צפו בגלריית הסת״ם הזמינה - עם תמונה אמיתית של כל מוצר</p>
         <button
           onClick={() => router.push('/')}
           style={{ background: C.gold, color: C.navy, border: 'none', borderRadius: 8, padding: '14px 32px', fontSize: 16, fontWeight: 800, cursor: 'pointer' }}
         >
-          לצפייה בכל המזוזות ←
+          לצפייה בכל המוצרים ←
         </button>
       </div>
 
       <div style={{ background: C.navy, padding: '20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>
         © 2025 Your Sofer · your-sofer.com
       </div>
+    </div>
+  );
+}
+
+function ArticleRow({
+  article,
+  isLast,
+  onClick,
+}: {
+  article: { emoji: string; title: string; desc: string; href: string; badge?: string };
+  isLast: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '18px 20px',
+        borderBottom: isLast ? 'none' : `1px solid ${C.border}`,
+        cursor: 'pointer',
+        transition: 'background 0.15s',
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = '#f0f4ff'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>{article.title}</span>
+          {article.badge && (
+            <span style={{ background: '#e8f4fd', color: '#0e6ba8', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 10 }}>
+              {article.badge}
+            </span>
+          )}
+        </div>
+        <div style={{ fontSize: 13, color: C.muted, marginTop: 3, lineHeight: 1.5 }}>{article.desc}</div>
+      </div>
+      <span style={{ color: C.gold, fontWeight: 700, fontSize: 14, flexShrink: 0, marginRight: 16 }}>קרא עוד ←</span>
     </div>
   );
 }
