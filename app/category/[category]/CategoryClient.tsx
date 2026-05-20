@@ -1504,7 +1504,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                     <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>⭐ מומלץ לרמת {lvl}</h2>
                   </div>
-                  <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
+                  <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
                     {recs.map((p, idx) => (
                       <div key={p.id}
                         style={{ border: '2px solid #1D4ED8', borderRadius: 18, overflow: 'hidden', background: (category.includes('מצווה') || category.includes('מצוה')) ? '#fff' : '#EFF4FF', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
@@ -1553,9 +1553,12 @@ export default function CategoryClient({ category }: { category: string }) {
                                 🎒 ניתן לבחור כיסוי תפילין בדף המוצר
                               </div>
                               <button
-                                onClick={e => { e.stopPropagation(); window.location.href = `/product/${p.id}`; }}
-                                style={{ width: '100%', padding: '11px', background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                לדף המוצר ←
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl || p.image_url, quantity: 1 });
+                                }}
+                                style={{ width: '100%', padding: '11px', background: '#C5A028', color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                הוסף לסל 🛒
                               </button>
                             </div>
                           </>
