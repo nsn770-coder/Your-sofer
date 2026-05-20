@@ -48,6 +48,7 @@ interface Product {
   stockCount?: number;
   stockVisible?: boolean;
   hasKlafSelection?: boolean;
+  isExpertRecommended?: boolean;
   priority?: number;
   marketingIntro?: string;
   whoIsItFor?: { emoji: string; text: string }[];
@@ -488,6 +489,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [stockCount, setStockCount]           = useState(String(product.stockCount || ''));
   const [stockVisible, setStockVisible]       = useState(product.stockVisible !== false);
   const [hasKlafSelection, setHasKlafSelection] = useState(product.hasKlafSelection ?? false);
+  const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [priority, setPriority]               = useState(String(product.priority ?? 0));
   const [soferId, setSoferId]                 = useState(product.soferId || '');
   const [soferOptions, setSoferOptions]       = useState<{ id: string; name: string }[]>([]);
@@ -571,6 +573,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         stockCount: stockCount ? Number(stockCount) : undefined,
         stockVisible,
         hasKlafSelection: hasKlafSelection,
+        isExpertRecommended: isExpertRecommended,
         priority: priority !== '' ? Number(priority) : 0,
         soferId: soferId || undefined,
         ...(saveGlobal ? {} : textData),
@@ -731,6 +734,11 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
             <input type="checkbox" checked={hasKlafSelection} onChange={e => setHasKlafSelection(e.target.checked)} />
             אפשר בחירת קלף אישית
             <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>hasKlafSelection</span>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
+            <input type="checkbox" checked={isExpertRecommended} onChange={e => setIsExpertRecommended(e.target.checked)} />
+            ⭐ מומלץ על ידי המומחים שלנו
+            <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>isExpertRecommended</span>
           </label>
           {(SOFER_EDIT_CATS.includes(cat) || !!soferId) && (
             <div>
