@@ -1356,9 +1356,16 @@ export default function ProductClient() {
 
   useEffect(() => {
     if (!product?.cat?.includes('בר מצ')) return;
-    getDocs(query(collection(db, 'products'), where('cat', '==', 'סט טלית תפילין'), limit(100)))
-      .then(snap => setCovers(snap.docs.map(d => ({ id: d.id, ...d.data() } as CoverProduct))))
-      .catch(() => {});
+    Promise.all([
+      getDocs(query(collection(db, 'products'), where('cat', '==', 'סט טלית תפילין'), limit(100))),
+      getDocs(query(collection(db, 'products'), where('category', '==', 'סט טלית תפילין'), limit(100))),
+    ]).then(([snap1, snap2]) => {
+      const seen = new Set<string>();
+      const merged = [...snap1.docs, ...snap2.docs]
+        .filter(d => { if (seen.has(d.id)) return false; seen.add(d.id); return true; })
+        .map(d => ({ id: d.id, ...d.data() } as CoverProduct));
+      setCovers(merged);
+    }).catch(() => {});
   }, [product?.cat]);
 
   async function handleSaveGlobal(data: Partial<PageDefaults>) {
