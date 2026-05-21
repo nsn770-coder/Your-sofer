@@ -3,7 +3,7 @@ import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'fire
 import { db } from '@/app/firebase';
 
 function detectOrderType(items: any[]): 'judaica' | 'stam' | 'mixed' {
-  const STAM_CATEGORIES = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'ספר תורה'];
+  const STAM_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'תפילין', 'מגילות', 'ספרי תורה', 'ספר תורה'];
   let hasStam = false;
   let hasJudaica = false;
 

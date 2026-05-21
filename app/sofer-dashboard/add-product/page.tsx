@@ -23,7 +23,7 @@ const CATEGORIES = [
   'ספרי תורה',
   'מגילות',
   'תפילין קומפלט',
-  'מזוזות',
+  'בתי מזוזה',
 ];
 
 export default function AddProductPage() {

@@ -67,6 +67,11 @@ const nextConfig: NextConfig = {
         destination: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA-%D7%95%D7%97%D7%92%D7%99%D7%9D',
         permanent: true,
       },
+      {
+        source: '/category/%D7%9E%D7%96%D7%95%D7%96%D7%95%D7%AA',
+        destination: '/category/%D7%91%D7%AA%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94',
+        permanent: true,
+      },
     ];
   },
 };

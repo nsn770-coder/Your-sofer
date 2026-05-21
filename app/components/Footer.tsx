@@ -14,7 +14,7 @@ const COLUMNS: Column[] = [
       { label: 'קלפי מזוזה',    path: `/category/${encodeURIComponent('קלפי מזוזה')}` },
       { label: 'תפילין קומפלט', path: `/category/${encodeURIComponent('תפילין קומפלט')}` },
       { label: 'סט בר מצווה',   path: '/bar-mitzva' },
-      { label: 'בתי מזוזה',     path: `/category/${encodeURIComponent('מזוזות')}` },
+      { label: 'בתי מזוזה',     path: `/category/${encodeURIComponent('בתי מזוזה')}` },
       { label: 'יודאיקה',       path: `/category/${encodeURIComponent('יודאיקה')}` },
     ],
   },

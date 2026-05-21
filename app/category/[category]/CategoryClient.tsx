@@ -108,7 +108,7 @@ interface NameFilterSpec {
 }
 
 const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
-  'מזוזות': [
+  'בתי מזוזה': [
     { key: 'חומר', label: 'חומר', options: ['אלומיניום', 'עץ', 'כסף', 'פלסטיק', 'מתכת', 'זכוכית', 'קרמיקה', 'פולימר', 'בטון וסמנט', 'שיש'] },
     { key: 'גודל', label: 'גודל', options: ['7 ס"מ', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ', '25 ס"מ', '30 ס"מ'] },
     { key: 'צבע',  label: 'צבע',  options: ['לבן', 'כסף', 'זהב', 'שחור', 'חום', 'צבעוני'] },
@@ -397,7 +397,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 // ─── Category scroll bar ─────────────────────────────────────────────────────
 
 const CAT_SCROLL_ITEMS: { label: string; href?: string; imgKey?: string }[] = [
-  { label: 'מזוזות' },
+  { label: 'בתי מזוזה' },
   { label: 'קלפי מזוזה' },
   { label: 'קלפי תפילין' },
   { label: 'תפילין קומפלט' },
@@ -1819,7 +1819,7 @@ export default function CategoryClient({ category }: { category: string }) {
             />
           ) : (
             <>
-              {(['מזוזות', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
+              {(['בתי מזוזה', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
                 (() => {
                   const gridCls = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
                   const renderCard = (p: Product, idx: number) => isStamCat ? (
