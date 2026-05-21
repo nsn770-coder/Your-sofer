@@ -1174,9 +1174,11 @@ export default function CategoryClient({ category }: { category: string }) {
           const map: Record<string, string> = {};
           snap.forEach(d => {
             const r = d.data();
-            const key = (d.id || r.slug || r.name || '') as string;
             const img = (r.imageUrl || r.imgUrl || '') as string;
-            if (key) map[key] = img;
+            if (!img) return;
+            if (d.id) map[d.id] = img;
+            if (r.slug) map[r.slug as string] = img;
+            if (r.name) map[r.name as string] = img;
           });
           setCatImages(map);
         }
