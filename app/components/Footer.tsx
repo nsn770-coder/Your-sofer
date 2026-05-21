@@ -198,10 +198,14 @@ export default function Footer() {
           fontSize: 12,
           color: 'rgba(255,255,255,0.4)',
         }}>
+          <div style={{ marginBottom: 6, fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+            Your Sofer מופעל על ידי סודות התורה ע״ר
+          </div>
           <div style={{ marginBottom: 10, fontSize: 12, color: 'rgba(255,255,255,0.45)', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px' }}>
-            <span>📍 פרופ׳ עדיה תנוי 19/2, דימונה</span>
-            <a href="tel:0552722228" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📞 055-272-2228</a>
-            <a href="mailto:shop@your-sofer.com" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>✉️ shop@your-sofer.com</a>
+            <span>📍 רחוב האורן 18, דימונה</span>
+            <a href="tel:0584877770" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📞 058-4877-770</a>
+            <a href="https://wa.me/972552722228" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>💬 055-272-2228</a>
+            <a href="mailto:support@your-sofer.com" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>✉️ support@your-sofer.com</a>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
             <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/visa.svg" alt="Visa" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />

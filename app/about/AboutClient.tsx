@@ -73,16 +73,20 @@ export default function AboutClient() {
         <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
           <h2 style={{ color: '#1E3A8A', fontSize: 20, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 15, color: '#444' }}>
-            <div><strong>שם העסק:</strong> YourSofer</div>
+            <div><strong>שם העסק:</strong> Your Sofer — חנות אונליין לרכישת מוצרי סת״מ ויודאיקה, המופעלת על ידי <strong>סודות התורה ע״ר</strong></div>
             <div>
-              <strong>טלפון: </strong>
-              <a href="tel:0552722228" style={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none' }}>055-272-2228</a>
+              <strong>טלפון ראשי: </strong>
+              <a href="tel:0584877770" style={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none' }}>058-4877-770</a>
+            </div>
+            <div>
+              <strong>וואטסאפ שירות לקוחות: </strong>
+              <a href="https://wa.me/972552722228" style={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none' }}>055-272-2228</a>
             </div>
             <div>
               <strong>מייל: </strong>
-              <a href="mailto:shop@your-sofer.com" style={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none' }}>shop@your-sofer.com</a>
+              <a href="mailto:support@your-sofer.com" style={{ color: '#1E3A8A', fontWeight: 700, textDecoration: 'none' }}>support@your-sofer.com</a>
             </div>
-            <div><strong>כתובת:</strong> פרופ׳ עדה יונת 19/2, דימונה, ישראל</div>
+            <div><strong>כתובת:</strong> רחוב האורן 18, דימונה, ישראל (בית חב״ד לנוער דימונה)</div>
             <div><strong>שעות פעילות:</strong> א׳–ה׳, 09:00–18:00</div>
           </div>
         </div>

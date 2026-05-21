@@ -53,11 +53,15 @@ export default function ContactPage() {
         {/* Contact details */}
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '28px', marginBottom: 24 }}>
           <h2 style={{ color: '#1E3A8A', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
+          <div style={{ background: 'rgba(30,58,138,0.05)', border: '1px solid rgba(30,58,138,0.15)', borderRadius: 6, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#1E3A8A' }}>
+            Your Sofer היא חנות אונליין לרכישת מוצרי סת״מ ויודאיקה, המופעלת על ידי <strong>סודות התורה ע״ר</strong>.
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[
-              { icon: '📍', label: 'כתובת', value: 'פרופ׳ עדיה תנוי 19/2, דימונה' },
-              { icon: '📞', label: 'טלפון', value: '055-272-2228', href: 'tel:0552722228' },
-              { icon: '📧', label: 'מייל', value: 'shop@your-sofer.com', href: 'mailto:shop@your-sofer.com' },
+              { icon: '📍', label: 'כתובת', value: 'רחוב האורן 18, דימונה, ישראל' },
+              { icon: '📞', label: 'טלפון ראשי', value: '058-4877-770', href: 'tel:0584877770' },
+              { icon: '💬', label: 'וואטסאפ שירות לקוחות', value: '055-272-2228', href: 'https://wa.me/972552722228' },
+              { icon: '📧', label: 'מייל', value: 'support@your-sofer.com', href: 'mailto:support@your-sofer.com' },
               { icon: '🕐', label: 'שעות פעילות', value: 'ימים א\'–ה\', 09:00–18:00' },
             ].map(({ icon, label, value, href }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
