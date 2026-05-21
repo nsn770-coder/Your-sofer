@@ -21,7 +21,7 @@ const FAQS = [
   },
   {
     q: 'יש לכם חנות פיזית?',
-    a: 'אין חנות פיזית פתוחה לקהל הרחב, אך ניתן לתאם פגישה אישית בדימונה. צרו קשר בטלפון 055-272-2228 או באימייל nsn770@gmail.com.',
+    a: 'אין חנות פיזית פתוחה לקהל הרחב, אך ניתן לתאם פגישה אישית בדימונה. צרו קשר בטלפון 058-4877-770, וואטסאפ 055-272-2228 או באימייל support@your-sofer.com.',
   },
   {
     q: 'האם ניתן לבקש כתיבה מותאמת אישית?',
@@ -41,7 +41,7 @@ const FAQS = [
   },
   {
     q: 'כיצד יוצרים קשר?',
-    a: 'טלפון: 055-272-2228\nאימייל: nsn770@gmail.com\nימים א׳–ה׳, 9:00–18:00',
+    a: 'טלפון: 058-4877-770\nוואטסאפ: 055-272-2228\nאימייל: support@your-sofer.com\nימים א׳–ה׳, 9:00–18:00',
   },
 ];
 
@@ -81,7 +81,7 @@ export default function FaqPage() {
           <div style={{ marginTop: 32, padding: '18px 20px', background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 10 }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: '#1E3A8A', margin: '0 0 6px' }}>לא מצאת תשובה?</p>
             <p style={{ fontSize: 13, color: '#555', margin: 0 }}>
-              טלפון: 055-272-2228 | אימייל: nsn770@gmail.com
+              טלפון: 058-4877-770 | וואטסאפ: 055-272-2228 | אימייל: support@your-sofer.com
             </p>
           </div>
         </div>
