@@ -13,6 +13,45 @@ function esc(s: string) {
     .replace(/"/g, '&quot;');
 }
 
+// Apparel categories that require color, gender, age_group
+const APPAREL_CATS = new Set([
+  'כיפות',
+  'טליתות וציציות',
+  'סט טלית תפילין',
+]);
+
+const COLOR_MAP: Record<string, string> = {
+  'שחור': 'Black',
+  'לבן': 'White',
+  'כחול': 'Blue',
+  'אדום': 'Red',
+  'חום': 'Brown',
+  'אפור': 'Gray',
+  'זהב': 'Gold',
+  'כסף': 'Silver',
+  'ירוק': 'Green',
+  'סגול': 'Purple',
+  'צבעוני': 'Multicolor',
+  'בורדו': 'Burgundy',
+  'בז': 'Beige',
+  'נייבי': 'Navy',
+};
+
+function resolveColor(d: Record<string, unknown>): string {
+  if (d.color && typeof d.color === 'string' && (d.color as string).trim()) {
+    return (d.color as string).trim();
+  }
+  const name = ((d.name ?? d.title ?? '') as string).toLowerCase();
+  for (const [heb, eng] of Object.entries(COLOR_MAP)) {
+    if (name.includes(heb)) return eng;
+  }
+  return 'Multicolor';
+}
+
+function getGender(_cat: string): string {
+  return 'male';
+}
+
 export async function GET() {
   try {
     const db = getAdminDb();
@@ -81,9 +120,9 @@ export async function GET() {
       ${googleProductCategory ? `<g:google_product_category>${esc(googleProductCategory)}</g:google_product_category>` : ''}
       ${cat ? `<g:product_type>${esc(cat)}</g:product_type>` : ''}
       ${material ? `<g:material>${esc(material)}</g:material>` : ''}
-      ${color ? `<g:color>${esc(color)}</g:color>` : ''}
-      ${cat === 'כיפות' ? `<g:gender>male</g:gender>` : ''}
-      ${cat === 'כיפות' ? `<g:age_group>adult</g:age_group>` : ''}
+      ${APPAREL_CATS.has(cat) ? `<g:color>${esc(resolveColor(d))}</g:color>` : (color ? `<g:color>${esc(color)}</g:color>` : '')}
+      ${APPAREL_CATS.has(cat) ? `<g:gender>${getGender(cat)}</g:gender>` : ''}
+      ${APPAREL_CATS.has(cat) ? `<g:age_group>adult</g:age_group>` : ''}
       ${badge ? `<g:custom_label_0>${esc(badge)}</g:custom_label_0>` : ''}
       <g:shipping>
         <g:country>IL</g:country>
