@@ -486,21 +486,18 @@ export default function HomePageClient() {
   useEffect(() => {
     async function fetchSoferim() {
       try {
-        const { collection: col, getDocs: get } = await import('firebase/firestore');
-        const { db: firestore } = await import('./firebase');
-        const snap = await get(col(firestore, 'soferim'));
-        console.log('SOFERIM DEBUG - total docs:', snap.size);
+        const snap = await getDocs(collection(db, 'soferim'));
+        console.log('[soferim] total docs:', snap.size);
         const list: Sofer[] = [];
         snap.forEach((d) => {
           const data = d.data();
-          console.log('SOFER:', d.id, Object.keys(data));
-          const img = (data.profileImage || data.imgUrl || data.image || data.photoURL || data.photo || '') as string;
+          const img = (data.imageUrl || data.profileImage || data.imgUrl || data.image || data.photoURL || data.photo || '') as string;
           if (img) list.push({ id: d.id, name: (data.name || '') as string, profileImage: img });
         });
-        console.log('SOFERIM with image:', list.length);
+        console.log('[soferim] with image:', list.length, list.map(s => s.name));
         setSoferimList(list);
       } catch(e) {
-        console.error('SOFERIM ERROR:', e);
+        console.error('[soferim] fetch error:', e);
       }
     }
     fetchSoferim();
