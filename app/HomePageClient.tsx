@@ -486,13 +486,15 @@ export default function HomePageClient() {
   useEffect(() => {
     const timer = setTimeout(async () => {
       try {
-        const snap = await getDocs(query(collection(db, 'soferim'), limit(20)));
+        const snap = await getDocs(query(collection(db, 'soferim'), limit(50)));
+        console.log('[soferim] total fetched:', snap.size);
         const list: Sofer[] = [];
         snap.forEach(d => {
           const data = d.data();
-          const img = (data.profileImage || data.imgUrl || '') as string;
-          if (img) list.push({ id: d.id, name: (data.name || '') as string, profileImage: data.profileImage, imgUrl: data.imgUrl });
+          const img = (data.profileImage || data.imgUrl || data.image || data.photoURL || data.photo || '') as string;
+          if (img) list.push({ id: d.id, name: (data.name || '') as string, profileImage: img });
         });
+        console.log('[soferim] passed filter (has image):', list.length);
         setSoferimList(list);
       } catch { /* non-fatal */ }
     }, 600);
@@ -903,7 +905,7 @@ export default function HomePageClient() {
             style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 20px 8px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
           >
             {soferimList.map(sofer => {
-              const img = optimizeCloudinaryUrl(sofer.profileImage || sofer.imgUrl || '', 200);
+              const img = optimizeCloudinaryUrl(sofer.profileImage || '', 200);
               return (
                 <a key={sofer.id} href={`/soferim/${sofer.id}`} style={{ textDecoration: 'none', flexShrink: 0, display: 'block' }}>
                   <div style={{ width: 112, height: 112, borderRadius: 0, overflow: 'hidden', position: 'relative', boxShadow: '0 2px 10px rgba(0,0,0,0.10)' }}>
