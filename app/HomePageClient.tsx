@@ -14,8 +14,6 @@ import HeroSwiper from './components/HeroSwiper';
 import ProductCard from '@/components/ui/ProductCard';
 const RabbinicalSupervision = dynamic(() => import('./components/RabbinicalSupervision'), { ssr: false, loading: () => <div style={{ height: 420 }} /> });
 
-const SmartFunnel        = dynamic(() => import('./components/SmartFunnel'),            { ssr: false, loading: () => <div style={{ height: 400 }} /> });
-
 const NewsletterPopup   = dynamic(() => import('./components/NewsletterPopup'),       { ssr: false, loading: () => <div className="hidden" /> });
 const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => <div style={{ height: 450 }} /> });
 import { useShaliach } from './contexts/ShaliachContext';
@@ -99,6 +97,13 @@ function IconCounterStar({ isMobile }: { isMobile: boolean }) {
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+
+interface Sofer {
+  id: string;
+  name: string;
+  profileImage?: string;
+  imgUrl?: string;
+}
 
 interface Testimonial {
   id: string;
@@ -332,6 +337,7 @@ export default function HomePageClient() {
   const [wizardKashrut, setWizardKashrut] = useState<'regular' | 'mehudar' | 'mehudar_plus' | null>(null);
   const [wizardResults, setWizardResults] = useState<Product[]>([]);
   const [wizardLoading, setWizardLoading] = useState(false);
+  const [soferimList, setSoferimList]           = useState<Sofer[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [testimonials, setTestimonials]         = useState<Testimonial[]>([]);
   const [newsletterEmail, setNewsletterEmail]   = useState('');
@@ -474,6 +480,22 @@ export default function HomePageClient() {
     }
     // Below the fold - defer so it doesn't compete with LCP
     const timer = setTimeout(fetchTestimonials, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      try {
+        const snap = await getDocs(query(collection(db, 'soferim'), limit(20)));
+        const list: Sofer[] = [];
+        snap.forEach(d => {
+          const data = d.data();
+          const img = (data.profileImage || data.imgUrl || '') as string;
+          if (img) list.push({ id: d.id, name: (data.name || '') as string, profileImage: data.profileImage, imgUrl: data.imgUrl });
+        });
+        setSoferimList(list);
+      } catch { /* non-fatal */ }
+    }, 600);
     return () => clearTimeout(timer);
   }, []);
 
@@ -644,6 +666,7 @@ export default function HomePageClient() {
           font-family: inherit;
         }
         .ys-hero-btn-secondary:hover { background: rgba(255,255,255,0.12); }
+        .ys-hscroll::-webkit-scrollbar { display: none; }
         .ys-outline-btn {
           display: inline-flex; align-items: center; justify-content: center;
           background: #FFFFFF; color: #2446A6;
@@ -869,13 +892,42 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── Smart Funnel ── */}
-      <div style={{ background: '#F8F6F1', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
-        <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '10px 0 6px', fontWeight: 500 }}>
-          בחר מה אתה מחפש - נמצא לך את המתאים ביותר
-        </p>
-        <SmartFunnel isMobile={isMobile} />
-      </div>
+      {/* ── Soferim horizontal row ── */}
+      {soferimList.length > 0 && (
+        <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 0 16px' : '40px 0 24px', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 16 }}>
+            <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הסופרים שלנו</h2>
+          </div>
+          <div
+            className="ys-hscroll"
+            style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 20px 8px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
+          >
+            {soferimList.map(sofer => {
+              const img = optimizeCloudinaryUrl(sofer.profileImage || sofer.imgUrl || '', 200);
+              return (
+                <a key={sofer.id} href={`/soferim/${sofer.id}`} style={{ textDecoration: 'none', flexShrink: 0, display: 'block' }}>
+                  <div style={{ width: 112, height: 112, borderRadius: 0, overflow: 'hidden', position: 'relative', boxShadow: '0 2px 10px rgba(0,0,0,0.10)' }}>
+                    <Image
+                      fill
+                      unoptimized
+                      loading="lazy"
+                      src={img}
+                      alt={sofer.name}
+                      style={{ objectFit: 'cover' }}
+                      sizes="112px"
+                    />
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)', padding: '20px 6px 7px' }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#fff', margin: 0, textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {sofer.name}
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Live Activity Bar - isolated component, re-renders independently ── */}
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
