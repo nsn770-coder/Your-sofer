@@ -181,32 +181,11 @@ async function ProductJsonLd({ id }: { id: string }) {
     shippingDetails: [
       {
         '@type': 'OfferShippingDetails',
-        shippingRate: { '@type': 'MonetaryAmount', value: '25', currency: 'ILS' },
+        shippingRate: { '@type': 'MonetaryAmount', value: '30', currency: 'ILS' },
         deliveryTime: {
           '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-          transitTime:  { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7, unitCode: 'DAY' },
-        },
-        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IL' },
-      },
-      {
-        '@type': 'OfferShippingDetails',
-        shippingRate: { '@type': 'MonetaryAmount', value: '45', currency: 'ILS' },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-          transitTime:  { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
-        },
-        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IL' },
-      },
-      {
-        '@type': 'OfferShippingDetails',
-        shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'ILS' },
-        shippingRateQualifier: 'משלוח חינם על הזמנות מעל 350 ₪',
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-          transitTime:  { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7, unitCode: 'DAY' },
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+          transitTime:  { '@type': 'QuantitativeValue', minValue: 5, maxValue: 8, unitCode: 'DAY' },
         },
         shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IL' },
       },

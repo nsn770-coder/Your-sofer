@@ -473,7 +473,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [price, setPrice]                     = useState(String(product.price));
   const [was, setWas]                         = useState(String(product.was || ''));
   const [cat, setCat]                         = useState(product.cat || '');
-  const [days, setDays]                       = useState(product.days || '7-14');
+  const [days, setDays]                       = useState(product.days || '7-10');
   const [size, setSize]                       = useState(product.size || '');
   const [badge, setBadge]                     = useState(product.badge || '');
   const [desc, setDesc]                       = useState(product.desc || product.description || '');
@@ -1102,13 +1102,13 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
     ? [
         { q: 'האם זה מוצר איכותי?', a: 'כן. כל מוצר עובר בדיקת מחשב ופיקוח מגיה מוסמך, ומגיע עם תעודת כשרות. אנחנו לא שולחים מוצרים שלא עברו בדיקה מלאה.' },
         { q: 'האם זה מתאים כמתנה?', a: 'בהחלט. המוצר מגיע באריזה מהודרת שמרגישה כמו מתנה. ניתן לציין בהזמנה שמדובר במתנה ונדאג לפרטים.' },
-        { q: 'מה זמן האספקה?', a: `${product.days || '7–14'} ימי עסקים ברחבי הארץ. לאחר אישור ההזמנה נשלח עדכון עם מספר מעקב.` },
+        { q: 'מה זמן האספקה?', a: `${product.days || '7-10'} ימי עסקים ברחבי הארץ. לאחר אישור ההזמנה נשלח עדכון עם מספר מעקב.` },
         { q: 'האם ניתן להחזיר?', a: 'כן, ניתן להחזיר תוך 14 יום ממועד קבלת המוצר ובלבד שלא נעשה שימוש. ההחזר מלא ומיידי.' },
       ]
     : [
         { q: 'האם זה מוצר איכותי?', a: 'כן. כל פריט נבחר בקפידה ועובר בקרת איכות לפני משלוח. אנחנו מציגים צילומים אמיתיים כדי שתדע בדיוק מה אתה מקבל.' },
         { q: 'האם זה מתאים כמתנה?', a: 'בהחלט. המוצר מגיע באריזה מהודרת שמרגישה כמו מתנה. ניתן לציין בהזמנה שמדובר במתנה ונדאג לפרטים.' },
-        { q: 'מה זמן האספקה?', a: `${product.days || '7–14'} ימי עסקים ברחבי הארץ. לאחר אישור ההזמנה נשלח עדכון עם מספר מעקב.` },
+        { q: 'מה זמן האספקה?', a: `${product.days || '7-10'} ימי עסקים ברחבי הארץ. לאחר אישור ההזמנה נשלח עדכון עם מספר מעקב.` },
         { q: 'האם ניתן להחזיר?', a: 'כן, ניתן להחזיר תוך 14 יום ממועד קבלת המוצר ובלבד שלא נעשה שימוש. ההחזר מלא ומיידי.' },
       ];
 
@@ -1767,7 +1767,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   ];
 
   const shippingRows = [
-    { icon: <Icon.Truck />,   k: 'משלוח',  v: `חינם לכל הארץ · ${product.days || '7-14'} ימי עסקים` },
+    { icon: <Icon.Truck />,   k: 'משלוח',  v: `₪30 עד הבית · ${product.days || '7-10'} ימי עסקים` },
     { icon: <Icon.Package />, k: 'אריזה',  v: 'אריזה מוגנת ומהודרת לכל הזמנה' },
     { icon: <Icon.Return />,  k: 'החזרות', v: 'ניתן להחזיר תוך 14 יום ממועד קבלת המוצר' },
     { icon: <Icon.X size={14} />, k: 'ביטול', v: 'ביטול אפשרי עד 24 שעות מהרכישה ללא עלות' },
@@ -1944,7 +1944,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   )}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px', background: '#f8f9fa', borderRadius: 10, padding: '10px 14px', fontSize: 12 }}>
                     <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Clock /> זמן אספקה</span>
-                    <span style={{ fontWeight: 600 }}>{product.days || '7-14'} ימי עסקים</span>
+                    <span style={{ fontWeight: 600 }}>{product.days || '7-10'} ימי עסקים</span>
                     <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Tag /> קטגוריה</span>
                     <span style={{ fontWeight: 600 }}>{product.cat || '-'}</span>
                   </div>

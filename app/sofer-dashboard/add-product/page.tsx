@@ -229,7 +229,7 @@ export default function AddProductPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
               <label style={labelStyle}>זמן אספקה (ימים)</label>
-              <input style={inputStyle} value={deliveryDays} onChange={e => setDeliveryDays(e.target.value)} placeholder="7-14" />
+              <input style={inputStyle} value={deliveryDays} onChange={e => setDeliveryDays(e.target.value)} placeholder="7-10" />
             </div>
             <div>
               <label style={labelStyle}>גודל / מידה</label>

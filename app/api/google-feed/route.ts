@@ -126,12 +126,12 @@ export async function GET() {
       ${badge ? `<g:custom_label_0>${esc(badge)}</g:custom_label_0>` : ''}
       <g:shipping>
         <g:country>IL</g:country>
-        <g:service>משלוח רגיל</g:service>
-        <g:price>0 ILS</g:price>
+        <g:service>משלוח עד הבית</g:service>
+        <g:price>30 ILS</g:price>
         <g:min_handling_time>1</g:min_handling_time>
-        <g:max_handling_time>3</g:max_handling_time>
-        <g:min_transit_time>3</g:min_transit_time>
-        <g:max_transit_time>11</g:max_transit_time>
+        <g:max_handling_time>2</g:max_handling_time>
+        <g:min_transit_time>5</g:min_transit_time>
+        <g:max_transit_time>8</g:max_transit_time>
       </g:shipping>
       <g:shipping>
         <g:country>US</g:country>
