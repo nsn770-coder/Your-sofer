@@ -82,6 +82,7 @@ export async function GET() {
       ${cat ? `<g:product_type>${esc(cat)}</g:product_type>` : ''}
       ${material ? `<g:material>${esc(material)}</g:material>` : ''}
       ${color ? `<g:color>${esc(color)}</g:color>` : ''}
+      ${d.size ? `<g:size>${esc(d.size as string)}</g:size>` : ''}
       ${cat === 'כיפות' ? `<g:gender>male</g:gender>` : ''}
       ${cat === 'כיפות' ? `<g:age_group>adult</g:age_group>` : ''}
       ${badge ? `<g:custom_label_0>${esc(badge)}</g:custom_label_0>` : ''}
