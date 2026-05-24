@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Heebo, Frank_Ruhl_Libre, Cormorant_Garamond } from "next/font/google";
 import { Suspense } from "react";
+import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -137,6 +138,20 @@ export default function RootLayout({
 
         {/* ── Tidio live chat - deferred 5 seconds ── */}
         {process.env.NEXT_PUBLIC_TIDIO_KEY && <TidioChat />}
+
+        {/* ── GA4 ── */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-PM7GW4MWEJ"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-PM7GW4MWEJ');
+          `}
+        </Script>
       </body>
     </html>
   );
