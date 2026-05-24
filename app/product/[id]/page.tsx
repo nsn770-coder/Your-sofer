@@ -44,6 +44,30 @@ interface ProductData {
   reviews?: number;
 }
 
+interface ReviewItem {
+  reviewerName?: string;
+  stars?: number;
+  text?: string;
+  createdAt?: string;
+}
+
+async function fetchReviews(id: string): Promise<ReviewItem[]> {
+  try {
+    const res = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/products/${id}/reviews?key=${FIREBASE_API_KEY}`,
+      { next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!data.documents) return [];
+    return data.documents.map((doc: { fields?: Record<string, unknown> }) =>
+      doc.fields ? parseFields(doc.fields) as ReviewItem : {}
+    );
+  } catch {
+    return [];
+  }
+}
+
 async function fetchProduct(id: string): Promise<ProductData | null> {
   try {
     const res = await fetch(
@@ -109,7 +133,7 @@ export async function generateMetadata(
 // ── Product JSON-LD ─────────────────────────────────────────────────────────
 
 async function ProductJsonLd({ id }: { id: string }) {
-  const product = await fetchProduct(id);
+  const [product, reviewItems] = await Promise.all([fetchProduct(id), fetchReviews(id)]);
   if (!product || !product.name) return null;
 
   const images = [
@@ -134,6 +158,18 @@ async function ProductJsonLd({ id }: { id: string }) {
         reviewCount: product.reviews,
       },
     } : {}),
+    ...(reviewItems.length > 0 ? {
+      review: reviewItems.slice(0, 5).map((r) => ({
+        '@type': 'Review',
+        author: { '@type': 'Person', name: r.reviewerName || 'לקוח מאומת' },
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: r.stars || 5,
+          bestRating: 5,
+        },
+        ...(r.text ? { reviewBody: r.text } : {}),
+      })),
+    } : {}),
     hasMerchantReturnPolicy: {
       '@type': 'MerchantReturnPolicy',
       applicableCountry: 'IL',
@@ -145,32 +181,11 @@ async function ProductJsonLd({ id }: { id: string }) {
     shippingDetails: [
       {
         '@type': 'OfferShippingDetails',
-        shippingRate: { '@type': 'MonetaryAmount', value: '25', currency: 'ILS' },
+        shippingRate: { '@type': 'MonetaryAmount', value: '30', currency: 'ILS' },
         deliveryTime: {
           '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-          transitTime:  { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7, unitCode: 'DAY' },
-        },
-        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IL' },
-      },
-      {
-        '@type': 'OfferShippingDetails',
-        shippingRate: { '@type': 'MonetaryAmount', value: '45', currency: 'ILS' },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-          transitTime:  { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
-        },
-        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IL' },
-      },
-      {
-        '@type': 'OfferShippingDetails',
-        shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'ILS' },
-        shippingRateQualifier: 'משלוח חינם על הזמנות מעל 350 ₪',
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-          transitTime:  { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7, unitCode: 'DAY' },
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+          transitTime:  { '@type': 'QuantitativeValue', minValue: 5, maxValue: 8, unitCode: 'DAY' },
         },
         shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IL' },
       },

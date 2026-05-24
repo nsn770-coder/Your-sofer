@@ -31,8 +31,8 @@ export const navigationData: NavItem[] = [
   // ── מזוזות ────────────────────────────────────────────────────────────────
   {
     id: "mezuzot",
-    label: "מזוזות",
-    href: "/category/מזוזות",
+    label: "בתי מזוזה",
+    href: "/category/בתי מזוזה",
     columns: [
       {
         title: "קלפי מזוזה",
@@ -46,11 +46,11 @@ export const navigationData: NavItem[] = [
       {
         title: "בתי מזוזה",
         items: [
-          { label: "כל בתי המזוזה",      href: "/category/מזוזות" },
-          { label: "מזוזות אלומיניום",  href: "/category/מזוזות?filter=אלומיניום" },
-          { label: "מזוזות עץ",         href: "/category/מזוזות?filter=עץ" },
-          { label: "מזוזות כסף",        href: "/category/מזוזות?filter=כסף" },
-          { label: "מזוזות פלסטיק",     href: "/category/מזוזות?filter=פלסטיק" },
+          { label: "כל בתי המזוזה",      href: "/category/בתי מזוזה" },
+          { label: "מזוזות אלומיניום",  href: "/category/בתי מזוזה?filter=אלומיניום" },
+          { label: "מזוזות עץ",         href: "/category/בתי מזוזה?filter=עץ" },
+          { label: "מזוזות כסף",        href: "/category/בתי מזוזה?filter=כסף" },
+          { label: "מזוזות פלסטיק",     href: "/category/בתי מזוזה?filter=פלסטיק" },
         ],
       },
     ],

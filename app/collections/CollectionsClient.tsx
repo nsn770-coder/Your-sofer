@@ -12,7 +12,7 @@ const COLLECTIONS = [
     bg: 'linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%)',
     border: '#bae6fd',
     dot: '#87CEEB',
-    href: '/category/מזוזות?collection=יהלום',
+    href: '/category/בתי מזוזה?collection=יהלום',
     bannerImage: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919873/1777913222083_ibossf.png',
   },
   {
@@ -23,7 +23,7 @@ const COLLECTIONS = [
     bg: 'linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%)',
     border: '#fde68a',
     dot: '#78350f',
-    href: '/category/מזוזות?collection=שוהם',
+    href: '/category/בתי מזוזה?collection=שוהם',
     bannerImage: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777920809/1777920771814_vikmum.png',
   },
   {

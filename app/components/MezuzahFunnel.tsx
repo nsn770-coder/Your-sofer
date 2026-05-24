@@ -341,7 +341,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
   useEffect(() => {
     async function fetchCases() {
       try {
-        const snap = await getDocs(query(collection(db, 'products'), where('cat', '==', 'מזוזות'), orderBy('priority', 'desc'), limit(20)));
+        const snap = await getDocs(query(collection(db, 'products'), where('cat', '==', 'בתי מזוזה'), orderBy('priority', 'desc'), limit(20)));
         setCases(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true).slice(0, 4));
       } catch { /* silent */ }
       finally { setLoading(false); }
@@ -399,7 +399,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
               ))}
             </div>
           ) : null}
-          <button onClick={() => router.push('/category/מזוזות')} style={{ width: '100%', background: 'none', border: '2px solid #1E3A8A', borderRadius: 0, padding: '12px', fontSize: 14, fontWeight: 700, color: '#1E3A8A', cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <button onClick={() => router.push('/category/בתי מזוזה')} style={{ width: '100%', background: 'none', border: '2px solid #1E3A8A', borderRadius: 0, padding: '12px', fontSize: 14, fontWeight: 700, color: '#1E3A8A', cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <IconArrowLeft size={14} color="#1E3A8A" /> לכל בתי המזוזה
           </button>
           <button onClick={onViewCart} style={{ width: '100%', background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: '14px', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
@@ -572,7 +572,7 @@ export default function MezuzahFunnel({ isMobile }: { isMobile: boolean }) {
       {showFinishedCases && (
         <FinishedCasesBanner
           onYes={() => { setShowFinishedCases(false); router.push('/cart'); }}
-          onNo={() => { setShowFinishedCases(false); router.push('/category/מזוזות'); }}
+          onNo={() => { setShowFinishedCases(false); router.push('/category/בתי מזוזה'); }}
         />
       )}
 

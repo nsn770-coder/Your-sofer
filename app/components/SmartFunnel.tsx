@@ -110,7 +110,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
     async function fetchImages() {
       try {
         const [mezSnap, tefSnap, klafSnap] = await Promise.all([
-          getDocs(query(collection(db, 'categories'), where('slug', '==', 'מזוזות'), limit(1))),
+          getDocs(query(collection(db, 'categories'), where('slug', '==', 'בתי מזוזה'), limit(1))),
           getDocs(query(collection(db, 'categories'), where('slug', '==', 'תפילין קומפלט'), limit(1))),
           getDocs(query(collection(db, 'categories'), where('slug', '==', 'קלפי מזוזה'), limit(1))),
         ]);
@@ -334,7 +334,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
                 img={batimImg}
                 label="בתי מזוזה"
                 desc="נרתיקים ובתים מכל הסוגים"
-                onClick={() => router.push(`/category/${encodeURIComponent('מזוזות')}`)}
+                onClick={() => router.push(`/category/${encodeURIComponent('בתי מזוזה')}`)}
                 height={130}
                 overlayOpacity={0.4}
                 isMobile={isMobile}

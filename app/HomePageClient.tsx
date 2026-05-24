@@ -14,8 +14,6 @@ import HeroSwiper from './components/HeroSwiper';
 import ProductCard from '@/components/ui/ProductCard';
 const RabbinicalSupervision = dynamic(() => import('./components/RabbinicalSupervision'), { ssr: false, loading: () => <div style={{ height: 420 }} /> });
 
-const SmartFunnel        = dynamic(() => import('./components/SmartFunnel'),            { ssr: false, loading: () => <div style={{ height: 400 }} /> });
-
 const NewsletterPopup   = dynamic(() => import('./components/NewsletterPopup'),       { ssr: false, loading: () => <div className="hidden" /> });
 const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => <div style={{ height: 450 }} /> });
 import { useShaliach } from './contexts/ShaliachContext';
@@ -99,6 +97,13 @@ function IconCounterStar({ isMobile }: { isMobile: boolean }) {
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+
+interface Sofer {
+  id: string;
+  name: string;
+  profileImage?: string;
+  imgUrl?: string;
+}
 
 interface Testimonial {
   id: string;
@@ -246,12 +251,12 @@ function SkeletonCategoryCard() {
 const STATIC_QUOTES = [
   { name: 'מיכל כהן',    city: 'תל אביב',  stars: 5, text: 'הזמנתי מזוזה לבית החדש - קיבלתי תמונה של הקלף לפני המשלוח. לא ציפיתי לרמת שירות כזו.' },
   { name: 'יוסף לוי',    city: 'ירושלים',  stars: 5, text: 'קניתי תפילין לבן שלי לבר מצווה. הסופר פנה אלינו אישית כדי לוודא שהכל מתאים. מרגש.' },
-  { name: 'שרה אברמוב',  city: 'חיפה',     stars: 5, text: 'מתנה לאמא שלי - היא בכתה מרוב שמחה. האריזה הייתה מהודרת ותעודת הכשרות נתנה לה ביטחון.' },
+  { name: 'שרה אברמוב',  city: 'חיפה',     stars: 5, text: 'מתנה לאמא שלי - היא בכתה מרוב שמחה. האריזה הייתה מהממת והיא בכתה מרוב התרגשות. מתנה מושלמת שהגיעה במארז מהמם!' },
   { name: 'דוד נחמיאס',  city: 'באר שבע',  stars: 5, text: 'ראיתי הרבה חנויות אונליין. כאן היחיד שמציג צילום אמיתי של הקלף. זה ההבדל כולו.' },
 ] as const;
 
 const CLEAR_PATH_ITEMS = [
-  { label: 'מצא מזוזה לבית',  href: '/category/מזוזות' },
+  { label: 'מצא מזוזה לבית',  href: '/category/בתי מזוזה' },
   { label: 'מצא מתנה לשבת',   href: '/category/שבתות וחגים' },
   { label: 'צפה בכל המוצרים', href: '/category/יודאיקה' },
 ] as const;
@@ -332,6 +337,7 @@ export default function HomePageClient() {
   const [wizardKashrut, setWizardKashrut] = useState<'regular' | 'mehudar' | 'mehudar_plus' | null>(null);
   const [wizardResults, setWizardResults] = useState<Product[]>([]);
   const [wizardLoading, setWizardLoading] = useState(false);
+  const [soferimList, setSoferimList]           = useState<Sofer[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [testimonials, setTestimonials]         = useState<Testimonial[]>([]);
   const [newsletterEmail, setNewsletterEmail]   = useState('');
@@ -478,6 +484,26 @@ export default function HomePageClient() {
   }, []);
 
   useEffect(() => {
+    async function fetchSoferim() {
+      try {
+        const snap = await getDocs(collection(db, 'soferim'));
+        console.log('[soferim] total docs:', snap.size);
+        const list: Sofer[] = [];
+        snap.forEach((d) => {
+          const data = d.data();
+          const img = (data.imageUrl || data.profileImage || data.imgUrl || data.image || data.photoURL || data.photo || '') as string;
+          if (img) list.push({ id: d.id, name: (data.name || '') as string, profileImage: img });
+        });
+        console.log('[soferim] with image:', list.length, list.map(s => s.name));
+        setSoferimList(list);
+      } catch(e) {
+        console.error('[soferim] fetch error:', e);
+      }
+    }
+    fetchSoferim();
+  }, []);
+
+  useEffect(() => {
     async function fetchCounts() {
       try {
         const oneWeekAgo = new Date();
@@ -540,7 +566,7 @@ export default function HomePageClient() {
     { name: 'נטלות וכלים',    emoji: '🫙', img: catImages['נטלות וכלים'] || 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776283325/eolm1mte2d2q1zjaijsn.png', href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94?filter=%D7%A0%D7%98%D7%99%D7%9C%D7%AA%20%D7%99%D7%93%D7%99%D7%99%D7%9D' },
     { name: 'שבתות וחגים',    emoji: '🕯️', img: catImages['שבתות וחגים'] || 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', href: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA%20%D7%95%D7%97%D7%92%D7%99%D7%9D' },
     { name: 'מגילות',          emoji: '📖', img: catImages['מגילות']          || '', href: '/category/%D7%9E%D7%92%D7%99%D7%9C%D7%95%D7%AA' },
-    { name: 'בתי מזוזה',       emoji: '📜', img: catImages['מזוזות']          || '', href: '/category/%D7%9E%D7%96%D7%95%D7%96%D7%95%D7%AA' },
+    { name: 'בתי מזוזה',       emoji: '📜', img: catImages['בתי מזוזה']       || '', href: '/category/%D7%91%D7%AA%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94' },
     { name: 'סט טלית תפילין', emoji: '🕍', img: catImages['סט טלית תפילין'] || '', href: '/category/%D7%A1%D7%98%20%D7%98%D7%9C%D7%99%D7%AA%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F', fallback: '#1a2744' },
   ] as { name: string; emoji: string; img: string; href: string; fallback?: string }[], [catImages]);
 
@@ -624,6 +650,36 @@ export default function HomePageClient() {
           .ys-cats-grid { grid-template-columns: repeat(2, 1fr); min-height: 450px; }
           .ys-quotes-grid { grid-template-columns: 1fr; }
         }
+        .ys-hero-btn-primary {
+          display: inline-flex; align-items: center; justify-content: center;
+          background: transparent; color: #C9A227;
+          border: 2px solid #C9A227;
+          height: 52px; padding: 0 36px; border-radius: 0;
+          font-weight: 800; font-size: 16px; text-decoration: none;
+          white-space: nowrap; transition: background 0.25s, color 0.25s; cursor: pointer;
+          font-family: inherit;
+        }
+        .ys-hero-btn-primary:hover { background: #C9A227; color: #1F3D8F; }
+        .ys-hero-btn-secondary {
+          display: inline-flex; align-items: center; justify-content: center;
+          background: transparent; color: #FFFFFF;
+          border: 1.5px solid rgba(255,255,255,0.7);
+          height: 52px; padding: 0 36px; border-radius: 0;
+          font-weight: 700; font-size: 16px; text-decoration: none;
+          white-space: nowrap; transition: background 0.25s; cursor: pointer;
+          font-family: inherit;
+        }
+        .ys-hero-btn-secondary:hover { background: rgba(255,255,255,0.12); }
+        .ys-hscroll::-webkit-scrollbar { display: none; }
+        .ys-outline-btn {
+          display: inline-flex; align-items: center; justify-content: center;
+          background: #FFFFFF; color: #2446A6;
+          border: 1.5px solid #2446A6; border-radius: 0;
+          height: 52px; padding: 0 36px;
+          font-weight: 700; font-size: 14px; text-decoration: none;
+          transition: background 0.2s, color 0.2s; cursor: pointer; font-family: inherit;
+        }
+        .ys-outline-btn:hover { background: #2446A6; color: #fff; }
       `}</style>
 
       {/* ── Newsletter popup ── */}
@@ -791,12 +847,12 @@ export default function HomePageClient() {
         </video>
 
         {/* Overlay */}
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.38)', zIndex: 1 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)', zIndex: 1 }} />
 
         {/* Content */}
         <div style={{
           position: 'relative', zIndex: 2,
-          padding: isMobile ? '60px 24px 40px' : '80px 48px 60px',
+          padding: isMobile ? '72px 24px 64px' : '100px 64px 96px',
           minHeight: isMobile ? 420 : 520,
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }}>
@@ -823,39 +879,16 @@ export default function HomePageClient() {
             מזוזות ותפילין מסופרים מוסמכים — עם צילום הקלף, בדיקת מגיה ואחריות מלאה.
           </p>
 
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 28 }}>
+          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 40 }}>
             <a
               href="/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94"
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                background: '#C9A227',
-                color: '#1F3D8F',
-                height: 52,
-                padding: '0 28px',
-                borderRadius: 14,
-                fontWeight: 800,
-                fontSize: 16,
-                textDecoration: 'none',
-                whiteSpace: 'nowrap',
-              }}
+              className="ys-hero-btn-primary"
             >
               בחרו מזוזה
             </a>
             <a
               href={`/category/${encodeURIComponent('בר מצווה')}`}
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(255,255,255,0.15)',
-                color: '#FFFFFF',
-                border: '1.5px solid rgba(255,255,255,0.6)',
-                height: 52,
-                padding: '0 28px',
-                borderRadius: 14,
-                fontWeight: 700,
-                fontSize: 16,
-                textDecoration: 'none',
-                whiteSpace: 'nowrap',
-              }}
+              className="ys-hero-btn-secondary"
             >
               סט בר מצווה
             </a>
@@ -863,26 +896,55 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── Smart Funnel ── */}
-      <div style={{ background: '#F8F6F1', textAlign: 'center', direction: 'rtl', padding: isMobile ? '4px 0 8px' : '8px 0 12px' }}>
-        <p style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(0,0,0,0.45)', margin: 0, padding: '10px 0 6px', fontWeight: 500 }}>
-          בחר מה אתה מחפש - נמצא לך את המתאים ביותר
-        </p>
-        <SmartFunnel isMobile={isMobile} />
-      </div>
+      {/* ── Soferim horizontal row ── */}
+      {soferimList.length > 0 && (
+        <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 0 16px' : '40px 0 24px', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 16 }}>
+            <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הסופרים שלנו</h2>
+          </div>
+          <div
+            className="ys-hscroll"
+            style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 20px 8px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
+          >
+            {soferimList.map(sofer => {
+              const img = optimizeCloudinaryUrl(sofer.profileImage || '', 200);
+              return (
+                <a key={sofer.id} href={`/soferim/${sofer.id}`} style={{ textDecoration: 'none', flexShrink: 0, display: 'block' }}>
+                  <div style={{ width: 112, height: 112, borderRadius: 0, overflow: 'hidden', position: 'relative', boxShadow: '0 2px 10px rgba(0,0,0,0.10)' }}>
+                    <Image
+                      fill
+                      unoptimized
+                      loading="lazy"
+                      src={img}
+                      alt={sofer.name}
+                      style={{ objectFit: 'cover' }}
+                      sizes="112px"
+                    />
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)', padding: '20px 6px 7px' }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#fff', margin: 0, textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {sofer.name}
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Live Activity Bar - isolated component, re-renders independently ── */}
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
 
       {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '12px 12px' : '16px 24px', borderBottom: '1px solid #f0ece4' }}>
+      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '24px 16px' : '40px 32px', borderBottom: '1px solid #f0ece4' }}>
         <div style={{
           maxWidth: 900, margin: '0 auto',
           background: '#fff',
-          padding: isMobile ? '14px 12px' : '20px 24px',
-          borderRadius: 14,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-          border: '1px solid #E7E2D8',
+          padding: isMobile ? '20px 16px' : '28px 40px',
+          borderRadius: 0,
+          boxShadow: '0 2px 16px rgba(0,0,0,0.05)',
+          border: '1px solid #EEEBE4',
           display: 'flex',
           justifyContent: 'space-around',
           alignItems: 'center',
@@ -916,25 +978,15 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      <div dir="rtl" style={{ padding: '28px 20px 22px', maxWidth: 680, margin: '0 auto', textAlign: 'center', fontFamily: "'Frank Ruhl Libre', serif" }}>
-        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300 }}>
-          יש אנשים שמבינים שהדברים הכי חשובים בחיים — הם דווקא אלה שלא תמיד רואים.
-        </p>
-        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300, marginTop: 12 }}>
-          מזוזה ותפילין הם לא עוד מוצר.<br/>
-          הם הקדושה והברכה שנכנסת לבית שלך, והחיבור השקט שלך לדבר אמיתי וגדול יותר.
-        </p>
-      </div>
-
       {/* ── 4. Category grid ── */}
-      <div id="categories" style={{ background: '#F8F6F1', padding: isMobile ? '28px 20px' : '40px 24px', direction: 'rtl' }}>
+      <div id="categories" style={{ background: '#F8F6F1', padding: isMobile ? '56px 20px' : '88px 32px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 800, color: '#1F2937', marginBottom: 8 }}>קטגוריות נבחרות</h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#6B7280', marginBottom: 24 }}>גלה עוד מגוון מוצרים</p>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 26 : 32, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 36, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-            gap: isMobile ? 12 : 20,
+            gap: isMobile ? 16 : 28,
           }}>
             {([
               categoryGridItems.find(c => c.name === 'קלף מזוזה'),
@@ -947,45 +999,33 @@ export default function HomePageClient() {
               <div key={cat.name}
                 onClick={() => router.push(cat.href)}
                 style={{
-                  borderRadius: 18,
+                  borderRadius: 0,
                   overflow: 'hidden',
                   cursor: 'pointer',
                   background: '#FFFFFF',
-                  border: '1px solid #E7E2D8',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
+                  transition: 'transform 0.25s, box-shadow 0.25s',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.14)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 32px rgba(0,0,0,0.12)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.07)'; }}
               >
-                <div style={{ height: 160, overflow: 'hidden', position: 'relative' }}>
+                <div style={{ height: 190, overflow: 'hidden', position: 'relative' }}>
                   {cat.img ? (
                     <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4' }}>{cat.emoji}</div>
                   )}
                 </div>
-                <div style={{ padding: '12px 16px', background: '#FFFFFF', textAlign: 'center' }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}>{cat.name}</span>
+                <div style={{ padding: '14px 16px', background: '#FFFFFF', textAlign: 'center' }}>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: '#1F2937', letterSpacing: '0.01em' }}>{cat.name}</span>
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
+          <div style={{ textAlign: 'center', marginTop: 36 }}>
             <a
               href="/categories"
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                background: '#FFFFFF',
-                border: '1.5px solid #E7E2D8',
-                color: '#2446A6',
-                borderRadius: 12,
-                height: 48,
-                padding: '0 28px',
-                fontWeight: 700,
-                fontSize: 14,
-                textDecoration: 'none',
-              }}
+              className="ys-outline-btn"
             >
               לכל הקטגוריות ←
             </a>
@@ -994,11 +1034,11 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Collections section ── */}
-      <div style={{ background: '#1E3A8A', padding: isMobile ? '36px 16px' : '52px 16px', direction: 'rtl' }}>
+      <div style={{ background: '#1E3A8A', padding: isMobile ? '64px 16px' : '96px 24px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.15em', textAlign: 'center', marginBottom: 8 }}>COLLECTIONS</p>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 20 : 28, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הקולקציות שלנו</h2>
-          <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 28 }}>שישה קוים עיצוביים — מצאו את הסגנון שמדבר אליכם</p>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 30, fontWeight: 300, color: '#fff', marginBottom: 10, letterSpacing: '-0.01em' }}>הקולקציות שלנו</h2>
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 44 }}>שישה קוים עיצוביים — מצאו את הסגנון שמדבר אליכם</p>
 
           {/* Horizontal scroll on mobile, grid on desktop */}
           <div style={isMobile
@@ -1006,12 +1046,12 @@ export default function HomePageClient() {
             : { display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 14 }
           }>
             {[
-              { id: 'יהלום',  tagline: 'הקו השקוף והמודרני',     dot: '#87CEEB', href: '/category/מזוזות?collection=יהלום',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919873/1777913222083_ibossf.png' },
+              { id: 'יהלום',  tagline: 'הקו השקוף והמודרני',     dot: '#87CEEB', href: '/category/בתי מזוזה?collection=יהלום',                   img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919873/1777913222083_ibossf.png' },
               { id: 'ישפה',   tagline: 'הקו האומנותי והצבעוני',  dot: 'rainbow', href: '/category/כלי שולחן והגשה?collection=ישפה',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png' },
               { id: 'ברקת',   tagline: 'הקו החגיגי והיוקרתי',    dot: '#15803d', href: '/category/כלי שולחן והגשה?collection=ברקת',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919689931_fkb8c6.png' },
               { id: 'תרשיש',  tagline: 'הקו הזהוב והמאיר',       dot: '#b45309', href: '/category/יודאיקה?collection=תרשיש',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919932/1777919910394_olu4mi.png' },
               { id: 'ספיר',   tagline: 'הקו המתכתי והקריר',      dot: '#94a3b8', href: '/category/יודאיקה?collection=ספיר',                      img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919702083_vflhuc.png' },
-              { id: 'שוהם',   tagline: 'הקו הטבעי והכהה',        dot: '#78350f', href: '/category/מזוזות?collection=שוהם',                       img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777920809/1777920771814_vikmum.png' },
+              { id: 'שוהם',   tagline: 'הקו הטבעי והכהה',        dot: '#78350f', href: '/category/בתי מזוזה?collection=שוהם',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777920809/1777920771814_vikmum.png' },
             ].map(col => (
               <a
                 key={col.id}
@@ -1054,8 +1094,8 @@ export default function HomePageClient() {
             ))}
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <a href="/collections" style={{ display: 'inline-block', border: '1.5px solid rgba(184,151,42,0.5)', color: '#C5A028', background: 'none', padding: '10px 28px', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+          <div style={{ textAlign: 'center', marginTop: 36 }}>
+            <a href="/collections" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: '1.5px solid rgba(197,160,40,0.6)', color: '#C5A028', background: 'none', padding: '0 32px', height: 48, fontSize: 13, fontWeight: 700, textDecoration: 'none', transition: 'background 0.2s', borderRadius: 0 }}>
               לכל הקולקציות ←
             </a>
           </div>
@@ -1065,19 +1105,21 @@ export default function HomePageClient() {
       {/* ── 5. Featured products horizontal scroll ── */}
       <div style={{ minHeight: isMobile ? 290 : 330 }}>
       {featuredProducts.length > 0 && (
-        <div style={{ background: '#F8F6F1', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', marginBottom: 14 }}>
-            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#111111', margin: 0 }}>המוצרים הנמכרים ביותר</h2>
+        <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 0' : '88px 0', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 20 }}>
+            <h2 style={{ fontSize: isMobile ? 20 : 26, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>המוצרים הנמכרים ביותר</h2>
           </div>
-          <div style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 16px 8px', scrollbarWidth: 'none' } as React.CSSProperties}>
+          <div style={{ display: 'flex', overflowX: 'auto', gap: 16, padding: '0 20px 12px', scrollbarWidth: 'none' } as React.CSSProperties}>
             {featuredProducts.map(p => {
               const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
               return (
                 <div key={p.id}
-                  style={{ width: 160, flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 0, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                  style={{ width: 172, flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 0, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)', transition: 'transform 0.2s, box-shadow 0.2s' }}
                   onClick={() => router.push(`/product/${p.id}`)}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.12)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)'; }}
                 >
-                  <div style={{ height: 140, overflow: 'hidden', position: 'relative' }}>
+                  <div style={{ height: 155, overflow: 'hidden', position: 'relative' }}>
                     {imgSrc ? (
                       <Image fill unoptimized loading="lazy" src={imgSrc} alt={p.name} style={{ objectFit: 'cover' }} sizes="160px" />
                     ) : (
@@ -1086,15 +1128,17 @@ export default function HomePageClient() {
                       </div>
                     )}
                   </div>
-                  <div style={{ padding: '8px 10px 10px' }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>{p.name}</p>
-                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C5A028', marginBottom: 8 }}>{formatPrice(p.price)}</p>
+                  <div style={{ padding: '10px 12px 14px' }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
+                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C5A028', marginBottom: 10 }}>{formatPrice(p.price)}</p>
                     <button
                       onClick={e => {
                         e.stopPropagation();
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
                       }}
-                      style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, padding: '4px 10px', cursor: 'pointer', width: '100%' }}
+                      style={{ background: 'transparent', color: '#1E3A8A', border: '1.5px solid #1E3A8A', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '5px 10px', cursor: 'pointer', width: '100%', transition: 'background 0.2s, color 0.2s' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1E3A8A'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1E3A8A'; }}
                     >
                       הוסף לסל
                     </button>
@@ -1108,49 +1152,65 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Shop All CTA ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '16px 16px 24px' : '20px 16px 32px', textAlign: 'center' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '24px 16px 48px' : '32px 16px 64px', textAlign: 'center' }}>
         <a
           href="/category/הכל"
-          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 32px', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}
+          className="ys-outline-btn"
         >
           לכל המוצרים ←
         </a>
       </div>
 
+      {/* ── Emotional intro (moved below products for better browse flow) ── */}
+      <div dir="rtl" style={{ padding: isMobile ? '56px 24px' : '88px 24px', background: '#F8F6F1', fontFamily: "'Frank Ruhl Libre', serif" }}>
+        <div style={{ maxWidth: 580, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300 }}>
+            יש אנשים שמבינים שהדברים הכי חשובים בחיים — הם דווקא אלה שלא תמיד רואים.
+          </p>
+          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300, marginTop: 18 }}>
+            מזוזה ותפילין הם לא עוד מוצר.<br/>
+            הם הקדושה והברכה שנכנסת לבית שלך, והחיבור השקט שלך לדבר אמיתי וגדול יותר.
+          </p>
+        </div>
+      </div>
+
       {/* ── Soferim CTA ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '20px 16px 32px' : '24px 16px 40px', direction: 'rtl', textAlign: 'center' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '0 16px 56px' : '0 16px 72px', direction: 'rtl', textAlign: 'center' }}>
         <button
           onClick={() => router.push('/soferim')}
           style={{
-            background: '#C9A227',
-            color: '#1F3D8F',
+            background: 'transparent',
+            color: '#C9A227',
             fontWeight: 800,
             fontSize: 15,
             padding: '0 48px',
             height: 52,
-            borderRadius: 14,
-            border: 'none',
+            borderRadius: 0,
+            border: '2px solid #C9A227',
             cursor: 'pointer',
             whiteSpace: 'nowrap',
+            transition: 'background 0.25s, color 0.25s',
           }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#C9A227'; (e.currentTarget as HTMLButtonElement).style.color = '#1F3D8F'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#C9A227'; }}
         >
           לצפייה במאגר הסופרים שלנו ←
         </button>
       </div>
 
-      <div dir="rtl" style={{ padding: '16px 20px', background: '#F5F2EC', margin: '0', fontFamily: "'Frank Ruhl Libre', serif" }}>
-        <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300 }}>
+      <div dir="rtl" style={{ padding: isMobile ? '64px 24px' : '96px 24px', background: '#F5F2EC', margin: '0', fontFamily: "'Frank Ruhl Libre', serif" }}>
+        <div style={{ maxWidth: 580, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300 }}>
             כי קל להשקיע במה שמרשים אחרים.
           </p>
-          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300, marginTop: 12 }}>
+          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300, marginTop: 18 }}>
             אבל אנשים עם יראת שמים אמיתית משקיעים גם בדברים שנמצאים בתוך המזוזה שעל הדלת — אפילו שאף אחד אחר לא יראה אותם לעולם.
           </p>
-          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 500, marginTop: 20 }}>
+          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 500, marginTop: 28 }}>
             אלו אנשים שלא מחפשים "בערך".<br/>
             הם מחפשים אמת, דיוק ואמון.
           </p>
-          <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300, marginTop: 16 }}>
+          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300, marginTop: 20 }}>
             לכן הקמנו את Your Sofer — לאנשים שמבינים את החשיבות של סת״מ מהודר, רוצים לדעת בדיוק:<br/>
             מי כתב את הקלף שלהם, מי בדק אותו, ושרוצים לדעת שיש על מי לסמוך.
           </p>
@@ -1158,9 +1218,9 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 6. More categories horizontal scroll ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '24px 0' : '32px 0', direction: 'rtl' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
-          <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#111111', marginBottom: 14 }}>עוד קטגוריות</h2>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 0' : '72px 0', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
+          <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 300, color: '#111111', marginBottom: 24, letterSpacing: '-0.01em' }}>עוד קטגוריות</h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, padding: '0 12px' }}>
           {MORE_CAT_DEFS.map(cat => {
@@ -1188,18 +1248,19 @@ export default function HomePageClient() {
       <RabbinicalSupervision isMobile={isMobile} />
 
       {/* ── Why Your Sofer trust block ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 16px' : '40px 24px', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 16px' : '88px 32px', direction: 'rtl' }}>
         <div style={{
-          maxWidth: 680, margin: '0 auto',
-          background: '#EEF3FF',
-          borderRadius: 22,
-          padding: isMobile ? '32px 20px' : '40px 36px',
+          maxWidth: 640, margin: '0 auto',
+          background: '#FFFFFF',
+          borderRadius: 0,
+          padding: isMobile ? '40px 24px' : '56px 48px',
           textAlign: 'center',
+          boxShadow: '0 4px 32px rgba(0,0,0,0.06)',
         }}>
-          <p style={{ fontSize: isMobile ? 26 : 26, fontWeight: 800, color: '#1F2937', marginBottom: 24, lineHeight: 1.4 }}>
+          <p style={{ fontSize: isMobile ? 24 : 26, fontWeight: 300, color: '#1F2937', marginBottom: 32, lineHeight: 1.5, letterSpacing: '-0.01em' }}>
             רוב האנשים לא יודעים מי כתב את המזוזה שלהם — אבל אצלנו:
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'right' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'right' }}>
             {[
               'כל קלף מצולם ומאומת לפני מכירה',
               'בדיקת מגיה מוסמך לכל מוצר',
@@ -1207,84 +1268,72 @@ export default function HomePageClient() {
               'ניתן לבחור קלף ספציפי',
               'כל סופר עובר אצלנו אבחון',
             ].map(row => (
-              <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 12, padding: '14px 16px' }}>
-                <span style={{ color: '#C9A227', fontSize: 16, flexShrink: 0, fontWeight: 900 }}>✓</span>
-                <span style={{ fontSize: 15, fontWeight: 600, color: '#1F2937' }}>{row}</span>
+              <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#F8F6F1', borderRadius: 0, padding: '14px 18px' }}>
+                <span style={{ color: '#C9A227', fontSize: 15, flexShrink: 0, fontWeight: 900, lineHeight: 1 }}>✓</span>
+                <span style={{ fontSize: 15, fontWeight: 500, color: '#1F2937', lineHeight: 1.5 }}>{row}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div dir="rtl" style={{ padding: '34px 20px 22px', maxWidth: 720, margin: '0 auto', textAlign: 'center', fontFamily: "'Frank Ruhl Libre', serif" }}>
-        <h2 style={{ fontSize: isMobile ? 28 : 32, fontWeight: 600, color: '#1F2937', marginBottom: 16, lineHeight: 1.4, fontFamily: "'Cormorant Garamond', serif" }}>
+      <div dir="rtl" style={{ padding: isMobile ? '56px 24px' : '88px 24px', maxWidth: 680, margin: '0 auto', textAlign: 'center', fontFamily: "'Frank Ruhl Libre', serif" }}>
+        <h2 style={{ fontSize: isMobile ? 28 : 34, fontWeight: 300, color: '#1F2937', marginBottom: 20, lineHeight: 1.4, fontFamily: "'Cormorant Garamond', serif", letterSpacing: '-0.01em' }}>
           הקמנו את Your Sofer.
         </h2>
-        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300 }}>
+        <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300 }}>
           מקום שמאפשר לך לקנות סת״מ בצורה אחרת.
         </p>
-        <p style={{ fontSize: isMobile ? 17 : 15, lineHeight: 1.8, color: '#1F2937', fontWeight: 300, marginTop: 14 }}>
+        <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300, marginTop: 18 }}>
           לראות את הקלף האמיתי.<br/>
           להכיר את הסופר שכתב אותו.<br/>
           לקבל תיעוד, בדיקה ושקיפות מלאה — ברמה שלא הייתה קיימת עד היום בעולם הסת״מ.
         </p>
-        <p style={{ fontSize: isMobile ? 17 : 16, lineHeight: 1.8, color: '#1F2937', fontWeight: 500, marginTop: 20, fontStyle: 'italic' }}>
+        <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 400, marginTop: 24, fontStyle: 'italic' }}>
           כי כשמדובר בדברים שמלווים את החיים עצמם —<br/>
           לא מתפשרים על הדבר האמיתי.
         </p>
       </div>
 
       {/* ── Static Social Proof ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '36px 20px' : '52px 24px', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '64px 20px' : '96px 32px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 800, color: '#1F2937', marginBottom: 8 }}>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 26 : 32, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>
             מה הלקוחות אומרים
           </h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#6B7280', marginBottom: 32 }}>אלפי לקוחות מרוצים ברחבי הארץ</p>
-          <div className="ys-quotes-grid" style={{ display: 'grid', gap: 16 }}>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 48, fontWeight: 400 }}>אלפי לקוחות מרוצים ברחבי הארץ</p>
+          <div className="ys-quotes-grid" style={{ display: 'grid', gap: 24 }}>
             {STATIC_QUOTES.slice(0, 3).map((q, i) => (
               <div key={i} style={{
                 background: '#FFFFFF',
-                border: '1px solid #E7E2D8',
-                borderRadius: 16,
-                padding: 20,
-                boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                borderRadius: 0,
+                padding: isMobile ? '28px 20px' : '36px 32px',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
               }}>
-                <div style={{ marginBottom: 10, display: 'flex', gap: 2 }}>
+                <div style={{ marginBottom: 14, display: 'flex', gap: 3 }}>
                   {Array.from({ length: q.stars }).map((_, si) => (
-                    <span key={si} style={{ color: '#C9A227', fontSize: 16 }}>★</span>
+                    <span key={si} style={{ color: '#C9A227', fontSize: 15 }}>★</span>
                   ))}
                 </div>
-                <p style={{ fontSize: 15, color: '#4B5563', lineHeight: 1.6, marginBottom: 16, fontStyle: 'italic' }}>
+                <p style={{ fontSize: 15, color: '#4B5563', lineHeight: 1.7, marginBottom: 20, fontStyle: 'italic' }}>
                   &ldquo;{q.text}&rdquo;
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span style={{ color: '#2446A6', fontWeight: 700, fontSize: 14 }}>{q.name.charAt(0)}</span>
                   </div>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#1F2937' }}>{q.name}</div>
-                    <div style={{ fontSize: 13, color: '#6B7280' }}>{q.city}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: '#1F2937' }}>{q.name}</div>
+                    <div style={{ fontSize: 13, color: '#9CA3AF' }}>{q.city}</div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
             <a
               href="/reviews"
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                background: '#FFFFFF',
-                border: '1.5px solid #E7E2D8',
-                color: '#2446A6',
-                borderRadius: 12,
-                height: 48,
-                padding: '0 28px',
-                fontWeight: 700,
-                fontSize: 14,
-                textDecoration: 'none',
-              }}
+              className="ys-outline-btn"
             >
               לכל הביקורות ←
             </a>

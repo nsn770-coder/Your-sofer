@@ -2,7 +2,7 @@
 
 export const CATS = [
   'הכל',
-  'מזוזות',
+  'בתי מזוזה',
   'כיסוי תפילין',
   'תפילין קומפלט',
   'טליתות',
@@ -38,7 +38,7 @@ export const SUB_CATS: Record<string, string[]> = {
 
 export const NAV_ITEMS: { label: string; cat: string | null; action: string | null }[] = [
   { label: '🔥 מבצעי היום',       cat: null,               action: null },
-  { label: 'מזוזות',              cat: 'מזוזות',           action: null },
+  { label: 'בתי מזוזה',           cat: 'בתי מזוזה',        action: null },
   { label: 'כיסוי תפילין',        cat: 'כיסוי תפילין',    action: null },
   { label: 'תפילין קומפלט',       cat: 'תפילין קומפלט',   action: null },
   { label: 'טליתות',              cat: 'טליתות',           action: null },

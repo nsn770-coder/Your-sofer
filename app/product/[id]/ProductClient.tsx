@@ -147,7 +147,7 @@ const HARDCODED_STAM_GENERIC_DEFAULTS: Required<PageDefaults> = {
   ],
 };
 
-const MEZUZA_CATS = new Set(['קלפי מזוזה', 'מזוזות']);
+const MEZUZA_CATS = new Set(['קלפי מזוזה', 'בתי מזוזה']);
 const TEFILLIN_CATS = new Set(['קלפי תפילין', 'תפילין קומפלט']);
 
 function getStamDefaults(cat: string | undefined): Required<PageDefaults> {
@@ -266,7 +266,7 @@ function TrustIcons({ hasSofer }: { hasSofer?: boolean }) {
 
 // ─── Trust Block ─────────────────────────────────────────────────────────────
 
-const STAM_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'בר מצווה'];
+const STAM_CATEGORIES = ['קלפי מזוזה', 'בתי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'בר מצווה'];
 const RABBINICAL_CATEGORIES = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה']);
 
 function TrustBlock({ isStam }: { isStam: boolean }) {
@@ -473,7 +473,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [price, setPrice]                     = useState(String(product.price));
   const [was, setWas]                         = useState(String(product.was || ''));
   const [cat, setCat]                         = useState(product.cat || '');
-  const [days, setDays]                       = useState(product.days || '7-14');
+  const [days, setDays]                       = useState(product.days || '7-10');
   const [size, setSize]                       = useState(product.size || '');
   const [badge, setBadge]                     = useState(product.badge || '');
   const [desc, setDesc]                       = useState(product.desc || product.description || '');
@@ -629,7 +629,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         </div>
       </div>
 
-      {['קלפי מזוזה', 'בתי מזוזה', 'מזוזות'].some(c => cat.includes(c)) && (
+      {['קלפי מזוזה', 'בתי מזוזה'].some(c => cat.includes(c)) && (
         <div>
           <label style={lS}>גודל</label>
           <select value={size} onChange={e => setSize(e.target.value)} style={{ ...iS, background: '#1E3A8A' }}>
@@ -1102,13 +1102,13 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
     ? [
         { q: 'האם זה מוצר איכותי?', a: 'כן. כל מוצר עובר בדיקת מחשב ופיקוח מגיה מוסמך, ומגיע עם תעודת כשרות. אנחנו לא שולחים מוצרים שלא עברו בדיקה מלאה.' },
         { q: 'האם זה מתאים כמתנה?', a: 'בהחלט. המוצר מגיע באריזה מהודרת שמרגישה כמו מתנה. ניתן לציין בהזמנה שמדובר במתנה ונדאג לפרטים.' },
-        { q: 'מה זמן האספקה?', a: `${product.days || '7–14'} ימי עסקים ברחבי הארץ. לאחר אישור ההזמנה נשלח עדכון עם מספר מעקב.` },
+        { q: 'מה זמן האספקה?', a: `${product.days || '7-10'} ימי עסקים ברחבי הארץ. לאחר אישור ההזמנה נשלח עדכון עם מספר מעקב.` },
         { q: 'האם ניתן להחזיר?', a: 'כן, ניתן להחזיר תוך 14 יום ממועד קבלת המוצר ובלבד שלא נעשה שימוש. ההחזר מלא ומיידי.' },
       ]
     : [
         { q: 'האם זה מוצר איכותי?', a: 'כן. כל פריט נבחר בקפידה ועובר בקרת איכות לפני משלוח. אנחנו מציגים צילומים אמיתיים כדי שתדע בדיוק מה אתה מקבל.' },
         { q: 'האם זה מתאים כמתנה?', a: 'בהחלט. המוצר מגיע באריזה מהודרת שמרגישה כמו מתנה. ניתן לציין בהזמנה שמדובר במתנה ונדאג לפרטים.' },
-        { q: 'מה זמן האספקה?', a: `${product.days || '7–14'} ימי עסקים ברחבי הארץ. לאחר אישור ההזמנה נשלח עדכון עם מספר מעקב.` },
+        { q: 'מה זמן האספקה?', a: `${product.days || '7-10'} ימי עסקים ברחבי הארץ. לאחר אישור ההזמנה נשלח עדכון עם מספר מעקב.` },
         { q: 'האם ניתן להחזיר?', a: 'כן, ניתן להחזיר תוך 14 יום ממועד קבלת המוצר ובלבד שלא נעשה שימוש. ההחזר מלא ומיידי.' },
       ];
 
@@ -1288,7 +1288,7 @@ export default function ProductClient() {
             const relSnap = await getDocs(query(collection(db, 'products'), where('cat', '==', p.cat), orderBy('priority', 'desc'), limit(5)));
             const relData: Product[] = [];
             relSnap.forEach(d => { if (d.id !== p.id) relData.push({ id: d.id, ...d.data() } as Product); });
-            const STAM_CATS = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה'];
+            const STAM_CATS = ['קלפי מזוזה', 'בתי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה'];
             const filtered = relData.filter(p => !STAM_CATS.includes(p.cat || ''));
             setRelated(filtered.slice(0, 4));
 
@@ -1316,7 +1316,7 @@ export default function ProductClient() {
               collSnap.forEach(d => {
                 const cp = { id: d.id, ...d.data() } as Product;
                 const cat = cp.cat ?? '';
-                if (cp.id !== p.id && cp.cat !== p.cat && ALLOWED_CATS.has(cat) && !cat.includes('מזוזה') && cat !== 'מזוזות') {
+                if (cp.id !== p.id && cp.cat !== p.cat && ALLOWED_CATS.has(cat) && !cat.includes('מזוזה') && cat !== 'בתי מזוזה') {
                   const count = catCounts[cat] ?? 0;
                   if (count < 10) {
                     catCounts[cat] = count + 1;
@@ -1336,9 +1336,9 @@ export default function ProductClient() {
   useEffect(() => {
     if (!product?.size) return;
     const isKlaf = product.cat?.includes('קלפי מזוזה');
-    const isBayit = product.cat?.includes('מזוזות');
+    const isBayit = product.cat === 'בתי מזוזה';
     if (!isKlaf && !isBayit) return;
-    const targetCat = isKlaf ? 'מזוזות' : 'קלפי מזוזה';
+    const targetCat = isKlaf ? 'בתי מזוזה' : 'קלפי מזוזה';
     getDocs(query(collection(db, 'products'), where('cat', '==', targetCat), where('size', '==', product.size), limit(50)))
       .then(snap => {
         const results: Product[] = [];
@@ -1412,7 +1412,7 @@ export default function ProductClient() {
   const discount = product.was ? Math.round((1 - product.price / product.was) * 100) : 0;
 
   const EMBROIDERY_CATEGORIES = ['כיסוי תפילין', 'כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן', 'תיקי טלית ותפילין'];
-const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
+const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
 
   const MEZUZAH_CERTS: Certificate[] = [
     {
@@ -1444,7 +1444,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
   ];
 
   const isMezuzahCat = (cat?: string) =>
-    !!cat && ['קלפי מזוזה', 'מזוזות', 'בתי מזוזה'].some(c => cat.includes(c));
+    !!cat && cat.includes('קלפי מזוזה');
   const isTefillinCat = (cat?: string) =>
     !!cat && ['קלפי תפילין', 'תפילין קומפלט'].some(c => cat.includes(c));
 
@@ -1484,12 +1484,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
 
   // ── Buy Box ──────────────────────────────────────────────────────────────────
   const ctaLabel: string | null =
-    product?.cat === 'קלפי מזוזה' || product?.cat === 'מזוזות' ? 'אני רוצה את המזוזה הזאת' :
+    product?.cat === 'קלפי מזוזה' || product?.cat === 'בתי מזוזה' ? 'אני רוצה את המזוזה הזאת' :
     product?.cat === 'קלפי תפילין' || product?.cat === 'תפילין קומפלט' || product?.cat === 'תפילין' ? 'אני רוצה את התפילין האלה' :
     null;
 
   const addToCartLabel: string =
-    product?.cat === 'קלפי מזוזה' || product?.cat === 'מזוזות'
+    product?.cat === 'קלפי מזוזה' || product?.cat === 'בתי מזוזה'
       ? '🛒 אני אוסיף לעגלה את המזוזה'
       : product?.cat === 'קלפי תפילין' || product?.cat === 'תפילין קומפלט'
       ? '🛒 אני אוסיף לעגלה את התפילין'
@@ -1767,14 +1767,14 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
   ];
 
   const shippingRows = [
-    { icon: <Icon.Truck />,   k: 'משלוח',  v: `חינם לכל הארץ · ${product.days || '7-14'} ימי עסקים` },
+    { icon: <Icon.Truck />,   k: 'משלוח',  v: `₪30 עד הבית · ${product.days || '7-10'} ימי עסקים` },
     { icon: <Icon.Package />, k: 'אריזה',  v: 'אריזה מוגנת ומהודרת לכל הזמנה' },
     { icon: <Icon.Return />,  k: 'החזרות', v: 'ניתן להחזיר תוך 14 יום ממועד קבלת המוצר' },
     { icon: <Icon.X size={14} />, k: 'ביטול', v: 'ביטול אפשרי עד 24 שעות מהרכישה ללא עלות' },
     { icon: <Icon.Shield />,  k: 'אחריות', v: 'אחריות פלטפורמה מלאה על כל מוצר' },
   ];
 
-  const HIDE_RELATED_CATS = ['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
+  const HIDE_RELATED_CATS = ['קלפי מזוזה', 'בתי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
   const showRelated = related.length > 0 && !HIDE_RELATED_CATS.includes(product?.cat || '');
 
   return (
@@ -1944,7 +1944,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
                   )}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px', background: '#f8f9fa', borderRadius: 10, padding: '10px 14px', fontSize: 12 }}>
                     <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Clock /> זמן אספקה</span>
-                    <span style={{ fontWeight: 600 }}>{product.days || '7-14'} ימי עסקים</span>
+                    <span style={{ fontWeight: 600 }}>{product.days || '7-10'} ימי עסקים</span>
                     <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Tag /> קטגוריה</span>
                     <span style={{ fontWeight: 600 }}>{product.cat || '-'}</span>
                   </div>
@@ -2022,7 +2022,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         </div>
 
         {/* ── השלם את המראה — collection cross-sell ── */}
-        {collectionProducts.length >= 2 && product.collection && !['קלפי מזוזה', 'מזוזות', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'].some(c => product.cat?.includes(c)) && (
+        {collectionProducts.length >= 2 && product.collection && !['קלפי מזוזה', 'בתי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'].some(c => product.cat?.includes(c)) && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
             <div style={{ marginBottom: 16 }}>
               <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>
@@ -2161,7 +2161,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'מזוזות', 'קלפי ת�
         </div>
       )}
 
-      {sizeMatchProducts.length > 0 && product.size && (product.cat?.includes('קלפי מזוזה') || product.cat?.includes('מזוזות')) && (
+      {sizeMatchProducts.length > 0 && product.size && (product.cat?.includes('קלפי מזוזה') || product.cat === 'בתי מזוזה') && (
         <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
           <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 16 }}>
             {product.cat?.includes('קלפי מזוזה')

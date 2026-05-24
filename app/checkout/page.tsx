@@ -66,10 +66,7 @@ function Input({ label, name, value, onChange, placeholder, type = 'text', requi
   );
 }
 
-const KLAF_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין']);
-const SHIPPING_REGULAR = 25;
-const SHIPPING_EXPRESS = 45;
-const FREE_SHIPPING_THRESHOLD = 350;
+const SHIPPING_REGULAR = 30;
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -95,7 +92,6 @@ export default function CheckoutPage() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
-  const [shippingOption, setShippingOption] = useState<'regular' | 'express'>('regular');
   const [itemCategories, setItemCategories] = useState<Record<string, string>>({});
 
   // Read isMobile before first paint to prevent the false→true CLS flip on mobile
@@ -188,9 +184,7 @@ export default function CheckoutPage() {
     finally { setCouponLoading(false); }
   }
 
-  const hasKlafItem = items.some(i => KLAF_CATS.has(itemCategories[i.id] ?? ''));
-  const isFreeShipping = !hasKlafItem && total >= FREE_SHIPPING_THRESHOLD;
-  const shippingCost = isFreeShipping ? 0 : (shippingOption === 'express' ? SHIPPING_EXPRESS : SHIPPING_REGULAR);
+  const shippingCost = SHIPPING_REGULAR;
   const discountAmount = appliedCoupon ? Math.round(total * appliedCoupon.discount / 100 * 100) / 100 : 0;
   const finalTotal = total - discountAmount + shippingCost;
 
@@ -209,7 +203,7 @@ export default function CheckoutPage() {
         address: `${form.address}, ${form.city}`, notes: form.notes || '',
         items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null })),
         total: finalTotal, couponCode: appliedCoupon?.code || null, couponDiscount: appliedCoupon ? discountAmount : null,
-        shippingCost, shippingType: isFreeShipping ? 'free' : shippingOption,
+        shippingCost, shippingType: 'regular',
         status: 'pending_payment', createdAt: serverTimestamp(),
         shaliachRef: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
         commissionPercent, commissionAmount,
@@ -297,24 +291,10 @@ export default function CheckoutPage() {
       </div>
       <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}><span>סכום ביניים</span><span>{formatPrice(total)}</span></div>
-        {isFreeShipping ? (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-            <span style={{ color: '#777' }}>משלוח</span>
-            <span style={{ color: '#1a6b3c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck size={12} color="#1a6b3c" /> חינם 🎉</span>
-          </div>
-        ) : (
-          <div style={{ fontSize: 13 }}>
-            <div style={{ color: '#777', marginBottom: 6 }}>משלוח</div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, cursor: 'pointer' }}>
-              <input type="radio" name="shipping" value="regular" checked={shippingOption === 'regular'} onChange={() => setShippingOption('regular')} style={{ accentColor: '#C5A028' }} />
-              <span>רגיל (3–7 ימים) — {formatPrice(SHIPPING_REGULAR)}</span>
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-              <input type="radio" name="shipping" value="express" checked={shippingOption === 'express'} onChange={() => setShippingOption('express')} style={{ accentColor: '#C5A028' }} />
-              <span>מהיר — שליח עד הבית (1–3 ימים) — {formatPrice(SHIPPING_EXPRESS)}</span>
-            </label>
-          </div>
-        )}
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+          <span style={{ color: '#777' }}>משלוח</span>
+          <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(SHIPPING_REGULAR)}</span>
+        </div>
         {appliedCoupon && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.discount}%)</span>

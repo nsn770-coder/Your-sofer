@@ -311,7 +311,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
   const [level, setLevel] = useState('');
   const [nusach, setNusach] = useState('');
   const [badge, setBadge] = useState('');
-  const [days, setDays] = useState('7-14');
+  const [days, setDays] = useState('7-10');
   const [soferId, setSoferId] = useState('');
   const [imgUrl, setImgUrl] = useState('');
   const [imgUrl2, setImgUrl2] = useState('');
@@ -473,7 +473,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
             </div>
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>זמן אספקה</label>
-              <input value={days} onChange={e => setDays(e.target.value)} placeholder="7-14"
+              <input value={days} onChange={e => setDays(e.target.value)} placeholder="7-10"
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
           </div>
@@ -775,7 +775,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             </div>
             <div>
               <label style={labelStyle}>זמן אספקה</label>
-              <input value={days} onChange={e => setDays(e.target.value)} placeholder="7-14" style={inputStyle} />
+              <input value={days} onChange={e => setDays(e.target.value)} placeholder="7-10" style={inputStyle} />
             </div>
           </div>
           <div>
@@ -860,7 +860,7 @@ function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () =>
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
 
-  const SOFER_CATS = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
+  const SOFER_CATS = ['בתי מזוזה', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
 
   function toggleCat(cat: string) {
     setCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
@@ -983,7 +983,7 @@ function EditSoferModal({ sofer, onClose, onSave }: {
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
 
-  const SOFER_CATS = ['מזוזות', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
+  const SOFER_CATS = ['בתי מזוזה', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
 
   function toggleCat(cat: string) {
     setCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
@@ -1624,7 +1624,7 @@ export default function AdminPage() {
   }
 
   const REQUIRED_CATS: { slug: string; displayName: string; priority: number }[] = [
-    { slug: 'מזוזות',          displayName: 'מזוזות',          priority: 1  },
+    { slug: 'בתי מזוזה',        displayName: 'בתי מזוזה',        priority: 1  },
     { slug: 'קלפי מזוזה',      displayName: 'קלפי מזוזה',      priority: 2  },
     { slug: 'קלפי תפילין',     displayName: 'קלפי תפילין',     priority: 3  },
     { slug: 'תפילין קומפלט',   displayName: 'תפילין קומפלט',   priority: 4  },
@@ -2018,7 +2018,7 @@ export default function AdminPage() {
       ...products.map(p => [
         p.id, p.name, p.cat || '', p.price,
         (p as any).was || '', (p as any).desc || '',
-        (p as any).badge || '', (p as any).days || '7-14',
+        (p as any).badge || '', (p as any).days || '7-10',
         p.imgUrl || p.image_url || '',
         (p as any).imgUrl2 || '', (p as any).imgUrl3 || '',
         p.soferId || ''
@@ -2034,7 +2034,7 @@ export default function AdminPage() {
 
   function downloadTemplate() {
     const headers = ['id', 'name', 'cat', 'price', 'was', 'desc', 'badge', 'days', 'imgUrl', 'imgUrl2', 'imgUrl3', 'soferId'];
-    const example = ['', 'בית מזוזה כסף 10 ס"מ', 'מזוזות', '89.90', '', 'תיאור המוצר כאן', 'חדש', '7-14', 'https://example.com/image.jpg', '', '', ''];
+    const example = ['', 'בית מזוזה כסף 10 ס"מ', 'בתי מזוזה', '89.90', '', 'תיאור המוצר כאן', 'חדש', '7-10', 'https://example.com/image.jpg', '', '', ''];
     const csv = [headers.join(','), example.map(v => `"${v}"`).join(',')].join('\n');
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');

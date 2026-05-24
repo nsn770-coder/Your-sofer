@@ -24,9 +24,9 @@ function BadgePill({ children }: { children: React.ReactNode }) {
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 5,
       background: '#EEF3FF',
-      borderRadius: 20, padding: '4px 12px',
-      fontSize: 12, fontWeight: 700, color: '#2446A6',
-      letterSpacing: 0.3,
+      borderRadius: 0, padding: '5px 14px',
+      fontSize: 12, fontWeight: 600, color: '#2446A6',
+      letterSpacing: 0.4,
     }}>
       {children}
     </span>
@@ -44,13 +44,11 @@ function ProfileCard({
     <div style={{
       flex: 1,
       background: '#FFFFFF',
-      border: '1px solid #E7E2D8',
-      borderRight: `3px solid ${GOLD}`,
-      borderRadius: 16,
-      padding: isMobile ? '24px 20px' : '28px 24px',
+      borderRadius: 0,
+      padding: isMobile ? '32px 24px' : '40px 32px',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      gap: 14, textAlign: 'center',
-      boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+      gap: 16, textAlign: 'center',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
     }}>
       {imageUrl ? (
         <img
@@ -83,7 +81,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
       dir="rtl"
       style={{
         background: '#FAF8F3',
-        padding: isMobile ? '56px 20px' : '88px 48px',
+        padding: isMobile ? '72px 20px' : '112px 48px',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -95,18 +93,19 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             background: GOLD_LIGHT,
-            border: `1px solid rgba(201,162,39,0.4)`,
-            borderRadius: 20, padding: '6px 16px',
-            fontSize: 12, fontWeight: 700, color: GOLD,
-            marginBottom: 16, letterSpacing: 0.5,
+            border: `1px solid rgba(201,162,39,0.35)`,
+            borderRadius: 0, padding: '6px 16px',
+            fontSize: 12, fontWeight: 600, color: GOLD,
+            marginBottom: 16, letterSpacing: 0.6,
           }}>
             <span>✡</span> פיקוח רבני
           </div>
 
           <h2 style={{
-            fontSize: isMobile ? 28 : 32,
-            fontWeight: 800, color: '#1F2937',
-            lineHeight: 1.35, margin: '0 0 12px',
+            fontSize: isMobile ? 26 : 32,
+            fontWeight: 300, color: '#1F2937',
+            lineHeight: 1.4, margin: '0 0 14px',
+            letterSpacing: '-0.01em',
           }}>
             כל מוצר סת״מ באתר עובר בדיקה ואישור רבני
           </h2>
@@ -151,14 +150,17 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
             href="/kashrut"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: GOLD,
-              color: NAVY,
-              borderRadius: 10, padding: isMobile ? '11px 24px' : '13px 32px',
-              fontSize: isMobile ? 14 : 15, fontWeight: 900,
+              background: 'transparent',
+              color: GOLD,
+              border: `2px solid ${GOLD}`,
+              borderRadius: 0, padding: isMobile ? '11px 28px' : '13px 36px',
+              fontSize: isMobile ? 14 : 15, fontWeight: 700,
               textDecoration: 'none',
-              boxShadow: '0 4px 20px rgba(197,160,40,0.35)',
-              letterSpacing: 0.2,
+              letterSpacing: 0.3,
+              transition: 'background 0.25s, color 0.25s',
             }}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = GOLD; (e.currentTarget as HTMLAnchorElement).style.color = NAVY; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; (e.currentTarget as HTMLAnchorElement).style.color = GOLD; }}
           >
             📜 צפה בתעודת הכשרות
           </a>
@@ -178,9 +180,8 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
           ].map(item => (
             <div key={item} style={{
               display: 'flex', alignItems: 'center', gap: 7,
-              background: '#f5f5f5',
-              border: '1px solid #e0e0e0',
-              borderRadius: 20, padding: '7px 14px',
+              background: '#F8F6F1',
+              borderRadius: 0, padding: '7px 16px',
               fontSize: 12, color: '#1E3A8A', fontWeight: 600,
             }}>
               <span style={{ color: GOLD, fontSize: 13 }}>✓</span> {item}

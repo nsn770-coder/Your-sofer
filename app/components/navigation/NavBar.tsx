@@ -29,7 +29,7 @@ interface NavMenuItem {
 
 const MEGA_MENU_DATA: NavMenuItem[] = [
   {
-    id: "mezuzot", label: "מזוזות", cat: "מזוזות",
+    id: "mezuzot", label: "בתי מזוזה", cat: "בתי מזוזה",
     columns: [
       {
         title: "קלפי מזוזה",
@@ -44,27 +44,27 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
       {
         title: "בתי מזוזה",
         items: [
-          { label: "כל בתי המזוזה", cat: "מזוזות" },
-          { label: "פולימר", cat: "מזוזות", filter: "פולימר" },
-          { label: "בטון וסמנט", cat: "מזוזות", filter: "בטון" },
-          { label: "פלסטיק", cat: "מזוזות", filter: "פלסטיק" },
-          { label: "אלומיניום", cat: "מזוזות", filter: "אלומיניום" },
-          { label: "מתכת", cat: "מזוזות", filter: "מתכת" },
-          { label: "עץ", cat: "מזוזות", filter: "עץ" },
-          { label: "זכוכית", cat: "מזוזות", filter: "זכוכית" },
-          { label: "שיש", cat: "מזוזות", filter: "שיש" },
+          { label: "כל בתי המזוזה", cat: "בתי מזוזה" },
+          { label: "פולימר", cat: "בתי מזוזה", filter: "פולימר" },
+          { label: "בטון וסמנט", cat: "בתי מזוזה", filter: "בטון" },
+          { label: "פלסטיק", cat: "בתי מזוזה", filter: "פלסטיק" },
+          { label: "אלומיניום", cat: "בתי מזוזה", filter: "אלומיניום" },
+          { label: "מתכת", cat: "בתי מזוזה", filter: "מתכת" },
+          { label: "עץ", cat: "בתי מזוזה", filter: "עץ" },
+          { label: "זכוכית", cat: "בתי מזוזה", filter: "זכוכית" },
+          { label: "שיש", cat: "בתי מזוזה", filter: "שיש" },
         ]
       },
       {
         title: "לפי גודל",
         items: [
-          { label: '7 ס"מ', cat: "מזוזות", filter: '7 ס"מ' },
-          { label: '10 ס"מ', cat: "מזוזות", filter: '10 ס"מ' },
-          { label: '12 ס"מ', cat: "מזוזות", filter: '12 ס"מ' },
-          { label: '15 ס"מ', cat: "מזוזות", filter: '15 ס"מ' },
-          { label: '20 ס"מ', cat: "מזוזות", filter: '20 ס"מ' },
-          { label: '25 ס"מ', cat: "מזוזות", filter: '25 ס"מ' },
-          { label: '30 ס"מ', cat: "מזוזות", filter: '30 ס"מ' },
+          { label: '7 ס"מ', cat: "בתי מזוזה", filter: '7 ס"מ' },
+          { label: '10 ס"מ', cat: "בתי מזוזה", filter: '10 ס"מ' },
+          { label: '12 ס"מ', cat: "בתי מזוזה", filter: '12 ס"מ' },
+          { label: '15 ס"מ', cat: "בתי מזוזה", filter: '15 ס"מ' },
+          { label: '20 ס"מ', cat: "בתי מזוזה", filter: '20 ס"מ' },
+          { label: '25 ס"מ', cat: "בתי מזוזה", filter: '25 ס"מ' },
+          { label: '30 ס"מ', cat: "בתי מזוזה", filter: '30 ס"מ' },
         ]
       },
     ],

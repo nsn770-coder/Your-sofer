@@ -33,7 +33,7 @@ interface ProductEntry {
 }
 
 function emptyProduct(): ProductEntry {
-  return { type: PRODUCT_TYPES[0], name: '', desc: '', nusach: 'אשכנזי', level: 'כשר לכתחילה', days: '7-14', soferPrice: '', size: '', images: [] };
+  return { type: PRODUCT_TYPES[0], name: '', desc: '', nusach: 'אשכנזי', level: 'כשר לכתחילה', days: '7-10', soferPrice: '', size: '', images: [] };
 }
 
 // ─── Shared styles ────────────────────────────────────────────────────────────
@@ -504,7 +504,7 @@ export default function SoferApplyPage() {
                       <div>
                         <label style={labelStyle}>זמן אספקה (ימי עסקים)</label>
                         <input value={product.days} onChange={e => updateProduct(pIdx, 'days', e.target.value)}
-                          placeholder="7-14" style={inputStyle} />
+                          placeholder="7-10" style={inputStyle} />
                         <div style={tipStyle}>💡 זמן קצר מגביר סיכוי לרכישה</div>
                       </div>
                       <div>

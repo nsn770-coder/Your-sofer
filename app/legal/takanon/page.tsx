@@ -47,7 +47,7 @@ export default function TakanonPage() {
           </Section>
 
           <Section title="9. יצירת קשר">
-            לכל שאלה: טלפון 055-272-2228 | אימייל nsn770@gmail.com
+            לכל שאלה: טלפון 058-4877-770 | וואטסאפ: 055-272-2228 | אימייל: support@your-sofer.com
           </Section>
         </div>
       </div>

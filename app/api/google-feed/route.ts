@@ -13,6 +13,45 @@ function esc(s: string) {
     .replace(/"/g, '&quot;');
 }
 
+// Apparel categories that require color, gender, age_group
+const APPAREL_CATS = new Set([
+  'כיפות',
+  'טליתות וציציות',
+  'סט טלית תפילין',
+]);
+
+const COLOR_MAP: Record<string, string> = {
+  'שחור': 'Black',
+  'לבן': 'White',
+  'כחול': 'Blue',
+  'אדום': 'Red',
+  'חום': 'Brown',
+  'אפור': 'Gray',
+  'זהב': 'Gold',
+  'כסף': 'Silver',
+  'ירוק': 'Green',
+  'סגול': 'Purple',
+  'צבעוני': 'Multicolor',
+  'בורדו': 'Burgundy',
+  'בז': 'Beige',
+  'נייבי': 'Navy',
+};
+
+function resolveColor(d: Record<string, unknown>): string {
+  if (d.color && typeof d.color === 'string' && (d.color as string).trim()) {
+    return (d.color as string).trim();
+  }
+  const name = ((d.name ?? d.title ?? '') as string).toLowerCase();
+  for (const [heb, eng] of Object.entries(COLOR_MAP)) {
+    if (name.includes(heb)) return eng;
+  }
+  return 'Multicolor';
+}
+
+function getGender(_cat: string): string {
+  return 'male';
+}
+
 export async function GET() {
   try {
     const db = getAdminDb();
@@ -73,27 +112,27 @@ export async function GET() {
       ${imageLink ? `<g:image_link>${esc(imageLink)}</g:image_link>` : ''}
       ${additionalImages.map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('\n      ')}
       <g:availability>${esc(availability)}</g:availability>
-      <g:price>${d.was ? (d.was as number).toFixed(2) : price.toFixed(2)} ILS</g:price>
-      ${d.was ? `<g:sale_price>${price.toFixed(2)} ILS</g:sale_price>` : ''}
+      <g:price>${(d.was && (d.was as number) > price) ? (d.was as number).toFixed(2) : price.toFixed(2)} ILS</g:price>
+      ${(d.was && (d.was as number) > price) ? `<g:sale_price>${price.toFixed(2)} ILS</g:sale_price>` : ''}
       <g:brand>${esc(brand)}</g:brand>
       <g:condition>${esc(condition)}</g:condition>
       <g:identifier_exists>${esc(identifierExists)}</g:identifier_exists>
       ${googleProductCategory ? `<g:google_product_category>${esc(googleProductCategory)}</g:google_product_category>` : ''}
       ${cat ? `<g:product_type>${esc(cat)}</g:product_type>` : ''}
       ${material ? `<g:material>${esc(material)}</g:material>` : ''}
-      ${color ? `<g:color>${esc(color)}</g:color>` : ''}
+      ${APPAREL_CATS.has(cat) ? `<g:color>${esc(resolveColor(d))}</g:color>` : (color ? `<g:color>${esc(color)}</g:color>` : '')}
       ${d.size ? `<g:size>${esc(d.size as string)}</g:size>` : ''}
-      ${cat === 'כיפות' ? `<g:gender>male</g:gender>` : ''}
-      ${cat === 'כיפות' ? `<g:age_group>adult</g:age_group>` : ''}
+      ${APPAREL_CATS.has(cat) ? `<g:gender>${getGender(cat)}</g:gender>` : ''}
+      ${APPAREL_CATS.has(cat) ? `<g:age_group>adult</g:age_group>` : ''}
       ${badge ? `<g:custom_label_0>${esc(badge)}</g:custom_label_0>` : ''}
       <g:shipping>
         <g:country>IL</g:country>
-        <g:service>משלוח רגיל</g:service>
-        <g:price>0 ILS</g:price>
+        <g:service>משלוח עד הבית</g:service>
+        <g:price>30 ILS</g:price>
         <g:min_handling_time>1</g:min_handling_time>
-        <g:max_handling_time>3</g:max_handling_time>
-        <g:min_transit_time>3</g:min_transit_time>
-        <g:max_transit_time>11</g:max_transit_time>
+        <g:max_handling_time>2</g:max_handling_time>
+        <g:min_transit_time>5</g:min_transit_time>
+        <g:max_transit_time>8</g:max_transit_time>
       </g:shipping>
       <g:shipping>
         <g:country>US</g:country>

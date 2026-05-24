@@ -51,14 +51,14 @@ export const CARDS: CardDef[] = [
   },
   // ── Remaining 5 revealed by scrolling ─────────────────────────────────────
   {
-    title: 'מזוזות',
-    href: '/category/מזוזות',
-    ctaLabel: 'לכל המזוזות ←',
+    title: 'בתי מזוזה',
+    href: '/category/בתי מזוזה',
+    ctaLabel: 'לכל בתי המזוזה ←',
     items: [
-      { label: 'מזוזה אלומיניום', href: '/category/מזוזות?filter=אלומיניום', cat: 'מזוזות' },
-      { label: 'מזוזה עץ',        href: '/category/מזוזות?filter=עץ',        cat: 'מזוזות' },
-      { label: 'מזוזה כסף',       href: '/category/מזוזות?filter=כסף',       cat: 'מזוזות' },
-      { label: 'מזוזה פולימר',    href: '/category/מזוזות?filter=פולימר',    cat: 'מזוזות' },
+      { label: 'מזוזה אלומיניום', href: '/category/בתי מזוזה?filter=אלומיניום', cat: 'בתי מזוזה' },
+      { label: 'מזוזה עץ',        href: '/category/בתי מזוזה?filter=עץ',        cat: 'בתי מזוזה' },
+      { label: 'מזוזה כסף',       href: '/category/בתי מזוזה?filter=כסף',       cat: 'בתי מזוזה' },
+      { label: 'מזוזה פולימר',    href: '/category/בתי מזוזה?filter=פולימר',    cat: 'בתי מזוזה' },
     ],
   },
   {

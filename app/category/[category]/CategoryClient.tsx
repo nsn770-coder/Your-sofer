@@ -108,7 +108,7 @@ interface NameFilterSpec {
 }
 
 const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
-  'מזוזות': [
+  'בתי מזוזה': [
     { key: 'חומר', label: 'חומר', options: ['אלומיניום', 'עץ', 'כסף', 'פלסטיק', 'מתכת', 'זכוכית', 'קרמיקה', 'פולימר', 'בטון וסמנט', 'שיש'] },
     { key: 'גודל', label: 'גודל', options: ['7 ס"מ', '10 ס"מ', '12 ס"מ', '15 ס"מ', '20 ס"מ', '25 ס"מ', '30 ס"מ'] },
     { key: 'צבע',  label: 'צבע',  options: ['לבן', 'כסף', 'זהב', 'שחור', 'חום', 'צבעוני'] },
@@ -397,7 +397,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 // ─── Category scroll bar ─────────────────────────────────────────────────────
 
 const CAT_SCROLL_ITEMS: { label: string; href?: string; imgKey?: string }[] = [
-  { label: 'מזוזות' },
+  { label: 'בתי מזוזה' },
   { label: 'קלפי מזוזה' },
   { label: 'קלפי תפילין' },
   { label: 'תפילין קומפלט' },
@@ -703,7 +703,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
           </div>
           <span className={`text-xs flex items-center gap-1 ${filters.freeShipping ? 'font-bold text-[#1E3A8A]' : 'text-gray-600'}`}>
             <IconTruck size={12} />
-            משלוח חינם
+            משלוח ₪30
           </span>
         </label>
       </Section>
@@ -789,7 +789,7 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
     pills.push({ label: `${filters.minRating}★ ומעלה`, onRemove: () => onChange({ ...filters, minRating: 0 }) });
   }
   if (filters.freeShipping) {
-    pills.push({ label: 'משלוח חינם', onRemove: () => onChange({ ...filters, freeShipping: false }) });
+    pills.push({ label: 'משלוח ₪30', onRemove: () => onChange({ ...filters, freeShipping: false }) });
   }
   if (filters.sizeMin > 0 || filters.sizeMax < 100) {
     pills.push({
@@ -1049,6 +1049,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [soferMap, setSoferMap] = useState<Record<string, { name: string; imageUrl?: string }>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { setStamPage } = useChatPersona();
+  const { addItem } = useCart();
   const isStamCat = SOFER_FETCH_CATS.has(category);
   const [showAllProducts, setShowAllProducts] = useState(false);
 
@@ -1173,9 +1174,11 @@ export default function CategoryClient({ category }: { category: string }) {
           const map: Record<string, string> = {};
           snap.forEach(d => {
             const r = d.data();
-            const key = (d.id || r.slug || r.name || '') as string;
             const img = (r.imageUrl || r.imgUrl || '') as string;
-            if (key) map[key] = img;
+            if (!img) return;
+            if (d.id) map[d.id] = img;
+            if (r.slug) map[r.slug as string] = img;
+            if (r.name) map[r.name as string] = img;
           });
           setCatImages(map);
         }
@@ -1357,9 +1360,9 @@ export default function CategoryClient({ category }: { category: string }) {
       </div>
 
       {/* ── Header ── */}
-      <div style={{ background: '#FAF8F3', padding: '20px 20px 0' }}>
+      <div style={{ background: '#FAF8F3', padding: '40px 20px 24px' }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#1F2937', margin: 0 }}>
+          <h1 style={{ fontSize: 26, fontWeight: 400, color: '#1F2937', margin: 0, letterSpacing: '-0.01em' }}>
             {category === 'מתנות' ? 'מתנות ומוצרי בית' : category}
           </h1>
           {!loading && (
@@ -1423,7 +1426,7 @@ export default function CategoryClient({ category }: { category: string }) {
         <div dir="rtl" style={{
           background: '#EEF3FF',
           border: '1px solid #C5D5F0',
-          borderRadius: 12,
+          borderRadius: 8,
           margin: '12px 20px',
           padding: '10px 16px',
           display: 'flex', alignItems: 'center', gap: 10,
@@ -1437,7 +1440,7 @@ export default function CategoryClient({ category }: { category: string }) {
             fontSize: 11, color: '#2446A6', fontWeight: 700,
             background: '#fff',
             border: '1px solid #C5D5F0',
-            borderRadius: 20, padding: '3px 10px',
+            borderRadius: 4, padding: '3px 10px',
           }}>
             הרב שמחה בונים ברג'יקובסקי · מגיה מוסמך
           </span>
@@ -1450,7 +1453,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <span style={{ fontSize: 13, color: '#6B7280', flex: 1 }}>{filtered.length} מוצרים</span>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 10, padding: '8px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 8, padding: '8px 14px' }}>
           <IconSort size={13} />
           <select
             value={sortBy}
@@ -1463,7 +1466,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
         <button
           onClick={() => setDrawerOpen(true)}
-          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 10, padding: '8px 14px', fontSize: 13, color: '#1F2937', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
+          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 8, padding: '8px 14px', fontSize: 13, color: '#1F2937', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
         >
           <IconFilter size={14} />
           סינון
@@ -1486,7 +1489,7 @@ export default function CategoryClient({ category }: { category: string }) {
       )}
 
       {/* ── Main layout ── */}
-      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6 items-start">
+      <div className="max-w-7xl mx-auto px-4 py-10 flex gap-6 items-start">
 
         {/* Desktop sidebar */}
         <aside className="hidden lg:block w-60 flex-shrink-0 sticky top-4">
@@ -1504,31 +1507,90 @@ export default function CategoryClient({ category }: { category: string }) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                     <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>⭐ מומלץ לרמת {lvl}</h2>
                   </div>
-                  <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
+                  <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
                     {recs.map((p, idx) => (
-                      <div key={p.id} style={{ border: '2px solid #1D4ED8', borderRadius: 18, overflow: 'hidden', background: '#EFF4FF' }}>
-                        <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
-                          ⭐ מומלץ לרמת {lvl}
-                        </div>
-                        {isStamCat ? (
-                          <StamCard
-                            product={p}
-                            soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                            soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                            aboveFold={idx < 2}
-                          />
+                      <div key={p.id}
+                        style={{ border: '2px solid #1D4ED8', borderRadius: 12, overflow: 'hidden', background: (category.includes('מצווה') || category.includes('מצוה')) ? '#fff' : '#EFF4FF', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
+                        onClick={() => { if (category.includes('מצווה') || category.includes('מצוה')) window.location.href = `/product/${p.id}`; }}>
+
+                        {(category.includes('מצווה') || category.includes('מצוה')) ? (
+                          <>
+                            {/* Large image */}
+                            <div style={{ width: '100%', aspectRatio: '4/3', overflow: 'hidden', background: '#f5f5f5' }}>
+                              <img
+                                src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 600)}
+                                alt={p.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                loading={idx < 2 ? 'eager' : 'lazy'}
+                              />
+                            </div>
+                            {/* Blue banner */}
+                            <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
+                              ⭐ מומלץ לרמת {lvl}
+                            </div>
+                            {/* Content */}
+                            <div style={{ padding: '14px 16px', direction: 'rtl' }}>
+                              {p.stars && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 8 }}>
+                                  {Array.from({ length: 5 }).map((_, i) => (
+                                    <span key={i} style={{ fontSize: 20, color: i < Math.round(p.stars!) ? '#F59E0B' : '#ddd' }}>★</span>
+                                  ))}
+                                  <span style={{ fontSize: 13, color: '#666', marginRight: 4 }}>({p.stars})</span>
+                                </div>
+                              )}
+                              <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a', margin: '0 0 10px', lineHeight: 1.4, textAlign: 'right' }}>
+                                {p.name}
+                              </h3>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A' }}>₪{p.price?.toLocaleString()}</span>
+                                {p.was && p.was > p.price && (
+                                  <>
+                                    <span style={{ fontSize: 13, color: '#999', textDecoration: 'line-through' }}>₪{p.was?.toLocaleString()}</span>
+                                    <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>
+                                      {Math.round((1 - p.price / p.was) * 100)}% הנחה
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                              <div style={{ fontSize: 12, color: '#1E3A8A', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, padding: '6px 10px', marginBottom: 10, textAlign: 'right' }}>
+                                🎒 ניתן לבחור כיסוי תפילין בדף המוצר
+                              </div>
+                              <button
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl || p.image_url, quantity: 1 });
+                                }}
+                                style={{ width: '100%', padding: '11px', background: '#C5A028', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                                הוסף לסל 🛒
+                              </button>
+                            </div>
+                          </>
                         ) : (
-                          <ProductCard
-                            id={p.id} name={p.name} price={p.price}
-                            images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                            priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
-                            was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
-                            hasKlafSelection={p.hasKlafSelection} cat={p.cat}
-                            soferId={p.soferId}
-                            soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                            soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                            stars={p.stars || undefined}
-                          />
+                          <>
+                            <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
+                              ⭐ מומלץ לרמת {lvl}
+                            </div>
+                            {isStamCat ? (
+                              <StamCard
+                                product={p}
+                                soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                                soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                                aboveFold={idx < 2}
+                              />
+                            ) : (
+                              <ProductCard
+                                id={p.id} name={p.name} price={p.price}
+                                images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                                priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
+                                was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
+                                hasKlafSelection={p.hasKlafSelection} cat={p.cat}
+                                soferId={p.soferId}
+                                soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                                soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                                stars={p.stars || undefined}
+                              />
+                            )}
+                          </>
                         )}
                       </div>
                     ))}
@@ -1542,7 +1604,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     background: showAllProducts ? '#1E3A8A' : '#fff',
                     color: showAllProducts ? '#fff' : '#1E3A8A',
                     border: '2px solid #1E3A8A',
-                    borderRadius: 12, padding: '10px 28px',
+                    borderRadius: 8, padding: '10px 28px',
                     fontSize: 14, fontWeight: 700, cursor: 'pointer',
                     fontFamily: 'inherit', direction: 'rtl', transition: 'all 0.2s',
                   }}
@@ -1759,7 +1821,7 @@ export default function CategoryClient({ category }: { category: string }) {
             />
           ) : (
             <>
-              {(['מזוזות', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
+              {(['בתי מזוזה', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
                 (() => {
                   const gridCls = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
                   const renderCard = (p: Product, idx: number) => isStamCat ? (
@@ -1950,3 +2012,4 @@ export default function CategoryClient({ category }: { category: string }) {
     </div>
   );
 }
+
