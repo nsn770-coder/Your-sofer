@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 const ITEMS = [
-  '✓ 500+ משפחות בחרו בנו',
+  '✓ +1200 משפחות בחרו בנו',
   '✓ תמיכה מלאה בוואטסאפ גם אחרי הרכישה',
   '🔒 הזמנה בטוחה בתקן SSL',
 ];

@@ -537,7 +537,7 @@ export default function HomePageClient() {
   // Counter animation - writes directly to DOM refs, zero React re-renders
   useEffect(() => {
     if (!countersVisible) return;
-    const targets = { soferim: soferimCount || 12, products: productsCount || 180, customers: 1000 };
+    const targets = { soferim: soferimCount || 12, products: productsCount || 180, customers: 1200 };
     const duration = 1200;
     const start = performance.now();
     let rafId: number;
@@ -955,7 +955,7 @@ export default function HomePageClient() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
             <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterCheck isMobile={false} /></span>
             <span ref={customersValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0+</span>
-            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>לקוחות מרוצים</span>
+            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>משפחות כבר בחרו בנו</span>
           </div>
           {/* סופרים מוסמכים */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
