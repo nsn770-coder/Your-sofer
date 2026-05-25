@@ -10,6 +10,7 @@ interface ProductDoc {
   desc?: string;
   description?: string;
   price: number;
+  soferBasePrice?: number;
   imgUrl?: string;
   imgUrl2?: string;
   imgUrl3?: string;
@@ -78,7 +79,8 @@ export default function EditProductPage() {
 
       setName(d.name ?? '');
       setDesc(d.desc ?? d.description ?? '');
-      setPrice(String(d.price ?? ''));
+      // Show soferBasePrice if available, else fall back to stored price (legacy products saved base price directly)
+      setPrice(String(d.soferBasePrice ?? d.price ?? ''));
       setImgUrl(d.imgUrl ?? '');
       setImgUrl2(d.imgUrl2 ?? '');
       setImgUrl3(d.imgUrl3 ?? '');
@@ -113,11 +115,14 @@ export default function EditProductPage() {
     setSaving(true);
     setError('');
     try {
+      const soferBasePrice = Number(price);
+      const finalPrice = Math.round(soferBasePrice * 1.15 * 1.18);
       await updateDoc(doc(db, 'products', productId), {
         name,
         desc,
         description: desc,
-        price: Number(price),
+        price: finalPrice,
+        soferBasePrice,
         imgUrl: imgUrl || '',
         imgUrl2: imgUrl2 || '',
         imgUrl3: imgUrl3 || '',
@@ -197,9 +202,37 @@ export default function EditProductPage() {
 
           {/* Price */}
           <div>
-            <label style={labelStyle}>מחיר ₪ *</label>
+            <label style={labelStyle}>המחיר שלך לפני רווח ומע"מ ₪ *</label>
             <input type="number" min="0" style={{ ...inputStyle, maxWidth: 160 }}
               value={price} onChange={e => setPrice(e.target.value)} required />
+            {price && Number(price) > 0 && (() => {
+              const base = Number(price);
+              const afterMargin = base * 1.15;
+              const final = Math.round(base * 1.15 * 1.18);
+              return (
+                <div style={{ marginTop: 10, background: '#f0f9f4', border: '1px solid #a7d7b8', borderRadius: 8, padding: '12px 14px', fontSize: 13 }}>
+                  <div style={{ fontWeight: 700, color: '#1a3a2a', marginBottom: 8 }}>💰 חישוב מחיר לצרכן</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, color: '#374151' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>המחיר שלך (בסיס)</span>
+                      <span>₪{base.toFixed(2)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6b7280' }}>
+                      <span>+ 15% רווח</span>
+                      <span>₪{afterMargin.toFixed(2)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6b7280' }}>
+                      <span>+ 18% מע"מ</span>
+                      <span>₪{final}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, color: '#1a3a2a', borderTop: '1px solid #a7d7b8', paddingTop: 6, marginTop: 4, fontSize: 15 }}>
+                      <span>מחיר סופי לצרכן</span>
+                      <span>₪{final}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Images */}
