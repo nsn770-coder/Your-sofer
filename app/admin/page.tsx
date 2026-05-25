@@ -1864,6 +1864,22 @@ export default function AdminPage() {
       }
       if (app.email) {
         const normalizedEmail = app.email.trim().toLowerCase();
+
+        // Create (or verify) Firebase Auth account via Admin SDK
+        try {
+          const _auth = await getAuthLazy();
+          const idToken = await _auth.currentUser?.getIdToken(true);
+          if (idToken) {
+            await fetch('/api/admin/create-sofer-auth', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+              body: JSON.stringify({ email: normalizedEmail, displayName: app.name, soferId: soferRef.id }),
+            });
+          }
+        } catch (authErr) {
+          console.error('create-sofer-auth failed (non-fatal):', authErr);
+        }
+
         const usersSnap = await getDocs(query(collection(db, 'users'), where('email', '==', normalizedEmail)));
         if (!usersSnap.empty) {
           await updateDoc(usersSnap.docs[0].ref, {
@@ -1882,9 +1898,10 @@ export default function AdminPage() {
             soferId: soferRef.id,
             taxStatus: app.taxStatus || null,
             status: 'active',
+            neverLoggedIn: true,
             createdAt: serverTimestamp(),
           });
-          const newUser: AppUser = { id: newUserRef.id, email: normalizedEmail, displayName: app.name, role: 'sofer', soferId: soferRef.id, status: 'active' };
+          const newUser: AppUser = { id: newUserRef.id, email: normalizedEmail, displayName: app.name, role: 'sofer', soferId: soferRef.id, status: 'active', neverLoggedIn: true };
           setUsers(prev => [...prev, newUser]);
         }
       }
