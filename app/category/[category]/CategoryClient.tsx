@@ -346,8 +346,8 @@ function applyFilters(products: Product[], f: FilterState): Product[] {
       const chosen = f.attrFilters[key];
       if (chosen && chosen !== 'הכל' && p.filterAttributes?.[key] !== chosen) return false;
     }
-    for (const [, val] of Object.entries(f.nameFilters)) {
-      if (val && val !== 'הכל' && !p.name.includes(val)) return false;
+    for (const [key, val] of Object.entries(f.nameFilters)) {
+      if (key !== '_url' && val && val !== 'הכל' && !p.name.includes(val)) return false;
     }
     return true;
   });
@@ -1068,6 +1068,17 @@ export default function CategoryClient({ category }: { category: string }) {
   // Case A: recognized ?filter= values that map to a direct subCategory query
   const SUBCAT_QUERY_OVERRIDES: Record<string, Record<string, string>> = {
     'יודאיקה': { 'נטילת ידיים': 'נטילת ידיים', 'נטלות': 'נטילת ידיים' },
+    'כלי שולחן והגשה': {
+      'מגשים': 'מגשים', 'כוסות': 'כוסות', 'צלחות וקערות': 'צלחות וקערות',
+      'קנקנים': 'קנקנים', 'ספלים': 'ספלים', 'מערכות אוכל': 'מערכות אוכל',
+      'שבת': 'שבת', 'פסח': 'פסח', 'חנוכה': 'חנוכה',
+    },
+    'עיצוב הבית': {
+      'פמוטים': 'פמוטים', 'אגרטלים': 'אגרטלים', 'מראות': 'מראות',
+      'נרות ריחניים': 'נרות ריחניים', 'קישוטים': 'קישוטים',
+      'מסגרות תמונה': 'מסגרות תמונה', 'מעמדות לנר': 'מעמדות לנר',
+      'קופסאות תכשיטים': 'קופסאות תכשיטים',
+    },
   };
 
   // Keywords checked against subCategory for the שבתות-וחגים virtual category
@@ -1217,6 +1228,8 @@ export default function CategoryClient({ category }: { category: string }) {
 
   useEffect(() => {
     setFilters(EMPTY_FILTERS);
+    setSubCategoryFilter('');
+    setCollectionFilter('');
     setCurrentPage(1);
   }, [urlFilter]);
 
@@ -1233,7 +1246,8 @@ export default function CategoryClient({ category }: { category: string }) {
     for (const spec of catFilters) {
       if (spec.options.includes(urlFilter)) { setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, [spec.key]: urlFilter } })); return; }
     }
-    setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, _url: urlFilter } }));
+    setFilters(EMPTY_FILTERS);
+    setSubCategoryFilter('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlFilter, loading, allLoaded.length]);
 
