@@ -111,6 +111,8 @@ interface Product {
   imgUrl2?: string;
   imgUrl3?: string;
   sourceUrl?: string;
+  source?: string;
+  sku?: string;
   stockCount?: number;
   stockVisible?: boolean;
   soferName?: string;
@@ -835,6 +837,45 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             </div>
           )}
         </div>
+
+        {/* ── מידע ספק ── */}
+        {product.source && (
+          <div style={{ marginTop: 14, background: '#f0f4ff', border: '1px solid #c5d8ff', borderRadius: 8, padding: '12px 14px' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', marginBottom: 10 }}>מידע ספק</div>
+            <div style={{ display: 'grid', gap: 7, fontSize: 13, color: '#333' }}>
+              <div>
+                <span style={{ fontWeight: 700, color: '#555', marginLeft: 6 }}>ספק:</span>
+                <span style={{ fontFamily: 'monospace' }}>{product.source}</span>
+              </div>
+              {product.sku && (
+                <div>
+                  <span style={{ fontWeight: 700, color: '#555', marginLeft: 6 }}>מק&quot;ט:</span>
+                  <span style={{ fontFamily: 'monospace' }}>{product.sku}</span>
+                </div>
+              )}
+              {(() => {
+                const url = product.sourceUrl || (
+                  product.source === 'israel-judaica' && product.sku
+                    ? `https://www.israel-judaica.com/index.php?option=com_art&view=product&sku=${encodeURIComponent(product.sku)}&lang=he`
+                    : null
+                );
+                return url ? (
+                  <div>
+                    <span style={{ fontWeight: 700, color: '#555', marginLeft: 6 }}>קישור לספק:</span>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#1E3A8A', textDecoration: 'underline', fontSize: 12, wordBreak: 'break-all' }}
+                    >
+                      {url}
+                    </a>
+                  </div>
+                ) : null;
+              })()}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
