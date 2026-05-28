@@ -1,7 +1,7 @@
 ﻿'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import ProductCard from '@/components/ui/ProductCard';
 import { search as pixelSearch } from '@/lib/metaPixel';
@@ -20,7 +20,7 @@ interface Product {
   was?: number | null;
   createdAt?: { seconds: number } | null;
   hidden?: boolean;
-  description?: string;
+  desc?: string;
   cat?: string;
 }
 
@@ -39,16 +39,17 @@ export default function SearchPage() {
     setLoading(true);
     try {
       const snap = await getDocs(
-        query(collection(db, 'products'), orderBy('priority', 'desc'), limit(2000))
+        query(collection(db, 'products'), limit(5000))
       );
       const all = snap.docs
         .map(d => ({ id: d.id, ...d.data() } as Product))
-        .filter(p => p.hidden !== true);
+        .filter(p => p.hidden !== true)
+        .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
 
       const lower = term.toLowerCase();
       const matched = all.filter(p =>
         p.name?.toLowerCase().includes(lower) ||
-        p.description?.toLowerCase().includes(lower) ||
+        p.desc?.toLowerCase().includes(lower) ||
         p.cat?.toLowerCase().includes(lower)
       );
       setResults(matched);
