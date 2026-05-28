@@ -29,6 +29,12 @@ interface Order {
   customerName: string;
   total: number;
   status: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  notes?: string;
+  shippingCost?: number;
+  shippingType?: string;
   shaliachName?: string;
   commissionAmount?: number;
   createdAt?: { seconds: number };
@@ -1320,34 +1326,63 @@ function OrdersTab({ orders, setOrders }: { orders: Order[]; setOrders: React.Di
                     {updatingId === o.id && <span className="ml-2 text-xs text-gray-400">שומר...</span>}
                   </td>
                 </tr>
-                {isExpanded && o.items && o.items.length > 0 && (
+                {isExpanded && (
                   <tr className="bg-blue-50 border-t border-blue-100">
-                    <td colSpan={5} className="px-5 py-3">
-                      <p className="text-xs font-bold text-gray-500 mb-2">פריטים בהזמנה:</p>
-                      <div className="flex flex-col gap-1">
-                        {o.items.map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-3 text-xs text-gray-700">
-                            <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600 cursor-pointer">{item.name}</a>
-                            <span className="text-gray-400">×{item.quantity}</span>
-                            <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
-                            {item.embroideryText && (
-                              <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
-                                ✍️ ריקמה: <strong>{item.embroideryText}</strong>
-                              </span>
-                            )}
-                            {item.selectedKlafName && (
-                              <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
-                                📜 קלף: <strong>{item.selectedKlafName}</strong>
-                              </span>
-                            )}
-                            {item.selectedCover && (
-                              <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
-                                כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
-                              </span>
-                            )}
-                          </div>
-                        ))}
+                    <td colSpan={5} className="px-5 py-3" dir="rtl">
+                      {/* ── פרטי לקוח ── */}
+                      <div className="bg-white border border-blue-100 rounded-lg px-4 py-3 mb-3 text-xs text-gray-700">
+                        <p className="text-xs font-bold text-gray-400 mb-2">פרטי לקוח</p>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+                          {o.customerName && (
+                            <div><span className="text-gray-400 ml-1">שם:</span><span className="font-medium">{o.customerName}</span></div>
+                          )}
+                          {o.phone && (
+                            <div><span className="text-gray-400 ml-1">טלפון:</span><span className="font-medium" dir="ltr">{o.phone}</span></div>
+                          )}
+                          {o.email && (
+                            <div><span className="text-gray-400 ml-1">אימייל:</span><span className="font-medium" dir="ltr">{o.email}</span></div>
+                          )}
+                          {o.address && (
+                            <div><span className="text-gray-400 ml-1">כתובת:</span><span className="font-medium">{o.address}</span></div>
+                          )}
+                          {o.shippingCost != null && (
+                            <div><span className="text-gray-400 ml-1">משלוח:</span><span className="font-medium">₪{o.shippingCost}</span></div>
+                          )}
+                          {o.notes && (
+                            <div className="col-span-2 mt-1"><span className="text-gray-400 ml-1">הערות:</span><span className="font-medium">{o.notes}</span></div>
+                          )}
+                        </div>
                       </div>
+                      {/* ── פריטים ── */}
+                      {o.items && o.items.length > 0 && (
+                        <>
+                          <p className="text-xs font-bold text-gray-500 mb-2">פריטים בהזמנה:</p>
+                          <div className="flex flex-col gap-1">
+                            {o.items.map((item, idx) => (
+                              <div key={idx} className="flex items-center gap-3 text-xs text-gray-700">
+                                <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600 cursor-pointer">{item.name}</a>
+                                <span className="text-gray-400">×{item.quantity}</span>
+                                <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
+                                {item.embroideryText && (
+                                  <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
+                                    ✍️ ריקמה: <strong>{item.embroideryText}</strong>
+                                  </span>
+                                )}
+                                {item.selectedKlafName && (
+                                  <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                                    📜 קלף: <strong>{item.selectedKlafName}</strong>
+                                  </span>
+                                )}
+                                {item.selectedCover && (
+                                  <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
+                                    כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      )}
                     </td>
                   </tr>
                 )}
