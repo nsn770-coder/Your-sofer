@@ -185,7 +185,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails';
 
 interface RabbiRequest {
   id: string;
@@ -2234,6 +2234,7 @@ export default function AdminPage() {
           { key: 'abandoned_carts', label: '🛒 נטישות עגלה',    color: 'bg-orange-600',  badge: abandonedCarts.length },
           { key: 'customers',      label: '👤 לקוחות',           color: 'bg-cyan-700' },
           { key: 'leads',          label: '📋 לידים',            color: 'bg-lime-700',   badge: leads.length },
+          { key: 'emails',         label: '📧 מיילים',           color: 'bg-sky-700' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -3299,6 +3300,16 @@ export default function AdminPage() {
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === 'emails' && (
+        <div className="bg-white rounded-xl shadow overflow-hidden" style={{ height: 'calc(100vh - 280px)' }}>
+          <iframe
+            src="/admin/emails"
+            className="w-full h-full border-0"
+            title="ניהול מיילים"
+          />
         </div>
       )}
 
