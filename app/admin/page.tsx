@@ -1286,7 +1286,7 @@ function OrdersTab({ orders, setOrders }: { orders: Order[]; setOrders: React.Di
                       <div className="flex flex-col gap-1">
                         {o.items.map((item, idx) => (
                           <div key={idx} className="flex items-center gap-3 text-xs text-gray-700">
-                            <span className="font-bold">{item.name}</span>
+                            <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600 cursor-pointer">{item.name}</a>
                             <span className="text-gray-400">×{item.quantity}</span>
                             <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
                             {item.embroideryText && (
