@@ -91,14 +91,28 @@ function ThankYouContent() {
           })),
         });
 
-        // Meta Pixel purchase event
-        pixel.purchase(
-          order.orderNumber,
-          (order.items || []).map((i: { id: string; name: string; price: number; quantity: number }) => ({
-            id: i.id, name: i.name, price: i.price, quantity: i.quantity,
-          })),
-          order.total,
-        );
+        // Meta Pixel purchase event — guarded against double-fire on page refresh
+        const pixelKey = `purchase_fired_${orderId}`;
+        let alreadyFired = false;
+        try {
+          if (typeof window !== 'undefined') {
+            alreadyFired = !!localStorage.getItem(pixelKey);
+          }
+        } catch {}
+        if (!alreadyFired) {
+          pixel.purchase(
+            order.orderNumber,
+            (order.items || []).map((i: { id: string; name: string; price: number; quantity: number }) => ({
+              id: i.id, name: i.name, price: i.price, quantity: i.quantity,
+            })),
+            order.total,
+          );
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(pixelKey, '1');
+            }
+          } catch {}
+        }
 
         // שלח מייל ללקוח
         await fetch('/api/send-order-email', {
