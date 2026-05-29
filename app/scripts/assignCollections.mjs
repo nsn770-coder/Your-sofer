@@ -1,17 +1,22 @@
 /**
  * assignCollections.mjs
- * Assigns one of 5 collections to every active product based on
+ * Assigns one of 6 collections to every active product based on
  * weighted keyword matching across name, description, and filterAttributes.
  *
- * Scoring:
+ * Scoring weights:
  *   name match      = 3 pts per keyword
  *   desc match      = 2 pts per keyword
  *   attribute match = 1 pt  per keyword
  *
- * Default collection when score = 0: ישפה
+ * All 5 keyword collections are scored normally (יהלום, שוהם, ישפה, ספיר, ברקת).
+ * After the winner is determined, one post-processing rule applies:
+ *   if winner === 'ברקת' AND product color is gold → reassign to 'תרשיש'
+ * This splits ברקת into two by gold color. תרשיש only ever receives products
+ * that already qualified for ברקת by keywords AND are gold-colored.
+ * Default collection when no keyword winner: ישפה
  *
  * Usage:
- *   node app/scripts/assignCollections.mjs --dry-run   (20 products, no writes)
+ *   node app/scripts/assignCollections.mjs --dry-run   (all products, no writes)
  *   node app/scripts/assignCollections.mjs              (full run, writes collection field)
  *   node app/scripts/assignCollections.mjs --reassign  (overwrite existing collection values)
  */
@@ -40,14 +45,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 })();
 
 // ── Firebase Admin ────────────────────────────────────────────────────────────
-const SA = resolve(__dirname, '../../serviceAccountKey.json.json');
+const SA = resolve(__dirname, '../../your-sofer-firebase-adminsdk-fbsvc-418544c2de.json');
 if (getApps().length === 0) initializeApp({ credential: cert(SA) });
 const db = getFirestore();
 
 // ── CLI flags ─────────────────────────────────────────────────────────────────
 const DRY_RUN  = process.argv.includes('--dry-run');
 const REASSIGN = process.argv.includes('--reassign');
-const DRY_LIMIT = 20;
 
 // ── Collection definitions ────────────────────────────────────────────────────
 const COLLECTIONS = [
@@ -98,6 +102,15 @@ const COLLECTIONS = [
 ];
 
 const DEFAULT_COLLECTION = 'ישפה';
+
+// Gold values matched against filterAttributes['צבע'] (or product.color) to
+// split ברקת winners: ברקת + gold color → תרשיש.
+const GOLD_KEYWORDS = ['זהב', 'מוזהב', 'זהוב'];
+
+function isGoldProduct(product) {
+  const colorAttr = (product.filterAttributes?.['צבע'] || product.color || '').toLowerCase();
+  return GOLD_KEYWORDS.some(v => colorAttr === v.toLowerCase());
+}
 
 // ── Word-boundary matcher ─────────────────────────────────────────────────────
 // Multi-word keywords (containing spaces) use plain includes — they can't be
@@ -166,7 +179,7 @@ function scoreProduct(product) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 console.log(DRY_RUN
-  ? `🧪 Dry-run mode — first ${DRY_LIMIT} active products, no Firestore writes\n`
+  ? '🧪 Dry-run mode — ALL active products, no Firestore writes\n'
   : '🚀 Live mode — writing collection field to Firestore\n'
 );
 
@@ -188,19 +201,26 @@ if (products.length === 0) {
   process.exit(0);
 }
 
-const sample = DRY_RUN ? products.slice(0, DRY_LIMIT) : products;
+const sample = products; // dry-run controls writes, not sample size
 console.log(`🎯 Processing ${sample.length} products\n`);
 
 // ── Process ───────────────────────────────────────────────────────────────────
 const results = [];
 
 for (const p of sample) {
-  const { collection, score, matchedKeywords, allScores } = scoreProduct(p);
+  const { collection: kwCollection, score, matchedKeywords, allScores } = scoreProduct(p);
+
+  // Post-process: ברקת winners that are gold-colored move to תרשיש.
+  // Nothing outside ברקת can ever become תרשיש.
+  const finalCollection = (kwCollection === 'ברקת' && isGoldProduct(p))
+    ? 'תרשיש'
+    : kwCollection;
+
   results.push({
     id:         p.id,
     name:       p.name || '(ללא שם)',
     cat:        p.cat  || p.category || '',
-    collection,
+    collection: finalCollection,
     score,
     matchedKeywords,
     allScores,
@@ -239,11 +259,13 @@ console.log('\n═════════════════════�
 console.log('📊 התפלגות לפי אוסף:');
 const dist = {};
 for (const r of results) dist[r.collection] = (dist[r.collection] || 0) + 1;
-for (const col of COLLECTIONS) {
-  const count   = dist[col.id] || 0;
+// All 6 display IDs — תרשיש is post-assigned from ברקת winners, not scored directly
+const DISPLAY_ORDER = ['יהלום', 'ישפה', 'ברקת', 'תרשיש', 'ספיר', 'שוהם'];
+for (const id of DISPLAY_ORDER) {
+  const count   = dist[id] || 0;
   const pct     = ((count / results.length) * 100).toFixed(1);
   const bar     = '█'.repeat(Math.round(count / results.length * 30));
-  console.log(`   ${col.id.padEnd(6)} ${String(count).padStart(4)} (${pct.padStart(5)}%)  ${bar}`);
+  console.log(`   ${id.padEnd(6)} ${String(count).padStart(4)} (${pct.padStart(5)}%)  ${bar}`);
 }
 const defaults = results.filter(r => r.score === 0).length;
 console.log(`\n   ⚪ ברירת מחדל (ניקוד 0): ${defaults} מוצרים`);

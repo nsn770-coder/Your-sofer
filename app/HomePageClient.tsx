@@ -343,6 +343,7 @@ export default function HomePageClient() {
   const [newsletterEmail, setNewsletterEmail]   = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
+  const [homeSearchQuery, setHomeSearchQuery] = useState('');
   const cardsRef   = useRef<HTMLDivElement>(null);
   const router     = useRouter();
   const { shaliach } = useShaliach();
@@ -893,6 +894,34 @@ export default function HomePageClient() {
               סט בר מצווה
             </a>
           </div>
+        </div>
+      </div>
+
+      {/* ── Homepage search band ── */}
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '20px 16px' : '28px 32px', borderBottom: '1px solid #E7E2D8' }}>
+        <div style={{ maxWidth: 600, margin: '0 auto', display: 'flex', overflow: 'hidden', border: '1.5px solid #D1D5DB' }}>
+          <input
+            value={homeSearchQuery}
+            onChange={e => setHomeSearchQuery(e.target.value)}
+            onKeyDown={e => {
+              if (e.key !== 'Enter') return;
+              const q = homeSearchQuery.trim();
+              if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
+            }}
+            placeholder="חיפוש מזוזות, תפילין, מתנות..."
+            dir="rtl"
+            style={{ flex: 1, border: 'none', padding: '14px 18px', fontSize: 15, color: '#111', background: '#fff', outline: 'none', minWidth: 0 }}
+          />
+          <button
+            onClick={() => {
+              const q = homeSearchQuery.trim();
+              if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
+            }}
+            style={{ background: '#C5A028', border: 'none', padding: '0 22px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, fontFamily: 'inherit', fontSize: 14, fontWeight: 700, color: '#fff' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            {!isMobile && 'חיפוש'}
+          </button>
         </div>
       </div>
 

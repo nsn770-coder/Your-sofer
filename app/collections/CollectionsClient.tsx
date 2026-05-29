@@ -59,6 +59,17 @@ const COLLECTIONS = [
     href: '/category/כלי שולחן והגשה?collection=ברקת',
     bannerImage: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919689931_fkb8c6.png',
   },
+  {
+    id: 'תרשיש',
+    tagline: 'הקו הזהוב והמאיר',
+    description: 'עיצובים זהובים ומוזהבים — חמימות ואור בכל פינה של הבית.',
+    color: '#b45309',
+    bg: 'linear-gradient(135deg, #fef9c3 0%, #fefce8 100%)',
+    border: '#fcd34d',
+    dot: '#b45309',
+    href: '/category/יודאיקה?collection=תרשיש',
+    bannerImage: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919932/1777919910394_olu4mi.png',
+  },
 ];
 
 type Collection = typeof COLLECTIONS[0];
@@ -187,7 +198,7 @@ export default function CollectionsPage() {
           הקולקציות שלנו
         </h1>
         <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
-          חמישה קוים עיצוביים נבחרים — מצאו את הסגנון שמדבר אליכם
+          שישה קוים עיצוביים נבחרים — מצאו את הסגנון שמדבר אליכם
         </p>
       </div>
 

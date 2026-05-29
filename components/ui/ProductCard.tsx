@@ -301,8 +301,10 @@ export default function ProductCard({
         {imgSrc ? (
           <img
             src={imgSrc} alt={name}
+            width={400} height={400}
             loading={aboveFold ? 'eager' : 'lazy'}
             fetchPriority={aboveFold ? 'high' : 'auto'}
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             onError={e => { e.currentTarget.style.display = 'none'; }}
           />
@@ -361,6 +363,7 @@ export default function ProductCard({
           fontSize: 15, fontWeight: 500, color: '#1F2937', lineHeight: 1.4,
           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
           overflow: 'hidden', marginBottom: 6,
+          minHeight: '42px',
         } as React.CSSProperties}>
           {name}
         </p>

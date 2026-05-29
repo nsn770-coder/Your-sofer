@@ -1247,6 +1247,8 @@ export default function ProductClient() {
     return (Math.abs(hash) % 8) + 12;
   });
   const buyBoxRef = useRef<HTMLDivElement>(null);
+  const mobileBuyBoxRef = useRef<HTMLDivElement>(null);
+  const [stickyBarVisible, setStickyBarVisible] = useState(false);
   const { setStamPage } = useChatPersona();
 
   useEffect(() => {
@@ -1258,6 +1260,18 @@ export default function ProductClient() {
     check(); window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const el = mobileBuyBoxRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setStickyBarVisible(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isMobile]);
 
   useEffect(() => {
     const STAM_CHAT_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
@@ -1883,6 +1897,14 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               )}
             </div>
 
+            {/* STaM trust line — above the fold, only for supervised categories */}
+            {product.cat && RABBINICAL_CATEGORIES.has(product.cat) && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#1a6b3c', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 20, padding: '5px 12px', marginBottom: 12, alignSelf: 'flex-start' }}>
+                <span>✓</span>
+                בהשגחת מגיה מוסמך · כולל תעודת כשרות
+              </div>
+            )}
+
             {/* Mobile price */}
             {isMobile && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f0f0f0' }}>
@@ -2008,7 +2030,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               />
             )}
 
-            {isMobile && <div style={{ marginTop: 16 }}><BuyBox /></div>}
+            {isMobile && <div ref={mobileBuyBoxRef} style={{ marginTop: 16 }}><BuyBox /></div>}
           </div>
 
           {/* ── Column 3: Buy Box desktop ── */}
@@ -2261,6 +2283,42 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </a>
       )}
 
+
+      {/* Sticky add-to-cart bar — mobile only, appears after scrolling past BuyBox */}
+      {isMobile && stickyBarVisible && (
+        <div
+          dir="rtl"
+          style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0,
+            zIndex: 90,
+            background: '#fff',
+            borderTop: '1px solid #e8e8e8',
+            boxShadow: '0 -4px 16px rgba(0,0,0,0.10)',
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '10px 16px',
+            paddingBottom: 'calc(10px + env(safe-area-inset-bottom))',
+          }}
+        >
+          <span style={{ fontSize: 18, fontWeight: 800, color: '#1E3A8A', whiteSpace: 'nowrap' }}>
+            {formatPrice(product.price)}
+          </span>
+          <button
+            onClick={handleAddToCart}
+            style={{
+              flex: 1,
+              height: 44,
+              background: '#C9A227', color: '#1F3D8F',
+              border: 'none', borderRadius: 10,
+              fontSize: 15, fontWeight: 900,
+              cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            }}
+          >
+            <Icon.Cart size={15} color="#1F3D8F" />
+            הוסף לסל
+          </button>
+        </div>
+      )}
 
       {/* Mobile FAB — admin only */}
       {user?.role === 'admin' && isMobile && !adminOpen && (
