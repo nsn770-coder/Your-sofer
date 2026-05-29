@@ -163,7 +163,22 @@
       "Bash(Select-Object -ExpandProperty FullName)",
       "Read(//c/Users/Nissan/**)",
       "Bash(Select-Object Name)",
-      "Bash(tee scripts/import-log.txt)"
+      "Bash(tee scripts/import-log.txt)",
+      "Bash(SERVICE_ACCOUNT_PATH=\"C:\\\\Users\\\\Owner\\\\Downloads\\\\your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\" node app/scripts/renameCategoryMezuzot.mjs)",
+      "Bash(SERVICE_ACCOUNT_PATH=\"C:\\\\Users\\\\Owner\\\\Downloads\\\\your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\" node app/scripts/updateCategoryDocument.mjs)",
+      "Bash(SERVICE_ACCOUNT_PATH=\"C:\\\\Users\\\\Owner\\\\Downloads\\\\your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\" node app/scripts/migrateCategoryDocId.mjs)",
+      "Bash(SERVICE_ACCOUNT_PATH=\"C:\\\\Users\\\\Owner\\\\Downloads\\\\your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\" node --input-type=module)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\")",
+      "Bash(findstr /i \"\\\\.tsx$\")",
+      "Bash(findstr /i \"catalog\\\\|product\\\\|filter\\\\|categor\\\\|nav\\\\|menu\")",
+      "Bash(ls /mnt/)",
+      "Read(//c//**)",
+      "Bash(git *)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\" -Name | Where-Object { $_ -match 'service|key|account|credential' })",
+      "Bash(tee -a scripts/import-log.txt)",
+      "Bash(SERVICE_ACCOUNT_PATH=\"C:/Users/Owner/Downloads/your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\" node scripts/importAllIsraelJudaica.mjs --start=1168)",
+      "Bash(SERVICE_ACCOUNT_PATH=\"C:/Users/Owner/Downloads/your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\" node *)",
+      "Bash(export SERVICE_ACCOUNT_PATH=\"C:/Users/Owner/Downloads/your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\")"
     ]
   }
 }

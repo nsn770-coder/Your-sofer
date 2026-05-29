@@ -29,7 +29,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 })();
 
 // ── Firebase ──────────────────────────────────────────────────────────────────
-const SA = resolve(__dirname, '../../serviceAccountKey.json.json');
+const SA = process.env.SERVICE_ACCOUNT_PATH || resolve(__dirname, '../../serviceAccountKey.json');
 if (getApps().length === 0) initializeApp({ credential: cert(SA) });
 const db = getFirestore();
 

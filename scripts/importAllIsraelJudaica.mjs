@@ -75,7 +75,7 @@ const UPLOAD_PRESET  = 'yoursofer_upload';
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 // ── Firebase Admin ────────────────────────────────────────────────────────────
-const SA_PATH = resolve(__dirname, '../app/scripts/your-sofer-firebase-adminsdk-fbsvc-dd43a60da9.json');
+const SA_PATH = process.env.SERVICE_ACCOUNT_PATH || resolve(__dirname, '../app/scripts/your-sofer-firebase-adminsdk-fbsvc-dd43a60da9.json');
 const serviceAccount = JSON.parse(readFileSync(SA_PATH, 'utf8'));
 if (getApps().length === 0) initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore();

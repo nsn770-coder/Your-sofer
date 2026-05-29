@@ -1,19 +1,144 @@
 {
-  "date": "2026-05-29T08:33:31.051Z",
-  "dryRun": true,
-  "totalCategories": 1,
-  "totalFound": 133,
-  "totalAdded": 133,
+  "date": "2026-05-29T10:01:48.465Z",
+  "dryRun": false,
+  "totalCategories": 14,
+  "totalFound": 939,
+  "totalAdded": 862,
   "categories": [
     {
-      "code": "1129",
-      "label": "חנוכה",
-      "cat": "יודאיקה",
-      "subCategory": "חנוכה",
-      "found": 133,
-      "added": 133,
+      "code": "1168",
+      "label": "פמוטים",
+      "cat": "שבת",
+      "subCategory": "פמוטים",
+      "found": 273,
+      "added": 273,
       "skipped": 0,
-      "dryRun": true
+      "failed": 0
+    },
+    {
+      "code": "1169",
+      "label": "קופות צדקה",
+      "cat": "יודאיקה",
+      "subCategory": "קופות צדקה",
+      "found": 71,
+      "added": 71,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "code": "1171",
+      "label": "כיסויי חלה",
+      "cat": "שבת",
+      "subCategory": "כיסויי חלה",
+      "found": 136,
+      "added": 136,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "code": "1172",
+      "label": "כיסויי פלטה",
+      "cat": "שבת",
+      "subCategory": "כיסויי פלטה",
+      "found": 21,
+      "added": 21,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "code": "1173",
+      "label": "מפות שולחן",
+      "cat": "כלי שולחן והגשה",
+      "subCategory": "מפות שולחן",
+      "found": 25,
+      "added": 25,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "code": "1174",
+      "label": "קרשי חלה וסכינים",
+      "cat": "שבת",
+      "subCategory": "קרשי חלה",
+      "found": 90,
+      "added": 90,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "code": "1175",
+      "label": "מלחיות",
+      "cat": "שבת",
+      "subCategory": "מלחיות",
+      "found": 101,
+      "added": 101,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "code": "1176",
+      "label": "תכשיטים",
+      "cat": "תכשיטים",
+      "subCategory": "תכשיטים",
+      "found": 63,
+      "added": 58,
+      "skipped": 5,
+      "failed": 0
+    },
+    {
+      "code": "1177",
+      "label": "צמידים וטבעות",
+      "cat": "תכשיטים",
+      "subCategory": "צמידים וטבעות",
+      "found": 14,
+      "added": 0,
+      "skipped": 14
+    },
+    {
+      "code": "1178",
+      "label": "תכשיטי כסף טהור",
+      "cat": "תכשיטים",
+      "subCategory": "תכשיטי כסף",
+      "found": 38,
+      "added": 0,
+      "skipped": 38
+    },
+    {
+      "code": "1180",
+      "label": "נירוסטה ורודיום",
+      "cat": "תכשיטים",
+      "subCategory": "נירוסטה ורודיום",
+      "found": 4,
+      "added": 0,
+      "skipped": 4
+    },
+    {
+      "code": "1185",
+      "label": "קיטלים",
+      "cat": "יודאיקה",
+      "subCategory": "קיטלים",
+      "found": 4,
+      "added": 0,
+      "skipped": 4
+    },
+    {
+      "code": "1187",
+      "label": "ברכונים",
+      "cat": "יודאיקה",
+      "subCategory": "ברכונים",
+      "found": 87,
+      "added": 87,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "code": "1193",
+      "label": "גביעי קידוש פולימר",
+      "cat": "שבת",
+      "subCategory": "כוסות קידוש",
+      "found": 12,
+      "added": 0,
+      "skipped": 12
     }
   ]
 }
