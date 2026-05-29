@@ -48,6 +48,7 @@ interface Product {
   collection?: string;
   hasKlafSelection?: boolean;
   isExpertRecommended?: boolean;
+  outOfStock?: boolean;
 }
 
 interface Curation {
@@ -1602,6 +1603,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                                 soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                                 stars={p.stars || undefined}
+                                outOfStock={p.outOfStock}
                               />
                             )}
                           </>
@@ -1855,7 +1857,8 @@ export default function CategoryClient({ category }: { category: string }) {
                       soferId={p.soferId}
                       soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                       soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                      stars={p.stars || undefined} />
+                      stars={p.stars || undefined}
+                      outOfStock={p.outOfStock} />
                   );
                   const LEVEL_GROUPS = [
                     {
@@ -1944,6 +1947,7 @@ export default function CategoryClient({ category }: { category: string }) {
                         soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                         soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                         stars={p.stars || undefined}
+                        outOfStock={p.outOfStock}
                       />
                     ))}
                   </div>
@@ -1988,6 +1992,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                               soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                               stars={p.stars || undefined}
+                              outOfStock={p.outOfStock}
                             />
                           ))}
                         </div>

@@ -121,6 +121,7 @@ interface Product {
   sku?: string;
   stockCount?: number;
   stockVisible?: boolean;
+  outOfStock?: boolean;
   soferName?: string;
   soferPrice?: number;
   createdAt?: { seconds: number };
@@ -577,6 +578,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
     if (product.stockVisible !== undefined) return product.stockVisible;
     return !['מגילות', 'ספרי תורה'].includes(product.cat || product.category || '');
   });
+  const [outOfStock, setOutOfStock] = useState(product.outOfStock ?? false);
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [stockCountInput, setStockCountInput] = useState(
     product.stockCount != null ? String(product.stockCount) : ''
@@ -655,6 +657,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         imgUrl3: imgUrl3 || null,
         stockVisible,
         stockCount: stockCountInput !== '' ? Number(stockCountInput) : null,
+        outOfStock,
         isExpertRecommended: EXPERT_REC_CATS_ADMIN.includes(cat) ? isExpertRecommended : false,
       });
       onSave();
@@ -818,6 +821,17 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         {/* ── מלאי ── */}
         <div style={{ marginTop: 14, background: '#f8f6f2', border: '1px solid #e8e0d0', borderRadius: 8, padding: '12px 14px' }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', marginBottom: 10 }}>מלאי</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: outOfStock ? '#dc2626' : '#333', fontWeight: outOfStock ? 700 : 400 }}>
+              <input
+                type="checkbox"
+                checked={outOfStock}
+                onChange={e => setOutOfStock(e.target.checked)}
+                style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#dc2626' }}
+              />
+              אזל מהמלאי (לא ניתן לרכישה)
+            </label>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: stockVisible ? 10 : 0 }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#333' }}>
               <input
