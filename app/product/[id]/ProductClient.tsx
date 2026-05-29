@@ -48,6 +48,7 @@ interface Product {
   stockCount?: number;
   stockVisible?: boolean;
   outOfStock?: boolean;
+  sourceUrl?: string;
   hasKlafSelection?: boolean;
   isExpertRecommended?: boolean;
   priority?: number;
@@ -490,6 +491,8 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [closeupImageUrl, setCloseupImageUrl] = useState(product.closeupImageUrl || '');
   const [stockCount, setStockCount]           = useState(String(product.stockCount || ''));
   const [stockVisible, setStockVisible]       = useState(product.stockVisible !== false);
+  const [outOfStock, setOutOfStock]             = useState(product.outOfStock ?? false);
+  const [sourceUrl, setSourceUrl]               = useState(product.sourceUrl || '');
   const [hasKlafSelection, setHasKlafSelection] = useState(product.hasKlafSelection ?? false);
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [priority, setPriority]               = useState(String(product.priority ?? 0));
@@ -574,6 +577,8 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         closeupImageUrl: isStam ? (closeupImageUrl || undefined) : undefined,
         stockCount: stockCount ? Number(stockCount) : undefined,
         stockVisible,
+        outOfStock,
+        sourceUrl: sourceUrl || undefined,
         hasKlafSelection: hasKlafSelection,
         isExpertRecommended: isExpertRecommended,
         priority: priority !== '' ? Number(priority) : 0,
@@ -725,6 +730,10 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
       <div style={{ marginBottom: 16 }}>
         <div style={secTitleS}>§ מלאי</div>
         <div style={{ display: 'grid', gap: 7 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: outOfStock ? '#ef4444' : '#ddd5c0', fontWeight: outOfStock ? 700 : 400 }}>
+            <input type="checkbox" checked={outOfStock} onChange={e => setOutOfStock(e.target.checked)} style={{ accentColor: '#ef4444' }} />
+            אזל מהמלאי (לא ניתן לרכישה)
+          </label>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 6, alignItems: 'end' }}>
             <div><label style={lS}>כמות במלאי</label><input type="number" value={stockCount} onChange={e => setStockCount(e.target.value)} placeholder="–" style={iS} /></div>
             <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: 11, color: '#ddd5c0', whiteSpace: 'nowrap', paddingBottom: 4 }}>
@@ -751,6 +760,10 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
               </select>
             </div>
           )}
+          <div>
+            <label style={lS}>קישור מקור לספק (sourceUrl)</label>
+            <input value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="https://..." style={iS} />
+          </div>
         </div>
       </div>
 
