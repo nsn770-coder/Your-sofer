@@ -1,0 +1,19 @@
+{
+  "date": "2026-05-29T08:33:31.051Z",
+  "dryRun": true,
+  "totalCategories": 1,
+  "totalFound": 133,
+  "totalAdded": 133,
+  "categories": [
+    {
+      "code": "1129",
+      "label": "חנוכה",
+      "cat": "יודאיקה",
+      "subCategory": "חנוכה",
+      "found": 133,
+      "added": 133,
+      "skipped": 0,
+      "dryRun": true
+    }
+  ]
+}

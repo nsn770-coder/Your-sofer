@@ -162,7 +162,8 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Nissan\\\\your-sofer\" -Recurse -Directory -ErrorAction SilentlyContinue)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Read(//c/Users/Nissan/**)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(tee scripts/import-log.txt)"
     ]
   }
 }

@@ -204,7 +204,8 @@ async function main() {
       source:       'israel-judaica',
       sourceUrl:    p.product_url,
       status:       'active',               // for pipeline scripts (aiMedia, etc.)
-      hidden:       true,                   // ← hides from storefront until real price set
+      hidden:       false,
+      outOfStock:   true,                   // ← not purchasable until real price set
       priority:     50,
       isBestSeller: false,
       badge:        null,
@@ -229,7 +230,7 @@ async function main() {
   console.log(`   Scraped   : ${scraped.length} products`);
   console.log(`   To import : ${toProcess.length} (new, have Hebrew name)`);
   console.log(`   Cloudinary: ${uploaded} uploaded, ${uploadFailed} fallback to source URL`);
-  console.log(`   hidden    : true  ← all products hidden until price is set`);
+  console.log(`   hidden    : false | outOfStock: true  ← visible but not purchasable until price is set`);
   console.log(`   price     : 0     ← to be filled by SKU match after login`);
 
   if (DRY_RUN) {
