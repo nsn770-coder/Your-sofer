@@ -1446,19 +1446,30 @@ function OrdersTab({ orders, setOrders }: { orders: Order[]; setOrders: React.Di
 }
 
 function CouponCreateForm({ onCreated }: { onCreated: () => void }) {
-  const [newCoupon, setNewCoupon] = useState<{ code: string; type: 'percent' | 'fixed'; discount: number; minOrder: number; expiresAt: string }>({ code: '', type: 'percent', discount: 10, minOrder: 0, expiresAt: '' });
+  const codeRef = useRef<HTMLInputElement>(null);
+  const typeRef = useRef<HTMLSelectElement>(null);
+  const discountRef = useRef<HTMLInputElement>(null);
+  const minOrderRef = useRef<HTMLInputElement>(null);
+  const expiresAtRef = useRef<HTMLInputElement>(null);
   const [couponSaving, setCouponSaving] = useState(false);
 
   async function createCoupon() {
-    const code = newCoupon.code.trim().toUpperCase();
-    if (!code || !Number(newCoupon.discount)) return;
+    const code = codeRef.current?.value.trim().toUpperCase() || '';
+    const type = (typeRef.current?.value || 'percent') as 'percent' | 'fixed';
+    const discount = Number(discountRef.current?.value || 0);
+    const minOrder = Number(minOrderRef.current?.value || 0);
+    const expiresAt = expiresAtRef.current?.value || '';
+    if (!code || !discount) return;
     setCouponSaving(true);
     try {
-      const data: any = { code, type: newCoupon.type, discount: newCoupon.discount, active: true, usedBy: [], createdAt: new Date().toISOString() };
-      if (newCoupon.minOrder > 0) data.minOrder = newCoupon.minOrder;
-      if (newCoupon.expiresAt) data.expiresAt = newCoupon.expiresAt;
+      const data: any = { code, type, discount, active: true, usedBy: [], createdAt: new Date().toISOString() };
+      if (minOrder > 0) data.minOrder = minOrder;
+      if (expiresAt) data.expiresAt = expiresAt;
       await setDoc(doc(db, 'coupons', code), data);
-      setNewCoupon({ code: '', type: 'percent', discount: 10, minOrder: 0, expiresAt: '' });
+      if (codeRef.current) codeRef.current.value = '';
+      if (discountRef.current) discountRef.current.value = '10';
+      if (minOrderRef.current) minOrderRef.current.value = '0';
+      if (expiresAtRef.current) expiresAtRef.current.value = '';
       onCreated();
     } catch (e) { console.error(e); }
     finally { setCouponSaving(false); }
@@ -1470,28 +1481,28 @@ function CouponCreateForm({ onCreated }: { onCreated: () => void }) {
       <div className="flex flex-wrap gap-3 items-end">
         <div className="flex flex-col gap-1">
           <label className="text-xs font-bold text-gray-500">קוד קופון</label>
-          <input value={newCoupon.code} onChange={e => setNewCoupon(p => ({ ...p, code: e.target.value.toUpperCase() }))} placeholder="SAVE10" autoComplete="off" autoCorrect="off" autoCapitalize="characters" spellCheck={false} className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono tracking-widest w-36" />
+          <input ref={codeRef} defaultValue="" placeholder="SAVE10" autoComplete="off" autoCorrect="off" autoCapitalize="characters" spellCheck={false} className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono tracking-widest w-36" />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-bold text-gray-500">סוג הנחה</label>
-          <select value={newCoupon.type} onChange={e => setNewCoupon(p => ({ ...p, type: e.target.value as 'percent' | 'fixed' }))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm">
+          <select ref={typeRef} defaultValue="percent" className="border border-gray-200 rounded-xl px-3 py-2 text-sm">
             <option value="percent">אחוז (%)</option>
             <option value="fixed">סכום קבוע (₪)</option>
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-bold text-gray-500">{newCoupon.type === 'percent' ? 'אחוז הנחה' : 'סכום הנחה (₪)'}</label>
-          <input type="number" min={1} value={newCoupon.discount} onFocus={e => e.target.select()} onChange={e => setNewCoupon(p => ({ ...p, discount: +e.target.value }))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm w-24" />
+          <label className="text-xs font-bold text-gray-500">אחוז / סכום הנחה</label>
+          <input ref={discountRef} type="number" min={1} defaultValue={10} onFocus={e => e.target.select()} className="border border-gray-200 rounded-xl px-3 py-2 text-sm w-24" />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-bold text-gray-500">הזמנה מינימלית (₪)</label>
-          <input type="number" min={0} value={newCoupon.minOrder} onFocus={e => e.target.select()} onChange={e => setNewCoupon(p => ({ ...p, minOrder: +e.target.value }))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm w-28" />
+          <input ref={minOrderRef} type="number" min={0} defaultValue={0} onFocus={e => e.target.select()} className="border border-gray-200 rounded-xl px-3 py-2 text-sm w-28" />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-bold text-gray-500">תפוגה</label>
-          <input type="date" value={newCoupon.expiresAt} onChange={e => setNewCoupon(p => ({ ...p, expiresAt: e.target.value }))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm" />
+          <input ref={expiresAtRef} type="date" defaultValue="" className="border border-gray-200 rounded-xl px-3 py-2 text-sm" />
         </div>
-        <button onClick={createCoupon} disabled={couponSaving || !newCoupon.code.trim()} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: couponSaving || !newCoupon.code.trim() ? 0.5 : 1 }}>
+        <button onClick={createCoupon} disabled={couponSaving} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: couponSaving ? 0.5 : 1 }}>
           {couponSaving ? '...' : '➕ צור קופון'}
         </button>
       </div>
