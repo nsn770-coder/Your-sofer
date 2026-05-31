@@ -88,7 +88,7 @@ export default function CheckoutPage() {
   // without needing form in the dependency array
   const formRef = useRef(form);
   useEffect(() => { formRef.current = form; }, [form]);
-  const [couponInput, setCouponInput] = useState('');
+  const couponInputRef = useRef<HTMLInputElement>(null);
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' } | null>(null);
@@ -170,7 +170,7 @@ export default function CheckoutPage() {
   }
 
   async function applyCoupon() {
-    const code = couponInput.trim().toUpperCase();
+    const code = couponInputRef.current?.value.trim().toUpperCase() || '';
     if (!code) return;
     setCouponLoading(true); setCouponError('');
     try {
@@ -182,7 +182,7 @@ export default function CheckoutPage() {
       if (data.minOrder && total < data.minOrder) { setCouponError(`קופון זה תקף להזמנות מעל ₪${data.minOrder}`); return; }
       const couponType: 'percent' | 'fixed' = data.type === 'fixed' ? 'fixed' : 'percent';
       setAppliedCoupon({ code, discount: data.discount, type: couponType });
-      setCouponInput('');
+      if (couponInputRef.current) couponInputRef.current.value = '';
     } catch { setCouponError('שגיאה בבדיקת הקופון'); }
     finally { setCouponLoading(false); }
   }
@@ -322,8 +322,8 @@ export default function CheckoutPage() {
           </div>
         ) : (
           <div style={{ display: 'flex', gap: 6 }}>
-            <input value={couponInput} onChange={e => { setCouponInput(e.target.value.toUpperCase()); setCouponError(''); }} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }} />
-            <button onClick={applyCoupon} disabled={couponLoading || !couponInput.trim()} style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: couponLoading || !couponInput.trim() ? 0.5 : 1, whiteSpace: 'nowrap' }}>
+            <input ref={couponInputRef} defaultValue="" onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }} />
+            <button onClick={applyCoupon} disabled={couponLoading} style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: couponLoading ? 0.5 : 1, whiteSpace: 'nowrap' }}>
               {couponLoading ? '...' : 'החל'}
             </button>
           </div>
