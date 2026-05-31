@@ -87,13 +87,18 @@ export default function PrintOrderPage() {
   // Drag & resize state
   const [imgPos, setImgPos] = useState({ x: 0, y: 0 });
   const [imgScale, setImgScale] = useState(1);
+  const [imgRotation, setImgRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
   // Refs for drag logic (avoid stale closures in window listeners)
   const imgPosRef = useRef({ x: 0, y: 0 });
+  const imgScaleRef = useRef(1);
+  const imgRotationRef = useRef(0);
   const isDraggingRef = useRef(false);
+  const isPinchingRef = useRef(false);
   const dragOriginRef = useRef({ mouseX: 0, mouseY: 0, imgX: 0, imgY: 0 });
+  const pinchStartRef = useRef({ dist: 1, angle: 0, scale: 1, rotation: 0 });
   const printAreaRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
@@ -140,37 +145,73 @@ export default function PrintOrderPage() {
   }
 
   function handleOverlayTouchStart(e: React.TouchEvent) {
-    const touch = e.touches[0];
-    isDraggingRef.current = true;
-    setIsDragging(true);
-    dragOriginRef.current = {
-      mouseX: touch.clientX,
-      mouseY: touch.clientY,
-      imgX: imgPosRef.current.x,
-      imgY: imgPosRef.current.y,
-    };
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      isPinchingRef.current = true;
+      const t1 = e.touches[0], t2 = e.touches[1];
+      const dx = t2.clientX - t1.clientX;
+      const dy = t2.clientY - t1.clientY;
+      pinchStartRef.current = {
+        dist: Math.sqrt(dx * dx + dy * dy),
+        angle: Math.atan2(dy, dx) * (180 / Math.PI),
+        scale: imgScaleRef.current,
+        rotation: imgRotationRef.current,
+      };
+    } else if (e.touches.length === 1) {
+      isPinchingRef.current = false;
+      const touch = e.touches[0];
+      isDraggingRef.current = true;
+      setIsDragging(true);
+      dragOriginRef.current = {
+        mouseX: touch.clientX,
+        mouseY: touch.clientY,
+        imgX: imgPosRef.current.x,
+        imgY: imgPosRef.current.y,
+      };
+    }
   }
 
   function handleOverlayTouchMove(e: React.TouchEvent) {
-    if (!isDraggingRef.current) return;
-    const touch = e.touches[0];
-    const dx = touch.clientX - dragOriginRef.current.mouseX;
-    const dy = touch.clientY - dragOriginRef.current.mouseY;
-    const newPos = { x: dragOriginRef.current.imgX + dx, y: dragOriginRef.current.imgY + dy };
-    imgPosRef.current = newPos;
-    setImgPos(newPos);
+    if (e.touches.length === 2 && isPinchingRef.current) {
+      e.preventDefault();
+      const t1 = e.touches[0], t2 = e.touches[1];
+      const dx = t2.clientX - t1.clientX;
+      const dy = t2.clientY - t1.clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      const { dist: startDist, angle: startAngle, scale: startScale, rotation: startRotation } = pinchStartRef.current;
+      const newScale = Math.min(3, Math.max(0.25, startScale * (dist / startDist)));
+      const newRotation = startRotation + (angle - startAngle);
+      imgScaleRef.current = newScale;
+      imgRotationRef.current = newRotation;
+      setImgScale(newScale);
+      setImgRotation(newRotation);
+    } else if (e.touches.length === 1 && isDraggingRef.current) {
+      const touch = e.touches[0];
+      const dx = touch.clientX - dragOriginRef.current.mouseX;
+      const dy = touch.clientY - dragOriginRef.current.mouseY;
+      const newPos = { x: dragOriginRef.current.imgX + dx, y: dragOriginRef.current.imgY + dy };
+      imgPosRef.current = newPos;
+      setImgPos(newPos);
+    }
   }
 
   function handleOverlayTouchEnd() {
     isDraggingRef.current = false;
+    isPinchingRef.current = false;
     setIsDragging(false);
   }
 
   function resetImageTransform() {
     const zero = { x: 0, y: 0 };
     imgPosRef.current = zero;
+    imgScaleRef.current = 1;
+    imgRotationRef.current = 0;
     setImgPos(zero);
     setImgScale(1);
+    setImgRotation(0);
   }
 
   function selectProduct(pt: ProductType) {
@@ -192,11 +233,14 @@ export default function PrintOrderPage() {
     setShowBgRemoved(false);
     setUploadError(null);
     setUploading(true);
-    // Reset position/scale for new image
+    // Reset position/scale/rotation for new image
     const zero = { x: 0, y: 0 };
     imgPosRef.current = zero;
+    imgScaleRef.current = 1;
+    imgRotationRef.current = 0;
     setImgPos(zero);
     setImgScale(1);
+    setImgRotation(0);
 
     try {
       const fd = new FormData();
@@ -271,6 +315,7 @@ export default function PrintOrderPage() {
         imageX,
         imageY,
         imageScale: imgScale,
+        imageRotation: imgRotation,
       },
     });
     setAdded(true);
@@ -503,7 +548,7 @@ export default function PrintOrderPage() {
                             height: '100%',
                             objectFit: 'contain',
                             opacity: 0.6,
-                            transform: `translate(calc(-50% + ${imgPos.x}px), calc(-50% + ${imgPos.y}px)) scale(${imgScale})`,
+                            transform: `translate(calc(-50% + ${imgPos.x}px), calc(-50% + ${imgPos.y}px)) scale(${imgScale}) rotate(${imgRotation}deg)`,
                             transformOrigin: 'center center',
                             pointerEvents: 'none',
                           }}
@@ -513,7 +558,7 @@ export default function PrintOrderPage() {
 
                     {/* Hint text */}
                     <div style={{ textAlign: 'center', fontSize: 12, color: '#888', marginTop: 6 }}>
-                      גרור את התמונה להזזה • השתמש בסליידר לשינוי גודל
+                      גרור להזזה • צבוט בשתי אצבעות לזום וסיבוב
                     </div>
 
                     {/* Scale slider */}
@@ -535,7 +580,7 @@ export default function PrintOrderPage() {
                         max="150"
                         step="1"
                         value={Math.round(imgScale * 100)}
-                        onChange={e => setImgScale(Number(e.target.value) / 100)}
+                        onChange={e => { const s = Number(e.target.value) / 100; imgScaleRef.current = s; setImgScale(s); }}
                         dir="ltr"
                         style={{ width: '100%', accentColor: GOLD, cursor: 'pointer' }}
                       />
@@ -544,6 +589,17 @@ export default function PrintOrderPage() {
                         <span>150%</span>
                       </div>
                     </div>
+
+                    {imgRotation !== 0 && (
+                      <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 13, color: '#555' }}>
+                        <span>סיבוב: {Math.round(imgRotation)}°</span>
+                        <button
+                          onClick={() => { imgRotationRef.current = 0; setImgRotation(0); }}
+                          style={{ fontSize: 11, background: 'none', border: `1px solid ${NAVY}`, color: NAVY, padding: '2px 8px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>
+                          איפוס סיבוב
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div style={{ textAlign: 'center' }}>

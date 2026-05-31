@@ -22,6 +22,7 @@ interface CartItem {
     imageX?: number;
     imageY?: number;
     imageScale?: number;
+    imageRotation?: number;
   };
 }
 

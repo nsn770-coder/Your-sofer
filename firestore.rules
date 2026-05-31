@@ -218,5 +218,12 @@ service cloud.firestore {
     match /opsUsers/{id} {
       allow read, write: if isAdmin();
     }
+
+    // ── Coupons ─────────────────────────────────────────────────────────────
+
+    match /coupons/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }
