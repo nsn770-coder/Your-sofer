@@ -225,5 +225,12 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // ── Saved carts (shared cart links) ─────────────────────────────────────
+
+    match /savedCarts/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
   }
 }
