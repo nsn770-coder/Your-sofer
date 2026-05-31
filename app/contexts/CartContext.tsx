@@ -19,6 +19,9 @@ interface CartItem {
     uploadedImageUrl: string;
     bgRemoved: boolean;
     originalImageUrl: string;
+    imageX?: number;
+    imageY?: number;
+    imageScale?: number;
   };
 }
 

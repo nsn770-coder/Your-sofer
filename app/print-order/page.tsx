@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/app/contexts/CartContext';
 
@@ -83,12 +83,95 @@ export default function PrintOrderPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [previewTab, setPreviewTab] = useState<'preview' | 'image'>('preview');
   const [added, setAdded] = useState(false);
+
+  // Drag & resize state
+  const [imgPos, setImgPos] = useState({ x: 0, y: 0 });
+  const [imgScale, setImgScale] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+
+  // Refs for drag logic (avoid stale closures in window listeners)
+  const imgPosRef = useRef({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
+  const dragOriginRef = useRef({ mouseX: 0, mouseY: 0, imgX: 0, imgY: 0 });
+  const printAreaRef = useRef<HTMLDivElement>(null);
+
   const router = useRouter();
   const { addItem } = useCart();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const kipaUnitPrice = qty >= PRINT_PRODUCTS.kipa.bulkMinQty ? PRINT_PRODUCTS.kipa.bulkPrice : PRINT_PRODUCTS.kipa.price;
   const kipaTotal = kipaUnitPrice * qty;
+
+  // Global mouse listeners for drag (added once, use refs)
+  useEffect(() => {
+    function onMouseMove(e: MouseEvent) {
+      if (!isDraggingRef.current) return;
+      const dx = e.clientX - dragOriginRef.current.mouseX;
+      const dy = e.clientY - dragOriginRef.current.mouseY;
+      const newPos = { x: dragOriginRef.current.imgX + dx, y: dragOriginRef.current.imgY + dy };
+      imgPosRef.current = newPos;
+      setImgPos(newPos);
+    }
+    function onMouseUp() {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        setIsDragging(false);
+      }
+    }
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
+  function handleOverlayMouseDown(e: React.MouseEvent) {
+    e.preventDefault();
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    dragOriginRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      imgX: imgPosRef.current.x,
+      imgY: imgPosRef.current.y,
+    };
+  }
+
+  function handleOverlayTouchStart(e: React.TouchEvent) {
+    const touch = e.touches[0];
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    dragOriginRef.current = {
+      mouseX: touch.clientX,
+      mouseY: touch.clientY,
+      imgX: imgPosRef.current.x,
+      imgY: imgPosRef.current.y,
+    };
+  }
+
+  function handleOverlayTouchMove(e: React.TouchEvent) {
+    if (!isDraggingRef.current) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - dragOriginRef.current.mouseX;
+    const dy = touch.clientY - dragOriginRef.current.mouseY;
+    const newPos = { x: dragOriginRef.current.imgX + dx, y: dragOriginRef.current.imgY + dy };
+    imgPosRef.current = newPos;
+    setImgPos(newPos);
+  }
+
+  function handleOverlayTouchEnd() {
+    isDraggingRef.current = false;
+    setIsDragging(false);
+  }
+
+  function resetImageTransform() {
+    const zero = { x: 0, y: 0 };
+    imgPosRef.current = zero;
+    setImgPos(zero);
+    setImgScale(1);
+  }
 
   function selectProduct(pt: ProductType) {
     setProductType(pt);
@@ -109,6 +192,11 @@ export default function PrintOrderPage() {
     setShowBgRemoved(false);
     setUploadError(null);
     setUploading(true);
+    // Reset position/scale for new image
+    const zero = { x: 0, y: 0 };
+    imgPosRef.current = zero;
+    setImgPos(zero);
+    setImgScale(1);
 
     try {
       const fd = new FormData();
@@ -156,6 +244,10 @@ export default function PrintOrderPage() {
     const imageUrl = uploadedUrl || localUrl || '';
     const templateUrl = getTemplateUrl(productType, color, side);
 
+    const el = printAreaRef.current;
+    const imageX = el ? (imgPosRef.current.x / el.offsetWidth) * 100 : 0;
+    const imageY = el ? (imgPosRef.current.y / el.offsetHeight) * 100 : 0;
+
     const name = productType === 'shirt'
       ? `חולצה מודפסת - ${color === 'white' ? 'לבן' : 'שחור'} - ${side === 'front' ? 'קדימה' : 'מאחורה'}`
       : `הדפסה על כיפה × ${qty}`;
@@ -176,6 +268,9 @@ export default function PrintOrderPage() {
         uploadedImageUrl: imageUrl,
         bgRemoved: bgRemoveChecked && !!bgRemovedUrl,
         originalImageUrl: originalUrl || imageUrl,
+        imageX,
+        imageY,
+        imageScale: imgScale,
       },
     });
     setAdded(true);
@@ -185,6 +280,7 @@ export default function PrintOrderPage() {
   const displayImageUrl = showBgRemoved && bgRemovedUrl ? bgRemovedUrl : localUrl;
   const templateUrl = productType ? getTemplateUrl(productType, color, side) : '';
   const printArea = productType ? getPrintArea(productType) : null;
+  const overlayActive = isDragging || isHovering;
 
   return (
     <div dir="rtl" style={{ background: '#F5F2EC', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
@@ -219,7 +315,6 @@ export default function PrintOrderPage() {
           <div>
             <h2 style={{ fontSize: 20, fontWeight: 900, color: NAVY, marginBottom: 20, textAlign: 'center' }}>בחרו מוצר</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              {/* Shirt card */}
               <button onClick={() => selectProduct('shirt')}
                 style={{ background: '#fff', border: `2px solid ${productType === 'shirt' ? GOLD : '#E7E2D8'}`, padding: '24px 16px', cursor: 'pointer', textAlign: 'center', fontFamily: 'inherit', transition: 'all 0.2s', boxShadow: productType === 'shirt' ? `0 0 0 3px ${GOLD}33` : '0 1px 4px rgba(0,0,0,0.06)' }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>👕</div>
@@ -227,7 +322,6 @@ export default function PrintOrderPage() {
                 <div style={{ fontSize: 22, fontWeight: 900, color: GOLD }}>₪60</div>
                 <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>לפריט</div>
               </button>
-              {/* Kipa card */}
               <button onClick={() => selectProduct('kipa')}
                 style={{ background: '#fff', border: `2px solid ${productType === 'kipa' ? GOLD : '#E7E2D8'}`, padding: '24px 16px', cursor: 'pointer', textAlign: 'center', fontFamily: 'inherit', transition: 'all 0.2s', boxShadow: productType === 'kipa' ? `0 0 0 3px ${GOLD}33` : '0 1px 4px rgba(0,0,0,0.06)' }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🥷</div>
@@ -249,7 +343,6 @@ export default function PrintOrderPage() {
 
             {productType === 'shirt' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                {/* Color */}
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: NAVY, marginBottom: 12 }}>צבע החולצה</div>
                   <div style={{ display: 'flex', gap: 12 }}>
@@ -262,7 +355,6 @@ export default function PrintOrderPage() {
                     ))}
                   </div>
                 </div>
-                {/* Side */}
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: NAVY, marginBottom: 12 }}>צד הדפסה</div>
                   <div style={{ display: 'flex', gap: 12 }}>
@@ -281,7 +373,6 @@ export default function PrintOrderPage() {
 
             {productType === 'kipa' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                {/* Side */}
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: NAVY, marginBottom: 12 }}>מיקום ההדפסה</div>
                   <div style={{ display: 'flex', gap: 12 }}>
@@ -295,7 +386,6 @@ export default function PrintOrderPage() {
                     ))}
                   </div>
                 </div>
-                {/* Quantity */}
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: NAVY, marginBottom: 12 }}>כמות כיפות</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -371,18 +461,88 @@ export default function PrintOrderPage() {
                 </div>
 
                 {previewTab === 'preview' ? (
-                  <div style={{ position: 'relative', width: '100%', maxWidth: 360, margin: '0 auto', display: 'block' }}>
-                    {/* Template base */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={templateUrl} alt="תבנית" style={{ width: '100%', display: 'block' }} />
-                    {/* User image overlay */}
-                    <div style={{ position: 'absolute', top: printArea.top, left: printArea.left, width: printArea.width, height: printArea.height, overflow: 'hidden' }}>
+                  <div>
+                    {/* Template + overlay */}
+                    <div style={{ position: 'relative', width: '100%', maxWidth: 360, margin: '0 auto', display: 'block', userSelect: 'none' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={displayImageUrl || localUrl}
-                        alt="תמונה מועלית"
-                        style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.6 }}
+                      <img src={templateUrl} alt="תבנית" style={{ width: '100%', display: 'block', pointerEvents: 'none' }} />
+
+                      {/* Draggable print area */}
+                      <div
+                        ref={printAreaRef}
+                        onMouseDown={handleOverlayMouseDown}
+                        onMouseEnter={() => setIsHovering(true)}
+                        onMouseLeave={() => setIsHovering(false)}
+                        onTouchStart={handleOverlayTouchStart}
+                        onTouchMove={handleOverlayTouchMove}
+                        onTouchEnd={handleOverlayTouchEnd}
+                        style={{
+                          position: 'absolute',
+                          top: printArea.top,
+                          left: printArea.left,
+                          width: printArea.width,
+                          height: printArea.height,
+                          overflow: 'hidden',
+                          cursor: isDragging ? 'grabbing' : 'grab',
+                          outline: overlayActive ? `2px dashed ${GOLD}` : '2px dashed transparent',
+                          outlineOffset: '-2px',
+                          transition: 'outline-color 0.15s',
+                          touchAction: 'none',
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={displayImageUrl || localUrl}
+                          alt="תמונה מועלית"
+                          draggable={false}
+                          style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain',
+                            opacity: 0.6,
+                            transform: `translate(calc(-50% + ${imgPos.x}px), calc(-50% + ${imgPos.y}px)) scale(${imgScale})`,
+                            transformOrigin: 'center center',
+                            pointerEvents: 'none',
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Hint text */}
+                    <div style={{ textAlign: 'center', fontSize: 12, color: '#888', marginTop: 6 }}>
+                      גרור את התמונה להזזה • השתמש בסליידר לשינוי גודל
+                    </div>
+
+                    {/* Scale slider */}
+                    <div style={{ marginTop: 14, background: '#fff', padding: '14px 16px', border: '1px solid #E7E2D8' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: NAVY }}>גודל התמונה</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: 13, color: '#555', minWidth: 36, textAlign: 'center' }}>{Math.round(imgScale * 100)}%</span>
+                          <button
+                            onClick={resetImageTransform}
+                            style={{ fontSize: 11, background: 'none', border: `1px solid ${NAVY}`, color: NAVY, padding: '3px 10px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>
+                            איפוס מיקום
+                          </button>
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        min="50"
+                        max="150"
+                        step="1"
+                        value={Math.round(imgScale * 100)}
+                        onChange={e => setImgScale(Number(e.target.value) / 100)}
+                        dir="ltr"
+                        style={{ width: '100%', accentColor: GOLD, cursor: 'pointer' }}
                       />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#aaa', marginTop: 2 }}>
+                        <span>50%</span>
+                        <span>150%</span>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -392,7 +552,7 @@ export default function PrintOrderPage() {
                   </div>
                 )}
 
-                {/* Before/After toggle (only when bg removed) */}
+                {/* Before/After toggle */}
                 {bgRemovedUrl && (
                   <button onClick={() => setShowBgRemoved(v => !v)}
                     style={{ marginTop: 10, background: 'none', border: `1.5px solid ${NAVY}`, color: NAVY, padding: '7px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', width: '100%' }}>
