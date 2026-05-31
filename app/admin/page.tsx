@@ -1853,7 +1853,7 @@ export default function AdminPage() {
 
   async function createCoupon() {
     const code = newCoupon.code.trim().toUpperCase();
-    if (!code || !newCoupon.discount) return;
+    if (!code || !Number(newCoupon.discount)) return;
     setCouponSaving(true);
     try {
       const data: any = { code, type: newCoupon.type, discount: newCoupon.discount, active: true, usedBy: [], createdAt: new Date().toISOString() };
