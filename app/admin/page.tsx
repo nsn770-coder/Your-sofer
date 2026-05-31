@@ -22,6 +22,14 @@ interface OrderItem {
   embroideryText?: string | null;
   selectedKlafName?: string | null;
   selectedCover?: { id: string; name: string; imgUrl: string } | null;
+  printCustomization?: {
+    productType: string;
+    side: string;
+    color?: string;
+    uploadedImageUrl: string;
+    bgRemoved: boolean;
+    originalImageUrl: string;
+  } | null;
 }
 
 interface Order {
@@ -1403,6 +1411,21 @@ function OrdersTab({ orders, setOrders }: { orders: Order[]; setOrders: React.Di
                                 {item.selectedCover && (
                                   <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
                                     כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
+                                  </span>
+                                )}
+                                {item.printCustomization && (
+                                  <span className="inline-flex flex-wrap items-center gap-1.5 mt-1">
+                                    <span className="inline-flex items-center gap-1 text-blue-800 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5">
+                                      🖨️ {item.printCustomization.productType === 'shirt' ? 'חולצה' : 'כיפה'} · {item.printCustomization.side}{item.printCustomization.color ? ` · ${item.printCustomization.color === 'white' ? 'לבן' : 'שחור'}` : ''}
+                                    </span>
+                                    <a href={item.printCustomization.uploadedImageUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-2 py-0.5 hover:underline">
+                                      ⬇️ הורד תמונה
+                                    </a>
+                                    {item.printCustomization.bgRemoved && (
+                                      <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
+                                        ✂️ רקע הוסר
+                                      </span>
+                                    )}
                                   </span>
                                 )}
                               </div>

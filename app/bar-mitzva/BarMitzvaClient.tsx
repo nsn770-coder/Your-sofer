@@ -171,6 +171,26 @@ export default function BarMitzvaPage() {
         )}
       </section>
 
+      {/* Print banner */}
+      <section style={{ maxWidth: 900, margin: '0 auto', padding: isMobile ? '0 16px 40px' : '0 24px 56px' }}>
+        <a href="/print-order" style={{ display: 'block', background: `linear-gradient(135deg, ${NAVY} 0%, #162a5c 100%)`, borderRadius: 14, padding: isMobile ? '20px 20px' : '28px 36px', textDecoration: 'none', border: `2px solid ${GOLD}`, overflow: 'hidden', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <div style={{ fontSize: isMobile ? 36 : 48, lineHeight: 1, flexShrink: 0 }}>🖨️</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, color: '#fff', marginBottom: 6 }}>
+                הוסיפו הדפסה אישית לאירוע
+              </div>
+              <div style={{ fontSize: isMobile ? 13 : 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6 }}>
+                חולצות מודפסות לבר מצווה, הדפסות על כיפות — העלו תמונה, בחרו עיצוב, וקבלו הדפסה אישית
+              </div>
+            </div>
+            <div style={{ flexShrink: 0, background: GOLD, color: NAVY, fontWeight: 900, fontSize: 14, padding: '10px 22px', borderRadius: 10 }}>
+              להזמנה ←
+            </div>
+          </div>
+        </a>
+      </section>
+
     </div>
   );
 }

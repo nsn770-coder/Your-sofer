@@ -12,6 +12,14 @@ interface CartItem {
   selectedKlafName?: string; // ← חדש: שם הקלף לתצוגה
   embroideryText?: string;   // ← טקסט לריקמה אישית
   selectedCover?: { id: string; name: string; imgUrl: string };
+  printCustomization?: {
+    productType: string;
+    side: string;
+    color?: string;
+    uploadedImageUrl: string;
+    bgRemoved: boolean;
+    originalImageUrl: string;
+  };
 }
 
 interface CartContextType {
@@ -54,7 +62,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           : x
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: product.quantity ?? 1 }];
     });
   }
 

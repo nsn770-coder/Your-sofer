@@ -312,6 +312,7 @@ const SIMPLE_NAV = [
   { label: "ספרי תורה", action: "sifrei-torah" },
   { label: "מגילות", action: "megilot" },
   { label: "בר מצווה", action: "bar-mitzva" },
+  { label: "🖨️ הדפסות לאירועים", action: "print-order" },
   { label: "ערכות", action: "bundles" },
   { label: "ביקורות", action: "reviews" },
   { label: "קולקציות", action: "collections" },
@@ -434,6 +435,7 @@ function NavBarContent() {
     else if (action === "about") router.push("/about");
     else if (action === "faq") router.push("/faq");
     else if (action === "contact") router.push("/contact");
+    else if (action === "print-order") router.push("/print-order");
   }
 
   return (
