@@ -3,7 +3,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
-import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc, setDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
@@ -91,7 +91,7 @@ export default function CheckoutPage() {
   const [couponInput, setCouponInput] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' } | null>(null);
   const [itemCategories, setItemCategories] = useState<Record<string, string>>({});
 
   // Read isMobile before first paint to prevent the false→true CLS flip on mobile
@@ -177,15 +177,22 @@ export default function CheckoutPage() {
       const snap = await getDoc(doc(db, 'coupons', code));
       if (!snap.exists()) { setCouponError('קוד קופון לא נמצא'); return; }
       const data = snap.data();
-      if (!data.active || data.usedBy) { setCouponError('קוד הקופון כבר שומש או אינו פעיל'); return; }
-      setAppliedCoupon({ code, discount: data.discount });
+      if (!data.active) { setCouponError('קוד הקופון אינו פעיל'); return; }
+      if (data.expiresAt && new Date(data.expiresAt) < new Date()) { setCouponError('קוד הקופון פג תוקף'); return; }
+      if (data.minOrder && total < data.minOrder) { setCouponError(`קופון זה תקף להזמנות מעל ₪${data.minOrder}`); return; }
+      const couponType: 'percent' | 'fixed' = data.type === 'fixed' ? 'fixed' : 'percent';
+      setAppliedCoupon({ code, discount: data.discount, type: couponType });
       setCouponInput('');
     } catch { setCouponError('שגיאה בבדיקת הקופון'); }
     finally { setCouponLoading(false); }
   }
 
   const shippingCost = SHIPPING_REGULAR;
-  const discountAmount = appliedCoupon ? Math.round(total * appliedCoupon.discount / 100 * 100) / 100 : 0;
+  const discountAmount = appliedCoupon
+    ? appliedCoupon.type === 'fixed'
+      ? Math.min(appliedCoupon.discount, total)
+      : Math.round(total * appliedCoupon.discount / 100 * 100) / 100
+    : 0;
   const finalTotal = total - discountAmount + shippingCost;
 
   async function handleSubmit() {
@@ -211,7 +218,7 @@ export default function CheckoutPage() {
       });
 
       if (appliedCoupon) {
-        await updateDoc(doc(db, 'coupons', appliedCoupon.code), { active: false, usedBy: form.email || form.name, usedAt: serverTimestamp() });
+        await updateDoc(doc(db, 'coupons', appliedCoupon.code), { usedBy: arrayUnion(form.email || form.name), usedAt: serverTimestamp() });
       }
 
       // Upsert customer record immediately - don't rely on /thank-you reaching Firestore
@@ -297,7 +304,7 @@ export default function CheckoutPage() {
         </div>
         {appliedCoupon && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.discount}%)</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})</span>
             <span>-{formatPrice(discountAmount)}</span>
           </div>
         )}
@@ -310,7 +317,7 @@ export default function CheckoutPage() {
         <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#555" /> קוד קופון</div>
         {appliedCoupon ? (
           <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} - {appliedCoupon.discount}% הנחה</span>
+            <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} — {appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה</span>
             <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', display: 'flex' }}><IconX size={14} /></button>
           </div>
         ) : (

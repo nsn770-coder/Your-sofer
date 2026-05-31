@@ -187,7 +187,19 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons';
+
+interface Coupon {
+  id: string;
+  code: string;
+  type: 'percent' | 'fixed';
+  discount: number;
+  active: boolean;
+  usedBy: string[];
+  minOrder?: number;
+  expiresAt?: string;
+  createdAt: string;
+}
 
 interface RabbiRequest {
   id: string;
@@ -1448,6 +1460,10 @@ export default function AdminPage() {
   const [productSearch, setProductSearch] = useState('');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [couponsLoading, setCouponsLoading] = useState(false);
+  const [newCoupon, setNewCoupon] = useState<{ code: string; type: 'percent' | 'fixed'; discount: number; minOrder: number; expiresAt: string }>({ code: '', type: 'percent', discount: 10, minOrder: 0, expiresAt: '' });
+  const [couponSaving, setCouponSaving] = useState(false);
   const [showAddSofer, setShowAddSofer] = useState(false);
   const [editingSofer, setEditingSofer] = useState<SoferFull | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -1483,7 +1499,7 @@ export default function AdminPage() {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
       loadReviews(); loadShluchimApplications(); loadTestimonials(); loadEditRequests();
-      loadAbandonedCarts(); loadCustomers(); loadLeads(); loadRabbiRequests();
+      loadAbandonedCarts(); loadCustomers(); loadLeads(); loadRabbiRequests(); loadCoupons();
     }
   }, [user]);
 
@@ -1799,6 +1815,42 @@ export default function AdminPage() {
       data.sort((a, b) => a.priority - b.priority);
       setCategories(data);
     } catch (e) { console.error(e); }
+  }
+
+  async function loadCoupons() {
+    setCouponsLoading(true);
+    try {
+      const snap = await getDocs(query(collection(db, 'coupons'), orderBy('createdAt', 'desc')));
+      const data: Coupon[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Coupon));
+      setCoupons(data);
+    } catch (e) { console.error(e); }
+    finally { setCouponsLoading(false); }
+  }
+
+  async function createCoupon() {
+    const code = newCoupon.code.trim().toUpperCase();
+    if (!code || !newCoupon.discount) return;
+    setCouponSaving(true);
+    try {
+      const data: any = { code, type: newCoupon.type, discount: newCoupon.discount, active: true, usedBy: [], createdAt: new Date().toISOString() };
+      if (newCoupon.minOrder > 0) data.minOrder = newCoupon.minOrder;
+      if (newCoupon.expiresAt) data.expiresAt = newCoupon.expiresAt;
+      await setDoc(doc(db, 'coupons', code), data);
+      setNewCoupon({ code: '', type: 'percent', discount: 10, minOrder: 0, expiresAt: '' });
+      await loadCoupons();
+    } catch (e) { console.error(e); }
+    finally { setCouponSaving(false); }
+  }
+
+  async function toggleCoupon(id: string, active: boolean) {
+    await updateDoc(doc(db, 'coupons', id), { active: !active });
+    setCoupons(prev => prev.map(c => c.id === id ? { ...c, active: !active } : c));
+  }
+
+  async function deleteCoupon(id: string) {
+    await deleteDoc(doc(db, 'coupons', id));
+    setCoupons(prev => prev.filter(c => c.id !== id));
   }
 
   async function saveContent() {
@@ -2275,6 +2327,7 @@ export default function AdminPage() {
           { key: 'customers',      label: '👤 לקוחות',           color: 'bg-cyan-700' },
           { key: 'leads',          label: '📋 לידים',            color: 'bg-lime-700',   badge: leads.length },
           { key: 'emails',         label: '📧 מיילים',           color: 'bg-sky-700' },
+          { key: 'coupons',        label: '🏷️ קופונים',          color: 'bg-rose-700' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -3364,6 +3417,94 @@ export default function AdminPage() {
             className="w-full h-full border-0"
             title="ניהול מיילים"
           />
+        </div>
+      )}
+
+      {activeTab === 'coupons' && (
+        <div className="grid gap-6">
+          {/* Create coupon form */}
+          <div className="bg-white rounded-xl shadow p-6">
+            <h2 className="text-xl font-black mb-4" style={{ color: '#1E3A8A' }}>🏷️ יצירת קופון חדש</h2>
+            <div className="flex flex-wrap gap-3 items-end">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-gray-500">קוד קופון</label>
+                <input value={newCoupon.code} onChange={e => setNewCoupon(p => ({ ...p, code: e.target.value.toUpperCase() }))} placeholder="SAVE10" className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono tracking-widest w-36" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-gray-500">סוג הנחה</label>
+                <select value={newCoupon.type} onChange={e => setNewCoupon(p => ({ ...p, type: e.target.value as 'percent' | 'fixed' }))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm">
+                  <option value="percent">אחוז (%)</option>
+                  <option value="fixed">סכום קבוע (₪)</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-gray-500">{newCoupon.type === 'percent' ? 'אחוז הנחה' : 'סכום הנחה (₪)'}</label>
+                <input type="number" min={1} value={newCoupon.discount} onChange={e => setNewCoupon(p => ({ ...p, discount: +e.target.value }))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm w-24" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-gray-500">הזמנה מינימלית (₪)</label>
+                <input type="number" min={0} value={newCoupon.minOrder} onChange={e => setNewCoupon(p => ({ ...p, minOrder: +e.target.value }))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm w-28" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-gray-500">תפוגה</label>
+                <input type="date" value={newCoupon.expiresAt} onChange={e => setNewCoupon(p => ({ ...p, expiresAt: e.target.value }))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm" />
+              </div>
+              <button onClick={createCoupon} disabled={couponSaving || !newCoupon.code.trim()} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: couponSaving || !newCoupon.code.trim() ? 0.5 : 1 }}>
+                {couponSaving ? '...' : '➕ צור קופון'}
+              </button>
+            </div>
+          </div>
+
+          {/* Coupons table */}
+          <div className="bg-white rounded-xl shadow overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-lg font-black" style={{ color: '#1E3A8A' }}>קופונים קיימים</h2>
+              <span className="text-sm text-gray-500">{coupons.length} קופונים</span>
+            </div>
+            {couponsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div> : (
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-3 text-right">קוד</th>
+                    <th className="p-3 text-right">סוג</th>
+                    <th className="p-3 text-right">הנחה</th>
+                    <th className="p-3 text-right">מינימום</th>
+                    <th className="p-3 text-right">תפוגה</th>
+                    <th className="p-3 text-right">שימושים</th>
+                    <th className="p-3 text-right">סטטוס</th>
+                    <th className="p-3 text-right">פעולות</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {coupons.length === 0 ? (
+                    <tr><td colSpan={8} className="p-10 text-center text-gray-400">אין קופונים</td></tr>
+                  ) : coupons.map(c => (
+                    <tr key={c.id} className="border-t hover:bg-gray-50">
+                      <td className="p-3 font-mono font-black tracking-widest text-sm">{c.code}</td>
+                      <td className="p-3 text-xs text-gray-500">{c.type === 'percent' ? 'אחוז' : 'סכום'}</td>
+                      <td className="p-3 font-bold text-green-700">{c.type === 'percent' ? `${c.discount}%` : `₪${c.discount}`}</td>
+                      <td className="p-3 text-xs text-gray-500">{c.minOrder ? `₪${c.minOrder}` : '—'}</td>
+                      <td className="p-3 text-xs text-gray-500">{c.expiresAt || '—'}</td>
+                      <td className="p-3 text-xs text-gray-600">{(c.usedBy || []).length} שימושים</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${c.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                          {c.active ? '● פעיל' : '● מושהה'}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex gap-2">
+                          <button onClick={() => toggleCoupon(c.id, c.active)} className={`px-2 py-1 rounded-full text-xs font-bold ${c.active ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' : 'bg-green-50 text-green-700 hover:bg-green-100'}`}>
+                            {c.active ? 'השהה' : 'הפעל'}
+                          </button>
+                          <button onClick={() => deleteCoupon(c.id)} className="px-2 py-1 rounded-full text-xs font-bold bg-red-50 text-red-500 hover:bg-red-100">מחק</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       )}
 

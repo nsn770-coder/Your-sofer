@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 
@@ -45,7 +46,28 @@ function IconShield() {
 export default function CartPage() {
   const router = useRouter();
   const { items, removeItem, updateQty, total } = useCart();
+  const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  async function shareCart() {
+    setShareLoading(true);
+    try {
+      const res = await fetch('/api/save-cart', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }) });
+      const { cartId } = await res.json();
+      const url = `${window.location.origin}/shared-cart/${cartId}`;
+      setShareUrl(url);
+    } catch { alert('שגיאה ביצירת קישור שיתוף'); }
+    finally { setShareLoading(false); }
+  }
+
+  function copyShareUrl() {
+    navigator.clipboard.writeText(shareUrl);
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 2000);
+  }
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -317,6 +339,26 @@ export default function CartPage() {
                 style={{ width: '100%', background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                 המשך לקנות
               </button>
+
+              {user?.role === 'admin' && (
+                <div style={{ marginTop: 12 }}>
+                  {!shareUrl ? (
+                    <button onClick={shareCart} disabled={shareLoading} style={{ width: '100%', background: '#f8f4ec', color: '#1E3A8A', border: '1.5px solid #C5A028', borderRadius: 12, height: 44, fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: shareLoading ? 0.6 : 1 }}>
+                      {shareLoading ? '...' : '🔗 שתף עגלה'}
+                    </button>
+                  ) : (
+                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#15803d', marginBottom: 6 }}>✓ קישור שיתוף מוכן</div>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <input readOnly value={shareUrl} style={{ flex: 1, fontSize: 11, border: '1px solid #d1fae5', borderRadius: 8, padding: '6px 8px', background: '#fff', color: '#333', direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} />
+                        <button onClick={copyShareUrl} style={{ flexShrink: 0, background: shareCopied ? '#16a34a' : '#1E3A8A', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                          {shareCopied ? '✓ הועתק' : 'העתק'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eee', fontSize: 11, color: '#888', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconLock /> תשלום מאובטח ומוצפן</div>
