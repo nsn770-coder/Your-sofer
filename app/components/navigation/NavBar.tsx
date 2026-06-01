@@ -8,6 +8,7 @@ import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useShaliach } from "@/app/contexts/ShaliachContext";
 import MobileDrawerMenu from "./MobileDrawerMenu";
+import lifeEvents from "@/data/lifeEvents";
 
 interface NavSubItem {
   label: string;
@@ -103,6 +104,15 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
           { label: "ספרד", cat: "קלפי תפילין", filter: "ספרד" },
           { label: 'חב"ד', cat: "קלפי תפילין", filter: 'חב"ד' },
           { label: "תימני", cat: "קלפי תפילין", filter: "תימני" },
+        ]
+      },
+      {
+        title: "סט טלית ותפילין",
+        items: [
+          { label: "כל הסטים", cat: "סט טלית תפילין" },
+          { label: "דמוי עור", cat: "סט טלית תפילין", filter: "דמוי עור" },
+          { label: "פשתן", cat: "סט טלית תפילין", filter: "פשתן" },
+          { label: "בר מצווה", cat: "סט טלית תפילין", filter: "בר מצווה" },
         ]
       },
     ],
@@ -423,6 +433,11 @@ function NavBarContent() {
     router.push(`/search?q=${encodeURIComponent(q)}`);
   }
 
+  function handleMoment(id: string) {
+    setMobileOpen(false);
+    router.push(`/moment/${id}`);
+  }
+
   function handleAction(action: string) {
     setMobileOpen(false);
     if (action === "shabbat-holidays") router.push("/category/שבתות-וחגים");
@@ -534,6 +549,27 @@ function NavBarContent() {
         </div>
 
         {!isMobile && (
+          <div style={{ background: "#1E3A8A", borderBottom: "2px solid #C5A028" }}>
+            <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#C5A028", letterSpacing: 1.5, padding: "8px 14px 8px 0", borderLeft: "1px solid rgba(255,255,255,0.15)", marginLeft: 6, whiteSpace: "nowrap", flexShrink: 0 }}>
+                רגעי חיים
+              </span>
+              {lifeEvents.map(ev => (
+                <button
+                  key={ev.id}
+                  onClick={() => handleMoment(ev.id)}
+                  style={{ background: "none", border: "none", borderBottom: "2px solid transparent", color: "rgba(255,255,255,0.82)", padding: "8px 13px", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", transition: "color 0.15s, border-bottom-color 0.15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderBottomColor = "#C5A028"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.82)"; e.currentTarget.style.borderBottomColor = "transparent"; }}
+                >
+                  {ev.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!isMobile && (
           <div style={{ background: "#FAF8F3", borderTop: "1px solid #E7E2D8", position: "relative" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
               {MEGA_MENU_DATA.map(item => (
@@ -614,6 +650,8 @@ function NavBarContent() {
         simpleNav={SIMPLE_NAV}
         onSelect={handleSelect}
         onAction={handleAction}
+        onMoment={handleMoment}
+        lifeEvents={lifeEvents}
         user={user}
         signInWithGoogle={signInWithGoogle}
         logout={logout}

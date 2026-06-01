@@ -8,6 +8,8 @@ export interface NavColumn { title: string; items: NavSubItem[]; }
 export interface NavMenuItem { id: string; label: string; cat: string; columns: NavColumn[]; }
 export interface SimpleNavItem { label: string; action: string; }
 
+interface LifeEventItem { id: string; title: string; }
+
 interface MobileDrawerMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -15,6 +17,8 @@ interface MobileDrawerMenuProps {
   simpleNav: SimpleNavItem[];
   onSelect: (cat: string, filter?: string) => void;
   onAction: (action: string) => void;
+  onMoment: (id: string) => void;
+  lifeEvents: LifeEventItem[];
   user: { displayName?: string | null; photoURL?: string | null; role?: string } | null;
   signInWithGoogle: () => void;
   logout: () => void;
@@ -93,6 +97,8 @@ export default function MobileDrawerMenu({
   simpleNav,
   onSelect,
   onAction,
+  onMoment,
+  lifeEvents,
   user,
   signInWithGoogle,
   logout,
@@ -137,6 +143,36 @@ export default function MobileDrawerMenu({
         </div>
 
         <div className="flex-1 overflow-y-auto">
+          {/* ── Life events section ── */}
+          <div style={{ background: "#1E3A8A", padding: "16px 20px 20px" }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "#C5A028", letterSpacing: 1.5, marginBottom: 12, marginTop: 0 }}>
+              רגעי חיים
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {lifeEvents.map((ev, i) => (
+                <button
+                  key={ev.id}
+                  onClick={() => onMoment(ev.id)}
+                  style={{
+                    background: "rgba(255,255,255,0.10)",
+                    border: "none",
+                    borderBottom: "2px solid #C5A028",
+                    color: "#fff",
+                    padding: "11px 14px",
+                    fontSize: 15,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    textAlign: "right",
+                    fontFamily: "inherit",
+                    gridColumn: (i === lifeEvents.length - 1 && lifeEvents.length % 2 !== 0) ? "span 2" : undefined,
+                  }}
+                >
+                  {ev.title}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {menuData.map(item => (
             <MobileAccordion key={item.id} item={item} onSelect={onSelect} />
           ))}
