@@ -139,6 +139,18 @@ const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
     { key: 'חומר', label: 'חומר', options: ['מתכת', 'עץ', 'זכוכית', 'קרמיקה', 'כסף'] },
     { key: 'צבע',  label: 'צבע',  options: ['זהב', 'כסף', 'לבן', 'צבעוני'] },
   ],
+  'כיפות': [
+    { key: 'חומר', label: 'חומר', options: ['בד', 'זמש', 'פשתן', 'ארטמן', 'משי', 'סרוגות'] },
+  ],
+};
+
+// Maps URL ?filter= values to subCategory values for specific categories.
+// Prevents unmatched filters from falling through and showing all products.
+const FILTER_TO_SUBCAT: Record<string, Record<string, string>> = {
+  'כיפות': {
+    'סרוגות':        'כיפות סרוגות',
+    'כיפות סרוגות': 'כיפות סרוגות',
+  },
 };
 
 // ─── Collection metadata ──────────────────────────────────────────────────────
@@ -1236,7 +1248,10 @@ export default function CategoryClient({ category }: { category: string }) {
 
   useEffect(() => {
     if (!urlFilter || loading || allLoaded.length === 0) return;
-    // Check subCategory match first
+    // Check category-specific filter→subCategory aliases first (e.g. "סרוגות" → "כיפות סרוגות")
+    const subcatAlias = FILTER_TO_SUBCAT[category]?.[urlFilter];
+    if (subcatAlias) { setSubCategoryFilter(subcatAlias); return; }
+    // Check exact subCategory match
     const subCatSet = new Set(allLoaded.map(p => p.subCategory).filter(Boolean) as string[]);
     if (subCatSet.has(urlFilter)) { setSubCategoryFilter(urlFilter); return; }
     for (const key of ATTR_KEYS) {
@@ -1247,8 +1262,10 @@ export default function CategoryClient({ category }: { category: string }) {
     for (const spec of catFilters) {
       if (spec.options.includes(urlFilter)) { setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, [spec.key]: urlFilter } })); return; }
     }
+    // No match found — set subCategory to the filter value so the grid shows 0 results
+    // instead of falling through and showing all products unfiltered.
+    setSubCategoryFilter(urlFilter);
     setFilters(EMPTY_FILTERS);
-    setSubCategoryFilter('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlFilter, loading, allLoaded.length]);
 
