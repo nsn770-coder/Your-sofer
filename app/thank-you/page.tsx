@@ -132,6 +132,7 @@ function ThankYouContent() {
         fetch('/api/ops/sync-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
           body: JSON.stringify({
             orderId: orderId,
             orderNumber: order.orderNumber,

@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     // Notify team (non-fatal)
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://your-sofer.com';
-      await fetch(`${baseUrl}/api/ops/notify-team`, {
+      const notifyRes = await fetch(`${baseUrl}/api/ops/notify-team`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -113,6 +113,7 @@ export async function POST(req: NextRequest) {
           orderType,
         }),
       });
+      if (!notifyRes.ok) console.error('[sync-order] notify-team failed:', notifyRes.status, await notifyRes.text());
     } catch (notifyErr) {
       console.error('Notify failed (non-fatal):', notifyErr);
     }

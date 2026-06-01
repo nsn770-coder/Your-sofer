@@ -33,7 +33,7 @@ async function sendWhatsApp(payload: NotifyPayload) {
   console.log('[WhatsApp] to numbers:', WHATSAPP_NUMBERS);
 
   if (!sid || !token) {
-    console.warn('[WhatsApp] Twilio credentials not set — skipping WhatsApp');
+    console.error('[WhatsApp] Twilio credentials not set — skipping WhatsApp');
     return;
   }
 
