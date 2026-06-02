@@ -1004,33 +1004,42 @@ export default function HomePageClient() {
                 width: isMobile ? 200 : 240,
                 background: '#FFFFFF',
                 border: '1px solid #EDE8DC',
-                padding: '22px 18px',
+                overflow: 'hidden',
                 transition: 'box-shadow 0.2s, transform 0.2s',
                 cursor: 'pointer',
               }}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(58,46,26,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
             >
-              <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10, marginTop: 0 }}>
-                {ev.title}
-              </p>
-              <p style={{ fontSize: 17, fontWeight: 300, color: '#3A2E1A', lineHeight: 1.3, marginBottom: 10 }}>
-                {ev.emotionalTitle}
-              </p>
-              <p style={{
-                fontSize: 12,
-                color: '#8B7355',
-                lineHeight: 1.65,
-                flex: 1,
-                marginBottom: 16,
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              } as React.CSSProperties}>
-                {ev.description}
-              </p>
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#9C7B3F' }}>גלה ←</span>
+              {ev.image && (
+                <img
+                  src={ev.image}
+                  alt={ev.title}
+                  style={{ width: '100%', height: 140, objectFit: 'cover', display: 'block', flexShrink: 0 }}
+                />
+              )}
+              <div style={{ padding: '18px 18px 22px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10, marginTop: 0 }}>
+                  {ev.title}
+                </p>
+                <p style={{ fontSize: 17, fontWeight: 300, color: '#3A2E1A', lineHeight: 1.3, marginBottom: 10 }}>
+                  {ev.emotionalTitle}
+                </p>
+                <p style={{
+                  fontSize: 12,
+                  color: '#8B7355',
+                  lineHeight: 1.65,
+                  flex: 1,
+                  marginBottom: 16,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                } as React.CSSProperties}>
+                  {ev.description}
+                </p>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#9C7B3F' }}>גלה ←</span>
+              </div>
             </a>
           ))}
         </div>
