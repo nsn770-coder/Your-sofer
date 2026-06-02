@@ -258,7 +258,14 @@ export default function CheckoutPage() {
       const paymentRes = await fetch('/api/payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })), total: finalTotal, customer: { name: form.name, email: form.email, phone: form.phone }, orderNumber, orderId: orderRef.id, baseUrl }),
+        body: JSON.stringify({
+          items: [
+            ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+            ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1 }] : []),
+            ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1 }] : []),
+          ],
+          total: finalTotal, customer: { name: form.name, email: form.email, phone: form.phone }, orderNumber, orderId: orderRef.id, baseUrl,
+        }),
       });
 
       const paymentData = await paymentRes.json();
