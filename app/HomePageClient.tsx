@@ -869,7 +869,7 @@ export default function HomePageClient() {
             margin: '0 0 14px',
             letterSpacing: '-0.01em',
           }}>
-            הבית לכל מי שמחפש את החיבור היהודי
+            הבית היהודי שתמיד דמיינתם
           </p>
 
           {/* h1 — preserved for SEO, styled as sub-label */}
@@ -892,18 +892,18 @@ export default function HomePageClient() {
             maxWidth: '80%',
             lineHeight: 1.7,
           }}>
-            מזוזות, תפילין ויודאיקה מסופרים מוסמכים — שקיפות מלאה, בדיקת מגיה, ואחריות.
+            להתחבר לטוב ביותר
           </p>
 
           <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 36 }}>
             <a href="#life-events" className="ys-hero-btn-primary">
-              בחרו את הרגע שלכם ↓
+              גלו את הקולקציה
             </a>
             <a
               href={`/category/${encodeURIComponent('בר מצווה')}`}
               className="ys-hero-btn-secondary"
             >
-              סט בר מצווה
+              הכירו את הסופרים
             </a>
           </div>
         </div>
