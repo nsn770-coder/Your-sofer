@@ -970,9 +970,6 @@ export default function HomePageClient() {
             </a>
           ))}
         </div>
-        <div style={{ textAlign: 'center', padding: '0 20px' }}>
-          <a href="/products" style={{ display: 'inline-block', marginTop: 24, padding: '12px 32px', background: '#1E3A8A', color: '#fff', textDecoration: 'none', fontSize: 15, fontWeight: 500, borderRadius: 2 }}>לכל המוצרים ←</a>
-        </div>
       </section>
 
       {/* ── Live Activity Bar - isolated component, re-renders independently ── */}
