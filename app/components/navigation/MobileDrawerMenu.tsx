@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { X, ChevronDown } from "lucide-react";
@@ -24,72 +24,115 @@ interface MobileDrawerMenuProps {
   logout: () => void;
 }
 
+// ── Accordion row ─────────────────────────────────────────────────────────────
+// Label click → navigates to category. Chevron click → toggles sub-items.
 function MobileAccordion({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
   const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-gray-200 last:border-0" dir="rtl">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-5 py-5 text-right text-gray-900 font-semibold text-[17px] hover:bg-gray-50 transition-colors duration-150 outline-none"
-      >
-        <span className="flex-1 text-right">{item.label}</span>
-        <span style={{
-          display: 'inline-flex',
-          flexShrink: 0,
-          marginLeft: '0.5rem',
-          color: '#9ca3af',
-          transition: 'transform 0.22s ease',
-          transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-        }}>
-          <ChevronDown size={20} />
-        </span>
-      </button>
 
-      {/* grid-template-rows trick: animates height 0 → auto without JS */}
+  return (
+    <div style={{ borderBottom: '1px solid #F0EDE8' }} dir="rtl">
+
+      {/* ── Main row ── */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* Label — navigates to category page */}
+        <button
+          onClick={() => onSelect(item.cat)}
+          style={{
+            flex: 1,
+            textAlign: 'right',
+            padding: '16px 20px',
+            fontSize: 16,
+            fontWeight: 600,
+            color: '#1a1a1a',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          {item.label}
+        </button>
+
+        {/* Chevron — toggles sub-items only */}
+        <button
+          onClick={() => setOpen(o => !o)}
+          aria-label={open ? 'סגור' : 'פתח תת-קטגוריות'}
+          style={{
+            padding: '16px 18px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#9ca3af',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <ChevronDown
+            size={18}
+            style={{
+              transition: 'transform 0.22s ease',
+              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
+        </button>
+      </div>
+
+      {/* ── Sub-items — same visual style as main rows ── */}
       <div style={{
         display: 'grid',
         gridTemplateRows: open ? '1fr' : '0fr',
         transition: 'grid-template-rows 0.25s ease',
       }}>
         <div style={{ overflow: 'hidden' }}>
-          <div className="pb-4 bg-gray-50">
-            {item.columns.map((col, ci) => (
-              <div key={ci} className="pt-3">
-                <p className="px-6 pt-1 text-right" style={{ fontSize: 16, fontWeight: 900, color: '#1E3A8A', marginBottom: 8, paddingBottom: 6, borderBottom: '2px solid #C5A028' }}>
+          {item.columns.map((col, ci) => (
+            <div key={ci}>
+              {/* Column title — only when multiple columns */}
+              {item.columns.length > 1 && (
+                <p style={{
+                  padding: '8px 28px 6px',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: '#b0a898',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  borderBottom: '1px solid #F0EDE8',
+                  margin: 0,
+                }}>
                   {col.title}
                 </p>
-                <ul>
-                  {col.items.map((sub, si) => (
-                    <li key={si}>
-                      <button
-                        onClick={() => onSelect(sub.cat, sub.filter)}
-                        className="flex items-center justify-end gap-3 w-full px-6 py-3 text-[16px] text-gray-700 hover:text-gray-900 hover:bg-white transition-colors duration-150 active:bg-gray-100 text-right"
-                        style={{ fontFamily: "inherit" }}
-                      >
-                        {sub.label}
-                        <span className="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-            <div className="px-5 pt-2 flex justify-end">
-              <button
-                onClick={() => onSelect(item.cat)}
-                className="text-[12px] text-amber-700 border border-amber-200 rounded-full px-3.5 py-1.5 hover:bg-amber-50 transition-colors"
-                style={{ fontFamily: "inherit" }}
-              >
-                לכל {item.label} ←
-              </button>
+              )}
+              {col.items.map((sub, si) => (
+                <button
+                  key={si}
+                  onClick={() => onSelect(sub.cat, sub.filter)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    width: '100%',
+                    padding: '13px 32px',
+                    fontSize: 15,
+                    color: '#444',
+                    background: 'none',
+                    border: 'none',
+                    borderBottom: '1px solid #F0EDE8',
+                    cursor: 'pointer',
+                    textAlign: 'right',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {sub.label}
+                </button>
+              ))}
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
+// ── Drawer ────────────────────────────────────────────────────────────────────
 export default function MobileDrawerMenu({
   isOpen,
   onClose,
@@ -110,10 +153,11 @@ export default function MobileDrawerMenu({
 
   return (
     <>
-      {/* Backdrop - always in DOM, CSS opacity/pointer-events toggle */}
+      {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[300] bg-black/50 backdrop-blur-sm"
         style={{
+          position: 'fixed', inset: 0, zIndex: 300,
+          background: 'rgba(0,0,0,0.35)',
           opacity: isOpen ? 1 : 0,
           pointerEvents: isOpen ? 'auto' : 'none',
           transition: 'opacity 0.2s ease',
@@ -121,50 +165,56 @@ export default function MobileDrawerMenu({
         onClick={onClose}
       />
 
-      {/* Drawer panel - always in DOM, CSS transform toggle */}
+      {/* Drawer panel */}
       <div
-        className="fixed top-0 right-0 bottom-0 z-[310] w-[85vw] max-w-sm bg-white shadow-2xl flex flex-col"
         style={{
+          position: 'fixed', top: 0, right: 0, bottom: 0,
+          zIndex: 310,
+          width: '85vw', maxWidth: 360,
+          background: '#fff',
+          boxShadow: '-4px 0 24px rgba(0,0,0,0.12)',
+          display: 'flex', flexDirection: 'column',
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)',
         }}
         dir="rtl"
         aria-hidden={!isOpen}
       >
-        <div className="flex items-center justify-between px-5 py-5 border-b border-gray-200">
-          <span className="text-[18px] font-bold text-gray-900">תפריט</span>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: '1px solid #F0EDE8' }}>
+          <span style={{ fontSize: 17, fontWeight: 700, color: '#1a1a1a' }}>תפריט</span>
           <button
             onClick={onClose}
-            className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="סגור תפריט"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, color: '#888', display: 'flex' }}
           >
             <X size={22} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          {/* ── Life events section ── */}
-          <div style={{ background: "#1E3A8A", padding: "16px 20px 20px" }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "#C5A028", letterSpacing: 1.5, marginBottom: 12, marginTop: 0 }}>
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+
+          {/* ── Life events section — Warm Jewish Elegance ── */}
+          <div style={{ background: '#F4EADB', padding: '14px 20px 18px', borderBottom: '1px solid #E0D4C5' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12, marginTop: 0 }}>
               רגעי חיים
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               {lifeEvents.map((ev, i) => (
                 <button
                   key={ev.id}
                   onClick={() => onMoment(ev.id)}
                   style={{
-                    background: "rgba(255,255,255,0.10)",
-                    border: "none",
-                    borderBottom: "2px solid #C5A028",
-                    color: "#fff",
-                    padding: "11px 14px",
-                    fontSize: 15,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    textAlign: "right",
-                    fontFamily: "inherit",
-                    gridColumn: (i === lifeEvents.length - 1 && lifeEvents.length % 2 !== 0) ? "span 2" : undefined,
+                    background: '#fff',
+                    border: '1px solid #E0D4C5',
+                    color: '#3A2E1A',
+                    padding: '11px 14px',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textAlign: 'right',
+                    fontFamily: 'inherit',
+                    gridColumn: (i === lifeEvents.length - 1 && lifeEvents.length % 2 !== 0) ? 'span 2' : undefined,
                   }}
                 >
                   {ev.title}
@@ -173,23 +223,25 @@ export default function MobileDrawerMenu({
             </div>
           </div>
 
+          {/* ── Catalog accordion ── */}
           {menuData.map(item => (
             <MobileAccordion key={item.id} item={item} onSelect={onSelect} />
           ))}
-          <div className="px-4 py-3">
+
+          {/* Soferim CTA */}
+          <div style={{ padding: '12px 16px', borderBottom: '1px solid #F0EDE8' }}>
             <a
               href="/soferim"
               onClick={onClose}
               style={{
                 display: 'block',
                 width: '100%',
-                background: '#EEF3FF',
+                background: '#F5F8FF',
                 color: '#2446A6',
-                border: '1.5px solid #C5D5F0',
-                borderRadius: 12,
+                border: '1px solid #C5D5F0',
                 padding: '12px 16px',
                 fontWeight: 700,
-                fontSize: 15,
+                fontSize: 14,
                 textAlign: 'right',
                 textDecoration: 'none',
                 boxSizing: 'border-box',
@@ -198,13 +250,26 @@ export default function MobileDrawerMenu({
               הכירו את הסופרים שלנו ←
             </a>
           </div>
-          <div className="border-t border-gray-200 mt-2">
+
+          {/* Simple nav links */}
+          <div style={{ borderTop: '1px solid #F0EDE8' }}>
             {simpleNav.map(nav => (
               <button
                 key={nav.action}
                 onClick={() => onAction(nav.action)}
-                className="block w-full px-5 py-4 text-right text-[17px] text-gray-700 hover:bg-gray-50 transition-colors"
-                style={{ fontFamily: "inherit" }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '15px 20px',
+                  textAlign: 'right',
+                  fontSize: 16,
+                  color: '#555',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: '1px solid #F0EDE8',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                }}
               >
                 {nav.label}
               </button>
@@ -212,25 +277,24 @@ export default function MobileDrawerMenu({
           </div>
         </div>
 
-        <div className="border-t border-gray-200 px-5 py-5 bg-gray-50">
+        {/* Footer — auth */}
+        <div style={{ borderTop: '1px solid #F0EDE8', padding: '18px 20px', background: '#fafaf9' }}>
           {user ? (
-            <div className="flex items-center justify-between">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <button
                 onClick={logout}
-                className="border border-gray-300 text-gray-600 rounded-lg px-4 py-2 text-[13px] hover:bg-gray-100 transition-colors"
-                style={{ fontFamily: "inherit" }}
+                style={{ border: '1px solid #ddd', color: '#666', background: '#fff', padding: '8px 16px', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}
               >
                 יציאה
               </button>
-              <span className="text-[14px] text-gray-900 font-medium">
+              <span style={{ fontSize: 14, color: '#1a1a1a', fontWeight: 500 }}>
                 שלום, {user.displayName?.split(" ")[0]}
               </span>
             </div>
           ) : (
             <button
               onClick={signInWithGoogle}
-              className="w-full bg-white border border-gray-300 text-gray-800 rounded-xl py-3 text-[15px] font-semibold hover:bg-gray-50 transition-colors"
-              style={{ fontFamily: "inherit" }}
+              style={{ width: '100%', background: '#fff', border: '1px solid #ddd', color: '#333', padding: '12px', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
             >
               התחבר עם Google
             </button>
