@@ -937,70 +937,6 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── Life events grid ── */}
-      <section
-        id="life-events"
-        style={{ background: '#FBF8F3', padding: isMobile ? '52px 20px' : '80px 32px', direction: 'rtl' }}
-      >
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', textAlign: 'center', marginBottom: 10, marginTop: 0 }}>
-            רגעי חיים
-          </p>
-          <p style={{ textAlign: 'center', fontSize: isMobile ? 24 : 32, fontWeight: 300, color: '#3A2E1A', marginBottom: 10, letterSpacing: '-0.01em' }}>
-            מה מביא אותכם אלינו?
-          </p>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#8B7355', marginBottom: isMobile ? 36 : 52, maxWidth: 480, marginInline: 'auto' }}>
-            בחרו את הרגע שלכם — נלווה אתכם עד הבית
-          </p>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-            gap: isMobile ? 14 : 22,
-          }}>
-            {lifeEvents.map(ev => (
-              <a
-                key={ev.id}
-                href={`/moment/${ev.id}`}
-                style={{
-                  textDecoration: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  background: '#FFFFFF',
-                  border: '1px solid #EDE8DC',
-                  padding: isMobile ? '22px 18px' : '32px 28px',
-                  transition: 'box-shadow 0.2s, transform 0.2s',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 32px rgba(58,46,26,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
-              >
-                <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10, marginTop: 0 }}>
-                  {ev.title}
-                </p>
-                <p style={{ fontSize: isMobile ? 17 : 21, fontWeight: 300, color: '#3A2E1A', lineHeight: 1.3, marginBottom: 12 }}>
-                  {ev.emotionalTitle}
-                </p>
-                <p style={{
-                  fontSize: 13,
-                  color: '#8B7355',
-                  lineHeight: 1.7,
-                  flex: 1,
-                  marginBottom: 18,
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                } as React.CSSProperties}>
-                  {ev.description}
-                </p>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#9C7B3F' }}>גלה ←</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Soferim horizontal row ── */}
       {soferimList.length > 0 && (
         <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 0 16px' : '40px 0 24px', direction: 'rtl' }}>
@@ -1037,6 +973,68 @@ export default function HomePageClient() {
           </div>
         </div>
       )}
+
+      {/* ── Life events horizontal scroll ── */}
+      <section
+        id="life-events"
+        style={{ background: '#FBF8F3', padding: isMobile ? '36px 0 24px' : '52px 0 32px', direction: 'rtl' }}
+      >
+        <div style={{ textAlign: 'center', padding: '0 20px', marginBottom: isMobile ? 20 : 32 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, marginTop: 0 }}>
+            רגעי חיים
+          </p>
+          <p style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
+            מה מביא אותכם אלינו?
+          </p>
+        </div>
+
+        <div
+          className="ys-hscroll"
+          style={{ display: 'flex', overflowX: 'auto', gap: 14, padding: '4px 20px 16px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
+        >
+          {lifeEvents.map(ev => (
+            <a
+              key={ev.id}
+              href={`/moment/${ev.id}`}
+              style={{
+                textDecoration: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                flexShrink: 0,
+                width: isMobile ? 200 : 240,
+                background: '#FFFFFF',
+                border: '1px solid #EDE8DC',
+                padding: '22px 18px',
+                transition: 'box-shadow 0.2s, transform 0.2s',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(58,46,26,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
+            >
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10, marginTop: 0 }}>
+                {ev.title}
+              </p>
+              <p style={{ fontSize: 17, fontWeight: 300, color: '#3A2E1A', lineHeight: 1.3, marginBottom: 10 }}>
+                {ev.emotionalTitle}
+              </p>
+              <p style={{
+                fontSize: 12,
+                color: '#8B7355',
+                lineHeight: 1.65,
+                flex: 1,
+                marginBottom: 16,
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              } as React.CSSProperties}>
+                {ev.description}
+              </p>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#9C7B3F' }}>גלה ←</span>
+            </a>
+          ))}
+        </div>
+      </section>
 
       {/* ── Live Activity Bar - isolated component, re-renders independently ── */}
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
