@@ -187,7 +187,7 @@ export default function ProductCard({
       onClick={e => e.stopPropagation()}
       style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-        background: '#1E3A8A',
+        background: '#1a1a1a',
         borderTop: '2px solid rgba(184,151,42,0.5)',
         padding: '16px 20px 20px',
         direction: 'rtl',
@@ -334,7 +334,7 @@ export default function ProductCard({
             </span>
           )}
           {hasKlafSelection && (
-            <span style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', color: '#1E3A8A', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+            <span style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', color: '#1a1a1a', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
               ✦ בחר את הקלף שלך
             </span>
           )}
@@ -400,7 +400,7 @@ export default function ProductCard({
 
         {/* Price */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ fontSize: 22, fontWeight: 600, color: '#1E3A8A', lineHeight: 1 }}>
+          <span style={{ fontSize: 22, fontWeight: 600, color: '#1a1a1a', lineHeight: 1 }}>
             {formatPrice(price)}
           </span>
           {hasSale && (
@@ -439,13 +439,13 @@ export default function ProductCard({
               onClick={handleAdd}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: 'transparent', color: '#1E3A8A',
-                height: 44, borderRadius: 8, border: '1.5px solid #1E3A8A',
+                background: 'transparent', color: '#1a1a1a',
+                height: 44, borderRadius: 8, border: '1.5px solid #1a1a1a',
                 fontWeight: 700, fontSize: 14, cursor: 'pointer',
                 transition: 'background 0.2s, color 0.2s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1E3A8A'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1E3A8A'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1a1a1a'; }}
             >
               <IconCart size={13} />
               הוסף לסל

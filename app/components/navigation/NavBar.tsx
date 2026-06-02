@@ -339,12 +339,12 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
         style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 520, maxWidth: 860, animation: "navMegaIn 0.2s ease-out" }}
         onMouseDown={e => e.preventDefault()}
       >
-        <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "#1E40AF", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
-        <div style={{ background: "linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)", borderRadius: 0, border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(184,151,42,0.15)", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "#1a1a1a", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
+        <div style={{ background: "#1a1a1a", borderRadius: 0, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(184,151,42,0.12)", overflow: "hidden" }}>
           <div style={{ display: "flex", flexDirection: "row-reverse", padding: "24px 24px 16px" }}>
             {item.columns.map((col, ci) => (
               <div key={ci} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-                <div style={{ fontSize: 15, fontWeight: 900, color: "#1E3A8A", textAlign: "right", marginBottom: 10, paddingBottom: 6, borderBottom: "2px solid #C5A028" }}>{col.title}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.9)", textAlign: "right", marginBottom: 10, paddingBottom: 6, borderBottom: "1px solid rgba(197,160,40,0.5)" }}>{col.title}</div>
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {col.items.map((sub, si) => (
                     <li key={si}>
@@ -461,7 +461,7 @@ function NavBarContent() {
       `}</style>
 
       {shaliach && (
-        <div style={{ background: "linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)", borderBottom: "3px solid #C5A028", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ background: "#1a1a1a", borderBottom: "3px solid #C5A028", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {shaliach.logoUrl
               ? <img src={shaliach.logoUrl} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A028", flexShrink: 0 }} />
@@ -482,27 +482,27 @@ function NavBarContent() {
         </div>
       )}
 
-      <header style={{ background: "#FAF8F3", color: "#1E3A8A", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E7E2D8" }}>
+      <header style={{ background: "#FAF8F3", color: "#1a1a1a", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E7E2D8" }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center", gap: isMobile ? 6 : 12 }}>
-          <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "#1E3A8A", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
-            <div style={{ width: 20, height: 2, background: "#1E3A8A", borderRadius: 0 }} />
-            <div style={{ width: 20, height: 2, background: "#1E3A8A", borderRadius: 0 }} />
-            <div style={{ width: 20, height: 2, background: "#1E3A8A", borderRadius: 0 }} />
+          <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "#1a1a1a", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
+            <div style={{ width: 20, height: 2, background: "#1a1a1a", borderRadius: 0 }} />
+            <div style={{ width: 20, height: 2, background: "#1a1a1a", borderRadius: 0 }} />
+            <div style={{ width: 20, height: 2, background: "#1a1a1a", borderRadius: 0 }} />
           </button>
 
           <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
             <Image src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778746370/%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_L_ecatchila_1_hrlkhj.png" alt="logo" width={200} height={48} className="ys-nav-logo" style={{ height: 48, width: "auto", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
-            <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "#1E3A8A", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
+            <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "#1a1a1a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 
           {isMobile ? (
             <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
               <button
                 onClick={() => setSearchOpen(o => !o)}
-                style={{ background: "none", border: "none", color: "#1E3A8A", padding: "6px 8px", cursor: "pointer", display: "flex", alignItems: "center" }}
+                style={{ background: "none", border: "none", color: "#1a1a1a", padding: "6px 8px", cursor: "pointer", display: "flex", alignItems: "center" }}
                 aria-label="חיפוש"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
               </button>
             </div>
           ) : (
@@ -526,30 +526,30 @@ function NavBarContent() {
             {user ? (
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 {user.photoURL && !isMobile && <img src={user.photoURL} alt="" style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid #C5A028" }} />}
-                {!isMobile && <div style={{ fontSize: 11 }}><div style={{ color: "#888", fontSize: 10 }}>שלום,</div><div style={{ fontWeight: 700, color: "#1E3A8A" }}>{user.displayName?.split(" ")[0]}</div></div>}
-                {user.role === "admin" && <button onClick={() => router.push("/admin")} style={{ background: "#1E3A8A", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>ניהול</button>}
+                {!isMobile && <div style={{ fontSize: 11 }}><div style={{ color: "#888", fontSize: 10 }}>שלום,</div><div style={{ fontWeight: 700, color: "#1a1a1a" }}>{user.displayName?.split(" ")[0]}</div></div>}
+                {user.role === "admin" && <button onClick={() => router.push("/admin")} style={{ background: "#1a1a1a", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>ניהול</button>}
                 {user.role === "sofer" && <button onClick={() => router.push("/sofer-dashboard")} style={{ background: "#1a3a2a", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>סופר</button>}
-                {user.role === "shaliach" && <button onClick={() => router.push("/shaliach-dashboard")} style={{ background: "none", color: "#1E3A8A", border: "1px solid #1E3A8A", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>שלוחה</button>}
+                {user.role === "shaliach" && <button onClick={() => router.push("/shaliach-dashboard")} style={{ background: "none", color: "#1a1a1a", border: "1px solid #1a1a1a", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>שלוחה</button>}
                 {!isMobile && <button onClick={logout} style={{ background: "none", border: "none", color: "#888", fontSize: 11, cursor: "pointer" }}>יציאה</button>}
               </div>
             ) : (
-              <button onClick={signInWithGoogle} style={{ background: "none", border: "1px solid #1E3A8A", borderRadius: 0, padding: isMobile ? "4px 7px" : "5px 8px", color: "#1E3A8A", fontSize: isMobile ? 10 : 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
+              <button onClick={signInWithGoogle} style={{ background: "none", border: "1px solid #1a1a1a", borderRadius: 0, padding: isMobile ? "4px 7px" : "5px 8px", color: "#1a1a1a", fontSize: isMobile ? 10 : 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
                 <svg width="11" height="11" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
                 {isMobile ? "כניסה" : "התחבר"}
               </button>
             )}
             <div onClick={() => router.push("/cart")} style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
               <div style={{ position: "relative" }}>
-                <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" strokeWidth="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                {count > 0 && <span style={{ position: "absolute", top: -4, left: -4, background: "#C5A028", color: "#1E3A8A", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
+                <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                {count > 0 && <span style={{ position: "absolute", top: -4, left: -4, background: "#C5A028", color: "#1a1a1a", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
               </div>
-              <div style={{ fontSize: 11, color: "#1E3A8A", fontWeight: 700 }}>סל ({count})</div>
+              <div style={{ fontSize: 11, color: "#1a1a1a", fontWeight: 700 }}>סל ({count})</div>
             </div>
           </div>
         </div>
 
         {!isMobile && (
-          <div style={{ background: "#1E3A8A", borderBottom: "2px solid #C5A028" }}>
+          <div style={{ background: "#1a1a1a", borderBottom: "2px solid #C5A028" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#C5A028", letterSpacing: 1.5, padding: "8px 14px 8px 0", borderLeft: "1px solid rgba(255,255,255,0.15)", marginLeft: 6, whiteSpace: "nowrap", flexShrink: 0 }}>
                 רגעי חיים
@@ -577,7 +577,7 @@ function NavBarContent() {
                   onMouseEnter={() => handleEnter(item.id)}
                   onMouseLeave={handleLeave}
                 >
-                  <button onClick={() => handleSelect(item.cat)} style={{ background: "none", border: "none", color: activeId === item.id ? "#C5A028" : "#1E3A8A", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 500, borderBottom: activeId === item.id ? "2px solid #C5A028" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
+                  <button onClick={() => handleSelect(item.cat)} style={{ background: "none", border: "none", color: activeId === item.id ? "#C5A028" : "#1a1a1a", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 500, borderBottom: activeId === item.id ? "2px solid #C5A028" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
                     {item.label}
                     <span style={{ fontSize: 9, color: "#C5A028", display: "inline-block", transition: "transform 0.2s ease", transform: activeId === item.id ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
                   </button>
@@ -588,7 +588,7 @@ function NavBarContent() {
               {SIMPLE_NAV.map(nav => (
                 <button key={nav.action} onClick={() => handleAction(nav.action)}
                   style={{ background: "none", border: "none", color: "#555", padding: "9px 11px", fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", borderBottom: "2px solid transparent", transition: "all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.color = "#1E3A8A"; }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "#1a1a1a"; }}
                   onMouseLeave={e => { e.currentTarget.style.color = "#555"; }}
                 >
                   {nav.label}

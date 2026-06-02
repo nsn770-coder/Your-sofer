@@ -196,7 +196,7 @@ function CategoryCard({
     >
       <h3
         className="text-right mb-3"
-        style={{ fontSize: 17, fontWeight: 900, color: '#1E3A8A', lineHeight: 1.2 }}
+        style={{ fontSize: 17, fontWeight: 900, color: '#1a1a1a', lineHeight: 1.2 }}
       >
         {card.title}
       </h3>
@@ -702,7 +702,7 @@ export default function HomePageClient() {
           onClick={closeWizard}>
           <div style={{ background: '#fff', borderRadius: 0, width: '100%', maxWidth: 480, boxShadow: '0 24px 60px rgba(0,0,0,0.25)', overflow: 'hidden' }}
             onClick={e => e.stopPropagation()}>
-            <div style={{ background: '#1E3A8A', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ background: '#1a1a1a', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, marginBottom: 2 }}>
                   {wizardStep < 3 ? `שאלה ${wizardStep + 1} מתוך 3` : '✨ ההמלצות שלנו'}
@@ -728,7 +728,7 @@ export default function HomePageClient() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     {[{ val: 'self' as const, label: '👤 לי עצמי' }, { val: 'gift' as const, label: '🎁 מתנה לאחר' }].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardFor(opt.val); setWizardStep(1); }}
-                        style={{ padding: '18px 12px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1E3A8A', cursor: 'pointer', transition: 'all 0.15s' }}
+                        style={{ padding: '18px 12px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         {opt.label}
@@ -747,7 +747,7 @@ export default function HomePageClient() {
                       { val: 'high' as const, label: 'מעל 1,000 ₪',  sub: 'מוצרים מהדרין מובחרים' },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardBudget(opt.val); setWizardStep(2); }}
-                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1E3A8A', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
@@ -767,7 +767,7 @@ export default function HomePageClient() {
                       { val: 'mehudar_plus' as const, label: 'מהודר בתכלית', sub: 'רמת הכשרות הגבוהה ביותר' },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardKashrut(opt.val); setWizardStep(3); fetchWizardResults(wizardBudget, opt.val); }}
-                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1E3A8A', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
@@ -785,7 +785,7 @@ export default function HomePageClient() {
                     <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
                     לא נמצאו מוצרים מתאימים לפי הסינון.
                     <br />
-                    <button onClick={() => router.push('/category/הכל')} style={{ marginTop: 16, background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
+                    <button onClick={() => router.push('/category/הכל')} style={{ marginTop: 16, background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
                   </div>
                 ) : (
                   <>
@@ -799,14 +799,14 @@ export default function HomePageClient() {
                             <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 100)} alt={p.name} loading="lazy" style={{ width: 60, height: 60, borderRadius: 0, objectFit: 'cover', flexShrink: 0 }} />
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: '#1E3A8A', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
                             <div style={{ fontSize: 15, fontWeight: 900, color: '#C5A028' }}>{formatPrice(p.price)}</div>
                           </div>
                           <span style={{ color: '#C5A028', fontSize: 18, flexShrink: 0 }}>←</span>
                         </div>
                       ))}
                     </div>
-                    <button onClick={closeWizard} style={{ width: '100%', background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                    <button onClick={closeWizard} style={{ width: '100%', background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                       המשך לגלישה
                     </button>
                   </>
@@ -1120,9 +1120,10 @@ export default function HomePageClient() {
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4' }}>{cat.emoji}</div>
                   )}
-                </div>
-                <div style={{ padding: '14px 16px', background: '#FFFFFF', textAlign: 'center' }}>
-                  <span style={{ fontSize: 15, fontWeight: 600, color: '#1F2937', letterSpacing: '0.01em' }}>{cat.name}</span>
+                  {/* SURI-style: floating label over bottom of image */}
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.92)', padding: '10px 14px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', letterSpacing: '0.01em' }}>{cat.name}</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1139,7 +1140,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Collections section ── */}
-      <div style={{ background: '#1E3A8A', padding: isMobile ? '64px 16px' : '96px 24px', direction: 'rtl' }}>
+      <div style={{ background: '#1a1a1a', padding: isMobile ? '64px 16px' : '96px 24px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.15em', textAlign: 'center', marginBottom: 8 }}>COLLECTIONS</p>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 30, fontWeight: 300, color: '#fff', marginBottom: 10, letterSpacing: '-0.01em' }}>הקולקציות שלנו</h2>
@@ -1234,16 +1235,16 @@ export default function HomePageClient() {
                     )}
                   </div>
                   <div style={{ padding: '10px 12px 14px' }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
                     <p style={{ fontSize: 14, fontWeight: 800, color: '#C5A028', marginBottom: 10 }}>{formatPrice(p.price)}</p>
                     <button
                       onClick={e => {
                         e.stopPropagation();
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
                       }}
-                      style={{ background: 'transparent', color: '#1E3A8A', border: '1.5px solid #1E3A8A', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '5px 10px', cursor: 'pointer', width: '100%', transition: 'background 0.2s, color 0.2s' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1E3A8A'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1E3A8A'; }}
+                      style={{ background: 'transparent', color: '#1a1a1a', border: '1.5px solid #1a1a1a', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '5px 10px', cursor: 'pointer', width: '100%', transition: 'background 0.2s, color 0.2s' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1a1a1a'; }}
                     >
                       הוסף לסל
                     </button>
@@ -1342,7 +1343,7 @@ export default function HomePageClient() {
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{cat.emoji}</div>
                   )}
                 </div>
-                <p style={{ fontSize: 11, textAlign: 'center', color: '#1E3A8A', fontWeight: 600, marginTop: 6 }}>{cat.slug}</p>
+                <p style={{ fontSize: 11, textAlign: 'center', color: '#1a1a1a', fontWeight: 600, marginTop: 6 }}>{cat.slug}</p>
               </div>
             );
           })}

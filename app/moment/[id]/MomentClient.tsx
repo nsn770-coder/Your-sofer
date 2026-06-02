@@ -330,8 +330,8 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
                 href={link.href}
                 style={{
                   display: 'inline-block',
-                  color: '#1E3A8A',
-                  border: '1.5px solid #1E3A8A',
+                  color: '#1a1a1a',
+                  border: '1.5px solid #1a1a1a',
                   padding: '12px 28px',
                   fontWeight: 700,
                   fontSize: 15,

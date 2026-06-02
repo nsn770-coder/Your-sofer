@@ -202,7 +202,7 @@ function LookBreakBanner({ col, onSelect }: { col: string; onSelect: (c: string)
           <button
             onClick={() => { onSelect(col); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             style={{
-              background: '#C5A028', color: '#1E3A8A',
+              background: '#C5A028', color: '#1a1a1a',
               border: 'none', borderRadius: 8,
               padding: '10px 22px', fontSize: 14, fontWeight: 900,
               cursor: 'pointer',
@@ -442,7 +442,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
             style={{
               flexShrink: 0, width: 88, height: 114, borderRadius: 0, overflow: 'hidden',
               position: 'relative', display: 'block', textDecoration: 'none',
-              background: img ? '#000' : 'linear-gradient(135deg, #1E3A8A, #1E40AF)',
+              background: img ? '#000' : 'linear-gradient(135deg, #1a1a1a, #1E40AF)',
               boxShadow: isActive ? '0 0 0 2.5px #C5A028, 0 4px 12px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.12)',
               transition: 'transform 0.18s ease, box-shadow 0.18s ease',
             }}
@@ -477,16 +477,16 @@ function SizeRangeSlider({ sizeMin, sizeMax, onChange }: { sizeMin: number; size
     <>
       <style dangerouslySetInnerHTML={{ __html: `.size-range{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0}.size-range::-webkit-slider-thumb{appearance:none;width:18px;height:18px}.size-range::-moz-range-thumb{width:18px;height:18px;border:none;background:transparent}` }} />
       <div className="flex justify-between items-center mb-2" dir="rtl">
-        <span className="text-xs font-semibold text-[#1E3A8A]">{isActive ? `${sizeMin} ס״מ - ${sizeMax} ס״מ` : 'כל הגדלים'}</span>
+        <span className="text-xs font-semibold text-[#1a1a1a]">{isActive ? `${sizeMin} ס״מ - ${sizeMax} ס״מ` : 'כל הגדלים'}</span>
         {isActive && <button onClick={() => onChange(MIN, MAX)} className="text-[10px] text-red-400 hover:text-red-600">איפוס</button>}
       </div>
       <div className="relative h-6 flex items-center mx-1" style={{ direction: 'ltr' }}>
         <div className="absolute w-full h-1.5 rounded-full bg-gray-200" />
-        <div className="absolute h-1.5 rounded-full pointer-events-none" style={{ background: '#1E3A8A', left: `${leftPct}%`, right: `${100 - rightPct}%` }} />
+        <div className="absolute h-1.5 rounded-full pointer-events-none" style={{ background: '#1a1a1a', left: `${leftPct}%`, right: `${100 - rightPct}%` }} />
         <input type="range" min={MIN} max={MAX} step={1} value={sizeMin} onChange={e => onChange(Math.min(Number(e.target.value), sizeMax - 1), sizeMax)} className="size-range" style={{ zIndex: sizeMin > MAX - 10 ? 5 : 3 }} />
         <input type="range" min={MIN} max={MAX} step={1} value={sizeMax} onChange={e => onChange(sizeMin, Math.max(Number(e.target.value), sizeMin + 1))} className="size-range" style={{ zIndex: 4 }} />
-        <div className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none" style={{ background: '#1E3A8A', left: `calc(${leftPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }} />
-        <div className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none" style={{ background: '#1E3A8A', left: `calc(${rightPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }} />
+        <div className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none" style={{ background: '#1a1a1a', left: `calc(${leftPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }} />
+        <div className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none" style={{ background: '#1a1a1a', left: `calc(${rightPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }} />
       </div>
       <div className="flex justify-between text-[9px] text-gray-400 mt-1 mx-1" style={{ direction: 'ltr' }}>
         {[0, 25, 50, 75, 100].map(v => <span key={v}>{v}</span>)}
@@ -534,7 +534,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#1E3A8A] flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-[#1a1a1a] flex items-center justify-center">
             <IconFilter size={14} />
           </div>
           <span className="font-bold text-gray-800 text-sm">סינון</span>
@@ -552,11 +552,11 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
         <Section title="קטגוריה">
           {([{ value: 'הכל', label: 'הכל' }, { value: 'מתנות', label: 'מתנות לחתן ובר מצוה' }, { value: 'כלי שולחן והגשה', label: 'כלי שולחן והגשה' }, { value: 'עיצוב הבית', label: 'עיצוב הבית' }, { value: 'יודאיקה', label: 'יודאיקה' }] as { value: string; label: string }[]).map(({ value, label }) => (
             <label key={value} className="flex items-center gap-2 py-1 cursor-pointer group">
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${(catFilter ?? 'הכל') === value ? 'border-[#1E3A8A] bg-[#1E3A8A]' : 'border-gray-300 group-hover:border-gray-400'}`}>
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${(catFilter ?? 'הכל') === value ? 'border-[#1a1a1a] bg-[#1a1a1a]' : 'border-gray-300 group-hover:border-gray-400'}`}>
                 {(catFilter ?? 'הכל') === value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
               </div>
               <input type="radio" name="cat-filter" checked={(catFilter ?? 'הכל') === value} onChange={() => onCatFilter(value)} className="sr-only" />
-              <span className={`text-xs transition-colors ${(catFilter ?? 'הכל') === value ? 'font-bold text-[#1E3A8A]' : 'text-gray-600 group-hover:text-gray-900'}`}>{label}</span>
+              <span className={`text-xs transition-colors ${(catFilter ?? 'הכל') === value ? 'font-bold text-[#1a1a1a]' : 'text-gray-600 group-hover:text-gray-900'}`}>{label}</span>
             </label>
           ))}
         </Section>
@@ -572,7 +572,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                 onClick={() => onSubCategoryFilter(opt === 'הכל' ? '' : opt)}
                 className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
                   (subCategoryFilter || '') === (opt === 'הכל' ? '' : opt)
-                    ? 'bg-[#1E3A8A] text-white border-[#1E3A8A]'
+                    ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                 }`}
               >
@@ -616,7 +616,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                   )}
                   <span style={{
                     fontSize: 11, fontWeight: 700,
-                    color: isActive ? '#1E3A8A' : '#6b7280',
+                    color: isActive ? '#1a1a1a' : '#6b7280',
                     padding: img ? '0 9px' : 0,
                     whiteSpace: 'nowrap',
                   }}>
@@ -639,7 +639,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                 onClick={() => set({ nusachFilter: opt === 'הכל' ? '' : opt })}
                 className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
                   (filters.nusachFilter || '') === (opt === 'הכל' ? '' : opt)
-                    ? 'bg-[#1E3A8A] text-white border-[#1E3A8A]'
+                    ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                 }`}
               >
@@ -660,7 +660,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                 onClick={() => set({ level: opt === 'הכל' ? '' : opt })}
                 className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
                   (filters.level || '') === (opt === 'הכל' ? '' : opt)
-                    ? 'bg-[#1E3A8A] text-white border-[#1E3A8A]'
+                    ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                 }`}
               >
@@ -682,10 +682,10 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
       <Section title="טווח מחיר">
         <div className="flex items-center gap-2">
           <input type="number" min={0} placeholder="מינ׳" value={filters.minPrice} onChange={e => set({ minPrice: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A]/20 transition-all" />
+            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all" />
           <span className="text-gray-300">-</span>
           <input type="number" min={0} placeholder="מקס׳" value={filters.maxPrice} onChange={e => set({ maxPrice: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1E3A8A] focus:ring-1 focus:ring-[#1E3A8A]/20 transition-all" />
+            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all" />
         </div>
       </Section>
 
@@ -693,11 +693,11 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
       <Section title="דירוג לקוחות">
         {[{ label: 'הכל', value: 0 }, { label: '3 ★ ומעלה', value: 3 }, { label: '4 ★ ומעלה', value: 4 }].map(opt => (
           <label key={opt.value} className="flex items-center gap-2 py-1 cursor-pointer group">
-            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${filters.minRating === opt.value ? 'border-[#1E3A8A] bg-[#1E3A8A]' : 'border-gray-300 group-hover:border-gray-400'}`}>
+            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${filters.minRating === opt.value ? 'border-[#1a1a1a] bg-[#1a1a1a]' : 'border-gray-300 group-hover:border-gray-400'}`}>
               {filters.minRating === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
             </div>
             <input type="radio" name="rating" checked={filters.minRating === opt.value} onChange={() => set({ minRating: opt.value })} className="sr-only" />
-            <span className={`text-xs flex items-center gap-1 transition-colors ${filters.minRating === opt.value ? 'font-bold text-[#1E3A8A]' : 'text-gray-600 group-hover:text-gray-900'}`}>
+            <span className={`text-xs flex items-center gap-1 transition-colors ${filters.minRating === opt.value ? 'font-bold text-[#1a1a1a]' : 'text-gray-600 group-hover:text-gray-900'}`}>
               {opt.value > 0 && <IconStar size={11} />}
               {opt.label}
             </span>
@@ -710,11 +710,11 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
         <label className="flex items-center gap-2 cursor-pointer group">
           <div
             onClick={() => set({ freeShipping: !filters.freeShipping })}
-            className={`w-9 h-5 rounded-full transition-all flex items-center cursor-pointer flex-shrink-0 ${filters.freeShipping ? 'bg-[#1E3A8A]' : 'bg-gray-200'}`}
+            className={`w-9 h-5 rounded-full transition-all flex items-center cursor-pointer flex-shrink-0 ${filters.freeShipping ? 'bg-[#1a1a1a]' : 'bg-gray-200'}`}
           >
             <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform mx-0.5 ${filters.freeShipping ? 'translate-x-4' : 'translate-x-0'}`} />
           </div>
-          <span className={`text-xs flex items-center gap-1 ${filters.freeShipping ? 'font-bold text-[#1E3A8A]' : 'text-gray-600'}`}>
+          <span className={`text-xs flex items-center gap-1 ${filters.freeShipping ? 'font-bold text-[#1a1a1a]' : 'text-gray-600'}`}>
             <IconTruck size={12} />
             משלוח ₪30
           </span>
@@ -733,7 +733,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                   onClick={() => setNameFilter(spec.key, opt)}
                   className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
                     current === opt
-                      ? 'bg-[#1E3A8A] text-white border-[#1E3A8A]'
+                      ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                   }`}
                 >
@@ -759,7 +759,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                   onClick={() => setAttr(key, opt)}
                   className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
                     current === opt
-                      ? 'bg-[#1E3A8A] text-white border-[#1E3A8A]'
+                      ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                   }`}
                 >
@@ -830,7 +830,7 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
         פעיל:
       </span>
       {pills.map((pill, i) => (
-        <span key={i} className="inline-flex items-center gap-1.5 bg-[#1E3A8A]/8 text-[#1E3A8A] text-xs font-semibold px-3 py-1 rounded-lg border border-[#1E3A8A]/20">
+        <span key={i} className="inline-flex items-center gap-1.5 bg-[#1a1a1a]/8 text-[#1a1a1a] text-xs font-semibold px-3 py-1 rounded-lg border border-[#1a1a1a]/20">
           {pill.label}
           <button onClick={pill.onRemove} className="hover:text-red-500 transition-colors">
             <IconX size={10} />
@@ -865,7 +865,7 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
       {active ? (
         <button
           onClick={onClear}
-          className="px-6 py-2.5 bg-[#1E3A8A] text-white rounded-lg font-bold text-sm hover:bg-[#1D4ED8] transition-colors"
+          className="px-6 py-2.5 bg-[#1a1a1a] text-white rounded-lg font-bold text-sm hover:bg-[#1D4ED8] transition-colors"
         >
           נקה סינון
         </button>
@@ -875,7 +875,7 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
             <Link
               key={cat}
               href={`/category/${encodeURIComponent(cat)}`}
-              className="px-5 py-2.5 bg-[#1E3A8A] text-white rounded-lg text-sm font-bold hover:bg-[#1D4ED8] transition-colors"
+              className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-bold hover:bg-[#1D4ED8] transition-colors"
             >
               {cat}
             </Link>
@@ -1382,12 +1382,12 @@ export default function CategoryClient({ category }: { category: string }) {
       {/* ── Breadcrumb ── */}
       <div className="bg-white border-b border-gray-100 px-4 py-2.5" dir="rtl">
         <div className="max-w-7xl mx-auto flex items-center gap-2 text-xs text-gray-400">
-          <Link href="/" className="hover:text-[#1E3A8A] flex items-center gap-1 transition-colors font-medium">
+          <Link href="/" className="hover:text-[#1a1a1a] flex items-center gap-1 transition-colors font-medium">
             <IconHome size={12} />
             דף הבית
           </Link>
           <IconChevronLeft size={11} />
-          <span className="text-[#1E3A8A] font-semibold">{category}</span>
+          <span className="text-[#1a1a1a] font-semibold">{category}</span>
         </div>
       </div>
 
@@ -1414,7 +1414,7 @@ export default function CategoryClient({ category }: { category: string }) {
             width: '100%',
             height: 220,
             overflow: 'hidden',
-            background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)',
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #1E40AF 100%)',
           }}
         >
           {curation.bannerImageUrl && (
@@ -1513,7 +1513,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <div className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 pb-8 shadow-2xl">
             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
             <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} availableCollections={availableCollections} />
-            <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#1E3A8A] text-white rounded-2xl font-bold text-sm hover:bg-[#1D4ED8] transition-colors">
+            <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#1a1a1a] text-white rounded-2xl font-bold text-sm hover:bg-[#1D4ED8] transition-colors">
               הצג {filtered.length} תוצאות
             </button>
           </div>
@@ -1537,7 +1537,7 @@ export default function CategoryClient({ category }: { category: string }) {
               {recommendedByLevel.map(({ level: lvl, products: recs }) => (
                 <div key={lvl} style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>⭐ מומלץ לרמת {lvl}</h2>
+                    <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a', margin: 0 }}>⭐ מומלץ לרמת {lvl}</h2>
                   </div>
                   <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
                     {recs.map((p, idx) => (
@@ -1557,7 +1557,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               />
                             </div>
                             {/* Blue banner */}
-                            <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
+                            <div style={{ background: '#1a1a1a', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
                               ⭐ מומלץ לרמת {lvl}
                             </div>
                             {/* Content */}
@@ -1574,7 +1574,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 {p.name}
                               </h3>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-                                <span style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A' }}>₪{p.price?.toLocaleString()}</span>
+                                <span style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a' }}>₪{p.price?.toLocaleString()}</span>
                                 {p.was && p.was > p.price && (
                                   <>
                                     <span style={{ fontSize: 13, color: '#999', textDecoration: 'line-through' }}>₪{p.was?.toLocaleString()}</span>
@@ -1584,7 +1584,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                   </>
                                 )}
                               </div>
-                              <div style={{ fontSize: 12, color: '#1E3A8A', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, padding: '6px 10px', marginBottom: 10, textAlign: 'right' }}>
+                              <div style={{ fontSize: 12, color: '#1a1a1a', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, padding: '6px 10px', marginBottom: 10, textAlign: 'right' }}>
                                 🎒 ניתן לבחור כיסוי תפילין בדף המוצר
                               </div>
                               <button
@@ -1599,7 +1599,7 @@ export default function CategoryClient({ category }: { category: string }) {
                           </>
                         ) : (
                           <>
-                            <div style={{ background: '#1E3A8A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
+                            <div style={{ background: '#1a1a1a', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
                               ⭐ מומלץ לרמת {lvl}
                             </div>
                             {isStamCat ? (
@@ -1634,9 +1634,9 @@ export default function CategoryClient({ category }: { category: string }) {
                 <button
                   onClick={() => setShowAllProducts(v => !v)}
                   style={{
-                    background: showAllProducts ? '#1E3A8A' : '#fff',
-                    color: showAllProducts ? '#fff' : '#1E3A8A',
-                    border: '2px solid #1E3A8A',
+                    background: showAllProducts ? '#1a1a1a' : '#fff',
+                    color: showAllProducts ? '#fff' : '#1a1a1a',
+                    border: '2px solid #1a1a1a',
                     borderRadius: 8, padding: '10px 28px',
                     fontSize: 14, fontWeight: 700, cursor: 'pointer',
                     fontFamily: 'inherit', direction: 'rtl', transition: 'all 0.2s',
@@ -1668,7 +1668,7 @@ export default function CategoryClient({ category }: { category: string }) {
                       value={current}
                       onChange={e => setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, [spec.key]: e.target.value } }))}
                       className="appearance-none border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all pr-7"
-                      style={{ direction: 'rtl', borderColor: isActive ? '#1E3A8A' : '#e5e7eb', color: isActive ? '#1E3A8A' : '#6b7280', background: isActive ? '#f0f4ff' : '#fff' }}
+                      style={{ direction: 'rtl', borderColor: isActive ? '#1a1a1a' : '#e5e7eb', color: isActive ? '#1a1a1a' : '#6b7280', background: isActive ? '#f0f4ff' : '#fff' }}
                     >
                       <option value="הכל">{spec.label}: הכל</option>
                       {spec.options.map(o => <option key={o} value={o}>{o}</option>)}
@@ -1683,7 +1683,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   value={filters.nusachFilter || 'הכל'}
                   onChange={e => setFilters(prev => ({ ...prev, nusachFilter: e.target.value === 'הכל' ? '' : e.target.value }))}
                   className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
-                  style={{ direction: 'rtl', borderColor: filters.nusachFilter ? '#1E3A8A' : '#e5e7eb', color: filters.nusachFilter ? '#1E3A8A' : '#6b7280', background: filters.nusachFilter ? '#f0f4ff' : '#fff' }}
+                  style={{ direction: 'rtl', borderColor: filters.nusachFilter ? '#1a1a1a' : '#e5e7eb', color: filters.nusachFilter ? '#1a1a1a' : '#6b7280', background: filters.nusachFilter ? '#f0f4ff' : '#fff' }}
                 >
                   <option value="הכל">נוסח: הכל</option>
                   {['אשכנז', 'ספרד', 'חב"ד', 'תימני', 'עדות המזרח'].map(o => <option key={o} value={o}>{o}</option>)}
@@ -1696,7 +1696,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   value={filters.level || 'הכל'}
                   onChange={e => setFilters(prev => ({ ...prev, level: e.target.value === 'הכל' ? '' : e.target.value }))}
                   className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
-                  style={{ direction: 'rtl', borderColor: filters.level ? '#1E3A8A' : '#e5e7eb', color: filters.level ? '#1E3A8A' : '#6b7280', background: filters.level ? '#f0f4ff' : '#fff' }}
+                  style={{ direction: 'rtl', borderColor: filters.level ? '#1a1a1a' : '#e5e7eb', color: filters.level ? '#1a1a1a' : '#6b7280', background: filters.level ? '#f0f4ff' : '#fff' }}
                 >
                   <option value="הכל">רמת כשרות: הכל</option>
                   {['מהודר בתכלית', 'מהודר', 'כשר לכתחילה'].map(o => <option key={o} value={o}>{o}</option>)}
@@ -1708,7 +1708,7 @@ export default function CategoryClient({ category }: { category: string }) {
                 value={filters.minRating}
                 onChange={e => setFilters(prev => ({ ...prev, minRating: Number(e.target.value) }))}
                 className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
-                style={{ direction: 'rtl', borderColor: filters.minRating > 0 ? '#1E3A8A' : '#e5e7eb', color: filters.minRating > 0 ? '#1E3A8A' : '#6b7280', background: filters.minRating > 0 ? '#f0f4ff' : '#fff' }}
+                style={{ direction: 'rtl', borderColor: filters.minRating > 0 ? '#1a1a1a' : '#e5e7eb', color: filters.minRating > 0 ? '#1a1a1a' : '#6b7280', background: filters.minRating > 0 ? '#f0f4ff' : '#fff' }}
               >
                 <option value={0}>דירוג: הכל</option>
                 <option value={3}>3★ ומעלה</option>
@@ -1727,7 +1727,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     value={current}
                     onChange={e => setFilters(prev => ({ ...prev, attrFilters: { ...prev.attrFilters, [key]: e.target.value } }))}
                     className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
-                    style={{ direction: 'rtl', borderColor: isActive ? '#1E3A8A' : '#e5e7eb', color: isActive ? '#1E3A8A' : '#6b7280', background: isActive ? '#f0f4ff' : '#fff' }}
+                    style={{ direction: 'rtl', borderColor: isActive ? '#1a1a1a' : '#e5e7eb', color: isActive ? '#1a1a1a' : '#6b7280', background: isActive ? '#f0f4ff' : '#fff' }}
                   >
                     <option value="הכל">{key}: הכל</option>
                     {vals.map(o => <option key={o} value={o}>{o}</option>)}
@@ -1749,7 +1749,7 @@ export default function CategoryClient({ category }: { category: string }) {
                 value={collectionFilter || 'הכל'}
                 onChange={e => setCollectionFilter(e.target.value === 'הכל' ? '' : e.target.value)}
                 className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
-                style={{ direction: 'rtl', borderColor: collectionFilter ? '#1E3A8A' : '#e5e7eb', color: collectionFilter ? '#1E3A8A' : '#6b7280', background: collectionFilter ? '#f0f4ff' : '#fff' }}
+                style={{ direction: 'rtl', borderColor: collectionFilter ? '#1a1a1a' : '#e5e7eb', color: collectionFilter ? '#1a1a1a' : '#6b7280', background: collectionFilter ? '#f0f4ff' : '#fff' }}
               >
                 <option value="הכל">קולקציה: הכל</option>
                 {COLLECTIONS_ORDER.filter(c => availableCollections.includes(c)).map(c => (
@@ -1779,9 +1779,9 @@ export default function CategoryClient({ category }: { category: string }) {
                 onClick={() => setCollectionFilter('')}
                 style={{
                   padding: '7px 18px', fontWeight: 700, fontSize: 13,
-                  background: !collectionFilter ? '#1E3A8A' : '#fff',
+                  background: !collectionFilter ? '#1a1a1a' : '#fff',
                   color:      !collectionFilter ? '#fff'    : '#374151',
-                  border:     `1.5px solid ${!collectionFilter ? '#1E3A8A' : '#e5e7eb'}`,
+                  border:     `1.5px solid ${!collectionFilter ? '#1a1a1a' : '#e5e7eb'}`,
                   borderRadius: 0, cursor: 'pointer', transition: 'all 0.15s ease', flexShrink: 0,
                 }}
               >
@@ -1816,7 +1816,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     )}
                     <span style={{
                       fontSize: 13, fontWeight: 700,
-                      color: isActive ? '#1E3A8A' : '#374151',
+                      color: isActive ? '#1a1a1a' : '#374151',
                       padding: img ? '0 12px' : 0,
                       whiteSpace: 'nowrap',
                     }}>
@@ -2033,7 +2033,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
               {hasMore ? (
                 <div ref={sentinelRef} className="flex justify-center items-center py-10 gap-2 text-gray-400">
-                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 border-t-[#1E3A8A] animate-spin" />
+                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 border-t-[#1a1a1a] animate-spin" />
                   <span className="text-sm">טוען עוד מוצרים...</span>
                 </div>
               ) : (
