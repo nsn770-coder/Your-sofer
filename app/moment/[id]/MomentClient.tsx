@@ -10,7 +10,10 @@ interface Product {
   id: string;
   name: string;
   price: number;
-  images: string[];
+  imgUrl?: string;
+  image_url?: string;
+  imgUrl2?: string;
+  imgUrl3?: string;
   priority?: number;
   isBestSeller?: boolean;
   badge?: string | null;
@@ -298,7 +301,7 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
                   id={p.id}
                   name={p.name}
                   price={p.price}
-                  images={p.images ?? []}
+                  images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
                   priority={p.priority}
                   isBestSeller={p.isBestSeller}
                   badge={p.badge}
