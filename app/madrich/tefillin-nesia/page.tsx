@@ -50,7 +50,7 @@ export default function TefillinNesiaPage() {
 
           <QuoteBlock text='הלכה למשה מסיני קובעת "תפילין מרובעות". עיוות של הזוויות פוסל את המצווה לחלוטין.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             הסכנות הנפוצות לתפילין בשטח
           </h2>
 
@@ -80,7 +80,7 @@ export default function TefillinNesiaPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             כיצד להגן על התפילין
           </h2>
 
@@ -92,13 +92,13 @@ export default function TefillinNesiaPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם מותר להשאיר תפילין בתוך רכב סגור בקיץ?' a='בשום אופן לא. הטמפרטורה ברכב עשויה להגיע ל-70 מעלות בתוך דקות, מה שימיס את הדיו ויעוות את העור כמעט מיד.' />
@@ -106,7 +106,7 @@ export default function TefillinNesiaPage() {
           <FAQItem q='האם מכשירי רנטגן בשדה תעופה פוגעים בתפילין?' a='לא. סורקי הרנטגן הסטנדרטיים אינם מייצרים חום או קרינה שמשפיעים על הדיו האורגני. הפריטים נשארים כשרים.' />
           <FAQItem q='מה עושים אם הפינות התעגלו?' a='יש לפנות לאיש מקצוע (מעבדת בתי תפילין) שיכניס את הבית למכבש ויישר את הפינות מחדש. זה משתלם בהרבה מרכישת בתים חדשים.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🔧' title='תיקון תפילין' desc='מתי מתקנים ומתי קונים חדש' href='/madrich/tikun-tefillin' />
             <RelatedCard emoji='🐂' title='בהמה גסה' desc='למה לא להתפשר על סוג העור' href='/madrich/behema-gasa' />

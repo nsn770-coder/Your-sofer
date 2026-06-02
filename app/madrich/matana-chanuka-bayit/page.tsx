@@ -50,7 +50,7 @@ export default function MatanaChanukaBayitPage() {
 
           <QuoteBlock text='מתנת מזוזה מהודרת אומרת: אני מעריך אותך ומכבד את הרוחניות שלך.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מה הופך קלף למתנה מושלמת?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -69,13 +69,13 @@ export default function MatanaChanukaBayitPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             כשר מול מהודר – מה ההבדל?
           </h2>
 
@@ -98,7 +98,7 @@ export default function MatanaChanukaBayitPage() {
 
           <QuoteBlock text='מזוזה מהודרת כמתנה – בחרו ברמה שתכבד גם את הנותן וגם את המקבל.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם כדאי לקנות בית מזוזה יחד עם הקלף?' a='מומלץ מאוד לשלב ביניהם כדי שהמתנה תהיה מוכנה לשימוש מיידי. ניתן להתאים בין קלפים מהודרים לבתי מזוזה מעוצבים בסגנונות שונים.' />
@@ -106,7 +106,7 @@ export default function MatanaChanukaBayitPage() {
           <FAQItem q='מה הגודל המומלץ למזוזה מתנה?' a='לדלת כניסה ראשית: 12 ס"מ לפחות, עדיף 15 ס"מ. קלף גדול מאפשר כתב מהודר יותר ונראה ייצוגי יותר כמתנה.' />
           <FAQItem q='האם מתנה של מזוזה דורשת אישור בדיקה?' a='כן, מתנה איכותית מגיעה עם תעודת בדיקה רשמית. זה מעניק למקבל ביטחון הלכתי ומראה שהקלף עבר בדיקה מקצועית.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='⭐' title='מה זה מזוזה מהודרת' desc='ההבדל בין כשר למהודר' href='/madrich/mehudar' />
             <RelatedCard emoji='🏠' title='סוגי בתי מזוזה' desc='להתאים עיצוב לאיכות' href='/madrich/batei-mezuza' />

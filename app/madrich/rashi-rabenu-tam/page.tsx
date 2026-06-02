@@ -50,7 +50,7 @@ export default function RashiRabenuTamPage() {
 
           <QuoteBlock text='תפילין של רש"י – חובת כל יהודי. תפילין רבנו תם – חומרת חסידים ומדקדקים.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מה ההבדל בפועל?
           </h2>
 
@@ -58,7 +58,7 @@ export default function RashiRabenuTamPage() {
             {[
               {
                 title: 'תפילין רש"י',
-                color: '#1E3A8A',
+                color: '#1a1a1a',
                 bg: '#f0f4ff',
                 items: ['סדר הפרשיות כפי שהן בתורה', 'קדש – והיה כי יביאך – שמע – והיה אם שמוע', 'חובה על כל יהודי', 'מברכים עליהן בכל בוקר'],
               },
@@ -80,14 +80,14 @@ export default function RashiRabenuTamPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             כיצד להבדיל בין שני הזוגות
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             חשוב מאוד לרכוש בתי תפילין המסומנים מבחוץ כדי להבדיל בין רש"י לרבנו תם ולמנוע טעות. הסימון נעשה בדרך כלל בחריטה עדינה על גוף הבית, ומונע תקרית של הנחת הזוג הלא נכון בבוקר.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם מותר להניח רש"י ורבנו תם יחד בו-זמנית?' a='מקובלים וחסידים מניחים את שניהם יחד (בתפילין קטנות במיוחד), אך הרוב מניח רש"י, חולץ בסוף התפילה, ומניח רבנו תם לכמה דקות.' />
@@ -95,7 +95,7 @@ export default function RashiRabenuTamPage() {
           <FAQItem q='מאיזה גיל מניחים רבנו תם?' a='ההנחה המקובלת היא לאחר החתונה, אצל חסידים ומחמירים. גבר רווק יכול לקחת על עצמו מנהג זה בהחלטה אישית.' />
           <FAQItem q='האם אפשר להזמין סט תואם של שני הזוגות מאותו סופר?' a='כן. הדבר מומלץ כדי ששני הזוגות יהיו בכתב זהה ובאותה רמת הידור, מה שמאפשר אחידות הלכתית ואסתטית.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🎓' title='תפילין לבר מצווה' desc='מדריך לבחירת הסט הראשון' href='/madrich/bar-mitzva-tefillin' />
             <RelatedCard emoji='📖' title='הבדלים בין נוסחים' desc='כתב בית יוסף, האר"י וספרד' href='/madrich/nosachim' />

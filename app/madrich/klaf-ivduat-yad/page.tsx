@@ -50,14 +50,14 @@ export default function KlafIvduatYadPage() {
 
           <QuoteBlock text='הקלף הוא הבית של הקדושה – חשוב לבחור אותו בקפידה.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מה זה בכלל "קלף"?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             קלף (גוויל) הוא עור בהמה טהורה (בדרך כלל פרה, עגל, עז או כבש) שעבר עיבוד מיוחד לשם כתיבת סת"ם. תהליך עיבוד הקלף כולל: הסרת שיער, השריה בסיד, הכשרה לשם מצווה, מתיחה, ייבוש וגרד. כדי שהעור הגולמי יהפוך לקלף עדין, חלק וראוי לכתיבה – הוא חייב לעבור תהליך ארוך וקפדני.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             ההבדל בין עבודת יד למכונה
           </h2>
 
@@ -101,7 +101,7 @@ export default function KlafIvduatYadPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             ההשלכות ההלכתיות – עיבוד "לשמה"
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -111,7 +111,7 @@ export default function KlafIvduatYadPage() {
             רוב הפוסקים מתירים קלף מכונה בדיעבד, אך לכתחילה עדיף קלף עבודת יד – בייחוד לתפילין ולמזוזת הפתח הראשי. כדי לצאת ידי חובת כל הדעות, הציבור המדקדק רוכש אך ורק קלף עבודת יד.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             עמידות הדיו ואורך חיי המזוזה
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -126,7 +126,7 @@ export default function KlafIvduatYadPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
@@ -134,7 +134,7 @@ export default function KlafIvduatYadPage() {
 
           <QuoteBlock text='קלף טוב הוא השקעה ארוכת טווח – מזוזה על קלף ירוד תדרוש החלפה מהר יותר.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='איך מזהים קלף עבודת יד?' a='קלף עבודת יד מאופיין לרוב במרקם עשיר יותר, אינו אחיד בצורה מלאכותית, ובצד האחורי שלו ניתן לעיתים לראות סימני גרד ידניים עדינים. שאלו את הסופר ישירות ממי רכש את הקלף – שמות בתי המלאכה הידועים לקלף עבודת יד מוכרים בקהילת הסת"ם.' />
@@ -142,7 +142,7 @@ export default function KlafIvduatYadPage() {
           <FAQItem q='מה זה "גוויל"?' a='גוויל הוא שם נרדף לקלף, אך לעיתים מתייחס ספציפית לסוג קלף שעובד בצורה מסוימת (צד השיער). נהוג בכתיבת ספרי תורה בנוסחים מסוימים.' />
           <FAQItem q='האם כדאי לשלם יותר על קלף עבודת יד?' a='בהחלט, בייחוד לתפילין ולמזוזת הכניסה הראשית. ההפרש במחיר לא גדול יחסית לסך כל עלות הסת"ם, אבל ההשפעה על הכשרות לאורך שנים חשובה מאוד.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🔬' title='האותיות והתגים' desc='מה עוד משפיע על כשרות' href='/madrich/otiyot-vetaguim' />
             <RelatedCard emoji='⭐' title='מה זה מזוזה מהודרת' desc='ההבדל בין כשר למהודר' href='/madrich/mehudar' />

@@ -50,7 +50,7 @@ export default function OtiyotVetaguimPage() {
 
           <QuoteBlock text='חז"ל אמרו: "תגין שעל גבי האותיות" הם מסורת למשה מסיני – עתיקים ומדויקים.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מה זה תגים?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -60,7 +60,7 @@ export default function OtiyotVetaguimPage() {
             יש שתי מסורות עיקריות לתגים: תגי "שעטנ"ז ג"ץ" ותגי "אותיות יש ביאה". בנוסח האר"י יש מערכת תגים שונה מעט. כל תג חייב להיות מופרד ונוגע בדיוק בראש האות הנכונה – תג שמנותק לחלוטין או נוגע באות שלידה פוסל.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             אותיות שעטנ"ז ג"ץ
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -76,13 +76,13 @@ export default function OtiyotVetaguimPage() {
                 padding: '20px 10px',
                 textAlign: 'center',
               }}>
-                <div style={{ fontSize: 36, fontWeight: 900, color: '#1E3A8A', lineHeight: 1 }}>{letter}</div>
+                <div style={{ fontSize: 36, fontWeight: 900, color: '#1a1a1a', lineHeight: 1 }}>{letter}</div>
                 <div style={{ fontSize: 11, color: '#888', marginTop: 8 }}>3 תגים</div>
               </div>
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             חוקי כתיבת האותיות – מרווחים וצורה
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -97,13 +97,13 @@ export default function OtiyotVetaguimPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             למה צורת האות משנה?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -117,12 +117,12 @@ export default function OtiyotVetaguimPage() {
             { pair: 'ו/י', desc: 'הוא"ו ארוכה יותר מהיו"ד. שתי אותיות שנבדלות בגודל – אם זהות, שתיהן פסולות.' },
           ].map(item => (
             <div key={item.pair} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <div style={{ background: '#1E3A8A', color: '#C5A028', fontWeight: 900, fontSize: 18, minWidth: 48, height: 48, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.pair}</div>
+              <div style={{ background: '#1a1a1a', color: '#C5A028', fontWeight: 900, fontSize: 18, minWidth: 48, height: 48, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.pair}</div>
               <div style={{ fontSize: 14, color: '#555', lineHeight: 1.7 }}>{item.desc}</div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מה בודק המגיה?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -131,7 +131,7 @@ export default function OtiyotVetaguimPage() {
 
           <QuoteBlock text='הסופר כותב את הקדושה – המגיה שומר עליה.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='מה קורה אם תג של האות ש׳ נוגע בתג של האות שלידה?' a='נגיעה בין תגים או בין אותיות פוסלת את המזוזה מיד. במקרים מסוימים, אם הנגיעה לא שינתה את צורת האות הבסיסית, מגיה מוסמך יכול להפריד בעדינות באמצעות גירוד – אך רק אם אין עיוות של "חק תוכות".' />
@@ -140,7 +140,7 @@ export default function OtiyotVetaguimPage() {
           <FAQItem q='האם ניתן לראות את התגים בתמונה?' a='כן. בתמונות ברזולוציה גבוהה של הקלפים, ניתן לראות בבירור את התגים על האותיות.' />
           <FAQItem q='מה ההבדל בין תגים לכתב?' a='הכתב הוא צורת האות עצמה (משפיעה על הכשרות); התגים הם הוספות קטנות מעל האות (משפיעות על ההידור).' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='⭐' title='מה זה מזוזה מהודרת' desc='ההבדל בין כשר למהודר' href='/madrich/mehudar' />
             <RelatedCard emoji='🔍' title='תהליך הבדיקה' desc='איך נבדקת כל מזוזה' href='/madrich/bedika' />

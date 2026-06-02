@@ -1,7 +1,7 @@
 'use client';
 
 const GOLD = '#C9A227';
-const NAVY = '#1E3A8A';
+const NAVY = '#1a1a1a';
 const GOLD_LIGHT = 'rgba(201,162,39,0.12)';
 
 function InitialsAvatar({ initials, size = 88 }: { initials: string; size?: number }) {
@@ -25,7 +25,7 @@ function BadgePill({ children }: { children: React.ReactNode }) {
       display: 'inline-flex', alignItems: 'center', gap: 5,
       background: '#EEF3FF',
       borderRadius: 0, padding: '5px 14px',
-      fontSize: 12, fontWeight: 600, color: '#2446A6',
+      fontSize: 12, fontWeight: 600, color: '#1a1a1a',
       letterSpacing: 0.4,
     }}>
       {children}
@@ -182,7 +182,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
               display: 'flex', alignItems: 'center', gap: 7,
               background: '#F8F6F1',
               borderRadius: 0, padding: '7px 16px',
-              fontSize: 12, color: '#1E3A8A', fontWeight: 600,
+              fontSize: 12, color: '#1a1a1a', fontWeight: 600,
             }}>
               <span style={{ color: GOLD, fontSize: 13 }}>✓</span> {item}
             </div>

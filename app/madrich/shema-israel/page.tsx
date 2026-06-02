@@ -50,13 +50,13 @@ export default function ShemaIsraelPage() {
 
           <QuoteBlock text='המזוזה היא תעודת הזהות של הבית היהודי – ה"שמע" שבפנים מזכיר לדיירים מי הם ומה שורשיהם.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             הפרשיות שבמזוזה ובתפילין
           </h2>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, margin: '20px 0 32px' }}>
             {[
-              { title: 'מזוזה', color: '#1E3A8A', bg: '#f0f4ff', items: ['פרשת שמע (דברים ו:ד-ט)', 'פרשת והיה אם שמוע (דברים יא:יג-כא)', 'הצהרת אחדות הבורא', 'קבלת עול מצוות'] },
+              { title: 'מזוזה', color: '#1a1a1a', bg: '#f0f4ff', items: ['פרשת שמע (דברים ו:ד-ט)', 'פרשת והיה אם שמוע (דברים יא:יג-כא)', 'הצהרת אחדות הבורא', 'קבלת עול מצוות'] },
               { title: 'תפילין', color: '#1a5c3a', bg: '#f0fff5', items: ['קדש (שמות יג:א-י)', 'והיה כי יביאך (שמות יג:יא-טז)', 'שמע (דברים ו:ד-ט)', 'והיה אם שמוע (דברים יא:יג-כא)'] },
             ].map(c => (
               <div key={c.title} style={{ background: c.bg, border: `1px solid ${c.color}33`, borderRadius: 10, padding: '20px' }}>
@@ -70,7 +70,7 @@ export default function ShemaIsraelPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             אותיות רבתי – הסוד שבאות הגדולה
           </h2>
 
@@ -81,20 +81,20 @@ export default function ShemaIsraelPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='למה כותבים בסוף המזוזה מאחור את המילה "שד"י"?' a='השם שד"י מייצג גם "שומר דלתות ישראל". גלגול הקלף נעשה כך שהמילה תישאר מבחוץ, ומספקת את סגולת השמירה על יושבי הבית.' />
           <FAQItem q='האם מותר לפתוח ולראות את הקלף עם הטקסט?' a='מותר ומומלץ לראות ולהתרשם מהאותיות, מתוך יראת כבוד וללא מגע ישיר בידיים מזיעות על הדיו.' />
           <FAQItem q='מה ההבדל בין "שמע" במזוזה לבין "שמע" בתפילין?' a='הטקסט זהה. אך בתפילין ישנן שתי פרשיות נוספות מספר שמות, ויש מחלוקת על סדר הפרשיות (רש"י ורבנו תם).' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🔤' title='אותיות ותגים' desc='סודות הכתב האשורי' href='/madrich/otiyot-vetaguim' />
             <RelatedCard emoji='📖' title='הבדלים בין נוסחים' desc='כתב בית יוסף, האר"י וספרד' href='/madrich/nosachim' />

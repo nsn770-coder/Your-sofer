@@ -50,7 +50,7 @@ export default function ChavilotBarMitzvaPage() {
 
           <QuoteBlock text='רכישת חבילה מובנית מפחיתת עלויות תיווך ומבטיחה שכל החלקים עומדים באותה רמת כשרות והידור.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מה חייב להיות בחבילה איכותית
           </h2>
 
@@ -62,13 +62,13 @@ export default function ChavilotBarMitzvaPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             רכיבי החבילה האופיינית
           </h2>
 
@@ -78,18 +78,18 @@ export default function ChavilotBarMitzvaPage() {
               { title: 'טלית', emoji: '🕍', items: ['100% צמר רחלים', 'ציצית עבודת יד', 'חותמת נגד שעטנז', 'מידה מותאמת לגיל'] },
               { title: 'נרתיקים', emoji: '🎁', items: ['קטיפה או עור', 'רקמה עם שם הנער', 'עיצוב תואם', 'מארז מתנה מפואר'] },
             ].map(c => (
-              <div key={c.title} style={{ background: '#f8f9ff', border: '1px solid #1E3A8A33', borderRadius: 10, padding: '20px' }}>
-                <div style={{ fontWeight: 900, fontSize: 17, color: '#1E3A8A', marginBottom: 14 }}>{c.emoji} {c.title}</div>
+              <div key={c.title} style={{ background: '#f8f9ff', border: '1px solid #1a1a1a33', borderRadius: 10, padding: '20px' }}>
+                <div style={{ fontWeight: 900, fontSize: 17, color: '#1a1a1a', marginBottom: 14 }}>{c.emoji} {c.title}</div>
                 {c.items.map(item => (
                   <div key={item} style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 14, color: '#333' }}>
-                    <span style={{ color: '#1E3A8A' }}>✓</span>{item}
+                    <span style={{ color: '#1a1a1a' }}>✓</span>{item}
                   </div>
                 ))}
               </div>
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='כמה זמן מראש כדאי להזמין חבילת בר מצווה?' a='מומלץ להזמין לפחות 2-3 חודשים לפני הבר מצווה או תחילת אימוני ההנחה. כך הסופר כותב בריכוז ולא בלחץ, וזמן משלוח לחו"ל לא יהפוך לגורם לחץ.' />
@@ -97,7 +97,7 @@ export default function ChavilotBarMitzvaPage() {
           <FAQItem q='האם חבילה מישראל עוברת מכס בחו"ל?' a='פריטי דת ותשמישי קדושה נהנים לעתים מפטורים מכסוניים במדינות רבות. מומלץ לבדוק עם השלחן ביחס לספציפי למדינתכם.' />
           <FAQItem q='מה הדין בתפילין שהוזמנו לשמאלי?' a='חובה לציין בעת ההזמנה שהנער שמאלי. הכיוון שבו עוברת הרצועה משתנה ואין אפשרות לתקן בדיעבד ללא פתיחת התפירות.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🎓' title='תפילין לבר מצווה' desc='מדריך לבחירת הסט הראשון' href='/madrich/bar-mitzva-tefillin' />
             <RelatedCard emoji='💰' title='מחירי סופרי סת"ם' desc='מה מרכיב מחיר הוגן' href='/madrich/michrei-soferim' />

@@ -50,7 +50,7 @@ export default function BateiMezuzaPage() {
 
           <QuoteBlock text='בית מזוזה יפה שאינו אטום בחוץ עולה יקר – כשהקלף נהרס בגשם הראשון.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             לפי מיקום – מה מתאים לאן
           </h2>
 
@@ -80,7 +80,7 @@ export default function BateiMezuzaPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             דרישות הלכתיות לבית המזוזה
           </h2>
 
@@ -92,13 +92,13 @@ export default function BateiMezuzaPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם מותר להשתמש בבית מזוזה מפלסטיק פשוט?' a='כן, מבחינה הלכתית כל חומר שמגן על הקלף הוא כשר. עם זאת, לטובת הידור מצווה ומכיוון שמדובר בפתח הבית, נהוג לבחור בבית מכובד ואסתטי.' />
@@ -106,7 +106,7 @@ export default function BateiMezuzaPage() {
           <FAQItem q='מה גודל בית המזוזה שצריך לקנות?' a='תמיד מדדו את "החלל הפנימי" של בית המזוזה ולא את האורך החיצוני שלו. לקלף 12 ס"מ – בחרו בית עם חלל פנימי של 13 ס"מ לפחות.' />
           <FAQItem q='האם מותר לדביק בית מזוזה לדלת זכוכית?' a='כן, ניתן להשתמש בדבק תעשייתי כפול דו-צדדי שקוף, עמיד בחום חיצוני. לא ניתן לקדוח בזכוכית מחוסמת, ולכן הדבקה היא הפתרון המקובל.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='📏' title='גודל המזוזה' desc='10 ס"מ, 12 ס"מ, 15 ס"מ – מה ההבדל?' href='/madrich/godel-mezuza' />
             <RelatedCard emoji='🏠' title='קביעת מזוזה' desc='מדריך שלב אחר שלב' href='/madrich/kviyas-mezuza' />

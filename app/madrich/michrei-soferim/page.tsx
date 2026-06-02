@@ -50,7 +50,7 @@ export default function MichreiSoferimPage() {
 
           <QuoteBlock text='מזוזה ב-50 ש"ח – בדרך כלל לא כשרה. מזוזה ב-200 ש"ח – כשרה בסיסית. מזוזה ב-500 ש"ח – מהודרת.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מה מרכיב את מחיר הסת"ם?
           </h2>
 
@@ -63,13 +63,13 @@ export default function MichreiSoferimPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             טווח המחירים המקובל
           </h2>
 
@@ -89,7 +89,7 @@ export default function MichreiSoferimPage() {
 
           <QuoteBlock text='סופר שמשקיע 3-4 שעות בכתיבת מזוזה לא יכול למכור אותה ב-100 ש"ח ולהתפרנס.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם מזוזה זולה היא בהכרח פסולה?' a='לא בהכרח פסולה, אך היא לרוב ברמת הכשרות המינימלית ביותר ("בדיעבד"), וקיים סיכון גבוה שנכתבה במהירות רבה מדי או ללא פיקוח הדוק.' />
@@ -97,7 +97,7 @@ export default function MichreiSoferimPage() {
           <FAQItem q='האם מחיר גבוה מבטיח איכות?' a='לא בהכרח. הגנה הטובה ביותר היא שקיפות: צילום של הקלף הספציפי שאתם מקבלים + תעודת בדיקה + זיהוי הסופר.' />
           <FAQItem q='כמה עולה כתיבת מזוזה לסופר?' a='כתיבת מזוזה מהודרת לוקחת 3-5 שעות. בחשב שכר מקצועי הוגן ועלויות חומרים, מחיר של פחות מ-200 ש"ח הוא אות אזהרה.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🛡️' title='קניית סת"ם באינטרנט' desc='איך לוודא שלא נופלים בהונאה' href='/madrich/knia-online' />
             <RelatedCard emoji='⭐' title='מה זה מזוזה מהודרת' desc='ההבדל בין כשר למהודר' href='/madrich/mehudar' />

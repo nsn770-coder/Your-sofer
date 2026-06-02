@@ -50,7 +50,7 @@ export default function TefillinPerudotPage() {
 
           <QuoteBlock text='תפילין פרודות: היצרן מוודא שכל חדר נפרד לחלוטין מרעהו – הפרדה אמיתית של 100%.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             פרודות לעומת רובות – ההבדל
           </h2>
 
@@ -64,7 +64,7 @@ export default function TefillinPerudotPage() {
               },
               {
                 title: 'פרודות (הידור)',
-                color: '#1E3A8A',
+                color: '#1a1a1a',
                 bg: '#f0f4ff',
                 items: ['הידור לכתחילה מושלם', 'חוט מועבר בין כל חדר לחדר', 'ניתן לראות אור בין החריצים', 'מבוקש אצל מדקדקים'],
               },
@@ -84,14 +84,14 @@ export default function TefillinPerudotPage() {
             דעת הרמב"ם והשולחן ערוך היא שארבעת בתי התפילין של ראש צריכים להיות ארבעה בתים נפרדים לחלוטין. ייצור "פרודות" הוא תהליך עדין ויקר יותר המצריך מיומנות רבה, אך פותר את הספק ההלכתי ומעניק לכתחילה מושלם.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='איך מוודאים שהתפילין שרכשתי הן "פרודות"?' a='בתפילין פרודות אמיתיות, אם מחזיקים אותן מול האור בצורה ישרה, ניתן לעיתים לראות פס אור דקיק עובר בין החריצים.' />
           <FAQItem q='האם תפילין שאינן פרודות הן פסולות?' a='לא. הן כשרות לפי רוב הפוסקים. "פרודות" נחשב להידור גבוה (חומרה לכתחילה), סטנדרט מבוקש בקרב מדקדקים.' />
           <FAQItem q='מה ההשפעה של פרודות על מחיר התפילין?' a='תפילין פרודות יקרות יותר ב-20-40% מרובות ברמת הכשרות הזהה, בשל עלות ייצור גבוהה יותר ושכבת בקרת איכות נוספת.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🐂' title='בהמה גסה' desc='למה לא להתפשר על סוג העור' href='/madrich/behema-gasa' />
             <RelatedCard emoji='⭐' title='מזוזה מהודרת' desc='ההבדל בין כשר למהודר' href='/madrich/mehudar' />

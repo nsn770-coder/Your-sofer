@@ -325,7 +325,7 @@ function SoferCard({ soferId }: { soferId: string }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
         {sofer.profileImage
           ? <NextImage src={sofer.profileImage!} alt={sofer.name ?? ''} width={52} height={52} loading="lazy" style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #C9A227', flexShrink: 0 }} />
-          : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2446A6', fontSize: 22, flexShrink: 0 }}>✍️</div>
+          : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', fontSize: 22, flexShrink: 0 }}>✍️</div>
         }
         <div>
           <div style={{ fontWeight: 800, fontSize: 15, color: '#1F2937' }}>{sofer.name}</div>
@@ -342,13 +342,13 @@ function SoferCard({ soferId }: { soferId: string }) {
       {sofer.certifications?.length ? (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
           {sofer.certifications.map(cert => (
-            <span key={cert} style={{ background: '#EEF3FF', color: '#2446A6', fontSize: 11, fontWeight: 600, borderRadius: 20, padding: '3px 9px' }}>{cert}</span>
+            <span key={cert} style={{ background: '#EEF3FF', color: '#1a1a1a', fontSize: 11, fontWeight: 600, borderRadius: 20, padding: '3px 9px' }}>{cert}</span>
           ))}
         </div>
       ) : null}
       <button
         onClick={() => { trackOpenSoferProfile(soferId); router.push(`/soferim/${soferId}`); }}
-        style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+        style={{ background: '#FFFFFF', color: '#1a1a1a', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
       >
         ראה פרופיל מלא
       </button>
@@ -1529,7 +1529,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {!compact && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-            <span style={{ fontSize: 28, fontWeight: 800, color: '#2446A6' }}>{formatPrice(product.price)}</span>
+            <span style={{ fontSize: 28, fontWeight: 800, color: '#1a1a1a' }}>{formatPrice(product.price)}</span>
             {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
             {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
           </div>
@@ -1789,7 +1789,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {!compact && product.cat && RABBINICAL_CATEGORIES.has(product.cat) && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          background: 'linear-gradient(90deg, #111d3a 0%, #1E40AF 100%)',
+          background: 'linear-gradient(90deg, #111d3a 0%, #1a1a1a 100%)',
           border: '1px solid rgba(197,160,40,0.35)',
           borderRadius: 10, padding: '9px 14px', marginBottom: 4,
           direction: 'rtl',
@@ -1949,7 +1949,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             {isMobile && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f0f0f0' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-                  <span style={{ fontSize: 28, fontWeight: 800, color: '#2446A6' }}>{formatPrice(product.price)}</span>
+                  <span style={{ fontSize: 28, fontWeight: 800, color: '#1a1a1a' }}>{formatPrice(product.price)}</span>
                   {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
                   {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
                 </div>

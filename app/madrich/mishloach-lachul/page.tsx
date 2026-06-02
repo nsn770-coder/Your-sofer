@@ -50,7 +50,7 @@ export default function MishloachLachulPage() {
 
           <QuoteBlock text='אריזה נכונה מוציאה את הקלף מישראל בריא – וכך הוא מגיע לדלת הלקוח.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             פרוטוקול אריזה נכון לשילוח בינלאומי
           </h2>
 
@@ -60,15 +60,15 @@ export default function MishloachLachulPage() {
             { num: 3, title: 'שילוח אקספרס מבוטח', desc: 'חברות שילוח אקספרס בינלאומיות מבטיחות מסירה תוך 3-5 ימי עסקים, ביטוח מלא ומעקב דיגיטלי צמוד.' },
           ].map(item => (
             <div key={item.num} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <div style={{ background: '#1E3A8A', color: '#C5A028', fontWeight: 900, fontSize: 18, minWidth: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.num}</div>
+              <div style={{ background: '#1a1a1a', color: '#C5A028', fontWeight: 900, fontSize: 18, minWidth: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.num}</div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם צריך לשלם מכס על קבלת סת"ם בארה"ב או אירופה?' a='פריטי דת נהנים לעתים מפטורים מכסוניים במדינות רבות, אך מס יבוא סטנדרטי עשוי לחול. מומלץ לבדוק עם המשלחת ביחס לחוקי המדינה הספציפית.' />
@@ -76,7 +76,7 @@ export default function MishloachLachulPage() {
           <FAQItem q='כמה זמן לוקח שילוח מישראל לחו"ל?' a='בשילוח אקספרס – לרוב 3-5 ימי עסקים לארה"ב ואירופה. שילוח רגיל – שבועיים עד שלושה שבועות, אך לא מומלץ לפריטי קלף רגישים.' />
           <FAQItem q='מה קורה אם החבילה אבדה או נפגעה?' a='חבילות עם ביטוח מלא מכוסות לשווי המלא. אצל ספק מהימן, כל משלוח כזה מגיע עם תעודת ביטוח ומספר מעקב.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🛡️' title='קניית סת"ם אונליין' desc='4 סימני אמינות לבדיקה' href='/madrich/knia-online' />
             <RelatedCard emoji='⚠️' title='זיופי סת"ם' desc='ממה להיזהר ברשת' href='/madrich/ziyufei-stam' />

@@ -675,13 +675,13 @@ export default function HomePageClient() {
         .ys-hscroll::-webkit-scrollbar { display: none; }
         .ys-outline-btn {
           display: inline-flex; align-items: center; justify-content: center;
-          background: #FFFFFF; color: #2446A6;
-          border: 1.5px solid #2446A6; border-radius: 0;
+          background: #FFFFFF; color: #1a1a1a;
+          border: 1.5px solid #1a1a1a; border-radius: 0;
           height: 52px; padding: 0 36px;
           font-weight: 700; font-size: 14px; text-decoration: none;
           transition: background 0.2s, color 0.2s; cursor: pointer; font-family: inherit;
         }
-        .ys-outline-btn:hover { background: #2446A6; color: #fff; }
+        .ys-outline-btn:hover { background: #1a1a1a; color: #fff; }
       `}</style>
 
       {/* ── Newsletter popup ── */}
@@ -1426,7 +1426,7 @@ export default function HomePageClient() {
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ color: '#2446A6', fontWeight: 700, fontSize: 14 }}>{q.name.charAt(0)}</span>
+                    <span style={{ color: '#1a1a1a', fontWeight: 700, fontSize: 14 }}>{q.name.charAt(0)}</span>
                   </div>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 600, color: '#1F2937' }}>{q.name}</div>

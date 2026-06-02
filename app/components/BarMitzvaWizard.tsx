@@ -76,13 +76,13 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
   const isPage  = variant === 'page';
 
   const bg           = isPage ? '#fff' : 'transparent';
-  const textPrimary  = isPage ? '#1E3A8A' : '#fff';
+  const textPrimary  = isPage ? '#1a1a1a' : '#fff';
   const textMuted    = isPage ? '#6b7280' : 'rgba(255,252,240,0.6)';
   const accentGold   = '#C5A028';
   const green        = '#22c55e';
   const borderColor  = isPage ? '#e5e7eb' : 'rgba(255,252,240,0.15)';
   const currentBg    = isPage ? '#f0f4ff' : 'rgba(184,151,42,0.15)';
-  const currentBorder = isPage ? '#1E3A8A' : accentGold;
+  const currentBorder = isPage ? '#1a1a1a' : accentGold;
 
   const inner = (
     <div dir="rtl" style={{ fontFamily: 'inherit' }}>
@@ -160,7 +160,7 @@ export default function BarMitzvaWizard({ variant = 'page' }: Props) {
                       </div>
                       <button
                         onClick={() => handleSelect(idx)}
-                        style={{ flexShrink: 0, background: isPage ? '#1E3A8A' : accentGold, color: '#fff', border: 'none', borderRadius: 0, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                        style={{ flexShrink: 0, background: isPage ? '#1a1a1a' : accentGold, color: '#fff', border: 'none', borderRadius: 0, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                       >
                         לבחירה ←
                       </button>

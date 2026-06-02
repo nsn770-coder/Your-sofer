@@ -237,7 +237,7 @@ export default function MobileDrawerMenu({
                 display: 'block',
                 width: '100%',
                 background: '#F5F8FF',
-                color: '#2446A6',
+                color: '#1a1a1a',
                 border: '1px solid #C5D5F0',
                 padding: '12px 16px',
                 fontWeight: 700,

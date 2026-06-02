@@ -141,7 +141,7 @@ export default function AddProductPage() {
         </div>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
           <button onClick={() => { setSaved(false); setName(''); setDesc(''); setPrice(''); setCategory(''); setNusach(''); setLevel(''); setSize(''); setDeliveryDays(''); setImages([]); }}
-            style={{ background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             ➕ הוסף מוצר נוסף
           </button>
           <button onClick={() => router.push('/sofer-dashboard')}
@@ -156,7 +156,7 @@ export default function AddProductPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f0f4ff', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
       {/* Header */}
-      <div style={{ background: '#2563EB', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: '#1a1a1a', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginBottom: 3 }}>פורטל סופר</div>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>➕ הוספת מוצר חדש</div>
@@ -284,7 +284,7 @@ export default function AddProductPage() {
                       <div style={{ width: 64, height: 64, background: '#f3f4f6', borderRadius: 8, border: '2px dashed #d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 22 }}>🖼️</div>
                     )}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <label style={{ background: isDisabled ? '#9ca3af' : '#2563EB', color: '#fff', borderRadius: 7, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: (isDisabled || uploading !== null) ? 'not-allowed' : 'pointer', opacity: (isDisabled || uploading === i) ? 0.6 : 1 }}>
+                      <label style={{ background: isDisabled ? '#9ca3af' : '#1a1a1a', color: '#fff', borderRadius: 7, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: (isDisabled || uploading !== null) ? 'not-allowed' : 'pointer', opacity: (isDisabled || uploading === i) ? 0.6 : 1 }}>
                         {uploading === i ? '⏳ מעלה...' : `📷 תמונה ${i + 1}`}
                         <input type="file" accept="image/*" style={{ display: 'none' }} disabled={isDisabled || uploading !== null}
                           onChange={e => handleUpload(i, e)} />
@@ -310,7 +310,7 @@ export default function AddProductPage() {
 
           <div style={{ display: 'flex', gap: 12 }}>
             <button type="submit" disabled={saving || uploading !== null}
-              style={{ flex: 1, background: (saving || uploading !== null) ? '#9ca3af' : '#2563EB', color: '#fff', border: 'none', borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 700, cursor: (saving || uploading !== null) ? 'not-allowed' : 'pointer' }}>
+              style={{ flex: 1, background: (saving || uploading !== null) ? '#9ca3af' : '#1a1a1a', color: '#fff', border: 'none', borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 700, cursor: (saving || uploading !== null) ? 'not-allowed' : 'pointer' }}>
               {saving ? 'שולח...' : '📤 שלח לאישור'}
             </button>
             <button type="button" onClick={() => router.push('/sofer-dashboard')}

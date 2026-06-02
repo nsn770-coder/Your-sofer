@@ -200,7 +200,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   const btnStyle: React.CSSProperties = {
     background: 'rgba(30,58,138,0.08)',
     border: '2px solid rgba(30,58,138,0.3)',
-    color: '#1E3A8A',
+    color: '#1a1a1a',
     borderRadius: 0,
     padding: '14px 20px',
     fontSize: isMobile ? 15 : 16,
@@ -215,7 +215,7 @@ export default function SmartFunnel({ isMobile }: { isMobile: boolean }) {
   const titleStyle: React.CSSProperties = {
     fontSize: isMobile ? 18 : 22,
     fontWeight: 700,
-    color: '#1E3A8A',
+    color: '#1a1a1a',
     marginBottom: 20,
     textAlign: 'right',
   };

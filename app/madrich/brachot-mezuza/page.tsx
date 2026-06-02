@@ -50,7 +50,7 @@ export default function BrachotMezuzaPage() {
 
           <QuoteBlock text='הברכה הראשונה על דלת הכניסה פוטרת את כל הבית – בתנאי שמשנה לא תפסיק לדבר שיחת חולין.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מקרים נפוצים ומה הדין
           </h2>
 
@@ -64,20 +64,20 @@ export default function BrachotMezuzaPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='מה קורה אם דיברתי בטעות בין הדלת הראשונה לאחרת?' a='אם דיברת שיחת חולין, לפי פוסקים מסוימים הברכה הראשונה לא פוטרת יותר, ותצטרך לברך שוב על הדלת הבאה.' />
           <FAQItem q='האם אישה יכולה לקבוע מזוזה ולברך?' a='בהחלט. אישה מחויבת במצוות מזוזה ויכולה לברך ולקבוע בעצמה לכתחילה.' />
           <FAQItem q='האם מברכים על מזוזה בעסק?' a='ברוב מקרי העסק קובעים ללא ברכה, מאחר שאין "בית דירה" מובהק. אם בעל העסק ישן שם – יש להתייעץ עם פוסק.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='📿' title='קביעת מזוזה' desc='מדריך שלב אחר שלב' href='/madrich/kviyas-mezuza' />
             <RelatedCard emoji='🔍' title='בדיקת מזוזות' desc='מתי לבדוק ואיך' href='/madrich/bdika-mezuzot' />

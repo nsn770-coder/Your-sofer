@@ -50,7 +50,7 @@ export default function TallitTefillinPage() {
 
           <QuoteBlock text='100% צמר רחלים – הטלית המהודרת והמומלצת ביותר לפי כל הדעות. נושמת, נעימה, ומקיימת את המצווה לכתחילה.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             צמר רחלים לעומת אקרילן
           </h2>
 
@@ -80,7 +80,7 @@ export default function TallitTefillinPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             הקפדות הלכתיות בטלית
           </h2>
 
@@ -91,20 +91,20 @@ export default function TallitTefillinPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='איך לבחור מידת טלית נכונה?' a='מידות סטנדרטיות: 50 (לנערים), 60 (לגבר ממוצע), 70 (לגברים גבוהים ורחבים הרוצים להתעטף היטב). מומלץ להתייעץ לפי גובה ומשקל.' />
           <FAQItem q='האם אפשר לכבס טלית צמר במכונה?' a='בשום אופן. צמר מתכווץ בכביסה חמה, וחוטי הציצית עלולים להיפרם. טלית מורידים רק לניקוי יבש אצל מומחה.' />
           <FAQItem q='כמה עולה טלית צמר רחלים איכותית?' a='טלית צמר רחלים טובה עולה בין 300 ל-1,000 ש"ח, תלוי באיכות האריגה, רוחב הפסים ואיכות חוטי הציצית.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🎁' title='סט חתן' desc='טלית, תפילין ונרתיקים לחתן' href='/madrich/set-chatan' />
             <RelatedCard emoji='🎓' title='חבילות בר מצווה' desc='כל מה שצריך בסט אחד' href='/madrich/chavilot-bar-mitzva' />

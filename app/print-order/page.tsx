@@ -3,7 +3,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/app/contexts/CartContext';
 
-const NAVY = '#1E3A8A';
+const NAVY = '#1a1a1a';
 const GOLD = '#C5A028';
 
 type ProductType = 'shirt' | 'kipa';

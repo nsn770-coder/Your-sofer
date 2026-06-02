@@ -50,7 +50,7 @@ export default function BdikaMezuzotPage() {
 
           <QuoteBlock text='מזוזה פסולה שאינה בדוקה אינה מגינה – ואינה מקיימת את המצווה.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מתי צריך לבדוק?
           </h2>
 
@@ -63,13 +63,13 @@ export default function BdikaMezuzotPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שתי שיטות הבדיקה – ולמה צריך שתיהן
           </h2>
 
@@ -117,7 +117,7 @@ export default function BdikaMezuzotPage() {
 
           <QuoteBlock text='הסופר כותב את הקדושה – המגיה שומר עליה לאורך הדורות.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='כמה זמן לוקח תהליך בדיקת מזוזות?' a='בדיקה מקצועית משולבת (מחשב + מגיה) לוקחת בדרך כלל ימים בודדים מרגע קבלת הקלפים. הקלפים נסרקים, נבדקים ומוחזרים עם דוח מפורט.' />
@@ -125,7 +125,7 @@ export default function BdikaMezuzotPage() {
           <FAQItem q='איך שומרים על המזוזה מפני לחות?' a='מומלץ לעטוף את קלף המזוזה בניילון נצמד לפני הכנסה לבית המזוזה, ולוודא שבית המזוזה אטום לחלוטין – בייחוד בדלתות חיצוניות.' />
           <FAQItem q='האם תפילין צריכות בדיקה?' a='תפילין שמורות במקום יבש ומונחות באופן קבוע – לא חייבות בדיקה מדין. אבל מומלץ לבדוק כל כמה שנים, ובוודאי אחרי חשיפה לחום, לחות או נפילה.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🖐️' title='קלף עבודת יד' desc='למה איכות הקלף משפיעה על העמידות' href='/madrich/klaf-ivduat-yad' />
             <RelatedCard emoji='🔍' title='תהליך הבדיקה' desc='איך נבדקת כל מזוזה' href='/madrich/bedika' />

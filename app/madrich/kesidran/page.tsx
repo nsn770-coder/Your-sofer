@@ -50,14 +50,14 @@ export default function KesidranPage() {
 
           <QuoteBlock text='"כסדרן" – כתיבת המזוזה חייבת להיעשות לפי סדר המילים בתורה, מתחילה ועד סופה, מבלי לחזור אחורה.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מה זה "כסדרן"?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             הסופר חייב לכתוב מתחילת הפסוק ועד סופו, מהאות הראשונה ועד לאחרונה, מבלי לחזור אחורה. אם סיים לכתוב מזוזה וגילה שהוא שכח לכתוב את האות ב' במילה "לבבך" בתחילת הקלף – אינו יכול פשוט להוסיף אותה. אם יוסיף אותה עתה, היא נכתבה <em>אחרי</em> האותיות שבסוף המזוזה, ולכן נכתבה "שלא כסדרן". המזוזה כולה פסולה.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             מזוזה ותפילין לעומת ספר תורה
           </h2>
 
@@ -91,14 +91,14 @@ export default function KesidranPage() {
             הכלל נובע מהפסוק "וכתבתם על מזוזות ביתך" – "וכתבתם: כדרך כתיבתן". לכן מיומנותו וריכוזו של הסופר קריטיים. סופר שחושב שיכול לכתוב מהר ולתקן אחר כך – מייצר קלפים פסולים ללא ידיעתו.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם שום דבר לא ניתן לתיקון במזוזה?' a='אם נמצאה נגיעה קלה מאוד שלא פגעה בצורת האות המקורית – ישנם מצבים שההלכה מתירה לגרד את הנגיעה מבלי לעבור על פסול כסדרן. זה נתון להחלטת פוסק מומחה בלבד.' />
           <FAQItem q='האם בדיקת מחשב מונעת בעיות כסדרן?' a='בדיקת מחשב מגלה את הטעות, אבל לא יכולה לתקן בדיעבד. מטרת הבדיקה היא לגלות קלפים פסולים לפני מכירתם ללקוח.' />
           <FAQItem q='כיצד סופר מנוסה מונע טעויות כסדרן?' a='סופר מקצועי כותב לאט, בריכוז מלא, וקורא כל מילה מתוך "תיקון סופרים" לפני הכתיבה. מהירות יתרה היא אויב הכשרות.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='✍️' title='סופר ירא שמיים' desc='למה הממד הרוחני קריטי' href='/madrich/yirat-shamayim' />
             <RelatedCard emoji='🔍' title='בדיקת מזוזות' desc='מתי לבדוק ושיטות הבדיקה' href='/madrich/bdika-mezuzot' />

@@ -89,7 +89,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         className="w-full flex items-center justify-between gap-4 py-4 px-5 bg-transparent border-0 cursor-pointer text-right"
         style={{ fontFamily: 'inherit' }}
       >
-        <span className="text-[15px] font-semibold text-[#1E3A8A] flex-1 text-right">{q}</span>
+        <span className="text-[15px] font-semibold text-[#1a1a1a] flex-1 text-right">{q}</span>
         <span className="text-[#C5A028] font-bold text-base shrink-0 leading-none">
           {open ? '▴' : '▾'}
         </span>
@@ -110,7 +110,7 @@ export default function BarMitzvahPage() {
     >
 
       {/* ── 1. Hero ─────────────────────────────────────────────────────── */}
-      <section className="bg-[#1E3A8A] py-16 sm:py-24 px-4 text-center">
+      <section className="bg-[#1a1a1a] py-16 sm:py-24 px-4 text-center">
         <p className="text-[#C5A028] text-xs sm:text-sm font-bold tracking-widest mb-4 uppercase">
           Your Sofer — סת״מ בשקיפות מלאה
         </p>
@@ -122,7 +122,7 @@ export default function BarMitzvahPage() {
         </p>
         <a
           href={CATEGORY_URL}
-          className="inline-block bg-[#C5A028] text-[#1E3A8A] font-black text-base px-10 py-4 rounded-lg no-underline"
+          className="inline-block bg-[#C5A028] text-[#1a1a1a] font-black text-base px-10 py-4 rounded-lg no-underline"
         >
           בחר את הסט שלך ←
         </a>
@@ -138,7 +138,7 @@ export default function BarMitzvahPage() {
           ].map(item => (
             <div key={item.text} className="flex items-center gap-2">
               <span className="text-[#C5A028] font-black text-lg leading-none">{item.icon}</span>
-              <span className="text-[#1E3A8A] text-sm font-bold">{item.text}</span>
+              <span className="text-[#1a1a1a] text-sm font-bold">{item.text}</span>
             </div>
           ))}
         </div>
@@ -147,23 +147,23 @@ export default function BarMitzvahPage() {
       {/* ── 3. Single tier card ──────────────────────────────────────────── */}
       <section id="tiers" className="max-w-lg mx-auto px-4 py-14">
         <div className="bg-white rounded-2xl border border-[#E0D8CC] shadow-md p-8 flex flex-col items-center text-center">
-          <h3 className="text-2xl font-black text-[#1E3A8A] mb-3">סט תפילין מהודר לבר מצווה</h3>
+          <h3 className="text-2xl font-black text-[#1a1a1a] mb-3">סט תפילין מהודר לבר מצווה</h3>
           <p className="text-gray-500 text-sm leading-relaxed mb-6 max-w-sm">
             כתיבה ברמה גבוהה על קלף מעובד, בדיקת מחשב מוסמכת, תיק תפילין איכותי — סט מלא ומוכן.
           </p>
           <div className="bg-[#FEF9EC] border border-[#C5A028]/40 rounded-lg px-4 py-2 mb-4">
             <span className="text-[#9A7B1A] text-xs font-bold">המחיר כולל הכל — אין הפתעות</span>
           </div>
-          <div className="text-[#1E3A8A] text-3xl font-black mb-8">₪2,800 – ₪3,700</div>
+          <div className="text-[#1a1a1a] text-3xl font-black mb-8">₪2,800 – ₪3,700</div>
           <a
             href={CATEGORY_URL}
-            className="w-full block text-center bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-base py-4 rounded-lg no-underline transition-colors"
+            className="w-full block text-center bg-[#1a1a1a] hover:bg-[#1a1a1a] text-white font-bold text-base py-4 rounded-lg no-underline transition-colors"
           >
             לצפייה בסטים ←
           </a>
           <p className="text-gray-400 text-xs mt-5">
             שאלות?{' '}
-            <a href={WA_URL} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] underline">
+            <a href={WA_URL} target="_blank" rel="noopener noreferrer" className="text-[#1a1a1a] underline">
               שוחח איתנו בוואטסאפ
             </a>
             {' '}ונעזור לבחור.
@@ -173,16 +173,16 @@ export default function BarMitzvahPage() {
 
       {/* ── 4. How it works ──────────────────────────────────────────────── */}
       <section className="max-w-3xl mx-auto px-4 pb-14">
-        <h2 className="text-center text-[#1E3A8A] text-2xl sm:text-3xl font-black mb-10">
+        <h2 className="text-center text-[#1a1a1a] text-2xl sm:text-3xl font-black mb-10">
           איך זה עובד?
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {STEPS.map(step => (
             <div key={step.num} className="bg-white rounded-2xl border border-[#E0D8CC] p-6 flex flex-col items-center text-center shadow-sm">
-              <div className="w-12 h-12 rounded-full bg-[#1E3A8A] flex items-center justify-center text-[#C5A028] font-black text-xl mb-4 shrink-0">
+              <div className="w-12 h-12 rounded-full bg-[#1a1a1a] flex items-center justify-center text-[#C5A028] font-black text-xl mb-4 shrink-0">
                 {step.num}
               </div>
-              <h4 className="text-[#1E3A8A] font-black text-base mb-2">{step.title}</h4>
+              <h4 className="text-[#1a1a1a] font-black text-base mb-2">{step.title}</h4>
               <p className="text-gray-500 text-sm leading-relaxed m-0">{step.desc}</p>
             </div>
           ))}
@@ -190,7 +190,7 @@ export default function BarMitzvahPage() {
       </section>
 
       {/* ── 5. Testimonials ──────────────────────────────────────────────── */}
-      <section className="bg-[#1E3A8A] py-14 px-4">
+      <section className="bg-[#1a1a1a] py-14 px-4">
         <h2 className="text-center text-white text-2xl sm:text-3xl font-black mb-10">
           מה משפחות אומרות עלינו
         </h2>
@@ -200,11 +200,11 @@ export default function BarMitzvahPage() {
               <div className="text-[#C5A028] text-base mb-3 tracking-wide">★★★★★</div>
               <p className="text-gray-700 text-sm leading-relaxed italic mb-4 flex-1">"{t.text}"</p>
               <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
-                <div className="w-9 h-9 rounded-full bg-[#1E3A8A] flex items-center justify-center text-white font-bold text-xs shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#1a1a1a] flex items-center justify-center text-white font-bold text-xs shrink-0">
                   {t.initials}
                 </div>
                 <div>
-                  <div className="text-[#1E3A8A] font-bold text-sm">{t.name}</div>
+                  <div className="text-[#1a1a1a] font-bold text-sm">{t.name}</div>
                   <div className="text-gray-400 text-xs">{t.city}</div>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export default function BarMitzvahPage() {
 
       {/* ── 6. FAQ ───────────────────────────────────────────────────────── */}
       <section className="max-w-3xl mx-auto px-4 py-14">
-        <h2 className="text-center text-[#1E3A8A] text-2xl sm:text-3xl font-black mb-8">
+        <h2 className="text-center text-[#1a1a1a] text-2xl sm:text-3xl font-black mb-8">
           שאלות נפוצות
         </h2>
         <div className="bg-white rounded-2xl border border-[#E0D8CC] overflow-hidden shadow-sm">
@@ -226,13 +226,13 @@ export default function BarMitzvahPage() {
       </section>
 
       {/* ── 7. Final CTA ─────────────────────────────────────────────────── */}
-      <section className="bg-[#1E3A8A] py-16 px-4 text-center">
+      <section className="bg-[#1a1a1a] py-16 px-4 text-center">
         <h2 className="text-white text-2xl sm:text-3xl font-black mb-4">
           מוכן לבחור?
         </h2>
         <a
           href={CATEGORY_URL}
-          className="inline-block bg-[#C5A028] text-[#1E3A8A] font-black text-base px-10 py-4 rounded-lg no-underline mb-5"
+          className="inline-block bg-[#C5A028] text-[#1a1a1a] font-black text-base px-10 py-4 rounded-lg no-underline mb-5"
         >
           לצפייה בסטים ←
         </a>

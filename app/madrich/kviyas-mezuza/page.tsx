@@ -50,7 +50,7 @@ export default function KviyasMezuzaPage() {
 
           <QuoteBlock text='שלושה כללים פשוטים: ימין, שליש עליון, ואלכסון לאשכנזים – ישר לספרדים.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שלושת כללי היסוד
           </h2>
 
@@ -62,7 +62,7 @@ export default function KviyasMezuzaPage() {
             <Step key={item.num} num={item.num} title={item.title} desc={item.desc} />
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שלבי הקביעה בפועל
           </h2>
 
@@ -75,13 +75,13 @@ export default function KviyasMezuzaPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם מברכים על קביעת מזוזה בחדר שירותים?' a='חס ושלום. חדרים אלו פטורים לחלוטין ממזוזה ואסור להתקין בהם מזוזה מפאת קדושת הקלף.' />
@@ -89,7 +89,7 @@ export default function KviyasMezuzaPage() {
           <FAQItem q='מה עושים כשעוברים דירה שכורה?' a='שוכר דירה חייב לקבוע מזוזה בברכה בדיוק כמו בעל בית. אם השוכר הבא הוא יהודי, אסור להוריד את המזוזות.' />
           <FAQItem q='האם אישה יכולה לקבוע מזוזה ולברך?' a='בהחלט. אישה מחויבת במצוות מזוזה ממש כמו גבר ויכולה לברך ולקבוע בעצמה.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🏠' title='בתי מזוזה' desc='איך לבחור את הבית הנכון' href='/madrich/batei-mezuza' />
             <RelatedCard emoji='📏' title='גודל המזוזה' desc='10, 12, 15 ס"מ – מה ההבדל?' href='/madrich/godel-mezuza' />

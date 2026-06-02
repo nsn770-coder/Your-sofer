@@ -50,7 +50,7 @@ export default function BehemaGasaPage() {
 
           <QuoteBlock text='ה"ריבוע" של התפילין הוא נתון הלכתי קריטי – תפילין שפינותיהן התעגלו פסולות.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             ההבדל בין שני הסוגים
           </h2>
 
@@ -84,7 +84,7 @@ export default function BehemaGasaPage() {
             בתפילין דקות משתמשים לעיתים בדבק כדי להחזיק את המבנה המרובע ("תפילין פשוטות"), והדבק מאבד מיעילותו בחום. לעומת זאת, תפילין בהמה גסה מבוססות על עיצוב של חומר טבעי עבה מקשה אחת – מה שהופך אותן למהודרות יותר לכל הדעות ועמידות כמעט לחלוטין בפני פגעי הזמן.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='איך מבדילים מבחוץ בין בהמה דקה לגסה?' a='תפילין גסות מרגישות כבדות וקשיחות הרבה יותר (כמו פלסטיק דחוס). בתפילין דקות העור בבסיס נראה מקופל ומודבק ויש להן תחושה חלולה וקלה.' />
@@ -92,7 +92,7 @@ export default function BehemaGasaPage() {
           <FAQItem q='האם תפילין מבהמה דקה הן פסולות?' a='לא בהכרח פסולות מלכתחילה, אך הפינות מתעגלות בצורה ניכרת לאחר מספר שנות שימוש אינטנסיבי, מה שמוביל בסופו של דבר לפסלות.' />
           <FAQItem q='מה המחיר הממוצע לתפילין בהמה גסה?' a='תפילין בהמה גסה מהודרות עולות בין 1,500 ל-4,000 ש"ח ומעלה תלוי ברמת הידור הקלף ואיכות הבתים. זו השקעה לחיים ולא להחלפה.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🔧' title='תיקון תפילין' desc='מתי שווה לשפץ ומתי לקנות חדש' href='/madrich/tikun-tefillin' />
             <RelatedCard emoji='🎓' title='תפילין לבר מצווה' desc='מדריך לבחירת הסט הראשון' href='/madrich/bar-mitzva-tefillin' />

@@ -36,7 +36,7 @@ export default function WizardStickyBar() {
     <div
       dir="rtl"
       style={{
-        background: '#1E3A8A',
+        background: '#1a1a1a',
         borderRadius: 12,
         border: '2px solid #C5A028',
         padding: '12px 16px',
@@ -85,7 +85,7 @@ export default function WizardStickyBar() {
         style={{
           flexShrink: 0,
           background: '#C5A028',
-          color: '#1E3A8A',
+          color: '#1a1a1a',
           border: 'none',
           borderRadius: 8,
           padding: '10px 18px',

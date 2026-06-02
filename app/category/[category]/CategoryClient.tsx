@@ -442,7 +442,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
             style={{
               flexShrink: 0, width: 88, height: 114, borderRadius: 0, overflow: 'hidden',
               position: 'relative', display: 'block', textDecoration: 'none',
-              background: img ? '#000' : 'linear-gradient(135deg, #1a1a1a, #1E40AF)',
+              background: img ? '#000' : 'linear-gradient(135deg, #1a1a1a, #1a1a1a)',
               boxShadow: isActive ? '0 0 0 2.5px #C5A028, 0 4px 12px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.12)',
               transition: 'transform 0.18s ease, box-shadow 0.18s ease',
             }}
@@ -865,7 +865,7 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
       {active ? (
         <button
           onClick={onClear}
-          className="px-6 py-2.5 bg-[#1a1a1a] text-white rounded-lg font-bold text-sm hover:bg-[#1D4ED8] transition-colors"
+          className="px-6 py-2.5 bg-[#1a1a1a] text-white rounded-lg font-bold text-sm hover:bg-[#1a1a1a] transition-colors"
         >
           נקה סינון
         </button>
@@ -875,7 +875,7 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
             <Link
               key={cat}
               href={`/category/${encodeURIComponent(cat)}`}
-              className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-bold hover:bg-[#1D4ED8] transition-colors"
+              className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-bold hover:bg-[#1a1a1a] transition-colors"
             >
               {cat}
             </Link>
@@ -1001,7 +1001,7 @@ function StamCard({
 
         {/* Price */}
         <div>
-          <span style={{ fontSize: 20, fontWeight: 800, color: '#2446A6', lineHeight: 1, display: 'block' }}>
+          <span style={{ fontSize: 20, fontWeight: 800, color: '#1a1a1a', lineHeight: 1, display: 'block' }}>
             {formatPrice(product.price)}
           </span>
           {hasSale && (
@@ -1414,7 +1414,7 @@ export default function CategoryClient({ category }: { category: string }) {
             width: '100%',
             height: 220,
             overflow: 'hidden',
-            background: 'linear-gradient(135deg, #1a1a1a 0%, #1E40AF 100%)',
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #1a1a1a 100%)',
           }}
         >
           {curation.bannerImageUrl && (
@@ -1464,12 +1464,12 @@ export default function CategoryClient({ category }: { category: string }) {
           display: 'flex', alignItems: 'center', gap: 10,
           flexWrap: 'wrap',
         }}>
-          <span style={{ fontSize: 14, color: '#2446A6', fontWeight: 700, flexShrink: 0 }}>✓</span>
-          <span style={{ fontSize: 13, color: '#2446A6', fontWeight: 600 }}>
+          <span style={{ fontSize: 14, color: '#1a1a1a', fontWeight: 700, flexShrink: 0 }}>✓</span>
+          <span style={{ fontSize: 13, color: '#1a1a1a', fontWeight: 600 }}>
             כל המוצרים בקטגוריה זו עברו בדיקת מגיה רבנית
           </span>
           <span style={{
-            fontSize: 11, color: '#2446A6', fontWeight: 700,
+            fontSize: 11, color: '#1a1a1a', fontWeight: 700,
             background: '#fff',
             border: '1px solid #C5D5F0',
             borderRadius: 4, padding: '3px 10px',
@@ -1513,7 +1513,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <div className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 pb-8 shadow-2xl">
             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
             <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} availableCollections={availableCollections} />
-            <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#1a1a1a] text-white rounded-2xl font-bold text-sm hover:bg-[#1D4ED8] transition-colors">
+            <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#1a1a1a] text-white rounded-2xl font-bold text-sm hover:bg-[#1a1a1a] transition-colors">
               הצג {filtered.length} תוצאות
             </button>
           </div>
@@ -1542,7 +1542,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
                     {recs.map((p, idx) => (
                       <div key={p.id}
-                        style={{ border: '2px solid #1D4ED8', borderRadius: 12, overflow: 'hidden', background: (category.includes('מצווה') || category.includes('מצוה')) ? '#fff' : '#EFF4FF', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
+                        style={{ border: '2px solid #1a1a1a', borderRadius: 12, overflow: 'hidden', background: (category.includes('מצווה') || category.includes('מצוה')) ? '#fff' : '#EFF4FF', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
                         onClick={() => { if (category.includes('מצווה') || category.includes('מצוה')) window.location.href = `/product/${p.id}`; }}>
 
                         {(category.includes('מצווה') || category.includes('מצוה')) ? (

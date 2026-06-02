@@ -46,7 +46,7 @@ export default function UltimateFaqPage() {
             ריכוז השאלות הנפוצות ביותר שאנשים שואלים לפני שהם קונים מזוזה, תפילין, או סת"ם אחר. מוגש בצורה ברורה ופרקטית, על בסיס מאות פניות מהורים, בעלי בתים ותורמים.
           </p>
 
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A', margin: '0 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1a1a1a', margin: '0 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
             שאלות על רכישה
           </h2>
 
@@ -56,14 +56,14 @@ export default function UltimateFaqPage() {
           <FAQItem q='האם ניתן לקנות מזוזה אונליין?' a='כן, ובלבד שהאתר מציג תמונה אמיתית של הקלף (לא תמונת מלאי גנרית), שהסופר מזוהה, ויש בדיקת מגיה. רכישה "עיוורת" ללא תמונה – עדיף להימנע.' />
           <FAQItem q='כמה מזוזות צריך לדירה ממוצעת?' a='בדרך כלל בין 8 ל-15 מזוזות: פתח כניסה, כל חדר שינה, סלון, מטבח, חדר עבודה. חדר אמבטיה ושירותים – פטורים. כדאי להתייעץ עם רב לגבי דלתות ספציפיות.' />
 
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
             שאלות על הלכות מזוזה
           </h2>
 
           <FAQItem q='באילו חדרים בבית חייבים לשים מזוזה?' a='כל חדר המשמש למגורים קבועים ויש לו פתח עם שני משקופים ומשקוף עליון (צורת הפתח) ואורכו ורוחבו לפחות 2 מטרים, חייב במזוזה. כולל סלון, חדרי שינה, מטבח, חדר עבודה, ומחסנים ביתיים. חדר שירותים, מקלחת ומרפסות פתוחות – פטורים.' />
           <FAQItem q='מה ההבדל בין גודל מזוזה 10 ס"מ, 12 ס"מ ו-15 ס"מ?' a='הגודל מציין את גובה קלף המזוזה. כל הגדלים כשרים. ככל שהקלף גדול יותר, קל יותר לסופר לכתוב בצורה מהודרת, ברורה ונקייה. מזוזות בגודל 10 ס"מ ומטה דורשות מיומנות כתיבה מיקרוסקופית קשה, ולכן הידור רב קל יותר למצוא בגדלים 12 ו-15 ס"מ.' />
 
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
             שאלות על כשרות
           </h2>
 
@@ -72,7 +72,7 @@ export default function UltimateFaqPage() {
           <FAQItem q='האם מזוזה מודפסת כשרה?' a='לא. מזוזה חייבת להיכתב בכתב יד על ידי סופר מוסמך. מזוזה מודפסת – פסולה לחלוטין, ואין לה קדושת סת"ם.' />
           <FAQItem q='כמה פעמים צריך לבדוק מזוזה?' a='מצווה לבדוק מזוזות פעמיים בשבע שנים. מזוזה חיצונית (שחשופה למזג האוויר) – כל שנה-שנתיים. מזוזה שנרטבה – מיד.' />
 
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
             שאלות על תפילין ובר מצווה
           </h2>
 
@@ -83,7 +83,7 @@ export default function UltimateFaqPage() {
           <FAQItem q='האם נער בר מצווה יכול להניח תפילין ירושה?' a='כן, בתנאי שהתפילין נלקחות לבדיקה מקיפה (אדם ומחשב) אצל מגיה מוסמך לפני השימוש. פעמים רבות תפילין ישנות שעמדו בארון עשורים סובלות מדיו סדוק או ריבוע בתים שנפגם – דבר הפוסל אותן.' />
           <FAQItem q='האם צריך לבדוק תפילין?' a='כן, מומלץ לבדוק כל כמה שנים. תפילין שנרטבו, נפלו, או עברו חשיפה לחום קיצוני – יש לבדוק מיד.' />
 
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
             שאלות על מכירה, אחסון וטיפול
           </h2>
 
@@ -92,7 +92,7 @@ export default function UltimateFaqPage() {
           <FAQItem q='האם צריך מזוזה בדירת שכירות?' a='כן, גם שוכרי דירה חייבים במזוזה. כשיוצאים מהדירה, יש לקחת את המזוזות (אם הדייר הבא יהודי – כדאי לשאול רב). אם לוקחים – יש לשים מזוזות כשרות חדשות.' />
           <FAQItem q='האם מזוזה יכולה להגן?' a='מבחינה הלכתית, קיום מצוות מזוזה מקנה זכות לשמירה אלוקית. אבל המצווה מקוימת רק כשהמזוזה כשרה ובמקומה הנכון – לא על ידי תליית קישוט בצורת מזוזה.' />
 
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 4px', borderBottom: '3px solid #C5A028', paddingBottom: 8 }}>
             שאלות על הסופר
           </h2>
 
@@ -100,7 +100,7 @@ export default function UltimateFaqPage() {
           <FAQItem q='האם ניתן לפגוש את הסופר?' a='כן, ורצוי. פגישה עם הסופר מאפשרת לראות דוגמאות מכתבו, לשאול שאלות, ולבנות אמון. רכישה מסופר שמזוהים – תמיד עדיפה על קנייה אנונימית.' />
           <FAQItem q='האם סופר אחד עדיף על אחר?' a='כן. יש סופרים שכתבם יפה ומהודר ויש שכתבם בסיסי. יש סופרים שמקפידים יותר. הניסיון, ההכשרה, והמסירות – כולם משפיעים. לכן חשוב לראות דוגמאות אמיתיות מהסופר הספציפי.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>מאמרים נוספים שיעניינו אתכם</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>מאמרים נוספים שיעניינו אתכם</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='💸' title='למה לא לקנות מזוזה זולה' desc='הקשר בין מחיר לאיכות' href='/madrich/mezuza-zola' />
             <RelatedCard emoji='⭐' title='מה זה מזוזה מהודרת' desc='ההבדל בין כשר למהודר' href='/madrich/mehudar' />

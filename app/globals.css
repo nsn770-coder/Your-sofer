@@ -118,7 +118,7 @@ body {
 
 /* Category banner placeholder: reserve space even when image is loading */
 .category-banner-placeholder {
-  background: #1E40AF;
+  background: #1a1a1a;
   min-height: 120px;
   contain: layout size;
 }

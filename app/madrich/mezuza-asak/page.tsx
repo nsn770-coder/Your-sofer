@@ -50,13 +50,13 @@ export default function MezuzaAsakPage() {
 
           <QuoteBlock text='כל חלל שאדם עובד בו שעות ארוכות באופן קבוע – חייב במזוזה לשמירה על האדם ועסקיו.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             בית דירה לעומת עסק – ההבדלים ההלכתיים
           </h2>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, margin: '20px 0 32px' }}>
             {[
-              { title: 'בית מגורים', color: '#1E3A8A', bg: '#f0f4ff', items: ['חיוב מוחלט מהתורה', 'מברכים על הקביעה', 'כל חדר חייב', 'כולל חדרי שינה'] },
+              { title: 'בית מגורים', color: '#1a1a1a', bg: '#f0f4ff', items: ['חיוב מוחלט מהתורה', 'מברכים על הקביעה', 'כל חדר חייב', 'כולל חדרי שינה'] },
               { title: 'עסק ומשרד', color: '#1a5c3a', bg: '#f0fff5', items: ['חיוב מדרבנן על פי רוב', 'קובעים לרוב ללא ברכה', 'כל חדר עבודה עם דלת', 'חדרי שירותים פטורים'] },
             ].map(c => (
               <div key={c.title} style={{ background: c.bg, border: `1px solid ${c.color}33`, borderRadius: 10, padding: '20px' }}>
@@ -70,7 +70,7 @@ export default function MezuzaAsakPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             התקנה על דלתות זכוכית במשרדים מודרניים
           </h2>
 
@@ -81,20 +81,20 @@ export default function MezuzaAsakPage() {
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם צריך לשים מזוזה בכל חדר במשרד?' a='כן, כל חדר עבודה שיש לו דלת ומשקוף בגודל תקני מצריך מזוזה. חדרי שירותים ומטבחונים קטנים פטורים.' />
           <FAQItem q='אם אני עוזב את המשרד לשוכר אחר, להשאיר את המזוזות?' a='אם השוכר הבא הוא יהודי, אסור להוריד את המזוזות מהפתחים. זכותך לבקש ממנו תשלום על שוויין.' />
           <FAQItem q='האם מברכים על מזוזה בעסק?' a='ברוב המקרים קובעים ללא ברכה, מאחר שאין "בית דירה" מובהק. אם בעל העסק ישן שם לעיתים – יש לשאול פוסק מה דינו.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🏠' title='סוגי בתי מזוזה' desc='חומרים ועיצוב לכל דלת' href='/madrich/batei-mezuza' />
             <RelatedCard emoji='📿' title='קביעת מזוזה' desc='מדריך שלב אחר שלב' href='/madrich/kviyas-mezuza' />

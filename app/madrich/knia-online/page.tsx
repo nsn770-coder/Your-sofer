@@ -50,7 +50,7 @@ export default function KniaOnlinePage() {
 
           <QuoteBlock text='הכלל הראשון: אתר סת"ם מהימן מראה לכם פנים ושמות – לא תמונות גנריות.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             4 סימני אמינות שיש לבדוק
           </h2>
 
@@ -61,15 +61,15 @@ export default function KniaOnlinePage() {
             { num: 4, title: 'מדיניות החזרות וכשרות', desc: 'אתר אמין יאפשר לכם לקחת את המוצר לבדיקה עצמאית אצל כל רב מוסמך שתבחרו, וייתן אחריות על הכשרות.' },
           ].map(item => (
             <div key={item.num} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <div style={{ background: '#1E3A8A', color: '#C5A028', fontWeight: 900, fontSize: 18, minWidth: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.num}</div>
+              <div style={{ background: '#1a1a1a', color: '#C5A028', fontWeight: 900, fontSize: 18, minWidth: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.num}</div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             איך מזהים זיוף ביד?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -78,7 +78,7 @@ export default function KniaOnlinePage() {
 
           <QuoteBlock text='מוצר אמיתי מישראל – מגיע עם שם הסופר, תעודת בדיקה, ותמונת הקלף הספציפי.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1E3A8A', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='איך מזהים הדפסה כשהמזוזה מגיעה?' a='הדפסה תיראה מושלמת ושטוחה לחלוטין. כתיבה אמיתית מותירה מרקם של דיו מתנוסס, סימני קולמוס קלים, ולאורך גב הקלף ניתן לעיתים להרגיש את בלטות האותיות.' />
@@ -86,7 +86,7 @@ export default function KniaOnlinePage() {
           <FAQItem q='מה עושים אם קיבלתי מוצר שנראה זייפני?' a='פנו מיד לאתר ממנו קניתם ובקשו הסבר. אם האתר לא מגיב – פנו לרב מוסמך לבדיקה עצמאית ושקלו הגשת תלונה לצרכנות.' />
           <FAQItem q='האם כדאי לקנות מסופר ישירות?' a='בהחלט! קניה ישירה מהסופר מבטיחה שקיפות מקסימלית. אפשר לראות את כתבו, לשאול שאלות, ולקבל קלף שהסופר אחראי עליו באופן אישי.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='⚠️' title='זיופי סת"ם ברשת' desc='איך מזהים ממה להתרחק' href='/madrich/ziyufei-stam' />
             <RelatedCard emoji='💰' title='מחירי סופרי סת"ם' desc='מה מרכיב מחיר הוגן' href='/madrich/michrei-soferim' />
