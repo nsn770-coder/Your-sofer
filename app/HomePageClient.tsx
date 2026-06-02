@@ -844,8 +844,7 @@ export default function HomePageClient() {
           preload="auto"
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
         >
-          <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/q_auto,f_auto/v1780391744/%D7%95%D7%99%D7%93%D7%90%D7%95_%D7%94%D7%A6%D7%A2%D7%AA_%D7%A0%D7%99%D7%A9%D7%95%D7%90%D7%99%D7%9F_%D7%95%D7%98%D7%91%D7%A2%D7%AA_ubywp1.mp4" type="video/mp4" />
-          <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/v1780391744/%D7%95%D7%99%D7%93%D7%90%D7%95_%D7%94%D7%A6%D7%A2%D7%AA_%D7%A0%D7%99%D7%A9%D7%95%D7%90%D7%99%D7%9F_%D7%95%D7%98%D7%91%D7%A2%D7%AA_ubywp1.mp4" type="video/mp4" />
+          <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/v1780438734/Video_sxnlwo.mp4" type="video/mp4" />
         </video>
 
         {/* Overlay */}
