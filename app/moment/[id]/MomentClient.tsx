@@ -226,6 +226,9 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
       <style>{`
         .moment-pulse { animation: momentPulse 1.6s ease-in-out infinite; }
         @keyframes momentPulse { 0%,100%{opacity:1} 50%{opacity:0.45} }
+        .moment-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+        @media(min-width:640px){ .moment-grid{ grid-template-columns:repeat(3,1fr); gap:20px; } }
+        @media(min-width:1280px){ .moment-grid{ grid-template-columns:repeat(4,1fr); } }
       `}</style>
 
       {/* ── Filter bar ──────────────────────────────────────────────────────── */}
@@ -278,7 +281,7 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '40px 24px 72px' }}>
 
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: 20 }}>
+          <div className="moment-grid">
             {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
@@ -294,7 +297,7 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
             )}
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: 20 }}>
+          <div className="moment-grid">
             {filtered.map((p, i) => (
               <RevealCard key={p.id} delay={Math.min((i % 12) * 50, 300)}>
                 <ProductCard
