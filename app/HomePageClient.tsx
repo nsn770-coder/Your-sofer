@@ -1224,6 +1224,44 @@ export default function HomePageClient() {
         </a>
       </div>
 
+      {/* ── 6. More categories horizontal scroll ── */}
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 0' : '72px 0', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
+          <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 300, color: '#111111', marginBottom: 24, letterSpacing: '-0.01em' }}>עוד קטגוריות</h2>
+        </div>
+        <div
+          className="no-scrollbar"
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            gap: 12,
+            padding: '0 20px 8px',
+            scrollbarWidth: 'none',
+            direction: 'rtl',
+            scrollSnapType: 'x mandatory',
+          } as React.CSSProperties}
+        >
+          {MORE_CAT_DEFS.map(cat => {
+            const img = catImages[cat.slug] ? optimizeCloudinaryUrl(catImages[cat.slug], 300) : '';
+            return (
+              <div key={cat.slug}
+                onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
+                style={{ cursor: 'pointer', flexShrink: 0, width: isMobile ? 160 : 200, scrollSnapAlign: 'start' } as React.CSSProperties}
+              >
+                <div style={{ height: 100, width: '100%', borderRadius: 0, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
+                  {img ? (
+                    <Image fill unoptimized loading="lazy" src={img} alt={cat.slug} style={{ objectFit: 'cover' }} sizes="200px" />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{cat.emoji}</div>
+                  )}
+                </div>
+                <p style={{ fontSize: 11, textAlign: 'center', color: '#1a1a1a', fontWeight: 600, marginTop: 6 }}>{cat.slug}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* ── Soferim horizontal row ── */}
       {soferimList.length > 0 && (
         <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 0 16px' : '40px 0 24px', direction: 'rtl' }}>
@@ -1314,33 +1352,6 @@ export default function HomePageClient() {
             לכן הקמנו את Your Sofer — לאנשים שמבינים את החשיבות של סת״מ מהודר, רוצים לדעת בדיוק:<br/>
             מי כתב את הקלף שלהם, מי בדק אותו, ושרוצים לדעת שיש על מי לסמוך.
           </p>
-        </div>
-      </div>
-
-      {/* ── 6. More categories horizontal scroll ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 0' : '72px 0', direction: 'rtl' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
-          <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 300, color: '#111111', marginBottom: 24, letterSpacing: '-0.01em' }}>עוד קטגוריות</h2>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, padding: '0 12px' }}>
-          {MORE_CAT_DEFS.map(cat => {
-            const img = catImages[cat.slug] ? optimizeCloudinaryUrl(catImages[cat.slug], 300) : '';
-            return (
-              <div key={cat.slug}
-                onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div style={{ height: 100, width: '100%', borderRadius: 0, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
-                  {img ? (
-                    <Image fill unoptimized loading="lazy" src={img} alt={cat.slug} style={{ objectFit: 'cover' }} sizes="130px" />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{cat.emoji}</div>
-                  )}
-                </div>
-                <p style={{ fontSize: 11, textAlign: 'center', color: '#1a1a1a', fontWeight: 600, marginTop: 6 }}>{cat.slug}</p>
-              </div>
-            );
-          })}
         </div>
       </div>
 
