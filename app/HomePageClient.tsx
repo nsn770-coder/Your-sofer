@@ -872,15 +872,8 @@ export default function HomePageClient() {
             הבית היהודי שתמיד דמיינתם
           </p>
 
-          {/* h1 — preserved for SEO, styled as sub-label */}
-          <h1 style={{
-            fontSize: isMobile ? 11 : 13,
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.50)',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            margin: '0 0 16px',
-          }}>
+          {/* h1 — preserved for SEO, visually hidden */}
+          <h1 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
             לקנות ישירות מסופרי סת"ם
           </h1>
 
@@ -894,18 +887,6 @@ export default function HomePageClient() {
           }}>
             להתחבר לטוב ביותר
           </p>
-
-          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 36 }}>
-            <a href="#life-events" className="ys-hero-btn-primary">
-              גלו את הקולקציה
-            </a>
-            <a
-              href={`/category/${encodeURIComponent('בר מצווה')}`}
-              className="ys-hero-btn-secondary"
-            >
-              הכירו את הסופרים
-            </a>
-          </div>
         </div>
       </div>
 
