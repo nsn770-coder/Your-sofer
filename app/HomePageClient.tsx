@@ -981,30 +981,16 @@ export default function HomePageClient() {
                   style={{ width: '100%', height: 140, objectFit: 'cover', display: 'block', flexShrink: 0 }}
                 />
               )}
-              <div style={{ padding: '18px 18px 22px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10, marginTop: 0 }}>
+              <div style={{ padding: '12px 18px 16px' }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', margin: 0 }}>
                   {ev.title}
                 </p>
-                <p style={{ fontSize: 17, fontWeight: 300, color: '#3A2E1A', lineHeight: 1.3, marginBottom: 10 }}>
-                  {ev.emotionalTitle}
-                </p>
-                <p style={{
-                  fontSize: 12,
-                  color: '#8B7355',
-                  lineHeight: 1.65,
-                  flex: 1,
-                  marginBottom: 16,
-                  display: '-webkit-box',
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                } as React.CSSProperties}>
-                  {ev.description}
-                </p>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#9C7B3F' }}>גלה ←</span>
               </div>
             </a>
           ))}
+        </div>
+        <div style={{ textAlign: 'center', padding: '0 20px' }}>
+          <a href="/products" style={{ display: 'inline-block', marginTop: 24, padding: '12px 32px', background: '#1E3A8A', color: '#fff', textDecoration: 'none', fontSize: 15, fontWeight: 500, borderRadius: 2 }}>לכל המוצרים ←</a>
         </div>
       </section>
 
