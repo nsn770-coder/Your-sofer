@@ -24,6 +24,7 @@ import {
   CARDS, ALL_CATS, CONFIG_COLLECTION, CONFIG_DOC, slotKey,
 } from './constants/homepageCards';
 import type { CardDef, SubItem } from './constants/homepageCards';
+import lifeEvents from '@/data/lifeEvents';
 
 // Activity bar icons
 function IconActivityCheck() {
@@ -857,35 +858,46 @@ export default function HomePageClient() {
           minHeight: isMobile ? 420 : 520,
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }}>
-          <h1 style={{
-            fontSize: isMobile ? 32 : 48,
-            fontWeight: 800,
+          {/* Emotional title — visual prominence, NOT the h1 */}
+          <p style={{
+            fontSize: isMobile ? 26 : 42,
+            fontWeight: 300,
             color: '#FFFFFF',
-            lineHeight: 1.2,
-            maxWidth: '90%',
-            textShadow: '0 2px 8px rgba(0,0,0,0.3)',
-            margin: 0,
+            lineHeight: 1.25,
+            maxWidth: '85%',
+            textShadow: '0 2px 12px rgba(0,0,0,0.35)',
+            margin: '0 0 14px',
+            letterSpacing: '-0.01em',
+          }}>
+            הבית לכל מי שמחפש את החיבור היהודי
+          </p>
+
+          {/* h1 — preserved for SEO, styled as sub-label */}
+          <h1 style={{
+            fontSize: isMobile ? 11 : 13,
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.50)',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            margin: '0 0 16px',
           }}>
             לקנות ישירות מסופרי סת"ם
           </h1>
 
           <p style={{
-            fontSize: isMobile ? 16 : 18,
+            fontSize: isMobile ? 15 : 17,
             fontWeight: 400,
-            color: 'rgba(255,255,255,0.92)',
-            marginTop: 12,
-            maxWidth: '85%',
-            lineHeight: 1.6,
+            color: 'rgba(255,255,255,0.82)',
+            marginTop: 0,
+            maxWidth: '80%',
+            lineHeight: 1.7,
           }}>
-            מזוזות ותפילין מסופרים מוסמכים — עם צילום הקלף, בדיקת מגיה ואחריות מלאה.
+            מזוזות, תפילין ויודאיקה מסופרים מוסמכים — שקיפות מלאה, בדיקת מגיה, ואחריות.
           </p>
 
-          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 40 }}>
-            <a
-              href="/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94"
-              className="ys-hero-btn-primary"
-            >
-              בחרו מזוזה
+          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 36 }}>
+            <a href="#life-events" className="ys-hero-btn-primary">
+              בחרו את הרגע שלכם ↓
             </a>
             <a
               href={`/category/${encodeURIComponent('בר מצווה')}`}
@@ -924,6 +936,70 @@ export default function HomePageClient() {
           </button>
         </div>
       </div>
+
+      {/* ── Life events grid ── */}
+      <section
+        id="life-events"
+        style={{ background: '#FBF8F3', padding: isMobile ? '52px 20px' : '80px 32px', direction: 'rtl' }}
+      >
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', textAlign: 'center', marginBottom: 10, marginTop: 0 }}>
+            רגעי חיים
+          </p>
+          <p style={{ textAlign: 'center', fontSize: isMobile ? 24 : 32, fontWeight: 300, color: '#3A2E1A', marginBottom: 10, letterSpacing: '-0.01em' }}>
+            מה מביא אותכם אלינו?
+          </p>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#8B7355', marginBottom: isMobile ? 36 : 52, maxWidth: 480, marginInline: 'auto' }}>
+            בחרו את הרגע שלכם — נלווה אתכם עד הבית
+          </p>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+            gap: isMobile ? 14 : 22,
+          }}>
+            {lifeEvents.map(ev => (
+              <a
+                key={ev.id}
+                href={`/moment/${ev.id}`}
+                style={{
+                  textDecoration: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  background: '#FFFFFF',
+                  border: '1px solid #EDE8DC',
+                  padding: isMobile ? '22px 18px' : '32px 28px',
+                  transition: 'box-shadow 0.2s, transform 0.2s',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 32px rgba(58,46,26,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
+              >
+                <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10, marginTop: 0 }}>
+                  {ev.title}
+                </p>
+                <p style={{ fontSize: isMobile ? 17 : 21, fontWeight: 300, color: '#3A2E1A', lineHeight: 1.3, marginBottom: 12 }}>
+                  {ev.emotionalTitle}
+                </p>
+                <p style={{
+                  fontSize: 13,
+                  color: '#8B7355',
+                  lineHeight: 1.7,
+                  flex: 1,
+                  marginBottom: 18,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                } as React.CSSProperties}>
+                  {ev.description}
+                </p>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#9C7B3F' }}>גלה ←</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ── Soferim horizontal row ── */}
       {soferimList.length > 0 && (
