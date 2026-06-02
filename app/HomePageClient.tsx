@@ -937,43 +937,6 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── Soferim horizontal row ── */}
-      {soferimList.length > 0 && (
-        <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 0 16px' : '40px 0 24px', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 16 }}>
-            <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הסופרים שלנו</h2>
-          </div>
-          <div
-            className="ys-hscroll"
-            style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 20px 8px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
-          >
-            {soferimList.map(sofer => {
-              const img = optimizeCloudinaryUrl(sofer.profileImage || '', 200);
-              return (
-                <a key={sofer.id} href={`/soferim/${sofer.id}`} style={{ textDecoration: 'none', flexShrink: 0, display: 'block' }}>
-                  <div style={{ width: 112, height: 112, borderRadius: 0, overflow: 'hidden', position: 'relative', boxShadow: '0 2px 10px rgba(0,0,0,0.10)' }}>
-                    <Image
-                      fill
-                      unoptimized
-                      loading="lazy"
-                      src={img}
-                      alt={sofer.name}
-                      style={{ objectFit: 'cover' }}
-                      sizes="112px"
-                    />
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)', padding: '20px 6px 7px' }}>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: '#fff', margin: 0, textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {sofer.name}
-                      </p>
-                    </div>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
       {/* ── Life events horizontal scroll ── */}
       <section
         id="life-events"
@@ -1273,6 +1236,43 @@ export default function HomePageClient() {
           לכל המוצרים ←
         </a>
       </div>
+
+      {/* ── Soferim horizontal row ── */}
+      {soferimList.length > 0 && (
+        <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 0 16px' : '40px 0 24px', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 16 }}>
+            <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הסופרים שלנו</h2>
+          </div>
+          <div
+            className="ys-hscroll"
+            style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 20px 8px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
+          >
+            {soferimList.map(sofer => {
+              const img = optimizeCloudinaryUrl(sofer.profileImage || '', 200);
+              return (
+                <a key={sofer.id} href={`/soferim/${sofer.id}`} style={{ textDecoration: 'none', flexShrink: 0, display: 'block' }}>
+                  <div style={{ width: 112, height: 112, borderRadius: 0, overflow: 'hidden', position: 'relative', boxShadow: '0 2px 10px rgba(0,0,0,0.10)' }}>
+                    <Image
+                      fill
+                      unoptimized
+                      loading="lazy"
+                      src={img}
+                      alt={sofer.name}
+                      style={{ objectFit: 'cover' }}
+                      sizes="112px"
+                    />
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)', padding: '20px 6px 7px' }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#fff', margin: 0, textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {sofer.name}
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Emotional intro (moved below products for better browse flow) ── */}
       <div dir="rtl" style={{ padding: isMobile ? '56px 24px' : '88px 24px', background: '#F8F6F1', fontFamily: "'Frank Ruhl Libre', serif" }}>
