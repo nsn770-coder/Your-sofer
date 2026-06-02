@@ -985,6 +985,7 @@ export default function HomePageClient() {
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', margin: 0 }}>
                   {ev.title}
                 </p>
+                <span style={{ fontSize: 11, color: '#888', display: 'block', marginTop: 2 }}>לכל המוצרים ←</span>
               </div>
             </a>
           ))}
