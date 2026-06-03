@@ -1373,6 +1373,54 @@ export default function HomePageClient() {
         </div>
       )}
 
+      {/* ── Sofer STaM categories grid ── */}
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 20px' : '88px 32px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 26 : 32, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות סת״מ</h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 36, fontWeight: 400 }}>כל מוצרי הסופר סת״מ</p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+            gap: isMobile ? 16 : 28,
+          }}>
+            {([
+              { name: 'ספרי תורה',     emoji: '📜', img: catImages['ספרי תורה']     || '', href: '/category/%D7%A1%D7%A4%D7%A8%D7%99%20%D7%AA%D7%95%D7%A8%D7%94' },
+              { name: 'קלפי תפילין',   emoji: '📄', img: catImages['קלפי תפילין']   || '', href: '/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F' },
+              { name: 'תפילין קומפלט', emoji: '🖊️', img: catImages['תפילין קומפלט'] || '', href: '/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98' },
+              { name: 'קלפי מזוזה',    emoji: '📜', img: catImages['קלפי מזוזה']    || '', href: '/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94' },
+              { name: 'בר מצווה',      emoji: '✡️', img: catImages['בר מצווה']      || '', href: '/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94' },
+              { name: 'כיסויי תפילין', emoji: '🎒', img: catImages['כיסוי תפילין']  || '', href: '/category/%D7%9B%D7%99%D7%A1%D7%95%D7%99%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F' },
+            ] as { name: string; emoji: string; img: string; href: string }[]).map(cat => (
+              <div
+                key={cat.name}
+                onClick={() => router.push(cat.href)}
+                style={{
+                  borderRadius: 0,
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  background: '#FFFFFF',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
+                  transition: 'transform 0.25s, box-shadow 0.25s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 32px rgba(0,0,0,0.12)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.07)'; }}
+              >
+                <div style={{ height: 190, overflow: 'hidden', position: 'relative' }}>
+                  {cat.img ? (
+                    <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 33vw" />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f4' }}>{cat.emoji}</div>
+                  )}
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.92)', padding: '10px 14px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', letterSpacing: '0.01em' }}>{cat.name}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── Emotional intro (moved below products for better browse flow) ── */}
       <div dir="rtl" style={{ padding: isMobile ? '56px 24px' : '88px 24px', background: '#F8F6F1', fontFamily: "'Frank Ruhl Libre', serif" }}>
         <div style={{ maxWidth: 580, margin: '0 auto', textAlign: 'center' }}>
