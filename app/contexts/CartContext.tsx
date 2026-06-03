@@ -8,10 +8,12 @@ interface CartItem {
   imgUrl?: string;
   image_url?: string;
   quantity: number;
-  selectedKlafId?: string;   // ← חדש: ID של קלף נבחר מ-Google Drive
-  selectedKlafName?: string; // ← חדש: שם הקלף לתצוגה
-  embroideryText?: string;   // ← טקסט לריקמה אישית
+  selectedKlafId?: string;
+  selectedKlafName?: string;
+  embroideryText?: string;
   selectedCover?: { id: string; name: string; imgUrl: string };
+  promoPlan?: string;
+  promoPrice?: number;
   printCustomization?: {
     productType: string;
     side: string;
@@ -26,6 +28,25 @@ interface CartItem {
   };
 }
 
+/**
+ * Calculates the effective total applying 2+1 promo logic.
+ * For every 3 units of a "2+1" item, the cheapest unit is free.
+ */
+function calcTotal(items: CartItem[]): number {
+  let total = 0;
+  for (const item of items) {
+    if (item.promoPlan === '2+1' && item.quantity >= 3) {
+      const sets = Math.floor(item.quantity / 3);
+      const remainder = item.quantity % 3;
+      // Each set of 3: pay for 2 (cheapest unit = item.price is free)
+      total += sets * item.price * 2 + remainder * item.price;
+    } else {
+      total += item.price * item.quantity;
+    }
+  }
+  return Math.round(total * 100) / 100;
+}
+
 interface CartContextType {
   items: CartItem[];
   addItem: (product: CartItem) => void;
@@ -34,6 +55,7 @@ interface CartContextType {
   clearCart: () => void;
   total: number;
   count: number;
+  promoSavings: number;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -54,7 +76,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems(prev => {
       const existing = prev.find(x => x.id === product.id);
       if (existing) {
-        // אם יש קלף נבחר חדש - עדכן אותו, אחרת רק הוסף כמות
         return prev.map(x => x.id === product.id
           ? {
               ...x,
@@ -83,11 +104,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems([]);
   }
 
-  const total = items.reduce((sum, x) => sum + x.price * x.quantity, 0);
+  const regularTotal = items.reduce((sum, x) => sum + x.price * x.quantity, 0);
+  const total = calcTotal(items);
+  const promoSavings = Math.round((regularTotal - total) * 100) / 100;
   const count = items.reduce((sum, x) => sum + x.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQty, clearCart, total, count }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQty, clearCart, total, count, promoSavings }}>
       {children}
     </CartContext.Provider>
   );

@@ -323,6 +323,7 @@ const SIMPLE_NAV = [
   { label: "מגילות", action: "megilot" },
   { label: "בר מצווה", action: "bar-mitzva" },
   { label: "🖨️ הדפסות לאירועים", action: "print-order" },
+  { label: "🏷️ מבצעי 2+1", action: "promo-2plus1" },
   { label: "ערכות", action: "bundles" },
   { label: "ביקורות", action: "reviews" },
   { label: "קולקציות", action: "collections" },
@@ -445,6 +446,7 @@ function NavBarContent() {
     else if (action === "megilot") router.push("/category/מגילות");
     else if (action === "bar-mitzva") router.push("/bar-mitzva");
     else if (action === "collections") router.push("/collections");
+    else if (action === "promo-2plus1") router.push("/promo/2plus1");
     else if (action === "bundles") router.push("/bundles");
     else if (action === "reviews") router.push("/reviews");
     else if (action === "about") router.push("/about");
