@@ -1526,6 +1526,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
   const BuyBox = ({ compact = false }: { compact?: boolean }) => (
     <div style={{ background: '#fff', borderRadius: compact ? 0 : 12, padding: compact ? '12px 16px' : '20px 18px' }}>
+      {product.outOfStock && (
+        <div style={{ background: '#fef2f2', border: '2px solid #ef4444', color: '#b91c1c', padding: '10px 16px', borderRadius: 8, fontWeight: 700, textAlign: 'center', marginBottom: 14, fontSize: 15 }}>
+          🔴 אזל המלאי
+        </div>
+      )}
       {!compact && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>

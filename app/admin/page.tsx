@@ -131,6 +131,8 @@ interface Product {
   stockCount?: number;
   stockVisible?: boolean;
   outOfStock?: boolean;
+  outOfStockReason?: string | null;
+  outOfStockDate?: string | null;
   soferName?: string;
   soferPrice?: number;
   createdAt?: { seconds: number };
@@ -195,7 +197,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock';
 
 interface Coupon {
   id: string;
@@ -600,6 +602,8 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
     return !['מגילות', 'ספרי תורה'].includes(product.cat || product.category || '');
   });
   const [outOfStock, setOutOfStock] = useState(product.outOfStock ?? false);
+  const [outOfStockReason] = useState(product.outOfStockReason ?? null);
+  const [outOfStockDate] = useState(product.outOfStockDate ?? null);
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [stockCountInput, setStockCountInput] = useState(
     product.stockCount != null ? String(product.stockCount) : ''
@@ -679,6 +683,8 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         stockVisible,
         stockCount: stockCountInput !== '' ? Number(stockCountInput) : null,
         outOfStock,
+        outOfStockReason: outOfStock ? (outOfStockReason ?? null) : null,
+        outOfStockDate: outOfStock ? (outOfStockDate ?? null) : null,
         isExpertRecommended: EXPERT_REC_CATS_ADMIN.includes(cat) ? isExpertRecommended : false,
       });
       onSave();
@@ -853,6 +859,21 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               אזל מהמלאי (לא ניתן לרכישה)
             </label>
           </div>
+          {outOfStock && (outOfStockReason || outOfStockDate) && (
+            <div style={{ fontSize: 12, color: '#6b7280', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 6, padding: '6px 10px', marginBottom: 8 }}>
+              {outOfStockReason && <div>סיבה: <strong>{outOfStockReason === 'SKU_MISSING' ? 'SKU חסר' : outOfStockReason === 'NOT_FOUND_AT_SUPPLIER' ? 'לא נמצא אצל הספק' : outOfStockReason}</strong></div>}
+              {outOfStockDate && <div>תאריך סימון: <strong>{outOfStockDate}</strong></div>}
+            </div>
+          )}
+          {outOfStock && (
+            <button
+              type="button"
+              onClick={() => setOutOfStock(false)}
+              style={{ fontSize: 12, fontWeight: 700, color: '#15803d', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 6, padding: '6px 12px', cursor: 'pointer', marginBottom: 8 }}
+            >
+              ✅ סמן כחוזר למלאי
+            </button>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: stockVisible ? 10 : 0 }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#333' }}>
               <input
@@ -1541,6 +1562,8 @@ export default function AdminPage() {
   const [productsTotalCount, setProductsTotalCount] = useState(0);
   const [pageCursors, setPageCursors] = useState<any[]>([null]);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [outOfStockProducts, setOutOfStockProducts] = useState<Product[]>([]);
+  const [outOfStockLoading, setOutOfStockLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('orders');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>('הכל');
@@ -1585,7 +1608,7 @@ export default function AdminPage() {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
       loadReviews(); loadShluchimApplications(); loadTestimonials(); loadEditRequests();
-      loadAbandonedCarts(); loadCustomers(); loadLeads(); loadRabbiRequests(); loadCoupons();
+      loadAbandonedCarts(); loadCustomers(); loadLeads(); loadRabbiRequests(); loadCoupons(); loadOutOfStockProducts();
     }
   }, [user]);
 
@@ -1901,6 +1924,16 @@ export default function AdminPage() {
       data.sort((a, b) => a.priority - b.priority);
       setCategories(data);
     } catch (e) { console.error(e); }
+  }
+
+  async function loadOutOfStockProducts() {
+    setOutOfStockLoading(true);
+    try {
+      const snap = await getDocs(query(collection(db, 'products'), where('outOfStock', '==', true)));
+      const data: Product[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Product));
+      setOutOfStockProducts(data);
+    } catch { /* non-fatal */ } finally { setOutOfStockLoading(false); }
   }
 
   async function loadCoupons() {
@@ -2399,6 +2432,7 @@ export default function AdminPage() {
           { key: 'leads',          label: '📋 לידים',            color: 'bg-lime-700',   badge: leads.length },
           { key: 'emails',         label: '📧 מיילים',           color: 'bg-sky-700' },
           { key: 'coupons',        label: '🏷️ קופונים',          color: 'bg-rose-700' },
+          { key: 'out_of_stock',   label: '🔴 אזל מלאי',         color: 'bg-red-700',    badge: outOfStockProducts.length },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -3573,6 +3607,68 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+      {activeTab === 'out_of_stock' && (
+        <div className="grid gap-6">
+          <div className="bg-white rounded-xl shadow overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-2">
+              <h2 className="text-lg font-black text-red-700">🔴 מוצרי אזל מלאי</h2>
+              <div className="flex gap-4 text-sm text-gray-500">
+                <span>SKU חסר: <strong>{outOfStockProducts.filter(p => (p as any).outOfStockReason === 'SKU_MISSING').length}</strong></span>
+                <span>לא נמצא אצל ספק: <strong>{outOfStockProducts.filter(p => (p as any).outOfStockReason === 'NOT_FOUND_AT_SUPPLIER').length}</strong></span>
+                <span>סה״כ: <strong>{outOfStockProducts.length}</strong></span>
+                <button onClick={loadOutOfStockProducts} className="text-blue-600 underline">רענן</button>
+              </div>
+            </div>
+            {outOfStockLoading ? (
+              <div className="p-10 text-center text-gray-400">טוען...</div>
+            ) : outOfStockProducts.length === 0 ? (
+              <div className="p-10 text-center text-gray-400">אין מוצרים עם אזל מלאי</div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-3 text-right">שם המוצר</th>
+                    <th className="p-3 text-right">קטגוריה</th>
+                    <th className="p-3 text-right">סיבה</th>
+                    <th className="p-3 text-right">תאריך סימון</th>
+                    <th className="p-3 text-right">פעולות</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {outOfStockProducts.map(p => (
+                    <tr key={p.id} className="border-t hover:bg-gray-50">
+                      <td className="p-3">
+                        <a href={`/product/${p.id}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">
+                          {p.name || '(ללא שם)'}
+                        </a>
+                      </td>
+                      <td className="p-3 text-gray-500">{p.cat || '—'}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${(p as any).outOfStockReason === 'SKU_MISSING' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
+                          {(p as any).outOfStockReason === 'SKU_MISSING' ? 'SKU חסר' : (p as any).outOfStockReason === 'NOT_FOUND_AT_SUPPLIER' ? 'לא נמצא אצל ספק' : ((p as any).outOfStockReason || '—')}
+                        </span>
+                      </td>
+                      <td className="p-3 text-gray-500">{(p as any).outOfStockDate || '—'}</td>
+                      <td className="p-3">
+                        <button
+                          onClick={async () => {
+                            await updateDoc(doc(db, 'products', p.id), { outOfStock: false, outOfStockReason: null, outOfStockDate: null });
+                            setOutOfStockProducts(prev => prev.filter(x => x.id !== p.id));
+                          }}
+                          className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 rounded px-2 py-1 hover:bg-green-100 cursor-pointer"
+                        >
+                          ✅ חזרה למלאי
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
       {lightboxImage && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }} onClick={() => setLightboxImage(null)}>
           <img src={lightboxImage} alt="דוגמת כתיבה" style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 8, objectFit: 'contain', boxShadow: '0 8px 40px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()} />
