@@ -862,14 +862,14 @@ export default function HomePageClient() {
           marginRight: 0,
         }}
       >
-        {/* Background video — height 140% so it fills the width; top:0 keeps upper portion, bottom overflows and is clipped */}
+        {/* Background video — height 140% + objectFit:cover + objectPosition:top → fills width, crops from bottom only */}
         <video
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '140%', zIndex: 0 }}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '140%', objectFit: 'cover', objectPosition: 'top center', zIndex: 0 }}
         >
           <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/v1780438734/Video_sxnlwo.mp4" type="video/mp4" />
         </video>
