@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { collection, query, where, orderBy, limit, startAfter, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, query, where, limit, startAfter, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useCart } from '../../contexts/CartContext';
 import { formatPrice } from '@/app/lib/utils';
@@ -34,17 +34,21 @@ export default function TwoPlusOneClient() {
   const fetchPage = useCallback(async (after: QueryDocumentSnapshot | null) => {
     setLoading(true);
     try {
+      // orderBy('price') alongside where() on a different field requires a composite
+      // Firestore index. To avoid that requirement we sort client-side instead.
       const q = after
-        ? query(collection(db, 'products'), where('promoPlan', '==', '2+1'), orderBy('price'), limit(PAGE_SIZE), startAfter(after))
-        : query(collection(db, 'products'), where('promoPlan', '==', '2+1'), orderBy('price'), limit(PAGE_SIZE));
+        ? query(collection(db, 'products'), where('promoPlan', '==', '2+1'), limit(PAGE_SIZE), startAfter(after))
+        : query(collection(db, 'products'), where('promoPlan', '==', '2+1'), limit(PAGE_SIZE));
       const snap = await getDocs(q);
       const docs = snap.docs
         .map(d => ({ id: d.id, ...d.data() } as PromoProduct))
-        .filter(p => p.hidden !== true);
+        .filter(p => p.hidden !== true)
+        .sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
       setProducts(prev => after ? [...prev, ...docs] : docs);
       setLastDoc(snap.docs[snap.docs.length - 1] ?? null);
       setHasMore(snap.docs.length === PAGE_SIZE);
-    } catch {
+    } catch (err) {
+      console.error('[2+1] fetchPage error:', err);
       setHasMore(false);
     } finally {
       setLoading(false);
