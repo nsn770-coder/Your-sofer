@@ -1297,6 +1297,18 @@ export default function HomePageClient() {
         </div>
       </div>
 
+      {/* ── Cloudinary video ── */}
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '32px 16px' : '56px 32px' }}>
+        <div style={{ maxWidth: 896, margin: '0 auto', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', paddingTop: '56.25%' }}>
+          <iframe
+            src="https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=false&muted=true"
+            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+            allowFullScreen
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+          />
+        </div>
+      </div>
+
       {/* ── Soferim horizontal row ── */}
       {soferimList.length > 0 && (
         <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 0 16px' : '40px 0 24px', direction: 'rtl' }}>
