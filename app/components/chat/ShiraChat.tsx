@@ -25,14 +25,14 @@ function WaFloatBubble() {
   const [bubbleText, setBubbleText] = useState(BUBBLE_TEXT_IDLE);
   const [userMessage, setUserMessage] = useState('');
 
-  // 40-second idle trigger
+  // 20-second idle trigger
   useEffect(() => {
     const t = setTimeout(() => {
       if (!manuallyClosedRef.current) {
         setBubbleText(BUBBLE_TEXT_IDLE);
         setIsOpen(true);
       }
-    }, 40000);
+    }, 20000);
     return () => clearTimeout(t);
   }, []);
 
