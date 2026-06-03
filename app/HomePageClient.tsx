@@ -1103,7 +1103,7 @@ export default function HomePageClient() {
           }}>
             {([
               { name: 'חנוכה',        emoji: '🕎', img: catImages['חנוכה']        || '', href: '/category/%D7%97%D7%A0%D7%95%D7%9B%D7%94' },
-              { name: 'עיצוב הבית',  emoji: '🏠', img: catImages['עיצוב הבית']   || '', href: '/category/%D7%A2%D7%99%D7%A6%D7%95%D7%91%20%D7%94%D7%91%D7%99%D7%AA' },
+              { name: 'עיצוב הבית',  emoji: '🏠', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780487406/%D7%A2%D7%99%D7%A6%D7%95%D7%91_%D7%94%D7%91%D7%99%D7%AA_xggfic.png', href: '/category/%D7%A2%D7%99%D7%A6%D7%95%D7%91%20%D7%94%D7%91%D7%99%D7%AA' },
               { name: 'סט בר מצווה', emoji: '✡️', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777989198/fqm7twz1berprum03u7u.png', href: '/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94' },
               categoryGridItems.find(c => c.name === 'בתי מזוזה'),
               categoryGridItems.find(c => c.name === 'סט טלית תפילין'),
