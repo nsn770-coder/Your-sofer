@@ -178,7 +178,15 @@
       "Bash(tee -a scripts/import-log.txt)",
       "Bash(SERVICE_ACCOUNT_PATH=\"C:/Users/Owner/Downloads/your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\" node scripts/importAllIsraelJudaica.mjs --start=1168)",
       "Bash(SERVICE_ACCOUNT_PATH=\"C:/Users/Owner/Downloads/your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\" node *)",
-      "Bash(export SERVICE_ACCOUNT_PATH=\"C:/Users/Owner/Downloads/your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\")"
+      "Bash(export SERVICE_ACCOUNT_PATH=\"C:/Users/Owner/Downloads/your-sofer-firebase-adminsdk-fbsvc-a682983bfd.json\")",
+      "WebFetch(domain:israel-judaica.com)",
+      "Bash(dir /s /b app\\\\api\\\\*.ts)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(npx kill-port *)",
+      "Bash(sed -i 's/#1E3A8A/#1a1a1a/g' /c/Users/Owner/Downloads/projects/Your-sofer/app/product/[id]/ProductClient.tsx)",
+      "Bash(sed -i 's/#1E3A8A/#1a1a1a/g' /c/Users/Owner/Downloads/projects/Your-sofer/app/moment/[id]/MomentClient.tsx)",
+      "Bash(findstr /i \"firebase admin\")",
+      "Bash(dir *)"
     ]
   }
 }

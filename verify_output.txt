@@ -1,0 +1,46 @@
+════════════════════════════════════════════════════════════
+🔍 verifySeed — YourSofer multi-tenancy seed check
+════════════════════════════════════════════════════════════
+
+── 1. stores/yoursofer ───────────────────────────────────
+  ✅ Document exists. Fields:
+     commissionRate: 0
+     gaId: "G-PM7GW4MWEJ"
+     paymentSettings: {"provider":"cardcom"}
+     language: "he"
+     metaPixelId: ""
+     storeId: "yoursofer"
+     customDomain: "your-sofer.com"
+     createdAt: 2026-06-03T10:15:01.736Z
+     ownerUserId: "CqYU8azKVdQPt6PVahDLmCJ5fp53"
+     logo: ""
+     subdomain: "yoursofer"
+     currency: "ILS"
+     storeName: "YourSofer"
+     theme: {"heroImage":"","accent":"","font":"","primary":""}
+     plan: "owner"
+     slug: "yoursofer"
+     shippingSettings: {}
+     status: "active"
+
+── 2. memberships collection ─────────────────────────────
+  Total documents: 2
+
+  doc id : yoursofer_4YudTlW4KaPae7v1kvX4xjpncwi2
+    userId   : 4YudTlW4KaPae7v1kvX4xjpncwi2
+    storeId  : yoursofer
+    role     : superadmin
+    createdAt: 2026-06-03T10:15:04.363Z
+
+  doc id : yoursofer_CqYU8azKVdQPt6PVahDLmCJ5fp53
+    userId   : CqYU8azKVdQPt6PVahDLmCJ5fp53
+    storeId  : yoursofer
+    role     : owner
+    createdAt: 2026-06-03T10:15:02.491Z
+
+── 3. users platformRole ─────────────────────────────────
+  ✅ users/CqYU8azKVdQPt6PVahDLmCJ5fp53 (owner): platformRole = "superadmin"
+  ℹ️  idan UID resolved: 4YudTlW4KaPae7v1kvX4xjpncwi2
+  ✅ users/4YudTlW4KaPae7v1kvX4xjpncwi2 (idan — bnsymwlydn2@gmail.com): platformRole = "superadmin"
+
+════════════════════════════════════════════════════════════
