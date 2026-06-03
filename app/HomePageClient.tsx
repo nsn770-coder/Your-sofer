@@ -346,6 +346,8 @@ export default function HomePageClient() {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
   const [homeSearchQuery, setHomeSearchQuery] = useState('');
+  const [videoStarted, setVideoStarted] = useState(false);
+  const videoWrapperRef = useRef<HTMLDivElement>(null);
   const cardsRef   = useRef<HTMLDivElement>(null);
   const router     = useRouter();
   const { shaliach } = useShaliach();
@@ -565,6 +567,20 @@ export default function HomePageClient() {
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
   }, [countersVisible, soferimCount, productsCount]);
+
+  // Lazy autoplay: start video when wrapper scrolls into view (≥50% visible)
+  useEffect(() => {
+    const el = videoWrapperRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !videoStarted) {
+        setVideoStarted(true);
+        obs.disconnect();
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [videoStarted]);
 
   // popups disabled
   useEffect(() => {}, []);
@@ -1307,9 +1323,12 @@ export default function HomePageClient() {
             תפגשו ישירות עם סופרי סת&quot;ם ובפערי תיווך נמוכים
           </p>
         </div>
-        <div style={{ maxWidth: 896, margin: '0 auto', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', paddingTop: '56.25%' }}>
+        <div
+          ref={videoWrapperRef}
+          style={{ maxWidth: 896, margin: '0 auto', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', paddingTop: '56.25%' }}
+        >
           <iframe
-            src="https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=false&muted=true"
+            src={`https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=${videoStarted ? 'true' : 'false'}&muted=true`}
             allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
             allowFullScreen
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
