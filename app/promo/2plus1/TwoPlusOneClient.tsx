@@ -104,12 +104,10 @@ export default function TwoPlusOneClient() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 20 }}>
           {products.map(p => {
             const img = imgOf(p);
-            const savings = Math.round(p.price * 100) / 100;
-            const bundlePrice = Math.round(p.price * 2 * 100) / 100;
             return (
               <div key={p.id} style={{ background: '#fff', borderRadius: 0, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 {/* 2+1 badge */}
-                <div style={{ position: 'absolute', top: 10, right: 10, background: '#C5A028', color: '#1a1a1a', fontSize: 11, fontWeight: 900, padding: '3px 8px', zIndex: 1, letterSpacing: '0.05em' }}>
+                <div style={{ position: 'absolute', top: 10, right: 10, background: '#10b981', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 20, zIndex: 1, letterSpacing: '0.03em' }}>
                   2+1
                 </div>
                 <Link href={`/product/${p.id}`} style={{ display: 'block', textDecoration: 'none' }}>
@@ -125,14 +123,11 @@ export default function TwoPlusOneClient() {
                   <Link href={`/product/${p.id}`} style={{ textDecoration: 'none', color: '#1a1a1a', fontSize: 13, fontWeight: 600, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {p.name}
                   </Link>
-                  <div style={{ fontSize: 12, color: '#888' }}>מחיר יחיד: {formatPrice(p.price)}</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#C5A028' }}>
-                    קנו 3 ב-{formatPrice(bundlePrice)} &nbsp;
-                    <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 400 }}>(חיסכון {formatPrice(savings)})</span>
-                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>{formatPrice(p.price)}</div>
+                  <div style={{ fontSize: 11, color: '#10b981', fontWeight: 600 }}>קנו 3, שלמו על 2</div>
                   <button
                     onClick={() => handleAdd(p)}
-                    style={{ marginTop: 'auto', background: addedId === p.id ? '#15803d' : '#1a1a1a', color: '#fff', border: 'none', padding: '10px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }}
+                    style={{ marginTop: 'auto', background: addedId === p.id ? '#15803d' : '#2563EB', color: '#fff', border: 'none', padding: '10px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s', borderRadius: 0 }}
                   >
                     {addedId === p.id ? '✓ נוסף לעגלה' : 'הוסף לעגלה'}
                   </button>
