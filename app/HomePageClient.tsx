@@ -869,7 +869,7 @@ export default function HomePageClient() {
           loop
           playsInline
           preload="auto"
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '140%', objectFit: 'cover', objectPosition: 'top center', zIndex: 0 }}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '110%', objectFit: 'cover', objectPosition: 'top', zIndex: 0 }}
         >
           <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/v1780438734/Video_sxnlwo.mp4" type="video/mp4" />
         </video>
