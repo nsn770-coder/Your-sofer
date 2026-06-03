@@ -1324,7 +1324,7 @@ export default function HomePageClient() {
         </div>
         <div
           ref={videoWrapperRef}
-          style={{ maxWidth: 896, margin: '0 auto', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', paddingTop: '56.25%' }}
+          style={{ maxWidth: 896, margin: '0 auto', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', paddingTop: '75%' }}
         >
           <iframe
             src={`https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=${videoStarted ? 'true' : 'false'}&muted=true`}
