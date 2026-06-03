@@ -19,8 +19,11 @@ const BUBBLE_TEXT_CART = 'לפרטים נוספים ניתן לשאול כעת �
 
 function WaFloatBubble() {
   const { count } = useCart();
-  const prevCountRef = useRef<number | null>(null);
+  const pathname = usePathname();
+  const prevCountRef    = useRef<number | null>(null);
   const manuallyClosedRef = useRef(false);
+  const hasMountedRef   = useRef(false);
+  const cartOpenedRef   = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [bubbleText, setBubbleText] = useState(BUBBLE_TEXT_IDLE);
   const [userMessage, setUserMessage] = useState('');
@@ -36,18 +39,28 @@ function WaFloatBubble() {
     return () => clearTimeout(t);
   }, []);
 
-  // Cart-add trigger — skip initial load from localStorage
+  // Cart-add trigger — first run records baseline, never opens on mount
   useEffect(() => {
-    if (prevCountRef.current === null) {
-      prevCountRef.current = count;
+    if (!hasMountedRef.current) {
+      prevCountRef.current  = count;
+      hasMountedRef.current = true;
       return;
     }
-    if (count > prevCountRef.current && !manuallyClosedRef.current) {
+    if (count > (prevCountRef.current ?? 0) && !manuallyClosedRef.current) {
       setBubbleText(BUBBLE_TEXT_CART);
       setIsOpen(true);
     }
     prevCountRef.current = count;
   }, [count]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Cart-page trigger — open once when user navigates to /cart
+  useEffect(() => {
+    if (pathname === '/cart' && !cartOpenedRef.current && !manuallyClosedRef.current) {
+      cartOpenedRef.current = true;
+      setBubbleText(BUBBLE_TEXT_CART);
+      setIsOpen(true);
+    }
+  }, [pathname]);
 
   function closeBubble() {
     setIsOpen(false);
