@@ -340,6 +340,7 @@ export default function HomePageClient() {
   const [wizardLoading, setWizardLoading] = useState(false);
   const [soferimList, setSoferimList]           = useState<Sofer[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [promoProducts, setPromoProducts]       = useState<Product[]>([]);
   const [testimonials, setTestimonials]         = useState<Testimonial[]>([]);
   const [newsletterEmail, setNewsletterEmail]   = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
@@ -459,6 +460,15 @@ export default function HomePageClient() {
       } catch { /* non-fatal */ }
     }
 
+    async function fetchPromoProducts() {
+      try {
+        const snap = await getDocs(
+          query(collection(db, 'products'), where('promoPlan', '==', '2+1'), orderBy('price'), limit(8))
+        );
+        setPromoProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => !p.hidden && (p.imgUrl || p.image_url)));
+      } catch { /* non-fatal */ }
+    }
+
     // Defer all Firebase reads so the hero (LCP element) paints first
     const timer = setTimeout(() => {
       Promise.all([
@@ -466,6 +476,7 @@ export default function HomePageClient() {
         fetchCatImages(),
       ]);
       fetchFeaturedProducts();
+      fetchPromoProducts();
     }, 300);
     return () => clearTimeout(timer);
   }, []);
@@ -916,6 +927,53 @@ export default function HomePageClient() {
           </button>
         </div>
       </div>
+
+      {/* ── Promo 2+1 section ── */}
+      {promoProducts.length > 0 && (
+        <section style={{ background: '#1a1a1a', padding: isMobile ? '36px 16px 32px' : '52px 32px 44px', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 20 : 28, flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.16em', textTransform: 'uppercase', margin: '0 0 6px' }}>מבצע מיוחד</p>
+                <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>🏷️ קנו 3, שלמו על 2</h2>
+              </div>
+              <a href="/promo/2plus1" style={{ fontSize: 13, fontWeight: 700, color: '#C5A028', textDecoration: 'none', border: '1px solid #C5A028', padding: '8px 18px', whiteSpace: 'nowrap' }}>
+                לכל המבצעים ←
+              </a>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 12 : 16 }}>
+              {promoProducts.slice(0, isMobile ? 4 : 8).map(p => {
+                const img = p.imgUrl || p.image_url || '';
+                const promoPrice = (p as any).promoPrice as number | undefined;
+                return (
+                  <a key={p.id} href={`/product/${p.id}`} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', background: '#2a2a2a', overflow: 'hidden', position: 'relative', border: '1px solid rgba(255,255,255,0.08)', transition: 'transform 0.2s' }}
+                    onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                    onMouseLeave={e => (e.currentTarget.style.transform = 'none')}>
+                    <div style={{ position: 'absolute', top: 8, right: 8, background: '#C5A028', color: '#1a1a1a', fontSize: 10, fontWeight: 900, padding: '2px 7px', zIndex: 1, letterSpacing: '0.06em' }}>2+1</div>
+                    <div style={{ height: isMobile ? 140 : 180, overflow: 'hidden', background: '#333' }}>
+                      {img ? (
+                        <img src={optimizeCloudinaryUrl(img, 400)} alt={p.name} loading="lazy"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>🕍</div>
+                      )}
+                    </div>
+                    <div style={{ padding: '10px 12px 14px', flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#e5e7eb', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>
+                        {p.name}
+                      </span>
+                      <span style={{ fontSize: 11, color: '#9ca3af' }}>יחיד: {formatPrice(p.price)}</span>
+                      {promoPrice && (
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#C5A028' }}>3 ב-{formatPrice(Math.round(p.price * 2 * 100) / 100)}</span>
+                      )}
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Life events horizontal scroll ── */}
       <section

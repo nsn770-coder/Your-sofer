@@ -318,12 +318,12 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
 ];
 
 const SIMPLE_NAV = [
+  { label: "🏷️ מבצעי 2+1", action: "promo-2plus1" },
   { label: "שבתות וחגים", action: "shabbat-holidays" },
   { label: "ספרי תורה", action: "sifrei-torah" },
   { label: "מגילות", action: "megilot" },
   { label: "בר מצווה", action: "bar-mitzva" },
   { label: "🖨️ הדפסות לאירועים", action: "print-order" },
-  { label: "🏷️ מבצעי 2+1", action: "promo-2plus1" },
   { label: "ערכות", action: "bundles" },
   { label: "ביקורות", action: "reviews" },
   { label: "קולקציות", action: "collections" },
