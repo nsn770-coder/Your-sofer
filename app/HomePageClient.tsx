@@ -1001,7 +1001,7 @@ export default function HomePageClient() {
             רגעי חיים
           </p>
           <p style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
-            מה מביא אותכם אלינו?
+            מה מביא אתכם אלינו?
           </p>
         </div>
 
@@ -1331,7 +1331,7 @@ export default function HomePageClient() {
             src={`https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=${videoStarted ? 'true' : 'false'}&muted=true`}
             allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
             allowFullScreen
-            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '177.78%', border: 'none' }}
           />
         </div>
       </div>
