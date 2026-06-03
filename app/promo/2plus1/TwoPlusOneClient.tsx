@@ -35,10 +35,12 @@ export default function TwoPlusOneClient() {
     setLoading(true);
     try {
       const q = after
-        ? query(collection(db, 'products'), where('promoPlan', '==', '2+1'), where('hidden', '!=', true), orderBy('hidden'), orderBy('price'), limit(PAGE_SIZE), startAfter(after))
-        : query(collection(db, 'products'), where('promoPlan', '==', '2+1'), where('hidden', '!=', true), orderBy('hidden'), orderBy('price'), limit(PAGE_SIZE));
+        ? query(collection(db, 'products'), where('promoPlan', '==', '2+1'), orderBy('price'), limit(PAGE_SIZE), startAfter(after))
+        : query(collection(db, 'products'), where('promoPlan', '==', '2+1'), orderBy('price'), limit(PAGE_SIZE));
       const snap = await getDocs(q);
-      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() } as PromoProduct));
+      const docs = snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as PromoProduct))
+        .filter(p => p.hidden !== true);
       setProducts(prev => after ? [...prev, ...docs] : docs);
       setLastDoc(snap.docs[snap.docs.length - 1] ?? null);
       setHasMore(snap.docs.length === PAGE_SIZE);
