@@ -854,7 +854,7 @@ export default function HomePageClient() {
         dir="rtl"
         style={{
           position: 'relative',
-          minHeight: isMobile ? 420 : 520,
+          paddingTop: isMobile ? '56.25%' : '40%',
           overflow: 'hidden',
           borderRadius: 0,
           width: '100%',
@@ -862,14 +862,14 @@ export default function HomePageClient() {
           marginRight: 0,
         }}
       >
-        {/* Background video */}
+        {/* Background video — height 140% so it fills the width; top:0 keeps upper portion, bottom overflows and is clipped */}
         <video
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '140%', zIndex: 0 }}
         >
           <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/v1780438734/Video_sxnlwo.mp4" type="video/mp4" />
         </video>
@@ -877,11 +877,10 @@ export default function HomePageClient() {
         {/* Overlay */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)', zIndex: 1 }} />
 
-        {/* Content */}
+        {/* Content — absolute so it doesn't push container height */}
         <div style={{
-          position: 'relative', zIndex: 2,
-          padding: isMobile ? '72px 24px 64px' : '100px 64px 96px',
-          minHeight: isMobile ? 420 : 520,
+          position: 'absolute', inset: 0, zIndex: 2,
+          padding: isMobile ? '48px 24px 40px' : '80px 64px 72px',
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }}>
           {/* Emotional title — visual prominence, NOT the h1 */}
