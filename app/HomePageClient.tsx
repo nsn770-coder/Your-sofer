@@ -1299,6 +1299,14 @@ export default function HomePageClient() {
 
       {/* ── Cloudinary video ── */}
       <div style={{ background: '#F8F6F1', padding: isMobile ? '32px 16px' : '56px 32px' }}>
+        <div style={{ maxWidth: 896, margin: '0 auto', textAlign: 'center', direction: 'rtl', marginBottom: isMobile ? 20 : 28 }}>
+          <p style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: '#1E3A8A', margin: 0, lineHeight: 1.25 }}>
+            רק אצלנו ב&nbsp;<span dir="ltr" style={{ unicodeBidi: 'embed' }}>Your Sofer</span>
+          </p>
+          <p style={{ fontSize: isMobile ? 16 : 18, color: '#4B5563', marginTop: 10, marginBottom: 0 }}>
+            תפגשו ישירות עם סופרי סת&quot;ם ובפערי תיווך נמוכים
+          </p>
+        </div>
         <div style={{ maxWidth: 896, margin: '0 auto', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', paddingTop: '56.25%' }}>
           <iframe
             src="https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=false&muted=true"
