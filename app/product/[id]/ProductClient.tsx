@@ -1129,19 +1129,6 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
   return (
     <div dir="rtl" style={{ marginTop: 28 }}>
 
-      {/* Who is this for */}
-      <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a', marginBottom: 12, margin: '0 0 12px' }}>למי זה מתאים?</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-          {useCases.map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13, color: '#444' }}>
-              <span style={{ fontSize: 15, flexShrink: 0, lineHeight: 1.5 }}>{item.emoji}</span>
-              <span style={{ lineHeight: 1.6 }}>{item.text}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Why different — USP block for STAM categories */}
       {(() => {
         const cat = product.cat;

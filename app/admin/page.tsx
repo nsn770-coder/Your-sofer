@@ -2127,7 +2127,6 @@ export default function AdminPage() {
             days: p.days,
             priority: 0,
             status: 'active',
-            uploadedBySofer: true,
             createdAt: serverTimestamp(),
           })
         ));

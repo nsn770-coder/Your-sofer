@@ -18,6 +18,7 @@ import { FacebookPixel } from "@/components/FacebookPixel";
 import { TidioChat } from "@/components/TidioChat";
 import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
+import ClubPopupWrapper from "@/components/ClubPopupWrapper";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
@@ -116,13 +117,14 @@ export default function RootLayout({
                 <TrustBar />
                 {children}
                 <Footer />
+                <ShiraChat />
+                <ShavuotPopupWrapper />
+                <ClubPopupWrapper />
               </CartProvider>
             </ShaliachProvider>
           </Suspense>
           <GTMLoader />
         </AuthProvider>
-        <ShiraChat />
-        <ShavuotPopupWrapper />
         </ChatPersonaProvider>
         <SpeedInsights />
 
