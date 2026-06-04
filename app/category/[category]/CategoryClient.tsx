@@ -983,7 +983,7 @@ function StamCard({
 
   function handleAdd(e: React.MouseEvent) {
     e.stopPropagation();
-    addItem({ id: product.id, name: product.name, price: product.price, imgUrl: imgSrc ?? undefined, quantity: 1 });
+    addItem({ id: product.id, name: product.name, price: product.price, imgUrl: imgSrc ?? undefined, quantity: 1, cat: product.cat || undefined });
   }
   function handleDecrement(e: React.MouseEvent) {
     e.stopPropagation();
@@ -1686,7 +1686,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               <button
                                 onClick={e => {
                                   e.stopPropagation();
-                                  addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl || p.image_url, quantity: 1 });
+                                  addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl || p.image_url, quantity: 1, cat: p.cat || undefined });
                                 }}
                                 style={{ width: '100%', padding: '11px', background: '#C5A028', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                                 הוסף לסל 🛒

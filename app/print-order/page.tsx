@@ -28,9 +28,9 @@ const PRINT_PRODUCTS = {
   },
   kipa: {
     name: 'הדפסה על כיפה',
-    price: 20,
-    bulkPrice: 10,
-    bulkMinQty: 20,
+    price: 10,      // ₪10 per unit for < 100 units
+    bulkPrice: 4.5, // ₪4.5 per unit for 100+ units
+    bulkMinQty: 100,
     templates: {
       top: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780252683/%D7%9B%D7%99%D7%A4%D7%94_%D7%90%D7%A4%D7%95%D7%A8%D7%94_%D7%94%D7%93%D7%A4%D7%A1%D7%94_shpljn.jpg',
       bottom: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780252910/%D7%AA%D7%9E%D7%95%D7%A0%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%94%D7%A4%D7%95%D7%9A_zutxnt.jpg',

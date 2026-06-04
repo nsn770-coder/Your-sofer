@@ -146,7 +146,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
 
   function handleAdd(p: Product, e: React.MouseEvent) {
     e.stopPropagation();
-    addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, quantity: 1 });
+    addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, quantity: 1, cat: 'כיפות' });
     setAddedId(p.id);
     setTimeout(() => setAddedId(null), 1500);
   }

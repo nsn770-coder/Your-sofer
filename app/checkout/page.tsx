@@ -70,7 +70,7 @@ const SHIPPING_REGULAR = 30;
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, total } = useCart();
+  const { items, total, kippotDiscountActive, kippotDiscountAmount, discountableTotal } = useCart();
   const { shaliach, refCode } = useShaliach();
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -188,11 +188,16 @@ export default function CheckoutPage() {
   }
 
   const shippingCost = SHIPPING_REGULAR;
+  // Coupon applies only to items that didn't receive the kippot bulk discount.
+  // When kippot discount is active, base = discountableTotal (non-kippot items).
+  // When inactive, base = total (backward-compatible with all existing orders).
+  const couponBase     = kippotDiscountActive ? discountableTotal : total;
   const discountAmount = appliedCoupon
     ? appliedCoupon.type === 'fixed'
-      ? Math.min(appliedCoupon.discount, total)
-      : Math.round(total * appliedCoupon.discount / 100 * 100) / 100
+      ? Math.min(appliedCoupon.discount, couponBase)
+      : Math.round(couponBase * appliedCoupon.discount / 100 * 100) / 100
     : 0;
+  // total from CartContext already includes kippot 30% discount
   const finalTotal = total - discountAmount + shippingCost;
 
   async function handleSubmit() {
@@ -210,6 +215,7 @@ export default function CheckoutPage() {
         address: `${form.address}, ${form.city}`, notes: form.notes || '',
         items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null })),
         total: finalTotal, couponCode: appliedCoupon?.code || null, couponDiscount: appliedCoupon ? discountAmount : null,
+        kippotDiscount: kippotDiscountAmount > 0 ? kippotDiscountAmount : null,
         shippingCost, shippingType: 'regular',
         status: 'pending_payment', createdAt: serverTimestamp(),
         shaliachRef: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
@@ -219,34 +225,6 @@ export default function CheckoutPage() {
 
       if (appliedCoupon) {
         await updateDoc(doc(db, 'coupons', appliedCoupon.code), { usedBy: arrayUnion(form.email || form.name), usedAt: serverTimestamp() });
-      }
-
-      // Upsert customer record immediately - don't rely on /thank-you reaching Firestore
-      const customerEmail = form.email.toLowerCase();
-      const customerRef = doc(db, 'customers', customerEmail);
-      try {
-        const customerSnap = await getDoc(customerRef);
-        const now = new Date().toISOString();
-        if (customerSnap.exists()) {
-          const prev = customerSnap.data();
-          await updateDoc(customerRef, {
-            lastOrderAt: now,
-            totalOrders: (prev.totalOrders || 0) + 1,
-            totalSpent: Math.round(((prev.totalSpent || 0) + finalTotal) * 100) / 100,
-          });
-          console.log('[checkout] customer updated:', customerEmail);
-        } else {
-          await setDoc(customerRef, {
-            name: form.name, email: customerEmail, phone: form.phone,
-            address: `${form.address}, ${form.city}`,
-            firstOrderAt: now, lastOrderAt: now,
-            totalOrders: 1, totalSpent: finalTotal,
-            isGuest: true, uid: null,
-          });
-          console.log('[checkout] customer created:', customerEmail);
-        }
-      } catch (e) {
-        console.error('[checkout] customer upsert failed (non-fatal):', e);
       }
 
       const klafUpdates = items.filter(i => i.selectedKlafId).map(i =>
@@ -260,9 +238,10 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: [
-            ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
-            ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1 }] : []),
-            ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1 }] : []),
+            ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '' })),
+            ...(kippotDiscountAmount > 0 ? [{ name: 'הנחת כיפות בר מצווה — 30%', price: -kippotDiscountAmount, quantity: 1, cat: '' }] : []),
+            ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
+            ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
           ],
           total: finalTotal, customer: { name: form.name, email: form.email, phone: form.phone }, orderNumber, orderId: orderRef.id, baseUrl,
         }),
@@ -304,7 +283,16 @@ export default function CheckoutPage() {
         ))}
       </div>
       <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}><span>סכום ביניים</span><span>{formatPrice(total)}</span></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}>
+          <span>סכום ביניים</span>
+          <span>{formatPrice(kippotDiscountAmount > 0 ? total + kippotDiscountAmount : total)}</span>
+        </div>
+        {kippotDiscountAmount > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🎉 הנחת כיפות בר מצווה (30%)</span>
+            <span>-{formatPrice(kippotDiscountAmount)}</span>
+          </div>
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span style={{ color: '#777' }}>משלוח</span>
           <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(SHIPPING_REGULAR)}</span>

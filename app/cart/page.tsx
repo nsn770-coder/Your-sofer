@@ -45,7 +45,7 @@ function IconShield() {
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, removeItem, updateQty, total } = useCart();
+  const { items, removeItem, updateQty, total, kippotDiscountActive, kippotDiscountAmount } = useCart();
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
@@ -127,6 +127,16 @@ export default function CartPage() {
               <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #ddd', padding: '14px 16px', marginBottom: 12 }}>
                 <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0f1111', margin: 0 }}>סל הקניות ({totalItems} פריטים)</h2>
               </div>
+
+              {kippotDiscountActive && (
+                <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '10px 14px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 18 }}>🎉</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: '#15803d' }}>מבצע בר מצווה הופעל!</div>
+                    <div style={{ fontSize: 12, color: '#166534' }}>קיבלתם 30% הנחה על הכיפות — חיסכון של ₪{kippotDiscountAmount.toFixed(2)}</div>
+                  </div>
+                </div>
+              )}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {items.map(item => (
@@ -272,13 +282,19 @@ export default function CartPage() {
 
                         {/* Price */}
                         <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                          <div style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a' }}>
-                            {formatPrice(item.price * item.quantity)}
-                          </div>
-                          {item.quantity > 1 && (
-                            <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
-                              {formatPrice(item.price)} × {item.quantity}
-                            </div>
+                          {kippotDiscountActive && item.cat === 'כיפות' ? (
+                            <>
+                              <div style={{ fontSize: 13, color: '#999', textDecoration: 'line-through' }}>{formatPrice(item.price * item.quantity)}</div>
+                              <div style={{ fontSize: 18, fontWeight: 900, color: '#15803d' }}>{formatPrice(Math.round(item.price * item.quantity * 0.7 * 100) / 100)}</div>
+                              <div style={{ fontSize: 10, color: '#15803d', fontWeight: 700 }}>30% הנחה</div>
+                            </>
+                          ) : (
+                            <>
+                              <div style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a' }}>{formatPrice(item.price * item.quantity)}</div>
+                              {item.quantity > 1 && (
+                                <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{formatPrice(item.price)} × {item.quantity}</div>
+                              )}
+                            </>
                           )}
                         </div>
                       </>
@@ -307,8 +323,14 @@ export default function CartPage() {
               <div style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
                   <span style={{ color: '#555' }}>סכום ביניים ({totalItems} פריטים):</span>
-                  <span style={{ fontWeight: 700 }}>{formatPrice(total)}</span>
+                  <span style={{ fontWeight: 700 }}>{formatPrice(kippotDiscountAmount > 0 ? total + kippotDiscountAmount : total)}</span>
                 </div>
+                {kippotDiscountAmount > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
+                    <span>🎉 הנחת כיפות 30%:</span>
+                    <span>-{formatPrice(kippotDiscountAmount)}</span>
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
                   <span style={{ color: '#555' }}>משלוח:</span>
                   <span style={{ fontWeight: 700, color: '#555' }}>יחושב בקופה</span>

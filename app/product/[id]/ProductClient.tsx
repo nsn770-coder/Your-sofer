@@ -1485,11 +1485,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     if (product?.outOfStock) return;
     if (selectedKlafIds.length > 0) {
       for (let i = 0; i < selectedKlafIds.length; i++) {
-        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined });
+        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined });
       }
     } else {
       for (let i = 0; i < qty; i++) {
-        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined });
+        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined });
       }
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
@@ -1652,6 +1652,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </button>
       )}
 
+      {/* Kippot bulk discount notice */}
+      {product?.cat === 'כיפות' && (
+        <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', marginBottom: 8, fontSize: 12, color: '#15803d', fontWeight: 600 }}>
+          🎉 הזמינו 100 כיפות ומעלה וקבלו 30% הנחה אוטומטית
+        </div>
+      )}
+
       {/* SECONDARY: Add to Cart / Quantity control */}
       {!product.outOfStock && (cartQty === 0 ? (
         <button onClick={handleAddToCart}
@@ -1673,7 +1680,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </span>
           <button
             onClick={() => {
-              addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, embroideryText: embroideryText || undefined });
+              addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined });
               setCartQty(c => c + 1);
             }}
             style={{ flex: '0 0 48px', background: 'transparent', border: 'none', color: '#C9A227', fontSize: 22, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
