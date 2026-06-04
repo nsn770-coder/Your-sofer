@@ -24,7 +24,7 @@ export default function AnnouncementTicker() {
         .ticker-bar {
           width: 100%;
           height: 40px;
-          background-color: #d4af7a;
+          background-color: #000000;
           color: #ffffff;
           overflow: hidden;
           position: relative;
@@ -40,7 +40,7 @@ export default function AnnouncementTicker() {
           align-items: center;
           white-space: nowrap;
           will-change: transform;
-          animation: ticker-scroll 40s linear infinite;
+          animation: ticker-scroll 25s linear infinite;
         }
         .ticker-item {
           display: inline-flex;
@@ -52,8 +52,8 @@ export default function AnnouncementTicker() {
           opacity: 0.9;
         }
         @keyframes ticker-scroll {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
+          0% { transform: translateX(-25%); }
+          100% { transform: translateX(-75%); }
         }
         .ticker-bar:hover .ticker-track {
           animation-play-state: paused;
@@ -61,7 +61,7 @@ export default function AnnouncementTicker() {
         @media (max-width: 640px) {
           .ticker-bar { height: 36px; font-size: 13px; }
           .ticker-item { padding: 0 18px; }
-          .ticker-track { animation-duration: 30s; }
+          .ticker-track { animation-duration: 18s; }
         }
         @media (prefers-reduced-motion: reduce) {
           .ticker-track { animation: none; justify-content: center; width: 100%; }
