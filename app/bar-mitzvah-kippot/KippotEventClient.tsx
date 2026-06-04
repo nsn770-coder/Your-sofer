@@ -1,20 +1,30 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   collection, query, where, orderBy, limit, getDocs,
 } from 'firebase/firestore';
 import { db } from '@/app/firebase';
-import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
-import { formatPrice } from '@/app/lib/utils';
-import { useCart } from '@/app/contexts/CartContext';
+import ProductCard from '@/components/ui/ProductCard';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
+const PAGE_SIZE = 16;
+
+const MATERIAL_OPTIONS = ['בד', 'זמש', 'פשתן', 'ארטמן', 'משי', 'סרוגות'];
+
+const SORT_LABELS: Record<SortBy, string> = {
+  popular:    'הכי נמכר',
+  price_asc:  'מחיר: נמוך לגבוה',
+  price_desc: 'מחיר: גבוה לנמוך',
+  newest:     'חדש לישן',
+  oldest:     'ישן לחדש',
+};
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+
+type SortBy = 'popular' | 'price_asc' | 'price_desc' | 'newest' | 'oldest';
 
 interface Product {
   id: string;
@@ -22,10 +32,23 @@ interface Product {
   price: number;
   imgUrl?: string;
   image_url?: string;
+  imgUrl2?: string;
+  imgUrl3?: string;
   hidden?: boolean;
   priority?: number;
   subCategory?: string;
   was?: number | null;
+  isBestSeller?: boolean;
+  badge?: string | null;
+  bundlePromo?: string | null;
+  createdAt?: { seconds: number } | null;
+  cat?: string;
+  soferName?: string;
+  soferPhoto?: string;
+  soferId?: string;
+  stars?: number;
+  outOfStock?: boolean;
+  hasKlafSelection?: boolean;
 }
 
 export interface FaqItem {
@@ -33,15 +56,8 @@ export interface FaqItem {
   a: string;
 }
 
-// ── Config interface — duplicate this page for future event types ─────────────
-// To add "כיפות לחתונה":
-//   1. Copy app/bar-mitzvah-kippot → app/wedding-kippot
-//   2. Create a new EventKippotConfig with the new copy
-//   3. Pass it to KippotEventClient as a prop
-// KippotEventClient itself needs no changes.
-
 export interface EventKippotConfig {
-  heroTag:       string;   // e.g. "🎩 כיפות לאירועים"
+  heroTag:       string;
   heroTitle:     string;
   heroSubtitle:  string;
   promoBanner:   string;
@@ -69,19 +85,90 @@ const BENEFITS = [
   '✓ שירות מהיר',
 ];
 
+// ── Sort helper (copied from CategoryClient) ──────────────────────────────────
+
+function applySort(products: Product[], sort: SortBy): Product[] {
+  return [...products].sort((a, b) => {
+    switch (sort) {
+      case 'price_asc':  return (a.price ?? 0) - (b.price ?? 0);
+      case 'price_desc': return (b.price ?? 0) - (a.price ?? 0);
+      case 'newest':     return (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0);
+      case 'oldest':     return (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0);
+      case 'popular':
+      default:           return (b.priority ?? 0) - (a.priority ?? 0);
+    }
+  });
+}
+
+// ── RevealCard — scroll-reveal animation (copied from MomentClient) ───────────
+
+function RevealCard({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.05, rootMargin: '0px 0px -30px 0px' },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        opacity:    visible ? 1 : 0,
+        transform:  visible ? 'none' : 'translateY(16px)',
+        transition: `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 // ── Skeleton card ─────────────────────────────────────────────────────────────
 
 function SkeletonCard() {
   return (
-    <div style={{ background: '#fff', borderRadius: 0, overflow: 'hidden', border: '1px solid #eee' }}>
-      <div style={{ aspectRatio: '1', background: '#f0f0f0' }} />
-      <div style={{ padding: '12px 14px' }}>
-        <div style={{ height: 13, background: '#f0f0f0', borderRadius: 4, marginBottom: 6 }} />
-        <div style={{ height: 13, background: '#f0f0f0', borderRadius: 4, width: '70%', marginBottom: 10 }} />
-        <div style={{ height: 18, background: '#f0f0f0', borderRadius: 4, width: '40%', marginBottom: 10 }} />
-        <div style={{ height: 34, background: '#f0f0f0', borderRadius: 0 }} />
+    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
+      <div className="aspect-square bg-gray-100" />
+      <div className="p-3 space-y-2">
+        <div className="h-3 bg-gray-100 rounded-full w-3/4" />
+        <div className="h-3 bg-gray-100 rounded-full w-1/2" />
+        <div className="h-8 bg-gray-100 rounded-full mt-3" />
       </div>
     </div>
+  );
+}
+
+// ── Pill button ───────────────────────────────────────────────────────────────
+
+function Pill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background:  active ? NAVY : '#fff',
+        color:       active ? '#fff' : '#555',
+        border:      `1.5px solid ${active ? NAVY : '#D1D5DB'}`,
+        borderRadius: 20,
+        padding:     '5px 16px',
+        fontSize:    13,
+        fontWeight:  active ? 700 : 500,
+        cursor:      'pointer',
+        fontFamily:  'inherit',
+        whiteSpace:  'nowrap',
+        transition:  'all 0.15s',
+        flexShrink:  0,
+      }}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -93,15 +180,19 @@ interface Props {
 }
 
 export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFIG }: Props) {
-  const [products,  setProducts]  = useState<Product[]>([]);
-  const [loading,   setLoading]   = useState(true);
-  const [isMobile,  setIsMobile]  = useState(false);
-  const [openFaq,   setOpenFaq]   = useState<number | null>(null);
-  const [addedId,   setAddedId]   = useState<string | null>(null);
+  const [allProducts,    setAllProducts]    = useState<Product[]>([]);
+  const [loading,        setLoading]        = useState(true);
+  const [isMobile,       setIsMobile]       = useState(false);
+  const [openFaq,        setOpenFaq]        = useState<number | null>(null);
+  const [sortBy,         setSortBy]         = useState<SortBy>('popular');
+  const [subCatFilter,   setSubCatFilter]   = useState('');
+  const [materialFilter, setMaterialFilter] = useState('');
+  const [minPrice,       setMinPrice]       = useState('');
+  const [maxPrice,       setMaxPrice]       = useState('');
+  const [currentPage,    setCurrentPage]    = useState(1);
 
-  const gridRef = useRef<HTMLDivElement>(null);
-  const { addItem } = useCart();
-  const router     = useRouter();
+  const gridRef     = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // ── Responsive ──────────────────────────────────────────────────────────────
 
@@ -112,7 +203,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // ── Fetch products ───────────────────────────────────────────────────────────
+  // ── Fetch ────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     async function load() {
@@ -128,7 +219,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
         const prods = snap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
           .filter(p => p.hidden !== true);
-        setProducts(prods);
+        setAllProducts(prods);
       } catch (e) {
         console.error('[KippotEventClient] fetch error:', e);
       } finally {
@@ -138,28 +229,71 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
     load();
   }, []);
 
-  // ── Handlers ────────────────────────────────────────────────────────────────
+  // ── Filter + sort (memoized) ─────────────────────────────────────────────────
+
+  const filtered = useMemo(() => {
+    let result = allProducts;
+
+    if (subCatFilter) {
+      result = result.filter(p => p.subCategory === subCatFilter);
+    }
+
+    if (materialFilter) {
+      result = result.filter(p =>
+        p.name.toLowerCase().includes(materialFilter.toLowerCase()) ||
+        (materialFilter === 'סרוגות' && p.subCategory === 'כיפות סרוגות'),
+      );
+    }
+
+    if (minPrice !== '') {
+      result = result.filter(p => p.price >= Number(minPrice));
+    }
+    if (maxPrice !== '') {
+      result = result.filter(p => p.price <= Number(maxPrice));
+    }
+
+    return applySort(result, sortBy);
+  }, [allProducts, subCatFilter, materialFilter, minPrice, maxPrice, sortBy]);
+
+  // ── Pagination ───────────────────────────────────────────────────────────────
+
+  const paginated = filtered.slice(0, currentPage * PAGE_SIZE);
+  const hasMore   = paginated.length < filtered.length;
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [subCatFilter, materialFilter, minPrice, maxPrice, sortBy]);
+
+  // ── Infinite scroll ──────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && hasMore) setCurrentPage(p => p + 1); },
+      { rootMargin: '400px' },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMore]);
+
+  // ── Handlers ─────────────────────────────────────────────────────────────────
 
   function scrollToGrid() {
     gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function handleAdd(p: Product, e: React.MouseEvent) {
-    e.stopPropagation();
-    addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, quantity: 1, cat: 'כיפות' });
-    setAddedId(p.id);
-    setTimeout(() => setAddedId(null), 1500);
-  }
+  const anyFilterActive = !!(subCatFilter || materialFilter || minPrice || maxPrice);
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
     <div dir="rtl" style={{ background: '#f8f6f2', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
       <style>{`
-        @keyframes ys-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-        .ys-skeleton { animation: ys-pulse 1.5s ease-in-out infinite; }
-        .ys-kip-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10) !important; }
         .ys-faq-btn:hover { background: #f9f7f2 !important; }
+        .ys-kip-pill:hover { border-color: ${NAVY} !important; color: ${NAVY} !important; }
       `}</style>
 
       {/* ── 1. Hero ─────────────────────────────────────────────────────────── */}
@@ -171,7 +305,6 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
         }}
       >
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
-          {/* Tag */}
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             background: 'rgba(197,160,40,0.14)', border: '1px solid rgba(197,160,40,0.4)',
@@ -181,7 +314,6 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             {config.heroTag}
           </div>
 
-          {/* Title */}
           <h1 style={{
             fontSize: isMobile ? 28 : 46, fontWeight: 900,
             color: '#fff', lineHeight: 1.2, margin: '0 0 14px',
@@ -190,13 +322,11 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             {config.heroTitle}
           </h1>
 
-          {/* Subtitle */}
           <p style={{ fontSize: isMobile ? 15 : 18, color: 'rgba(255,255,255,0.75)', marginBottom: 28, lineHeight: 1.7 }}>
             הזמינו 100 כיפות ומעלה וקבלו{' '}
             <strong style={{ color: GOLD }}>30% הנחה אוטומטית</strong>
           </p>
 
-          {/* Benefits grid */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)',
@@ -213,7 +343,6 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             ))}
           </div>
 
-          {/* CTAs */}
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={scrollToGrid}
@@ -257,89 +386,183 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
           scrollMarginTop: 80,
         }}
       >
-        {/* Grid header */}
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 8 }}>
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 8 }}>
           <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, color: NAVY, margin: 0 }}>
             {config.gridTitle}
           </h2>
           {!loading && (
-            <span style={{ fontSize: 13, color: '#888' }}>{products.length} מוצרים</span>
+            <span style={{ fontSize: 13, color: '#888' }}>
+              {filtered.length} מוצרים
+            </span>
           )}
         </div>
 
-        {/* Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 12 : 16 }}>
-          {loading
-            ? Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="ys-skeleton"><SkeletonCard /></div>
-              ))
-            : products.map((p, idx) => {
-                const img = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 400);
-                const added = addedId === p.id;
-                return (
-                  <div
-                    key={p.id}
-                    className="ys-kip-card"
-                    onClick={() => router.push(`/product/${p.id}`)}
-                    style={{
-                      background: '#fff', overflow: 'hidden',
-                      border: '1px solid #eee', display: 'flex',
-                      flexDirection: 'column', cursor: 'pointer',
-                      transition: 'box-shadow 0.2s',
-                    }}
-                  >
-                    {/* Image — aspectRatio prevents CLS */}
-                    <div style={{ aspectRatio: '1', overflow: 'hidden', background: '#f5f5f5', position: 'relative' }}>
-                      {img ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={img}
-                          alt={p.name}
-                          loading={idx < 8 ? 'eager' : 'lazy'}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                        />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>🎩</div>
-                      )}
-                    </div>
+        {/* ── Toolbar ─────────────────────────────────────────────────────── */}
+        <div
+          dir="rtl"
+          style={{
+            background: '#fff',
+            border: '1px solid #E7E2D8',
+            borderRadius: 12,
+            padding: isMobile ? '12px 14px' : '14px 20px',
+            marginBottom: 24,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 12,
+            alignItems: 'center',
+          }}
+        >
+          {/* Subcategory pills */}
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flexShrink: 0 }}>
+            {['הכל', 'כיפות מיוחדות', 'כיפות סרוגות'].map(sub => (
+              <Pill
+                key={sub}
+                label={sub}
+                active={subCatFilter === (sub === 'הכל' ? '' : sub)}
+                onClick={() => setSubCatFilter(sub === 'הכל' ? '' : sub)}
+              />
+            ))}
+          </div>
 
-                    {/* Info */}
-                    <div style={{ padding: '10px 12px 14px', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <p style={{
-                        fontSize: isMobile ? 12 : 13, fontWeight: 600, color: '#111', margin: 0,
-                        overflow: 'hidden', display: '-webkit-box',
-                        WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                      } as React.CSSProperties}>
-                        {p.name}
-                      </p>
-                      <div style={{ marginTop: 'auto' }}>
-                        <div style={{ fontSize: isMobile ? 15 : 17, fontWeight: 900, color: '#1a1a1a' }}>
-                          {formatPrice(p.price)}
-                        </div>
-                        {p.was && p.was > p.price && (
-                          <div style={{ fontSize: 11, color: '#999', textDecoration: 'line-through' }}>
-                            {formatPrice(p.was)}
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        onClick={e => handleAdd(p, e)}
-                        style={{
-                          width: '100%', padding: '9px 0',
-                          background: added ? '#22c55e' : GOLD,
-                          color: added ? '#fff' : NAVY,
-                          border: 'none', fontSize: isMobile ? 12 : 13,
-                          fontWeight: 800, cursor: 'pointer',
-                          transition: 'background 0.2s', fontFamily: 'inherit',
-                        }}
-                      >
-                        {added ? '✓ נוסף לסל' : 'הוסף לסל'}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+          <div style={{ width: 1, height: 28, background: '#E7E2D8', flexShrink: 0 }} />
+
+          {/* Material filter */}
+          <select
+            value={materialFilter}
+            onChange={e => setMaterialFilter(e.target.value)}
+            style={{
+              border: `1.5px solid ${materialFilter ? NAVY : '#D1D5DB'}`,
+              borderRadius: 20, padding: '5px 12px',
+              fontSize: 13, fontWeight: materialFilter ? 700 : 500,
+              color: materialFilter ? NAVY : '#555',
+              background: materialFilter ? '#EEF3FF' : '#fff',
+              cursor: 'pointer', fontFamily: 'inherit',
+              direction: 'rtl', outline: 'none',
+            }}
+          >
+            <option value="">חומר: הכל</option>
+            {MATERIAL_OPTIONS.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+
+          {/* Price range */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <input
+              type="number"
+              placeholder="₪ מינ'"
+              value={minPrice}
+              onChange={e => setMinPrice(e.target.value)}
+              style={{
+                width: 72, border: '1.5px solid #D1D5DB', borderRadius: 20,
+                padding: '5px 10px', fontSize: 13, outline: 'none',
+                fontFamily: 'inherit', textAlign: 'center',
+              }}
+            />
+            <span style={{ color: '#aaa', fontSize: 13 }}>—</span>
+            <input
+              type="number"
+              placeholder="₪ מקס'"
+              value={maxPrice}
+              onChange={e => setMaxPrice(e.target.value)}
+              style={{
+                width: 72, border: '1.5px solid #D1D5DB', borderRadius: 20,
+                padding: '5px 10px', fontSize: 13, outline: 'none',
+                fontFamily: 'inherit', textAlign: 'center',
+              }}
+            />
+          </div>
+
+          <div style={{ width: 1, height: 28, background: '#E7E2D8', flexShrink: 0 }} />
+
+          {/* Sort */}
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value as SortBy)}
+            style={{
+              border: '1.5px solid #D1D5DB', borderRadius: 20,
+              padding: '5px 12px', fontSize: 13, fontWeight: 500,
+              color: '#555', background: '#fff',
+              cursor: 'pointer', fontFamily: 'inherit',
+              direction: 'rtl', outline: 'none', flexShrink: 0,
+            }}
+          >
+            {(Object.entries(SORT_LABELS) as [SortBy, string][]).map(([v, l]) => (
+              <option key={v} value={v}>{l}</option>
+            ))}
+          </select>
+
+          {/* Clear filters */}
+          {anyFilterActive && (
+            <button
+              onClick={() => { setSubCatFilter(''); setMaterialFilter(''); setMinPrice(''); setMaxPrice(''); }}
+              style={{
+                background: 'none', border: 'none', color: '#dc2626',
+                fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                fontFamily: 'inherit', flexShrink: 0,
+              }}
+            >
+              נקה ✕
+            </button>
+          )}
         </div>
+
+        {/* ── Grid ──────────────────────────────────────────────────────────── */}
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+            {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '64px 0', color: '#888' }}>
+            <div style={{ fontSize: 36, marginBottom: 12 }}>🎩</div>
+            <p style={{ fontSize: 16, marginBottom: 16 }}>לא נמצאו כיפות תואמות לסינון</p>
+            {anyFilterActive && (
+              <button
+                onClick={() => { setSubCatFilter(''); setMaterialFilter(''); setMinPrice(''); setMaxPrice(''); }}
+                style={{
+                  background: NAVY, color: '#fff', border: 'none',
+                  padding: '10px 28px', fontSize: 14, fontWeight: 700,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                }}
+              >
+                הצג את הכל
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+              {paginated.map((p, idx) => (
+                <RevealCard key={p.id} delay={Math.min((idx % PAGE_SIZE) * 50, 300)}>
+                  <ProductCard
+                    id={p.id}
+                    name={p.name}
+                    price={p.price}
+                    images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                    priority={p.priority}
+                    isBestSeller={p.isBestSeller}
+                    badge={p.badge}
+                    bundlePromo={p.bundlePromo}
+                    was={p.was}
+                    createdAt={p.createdAt}
+                    aboveFold={idx < 4}
+                    hasKlafSelection={p.hasKlafSelection}
+                    cat={p.cat}
+                    soferName={p.soferName}
+                    soferPhoto={p.soferPhoto}
+                    soferId={p.soferId}
+                    stars={p.stars}
+                    outOfStock={p.outOfStock}
+                  />
+                </RevealCard>
+              ))}
+            </div>
+
+            {/* Sentinel for infinite scroll */}
+            <div ref={sentinelRef} style={{ height: 1 }} />
+          </>
+        )}
       </section>
 
       {/* ── 4. Print CTA ────────────────────────────────────────────────────── */}
@@ -434,7 +657,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             בחירת צבעים
           </h3>
           <p>
-            הצבע צריך להתאים לפלטת הצבעים של האירוע. כיפות לבן או קרם הן בחירה נייטרלית שמתאימה לכמעט כל אירוע. כיפות כחול, שחור או כחול-כסף — אלגנטיות ופורמליות. כיפות בצבעים חמים (חאקי, קפה, בורדו) מתאימות לאירועים בסגנון טבעי וחמים. אפשר גם להזמין שני צבעים — גדולות וקטנות — כדי לאפשר לכולם לבחור.
+            הצבע צריך להתאים לפלטת הצבעים של האירוע. כיפות לבן או קרם הן בחירה נייטרלית שמתאימה לכמעט כל אירוע. כיפות כחול, שחור או כחול-כסף — אלגנטיות ופורמליות. כיפות בצבעים חמים (חאקי, קפה, בורדו) מתאימות לאירועים בסגנון טבעי וחמים.
           </p>
 
           <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: NAVY, marginTop: 40, marginBottom: 14 }}>
@@ -450,9 +673,6 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
           <p>
             כלל האצבע: כיפה לכל אורח מוזמן, פלוס 10-15% עודף. לאירוע של 150 אורחים, הזמינו 165-175 כיפות. העודף הולך לצלמים, למארגנים, לאורחים שמגיעים בלי הזמנה, ולמשפחה שתרצה לשמור כמה כזיכרון.
           </p>
-          <p>
-            חשוב גם לקחת בחשבון שחלק מהאורחים מגיעים עם כיפה משלהם — אבל תמיד עדיף שיהיה יותר מאשר שייגמרו.
-          </p>
 
           <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: NAVY, marginTop: 40, marginBottom: 14 }}>
             זמני אספקה ומשלוח
@@ -460,16 +680,10 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
           <p>
             הזמנת כיפות רגילות (ללא הדפסה) מגיעה תוך 3-5 ימי עסקים. הזמנות עם הדפסה מותאמת אישית — תוך 5-7 ימי עסקים. הזמנות גדולות (מעל 200 יחידות) — מומלץ להזמין לפחות שלושה שבועות לפני האירוע.
           </p>
-          <p>
-            משלוח זמין לכל רחבי הארץ. ניתן לבחור בין משלוח רגיל (בדואר ישראל) לבין שליח עד הבית. הזמנות דחופות ניתן לתאם בצ'אט.
-          </p>
 
           <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: NAVY, marginTop: 40, marginBottom: 14 }}>
             רעיונות עיצוב לכיפות מודפסות
           </h2>
-          <p>
-            הנה כמה רעיונות שעשו הכי הרבה הצלחה עם לקוחות שלנו:
-          </p>
           <ul style={{ paddingRight: 24, margin: '12px 0' }}>
             <li style={{ marginBottom: 10 }}><strong>עיצוב מינימלי:</strong> שם הבר מצווה בכתב יד אלגנטי בצבע אחד, מרכוז, בלי הרבה אלמנטים.</li>
             <li style={{ marginBottom: 10 }}><strong>פסוק מהתורה:</strong> הפסוק שהבר מצווה יקרא, עם שם הפרשה ותאריך.</li>
@@ -478,11 +692,15 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             <li style={{ marginBottom: 10 }}><strong>לוגו ומיתוג:</strong> עסק משפחתי או עיצוב גרפי שמשקף את אישיות הבר מצווה.</li>
           </ul>
           <p>
-            העצה שלנו: פשוט יותר הוא לרוב טוב יותר. עיצוב נקי עם שם ותאריך הוא תמיד בטוח ויפה. אם רוצים להפוך את הכיפה לחלק מחוויה שלמה — שלבו אותה עם מארז נייר כתשורת תודה.
+            העצה שלנו: פשוט יותר הוא לרוב טוב יותר. עיצוב נקי עם שם ותאריך הוא תמיד בטוח ויפה.
           </p>
 
           <p style={{ marginTop: 32, padding: '16px 20px', background: '#FBF8F3', borderRight: `4px solid ${GOLD}`, fontSize: 14, color: '#555' }}>
-            יש שאלות? <a href="https://wa.me/972584877770" target="_blank" rel="noopener noreferrer" style={{ color: GOLD, fontWeight: 700, textDecoration: 'none' }}>כתבו לנו בוואטסאפ</a> — נשמח לעזור לכם לבחור את הכיפה המושלמת לאירוע.
+            יש שאלות?{' '}
+            <a href="https://wa.me/972584877770" target="_blank" rel="noopener noreferrer" style={{ color: GOLD, fontWeight: 700, textDecoration: 'none' }}>
+              כתבו לנו בוואטסאפ
+            </a>{' '}
+            — נשמח לעזור לכם לבחור את הכיפה המושלמת לאירוע.
           </p>
         </div>
       </section>
