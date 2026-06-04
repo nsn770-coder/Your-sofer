@@ -10,27 +10,32 @@ const TICKER_ITEMS = [
 
 export default function AnnouncementTicker() {
   const scrollerRef = useRef<HTMLDivElement>(null);
-  // שני עותקים — מספיק ל-scroll loop חלק
   const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
 
-    // מכבדים prefers-reduced-motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     let rafId: number;
     let paused = false;
-    const speed = 0.6; // פיקסלים לפריים — מהירות הגלילה
+    const speed = 0.6;
+
+    // מתחילים מאמצע (סוף העותק הראשון) כדי שיהיה מקום לגלול ימינה
+    const initScroll = () => {
+      el.scrollLeft = el.scrollWidth / 2;
+    };
+    initScroll();
 
     const step = () => {
       if (!paused && el) {
-        el.scrollLeft += speed;
-        // כשהגענו לחצי (סוף העותק הראשון) — מאפסים, הלולאה seamless
+        // מקטינים = תנועה ימינה (נוח לקריאת עברית)
+        el.scrollLeft -= speed;
         const half = el.scrollWidth / 2;
-        if (el.scrollLeft >= half) {
-          el.scrollLeft -= half;
+        // כשהגענו ל-0 או מתחת — מוסיפים חצי רוחב, הלולאה seamless
+        if (el.scrollLeft <= 0) {
+          el.scrollLeft += half;
         }
       }
       rafId = requestAnimationFrame(step);
@@ -80,7 +85,6 @@ export default function AnnouncementTicker() {
           width: 100%;
           overflow-x: hidden;
           overflow-y: hidden;
-          /* כיוון הגלילה ב-LTR פנימי כדי ש-scrollLeft יעבוד צפוי */
           direction: ltr;
         }
         .ticker-track {
@@ -88,7 +92,6 @@ export default function AnnouncementTicker() {
           width: max-content;
           align-items: center;
           white-space: nowrap;
-          /* מחזירים את התוכן עצמו ל-RTL */
           direction: rtl;
         }
         .ticker-item {
