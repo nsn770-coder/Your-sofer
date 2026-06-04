@@ -7,7 +7,6 @@ const TICKER_ITEMS = [
 ];
 
 export default function AnnouncementTicker() {
-  // משכפלים 4 פעמים כדי שהבר תמיד מלא בטקסט מרגע הטעינה
   const items = [...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS];
 
   return (
@@ -40,8 +39,10 @@ export default function AnnouncementTicker() {
           flex-shrink: 0;
           align-items: center;
           white-space: nowrap;
+          min-width: max-content;
           will-change: transform;
           animation: ticker-scroll 30s linear infinite;
+          animation-fill-mode: both;
         }
         .ticker-item {
           display: inline-flex;
@@ -52,10 +53,10 @@ export default function AnnouncementTicker() {
           margin-left: 10px;
           opacity: 0.9;
         }
-        /* גולשים בדיוק חצי מרוחב התוכן (2 עותקים מתוך 4) ללולאה חלקה */
+        /* תנועה משמאל לימין: מתחילים ב--50% וגולשים ל-0 */
         @keyframes ticker-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
         }
         .ticker-bar:hover .ticker-track {
           animation-play-state: paused;
