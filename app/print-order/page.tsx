@@ -6,6 +6,26 @@ import { useCart } from '@/app/contexts/CartContext';
 const NAVY = '#1a1a1a';
 const GOLD = '#C5A028';
 
+// ── Cloudinary helper ─────────────────────────────────────────────────────────
+// Extracts the public ID from a Cloudinary URL and replaces "/" with ":" for
+// use in overlay transformation parameters (l_ layer syntax).
+function extractCloudinaryPublicId(url: string): string {
+  try {
+    const clean = url.split('?')[0];
+    const uploadIdx = clean.indexOf('/upload/');
+    if (uploadIdx === -1) return '';
+    const afterUpload = clean.slice(uploadIdx + 8);
+    // Skip version token (v<digits>/) if present
+    const vMatch = afterUpload.match(/v\d+\/(.*)/);
+    const publicIdWithExt = vMatch ? vMatch[1] : afterUpload;
+    const dotIdx = publicIdWithExt.lastIndexOf('.');
+    const publicId = dotIdx >= 0 ? publicIdWithExt.slice(0, dotIdx) : publicIdWithExt;
+    return publicId.replace(/\//g, ':');
+  } catch {
+    return '';
+  }
+}
+
 type ProductType = 'shirt' | 'kipa';
 type ShirtColor = 'white' | 'black';
 type Side = 'front' | 'back' | 'top' | 'bottom';
@@ -100,6 +120,7 @@ export default function PrintOrderPage() {
   const dragOriginRef = useRef({ mouseX: 0, mouseY: 0, imgX: 0, imgY: 0 });
   const pinchStartRef = useRef({ dist: 1, angle: 0, scale: 1, rotation: 0 });
   const printAreaRef = useRef<HTMLDivElement>(null);
+  const logoImgRef   = useRef<HTMLImageElement>(null);
 
   const router = useRouter();
   const { addItem } = useCart();
@@ -285,18 +306,56 @@ export default function PrintOrderPage() {
 
   function handleAddToCart() {
     if (!productType) return;
-    const imageUrl = uploadedUrl || localUrl || '';
+    const imageUrl    = uploadedUrl || localUrl || '';
     const templateUrl = getTemplateUrl(productType, color, side);
 
-    const el = printAreaRef.current;
-    const imageX = el ? (imgPosRef.current.x / el.offsetWidth) * 100 : 0;
+    const el     = printAreaRef.current;
+    const logoEl = logoImgRef.current;
+
+    // Position as % of printArea (scale-independent coordinates)
+    const imageX = el ? (imgPosRef.current.x / el.offsetWidth)  * 100 : 0;
     const imageY = el ? (imgPosRef.current.y / el.offsetHeight) * 100 : 0;
+
+    // Logo rendered width as % of printArea width
+    const logoWidthPct = (el && logoEl)
+      ? (logoEl.offsetWidth * imgScale) / el.offsetWidth * 100
+      : imgScale * 100;
+
+    // ── Build Cloudinary mockup URL ─────────────────────────────────────────
+    const pa      = getPrintArea(productType!);
+    const paTop   = parseFloat(pa.top);
+    const paLeft  = parseFloat(pa.left);
+    const paW     = parseFloat(pa.width);
+    const paH     = parseFloat(pa.height);
+
+    const BASE_W     = 1000;
+    const centerXpct = paLeft + paW / 2 + (imageX / 100) * paW;
+    const centerYpct = paTop  + paH / 2 + (imageY / 100) * paH;
+    const logoWpx    = Math.round((logoWidthPct / 100) * (paW / 100) * BASE_W);
+    const xpx        = Math.round((centerXpct / 100) * BASE_W - logoWpx / 2);
+    const ypx        = Math.round((centerYpct / 100) * BASE_W - logoWpx / 2);
+    const rot        = Math.round(imgRotation);
+
+    const logoPublicId     = extractCloudinaryPublicId(imageUrl);
+    const templatePublicId = extractCloudinaryPublicId(templateUrl);
+
+    let mockupUrl = '';
+    if (logoPublicId && templatePublicId && logoWpx > 0) {
+      mockupUrl =
+        `https://res.cloudinary.com/dyxzq3ucy/image/upload/` +
+        `w_${BASE_W}/` +
+        `l_${logoPublicId},w_${logoWpx}` +
+        (rot ? `,a_${rot}` : '') +
+        `,g_north_west,x_${xpx},y_${ypx}/` +
+        `${templatePublicId}.png`;
+    }
+    // ────────────────────────────────────────────────────────────────────────
 
     const name = productType === 'shirt'
       ? `חולצה מודפסת - ${color === 'white' ? 'לבן' : 'שחור'} - ${side === 'front' ? 'קדימה' : 'מאחורה'}`
       : `הדפסה על כיפה × ${qty}`;
 
-    const price = productType === 'shirt' ? PRINT_PRODUCTS.shirt.price : kipaUnitPrice;
+    const price   = productType === 'shirt' ? PRINT_PRODUCTS.shirt.price : kipaUnitPrice;
     const itemQty = productType === 'shirt' ? 1 : qty;
 
     addItem({
@@ -308,14 +367,16 @@ export default function PrintOrderPage() {
       printCustomization: {
         productType,
         side,
-        color: productType === 'shirt' ? color : undefined,
+        color:            productType === 'shirt' ? color : undefined,
         uploadedImageUrl: imageUrl,
-        bgRemoved: bgRemoveChecked && !!bgRemovedUrl,
+        bgRemoved:        bgRemoveChecked && !!bgRemovedUrl,
         originalImageUrl: originalUrl || imageUrl,
         imageX,
         imageY,
-        imageScale: imgScale,
+        imageScale:    imgScale,
         imageRotation: imgRotation,
+        logoWidthPct,
+        mockupUrl:     mockupUrl || undefined,
       },
     });
     setAdded(true);
@@ -537,6 +598,7 @@ export default function PrintOrderPage() {
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
+                          ref={logoImgRef}
                           src={displayImageUrl || localUrl}
                           alt="תמונה מועלית"
                           draggable={false}

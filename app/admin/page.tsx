@@ -29,6 +29,12 @@ interface OrderItem {
     uploadedImageUrl: string;
     bgRemoved: boolean;
     originalImageUrl: string;
+    imageX?: number;
+    imageY?: number;
+    imageScale?: number;
+    imageRotation?: number;
+    logoWidthPct?: number;
+    mockupUrl?: string;
   } | null;
 }
 
@@ -1435,19 +1441,57 @@ function OrdersTab({ orders, setOrders }: { orders: Order[]; setOrders: React.Di
                                   </span>
                                 )}
                                 {item.printCustomization && (
-                                  <span className="inline-flex flex-wrap items-center gap-1.5 mt-1">
-                                    <span className="inline-flex items-center gap-1 text-blue-800 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5">
-                                      🖨️ {item.printCustomization.productType === 'shirt' ? 'חולצה' : 'כיפה'} · {item.printCustomization.side}{item.printCustomization.color ? ` · ${item.printCustomization.color === 'white' ? 'לבן' : 'שחור'}` : ''}
+                                  <div className="mt-1 flex flex-col gap-1.5">
+                                    {/* Type + mockup preview */}
+                                    <span className="inline-flex flex-wrap items-center gap-1.5">
+                                      <span className="inline-flex items-center gap-1 text-blue-800 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5">
+                                        🖨️ {item.printCustomization.productType === 'shirt' ? 'חולצה' : 'כיפה'} · {item.printCustomization.side}{item.printCustomization.color ? ` · ${item.printCustomization.color === 'white' ? 'לבן' : 'שחור'}` : ''}
+                                      </span>
+                                      {item.printCustomization.bgRemoved && (
+                                        <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
+                                          ✂️ רקע הוסר
+                                        </span>
+                                      )}
                                     </span>
-                                    <a href={item.printCustomization.uploadedImageUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-2 py-0.5 hover:underline">
-                                      ⬇️ הורד תמונה
-                                    </a>
-                                    {item.printCustomization.bgRemoved && (
-                                      <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
-                                        ✂️ רקע הוסר
+                                    {/* Mockup image */}
+                                    {item.printCustomization.mockupUrl && (
+                                      // eslint-disable-next-line @next/next/no-img-element
+                                      <img
+                                        src={item.printCustomization.mockupUrl}
+                                        alt="הדמיה"
+                                        style={{ maxWidth: 200, display: 'block', border: '1px solid #e5e7eb', borderRadius: 4 }}
+                                      />
+                                    )}
+                                    {/* Download buttons */}
+                                    <span className="inline-flex flex-wrap gap-1.5">
+                                      {item.printCustomization.mockupUrl && (
+                                        <a
+                                          href={item.printCustomization.mockupUrl}
+                                          download
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5 hover:underline text-xs"
+                                        >
+                                          ⬇️ הורד הדמיה
+                                        </a>
+                                      )}
+                                      <a
+                                        href={item.printCustomization.uploadedImageUrl}
+                                        download
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-2 py-0.5 hover:underline text-xs"
+                                      >
+                                        ⬇️ הורד קובץ מקורי
+                                      </a>
+                                    </span>
+                                    {/* Coordinates */}
+                                    {item.printCustomization.imageX !== undefined && (
+                                      <span className="text-[10px] text-gray-400 font-mono" dir="ltr">
+                                        X:{item.printCustomization.imageX?.toFixed(1)} Y:{item.printCustomization.imageY?.toFixed(1)} scale:{item.printCustomization.imageScale?.toFixed(2)} rot:{item.printCustomization.imageRotation?.toFixed(0)}°
                                       </span>
                                     )}
-                                  </span>
+                                  </div>
                                 )}
                               </div>
                             ))}
@@ -1624,7 +1668,12 @@ export default function AdminPage() {
 
   async function loadOrders() {
     try {
-      const snap = await getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc')));
+      const snap = await getDocs(query(
+        collection(db, 'orders'),
+        where('status', '!=', 'pending_payment'),
+        orderBy('status'),
+        orderBy('createdAt', 'desc'),
+      ));
       const data: Order[] = [];
       snap.forEach(d => data.push({ id: d.id, ...d.data() } as Order));
       setOrders(data);

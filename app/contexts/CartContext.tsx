@@ -32,6 +32,8 @@ export interface CartItem {
     imageY?: number;
     imageScale?: number;
     imageRotation?: number;
+    logoWidthPct?: number;
+    mockupUrl?: string;
   };
 }
 
