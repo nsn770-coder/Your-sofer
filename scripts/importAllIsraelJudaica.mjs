@@ -63,6 +63,7 @@ const CATEGORY_MAP = [
   { code: '1185', label: 'קיטלים',                  cat: 'יודאיקה',                    subCategory: 'קיטלים' },
   { code: '1187', label: 'ברכונים',                 cat: 'יודאיקה',                    subCategory: 'ברכונים' },
   { code: '1193', label: 'גביעי קידוש פולימר',      cat: 'שבת',                        subCategory: 'כוסות קידוש' },
+  { code: '1116', label: 'הפרשת חלה',               cat: 'שבת',                        subCategory: 'הפרשת חלה' },
 ];
 
 // ── Constants ─────────────────────────────────────────────────────────────────

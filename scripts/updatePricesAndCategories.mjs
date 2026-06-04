@@ -39,6 +39,11 @@ function calcPrice(supplierPrice, isJewelry = false) {
   return roundUp90(supplierPrice * m);
 }
 
+// מחיר קבוע: מחיר_ספק_בשח × multiplier, מעוגל לשקל שלם
+function calcPriceFixed(supplierPrice, multiplier) {
+  return Math.round(supplierPrice * multiplier);
+}
+
 // ── New categories ────────────────────────────────────────────────────────────
 const NEW_CATEGORIES = [
   { slug: 'netilat-yadaim',       name: 'נטילת ידיים',      displayName: 'נטילת ידיים' },
@@ -83,15 +88,21 @@ const RAW = {
     category: 'מפות שולחן', subcategory: 'מפות שולחן', isJewelry: false,
     raw: `UK49056:12.99 UK67122:17.99 UK67130:17.99 UK67536:44.99 UK66987:29.99 UK66988:34.99 UK66989:39.99 UK66990:29.99 UK66991:39.99 UK66992:39.99 UK64717:32.99 UK67314:49.99 UK67315:54.99 UK67316:64.99 UK67317:79.99 UK67112:89.99 UK67113:99.99 UK67114:109.99 UK67115:129.99 UK67116:89.99 UK67117:99.99 UK67119:129.99 UK67716:99.99 UK67718:99.99 UK67719:109.99`,
   },
+  // הפרשת חלה — מחיר ספק בש"ח × 2.08 = מחיר ללקוח (מעוגל לשקל שלם)
+  // פורמט: UK{SKU}:{מחיר_ספק_בשח}  (מופרד ברווחים)
+  'הפרשת חלה': {
+    category: 'שבת', subcategory: 'הפרשת חלה', isJewelry: false, fixedMultiplier: 2.08,
+    raw: ``,  // ← הדבק כאן את רשימת המחירים מהספק
+  },
 };
 
 // ── Parse raw strings into SKU map ────────────────────────────────────────────
 const skuMap = {};
-for (const [, { category, subcategory, isJewelry, raw }] of Object.entries(RAW)) {
+for (const [, { category, subcategory, isJewelry, fixedMultiplier, raw }] of Object.entries(RAW)) {
   for (const token of raw.trim().split(/\s+/)) {
     const [sku, priceStr] = token.split(':');
     if (!sku || !priceStr) continue;
-    skuMap[sku.trim()] = { category, subcategory, isJewelry, supplierPrice: parseFloat(priceStr) };
+    skuMap[sku.trim()] = { category, subcategory, isJewelry, fixedMultiplier, supplierPrice: parseFloat(priceStr) };
   }
 }
 
@@ -144,7 +155,9 @@ async function main() {
       continue;
     }
 
-    const price = calcPrice(row.supplierPrice, row.isJewelry);
+    const price = row.fixedMultiplier
+      ? calcPriceFixed(row.supplierPrice, row.fixedMultiplier)
+      : calcPrice(row.supplierPrice, row.isJewelry);
     const update = {
       price,
       soferBasePrice: row.supplierPrice,

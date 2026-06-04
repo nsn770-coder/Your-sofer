@@ -34,6 +34,7 @@ export const lifeEvents: LifeEvent[] = [
       { category: 'טליתות וציציות',   subCategories: 'all' },
       { category: 'תכשיטים',          subCategories: 'all' },
       { category: 'עיצוב הבית',       subCategories: ['פמוטים'] },
+      { category: 'שבת',              subCategories: ['הפרשת חלה'] },
     ],
   },
   {
