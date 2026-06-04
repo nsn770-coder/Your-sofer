@@ -28,6 +28,7 @@ export default function AnnouncementTicker() {
           color: #ffffff;
           overflow: hidden;
           position: relative;
+          z-index: 50;
           display: flex;
           align-items: center;
           font-size: 14px;
@@ -39,10 +40,9 @@ export default function AnnouncementTicker() {
           flex-shrink: 0;
           align-items: center;
           white-space: nowrap;
-          min-width: max-content;
+          width: max-content;
           will-change: transform;
           animation: ticker-scroll 30s linear infinite;
-          animation-fill-mode: both;
         }
         .ticker-item {
           display: inline-flex;
@@ -53,10 +53,10 @@ export default function AnnouncementTicker() {
           margin-left: 10px;
           opacity: 0.9;
         }
-        /* תנועה משמאל לימין: מתחילים ב--50% וגולשים ל-0 */
+        /* גולשים בדיוק רוחב עותק אחד מתוך 4 = 25%, ללולאה חלקה ורציפה */
         @keyframes ticker-scroll {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-25%); }
         }
         .ticker-bar:hover .ticker-track {
           animation-play-state: paused;
