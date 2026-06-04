@@ -1326,7 +1326,7 @@ const ORDER_STATUSES: { value: string; label: string; color: string }[] = [
   { value: 'abandoned',  label: '🚫 בוטל',             color: 'bg-gray-200 text-gray-600' },
 ];
 
-function OrdersTab({ orders, setOrders }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>> }) {
+function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>>; ordersError?: string | null }) {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -1343,6 +1343,9 @@ function OrdersTab({ orders, setOrders }: { orders: Order[]; setOrders: React.Di
     return ORDER_STATUSES.find(s => s.value === val) ?? { label: val, color: 'bg-gray-100 text-gray-600' };
   }
 
+  if (ordersError) {
+    return <div className="bg-white rounded-xl shadow p-10 text-center text-red-600 font-bold">שגיאה בטעינת הזמנות: {ordersError}</div>;
+  }
   if (orders.length === 0) {
     return <div className="bg-white rounded-xl shadow p-10 text-center text-gray-400">אין הזמנות עדיין</div>;
   }
@@ -1598,6 +1601,7 @@ export default function AdminPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const [appsLoading, setAppsLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
@@ -1668,17 +1672,23 @@ export default function AdminPage() {
 
   async function loadOrders() {
     try {
+      // Single-field orderBy — no composite index required.
+      // pending_payment orders are filtered client-side (they are not real orders yet).
       const snap = await getDocs(query(
         collection(db, 'orders'),
-        where('status', '!=', 'pending_payment'),
-        orderBy('status'),
         orderBy('createdAt', 'desc'),
       ));
-      const data: Order[] = [];
-      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Order));
+      const data = snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as Order))
+        .filter(o => o.status !== 'pending_payment');
       setOrders(data);
-    } catch (e) { console.error(e); }
-    finally { setOrdersLoading(false); }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error('[loadOrders]', msg);
+      setOrdersError(msg);
+    } finally {
+      setOrdersLoading(false);
+    }
   }
 
   async function loadAbandonedCarts() {
@@ -2633,7 +2643,7 @@ export default function AdminPage() {
       )}
 
       {activeTab === 'orders' && (
-        <OrdersTab orders={orders} setOrders={setOrders} />
+        <OrdersTab orders={orders} setOrders={setOrders} ordersError={ordersError} />
       )}
 
       {activeTab === 'commissions' && (
