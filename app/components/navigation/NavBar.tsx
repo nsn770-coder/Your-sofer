@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import { useState, useRef, useCallback, useEffect } from "react";
@@ -9,6 +9,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useShaliach } from "@/app/contexts/ShaliachContext";
 import MobileDrawerMenu from "./MobileDrawerMenu";
 import lifeEvents from "@/data/lifeEvents";
+import AlgoliaSearch from "@/app/components/search/AlgoliaSearch";
 
 interface NavSubItem {
   label: string;
@@ -370,13 +371,11 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
 }
 
 function NavBarContent() {
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchOpen, setSearchOpen] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [activeId,    setActiveId]    = useState<string | null>(null);
+  const [mobileOpen,  setMobileOpen]  = useState(false);
+  const [isMobile,    setIsMobile]    = useState(false);
+  const [searchOpen,  setSearchOpen]  = useState(false);
+  const openTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
   const { count } = useCart();
@@ -395,12 +394,6 @@ function NavBarContent() {
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, []);
-
-  useEffect(() => {
-    if (searchOpen && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }, [searchOpen]);
 
   const clearTimers = () => {
     if (openTimer.current) clearTimeout(openTimer.current);
@@ -423,12 +416,6 @@ function NavBarContent() {
     let url = `/category/${encodeURIComponent(cat)}`;
     if (filter) url += `?filter=${encodeURIComponent(filter)}`;
     router.push(url);
-  }
-
-  function handleSearch() {
-    const q = searchQuery.trim();
-    if (!q) return;
-    router.push(`/search?q=${encodeURIComponent(q)}`);
   }
 
   function handleMoment(id: string) {
@@ -494,6 +481,7 @@ function NavBarContent() {
             <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "#1a1a1a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 
+          {/* ── Search area ──────────────────────────────────────────── */}
           {isMobile ? (
             <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
               <button
@@ -505,19 +493,8 @@ function NavBarContent() {
               </button>
             </div>
           ) : (
-            <div style={{ flex: 1, display: "flex", borderRadius: 0, overflow: "hidden", minWidth: 0 }}>
-              <select style={{ background: "#e8e8e8", border: "none", padding: "10px 8px", fontSize: 12, color: "#333", cursor: "pointer", borderRadius: 0, minWidth: 110 }}>
-                <option>כל הקטגוריות</option>
-              </select>
-              <input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleSearch()}
-                placeholder='חיפוש סת"מ ויודאיקה...'
-                style={{ flex: 1, border: "none", padding: "10px", fontSize: 14, color: "#111", background: "#f3f4f6", outline: "none", minWidth: 0 }} />
-              <button onClick={handleSearch} style={{ background: "#C5A028", border: "none", padding: "0 14px", cursor: "pointer" }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-              </button>
+            <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
+              <AlgoliaSearch onNavigate={() => setActiveId(null)} />
             </div>
           )}
 
@@ -605,36 +582,26 @@ function NavBarContent() {
         )}
       </header>
 
+      {/* ── Mobile search bar ─────────────────────────────────────────── */}
       {isMobile && searchOpen && (
         <div style={{
-          position: "sticky",
-          top: 57,
-          zIndex: 99,
-          background: "#fff",
+          position:     "sticky",
+          top:          57,
+          zIndex:       99,
+          background:   "#fff",
           borderBottom: "1px solid #E7E2D8",
-          display: "flex",
-          alignItems: "center",
-          padding: "0",
-          width: "100%",
+          display:      "flex",
+          alignItems:   "center",
+          width:        "100%",
         }}>
-          <input
-            ref={searchInputRef}
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter") { handleSearch(); setSearchOpen(false); } }}
-            placeholder='חיפוש סת"מ ויודאיקה...'
-            style={{ flex: 1, border: "none", padding: "12px 20px", fontSize: 14, color: "#111", outline: "none", background: "transparent", minWidth: 0 }}
+          <AlgoliaSearch
+            onNavigate={() => setSearchOpen(false)}
+            autoFocus
+            style={{ flex: 1 }}
           />
           <button
-            onClick={() => { handleSearch(); setSearchOpen(false); }}
-            style={{ background: "none", border: "none", padding: "12px 12px", cursor: "pointer", display: "flex", alignItems: "center" }}
-            aria-label="חפש"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-          </button>
-          <button
             onClick={() => setSearchOpen(false)}
-            style={{ background: "none", border: "none", padding: "12px 14px", cursor: "pointer", display: "flex", alignItems: "center", color: "#888", fontSize: 20, lineHeight: 1 }}
+            style={{ background: "none", border: "none", padding: "12px 14px", cursor: "pointer", display: "flex", alignItems: "center", color: "#888", fontSize: 20, lineHeight: "1", flexShrink: 0 }}
             aria-label="סגור חיפוש"
           >
             ✕
