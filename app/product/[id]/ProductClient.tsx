@@ -56,6 +56,7 @@ interface Product {
   whoIsItFor?: { emoji: string; text: string }[];
   whyUs?: string[];
   whatYouGet?: string[];
+  bundlePromo?: string | null;
 }
 
 interface KlafItem { id: string; name: string; imageUrl: string; status: string; }
@@ -1525,6 +1526,15 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
             {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
           </div>
+          {product.bundlePromo && (() => {
+            const BUNDLE_LABELS: Record<string, string> = { '3for100': '3 ב-₪100', '4for100': '4 ב-₪100', '5for100': '5 ב-₪100', '12for100': '12 ב-₪100' };
+            const label = BUNDLE_LABELS[product.bundlePromo];
+            return label ? (
+              <div style={{ display: 'inline-flex', alignItems: 'center', background: '#1a1a1a', color: '#C5A028', fontSize: 13, fontWeight: 800, padding: '5px 12px', borderRadius: 8, marginBottom: 8, letterSpacing: '0.01em' }}>
+                ✦ מבצע חבילה: {label}
+              </div>
+            ) : null;
+          })()}
           <div style={{ fontSize: 12, color: '#888', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
             <Icon.Truck /> כולל מע״מ · משלוח לכל הארץ
           </div>
@@ -1945,6 +1955,15 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
                   {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
                 </div>
+                {product.bundlePromo && (() => {
+                  const BUNDLE_LABELS: Record<string, string> = { '3for100': '3 ב-₪100', '4for100': '4 ב-₪100', '5for100': '5 ב-₪100', '12for100': '12 ב-₪100' };
+                  const label = BUNDLE_LABELS[product.bundlePromo];
+                  return label ? (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', background: '#1a1a1a', color: '#C5A028', fontSize: 13, fontWeight: 800, padding: '5px 12px', borderRadius: 8, marginBottom: 8, letterSpacing: '0.01em' }}>
+                      ✦ מבצע חבילה: {label}
+                    </div>
+                  ) : null;
+                })()}
                 <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Truck /> כולל מע״מ · משלוח לכל הארץ</div>
                 <InstallmentBadge price={product.price} />
               </div>

@@ -17,6 +17,7 @@ interface Props {
   priority?: number;
   isBestSeller?: boolean;
   badge?: string | null;
+  bundlePromo?: string | null;
   was?: number | null;
   createdAt?: { seconds: number } | null;
   hidden?: boolean;
@@ -111,7 +112,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProductCard({
-  id, name, price, images, priority, isBestSeller, badge, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
+  id, name, price, images, priority, isBestSeller, badge, bundlePromo, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
   soferId, soferName, soferPhoto, horizontal, stars, outOfStock,
 }: Props) {
   const router = useRouter();
@@ -316,9 +317,9 @@ export default function ProductCard({
           </div>
         )}
 
-        {/* Top-right: best-seller / priority badge */}
+        {/* Top-right: best-seller / priority / bundle badge */}
         <div className="absolute top-2 right-2">
-          <ProductBadge isBestSeller={isBestSeller} priority={priority} badge={badge} />
+          <ProductBadge isBestSeller={isBestSeller} priority={priority} badge={badge} bundlePromo={bundlePromo} />
         </div>
 
         {/* Top-left: sale / new / klaf-selection badges */}

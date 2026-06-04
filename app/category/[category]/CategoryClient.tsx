@@ -50,6 +50,7 @@ interface Product {
   isExpertRecommended?: boolean;
   outOfStock?: boolean;
   coverStyle?: string;
+  bundlePromo?: string | null;
 }
 
 interface Curation {
@@ -1693,7 +1694,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               <ProductCard
                                 id={p.id} name={p.name} price={p.price}
                                 images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                                priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
+                                priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge} bundlePromo={p.bundlePromo}
                                 was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
                                 hasKlafSelection={p.hasKlafSelection} cat={p.cat}
                                 soferId={p.soferId}
@@ -1948,7 +1949,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   ) : (
                     <ProductCard key={p.id} id={p.id} name={p.name} price={p.price}
                       images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                      priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge}
+                      priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge} bundlePromo={p.bundlePromo}
                       was={p.was} createdAt={p.createdAt} aboveFold={idx < 4}
                       hasKlafSelection={p.hasKlafSelection} cat={p.cat}
                       soferId={p.soferId}
@@ -2035,6 +2036,7 @@ export default function CategoryClient({ category }: { category: string }) {
                         priority={p.priority}
                         isBestSeller={p.isBestSeller}
                         badge={p.badge}
+                        bundlePromo={p.bundlePromo}
                         was={p.was}
                         createdAt={p.createdAt}
                         aboveFold={idx < 4}
@@ -2080,6 +2082,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               priority={p.priority}
                               isBestSeller={p.isBestSeller}
                               badge={p.badge}
+                              bundlePromo={p.bundlePromo}
                               was={p.was}
                               createdAt={p.createdAt}
                               aboveFold={start === 0 && idx < 4}

@@ -2,6 +2,7 @@ interface Props {
   isBestSeller?: boolean;
   priority?: number;
   badge?: string | null;
+  bundlePromo?: string | null;
 }
 
 interface BadgeConfig {
@@ -9,7 +10,14 @@ interface BadgeConfig {
   className: string;
 }
 
-function resolveBadge({ isBestSeller, priority, badge }: Props): BadgeConfig | null {
+const BUNDLE_LABELS: Record<string, string> = {
+  '3for100':  '3 ב-₪100',
+  '4for100':  '4 ב-₪100',
+  '5for100':  '5 ב-₪100',
+  '12for100': '12 ב-₪100',
+};
+
+function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundlePromo'>): BadgeConfig | null {
   if (isBestSeller) {
     return {
       label: 'הכי נמכר',
@@ -49,16 +57,27 @@ function resolveBadge({ isBestSeller, priority, badge }: Props): BadgeConfig | n
   return null;
 }
 
-export default function ProductBadge({ isBestSeller, priority, badge }: Props) {
+export default function ProductBadge({ isBestSeller, priority, badge, bundlePromo }: Props) {
   const config = resolveBadge({ isBestSeller, priority, badge });
-  if (!config) return null;
+  const bundleLabel = bundlePromo ? BUNDLE_LABELS[bundlePromo] : null;
+
+  if (!config && !bundleLabel) return null;
 
   return (
-    <span
-      dir="rtl"
-      className={`inline-flex items-center border rounded-full px-2 py-0.5 text-xs font-bold whitespace-nowrap ${config.className}`}
-    >
-      {config.label}
+    <span dir="rtl" className="inline-flex flex-col items-end gap-1">
+      {config && (
+        <span className={`inline-flex items-center border rounded-full px-2 py-0.5 text-xs font-bold whitespace-nowrap ${config.className}`}>
+          {config.label}
+        </span>
+      )}
+      {bundleLabel && (
+        <span
+          className="inline-flex items-center whitespace-nowrap"
+          style={{ background: '#1a1a1a', color: '#C5A028', fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, letterSpacing: '0.01em' }}
+        >
+          ✦ {bundleLabel}
+        </span>
+      )}
     </span>
   );
 }
