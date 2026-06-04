@@ -374,7 +374,6 @@ function NavBarContent() {
   const [activeId,    setActiveId]    = useState<string | null>(null);
   const [mobileOpen,  setMobileOpen]  = useState(false);
   const [isMobile,    setIsMobile]    = useState(false);
-  const [searchOpen,  setSearchOpen]  = useState(false);
   const openTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
@@ -390,7 +389,7 @@ function NavBarContent() {
   }, []);
 
   useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape") { setActiveId(null); setMobileOpen(false); setSearchOpen(false); } };
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") { setActiveId(null); setMobileOpen(false); } };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, []);
@@ -481,17 +480,9 @@ function NavBarContent() {
             <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "#1a1a1a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 
-          {/* ── Search area ──────────────────────────────────────────── */}
+          {/* ── Search area (desktop only) ───────────────────────────── */}
           {isMobile ? (
-            <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
-              <button
-                onClick={() => setSearchOpen(o => !o)}
-                style={{ background: "none", border: "none", color: "#1a1a1a", padding: "6px 8px", cursor: "pointer", display: "flex", alignItems: "center" }}
-                aria-label="חיפוש"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-              </button>
-            </div>
+            <div style={{ flex: 1 }} />
           ) : (
             <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
               <AlgoliaSearch onNavigate={() => setActiveId(null)} />
@@ -581,33 +572,6 @@ function NavBarContent() {
           </div>
         )}
       </header>
-
-      {/* ── Mobile search bar ─────────────────────────────────────────── */}
-      {isMobile && searchOpen && (
-        <div style={{
-          position:     "sticky",
-          top:          57,
-          zIndex:       99,
-          background:   "#fff",
-          borderBottom: "1px solid #E7E2D8",
-          display:      "flex",
-          alignItems:   "center",
-          width:        "100%",
-        }}>
-          <AlgoliaSearch
-            onNavigate={() => setSearchOpen(false)}
-            autoFocus
-            style={{ flex: 1 }}
-          />
-          <button
-            onClick={() => setSearchOpen(false)}
-            style={{ background: "none", border: "none", padding: "12px 14px", cursor: "pointer", display: "flex", alignItems: "center", color: "#888", fontSize: 20, lineHeight: "1", flexShrink: 0 }}
-            aria-label="סגור חיפוש"
-          >
-            ✕
-          </button>
-        </div>
-      )}
 
       <MobileDrawerMenu
         isOpen={mobileOpen}

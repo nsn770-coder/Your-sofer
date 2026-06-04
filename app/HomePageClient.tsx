@@ -25,6 +25,7 @@ import {
 } from './constants/homepageCards';
 import type { CardDef, SubItem } from './constants/homepageCards';
 import lifeEvents from '@/data/lifeEvents';
+import AlgoliaSearch from '@/app/components/search/AlgoliaSearch';
 
 // Activity bar icons
 function IconActivityCheck() {
@@ -912,6 +913,13 @@ export default function HomePageClient() {
           </p>
         </div>
       </div>
+
+      {/* ── Mobile search band ── */}
+      {isMobile && (
+        <div style={{ background: '#FFFFFF', padding: '20px 16px', borderBottom: '1px solid #E7E2D8' }}>
+          <AlgoliaSearch />
+        </div>
+      )}
 
       {/* ── Promo 2+1 section ── */}
       {promoProducts.length > 0 && (
