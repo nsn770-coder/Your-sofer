@@ -19,6 +19,7 @@ import { TidioChat } from "@/components/TidioChat";
 import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 import ClubPopupWrapper from "@/components/ClubPopupWrapper";
+import AnnouncementTicker from "./components/AnnouncementTicker";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
@@ -106,6 +107,7 @@ export default function RootLayout({
         ` }} />
       </head>
       <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100vw', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
+        <AnnouncementTicker />
         <ChatPersonaProvider>
         <AuthProvider>
           {/* Suspense is required by Next.js when useSearchParams() is used
