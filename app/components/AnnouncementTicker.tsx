@@ -23,12 +23,14 @@ export default function AnnouncementTicker() {
       <style jsx>{`
         .ticker-bar {
           width: 100%;
+          max-width: 100vw;
           height: 40px;
           background-color: #000000;
           color: #ffffff;
           overflow: hidden;
           position: relative;
-          z-index: 50;
+          z-index: 101;
+          contain: layout paint;
           display: flex;
           align-items: center;
           font-size: 14px;
@@ -42,6 +44,7 @@ export default function AnnouncementTicker() {
           white-space: nowrap;
           width: max-content;
           will-change: transform;
+          transform: translateZ(0);
           animation: ticker-scroll 30s linear infinite;
         }
         .ticker-item {
@@ -53,10 +56,10 @@ export default function AnnouncementTicker() {
           margin-left: 10px;
           opacity: 0.9;
         }
-        /* גולשים בדיוק רוחב עותק אחד מתוך 4 = 25%, ללולאה חלקה ורציפה */
+        /* גולשים רוחב עותק אחד מתוך 4 = 25%, לולאה רציפה. translateZ שומר GPU layer */
         @keyframes ticker-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-25%); }
+          0% { transform: translateZ(0) translateX(0); }
+          100% { transform: translateZ(0) translateX(-25%); }
         }
         .ticker-bar:hover .ticker-track {
           animation-play-state: paused;
