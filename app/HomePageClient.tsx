@@ -266,7 +266,6 @@ const MORE_CAT_DEFS = [
   { slug: 'סט טלית תפילין', emoji: '🕍' },
   { slug: 'ספרי תורה',       emoji: '📜' },
   { slug: 'פסח',             emoji: '🍷' },
-  { slug: 'כיסוי תפילין',    emoji: '🖊️' },
   { slug: 'קלפי תפילין',    emoji: '📄' },
   { slug: 'תפילין קומפלט',  emoji: '⬛' },
   { slug: 'קלפי מזוזה',      emoji: '📜' },
@@ -1388,7 +1387,7 @@ export default function HomePageClient() {
               { name: 'תפילין קומפלט', emoji: '🖊️', img: catImages['תפילין קומפלט'] || '', href: '/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98' },
               { name: 'קלפי מזוזה',    emoji: '📜', img: catImages['קלפי מזוזה']    || '', href: '/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94' },
               { name: 'בר מצווה',      emoji: '✡️', img: catImages['בר מצווה']      || '', href: '/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94' },
-              { name: 'כיסויי תפילין', emoji: '🎒', img: catImages['כיסוי תפילין']  || '', href: '/category/%D7%9B%D7%99%D7%A1%D7%95%D7%99%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F' },
+              { name: 'סט טלית תפילין', emoji: '🎒', img: catImages['סט טלית תפילין'] || '', href: '/category/%D7%A1%D7%98%20%D7%98%D7%9C%D7%99%D7%AA%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F' },
             ] as { name: string; emoji: string; img: string; href: string }[]).map(cat => (
               <div
                 key={cat.name}

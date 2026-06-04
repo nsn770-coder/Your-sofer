@@ -69,7 +69,7 @@ export const CARDS: CardDef[] = [
       { label: 'תפילין אשכנז', href: '/category/תפילין קומפלט?filter=אשכנז', cat: 'תפילין קומפלט' },
       { label: 'תפילין ספרד',  href: '/category/תפילין קומפלט?filter=ספרד',  cat: 'תפילין קומפלט' },
       { label: 'תפילין חב"ד',  href: '/category/תפילין קומפלט?filter=חב"ד',  cat: 'תפילין קומפלט' },
-      { label: 'כיסוי תפילין', href: '/category/כיסוי תפילין',              cat: 'כיסוי תפילין'  },
+      { label: 'סט טלית תפילין', href: '/category/סט טלית תפילין',          cat: 'סט טלית תפילין' },
     ],
   },
   {

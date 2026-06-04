@@ -72,6 +72,12 @@ const nextConfig: NextConfig = {
         destination: '/category/%D7%91%D7%AA%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94',
         permanent: true,
       },
+      // כיסוי תפילין → סט טלית תפילין (category merged 2026-06-04)
+      {
+        source: '/category/%D7%9B%D7%99%D7%A1%D7%95%D7%99%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F',
+        destination: '/category/%D7%A1%D7%98%20%D7%98%D7%9C%D7%99%D7%AA%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F',
+        permanent: true,
+      },
     ];
   },
 };

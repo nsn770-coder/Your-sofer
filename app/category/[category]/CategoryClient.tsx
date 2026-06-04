@@ -49,6 +49,7 @@ interface Product {
   hasKlafSelection?: boolean;
   isExpertRecommended?: boolean;
   outOfStock?: boolean;
+  coverStyle?: string;
 }
 
 interface Curation {
@@ -117,10 +118,6 @@ const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
   'קלפי מזוזה': [
     { key: 'גודל',   label: 'גודל',   options: ['12 ס"מ', '15 ס"מ', '20 ס"מ', '25 ס"מ'] },
     { key: 'כשרות',  label: 'כשרות',  options: ['מהודר', 'מהדרין', 'פשוט'] },
-  ],
-  'כיסוי תפילין': [
-    { key: 'חומר', label: 'חומר', options: ['עור', 'דמוי עור', 'קטיפה', 'בד', 'פיו', 'פשתן', 'משי'] },
-    { key: 'צבע',  label: 'צבע',  options: ['לבן', 'כסף', 'זהב', 'שחור', 'חום', 'צבעוני'] },
   ],
   'בר מצווה': [
     { key: 'סוג סט',     label: 'סוג סט',     options: ['עם תפילין', 'עם טלית', 'קומפלט'] },
@@ -407,6 +404,81 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+// ─── סט טלית תפילין — tab bar ────────────────────────────────────────────────
+
+type SetTab = '' | 'sets' | 'tefillin' | 'thermal' | 'batim' | 'rashitam';
+
+const SET_TABS: { id: SetTab; label: string }[] = [
+  { id: '',         label: 'הכל' },
+  { id: 'sets',     label: 'סט טלית תפילין' },
+  { id: 'tefillin', label: 'סט תפילין' },
+  { id: 'thermal',  label: 'סט תפילין תרמי' },
+  { id: 'batim',    label: 'בתי תפילין' },
+  { id: 'rashitam', label: 'רש"י ר"ת' },
+];
+
+function applySetTabFilter(products: Product[], tab: SetTab): Product[] {
+  if (!tab) return products;
+  return products.filter(p => {
+    const sub = p.subCategory ?? '';
+    switch (tab) {
+      case 'sets':     return sub.startsWith('סטים') || sub === 'תיקים';
+      case 'tefillin': return sub === 'תיקי עור מדומה';
+      case 'thermal':  return sub === 'תיקים טרמי';
+      case 'batim':    return sub === 'בתי תפילין';
+      case 'rashitam': return p.coverStyle === 'רש"י ר"ת';
+      default:         return true;
+    }
+  });
+}
+
+function SetTabBar({ active, onChange }: { active: SetTab; onChange: (t: SetTab) => void }) {
+  return (
+    <div
+      dir="rtl"
+      style={{
+        background: '#fff',
+        borderBottom: '1px solid #E7E2D8',
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        scrollbarWidth: 'none',
+      }}
+    >
+      <style>{`.set-tabs::-webkit-scrollbar{display:none}`}</style>
+      <div
+        className="set-tabs"
+        style={{ display: 'flex', gap: 0, padding: '0 12px', minWidth: 'max-content' }}
+      >
+        {SET_TABS.map(tab => {
+          const isActive = active === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onChange(tab.id)}
+              style={{
+                padding: '12px 18px',
+                fontSize: 13,
+                fontWeight: isActive ? 800 : 500,
+                color: isActive ? '#1a1a1a' : '#6B7280',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: isActive ? '2.5px solid #C5A028' : '2.5px solid transparent',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                fontFamily: 'inherit',
+                transition: 'color 0.15s, border-color 0.15s',
+                flexShrink: 0,
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Category scroll bar ─────────────────────────────────────────────────────
 
 const CAT_SCROLL_ITEMS: { label: string; href?: string; imgKey?: string }[] = [
@@ -414,7 +486,6 @@ const CAT_SCROLL_ITEMS: { label: string; href?: string; imgKey?: string }[] = [
   { label: 'קלפי מזוזה' },
   { label: 'קלפי תפילין' },
   { label: 'תפילין קומפלט' },
-  { label: 'כיסוי תפילין' },
   { label: 'סט טלית תפילין' },
   { label: 'יודאיקה' },
   { label: 'בר מצווה' },
@@ -1059,6 +1130,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const [catImages, setCatImages]               = useState<Record<string, string>>({});
   const [curation, setCuration]                 = useState<Curation | null>(null);
   const [collectionFilter, setCollectionFilter] = useState<string>('');
+  const [setTabFilter, setSetTabFilter]         = useState<SetTab>('');
   const [soferMap, setSoferMap] = useState<Record<string, { name: string; imageUrl?: string }>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { setStamPage } = useChatPersona();
@@ -1327,8 +1399,9 @@ export default function CategoryClient({ category }: { category: string }) {
     if (subCategoryFilter) result = result.filter(p => p.subCategory === subCategoryFilter);
     if (category === 'מתנות' && catFilter !== 'הכל') result = result.filter(p => p.cat === catFilter);
     if (collectionFilter) result = result.filter(p => p.collection === collectionFilter);
+    if (category === 'סט טלית תפילין' && setTabFilter) result = applySetTabFilter(result, setTabFilter);
     return applySort(result, sortBy);
-  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter, collectionFilter]);
+  }, [allLoaded, filters, sortBy, catFilter, category, subCategoryFilter, collectionFilter, setTabFilter]);
 
   const attrOptionsDesktop = useMemo(() =>
     ATTR_KEYS.reduce((acc, key) => {
@@ -1450,6 +1523,13 @@ export default function CategoryClient({ category }: { category: string }) {
               </div>
             </Link>
           </div>
+        </div>
+      )}
+
+      {/* ── סט טלית תפילין tab bar ── */}
+      {category === 'סט טלית תפילין' && (
+        <div className="sticky top-0 z-20">
+          <SetTabBar active={setTabFilter} onChange={t => { setSetTabFilter(t); setCurrentPage(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
         </div>
       )}
 

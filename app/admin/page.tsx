@@ -1865,7 +1865,6 @@ export default function AdminPage() {
     { slug: 'קלפי מזוזה',      displayName: 'קלפי מזוזה',      priority: 2  },
     { slug: 'קלפי תפילין',     displayName: 'קלפי תפילין',     priority: 3  },
     { slug: 'תפילין קומפלט',   displayName: 'תפילין קומפלט',   priority: 4  },
-    { slug: 'כיסוי תפילין',    displayName: 'כיסוי תפילין',    priority: 5  },
     { slug: 'סט טלית תפילין',  displayName: 'סט טלית תפילין',  priority: 6  },
     { slug: 'יודאיקה',         displayName: 'יודאיקה',         priority: 7  },
     { slug: 'בר מצווה',         displayName: 'בר מצווה',         priority: 8  },
