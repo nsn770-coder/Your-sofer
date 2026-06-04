@@ -1268,7 +1268,7 @@ export default function HomePageClient() {
                     <button
                       onClick={e => {
                         e.stopPropagation();
-                        addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1 });
+                        addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1, cat: p.cat || undefined });
                       }}
                       style={{ background: 'transparent', color: '#1a1a1a', border: '1.5px solid #1a1a1a', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '5px 10px', cursor: 'pointer', width: '100%', transition: 'background 0.2s, color 0.2s' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}

@@ -2137,7 +2137,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                       <Stars n={cp.stars || 4.5} size={11} />
                       <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#1a1a1a' }}>{formatPrice(cp.price)}</div>
                       <button
-                        onClick={e => { e.stopPropagation(); addItem({ id: cp.id, name: cp.name, price: cp.price, imgUrl: cpImg ?? undefined, quantity: 1 }); }}
+                        onClick={e => { e.stopPropagation(); addItem({ id: cp.id, name: cp.name, price: cp.price, imgUrl: cpImg ?? undefined, quantity: 1, cat: cp.cat || undefined }); }}
                         style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1a1a1a', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
                       >
                         הוסף לסל
@@ -2183,7 +2183,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                       <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, wordBreak: 'break-word', overflowWrap: 'break-word', maxWidth: '100%' }}>{r.name}</div>
                       <Stars n={r.stars || 4.5} size={11} />
                       <div style={{ fontSize: 14, fontWeight: 900, color: '#1a1a1a', overflow: 'hidden', maxWidth: '100%' }}>{formatPrice(r.price)}</div>
-                      <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 }); }}
+                      <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1, cat: r.cat || undefined }); }}
                         style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1a1a1a', border: 'none', fontWeight: 700, fontSize: 11, cursor: 'pointer', whiteSpace: 'nowrap', boxSizing: 'border-box' as const, overflow: 'hidden' }}>
                         הוסף לסל
                       </button>
@@ -2228,7 +2228,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{lp.name}</div>
                     <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#1a1a1a' }}>{formatPrice(lp.price)}</div>
                     <button
-                      onClick={e => { e.stopPropagation(); addItem({ id: lp.id, name: lp.name, price: lp.price, imgUrl: lpImg ?? undefined, quantity: 1 }); }}
+                      onClick={e => { e.stopPropagation(); addItem({ id: lp.id, name: lp.name, price: lp.price, imgUrl: lpImg ?? undefined, quantity: 1, cat: lp.cat || undefined }); }}
                       style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1a1a1a', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
                     >
                       הוסף לסל
@@ -2265,7 +2265,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.name}</div>
                     <Stars n={r.stars || 4.5} size={11} />
                     <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: '#1a1a1a' }}>{formatPrice(r.price)}</div>
-                    <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1 }); }}
+                    <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1, cat: r.cat || undefined }); }}
                       style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1a1a1a', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
                       הוסף לסל
                     </button>

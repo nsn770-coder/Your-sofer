@@ -62,7 +62,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
 
   function handleAdd(e: React.MouseEvent) {
     e.stopPropagation();
-    addItem({ id, name, price, imgUrl: imgUrl ?? undefined, quantity: 1 });
+    addItem({ id, name, price, imgUrl: imgUrl ?? undefined, quantity: 1, cat });
   }
 
   function handleDecrement(e: React.MouseEvent) {

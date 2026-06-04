@@ -168,7 +168,7 @@ export default function ProductCard({
   function handleAdd(e: React.MouseEvent) {
     e.stopPropagation();
     if (outOfStock) return;
-    addItem({ id, name, price, imgUrl: imgSrc ?? undefined, quantity: 1 });
+    addItem({ id, name, price, imgUrl: imgSrc ?? undefined, quantity: 1, cat });
     try { localStorage.removeItem('bmWizard_step'); } catch {}
   }
 
