@@ -38,7 +38,7 @@ export default function ShippingPage() {
           </Section>
 
           <Section title="יצירת קשר">
-            טלפון: 058-4877-770 | וואטסאפ: 055-272-2228 | אימייל: support@your-sofer.com
+            טלפון: 058-4877-770 | וואטסאפ: 058-487-7770 | אימייל: support@your-sofer.com
           </Section>
         </div>
       </div>

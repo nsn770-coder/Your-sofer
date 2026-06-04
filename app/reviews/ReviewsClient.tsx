@@ -65,7 +65,7 @@ export default function ReviewsClient() {
         <div style={{ background: '#F0EBE0', borderRadius: 14, padding: '40px 24px', textAlign: 'center', border: '1px solid #E0D8CC' }}>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1a1a1a', margin: '0 0 8px' }}>גם לך יש חוויה לשתף?</h2>
           <p style={{ fontSize: 14, color: '#666', margin: '0 0 24px' }}>הביקורת שלך עוזרת לאחרים לקנות סת״ם כשר בביטחון ובשקיפות</p>
-          <a href="https://wa.me/972552722228?text=אני%20רוצה%20לכתוב%20ביקורת%20על%20Your%20Sofer" target="_blank" rel="noopener noreferrer"
+          <a href="https://wa.me/972584877770?text=אני%20רוצה%20לכתוב%20ביקורת%20על%20Your%20Sofer" target="_blank" rel="noopener noreferrer"
             style={{ display: 'inline-block', background: '#C5A028', color: '#1a1a1a', fontWeight: 700, fontSize: 15, padding: '13px 32px', borderRadius: 8, textDecoration: 'none' }}>
             כתוב ביקורת בוואטסאפ
           </a>

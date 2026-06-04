@@ -11,7 +11,7 @@ const WHATSAPP_NUMBERS = [
   'whatsapp:+972584877770', // נסים
   'whatsapp:+972549101771', // עידן
   'whatsapp:+972525175536', // יוסף חיים
-  'whatsapp:+972552722228', // החנות
+  'whatsapp:+972584877770', // החנות
 ];
 
 const ORDER_TYPE_LABELS: Record<string, string> = {

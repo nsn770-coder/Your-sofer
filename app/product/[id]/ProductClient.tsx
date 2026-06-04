@@ -1634,7 +1634,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             אזל מהמלאי
           </button>
           <a
-            href={`https://wa.me/972552722228?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + (product.name || ''))}`}
+            href={`https://wa.me/972584877770?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + (product.name || ''))}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ width: '100%', height: 52, background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 14, fontSize: compact ? 13 : 14, fontWeight: 700, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, textDecoration: 'none', boxSizing: 'border-box' as const }}
@@ -1702,7 +1702,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       </div>
 
       <a
-        href={`https://wa.me/972552722228?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + (product.name || ''))}`}
+        href={`https://wa.me/972584877770?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + (product.name || ''))}`}
         target="_blank"
         rel="noopener noreferrer"
         style={{

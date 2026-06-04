@@ -39,7 +39,7 @@ export default function PrivacyPage() {
           </Section>
 
           <Section title="7. יצירת קשר">
-            לשאלות הנוגעות לפרטיות: support@your-sofer.com | טלפון: 058-4877-770 | וואטסאפ: 055-272-2228
+            לשאלות הנוגעות לפרטיות: support@your-sofer.com | טלפון: 058-4877-770 | וואטסאפ: 058-487-7770
           </Section>
         </div>
       </div>

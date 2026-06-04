@@ -42,7 +42,7 @@ export default function ReturnsPage() {
             <ul style={{ fontSize: 14, color: '#444', lineHeight: 2, margin: '0 0 14px', paddingRight: 20, listStyle: 'disc' }}>
               <li>אימייל: <a href="mailto:support@your-sofer.com" style={{ color: '#1a1a1a', fontWeight: 700 }}>support@your-sofer.com</a></li>
               <li>טלפון: <a href="tel:0584877770" style={{ color: '#1a1a1a', fontWeight: 700 }}>058-4877-770</a></li>
-              <li>וואטסאפ: <a href="https://wa.me/972552722228" style={{ color: '#1a1a1a', fontWeight: 700 }}>055-272-2228</a></li>
+              <li>וואטסאפ: <a href="https://wa.me/972584877770" style={{ color: '#1a1a1a', fontWeight: 700 }}>058-487-7770</a></li>
               <li>ימים ושעות פעילות: א׳–ה׳ בין 09:00–18:00</li>
             </ul>
             <p style={{ fontSize: 14, color: '#444', lineHeight: 1.8, margin: '0 0 8px', fontWeight: 700 }}>יש לציין:</p>

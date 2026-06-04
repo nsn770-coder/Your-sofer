@@ -9,7 +9,7 @@ import { formatPrice } from '@/app/lib/utils';
 
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
-const WA = 'https://wa.me/972552722228';
+const WA = 'https://wa.me/972584877770';
 
 interface Product {
   id: string;

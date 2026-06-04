@@ -418,7 +418,7 @@ export default function ProductCard({
         <div className={qty === 0 ? 'lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200' : ''} style={{ marginTop: 'auto', paddingTop: 10 }} onClick={e => e.stopPropagation()}>
           {outOfStock ? (
             <a
-              href={`https://wa.me/972552722228?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + name)}`}
+              href={`https://wa.me/972584877770?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + name)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
