@@ -1,10 +1,6 @@
 /**
  * Syncs Firestore products + categories to Algolia.
  * Run: node scripts/syncAlgolia.mjs
- *
- * Requires in .env.local:
- *   FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
- *   ALGOLIA_APP_ID, ALGOLIA_ADMIN_KEY
  */
 import { readFileSync } from 'fs';
 import { resolve, dirname } from 'path';
@@ -32,8 +28,6 @@ function loadEnvLocal() {
 }
 loadEnvLocal();
 
-// ── Firebase Admin ────────────────────────────────────────────────────────────
-
 const clientEmail = (process.env.FIREBASE_CLIENT_EMAIL ?? '').replace(/^Value:\s*/i, '').trim();
 const privateKey  = (process.env.FIREBASE_PRIVATE_KEY  ?? '').replace(/\\n/g, '\n');
 const projectId   = process.env.FIREBASE_PROJECT_ID ?? 'your-sofer';
@@ -43,19 +37,15 @@ if (!getApps().length) {
 }
 const db = getFirestore();
 
-// ── Algolia ───────────────────────────────────────────────────────────────────
-
-const algoliaAppId   = process.env.ALGOLIA_APP_ID   ?? '';
+const algoliaAppId    = process.env.ALGOLIA_APP_ID    ?? '';
 const algoliaAdminKey = process.env.ALGOLIA_ADMIN_KEY ?? '';
 
 if (!algoliaAppId || !algoliaAdminKey) {
-  console.error('❌ חסרים ALGOLIA_APP_ID או ALGOLIA_ADMIN_KEY ב-.env.local');
+  console.error('❌ חסר ALGOLIA_APP_ID או ALGOLIA_ADMIN_KEY ב-.env.local');
   process.exit(1);
 }
 
 const client = algoliasearch(algoliaAppId, algoliaAdminKey);
-
-// ── Sync products ─────────────────────────────────────────────────────────────
 
 async function syncProducts() {
   console.log('\n📦 קורא מוצרים מ-Firestore...');
@@ -66,7 +56,6 @@ async function syncProducts() {
   for (const doc of snap.docs) {
     const d = doc.data();
     if (d.status !== 'active' || d.hidden === true) continue;
-
     records.push({
       objectID:    doc.id,
       id:          doc.id,
@@ -85,30 +74,17 @@ async function syncProducts() {
   }
 
   console.log(`   מוצרים פעילים: ${records.length}`);
-
-  if (records.length === 0) {
-    console.log('   ⚠️  אין מוצרים להעלות.');
-    return;
-  }
+  if (records.length === 0) { console.log('   ⚠️ אין מוצרים להעלות.'); return; }
 
   console.log('   שולח ל-Algolia index "products"...');
   await client.saveObjects({ indexName: 'products', objects: records });
   console.log(`   ✅ הועלו ${records.length} records`);
 
-  console.log('   מגדיר settings לindex "products"...');
+  console.log('   מגדיר settings ל-index "products"...');
   await client.setSettings({
     indexName: 'products',
     indexSettings: {
-      searchableAttributes: [
-        'name',
-        'cat',
-        'subCategory',
-        'sku',
-        'styleTag',
-        'lookTag',
-        'collection',
-        'description',
-      ],
+      searchableAttributes: ['name', 'cat', 'subCategory', 'sku', 'styleTag', 'lookTag', 'collection', 'description'],
       attributesForFaceting: ['cat', 'subCategory'],
       queryLanguages:        ['he'],
       indexLanguages:        ['he'],
@@ -121,10 +97,8 @@ async function syncProducts() {
   console.log('   ✅ Settings עודכנו');
 }
 
-// ── Sync categories ───────────────────────────────────────────────────────────
-
 async function syncCategories() {
-  console.log('\n🗂️  קורא קטגוריות מ-Firestore...');
+  console.log('\n🗂️ קורא קטגוריות מ-Firestore...');
   const snap = await db.collection('categories').get();
   console.log(`   סה"כ מסמכים: ${snap.size}`);
 
@@ -143,7 +117,7 @@ async function syncCategories() {
   await client.saveObjects({ indexName: 'categories', objects: records });
   console.log(`   ✅ הועלו ${records.length} records`);
 
-  console.log('   מגדיר settings לindex "categories"...');
+  console.log('   מגדיר settings ל-index "categories"...');
   await client.setSettings({
     indexName: 'categories',
     indexSettings: {
@@ -155,8 +129,6 @@ async function syncCategories() {
   console.log('   ✅ Settings עודכנו');
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
-
 async function main() {
   console.log('\n🚀 Algolia sync — Your Sofer\n');
   await syncProducts();
@@ -165,7 +137,4 @@ async function main() {
   process.exit(0);
 }
 
-main().catch(err => {
-  console.error('\n❌ Fatal:', err.message);
-  process.exit(1);
-});
+main().catch((err) => { console.error('❌ Sync failed:', err); process.exit(1); });
