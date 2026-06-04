@@ -279,6 +279,28 @@ interface Curation {
   updatedAt?: { seconds: number };
 }
 
+interface AbandonedCartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  imgUrl?: string | null;
+  printCustomization?: {
+    productType: string;
+    side: string;
+    color?: string;
+    uploadedImageUrl: string;
+    bgRemoved: boolean;
+    originalImageUrl: string;
+    imageX?: number;
+    imageY?: number;
+    imageScale?: number;
+    imageRotation?: number;
+    logoWidthPct?: number;
+    mockupUrl?: string;
+  } | null;
+}
+
 interface AbandonedCart {
   id: string;
   sessionId: string;
@@ -286,7 +308,7 @@ interface AbandonedCart {
   email: string;
   phone: string;
   address: string;
-  cartItems: { id: string; name: string; price: number; quantity: number }[];
+  cartItems: AbandonedCartItem[];
   cartTotal: number;
   converted: boolean;
   convertedOrderId: string | null;
@@ -1326,6 +1348,76 @@ const ORDER_STATUSES: { value: string; label: string; color: string }[] = [
   { value: 'abandoned',  label: '🚫 בוטל',             color: 'bg-gray-200 text-gray-600' },
 ];
 
+// ── Shared print-customization display block ─────────────────────────────────
+// Used by both OrdersTab and AbandonedCartsTab so the UI stays in sync.
+
+interface PrintCustomizationData {
+  productType: string;
+  side: string;
+  color?: string;
+  uploadedImageUrl: string;
+  bgRemoved: boolean;
+  originalImageUrl: string;
+  imageX?: number;
+  imageY?: number;
+  imageScale?: number;
+  imageRotation?: number;
+  logoWidthPct?: number;
+  mockupUrl?: string;
+}
+
+function PrintCustomizationView({ pc }: { pc: PrintCustomizationData }) {
+  return (
+    <div className="mt-1 flex flex-col gap-1.5">
+      <span className="inline-flex flex-wrap items-center gap-1.5">
+        <span className="inline-flex items-center gap-1 text-blue-800 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5">
+          🖨️ {pc.productType === 'shirt' ? 'חולצה' : 'כיפה'} · {pc.side}{pc.color ? ` · ${pc.color === 'white' ? 'לבן' : 'שחור'}` : ''}
+        </span>
+        {pc.bgRemoved && (
+          <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
+            ✂️ רקע הוסר
+          </span>
+        )}
+      </span>
+      {pc.mockupUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={pc.mockupUrl}
+          alt="הדמיה"
+          style={{ maxWidth: 200, display: 'block', border: '1px solid #e5e7eb', borderRadius: 4 }}
+        />
+      )}
+      <span className="inline-flex flex-wrap gap-1.5">
+        {pc.mockupUrl && (
+          <a
+            href={pc.mockupUrl}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5 hover:underline text-xs"
+          >
+            ⬇️ הורד הדמיה
+          </a>
+        )}
+        <a
+          href={pc.uploadedImageUrl}
+          download
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-2 py-0.5 hover:underline text-xs"
+        >
+          ⬇️ הורד קובץ מקורי
+        </a>
+      </span>
+      {pc.imageX !== undefined && (
+        <span className="text-[10px] text-gray-400 font-mono" dir="ltr">
+          X:{pc.imageX?.toFixed(1)} Y:{pc.imageY?.toFixed(1)} scale:{pc.imageScale?.toFixed(2)} rot:{pc.imageRotation?.toFixed(0)}°
+        </span>
+      )}
+    </div>
+  );
+}
+
 function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>>; ordersError?: string | null }) {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -1444,57 +1536,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                                   </span>
                                 )}
                                 {item.printCustomization && (
-                                  <div className="mt-1 flex flex-col gap-1.5">
-                                    {/* Type + mockup preview */}
-                                    <span className="inline-flex flex-wrap items-center gap-1.5">
-                                      <span className="inline-flex items-center gap-1 text-blue-800 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5">
-                                        🖨️ {item.printCustomization.productType === 'shirt' ? 'חולצה' : 'כיפה'} · {item.printCustomization.side}{item.printCustomization.color ? ` · ${item.printCustomization.color === 'white' ? 'לבן' : 'שחור'}` : ''}
-                                      </span>
-                                      {item.printCustomization.bgRemoved && (
-                                        <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
-                                          ✂️ רקע הוסר
-                                        </span>
-                                      )}
-                                    </span>
-                                    {/* Mockup image */}
-                                    {item.printCustomization.mockupUrl && (
-                                      // eslint-disable-next-line @next/next/no-img-element
-                                      <img
-                                        src={item.printCustomization.mockupUrl}
-                                        alt="הדמיה"
-                                        style={{ maxWidth: 200, display: 'block', border: '1px solid #e5e7eb', borderRadius: 4 }}
-                                      />
-                                    )}
-                                    {/* Download buttons */}
-                                    <span className="inline-flex flex-wrap gap-1.5">
-                                      {item.printCustomization.mockupUrl && (
-                                        <a
-                                          href={item.printCustomization.mockupUrl}
-                                          download
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5 hover:underline text-xs"
-                                        >
-                                          ⬇️ הורד הדמיה
-                                        </a>
-                                      )}
-                                      <a
-                                        href={item.printCustomization.uploadedImageUrl}
-                                        download
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1 text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-2 py-0.5 hover:underline text-xs"
-                                      >
-                                        ⬇️ הורד קובץ מקורי
-                                      </a>
-                                    </span>
-                                    {/* Coordinates */}
-                                    {item.printCustomization.imageX !== undefined && (
-                                      <span className="text-[10px] text-gray-400 font-mono" dir="ltr">
-                                        X:{item.printCustomization.imageX?.toFixed(1)} Y:{item.printCustomization.imageY?.toFixed(1)} scale:{item.printCustomization.imageScale?.toFixed(2)} rot:{item.printCustomization.imageRotation?.toFixed(0)}°
-                                      </span>
-                                    )}
-                                  </div>
+                                  <PrintCustomizationView pc={item.printCustomization} />
                                 )}
                               </div>
                             ))}
@@ -3457,8 +3499,17 @@ export default function AdminPage() {
                         <td className="p-3 font-semibold">{cart.name || '-'}</td>
                         <td className="p-3 text-gray-600 text-xs">{cart.email || '-'}</td>
                         <td className="p-3 text-gray-600">{cart.phone || '-'}</td>
-                        <td className="p-3 text-gray-500 text-xs">
-                          {(cart.cartItems || []).map(i => `${i.name} ×${i.quantity}`).join(', ') || '-'}
+                        <td className="p-3 text-xs">
+                          <div className="flex flex-col gap-2">
+                            {(cart.cartItems || []).map((item, idx) => (
+                              <div key={idx}>
+                                <span className="text-gray-700">{item.name} ×{item.quantity} — {formatPrice(item.price)}</span>
+                                {item.printCustomization && (
+                                  <PrintCustomizationView pc={item.printCustomization} />
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </td>
                         <td className="p-3 font-bold text-green-700">{formatPrice(cartTotal)}</td>
                         <td className="p-3 text-gray-400 text-xs whitespace-nowrap">{timeAgo}</td>
