@@ -194,10 +194,10 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
                       onMouseEnter={e => { e.currentTarget.style.background = '#FBF9F4'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
                     >
+                      <span style={{ fontWeight: 600, fontSize: 13 }}>{cat.displayName || cat.name}</span>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.5" style={{ flexShrink: 0 }}>
                         <polyline points="9 18 3 12 9 6" />
                       </svg>
-                      <span>{cat.displayName || cat.name}</span>
                     </button>
                   ))}
                 </div>
