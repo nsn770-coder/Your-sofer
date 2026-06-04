@@ -6,13 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "algolia:sync": "node scripts/syncAlgolia.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.0",
     "@google/generative-ai": "^0.24.1",
     "@plasmicapp/loader-nextjs": "^2.0.2",
     "@vercel/speed-insights": "^2.0.0",
+    "algoliasearch": "^5.53.0",
     "csv-parse": "^6.2.1",
     "dotenv": "^17.4.2",
     "firebase": "^12.10.0",
