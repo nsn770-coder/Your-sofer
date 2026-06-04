@@ -1130,25 +1130,38 @@ export default function HomePageClient() {
           <a
             href="/bar-mitzvah-kippot"
             style={{
-              display: 'flex', alignItems: 'center', gap: isMobile ? 14 : 24,
-              background: 'linear-gradient(135deg, #111d3a 0%, #0e1a36 100%)',
-              padding: isMobile ? '18px 20px' : '24px 36px',
-              textDecoration: 'none',
+              display: 'block',
+              position: 'relative',
+              overflow: 'hidden',
               border: '2px solid #C5A028',
-              flexWrap: 'wrap',
+              textDecoration: 'none',
+              aspectRatio: isMobile ? '3 / 1' : '8 / 1.4',
+              minHeight: isMobile ? 90 : undefined,
             }}
           >
-            <div style={{ fontSize: isMobile ? 32 : 44, lineHeight: 1, flexShrink: 0 }}>🎩</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: '#fff', marginBottom: 4 }}>
-                כיפות לבר מצווה ואירועים — 100+ יחידות = 30% הנחה
+            <Image
+              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780605713/%D7%94%D7%93%D7%A4%D7%A1%D7%94_%D7%90%D7%99%D7%A9%D7%99%D7%AA_%D7%9C%D7%9B%D7%99%D7%A4%D7%95%D7%AA_zgu85j.png"
+              alt="כיפות בסיטונאות"
+              fill
+              unoptimized
+              loading="lazy"
+              style={{ objectFit: 'cover' }}
+              sizes="(max-width: 768px) 100vw, 1280px"
+            />
+            {/* gradient darkens the right (text) side in RTL */}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.72) 100%)' }} />
+            <div dir="rtl" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: isMobile ? '0 20px' : '0 52px' }}>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 'clamp(15px, 2.6vw, 26px)', fontWeight: 900, color: '#fff', textShadow: '0 2px 12px rgba(0,0,0,0.8)', lineHeight: 1.2, marginBottom: 4 }}>
+                  כיפות בסיטונאות
+                </div>
+                <div style={{ fontSize: 'clamp(20px, 3.4vw, 36px)', fontWeight: 900, color: '#FACC15', textShadow: '0 2px 14px rgba(0,0,0,0.8)', lineHeight: 1.1 }}>
+                  30% הנחה
+                </div>
+                <div style={{ fontSize: 'clamp(11px, 1.1vw, 13px)', color: 'rgba(255,255,255,0.85)', marginTop: 6, fontWeight: 600 }}>
+                  ב-100 כיפות ומעלה
+                </div>
               </div>
-              <div style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.65)' }}>
-                כיפות מודפסות לאירועים • כיפות לבר מצווה • כיפות לאירועים בכמויות
-              </div>
-            </div>
-            <div style={{ flexShrink: 0, background: '#C5A028', color: '#111d3a', fontWeight: 900, fontSize: 13, padding: '10px 20px', whiteSpace: 'nowrap' }}>
-              לכיפות לאירועים ←
             </div>
           </a>
         </div>

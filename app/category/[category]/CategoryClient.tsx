@@ -1509,17 +1509,39 @@ export default function CategoryClient({ category }: { category: string }) {
 
       {/* ── Bar-mitzvah kippot banner (כיפות only) ── */}
       {category === 'כיפות' && (
-        <div dir="rtl" style={{ background: '#111d3a', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>
-            🎩 מזמינים כיפות לאירוע? קבלו 30% הנחה על 100 כיפות ומעלה
-          </span>
-          <a
-            href="/bar-mitzvah-kippot"
-            style={{ background: '#C5A028', color: '#111d3a', fontWeight: 900, fontSize: 13, padding: '8px 18px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}
-          >
-            כיפות לבר מצווה ←
-          </a>
-        </div>
+        <a
+          href="/bar-mitzvah-kippot"
+          dir="rtl"
+          style={{
+            display: 'block',
+            position: 'relative',
+            overflow: 'hidden',
+            border: '2px solid #C5A028',
+            textDecoration: 'none',
+            aspectRatio: '16 / 2',
+            minHeight: 72,
+            backgroundImage: 'url("https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780605713/%D7%94%D7%93%D7%A4%D7%A1%D7%94_%D7%90%D7%99%D7%A9%D7%99%D7%AA_%D7%9C%D7%9B%D7%99%D7%A4%D7%95%D7%AA_zgu85j.png")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          {/* gradient darkens the right (text) side in RTL */}
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.72) 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 clamp(14px, 3vw, 40px)' }}>
+            <div style={{ fontSize: 'clamp(11px, 1.2vw, 13px)', fontWeight: 700, color: '#FACC15', flexShrink: 0 }}>
+              לעמוד הכיפות ←
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 'clamp(13px, 1.8vw, 20px)', fontWeight: 900, color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,0.8)', lineHeight: 1.2 }}>
+                כיפות בסיטונאות —{' '}
+                <span style={{ color: '#FACC15' }}>30% הנחה</span>
+              </div>
+              <div style={{ fontSize: 'clamp(10px, 1vw, 12px)', color: 'rgba(255,255,255,0.85)', marginTop: 3, fontWeight: 600 }}>
+                ב-100 כיפות ומעלה
+              </div>
+            </div>
+          </div>
+        </a>
       )}
 
       {/* ── Subcategory banner (מתנות only) ── */}
