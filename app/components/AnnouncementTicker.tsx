@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+
 const TICKER_ITEMS = [
   "הדפסת כיפות לאירועים – הנחה של עד 30% בהזמנות כמותיות",
   "הצטרפו למועדון Your Sofer וקבלו 10% הנחה על ההזמנה הראשונה",
@@ -7,17 +9,58 @@ const TICKER_ITEMS = [
 ];
 
 export default function AnnouncementTicker() {
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS];
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  // שני עותקים — מספיק ל-scroll loop חלק
+  const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    // מכבדים prefers-reduced-motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let rafId: number;
+    let paused = false;
+    const speed = 0.6; // פיקסלים לפריים — מהירות הגלילה
+
+    const step = () => {
+      if (!paused && el) {
+        el.scrollLeft += speed;
+        // כשהגענו לחצי (סוף העותק הראשון) — מאפסים, הלולאה seamless
+        const half = el.scrollWidth / 2;
+        if (el.scrollLeft >= half) {
+          el.scrollLeft -= half;
+        }
+      }
+      rafId = requestAnimationFrame(step);
+    };
+
+    const onEnter = () => { paused = true; };
+    const onLeave = () => { paused = false; };
+    el.addEventListener('mouseenter', onEnter);
+    el.addEventListener('mouseleave', onLeave);
+
+    rafId = requestAnimationFrame(step);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      el.removeEventListener('mouseenter', onEnter);
+      el.removeEventListener('mouseleave', onLeave);
+    };
+  }, []);
 
   return (
     <div className="ticker-bar" dir="rtl" role="marquee" aria-label="הודעות מבצעים">
-      <div className="ticker-track">
-        {items.map((text, i) => (
-          <span className="ticker-item" key={i}>
-            <span className="ticker-mark" aria-hidden="true">✦</span>
-            {text}
-          </span>
-        ))}
+      <div className="ticker-scroller" ref={scrollerRef}>
+        <div className="ticker-track">
+          {items.map((text, i) => (
+            <span className="ticker-item" key={i}>
+              <span className="ticker-mark" aria-hidden="true">✦</span>
+              {text}
+            </span>
+          ))}
+        </div>
       </div>
 
       <style jsx>{`
@@ -27,50 +70,43 @@ export default function AnnouncementTicker() {
           height: 40px;
           background-color: #000000;
           color: #ffffff;
-          overflow: hidden;
           position: relative;
           z-index: 101;
-          contain: layout paint;
           display: flex;
           align-items: center;
-          font-size: 14px;
-          font-weight: 500;
-          letter-spacing: 0.2px;
+          overflow: hidden;
+        }
+        .ticker-scroller {
+          width: 100%;
+          overflow-x: hidden;
+          overflow-y: hidden;
+          /* כיוון הגלילה ב-LTR פנימי כדי ש-scrollLeft יעבוד צפוי */
+          direction: ltr;
         }
         .ticker-track {
           display: flex;
-          flex-shrink: 0;
+          width: max-content;
           align-items: center;
           white-space: nowrap;
-          width: max-content;
-          will-change: transform;
-          transform: translateZ(0);
-          animation: ticker-scroll 30s linear infinite;
+          /* מחזירים את התוכן עצמו ל-RTL */
+          direction: rtl;
         }
         .ticker-item {
           display: inline-flex;
           align-items: center;
           padding: 0 28px;
+          font-size: 14px;
+          font-weight: 500;
+          letter-spacing: 0.2px;
+          color: #ffffff;
         }
         .ticker-mark {
           margin-left: 10px;
           opacity: 0.9;
         }
-        /* גולשים רוחב עותק אחד מתוך 4 = 25%, לולאה רציפה. translateZ שומר GPU layer */
-        @keyframes ticker-scroll {
-          0% { transform: translateZ(0) translateX(0); }
-          100% { transform: translateZ(0) translateX(-25%); }
-        }
-        .ticker-bar:hover .ticker-track {
-          animation-play-state: paused;
-        }
         @media (max-width: 640px) {
-          .ticker-bar { height: 36px; font-size: 13px; }
-          .ticker-item { padding: 0 18px; }
-          .ticker-track { animation-duration: 22s; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .ticker-track { animation: none; justify-content: center; width: 100%; }
+          .ticker-bar { height: 36px; }
+          .ticker-item { padding: 0 18px; font-size: 13px; }
         }
       `}</style>
     </div>
