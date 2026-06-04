@@ -1124,6 +1124,36 @@ export default function HomePageClient() {
         </div>
       </div>
 
+      {/* ── Bar-Mitzvah Kippot CTA ── */}
+      <div style={{ background: '#FAF8F3', padding: isMobile ? '0 20px 40px' : '0 32px 56px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <a
+            href="/bar-mitzvah-kippot"
+            style={{
+              display: 'flex', alignItems: 'center', gap: isMobile ? 14 : 24,
+              background: 'linear-gradient(135deg, #111d3a 0%, #0e1a36 100%)',
+              padding: isMobile ? '18px 20px' : '24px 36px',
+              textDecoration: 'none',
+              border: '2px solid #C5A028',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div style={{ fontSize: isMobile ? 32 : 44, lineHeight: 1, flexShrink: 0 }}>🎩</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 900, color: '#fff', marginBottom: 4 }}>
+                כיפות לבר מצווה ואירועים — 100+ יחידות = 30% הנחה
+              </div>
+              <div style={{ fontSize: isMobile ? 12 : 13, color: 'rgba(255,255,255,0.65)' }}>
+                כיפות מודפסות לאירועים • כיפות לבר מצווה • כיפות לאירועים בכמויות
+              </div>
+            </div>
+            <div style={{ flexShrink: 0, background: '#C5A028', color: '#111d3a', fontWeight: 900, fontSize: 13, padding: '10px 20px', whiteSpace: 'nowrap' }}>
+              לכיפות לאירועים ←
+            </div>
+          </a>
+        </div>
+      </div>
+
       {/* ── Collections section ── */}
       <div style={{ background: '#1a1a1a', padding: isMobile ? '64px 16px' : '96px 24px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>

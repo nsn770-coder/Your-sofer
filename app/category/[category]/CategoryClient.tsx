@@ -1507,6 +1507,21 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       )}
 
+      {/* ── Bar-mitzvah kippot banner (כיפות only) ── */}
+      {category === 'כיפות' && (
+        <div dir="rtl" style={{ background: '#111d3a', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>
+            🎩 מזמינים כיפות לאירוע? קבלו 30% הנחה על 100 כיפות ומעלה
+          </span>
+          <a
+            href="/bar-mitzvah-kippot"
+            style={{ background: '#C5A028', color: '#111d3a', fontWeight: 900, fontSize: 13, padding: '8px 18px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}
+          >
+            כיפות לבר מצווה ←
+          </a>
+        </div>
+      )}
+
       {/* ── Subcategory banner (מתנות only) ── */}
       {category === 'מתנות' && (
         <div className="bg-white border-b border-gray-100 px-4 py-4" dir="rtl">
