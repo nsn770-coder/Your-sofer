@@ -25,7 +25,7 @@ export interface LifeEvent {
 export const lifeEvents: LifeEvent[] = [
   {
     id: 'wedding',
-    title: 'חתונה',
+    title: 'חתונה והפרשת חלה',
     emotionalTitle: 'תחילת הבית היהודי',
     description: 'מתנות לחתן וכלה, סטים מיוחדים, תכשיטים ועיצוב לבית החדש שמתחיל.',
     image: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780390726/%D7%97%D7%AA%D7%95%D7%A0%D7%94_%D7%9E%D7%A9%D7%A4%D7%97%D7%94_kg2ifa.png',
