@@ -3503,7 +3503,8 @@ export default function AdminPage() {
                           <div className="flex flex-col gap-2">
                             {(cart.cartItems || []).map((item, idx) => (
                               <div key={idx}>
-                                <span className="text-gray-700">{item.name} ×{item.quantity} — {formatPrice(item.price)}</span>
+                                <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">{item.name}</a>
+                                <span className="text-gray-500"> ×{item.quantity} — {formatPrice(item.price)}</span>
                                 {item.printCustomization && (
                                   <PrintCustomizationView pc={item.printCustomization} />
                                 )}
