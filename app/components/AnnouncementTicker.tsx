@@ -7,7 +7,8 @@ const TICKER_ITEMS = [
 ];
 
 export default function AnnouncementTicker() {
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
+  // משכפלים 4 פעמים כדי שהבר תמיד מלא בטקסט מרגע הטעינה
+  const items = [...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS];
 
   return (
     <div className="ticker-bar" dir="rtl" role="marquee" aria-label="הודעות מבצעים">
@@ -40,7 +41,7 @@ export default function AnnouncementTicker() {
           align-items: center;
           white-space: nowrap;
           will-change: transform;
-          animation: ticker-scroll 25s linear infinite;
+          animation: ticker-scroll 30s linear infinite;
         }
         .ticker-item {
           display: inline-flex;
@@ -51,9 +52,10 @@ export default function AnnouncementTicker() {
           margin-left: 10px;
           opacity: 0.9;
         }
+        /* גולשים בדיוק חצי מרוחב התוכן (2 עותקים מתוך 4) ללולאה חלקה */
         @keyframes ticker-scroll {
-          0% { transform: translateX(-25%); }
-          100% { transform: translateX(-75%); }
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
         .ticker-bar:hover .ticker-track {
           animation-play-state: paused;
@@ -61,7 +63,7 @@ export default function AnnouncementTicker() {
         @media (max-width: 640px) {
           .ticker-bar { height: 36px; font-size: 13px; }
           .ticker-item { padding: 0 18px; }
-          .ticker-track { animation-duration: 18s; }
+          .ticker-track { animation-duration: 22s; }
         }
         @media (prefers-reduced-motion: reduce) {
           .ticker-track { animation: none; justify-content: center; width: 100%; }
