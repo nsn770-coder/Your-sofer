@@ -299,12 +299,22 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
       {/* ── 1. Hero ─────────────────────────────────────────────────────────── */}
       <section
         style={{
-          background: `linear-gradient(160deg, ${NAVY} 0%, #0e1a36 55%, #0a1428 100%)`,
+          position: 'relative',
+          backgroundImage: 'url("https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780610159/%D7%91%D7%90%D7%A0%D7%A8_%D7%94%D7%93%D7%A4%D7%A1%D7%95%D7%AA_%D7%9B%D7%99%D7%A4%D7%95%D7%AA_j0gyh1.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           padding: isMobile ? '48px 20px 44px' : '80px 24px 72px',
           minHeight: isMobile ? 380 : 460,
         }}
       >
-        <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
+        {/* Dark overlay for text readability */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55))',
+          zIndex: 0,
+        }} />
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             background: 'rgba(197,160,40,0.14)', border: '1px solid rgba(197,160,40,0.4)',
