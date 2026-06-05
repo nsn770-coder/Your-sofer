@@ -67,7 +67,7 @@ const SHIPPING_REGULAR = 30;
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, total, kippotDiscountActive, kippotDiscountAmount, discountableTotal } = useCart();
+  const { items, total, kippotDiscountActive, kippotDiscountAmount, printDiscountActive, printDiscountAmount, discountableTotal } = useCart();
   const { shaliach, refCode } = useShaliach();
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -266,6 +266,12 @@ export default function CheckoutPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🎉 הנחת כיפות בר מצווה (30%)</span>
             <span>-{formatPrice(kippotDiscountAmount)}</span>
+          </div>
+        )}
+        {printDiscountAmount > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🖨️ הנחת הדפסה (55%)</span>
+            <span>-{formatPrice(printDiscountAmount)}</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>

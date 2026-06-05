@@ -45,7 +45,7 @@ function IconShield() {
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, removeItem, updateQty, total, kippotDiscountActive, kippotDiscountAmount } = useCart();
+  const { items, removeItem, updateQty, total, kippotDiscountActive, kippotDiscountAmount, printDiscountActive, printDiscountAmount } = useCart();
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
@@ -134,6 +134,15 @@ export default function CartPage() {
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 800, color: '#15803d' }}>מבצע בר מצווה הופעל!</div>
                     <div style={{ fontSize: 12, color: '#166534' }}>קיבלתם 30% הנחה על הכיפות — חיסכון של ₪{kippotDiscountAmount.toFixed(2)}</div>
+                  </div>
+                </div>
+              )}
+              {printDiscountActive && (
+                <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '10px 14px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 18 }}>🖨️</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: '#15803d' }}>הנחת הדפסה הופעלה!</div>
+                    <div style={{ fontSize: 12, color: '#166534' }}>קיבלתם 55% הנחה על ההדפסות — חיסכון של ₪{printDiscountAmount.toFixed(2)}</div>
                   </div>
                 </div>
               )}
@@ -329,6 +338,12 @@ export default function CartPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
                     <span>🎉 הנחת כיפות 30%:</span>
                     <span>-{formatPrice(kippotDiscountAmount)}</span>
+                  </div>
+                )}
+                {printDiscountAmount > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
+                    <span>🖨️ הנחת הדפסה 55%:</span>
+                    <span>-{formatPrice(printDiscountAmount)}</span>
                   </div>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
