@@ -1522,7 +1522,7 @@ export default function CategoryClient({ category }: { category: string }) {
             textDecoration: 'none',
             minHeight: 96,
             cursor: 'pointer',
-            backgroundImage: 'url("https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780605713/%D7%94%D7%93%D7%A4%D7%A1%D7%94_%D7%90%D7%99%D7%A9%D7%99%D7%AA_%D7%9C%D7%9B%D7%99%D7%A4%D7%95%D7%AA_zgu85j.png")',
+            backgroundImage: 'url("https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780666296/ChatGPT_Image_Jun_5_2026_04_31_21_PM_xhjqhd.png")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             transition: 'opacity 0.18s, transform 0.18s',

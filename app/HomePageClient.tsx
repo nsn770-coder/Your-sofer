@@ -1140,7 +1140,7 @@ export default function HomePageClient() {
             }}
           >
             <Image
-              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780605713/%D7%94%D7%93%D7%A4%D7%A1%D7%94_%D7%90%D7%99%D7%A9%D7%99%D7%AA_%D7%9C%D7%9B%D7%99%D7%A4%D7%95%D7%AA_zgu85j.png"
+              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780666296/ChatGPT_Image_Jun_5_2026_04_31_21_PM_xhjqhd.png"
               alt="כיפות בסיטונאות"
               fill
               unoptimized
@@ -1164,6 +1164,69 @@ export default function HomePageClient() {
               </div>
             </div>
           </a>
+        </div>
+      </div>
+
+      {/* ── Embroidery & Print scroll ── */}
+      <div style={{ background: '#FAF8F3', padding: isMobile ? '48px 0 40px' : '72px 0 56px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: isMobile ? 20 : 32, textAlign: 'center' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, marginTop: 0 }}>
+            עבודות לדוגמה
+          </p>
+          <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
+            רקמה והדפסה אישית
+          </h2>
+        </div>
+        <style>{`
+          .ys-embroidery-scroll::-webkit-scrollbar { display: none; }
+          .ys-embroidery-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
+        <div
+          className="ys-embroidery-scroll"
+          style={{
+            display: 'flex',
+            overflowX: 'auto',
+            gap: 16,
+            padding: '8px 20px 16px',
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch',
+            direction: 'rtl',
+          } as React.CSSProperties}
+        >
+          {[
+            'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780666090/WhatsApp_Image_2026-06-05_at_15.59.56_kpmum5.jpg',
+            'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780666089/WhatsApp_Image_2026-06-05_at_15.59.56_3_l63jbz.jpg',
+            'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780647889/print-orders/qmj57yt5pmfbafg2aac6.jpg',
+            'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780666088/WhatsApp_Image_2026-06-05_at_15.59.57_2_oq8sb3.jpg',
+            'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780666088/WhatsApp_Image_2026-06-05_at_15.59.55_1_mfwuq0.jpg',
+            'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780666088/WhatsApp_Image_2026-06-05_at_15.59.57_3_jcy1si.jpg',
+            'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780666088/WhatsApp_Image_2026-06-05_at_15.59.55_eynvmh.jpg',
+          ].map((src, i) => (
+            <div
+              key={i}
+              style={{
+                flexShrink: 0,
+                width: 'clamp(220px, 60vw, 300px)',
+                aspectRatio: '4/5',
+                borderRadius: 20,
+                overflow: 'hidden',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+                background: '#fff',
+                scrollSnapAlign: 'start',
+                position: 'relative',
+              }}
+            >
+              <Image
+                src={src}
+                alt={`רקמה והדפסה אישית ${i + 1}`}
+                fill
+                unoptimized
+                loading="lazy"
+                style={{ objectFit: 'cover' }}
+                sizes="clamp(220px, 60vw, 300px)"
+              />
+            </div>
+          ))}
         </div>
       </div>
 
