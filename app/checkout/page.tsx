@@ -70,6 +70,7 @@ export default function CheckoutPage() {
   const { items, total, kippotDiscountActive, kippotDiscountAmount, discountableTotal } = useCart();
   const { shaliach, refCode } = useShaliach();
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', notes: '' });
 
@@ -176,6 +177,7 @@ export default function CheckoutPage() {
       }).catch(e => console.error('[checkout] abandoned_cart save FAILED:', e));
     }
 
+    setSubmitError(null);
     setLoading(true);
     try {
       const orderNumber = 'YS-' + Date.now().toString().slice(-6);
@@ -226,8 +228,9 @@ export default function CheckoutPage() {
         throw new Error(paymentData.error || 'שגיאה בקבלת דף תשלום');
       }
     } catch (e: any) {
-      alert('שגיאה: ' + (e.message || 'נסה שוב'));
+      setSubmitError('שגיאה: ' + (e.message || 'נסה שוב'));
       console.error(e);
+    } finally {
       setLoading(false);
     }
   }
@@ -372,6 +375,14 @@ export default function CheckoutPage() {
                 onFocus={e => (e.currentTarget.style.borderColor = '#C5A028')}
                 onBlur={e => (e.currentTarget.style.borderColor = '#e0e0e0')} />
             </div>
+
+            {/* Payment error banner */}
+            {submitError && (
+              <div style={{ background: '#fef2f2', border: '1.5px solid #fca5a5', borderRadius: 12, padding: '12px 16px', marginBottom: 14, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
+                <div style={{ fontSize: 13, color: '#b91c1c', fontWeight: 600, lineHeight: 1.5 }}>{submitError}</div>
+              </div>
+            )}
 
             {/* Security notice */}
             <div style={{ background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>

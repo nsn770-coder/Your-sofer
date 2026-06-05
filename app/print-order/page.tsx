@@ -364,6 +364,7 @@ export default function PrintOrderPage() {
       price,
       imgUrl: templateUrl,
       quantity: itemQty,
+      cat: productType === 'kipa' ? 'כיפות' : undefined,
       printCustomization: {
         productType,
         side,
