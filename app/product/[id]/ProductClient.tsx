@@ -305,16 +305,20 @@ interface SoferProfile {
   certifications?: string[];
 }
 
-function SoferCard({ soferId }: { soferId: string }) {
+function SoferCard({ soferId }: { soferId?: string }) {
   const [sofer, setSofer] = useState<SoferProfile | null>(null);
   const router = useRouter();
 
+  // Hooks must always run — guard is inside the effect, not before it
   useEffect(() => {
+    if (!soferId) return;
     getDoc(doc(db, 'soferim', soferId)).then(snap => {
       if (snap.exists()) setSofer(snap.data() as SoferProfile);
     }).catch(() => {});
   }, [soferId]);
 
+  // Early returns come AFTER all hooks
+  if (!soferId) return null;
   if (!sofer) return null;
 
   return (
@@ -464,14 +468,16 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
 const SOFER_EDIT_CATS = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
 const STAM_ADMIN_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה']);
 
-function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onClose }: {
+function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onClose, open }: {
   product: Product;
   onSave: (updated: Partial<Product>) => Promise<void>;
   onSaveGlobal: (data: Partial<PageDefaults>) => Promise<void>;
   pageDefaults: PageDefaults | null;
   isMobile: boolean;
   onClose: () => void;
+  open: boolean;
 }) {
+  const { user } = useAuth();
   const [name, setName]                       = useState(product.name);
   const [price, setPrice]                     = useState(String(product.price));
   const [was, setWas]                         = useState(String(product.was || ''));
@@ -518,6 +524,9 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
       })
       .catch(() => {});
   }, []);
+
+  // Early return AFTER all hooks — component is always mounted, decides here whether to render
+  if (!open || user?.role !== 'admin') return null;
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>, field: string) {
     const file = e.target.files?.[0];
@@ -2079,7 +2088,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
             <KlafGallery productId={product.id} onSelect={(ids, names) => { setSelectedKlafIds(ids); setSelectedKlafNames(names); }} />
 
-            {product.soferId && <SoferCard soferId={product.soferId} />}
+            <SoferCard soferId={product.soferId} />
 
             {productCerts && (
               <CertificatesSection
@@ -2390,9 +2399,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       )}
 
       {/* Admin panel */}
-      {user?.role === 'admin' && adminOpen && (
-        <AdminPanel product={product} onSave={handleSave} onSaveGlobal={handleSaveGlobal} pageDefaults={pageDefaults} isMobile={isMobile} onClose={() => setAdminOpen(false)} />
-      )}
+      <AdminPanel product={product} onSave={handleSave} onSaveGlobal={handleSaveGlobal} pageDefaults={pageDefaults} isMobile={isMobile} onClose={() => setAdminOpen(false)} open={adminOpen} />
 
       {product.cat === 'קלפי מזוזה' && <MezuzahUpsellPopup />}
 
