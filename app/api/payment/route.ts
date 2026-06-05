@@ -7,6 +7,8 @@ const SUMIT_API_KEY    = process.env.SUMIT_API_KEY!;
 // ── Must match app/contexts/CartContext.tsx ───────────────────────────────────
 const KIPPOT_DISCOUNT_QTY  = 100;
 const KIPPOT_DISCOUNT_RATE = 0.30;
+const PRINT_DISCOUNT_QTY   = 50;
+const PRINT_DISCOUNT_RATE  = 0.55;
 
 interface PaymentItem {
   name:     string;
@@ -46,6 +48,25 @@ export async function POST(req: NextRequest) {
           `expected=${expectedDiscount} submitted=${submittedDiscount}`,
         );
         return NextResponse.json({ error: 'שגיאה בחישוב הנחת הכיפות' }, { status: 400 });
+      }
+    }
+
+    // ── Server-side print discount validation ────────────────────────────────
+    const printItems = items.filter(i => i.name.includes('הדפסה') && !i.name.includes('הנחת'));
+    const printQty   = printItems.reduce((s, i) => s + i.quantity, 0);
+
+    if (printQty >= PRINT_DISCOUNT_QTY) {
+      const printOriginal      = printItems.reduce((s, i) => s + i.price * i.quantity, 0);
+      const expectedPrintDisc  = Math.round(printOriginal * PRINT_DISCOUNT_RATE * 100) / 100;
+      const printDiscountLine  = items.find(i => i.name.includes('הנחת הדפסה'));
+      const submittedPrintDisc = printDiscountLine ? -printDiscountLine.price : 0;
+
+      if (Math.abs(submittedPrintDisc - expectedPrintDisc) > 0.02) {
+        console.error(
+          `[payment] print discount mismatch orderId=${orderId}`,
+          `expected=${expectedPrintDisc} submitted=${submittedPrintDisc}`,
+        );
+        return NextResponse.json({ error: 'שגיאה בחישוב הנחת ההדפסה' }, { status: 400 });
       }
     }
 
