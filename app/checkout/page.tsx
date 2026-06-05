@@ -214,6 +214,7 @@ export default function CheckoutPage() {
           items: [
             ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '' })),
             ...(kippotDiscountAmount > 0 ? [{ name: 'הנחת כיפות בר מצווה — 30%', price: -kippotDiscountAmount, quantity: 1, cat: '' }] : []),
+            ...(printDiscountAmount  > 0 ? [{ name: 'הנחת הדפסה — 55%',           price: -printDiscountAmount,  quantity: 1, cat: '' }] : []),
             ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
           ],
