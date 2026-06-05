@@ -1512,31 +1512,36 @@ export default function CategoryClient({ category }: { category: string }) {
         <a
           href="/bar-mitzvah-kippot"
           dir="rtl"
+          className="mt-8"
           style={{
             display: 'block',
             position: 'relative',
             overflow: 'hidden',
             border: '2px solid #C5A028',
+            borderRadius: 24,
             textDecoration: 'none',
-            aspectRatio: '16 / 2',
-            minHeight: 72,
+            minHeight: 96,
+            cursor: 'pointer',
             backgroundImage: 'url("https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780605713/%D7%94%D7%93%D7%A4%D7%A1%D7%94_%D7%90%D7%99%D7%A9%D7%99%D7%AA_%D7%9C%D7%9B%D7%99%D7%A4%D7%95%D7%AA_zgu85j.png")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
+            transition: 'opacity 0.18s, transform 0.18s',
           }}
+          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.88'; (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-1px)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; (e.currentTarget as HTMLAnchorElement).style.transform = 'none'; }}
         >
           {/* gradient darkens the right (text) side in RTL */}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.72) 100%)' }} />
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 clamp(14px, 3vw, 40px)' }}>
-            <div style={{ fontSize: 'clamp(11px, 1.2vw, 13px)', fontWeight: 700, color: '#FACC15', flexShrink: 0 }}>
-              לעמוד הכיפות ←
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.72) 100%)', borderRadius: 22 }} />
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 clamp(20px, 4vw, 48px)' }}>
+            <div style={{ fontSize: 'clamp(13px, 1.4vw, 15px)', fontWeight: 800, color: '#FACC15', flexShrink: 0 }}>
+              להדפסה בכמויות כנסו ←
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 'clamp(13px, 1.8vw, 20px)', fontWeight: 900, color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,0.8)', lineHeight: 1.2 }}>
+              <div style={{ fontSize: 'clamp(15px, 2vw, 22px)', fontWeight: 900, color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,0.8)', lineHeight: 1.2 }}>
                 כיפות בסיטונאות —{' '}
                 <span style={{ color: '#FACC15' }}>30% הנחה</span>
               </div>
-              <div style={{ fontSize: 'clamp(10px, 1vw, 12px)', color: 'rgba(255,255,255,0.85)', marginTop: 3, fontWeight: 600 }}>
+              <div style={{ fontSize: 'clamp(11px, 1.1vw, 13px)', color: 'rgba(255,255,255,0.85)', marginTop: 4, fontWeight: 600 }}>
                 ב-100 כיפות ומעלה
               </div>
             </div>
