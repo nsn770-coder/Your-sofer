@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   collection, query, orderBy, limit, startAfter, getDocs,
   QueryDocumentSnapshot, DocumentData,
@@ -9,8 +9,8 @@ import ProductCard from '@/components/ui/ProductCard';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const BATCH_SIZE = 500;   // documents fetched per Firestore request
-const PAGE_SIZE  = 50;    // items revealed per "load more" click
+const BATCH_SIZE = 500;  // docs per Firestore request (background loader)
+const PAGE_SIZE  = 50;   // items revealed per "טען עוד" click
 
 type SortBy = 'popular' | 'price_asc' | 'price_desc' | 'newest';
 
@@ -21,7 +21,6 @@ const SORT_LABELS: Record<SortBy, string> = {
   newest:     'חדש לישן',
 };
 
-// Top-level category chips — used for the category filter
 const CAT_LIST = [
   'בתי מזוזה', 'קלפי מזוזה', 'תפילין קומפלט', 'קלפי תפילין',
   'כיפות', 'יודאיקה', 'כלי שולחן והגשה', 'עיצוב הבית',
@@ -56,8 +55,6 @@ interface Product {
   soferName?: string;
 }
 
-type FirestoreCursor = QueryDocumentSnapshot<DocumentData>;
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function applySort(products: Product[], sort: SortBy): Product[] {
@@ -66,7 +63,6 @@ function applySort(products: Product[], sort: SortBy): Product[] {
       case 'price_asc':  return (a.price ?? 0) - (b.price ?? 0);
       case 'price_desc': return (b.price ?? 0) - (a.price ?? 0);
       case 'newest':     return (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0);
-      case 'popular':
       default:           return (b.priority ?? 0) - (a.priority ?? 0);
     }
   });
@@ -85,7 +81,7 @@ function SkeletonCard() {
   );
 }
 
-// ── Filter panel (shared between sidebar + mobile drawer) ─────────────────────
+// ── Filter panel ──────────────────────────────────────────────────────────────
 
 interface FilterPanelProps {
   catFilter:    string;
@@ -104,7 +100,7 @@ function FilterPanel({
   return (
     <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      {/* Category */}
+      {/* Category chips */}
       <div>
         <div style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
           קטגוריה
@@ -117,11 +113,13 @@ function FilterPanel({
                 key={c}
                 onClick={() => setCatFilter(c === 'הכל' ? '' : (catFilter === c ? '' : c))}
                 style={{
-                  fontSize: 12, padding: '4px 12px', borderRadius: 20, fontWeight: isActive ? 700 : 500,
+                  fontSize: 12, padding: '4px 12px', borderRadius: 20,
+                  fontWeight: isActive ? 700 : 500,
                   background: isActive ? '#1a1a1a' : '#fff',
                   color:      isActive ? '#fff'    : '#555',
                   border:     `1.5px solid ${isActive ? '#1a1a1a' : '#D1D5DB'}`,
-                  cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'all 0.15s',
+                  cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
+                  transition: 'all 0.15s',
                 }}
               >
                 {c}
@@ -151,7 +149,6 @@ function FilterPanel({
         </div>
       </div>
 
-      {/* Clear all */}
       {anyActive && (
         <button
           onClick={onClear}
@@ -171,17 +168,13 @@ function FilterPanel({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function AllProductsClient() {
-  // ── Data state ───────────────────────────────────────────────
-  const [allProducts,        setAllProducts]        = useState<Product[]>([]);
-  const [lastCursor,         setLastCursor]         = useState<FirestoreCursor | null>(null);
-  const [hasMoreFromServer,  setHasMoreFromServer]  = useState(true);
-  const [loading,            setLoading]            = useState(true);
-  const [loadingMore,        setLoadingMore]        = useState(false);
+  // ── Data state ───────────────────────────────────────────────────────────────
+  const [allProducts,  setAllProducts]  = useState<Product[]>([]);
+  const [loading,      setLoading]      = useState(true);   // first batch in-flight
+  const [fullyLoaded,  setFullyLoaded]  = useState(false);  // all Firestore batches done
 
-  // ── Display state ────────────────────────────────────────────
+  // ── Display / filter / sort state ────────────────────────────────────────────
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
-
-  // ── Filter + sort state ──────────────────────────────────────
   const [sortBy,       setSortBy]       = useState<SortBy>('popular');
   const [catFilter,    setCatFilter]    = useState('');
   const [searchQuery,  setSearchQuery]  = useState('');
@@ -190,10 +183,9 @@ export default function AllProductsClient() {
   const [drawerOpen,   setDrawerOpen]   = useState(false);
   const [isMobile,     setIsMobile]     = useState(false);
 
-  const sentinelRef   = useRef<HTMLDivElement>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── Responsive ───────────────────────────────────────────────
+  // ── Responsive ───────────────────────────────────────────────────────────────
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
     check();
@@ -201,48 +193,55 @@ export default function AllProductsClient() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // ── Reset display count when any filter/sort changes ─────────
+  // Reset displayed page whenever filter / sort changes
   useEffect(() => {
     setDisplayCount(PAGE_SIZE);
   }, [sortBy, catFilter, searchQuery, priceMin, priceMax]);
 
-  // ── Fetch from Firestore ─────────────────────────────────────
-  const fetchBatch = useCallback(async (
-    cursor: FirestoreCursor | null,
-    isInitial = false,
-  ) => {
-    if (isInitial) setLoading(true);
-    else           setLoadingMore(true);
-    try {
-      // Single-field orderBy — no composite index required
-      const snap = await getDocs(
-        cursor
-          ? query(collection(db, 'products'), orderBy('priority', 'desc'), startAfter(cursor), limit(BATCH_SIZE))
-          : query(collection(db, 'products'), orderBy('priority', 'desc'), limit(BATCH_SIZE)),
-      );
-      const prods = snap.docs
-        .map(d => ({ id: d.id, ...d.data() } as Product))
-        .filter(p => p.status === 'active' && p.hidden !== true);
-
-      setAllProducts(prev => isInitial ? prods : [...prev, ...prods]);
-      setLastCursor(snap.docs[snap.docs.length - 1] ?? null);
-      setHasMoreFromServer(snap.docs.length === BATCH_SIZE);
-    } catch (e) {
-      console.error('[AllProductsClient] fetch error:', e);
-      setHasMoreFromServer(false);
-    } finally {
-      if (isInitial) setLoading(false);
-      else           setLoadingMore(false);
-    }
-  }, []);
-
-  // Initial load
+  // ── Background loader: fetch ALL active products in BATCH_SIZE chunks ─────────
+  // Filters run client-side, so we need the full catalog in memory.
+  // First batch (500 docs) triggers loading=false so the grid appears immediately;
+  // subsequent batches append silently in the background.
   useEffect(() => {
-    fetchBatch(null, true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    let cancelled = false;
+    let cursor: QueryDocumentSnapshot<DocumentData> | null = null;
+    let isFirst = true;
+
+    async function fetchAll() {
+      while (true) {
+        const q = cursor
+          ? query(collection(db, 'products'), orderBy('priority', 'desc'), startAfter(cursor), limit(BATCH_SIZE))
+          : query(collection(db, 'products'), orderBy('priority', 'desc'), limit(BATCH_SIZE));
+
+        try {
+          const snap = await getDocs(q);
+          if (cancelled) return;
+
+          const prods = snap.docs
+            .map(d => ({ id: d.id, ...d.data() } as Product))
+            .filter(p => p.status === 'active' && p.hidden !== true);
+
+          setAllProducts(prev => isFirst ? prods : [...prev, ...prods]);
+          if (isFirst) { setLoading(false); isFirst = false; }
+
+          if (snap.docs.length < BATCH_SIZE) {
+            setFullyLoaded(true);
+            return;
+          }
+          cursor = snap.docs[snap.docs.length - 1];
+        } catch (e) {
+          console.error('[AllProductsClient] Firestore fetch error:', e);
+          if (!cancelled) { setLoading(false); setFullyLoaded(true); }
+          return;
+        }
+      }
+    }
+
+    fetchAll();
+    return () => { cancelled = true; };
   }, []);
 
-  // ── Filtering + sorting (memoized) ───────────────────────────
+  // ── Filtering + sorting (memoised) ───────────────────────────────────────────
   const filtered = useMemo(() => {
     let r = allProducts;
     if (catFilter)   r = r.filter(p => p.cat === catFilter);
@@ -252,47 +251,27 @@ export default function AllProductsClient() {
     return applySort(r, sortBy);
   }, [allProducts, catFilter, searchQuery, priceMin, priceMax, sortBy]);
 
-  const paginated       = filtered.slice(0, displayCount);
-  const hasMoreDisplay  = displayCount < filtered.length;
-  // Show "load more" if there are more to display OR more on server (when unfiltered)
-  const hasMore         = hasMoreDisplay || (hasMoreFromServer && !catFilter && !searchQuery && !priceMin && !priceMax);
+  const paginated    = filtered.slice(0, displayCount);
+  const hasMore      = displayCount < filtered.length;
+  const nextCount    = Math.min(PAGE_SIZE, filtered.length - displayCount);
 
-  // ── Load more handler ────────────────────────────────────────
-  async function handleLoadMore() {
-    if (hasMoreDisplay) {
-      setDisplayCount(d => d + PAGE_SIZE);
-      return;
-    }
-    if (hasMoreFromServer) {
-      await fetchBatch(lastCursor);
-      setDisplayCount(d => d + PAGE_SIZE);
-    }
-  }
-
-  // ── Misc ─────────────────────────────────────────────────────
   const anyFilterActive = !!(catFilter || searchQuery || priceMin || priceMax);
 
   function clearAll() {
     setCatFilter(''); setSearchQuery(''); setPriceMin(''); setPriceMax('');
   }
 
-  // Debounced search input handler
   function handleSearchInput(value: string) {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     searchTimeout.current = setTimeout(() => setSearchQuery(value), 250);
   }
 
-  // Extra items count for the "load more" button label
-  const nextCount = hasMoreDisplay
-    ? Math.min(PAGE_SIZE, filtered.length - displayCount)
-    : PAGE_SIZE;
-
-  // ── Render ───────────────────────────────────────────────────
+  // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div dir="rtl" style={{ background: '#FAF8F3', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
       <style>{`@keyframes spin{from{transform-origin:center;transform:rotate(0)}to{transform-origin:center;transform:rotate(360deg)}}`}</style>
 
-      {/* ── Page header ─────────────────────────────────────────── */}
+      {/* ── Page header ─────────────────────────────────────────────────────── */}
       <div style={{ background: '#FAF8F3', padding: '32px 20px 16px' }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
           <h1 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 400, color: '#1F2937', margin: '0 0 4px', letterSpacing: '-0.01em' }}>
@@ -301,12 +280,12 @@ export default function AllProductsClient() {
           <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>
             {loading
               ? 'טוען מוצרים...'
-              : `${filtered.length.toLocaleString('he-IL')} מוצרים${hasMoreFromServer && !anyFilterActive ? '+' : ''}`}
+              : `${filtered.length.toLocaleString('he-IL')}${!fullyLoaded ? '+' : ''} מוצרים`}
           </p>
         </div>
       </div>
 
-      {/* ── Sticky toolbar ─────────────────────────────────────── */}
+      {/* ── Sticky toolbar (search + sort + mobile filter button) ───────────── */}
       <div
         className="sticky top-0 z-20"
         style={{ background: '#FAF8F3', borderBottom: '1px solid #E7E2D8', padding: '8px 20px' }}
@@ -317,7 +296,7 @@ export default function AllProductsClient() {
           <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
             <input
               type="text"
-              placeholder='חיפוש מוצרים...'
+              placeholder="חיפוש מוצרים..."
               defaultValue={searchQuery}
               onChange={e => handleSearchInput(e.target.value)}
               dir="rtl"
@@ -330,12 +309,15 @@ export default function AllProductsClient() {
               onFocus={e => (e.currentTarget.style.borderColor = '#C5A028')}
               onBlur={e  => (e.currentTarget.style.borderColor = '#E7E2D8')}
             />
-            <svg style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg
+              style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }}
+              width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+            >
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
           </div>
 
-          {/* Sort dropdown */}
+          {/* Sort */}
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as SortBy)}
@@ -366,9 +348,12 @@ export default function AllProductsClient() {
               aria-label="פתח סינון"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+                <line x1="4" y1="6" x2="20" y2="6"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+                <line x1="11" y1="18" x2="13" y2="18"/>
               </svg>
-              סינון{anyFilterActive && (
+              סינון
+              {anyFilterActive && (
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#C5A028', display: 'inline-block' }} />
               )}
             </button>
@@ -376,7 +361,7 @@ export default function AllProductsClient() {
         </div>
       </div>
 
-      {/* ── Mobile filter drawer ────────────────────────────────── */}
+      {/* ── Mobile filter drawer ─────────────────────────────────────────────── */}
       {isMobile && drawerOpen && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
           <div
@@ -386,26 +371,26 @@ export default function AllProductsClient() {
           <div className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 pb-8 shadow-2xl">
             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
             <FilterPanel
-              catFilter={catFilter}    setCatFilter={setCatFilter}
+              catFilter={catFilter}    setCatFilter={v => { setCatFilter(v); setDrawerOpen(false); }}
               priceMin={priceMin}      setPriceMin={setPriceMin}
               priceMax={priceMax}      setPriceMax={setPriceMax}
               anyActive={anyFilterActive} onClear={clearAll}
             />
             <button
               onClick={() => setDrawerOpen(false)}
-              className="mt-5 w-full py-3.5 bg-[#1a1a1a] text-white rounded-2xl font-bold text-sm hover:bg-[#333] transition-colors"
+              className="mt-5 w-full py-4 bg-[#1a1a1a] text-white rounded-2xl font-bold text-sm"
             >
-              הצג {filtered.length.toLocaleString('he-IL')} מוצרים
+              הצג {filtered.length.toLocaleString('he-IL')}{!fullyLoaded ? '+' : ''} מוצרים
             </button>
           </div>
         </div>
       )}
 
-      {/* ── Main content ────────────────────────────────────────── */}
-      <div style={{ maxWidth: '80rem', margin: '0 auto', padding: isMobile ? '16px 16px 48px' : '24px 20px 56px' }}>
+      {/* ── Main layout ──────────────────────────────────────────────────────── */}
+      <div style={{ maxWidth: '80rem', margin: '0 auto', padding: isMobile ? '16px 16px 56px' : '24px 20px 64px' }}>
         <div style={{ display: 'flex', gap: 24, alignItems: 'start' }}>
 
-          {/* ── Desktop sidebar ──────────────────────────────────── */}
+          {/* ── Desktop sidebar ───────────────────────────────────────────────── */}
           {!isMobile && (
             <aside style={{ width: 230, flexShrink: 0, position: 'sticky', top: 72 }}>
               <div style={{
@@ -421,7 +406,7 @@ export default function AllProductsClient() {
                   {anyFilterActive && (
                     <button
                       onClick={clearAll}
-                      style={{ fontSize: 11, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}
+                      style={{ fontSize: 11, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontFamily: 'inherit' }}
                     >
                       נקה ✕
                     </button>
@@ -437,10 +422,10 @@ export default function AllProductsClient() {
             </aside>
           )}
 
-          {/* ── Product grid ─────────────────────────────────────── */}
+          {/* ── Product grid ──────────────────────────────────────────────────── */}
           <div style={{ flex: 1, minWidth: 0 }}>
 
-            {/* Loading skeleton */}
+            {/* Loading skeletons — first batch in-flight */}
             {loading && (
               <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
                 {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
@@ -470,6 +455,16 @@ export default function AllProductsClient() {
             {/* Products */}
             {!loading && filtered.length > 0 && (
               <>
+                {/* Background-loading notice — appears while more batches are in-flight */}
+                {!fullyLoaded && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: 12, color: '#9CA3AF' }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 12a9 9 0 11-6.22-8.56" style={{ animation: 'spin 1s linear infinite' }} />
+                    </svg>
+                    טוען מוצרים נוספים ברקע…
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
                   {paginated.map((p, idx) => (
                     <ProductCard
@@ -499,48 +494,32 @@ export default function AllProductsClient() {
                 <div style={{ textAlign: 'center', marginTop: 48 }}>
                   <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 20 }}>
                     מציג {paginated.length.toLocaleString('he-IL')} מתוך{' '}
-                    {filtered.length.toLocaleString('he-IL')}
-                    {hasMoreFromServer && !anyFilterActive ? '+' : ''} מוצרים
+                    {filtered.length.toLocaleString('he-IL')}{!fullyLoaded && !anyFilterActive ? '+' : ''} מוצרים
                   </p>
 
-                  {hasMore && (
+                  {hasMore ? (
                     <button
-                      onClick={handleLoadMore}
-                      disabled={loadingMore}
+                      onClick={() => setDisplayCount(d => d + PAGE_SIZE)}
                       style={{
                         background: '#fff', color: '#1a1a1a',
                         border: '2px solid #1a1a1a', borderRadius: 12,
-                        padding: isMobile ? '14px 32px' : '14px 48px',
-                        fontSize: 15, fontWeight: 700, cursor: loadingMore ? 'not-allowed' : 'pointer',
-                        opacity: loadingMore ? 0.6 : 1, fontFamily: 'inherit',
-                        transition: 'background 0.18s, color 0.18s',
+                        padding: isMobile ? '16px 36px' : '14px 48px',
+                        fontSize: 15, fontWeight: 700, cursor: 'pointer',
+                        fontFamily: 'inherit', transition: 'background 0.18s, color 0.18s',
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        gap: 8, minWidth: isMobile ? 200 : 240, minHeight: 50,
+                        gap: 8, minWidth: isMobile ? 220 : 240, minHeight: 52,
                       }}
-                      onMouseEnter={e => { if (!loadingMore) { (e.currentTarget as HTMLElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLElement).style.color = '#fff'; } }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff'; (e.currentTarget as HTMLElement).style.color = '#1a1a1a'; }}
                     >
-                      {loadingMore ? (
-                        <>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M21 12a9 9 0 11-6.22-8.56" style={{ animation: 'spin 1s linear infinite' }} />
-                          </svg>
-                          טוען...
-                        </>
-                      ) : (
-                        `טען עוד ${nextCount} מוצרים`
-                      )}
+                      טען עוד {nextCount} מוצרים
                     </button>
-                  )}
-
-                  {!hasMore && filtered.length > 0 && (
+                  ) : (
                     <p style={{ fontSize: 12, color: '#C5A028', fontWeight: 700 }}>
                       ✓ הצגת את כל {filtered.length.toLocaleString('he-IL')} המוצרים
                     </p>
                   )}
                 </div>
-
-                <div ref={sentinelRef} style={{ height: 1 }} />
               </>
             )}
           </div>
