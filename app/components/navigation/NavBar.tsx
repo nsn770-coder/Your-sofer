@@ -10,6 +10,7 @@ import { useShaliach } from "@/app/contexts/ShaliachContext";
 import MobileDrawerMenu from "./MobileDrawerMenu";
 import lifeEvents from "@/data/lifeEvents";
 import AlgoliaSearch from "@/app/components/search/AlgoliaSearch";
+import CouponStrip from "@/app/components/CouponStrip";
 
 interface NavSubItem {
   label: string;
@@ -468,6 +469,7 @@ function NavBarContent() {
       )}
 
       <header style={{ background: "#FAF8F3", color: "#1a1a1a", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E7E2D8" }}>
+        <CouponStrip />
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center", gap: isMobile ? 6 : 12 }}>
           <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "#1a1a1a", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
             <div style={{ width: 20, height: 2, background: "#1a1a1a", borderRadius: 0 }} />
