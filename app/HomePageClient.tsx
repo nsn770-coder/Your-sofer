@@ -248,6 +248,14 @@ function SkeletonCategoryCard() {
   );
 }
 
+// ── Pinned best-seller IDs — always displayed first in the scroll, in this order ──
+const PINNED_BEST_SELLER_IDS = [
+  '0J65t9lZf1p0TxIpKmEy',
+  '0MwwFAvEK5XgDUqtL9wH',
+  'iIvJdvNHHQDybt6rC4id',
+  'CfdAck8YnbnFhfdwhuSz',
+];
+
 // ── Static data (outside component - never re-created on render) ───────────────
 
 const STATIC_QUOTES = [
@@ -432,9 +440,6 @@ export default function HomePageClient() {
 
     async function fetchFeaturedProducts() {
       try {
-        const snap = await getDocs(
-          query(collection(db, 'products'), where('isBestSeller', '==', true), limit(50)),
-        );
         const KLAF_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'מגילות', 'ספרי תורה']);
         const BLOCKED_NAMES = /מלחי|מלחית|מלחיות/;
         const isShowable = (p: Product) =>
@@ -444,11 +449,28 @@ export default function HomePageClient() {
           !BLOCKED_NAMES.test(p.name ?? '') &&
           !!(p.imgUrl || p.image_url);
 
+        // Fetch pinned products first, in the declared order, skip missing/hidden ones
+        const pinnedSnaps = await Promise.all(
+          PINNED_BEST_SELLER_IDS.map(id =>
+            getDoc(doc(db, 'products', id)).catch(() => null)
+          )
+        );
+        const pinnedProducts: Product[] = pinnedSnaps
+          .filter((s): s is NonNullable<typeof s> => s !== null && s.exists())
+          .map(s => ({ id: s.id, ...s.data() } as Product))
+          .filter(isShowable);
+
+        const pinnedIdSet = new Set(pinnedProducts.map(p => p.id));
+
+        const snap = await getDocs(
+          query(collection(db, 'products'), where('isBestSeller', '==', true), limit(50)),
+        );
         const bestSellers = snap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
-          .filter(isShowable);
-        if (bestSellers.length >= 4) {
-          setFeaturedProducts(bestSellers);
+          .filter(p => isShowable(p) && !pinnedIdSet.has(p.id));
+
+        if (pinnedProducts.length + bestSellers.length >= 4) {
+          setFeaturedProducts([...pinnedProducts, ...bestSellers]);
           return;
         }
         const fallbackSnap = await getDocs(
@@ -456,8 +478,8 @@ export default function HomePageClient() {
         );
         const all = fallbackSnap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
-          .filter(isShowable);
-        setFeaturedProducts(all);
+          .filter(p => isShowable(p) && !pinnedIdSet.has(p.id));
+        setFeaturedProducts([...pinnedProducts, ...all]);
       } catch { /* non-fatal */ }
     }
 
