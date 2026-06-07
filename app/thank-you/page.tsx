@@ -35,12 +35,16 @@ function ThankYouContent() {
         });
 
         // סמן עגלה נטושה כמומרת
-        if (order.sessionId) {
-          updateDoc(doc(db, 'abandoned_carts', order.sessionId), {
-            converted: true,
-            convertedOrderId: orderId,
-            updatedAt: serverTimestamp(),
-          }).catch((e) => console.error('[thank-you] abandoned_cart update failed:', e));
+        try {
+          if (order.sessionId) {
+            await updateDoc(doc(db, 'abandoned_carts', order.sessionId), {
+              converted: true,
+              convertedOrderId: orderId,
+              updatedAt: serverTimestamp(),
+            });
+          }
+        } catch (e) {
+          console.error('[thank-you] abandoned_cart update failed:', e);
         }
 
         // שמור / עדכן רשומת לקוח

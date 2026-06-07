@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 
@@ -10,7 +10,7 @@ const DELAY_MS    = 8000;
 const IMAGE_URL   = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780510230/%D7%A4%D7%95%D7%A4%D7%90%D7%A4_rnyoth.png';
 
 const GOLD   = '#C9A14A';
-const GOLD_D = '#a07c30';  // darker gold for hover
+const GOLD_D = '#a07c30';
 const DARK   = '#111111';
 
 function isValidEmail(v: string) {
@@ -22,15 +22,20 @@ function isValidIsraeliPhone(v: string) {
 }
 
 export default function ClubPopup() {
-  const [visible, setVisible] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [screen, setScreen]   = useState<'form' | 'thanks'>('form');
-  const [email, setEmail]     = useState('');
-  const [phone, setPhone]     = useState('');
-  const [consent, setConsent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors]   = useState<{ email?: string; phone?: string; consent?: string }>({});
-  const [copied, setCopied]   = useState(false);
+  const [visible, setVisible]       = useState(false);
+  const [isMobile, setIsMobile]     = useState(false);
+  const [screen, setScreen]         = useState<'form' | 'thanks'>('form');
+  const [email, setEmail]           = useState('');
+  const [phone, setPhone]           = useState('');
+  const [consent, setConsent]       = useState(false);
+  const [loading, setLoading]       = useState(false);
+  const [errors, setErrors]         = useState<{ email?: string; phone?: string; consent?: string }>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [copied, setCopied]         = useState(false);
+
+  // Refs to read autofill values at submit time, in case autofill skips onChange
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (sessionStorage.getItem(SESSION_KEY)) return;
@@ -44,39 +49,67 @@ export default function ClubPopup() {
     setVisible(false);
   }
 
-  function validate(): boolean {
+  function validate(emailVal: string, phoneVal: string): boolean {
     const e: typeof errors = {};
-    if (!isValidEmail(email))        e.email   = 'נא להזין כתובת מייל תקינה';
-    if (!isValidIsraeliPhone(phone)) e.phone   = 'נא להזין מספר טלפון ישראלי תקין (05X-XXXXXXX)';
-    if (!consent)                    e.consent = 'יש לאשר קבלת דיוור לפני ההצטרפות';
+    if (!isValidEmail(emailVal))        e.email   = 'נא להזין כתובת מייל תקינה';
+    if (!isValidIsraeliPhone(phoneVal)) e.phone   = 'נא להזין מספר טלפון ישראלי תקין (05X-XXXXXXX)';
+    if (!consent)                       e.consent = 'יש לאשר קבלת דיוור לפני ההצטרפות';
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
   async function handleSubmit(ev: React.FormEvent) {
     ev.preventDefault();
-    if (!validate()) return;
+    setSubmitError(null);
+
+    // Read from refs to catch autofill values that may not have triggered onChange
+    const emailVal = emailRef.current?.value ?? email;
+    const phoneVal = phoneRef.current?.value ?? phone;
+
+    // Sync state if autofill populated without onChange
+    if (emailVal !== email) setEmail(emailVal);
+    if (phoneVal !== phone) setPhone(phoneVal);
+
+    if (!validate(emailVal, phoneVal)) return;
+
     setLoading(true);
+    const normalizedEmail = emailVal.trim().toLowerCase();
+    const normalizedPhone = phoneVal.trim();
+
+    // Step 1: save lead — critical
     try {
       await addDoc(collection(db, 'leads'), {
-        email:     email.trim().toLowerCase(),
-        phone:     phone.trim(),
+        email:     normalizedEmail,
+        phone:     normalizedPhone,
         source:    'club',
         consent:   true,
         createdAt: serverTimestamp(),
       });
-      await fetch('/api/send-club-welcome', {
+    } catch (e) {
+      console.error('[ClubPopup] addDoc leads failed:', e);
+      setSubmitError('אירעה שגיאה בשליחה — נסו שוב בעוד רגע');
+      setLoading(false);
+      return;
+    }
+
+    // Step 2: send welcome email — best-effort, never blocks the user
+    try {
+      const res = await fetch('/api/send-club-welcome', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email: email.trim().toLowerCase() }),
+        body:    JSON.stringify({ email: normalizedEmail }),
       });
-      sessionStorage.setItem(SESSION_KEY, '1');
-      setScreen('thanks');
-    } catch {
-      setErrors({ email: 'אירעה שגיאה — נסו שוב בעוד רגע' });
-    } finally {
-      setLoading(false);
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.error('[ClubPopup] send-club-welcome failed:', res.status, text);
+      }
+    } catch (e) {
+      console.error('[ClubPopup] send-club-welcome network error:', e);
     }
+
+    sessionStorage.setItem(SESSION_KEY, '1');
+    setLoading(false);
+    setScreen('thanks');
   }
 
   async function copyCode() {
@@ -140,7 +173,6 @@ export default function ClubPopup() {
           boxShadow: '0 28px 90px rgba(0,0,0,0.55)',
           fontFamily: 'Heebo, Arial, sans-serif',
           animation: 'club-in 0.32s cubic-bezier(0.34,1.56,0.64,1)',
-          // full-bleed image background
           backgroundImage: `url(${IMAGE_URL})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -181,7 +213,7 @@ export default function ClubPopup() {
               {/* Subtitle */}
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.75, margin: '0 0 22px' }}>
                 <span style={{ color: GOLD, fontWeight: 700 }}>10% הנחה</span> על הרכישה הראשונה<br />
-                <span style={{ color: GOLD, fontWeight: 700 }}>+ 5% הנחה קבועה</span> לכל חברי המועדון
+                <span style={{ color: GOLD, fontWeight: 700 }}>+ 10% הנחה קבועה</span> לכל חברי המועדון
               </p>
 
               {/* Form */}
@@ -189,7 +221,11 @@ export default function ClubPopup() {
                 {/* Email */}
                 <div>
                   <input
+                    ref={emailRef}
                     type="email"
+                    name="email"
+                    autoComplete="email"
+                    inputMode="email"
                     value={email}
                     onChange={e => { setEmail(e.target.value); setErrors(p => ({ ...p, email: undefined })); }}
                     placeholder="כתובת מייל"
@@ -201,7 +237,11 @@ export default function ClubPopup() {
                 {/* Phone */}
                 <div>
                   <input
+                    ref={phoneRef}
                     type="tel"
+                    name="phone"
+                    autoComplete="tel"
+                    inputMode="tel"
                     value={phone}
                     onChange={e => { setPhone(e.target.value); setErrors(p => ({ ...p, phone: undefined })); }}
                     placeholder="מספר טלפון (05X-XXXXXXX)"
@@ -230,6 +270,21 @@ export default function ClubPopup() {
                   </label>
                   {errors.consent && <div style={{ fontSize: 11, color: '#fca5a5', marginTop: 3 }}>{errors.consent}</div>}
                 </div>
+
+                {/* General submit error — shown only when Firestore write fails */}
+                {submitError && (
+                  <div style={{
+                    background: 'rgba(248,113,113,0.15)',
+                    border: '1px solid rgba(248,113,113,0.5)',
+                    borderRadius: 8,
+                    padding: '9px 12px',
+                    fontSize: 12,
+                    color: '#fca5a5',
+                    textAlign: 'center',
+                  }}>
+                    {submitError}
+                  </div>
+                )}
 
                 {/* Submit */}
                 <button

@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         <div style="color:#1E3A8A;font-size:14px;font-weight:700;margin-bottom:8px;">ההטבות שלכם:</div>
         <div style="color:#333;font-size:13px;line-height:2;">
           ✅ 10% הנחה על הרכישה הראשונה (קוד למטה)<br/>
-          ✅ 5% הנחה קבועה על כל רכישה עתידית<br/>
+          ✅ 10% הנחה קבועה על כל רכישה עתידית<br/>
           ✅ עדכונים ראשונים על מוצרים ומבצעים חדשים
         </div>
       </div>

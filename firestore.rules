@@ -232,5 +232,12 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+
+    // ── Club leads (popup sign-ups — anonymous create, admin manages) ─────────
+
+    match /leads/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
   }
 }
