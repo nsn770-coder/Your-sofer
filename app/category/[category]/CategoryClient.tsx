@@ -983,7 +983,7 @@ function StamCard({
 
   function handleAdd(e: React.MouseEvent) {
     e.stopPropagation();
-    addItem({ id: product.id, name: product.name, price: product.price, imgUrl: imgSrc ?? undefined, quantity: 1, cat: product.cat || undefined });
+    addItem({ id: product.id, name: product.name, price: product.price, imgUrl: imgSrc ?? undefined, quantity: 1, cat: product.cat || undefined, bundlePromo: product.bundlePromo || undefined });
   }
   function handleDecrement(e: React.MouseEvent) {
     e.stopPropagation();

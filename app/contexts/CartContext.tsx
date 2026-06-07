@@ -22,8 +22,9 @@ export interface CartItem {
   selectedKlafName?: string;
   embroideryText?: string;
   selectedCover?: { id: string; name: string; imgUrl: string };
-  promoPlan?: string;
+  promoPlan?: string;              // '2+1' for the buy-2-get-1-free promo
   promoPrice?: number;
+  bundlePromo?: string;            // e.g. '4for100', '12for100' — NforX bundle promo
   printCustomization?: {
     productType: string;
     side: string;
@@ -49,20 +50,30 @@ interface CartContextType {
   total: number;                 // effective total (after ALL discounts, before shipping)
   count: number;
   promoSavings: number;          // 2+1 promo savings
-  kippotQty: number;             // regular kippot units (no printCustomization)
+  kippotQty: number;             // regular kippot units (no printCustomization, no bundlePromo)
   kippotDiscountActive: boolean;
   kippotDiscountAmount: number;  // ₪ saved from regular-kippot bulk discount
   printDiscountActive: boolean;
   printDiscountAmount: number;   // ₪ saved from print-kipa discount
+  bundleDiscountAmount: number;  // ₪ saved from NforX bundle promos (kippot)
   discountableTotal: number;     // portion eligible for coupon
+}
+
+// ── Bundle promo parser ────────────────────────────────────────────────────────
+// Parses keys like '4for100' → { n: 4, bundlePrice: 100 }
+function parseBundle(key: string): { n: number; bundlePrice: number } | null {
+  const m = key.match(/^(\d+)for(\d+)$/);
+  if (!m) return null;
+  return { n: parseInt(m[1]), bundlePrice: parseInt(m[2]) };
 }
 
 // ── Totals calculation ────────────────────────────────────────────────────────
 
 function calcTotals(items: CartItem[]) {
-  // ── Regular kippot: cat==='כיפות' AND no printCustomization ─────────────────
+  // ── Regular kippot: cat==='כיפות' AND no printCustomization AND no bundlePromo ─
+  // Items with bundlePromo are excluded from the 30% bulk discount entirely.
   const kippotQty = items
-    .filter(i => i.cat === 'כיפות' && !i.printCustomization)
+    .filter(i => i.cat === 'כיפות' && !i.printCustomization && !i.bundlePromo)
     .reduce((s, i) => s + i.quantity, 0);
   const kippotDiscountActive = kippotQty >= KIPPOT_DISCOUNT_QTY;
   const kippotDiscountRate   = kippotDiscountActive ? KIPPOT_DISCOUNT_RATE : 0;
@@ -80,8 +91,11 @@ function calcTotals(items: CartItem[]) {
   let discountable   = 0; // items eligible for coupon
 
   for (const item of items) {
+    // Bundle promo items are handled separately below
+    if (item.bundlePromo) continue;
+
     const isPrint  = !!item.printCustomization;
-    // Regular kippot: cat==='כיפות' AND not a print item — get the 30% discount
+    // Regular kippot: cat==='כיפות' AND not a print item AND no bundlePromo
     const isKippot = item.cat === 'כיפות' && !isPrint;
 
     if (isPrint) {
@@ -114,6 +128,59 @@ function calcTotals(items: CartItem[]) {
     }
   }
 
+  // ── Bundle promo (NforX) — group by bundlePromo key ──────────────────────────
+  // Rule: N units from the same bundle group cost ₪X total.
+  // Units are sorted by price descending; the most expensive N×fullBundles units
+  // enter the promo. Remainder units pay full price.
+  // Bundle items are excluded from kippot 30%, 2+1, and coupon eligibility.
+  const bundleGroups = new Map<string, CartItem[]>();
+  for (const item of items) {
+    if (!item.bundlePromo) continue;
+    const grp = bundleGroups.get(item.bundlePromo) ?? [];
+    grp.push(item);
+    bundleGroups.set(item.bundlePromo, grp);
+  }
+
+  let bundleOriginalSubtotal   = 0;
+  let bundleDiscountedSubtotal = 0;
+
+  for (const [promoKey, grpItems] of bundleGroups) {
+    const parsed = parseBundle(promoKey);
+    if (!parsed) {
+      // Unknown key format — charge full price, no discount
+      for (const item of grpItems) {
+        const orig = item.price * item.quantity;
+        total += orig;
+        discountable += orig;
+      }
+      continue;
+    }
+    const { n, bundlePrice } = parsed;
+
+    // Expand all units into a flat array and sort by price descending
+    // so the most expensive units benefit from the promo first (best for customer)
+    const units: number[] = [];
+    for (const item of grpItems) {
+      for (let i = 0; i < item.quantity; i++) units.push(item.price);
+    }
+    units.sort((a, b) => b - a);
+
+    const fullBundles    = Math.floor(units.length / n);
+    const promoUnits     = units.slice(0, fullBundles * n);
+    const remainderUnits = units.slice(fullBundles * n);
+
+    const origPromo     = promoUnits.reduce((s, p) => s + p, 0);
+    const discPromo     = fullBundles * bundlePrice;
+    const remainderCost = remainderUnits.reduce((s, p) => s + p, 0);
+
+    bundleOriginalSubtotal   += origPromo;
+    bundleDiscountedSubtotal += discPromo;
+    total += discPromo + remainderCost;
+    // Bundle items are NOT eligible for coupon
+  }
+
+  const bundleDiscountAmount = Math.round((bundleOriginalSubtotal - bundleDiscountedSubtotal) * 100) / 100;
+
   return {
     total:                Math.round(total          * 100) / 100,
     kippotQty,
@@ -121,6 +188,7 @@ function calcTotals(items: CartItem[]) {
     kippotDiscountAmount: Math.round(kippotSubtotal  * kippotDiscountRate  * 100) / 100,
     printDiscountActive,
     printDiscountAmount:  Math.round(printSubtotal   * printDiscountRate   * 100) / 100,
+    bundleDiscountAmount,
     discountableTotal:    Math.round(discountable    * 100) / 100,
   };
 }
@@ -176,7 +244,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const regularTotal = items.reduce((sum, x) => sum + x.price * x.quantity, 0);
   const {
     total, kippotQty, kippotDiscountActive, kippotDiscountAmount,
-    printDiscountActive, printDiscountAmount, discountableTotal,
+    printDiscountActive, printDiscountAmount, bundleDiscountAmount, discountableTotal,
   } = calcTotals(items);
   const promoSavings = Math.round((regularTotal - total) * 100) / 100;
   const count        = items.reduce((sum, x) => sum + x.quantity, 0);
@@ -187,6 +255,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       total, count, promoSavings,
       kippotQty, kippotDiscountActive, kippotDiscountAmount,
       printDiscountActive, printDiscountAmount,
+      bundleDiscountAmount,
       discountableTotal,
     }}>
       {children}

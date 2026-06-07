@@ -1488,11 +1488,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     if (product?.outOfStock) return;
     if (selectedKlafIds.length > 0) {
       for (let i = 0; i < selectedKlafIds.length; i++) {
-        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined });
+        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     } else {
       for (let i = 0; i < qty; i++) {
-        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined });
+        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
@@ -1677,7 +1677,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </span>
           <button
             onClick={() => {
-              addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined });
+              addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined, bundlePromo: product!.bundlePromo || undefined });
               setCartQty(c => c + 1);
             }}
             style={{ flex: '0 0 48px', background: 'transparent', border: 'none', color: '#C9A227', fontSize: 22, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

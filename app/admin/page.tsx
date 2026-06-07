@@ -143,6 +143,7 @@ interface Product {
   soferPrice?: number;
   createdAt?: { seconds: number };
   isExpertRecommended?: boolean;
+  isBestSeller?: boolean;
 }
 
 interface Sofer {
@@ -239,6 +240,7 @@ interface Lead {
   id: string;
   name?: string;
   phone?: string;
+  email?: string;
   nusach?: string;
   location?: string;
   klafimCount?: number;
@@ -633,6 +635,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [outOfStockReason] = useState(product.outOfStockReason ?? null);
   const [outOfStockDate] = useState(product.outOfStockDate ?? null);
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
+  const [isBestSeller, setIsBestSeller] = useState(product.isBestSeller ?? false);
   const [stockCountInput, setStockCountInput] = useState(
     product.stockCount != null ? String(product.stockCount) : ''
   );
@@ -714,6 +717,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         outOfStockReason: outOfStock ? (outOfStockReason ?? null) : null,
         outOfStockDate: outOfStock ? (outOfStockDate ?? null) : null,
         isExpertRecommended: EXPERT_REC_CATS_ADMIN.includes(cat) ? isExpertRecommended : false,
+        isBestSeller,
       });
       onSave();
       onClose();
@@ -815,6 +819,17 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               </div>
             </div>
           )}
+          <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: isBestSeller ? '#FFF7E6' : '#F9F9F9', border: `1.5px solid ${isBestSeller ? '#C5A028' : '#ddd'}`, borderRadius: 8, padding: '10px 14px', transition: 'all 0.15s' }}>
+            <input
+              type="checkbox"
+              checked={isBestSeller}
+              onChange={e => setIsBestSeller(e.target.checked)}
+              style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#C5A028' }}
+            />
+            <span style={{ fontSize: 13, fontWeight: 700, color: isBestSeller ? '#92710c' : '#555' }}>
+              🏆 נמכר ביותר (מופיע בסקרול דף הבית)
+            </span>
+          </label>
           {(
             <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: '#EFF4FF', border: '1.5px solid #93C5FD', borderRadius: 8, padding: '10px 14px' }}>
               <input
@@ -1986,27 +2001,44 @@ export default function AdminPage() {
   async function loadCategories() {
     try {
       const snap = await getDocs(collection(db, 'categories'));
+      // Track all existing slugs using BOTH the doc ID AND the slug/name fields
+      // so old auto-ID docs don't cause phantom re-creation of named docs.
       const existingSlugs = new Set<string>();
+      // Best imageUrl per slug (from any existing doc) — inherited when seeding new docs.
+      const slugToImg = new Map<string, string>();
       const data: Category[] = [];
+
       snap.forEach(d => {
-        const r = d.data();
+        const r    = d.data();
         const slug = (d.id || r.slug || r.name || '') as string;
-        existingSlugs.add(slug);
+        existingSlugs.add(d.id);
+        if (r.slug) existingSlugs.add(r.slug as string);
+        if (r.name) existingSlugs.add(r.name as string);
+
+        const img = (r.imageUrl || r.imgUrl || '') as string;
+        const effectiveSlug = (r.slug || r.name || d.id) as string;
+        if (img && effectiveSlug && !slugToImg.get(effectiveSlug)) {
+          slugToImg.set(effectiveSlug, img);
+        }
+
         data.push({
           id: d.id, slug,
           displayName: r.displayName || r.name || '',
-          imageUrl: r.imageUrl || r.imgUrl || '',
+          imageUrl: img,
           priority: r.priority ?? r.order ?? 0,
           name: r.name, imgUrl: r.imgUrl, sub: r.sub, order: r.order,
         });
       });
+
       await Promise.all(
         REQUIRED_CATS
           .filter(c => !existingSlugs.has(c.slug))
           .map(c => setDoc(doc(db, 'categories', c.slug), {
-            slug: c.slug, displayName: c.displayName, priority: c.priority, imageUrl: '',
+            slug: c.slug, displayName: c.displayName, priority: c.priority,
+            imageUrl: slugToImg.get(c.slug) || '', // inherit from old doc if available
           }, { merge: true }))
       );
+
       if (REQUIRED_CATS.some(c => !existingSlugs.has(c.slug))) {
         const fresh = await getDocs(collection(db, 'categories'));
         data.length = 0;
@@ -2154,6 +2186,16 @@ export default function AdminPage() {
     try {
       await updateDoc(doc(db, 'products', productId), { hidden: newHidden });
       setProducts(prev => prev.map(p => p.id === productId ? { ...p, hidden: newHidden } : p));
+    } catch (e) { console.error(e); alert('שגיאה בעדכון'); }
+    finally { setActionLoading(null); }
+  }
+
+  async function toggleBestSeller(productId: string, current: boolean) {
+    setActionLoading(productId + '_bs');
+    const next = !current;
+    try {
+      await updateDoc(doc(db, 'products', productId), { isBestSeller: next });
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, isBestSeller: next } : p));
     } catch (e) { console.error(e); alert('שגיאה בעדכון'); }
     finally { setActionLoading(null); }
   }
@@ -2582,7 +2624,7 @@ export default function AdminPage() {
             <>
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">הסתרה</th><th className="p-3 text-right">עריכה</th><th className="p-3 text-right">מחיקה</th></tr></thead>
+                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">נמכר ביותר</th><th className="p-3 text-right">הסתרה</th><th className="p-3 text-right">עריכה</th><th className="p-3 text-right">מחיקה</th></tr></thead>
                 <tbody>
                   {filteredProducts.length === 0 ? <tr><td colSpan={8} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
                   : filteredProducts.map(p => (
@@ -2605,6 +2647,12 @@ export default function AdminPage() {
                         <input type="number" min={1} max={99} value={p.priority ?? 50}
                           onChange={e => updatePriorityDebounced(p.id, Number(e.target.value))}
                           className={`w-14 border rounded-lg px-2 py-1 text-xs text-center font-bold ${priorityUpdating === p.id ? 'border-amber-400 bg-amber-50' : 'border-gray-200'}`} />
+                      </td>
+                      <td className="p-3">
+                        <button onClick={() => toggleBestSeller(p.id, p.isBestSeller ?? false)} disabled={actionLoading === p.id + '_bs'}
+                          className={`px-2 py-1 rounded-full text-xs font-bold transition ${p.isBestSeller ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                          {p.isBestSeller ? '🏆 כן' : '— לא'}
+                        </button>
                       </td>
                       <td className="p-3">
                         <button onClick={() => toggleHidden(p.id, p.hidden ?? false)} disabled={actionLoading === p.id + '_hidden'}
@@ -3591,6 +3639,7 @@ export default function AdminPage() {
                   <tr>
                     <th className="px-4 py-3 font-semibold">שם</th>
                     <th className="px-4 py-3 font-semibold">טלפון</th>
+                    <th className="px-4 py-3 font-semibold">אימייל</th>
                     <th className="px-4 py-3 font-semibold">נוסח</th>
                     <th className="px-4 py-3 font-semibold">מיקום</th>
                     <th className="px-4 py-3 font-semibold">כמות קלפים</th>
@@ -3606,6 +3655,7 @@ export default function AdminPage() {
                       <tr key={lead.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 font-medium">{lead.name || '—'}</td>
                         <td className="px-4 py-3 font-mono text-sm">{lead.phone || '—'}</td>
+                        <td className="px-4 py-3 text-sm">{lead.email || '—'}</td>
                         <td className="px-4 py-3">{lead.nusach || '—'}</td>
                         <td className="px-4 py-3">{lead.location === 'room' ? 'חדר' : lead.location === 'entrance' ? 'כניסה ראשית' : '—'}</td>
                         <td className="px-4 py-3 text-center">{lead.klafimCount ?? '—'}</td>

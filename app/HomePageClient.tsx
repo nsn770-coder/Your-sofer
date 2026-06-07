@@ -407,35 +407,39 @@ export default function HomePageClient() {
     }
 
     async function fetchCatImages() {
+      const map: Record<string, string> = {};
       try {
         const snap = await getDocs(collection(db, 'categories'));
-        if (!snap.empty) {
-          const map: Record<string, string> = {};
-          snap.forEach(d => {
-            const r = d.data();
-            const key = (d.id || r.slug || r.name || '') as string;
-            const img = (r.imageUrl || r.imgUrl || '') as string;
-            if (key) map[key] = img;
-          });
-          setCatImages(map);
-          return;
+        snap.forEach(d => {
+          const r   = d.data();
+          const key = (d.id || r.slug || r.name || '') as string;
+          const img = (r.imageUrl || r.imgUrl || '') as string;
+          if (key && img) map[key] = img; // skip docs with empty imageUrl
+        });
+      } catch { /* fall through to product fallback */ }
+
+      // For every cat still without an image, pull from its first product
+      const missing = ALL_CATS.filter(cat => !map[cat]);
+      if (missing.length > 0) {
+        const pairs = await Promise.all(
+          missing.map(async cat => {
+            try {
+              const pSnap = await getDocs(
+                query(collection(db, 'products'), where('cat', '==', cat), limit(1)),
+              );
+              if (!pSnap.empty) {
+                const d = pSnap.docs[0].data();
+                return [cat, (d.imgUrl || d.image_url || '') as string] as const;
+              }
+            } catch { /* ignore */ }
+            return [cat, ''] as const;
+          }),
+        );
+        for (const [cat, img] of pairs) {
+          if (img && !map[cat]) map[cat] = img;
         }
-      } catch { /* fall through */ }
-      const pairs = await Promise.all(
-        ALL_CATS.map(async cat => {
-          try {
-            const snap = await getDocs(
-              query(collection(db, 'products'), where('cat', '==', cat), limit(1)),
-            );
-            if (!snap.empty) {
-              const d = snap.docs[0].data();
-              return [cat, (d.imgUrl || d.image_url || '') as string] as const;
-            }
-          } catch { /* ignore */ }
-          return [cat, ''] as const;
-        }),
-      );
-      setCatImages(Object.fromEntries(pairs));
+      }
+      setCatImages(map);
     }
 
     async function fetchFeaturedProducts() {
@@ -456,9 +460,20 @@ export default function HomePageClient() {
           )
         );
         const pinnedProducts: Product[] = pinnedSnaps
-          .filter((s): s is NonNullable<typeof s> => s !== null && s.exists())
-          .map(s => ({ id: s.id, ...s.data() } as Product))
-          .filter(isShowable);
+          .map((s, i) => {
+            const id = PINNED_BEST_SELLER_IDS[i];
+            if (s === null || !s.exists()) {
+              console.warn(`[FeaturedProducts] pinned ID not found in Firestore: ${id}`);
+              return null;
+            }
+            const p = { id: s.id, ...s.data() } as Product;
+            if (!isShowable(p)) {
+              console.warn(`[FeaturedProducts] pinned ID failed isShowable filter: ${id}`);
+              return null;
+            }
+            return p;
+          })
+          .filter((p): p is Product => p !== null);
 
         const pinnedIdSet = new Set(pinnedProducts.map(p => p.id));
 

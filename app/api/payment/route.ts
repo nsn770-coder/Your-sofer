@@ -11,10 +11,17 @@ const PRINT_DISCOUNT_QTY   = 50;
 const PRINT_DISCOUNT_RATE  = 0.55;
 
 interface PaymentItem {
-  name:     string;
-  price:    number;
-  quantity: number;
-  cat?:     string;
+  name:        string;
+  price:       number;
+  quantity:    number;
+  cat?:        string;
+  bundlePromo?: string; // e.g. '4for100', '12for100'
+}
+
+function parseBundle(key: string): { n: number; bundlePrice: number } | null {
+  const m = key.match(/^(\d+)for(\d+)$/);
+  if (!m) return null;
+  return { n: parseInt(m[1]), bundlePrice: parseInt(m[2]) };
 }
 
 export async function POST(req: NextRequest) {
@@ -30,16 +37,15 @@ export async function POST(req: NextRequest) {
       };
 
     // ── Server-side kippot discount validation ────────────────────────────────
-    const kippotItems  = items.filter(i => i.cat === 'כיפות');
+    // Only regular kippot (no bundlePromo) count toward the 30% threshold.
+    const kippotItems  = items.filter(i => i.cat === 'כיפות' && !i.bundlePromo);
     const kippotQty    = kippotItems.reduce((s, i) => s + i.quantity, 0);
 
     if (kippotQty >= KIPPOT_DISCOUNT_QTY) {
-      // Expected discount = 30% of original kippot subtotal
-      const kippotOriginal  = kippotItems.reduce((s, i) => s + i.price * i.quantity, 0);
+      const kippotOriginal   = kippotItems.reduce((s, i) => s + i.price * i.quantity, 0);
       const expectedDiscount = Math.round(kippotOriginal * KIPPOT_DISCOUNT_RATE * 100) / 100;
 
-      // Client should have included a discount line in items
-      const discountLine     = items.find(i => i.name.includes('הנחת כיפות'));
+      const discountLine      = items.find(i => i.name.includes('הנחת כיפות'));
       const submittedDiscount = discountLine ? -discountLine.price : 0;
 
       if (Math.abs(submittedDiscount - expectedDiscount) > 0.02) {
@@ -70,7 +76,53 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── Build Sumit payload (strip internal `cat` field) ─────────────────────
+    // ── Server-side bundle promo validation (NforX) ───────────────────────────
+    // Group product items (non-discount lines) by bundlePromo key.
+    const productItems = items.filter(i => !i.name.includes('הנחת') && !i.name.includes('משלוח'));
+
+    const bundleGroups = new Map<string, PaymentItem[]>();
+    for (const item of productItems) {
+      if (!item.bundlePromo) continue;
+      const grp = bundleGroups.get(item.bundlePromo) ?? [];
+      grp.push(item);
+      bundleGroups.set(item.bundlePromo, grp);
+    }
+
+    let expectedBundleDiscount = 0;
+
+    for (const [promoKey, grpItems] of bundleGroups) {
+      const parsed = parseBundle(promoKey);
+      if (!parsed) continue;
+      const { n, bundlePrice } = parsed;
+
+      const units: number[] = [];
+      for (const item of grpItems) {
+        for (let i = 0; i < item.quantity; i++) units.push(item.price);
+      }
+      units.sort((a, b) => b - a);
+
+      const fullBundles = Math.floor(units.length / n);
+      const promoUnits  = units.slice(0, fullBundles * n);
+      const origPromo   = promoUnits.reduce((s, p) => s + p, 0);
+      const discPromo   = fullBundles * bundlePrice;
+
+      expectedBundleDiscount += Math.round((origPromo - discPromo) * 100) / 100;
+    }
+
+    if (expectedBundleDiscount > 0) {
+      const bundleDiscountLine  = items.find(i => i.name.includes('מבצע כיפות — חבילות'));
+      const submittedBundleDisc = bundleDiscountLine ? -bundleDiscountLine.price : 0;
+
+      if (Math.abs(submittedBundleDisc - expectedBundleDiscount) > 0.02) {
+        console.error(
+          `[payment] bundle discount mismatch orderId=${orderId}`,
+          `expected=${expectedBundleDiscount} submitted=${submittedBundleDisc}`,
+        );
+        return NextResponse.json({ error: 'שגיאה בחישוב הנחת חבילות הכיפות' }, { status: 400 });
+      }
+    }
+
+    // ── Build Sumit payload (strip internal fields) ───────────────────────────
     const body = {
       Customer: {
         Name:         customer.name,

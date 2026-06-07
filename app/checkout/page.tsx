@@ -67,7 +67,7 @@ const SHIPPING_REGULAR = 30;
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, total, kippotDiscountActive, kippotDiscountAmount, printDiscountActive, printDiscountAmount, discountableTotal } = useCart();
+  const { items, total, kippotDiscountActive, kippotDiscountAmount, printDiscountActive, printDiscountAmount, bundleDiscountAmount, discountableTotal } = useCart();
   const { shaliach, refCode } = useShaliach();
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -212,9 +212,10 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: [
-            ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '' })),
+            ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '', bundlePromo: i.bundlePromo || undefined })),
             ...(kippotDiscountAmount > 0 ? [{ name: 'הנחת כיפות בר מצווה — 30%', price: -kippotDiscountAmount, quantity: 1, cat: '' }] : []),
             ...(printDiscountAmount  > 0 ? [{ name: 'הנחת הדפסה — 55%',           price: -printDiscountAmount,  quantity: 1, cat: '' }] : []),
+            ...(bundleDiscountAmount > 0 ? [{ name: 'מבצע כיפות — חבילות',        price: -bundleDiscountAmount, quantity: 1, cat: '' }] : []),
             ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
           ],
@@ -261,7 +262,7 @@ export default function CheckoutPage() {
       <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}>
           <span>סכום ביניים</span>
-          <span>{formatPrice(kippotDiscountAmount > 0 ? total + kippotDiscountAmount : total)}</span>
+          <span>{formatPrice(total + kippotDiscountAmount + printDiscountAmount + bundleDiscountAmount)}</span>
         </div>
         {kippotDiscountAmount > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
@@ -273,6 +274,12 @@ export default function CheckoutPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🖨️ הנחת הדפסה (55%)</span>
             <span>-{formatPrice(printDiscountAmount)}</span>
+          </div>
+        )}
+        {bundleDiscountAmount > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🎁 מבצע כיפות חבילות</span>
+            <span>-{formatPrice(bundleDiscountAmount)}</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
