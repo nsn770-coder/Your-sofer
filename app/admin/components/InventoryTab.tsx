@@ -14,10 +14,27 @@ interface EditState {
   receivedFromSupplier: string;
 }
 
+interface ParsedItem {
+  code: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+interface ParsedInvoice {
+  invoiceDate: string;
+  invoiceNumber: string;
+  supplier: string;
+  items: ParsedItem[];
+}
+
 export default function InventoryTab({ products, orders, onSave }: InventoryTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [editing, setEditing] = useState<Record<string, EditState>>({});
   const [saving, setSaving] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [parsedInvoice, setParsedInvoice] = useState<ParsedInvoice | null>(null);
+  const [applyingInvoice, setApplyingInvoice] = useState(false);
 
   const getSold = (productId: string) =>
     orders.flatMap(o => o.items).filter(i => i.productId === productId).reduce((s, i) => s + i.quantity, 0);
@@ -50,6 +67,47 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     setEditing(prev => { const n = { ...prev }; delete n[id]; return n; });
   }
 
+  async function handleReceiptUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setParsedInvoice(null);
+    try {
+      const form = new FormData();
+      form.append('image', file);
+      const res = await fetch('/api/parse-receipt', { method: 'POST', body: form });
+      const data = await res.json();
+      if (data.error) { alert('שגיאה בניתוח: ' + data.error); return; }
+      setParsedInvoice(data as ParsedInvoice);
+    } catch (err) {
+      alert('שגיאה בשליחה');
+      console.error(err);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  }
+
+  async function applyInvoice() {
+    if (!parsedInvoice) return;
+    setApplyingInvoice(true);
+    for (const item of parsedInvoice.items) {
+      const product = products.find(p => p.supplierCode === item.code);
+      if (!product) continue;
+      const prevReceived = product.receivedFromSupplier ?? 0;
+      const newReceived  = prevReceived + item.quantity;
+      const sold         = getSold(product.id);
+      await onSave(product.id, {
+        receivedFromSupplier: newReceived,
+        purchasePrice:        item.unitPrice,
+        inStock:              newReceived - sold,
+      });
+    }
+    setApplyingInvoice(false);
+    setParsedInvoice(null);
+    alert('המלאי עודכן בהצלחה!');
+  }
+
   async function saveEdit(id: string) {
     const e = editing[id];
     if (!e) return;
@@ -79,7 +137,66 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
             onChange={e => setSearchTerm(e.target.value)}
             style={{ flex: 1, padding: '8px 12px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14 }}
           />
+          <label style={{
+            background: '#0c1a35', color: '#fff', border: 'none', borderRadius: 6,
+            padding: '8px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 13,
+            display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+          }}>
+            {uploading ? '⏳ מנתח...' : '📤 העלה קבלה מהספק'}
+            <input type="file" accept="image/*" onChange={handleReceiptUpload} style={{ display: 'none' }} disabled={uploading} />
+          </label>
         </div>
+
+        {/* Invoice preview after OCR */}
+        {parsedInvoice && (
+          <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: 16, marginBottom: 16 }}>
+            <div style={{ fontWeight: 700, marginBottom: 8 }}>
+              📄 חשבונית #{parsedInvoice.invoiceNumber} — {parsedInvoice.supplier} ({parsedInvoice.invoiceDate})
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #fcd34d' }}>
+                  <th style={{ padding: '4px 8px', textAlign: 'right' }}>קוד</th>
+                  <th style={{ padding: '4px 8px', textAlign: 'right' }}>שם</th>
+                  <th style={{ padding: '4px 8px', textAlign: 'center' }}>כמות</th>
+                  <th style={{ padding: '4px 8px', textAlign: 'center' }}>מחיר יחידה</th>
+                  <th style={{ padding: '4px 8px', textAlign: 'center' }}>מוצר בחנות</th>
+                </tr>
+              </thead>
+              <tbody>
+                {parsedInvoice.items.map((item, i) => {
+                  const matched = products.find(p => p.supplierCode === item.code);
+                  return (
+                    <tr key={i} style={{ borderBottom: '1px solid #fef3c7', background: matched ? '#f0fdf4' : undefined }}>
+                      <td style={{ padding: '4px 8px', fontFamily: 'monospace' }}>{item.code}</td>
+                      <td style={{ padding: '4px 8px' }}>{item.name.slice(0, 35)}</td>
+                      <td style={{ padding: '4px 8px', textAlign: 'center', fontWeight: 700 }}>{item.quantity}</td>
+                      <td style={{ padding: '4px 8px', textAlign: 'center' }}>₪{item.unitPrice}</td>
+                      <td style={{ padding: '4px 8px', textAlign: 'center', fontSize: 11, color: matched ? '#16a34a' : '#9ca3af' }}>
+                        {matched ? `✓ ${matched.name?.slice(0, 25)}` : '— לא נמצא'}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+              <button
+                onClick={applyInvoice}
+                disabled={applyingInvoice}
+                style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 700, cursor: 'pointer' }}
+              >
+                {applyingInvoice ? '⏳ מעדכן...' : '✓ עדכן מלאי'}
+              </button>
+              <button
+                onClick={() => setParsedInvoice(null)}
+                style={{ background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 700, cursor: 'pointer' }}
+              >
+                ביטול
+              </button>
+            </div>
+          </div>
+        )}
 
         <div style={{
           background: '#f0f9ff', padding: 12, borderRadius: 8, marginBottom: 15,

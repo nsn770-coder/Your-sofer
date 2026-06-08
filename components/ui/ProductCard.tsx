@@ -30,6 +30,9 @@ interface Props {
   horizontal?: boolean;
   stars?: number;
   outOfStock?: boolean;
+  clearanceDiscount?: boolean;
+  clearanceSalePrice?: number;
+  originalPrice?: number;
 }
 
 const SOFER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות']);
@@ -113,7 +116,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 
 export default function ProductCard({
   id, name, price, images, priority, isBestSeller, badge, bundlePromo, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
-  soferId, soferName, soferPhoto, horizontal, stars, outOfStock,
+  soferId, soferName, soferPhoto, horizontal, stars, outOfStock, clearanceDiscount, clearanceSalePrice, originalPrice,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -158,7 +161,9 @@ export default function ProductCard({
   const imgSrc       = optimizeCloudinaryUrl(thumbRaw, 400) || null;
   const itemInCart   = items.find(i => i.id === id);
   const qty          = itemInCart?.quantity ?? 0;
-  const hasSale      = typeof was === 'number' && was > price;
+  const hasClearance = clearanceDiscount === true && typeof clearanceSalePrice === 'number';
+  const displayPrice = hasClearance ? clearanceSalePrice! : price;
+  const hasSale      = !hasClearance && typeof was === 'number' && was > price;
   const savePct      = hasSale ? Math.round((1 - price / was!) * 100) : 0;
   const isNew        = (() => {
     if (!createdAt?.seconds) return false;
@@ -267,8 +272,13 @@ export default function ProductCard({
           <ProductBadge isBestSeller={isBestSeller} priority={priority} badge={badge} bundlePromo={bundlePromo} />
         </div>
 
-        {/* Top-left: sale / new / klaf-selection badges */}
+        {/* Top-left: clearance / sale / new / klaf-selection badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {hasClearance && (
+            <span className="flex items-center gap-1 text-white text-[10px] font-bold px-2 py-0.5 rounded-full leading-tight" style={{ background: '#0c6e4f' }}>
+              🏷️ 10% הנחת מלאי
+            </span>
+          )}
           {hasSale && (
             <span className="flex items-center gap-1 text-white text-[10px] font-bold px-2 py-0.5 rounded-full leading-tight" style={{ background: '#e53e3e' }}>
               <IconFlame /> מבצע
@@ -346,9 +356,17 @@ export default function ProductCard({
 
         {/* Price */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ fontSize: 22, fontWeight: 600, color: '#1a1a1a', lineHeight: 1 }}>
-            {formatPrice(price)}
+          <span style={{ fontSize: 22, fontWeight: 600, color: hasClearance ? '#0c6e4f' : '#1a1a1a', lineHeight: 1 }}>
+            {formatPrice(displayPrice)}
           </span>
+          {hasClearance && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 13, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(originalPrice ?? price)}</span>
+              <span style={{ background: '#d1fae5', color: '#065f46', fontSize: 11, fontWeight: 700, borderRadius: 0, padding: '2px 6px' }}>
+                חסכת 10%
+              </span>
+            </div>
+          )}
           {hasSale && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontSize: 13, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(was!)}</span>

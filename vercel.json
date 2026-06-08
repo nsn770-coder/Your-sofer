@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/daily-clearance",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

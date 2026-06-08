@@ -51,6 +51,10 @@ interface Product {
   outOfStock?: boolean;
   coverStyle?: string;
   bundlePromo?: string | null;
+  clearanceDiscount?: boolean;
+  clearanceSalePrice?: number;
+  originalPrice?: number;
+  inStock?: number | boolean;
 }
 
 interface Curation {
@@ -1232,6 +1236,16 @@ export default function CategoryClient({ category }: { category: string }) {
       return;
     }
 
+    if (category === 'מבצעי-מלאי' || category === 'מבצעי מלאי') {
+      const snap = await getDocs(query(collection(db, 'products'), where('clearanceDiscount', '==', true), limit(500)));
+      setAllLoaded(
+        snap.docs
+          .map(d => ({ id: d.id, ...d.data() } as Product))
+          .filter(p => p.hidden !== true && (typeof p.inStock === 'number' ? p.inStock > 0 : true))
+      );
+      return;
+    }
+
     if (category === 'מתנות') {
       const MATANOT_CATS = ['מתנות', 'כלי שולחן והגשה', 'עיצוב הבית', 'יודאיקה'];
       const snaps = await Promise.all(
@@ -1749,6 +1763,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                                 stars={p.stars || undefined}
                                 outOfStock={p.outOfStock}
+                                clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
                               />
                             )}
                           </>
@@ -2003,7 +2018,8 @@ export default function CategoryClient({ category }: { category: string }) {
                       soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                       soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                       stars={p.stars || undefined}
-                      outOfStock={p.outOfStock} />
+                      outOfStock={p.outOfStock}
+                      clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice} />
                   );
                   const LEVEL_GROUPS = [
                     {
@@ -2094,6 +2110,7 @@ export default function CategoryClient({ category }: { category: string }) {
                         soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                         stars={p.stars || undefined}
                         outOfStock={p.outOfStock}
+                        clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
                       />
                     ))}
                   </div>
@@ -2140,6 +2157,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                               stars={p.stars || undefined}
                               outOfStock={p.outOfStock}
+                              clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
                             />
                           ))}
                         </div>
