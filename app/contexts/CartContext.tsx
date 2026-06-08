@@ -31,6 +31,15 @@ export interface CartItem {
   promoPlan?: string;              // '2+1' for buy-2-get-1-free
   promoPrice?: number;
   bundlePromo?: string;            // e.g. '4for100', '12for100'
+  // ── רווחיות ──────────────────────────────────────────────────────────────
+  purchasePrice?: number;          // מחיר קנייה מהספק
+  finalPrice?: number;             // מחיר סופי אחרי הנחות
+  discountApplied?: {
+    type: 'bundle' | 'coupon' | 'temp_price' | 'event_print' | 'none';
+    amount?: number;               // ₪ הנחה
+    percent?: number;              // % הנחה
+    code?: string;                 // קוד קופון אם יש
+  };
   printCustomization?: {
     productType: string;
     side: string;
@@ -61,6 +70,10 @@ interface CartContextType {
   kippotDiscountAmount: number;
   bundleDiscountAmount: number;
   discountableTotal: number;
+  // ── רווחיות ──────────────────────────────────────────────────────────────
+  totalCost: number;               // סה"כ קנייה (purchasePrice × qty)
+  totalProfit: number;             // סה"כ רווח
+  profitPercent: number;           // % רווח כללי
   // A4 — gift
   giftEligible: boolean;
   amountToGift: number;
@@ -240,6 +253,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const promoSavings = Math.round((regularTotal - total) * 100) / 100;
   const count        = items.reduce((sum, x) => sum + x.quantity, 0);
 
+  // רווחיות
+  const totalCost    = items.reduce((s, x) => s + (x.purchasePrice ?? 0) * x.quantity, 0);
+  const totalProfit  = total - totalCost;
+  const profitPercent = total > 0 ? Math.round((totalProfit / total) * 1000) / 10 : 0;
+
   // A4: gift eligibility
   const giftEligible = total >= GIFT_THRESHOLD;
   const amountToGift = giftEligible ? 0 : Math.round((GIFT_THRESHOLD - total) * 100) / 100;
@@ -256,6 +274,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       kippotQty, kippotDiscountActive, kippotDiscountAmount,
       bundleDiscountAmount,
       discountableTotal,
+      totalCost, totalProfit, profitPercent,
       giftEligible, amountToGift, selectedGift, setSelectedGift,
     }}>
       {children}
