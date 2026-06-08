@@ -107,7 +107,7 @@ export interface Order {
   total: number;
   status?: string;
   shaliachName?: string;
-  items: OrderItem[];
+  items?: OrderItem[];
   createdAt?: Date;
   printCustomization?: unknown;
   selectedGift?: unknown;
