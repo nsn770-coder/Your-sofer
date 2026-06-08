@@ -1,0 +1,148 @@
+'use client';
+import { useState } from 'react';
+import { Product } from '@/app/lib/types';
+import { Order } from '@/app/lib/types';
+
+interface ProfitabilityTabProps {
+  products: Product[];
+  orders: Order[];
+}
+
+export default function ProfitabilityTab({ products, orders }: ProfitabilityTabProps) {
+  const [dateRange, setDateRange] = useState<'day' | 'week' | 'month' | 'quarter' | 'year'>('month');
+
+  const getFilteredOrders = () => {
+    const cutoffDate = new Date();
+
+    switch (dateRange) {
+      case 'day':     cutoffDate.setDate(cutoffDate.getDate() - 1); break;
+      case 'week':    cutoffDate.setDate(cutoffDate.getDate() - 7); break;
+      case 'month':   cutoffDate.setMonth(cutoffDate.getMonth() - 1); break;
+      case 'quarter': cutoffDate.setMonth(cutoffDate.getMonth() - 3); break;
+      case 'year':    cutoffDate.setFullYear(cutoffDate.getFullYear() - 1); break;
+    }
+
+    return orders.filter(order => {
+      const orderDate = order.createdAt instanceof Date
+        ? order.createdAt
+        : new Date((order.createdAt as { seconds: number } | undefined)?.seconds ?? 0 * 1000);
+      return orderDate >= cutoffDate;
+    });
+  };
+
+  const getProfitData = () => {
+    const profitMap: Record<string, {
+      name: string; sold: number; revenue: number; cost: number; profit: number;
+    }> = {};
+
+    getFilteredOrders().forEach(order => {
+      order.items.forEach(item => {
+        const product = products.find(p => p.id === item.productId);
+        if (!product) return;
+
+        const cost    = (product.purchasePrice ?? 0) * item.quantity;
+        const revenue = (item.finalPrice ?? item.price) * item.quantity;
+        const profit  = revenue - cost;
+
+        if (!profitMap[item.productId]) {
+          profitMap[item.productId] = { name: item.productName, sold: 0, revenue: 0, cost: 0, profit: 0 };
+        }
+        profitMap[item.productId].sold    += item.quantity;
+        profitMap[item.productId].revenue += revenue;
+        profitMap[item.productId].cost    += cost;
+        profitMap[item.productId].profit  += profit;
+      });
+    });
+
+    return Object.values(profitMap).sort((a, b) => b.profit - a.profit);
+  };
+
+  const profitData    = getProfitData();
+  const totalProfit   = profitData.reduce((s, p) => s + p.profit,  0);
+  const totalRevenue  = profitData.reduce((s, p) => s + p.revenue, 0);
+  const totalCost     = profitData.reduce((s, p) => s + p.cost,    0);
+  const profitPercent = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : '0';
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 18, fontWeight: 900, marginBottom: 15 }}>📊 דוח רווחיות</h2>
+
+      <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+        {(['day', 'week', 'month', 'quarter', 'year'] as const).map(range => (
+          <button
+            key={range}
+            onClick={() => setDateRange(range)}
+            style={{
+              padding: '8px 16px', borderRadius: 6, fontSize: 13, cursor: 'pointer', fontWeight: 700,
+              border:      dateRange === range ? '2px solid #0c1a35' : '1px solid #ddd',
+              background:  dateRange === range ? '#0c1a35' : '#fff',
+              color:       dateRange === range ? '#fff' : '#0c1a35',
+            }}
+          >
+            {range === 'day'     && '📅 יום'}
+            {range === 'week'    && '📆 שבוע'}
+            {range === 'month'   && '📊 חודש'}
+            {range === 'quarter' && '📈 רבעון'}
+            {range === 'year'    && '📉 שנה'}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 15, marginBottom: 20 }}>
+        <div style={{ background: '#ecfdf5', padding: 15, borderRadius: 8 }}>
+          <div style={{ fontSize: 12, color: '#059669', fontWeight: 700 }}>רווח כולל</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#059669' }}>₪{totalProfit.toFixed(2)}</div>
+        </div>
+        <div style={{ background: '#eff6ff', padding: 15, borderRadius: 8 }}>
+          <div style={{ fontSize: 12, color: '#0369a1', fontWeight: 700 }}>הכנסות</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#0369a1' }}>₪{totalRevenue.toFixed(2)}</div>
+        </div>
+        <div style={{ background: '#fef2f2', padding: 15, borderRadius: 8 }}>
+          <div style={{ fontSize: 12, color: '#dc2626', fontWeight: 700 }}>עלויות</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#dc2626' }}>₪{totalCost.toFixed(2)}</div>
+        </div>
+        <div style={{ background: '#f0fdf4', padding: 15, borderRadius: 8 }}>
+          <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 700 }}>% רווח</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: '#16a34a' }}>{profitPercent}%</div>
+        </div>
+      </div>
+
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #ddd' }}>
+              <th style={{ padding: 10, textAlign: 'right' }}>מוצר</th>
+              <th style={{ padding: 10, textAlign: 'center' }}>מכירות</th>
+              <th style={{ padding: 10, textAlign: 'center' }}>הכנסות</th>
+              <th style={{ padding: 10, textAlign: 'center' }}>עלויות</th>
+              <th style={{ padding: 10, textAlign: 'center' }}>רווח</th>
+              <th style={{ padding: 10, textAlign: 'center' }}>%</th>
+            </tr>
+          </thead>
+          <tbody>
+            {profitData.length === 0 ? (
+              <tr>
+                <td colSpan={6} style={{ padding: 20, textAlign: 'center', color: '#999' }}>
+                  אין נתונים לתקופה שנבחרה
+                </td>
+              </tr>
+            ) : profitData.map((p, idx) => (
+              <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
+                <td style={{ padding: 10 }}>{p.name.slice(0, 40)}</td>
+                <td style={{ padding: 10, textAlign: 'center', fontWeight: 700 }}>{p.sold}</td>
+                <td style={{ padding: 10, textAlign: 'center' }}>₪{p.revenue.toFixed(2)}</td>
+                <td style={{ padding: 10, textAlign: 'center' }}>₪{p.cost.toFixed(2)}</td>
+                <td style={{ padding: 10, textAlign: 'center', fontWeight: 700, color: p.profit >= 0 ? '#059669' : '#dc2626' }}>
+                  ₪{p.profit.toFixed(2)}
+                </td>
+                <td style={{ padding: 10, textAlign: 'center' }}>
+                  {p.revenue > 0 ? ((p.profit / p.revenue) * 100).toFixed(1) : '0'}%
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

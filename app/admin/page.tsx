@@ -13,6 +13,10 @@ import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
 import { CATS } from '../constants/categories';
 import HomepageConfigTab from './components/HomepageConfigTab';
+import InventoryTab from './components/InventoryTab';
+import PrintsTab from './components/PrintsTab';
+import StickersTab from './components/StickersTab';
+import ProfitabilityTab from './components/ProfitabilityTab';
 
 interface OrderItem {
   id: string;
@@ -204,7 +208,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability';
 
 interface Coupon {
   id: string;
@@ -2579,6 +2583,10 @@ export default function AdminPage() {
           { key: 'coupons',        label: '🏷️ קופונים',          color: 'bg-rose-700' },
           { key: 'out_of_stock',   label: '🔴 אזל מלאי',         color: 'bg-red-700',    badge: outOfStockProducts.length },
           { key: 'gifts',          label: '🎁 מתנות VIP',         color: 'bg-pink-600' },
+          { key: 'inventory',      label: '📦 מלאי',               color: 'bg-teal-600' },
+          { key: 'prints',         label: '🖨️ הדפסות',             color: 'bg-orange-600' },
+          { key: 'stickers',       label: '🏷️ מדבקות QR',          color: 'bg-indigo-600' },
+          { key: 'profitability',  label: '📊 רווחיות',             color: 'bg-emerald-700' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -3834,6 +3842,16 @@ export default function AdminPage() {
       )}
 
       {activeTab === 'gifts' && <GiftsTab />}
+
+      {activeTab === 'inventory' && <InventoryTab products={products} orders={orders} onSave={async (productId, data) => {
+        await updateDoc(doc(db, 'products', productId), data as Record<string, unknown>);
+      }} />}
+
+      {activeTab === 'prints' && <PrintsTab orders={orders} />}
+
+      {activeTab === 'stickers' && <StickersTab />}
+
+      {activeTab === 'profitability' && <ProfitabilityTab products={products} orders={orders} />}
 
       {lightboxImage && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }} onClick={() => setLightboxImage(null)}>
