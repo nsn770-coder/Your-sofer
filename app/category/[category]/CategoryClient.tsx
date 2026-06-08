@@ -372,7 +372,12 @@ function applySort(products: Product[], sort: SortBy): Product[] {
       case 'newest':     return (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0);
       case 'oldest':     return (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0);
       case 'popular':
-      default:           return (b.priority ?? 0) - (a.priority ?? 0);
+      default: {
+        const bsBest = (p: Product) => (p.isBestSeller ? 1 : 0);
+        const bsDiff = bsBest(b) - bsBest(a);
+        if (bsDiff !== 0) return bsDiff;
+        return (b.priority ?? 0) - (a.priority ?? 0);
+      }
     }
   });
 }

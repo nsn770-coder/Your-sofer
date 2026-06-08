@@ -5,12 +5,88 @@ import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firest
 import { db } from '../firebase';
 import * as pixel from '@/lib/metaPixel';
 
+// ── Gematria blessing system ───────────────────────────────────────────────────
+
+/**
+ * Customer number formula (deterministic):
+ *   customerNumber = max(1, hour × 20 + floor(minute / 3))
+ *
+ * Examples:
+ *   10:00 → 10×20 + 0 = 200
+ *   00:00 → 0 + 0 → clamped to 1
+ *   23:59 → 460 + 19 = 479
+ *
+ * The formula maps any hour:minute to a value in [1, 479].
+ * We then find the Hebrew word whose gematria value is closest.
+ */
+function computeCustomerNumber(createdAtSeconds: number): number {
+  const d = new Date(createdAtSeconds * 1000);
+  const hour = d.getHours();
+  const minute = d.getMinutes();
+  return Math.max(1, hour * 20 + Math.floor(minute / 3));
+}
+
+interface GematriaBlessingEntry {
+  value: number;
+  word: string;
+  blessing: string;
+}
+
+const GEMATRIA_BLESSINGS: GematriaBlessingEntry[] = [
+  { value: 17,  word: 'טוב',     blessing: 'יהיה לך טוב בכל דרכיך' },
+  { value: 18,  word: 'חי',      blessing: 'חיים ארוכים ובריאים לך ולביתך' },
+  { value: 29,  word: 'חדווה',   blessing: 'חדווה ושמחה ימלאו את ביתך' },
+  { value: 34,  word: 'כוח',     blessing: 'תמיד יהיה לך כוח להצליח' },
+  { value: 45,  word: 'גאולה',   blessing: 'גאולה ופדיה לך ולכל ישראל' },
+  { value: 58,  word: 'חן',      blessing: 'חן וחסד ימצאו עמך בכל מקום' },
+  { value: 67,  word: 'בינה',    blessing: 'בינה ודעת יואירו את דרכך' },
+  { value: 68,  word: 'חיים',    blessing: 'חיים מלאי אושר ובריאות' },
+  { value: 72,  word: 'חסד',     blessing: 'חסד אלוקי ילווה אותך תמיד' },
+  { value: 73,  word: 'חכמה',    blessing: 'חכמה ובינה יישרו את דרכך' },
+  { value: 91,  word: 'אמן',     blessing: 'אמן — כל ברכותיך יתקיימו' },
+  { value: 97,  word: 'אמון',    blessing: 'אמון ונאמנות ילוו את חייך' },
+  { value: 103, word: 'נחמה',    blessing: 'נחמה ושלווה ימלאו את לבך' },
+  { value: 106, word: 'יופי',    blessing: 'יופי ועושר יגיעו אליך' },
+  { value: 123, word: 'ענג',     blessing: 'עונג ושפע ישרו על ביתך' },
+  { value: 130, word: 'צהלה',    blessing: 'צהלה ורינה בביתך לעולם' },
+  { value: 138, word: 'הצלחה',   blessing: 'הצלחה ושגשוג בכל אשר תפנה' },
+  { value: 148, word: 'נצח',     blessing: 'ניצחון ותהילה לך ולמשפחתך' },
+  { value: 207, word: 'אור',     blessing: 'אור גדול יאיר את דרכך' },
+  { value: 209, word: 'הדר',     blessing: 'הדר ותפארת ילוו אותך' },
+  { value: 214, word: 'ניצחון',  blessing: 'ניצחון בכל אתגריך' },
+  { value: 227, word: 'ברכה',    blessing: 'ברכה והצלחה בכל מעשה ידיך' },
+  { value: 255, word: 'רנה',     blessing: 'שיר ורנה ישמע מביתך' },
+  { value: 292, word: 'רפואה',   blessing: 'רפואה שלמה לך ולכל יקיריך' },
+  { value: 306, word: 'דבש',     blessing: 'מתיקות ושפע יגיעו אליך' },
+  { value: 347, word: 'שלווה',   blessing: 'שלווה ומנוחה בכל מקום שתלך' },
+  { value: 353, word: 'שמחה',    blessing: 'שמחה אמיתית תמלא את לבך' },
+  { value: 376, word: 'שלום',    blessing: 'שלום ושלווה בביתך לעולם' },
+  { value: 391, word: 'ישועה',   blessing: 'ישועה ורחמים ישרו עליך' },
+  { value: 441, word: 'אמת',     blessing: 'תמיד תלך בדרך האמת' },
+  { value: 450, word: 'שפע',     blessing: 'שפע ברכות מהשמים יגיעו אליך' },
+  { value: 474, word: 'דעת',     blessing: 'דעת ואמונה ינחו את צעדיך' },
+];
+
+function findClosestBlessing(n: number): GematriaBlessingEntry {
+  let best = GEMATRIA_BLESSINGS[0];
+  let bestDist = Math.abs(n - best.value);
+  for (const entry of GEMATRIA_BLESSINGS) {
+    const dist = Math.abs(n - entry.value);
+    if (dist < bestDist) { best = entry; bestDist = dist; }
+  }
+  return best;
+}
+
+const GIFT_THRESHOLD = 250;
+
 function ThankYouContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('order');
   const orderId = searchParams.get('orderId');
   const [emailSent, setEmailSent] = useState(false);
+  const [blessing, setBlessing] = useState<{ customerNumber: number; word: string; text: string } | null>(null);
+  const [orderTotal, setOrderTotal] = useState<number>(0);
 
   useEffect(() => {
     if (!orderId || emailSent) return;
@@ -27,6 +103,14 @@ function ThankYouContent() {
 
         const order = orderSnap.data();
         console.log('[thank-you] order loaded, sessionId:', order.sessionId, 'email:', order.email);
+
+        // Gematria blessing
+        const createdSec: number =
+          order.createdAt?.seconds ?? Math.floor(Date.now() / 1000);
+        const customerNum = computeCustomerNumber(createdSec);
+        const blessingEntry = findClosestBlessing(customerNum);
+        setBlessing({ customerNumber: customerNum, word: blessingEntry.word, text: blessingEntry.blessing });
+        setOrderTotal(order.total ?? 0);
 
         // עדכן סטטוס הזמנה ל-paid
         await updateDoc(doc(db, 'orders', orderId!), {
@@ -158,25 +242,61 @@ function ThankYouContent() {
     sendEmail();
   }, [orderId]);
 
+  const hasGift = orderTotal >= GIFT_THRESHOLD;
+
   return (
-    <main className="max-w-lg mx-auto p-6 text-center" dir="rtl">
-      <div className="bg-white rounded-2xl shadow-lg p-10 mt-20">
-        <div className="text-6xl mb-6">🎉</div>
-        <h1 className="text-2xl font-black text-green-700 mb-2">ההזמנה התקבלה!</h1>
+    <main style={{ maxWidth: 520, margin: '0 auto', padding: '0 16px 48px', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
+      {/* ── Order confirmation card ── */}
+      <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', padding: '40px 32px', marginTop: 60, textAlign: 'center' }}>
+        <div style={{ fontSize: 56, marginBottom: 20 }}>🎉</div>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: '#166534', marginBottom: 8 }}>ההזמנה התקבלה!</h1>
         {orderNumber && (
-          <div className="text-gray-500 text-sm mb-6">
-            מספר הזמנה: <span className="font-bold text-gray-800">{orderNumber}</span>
+          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>
+            מספר הזמנה: <span style={{ fontWeight: 700, color: '#1a1a1a' }}>{orderNumber}</span>
           </div>
         )}
-        <p className="text-gray-600 mb-8 leading-relaxed">
-          תודה על הזמנתך! שלחנו אליך אישור במייל.
+        <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.7, marginBottom: 28 }}>
+          תודה על הזמנתך! שלחנו אליך אישור במייל.<br />
           הסופר יתחיל לעבוד על המוצר שלך בהקדם.
         </p>
+
+        {/* ── Gift section (if order total >= 250) ── */}
+        {hasGift && (
+          <div style={{ background: 'linear-gradient(135deg, #fef9c3, #fef3c7)', border: '1.5px solid #fbbf24', borderRadius: 14, padding: '16px 20px', marginBottom: 24, textAlign: 'center' }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>🎁</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#92400e', marginBottom: 4 }}>מתנה בהזמנתך!</div>
+            <div style={{ fontSize: 13, color: '#78350f' }}>
+              כתוצאה מהזמנה מעל ₪250, תקבל מתנה מיוחדת יחד עם המשלוח שלך.
+            </div>
+          </div>
+        )}
+
         <button onClick={() => router.push('/')}
-          className="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-lg transition">
+          style={{ width: '100%', background: '#166534', color: '#fff', border: 'none', borderRadius: 14, padding: '14px', fontSize: 16, fontWeight: 800, cursor: 'pointer', marginBottom: 0 }}>
           חזרה לחנות
         </button>
       </div>
+
+      {/* ── Gematria blessing card ── */}
+      {blessing && (
+        <div style={{ background: 'linear-gradient(135deg, #1a2744, #1e3a8a)', borderRadius: 20, boxShadow: '0 8px 40px rgba(30,58,138,0.25)', padding: '32px 28px', marginTop: 20, textAlign: 'center', color: '#fff' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 14 }}>
+            ✦ ברכה אישית לך ✦
+          </div>
+          <div style={{ fontSize: 52, fontWeight: 900, color: '#C5A028', letterSpacing: '0.05em', marginBottom: 6, fontFamily: "'Frank Ruhl Libre', serif" }}>
+            {blessing.word}
+          </div>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginBottom: 16 }}>
+            גימטריה: {blessing.customerNumber}
+          </div>
+          <div style={{ fontSize: 17, fontWeight: 400, color: 'rgba(255,255,255,0.92)', lineHeight: 1.7 }}>
+            {blessing.text}
+          </div>
+          <div style={{ marginTop: 20, fontSize: 11, color: 'rgba(197,160,40,0.7)', letterSpacing: '0.1em' }}>
+            Your Sofer — עם תפילה לשלומך
+          </div>
+        </div>
+      )}
     </main>
   );
 }

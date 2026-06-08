@@ -1361,6 +1361,11 @@ export default function HomePageClient() {
                         <span style={{ fontSize: 32, color: '#ccc' }}>📦</span>
                       </div>
                     )}
+                    {p.isBestSeller && (
+                      <div style={{ position: 'absolute', top: 7, right: 7, zIndex: 1, background: '#fff3e0', border: '1px solid #e8920a', borderRadius: 20, fontSize: 10, fontWeight: 800, color: '#c45e00', padding: '2px 8px', letterSpacing: '0.01em' }}>
+                        הכי נמכר
+                      </div>
+                    )}
                   </div>
                   <div style={{ padding: '10px 12px 14px' }}>
                     <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
