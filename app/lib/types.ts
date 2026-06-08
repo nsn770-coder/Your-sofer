@@ -105,7 +105,7 @@ export interface Order {
   email?: string;
   address?: string;
   total: number;
-  status: 'new' | 'processing' | 'delivered' | 'pending_payment';
+  status?: string;
   shaliachName?: string;
   items: OrderItem[];
   createdAt?: Date;
