@@ -37,7 +37,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
   const [applyingInvoice, setApplyingInvoice] = useState(false);
 
   const getSold = (productId: string) =>
-    orders.flatMap(o => o.items).filter(i => i.productId === productId).reduce((s, i) => s + i.quantity, 0);
+    orders.flatMap(o => o.items ?? []).filter(i => i.productId === productId).reduce((s, i) => s + i.quantity, 0);
 
   const getInventory = (product: Product) =>
     (product.receivedFromSupplier ?? 0) - getSold(product.id);
