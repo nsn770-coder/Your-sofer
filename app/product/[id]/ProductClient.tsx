@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { doc, getDoc, updateDoc, setDoc, addDoc, collection, getDocs, query, where, limit, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useCart } from '../../contexts/CartContext';
+import { useCart, getEventPrintPricePerUnit } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
 import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
@@ -52,6 +52,7 @@ interface Product {
   hasKlafSelection?: boolean;
   isExpertRecommended?: boolean;
   priority?: number;
+  isEventKippot?: boolean;
   marketingIntro?: string;
   whoIsItFor?: { emoji: string; text: string }[];
   whyUs?: string[];
@@ -463,6 +464,161 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
   );
 }
 
+// ─── Event Kippot Calculator (A1) ────────────────────────────────────────────
+
+const EVENT_QTY_STEPS = [50, 60, 70, 80, 90, 100, 120, 150, 200, 300, 500, 1000];
+const TABLE_QTYS      = [50, 60, 70, 80, 90, 100, 150, 200, 300, 500, 750, 1000];
+
+function EventKippotCalculator({
+  product,
+  onAddToCart,
+}: {
+  product: { id: string; name: string; price: number; imgUrl?: string; image_url?: string; outOfStock?: boolean };
+  onAddToCart: (qty: number, withPrinting: boolean, printFileUrl: string) => void;
+}) {
+  const [qty, setQty]                 = useState(100);
+  const [withPrinting, setWithPrinting] = useState(false);
+  const [printFileUrl, setPrintFileUrl] = useState('');
+  const [uploading, setUploading]     = useState(false);
+  const [showTable, setShowTable]     = useState(false);
+
+  const printPricePerUnit = getEventPrintPricePerUnit(qty);
+  const kippotTotal       = product.price * qty;
+  const printTotal        = withPrinting ? printPricePerUnit * qty : 0;
+  const grandTotal        = kippotTotal + printTotal;
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'yoursofer_upload');
+      const res  = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error('upload failed');
+      setPrintFileUrl(data.secure_url);
+    } catch { alert('שגיאה בהעלאת הקובץ'); }
+    finally { setUploading(false); }
+  }
+
+  return (
+    <div dir="rtl" style={{ fontFamily: 'Heebo, Arial, sans-serif' }}>
+      {/* Quantity steps */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 6 }}>כמות כיפות:</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {EVENT_QTY_STEPS.map(n => (
+            <button key={n} onClick={() => setQty(n)}
+              style={{ padding: '5px 12px', borderRadius: 8, border: `1.5px solid ${qty === n ? '#C5A028' : '#e0e0e0'}`, background: qty === n ? '#fffbf0' : '#fff', fontWeight: qty === n ? 800 : 500, fontSize: 13, cursor: 'pointer', color: qty === n ? '#1a1a1a' : '#555' }}>
+              {n}
+            </button>
+          ))}
+        </div>
+        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 12, color: '#888' }}>כמות מותאמת:</span>
+          <input type="number" min={1} step={10} value={qty}
+            onChange={e => { const v = parseInt(e.target.value) || 1; setQty(Math.max(1, v)); }}
+            style={{ width: 80, border: '1px solid #e0e0e0', borderRadius: 8, padding: '5px 8px', fontSize: 13, textAlign: 'center' }} />
+        </div>
+      </div>
+
+      {/* Print toggle */}
+      <div style={{ marginBottom: 14, background: '#f8f9fa', border: '1px solid #e8e8e8', borderRadius: 10, padding: '12px 14px' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+          <input type="checkbox" checked={withPrinting} onChange={e => setWithPrinting(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#C5A028' }} />
+          הוסף הדפסה אישית (לוגו / טקסט)
+        </label>
+        {withPrinting && (
+          <div style={{ marginTop: 10 }}>
+            <div style={{ fontSize: 11, color: '#666', marginBottom: 6 }}>
+              מחיר הדפסה: {qty >= 100 ? '₪5' : qty >= 50 ? '₪7' : '₪20'} ליחידה
+            </div>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: printFileUrl ? '#f0fdf4' : '#f5f5f5', border: `1.5px dashed ${printFileUrl ? '#86efac' : '#ccc'}`, borderRadius: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#555' }}>
+              {uploading ? 'מעלה...' : printFileUrl ? '✓ קובץ הועלה — לחץ להחלפה' : '📁 העלה לוגו / PDF / תמונה'}
+              <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handleUpload} disabled={uploading} />
+            </label>
+            {printFileUrl && (
+              <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <img src={printFileUrl} alt="עיצוב" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd' }} onError={e => (e.currentTarget.style.display='none')} />
+                <button onClick={() => setPrintFileUrl('')} style={{ background: 'none', border: 'none', color: '#c0392b', cursor: 'pointer', fontSize: 12 }}>הסר</button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Price breakdown */}
+      <div style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#555', marginBottom: 5 }}>
+          <span>כיפות × {qty}</span>
+          <span>₪{kippotTotal.toLocaleString()}</span>
+        </div>
+        {withPrinting && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#555', marginBottom: 5 }}>
+            <span>הדפסה × {qty} (₪{printPricePerUnit}/יח')</span>
+            <span>₪{printTotal.toLocaleString()}</span>
+          </div>
+        )}
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16, fontWeight: 900, color: '#1a1a1a', borderTop: '1px solid #f0f0f0', paddingTop: 8, marginTop: 4 }}>
+          <span>סה"כ</span>
+          <span>₪{grandTotal.toLocaleString()}</span>
+        </div>
+        {qty >= 100 && (
+          <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 600, marginTop: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
+            🎉 הנחת 30% על הכיפות תחול אוטומטית בעגלה!
+          </div>
+        )}
+      </div>
+
+      {/* Add to cart */}
+      <button
+        onClick={() => onAddToCart(qty, withPrinting, printFileUrl)}
+        disabled={!!product.outOfStock || (withPrinting && !printFileUrl)}
+        style={{ width: '100%', height: 52, background: (product.outOfStock || (withPrinting && !printFileUrl)) ? '#e5e7eb' : '#C9A227', color: (product.outOfStock || (withPrinting && !printFileUrl)) ? '#9ca3af' : '#1F3D8F', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 900, cursor: (product.outOfStock || (withPrinting && !printFileUrl)) ? 'not-allowed' : 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        {product.outOfStock ? 'אזל המלאי' : withPrinting && !printFileUrl ? 'נא להעלות קובץ הדפסה' : `🛒 הוסף ${qty} כיפות לסל`}
+      </button>
+
+      {/* Comparison table toggle */}
+      <button onClick={() => setShowTable(t => !t)}
+        style={{ width: '100%', background: 'none', border: '1px solid #e0e0e0', borderRadius: 8, padding: '8px', fontSize: 12, color: '#555', cursor: 'pointer', marginBottom: 8 }}>
+        {showTable ? '▲ סגור טבלת מחירים' : '▼ השוואת מחירים לפי כמות'}
+      </button>
+
+      {showTable && (
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', fontSize: 12 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#1a1a1a', color: '#C5A028' }}>
+                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>כמות</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>ללא הדפסה</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>כולל הדפסה</th>
+              </tr>
+            </thead>
+            <tbody>
+              {TABLE_QTYS.map((n, i) => {
+                const ppu = getEventPrintPricePerUnit(n);
+                const base = product.price * n;
+                const withPrint = base + ppu * n;
+                const isActive = n === qty;
+                return (
+                  <tr key={n} style={{ background: isActive ? '#fffbf0' : i % 2 === 0 ? '#fff' : '#fafafa', cursor: 'pointer' }}
+                    onClick={() => setQty(n)}>
+                    <td style={{ padding: '7px 10px', fontWeight: isActive ? 800 : 500, color: isActive ? '#C5A028' : '#333' }}>{n}</td>
+                    <td style={{ padding: '7px 10px', color: '#333' }}>₪{base.toLocaleString()}</td>
+                    <td style={{ padding: '7px 10px', color: '#1a6b3c', fontWeight: 600 }}>₪{withPrint.toLocaleString()} <span style={{ color: '#888', fontWeight: 400 }}>(₪{ppu}/יח')</span></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Admin Panel ──────────────────────────────────────────────────────────────
 
 const SOFER_EDIT_CATS = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
@@ -502,6 +658,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [sourceUrl, setSourceUrl]               = useState(product.sourceUrl || '');
   const [hasKlafSelection, setHasKlafSelection] = useState(product.hasKlafSelection ?? false);
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
+  const [isEventKippot, setIsEventKippot]             = useState(product.isEventKippot ?? false);
   const [priority, setPriority]               = useState(String(product.priority ?? 0));
   const [soferId, setSoferId]                 = useState(product.soferId || '');
   const [soferOptions, setSoferOptions]       = useState<{ id: string; name: string }[]>([]);
@@ -591,6 +748,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         sourceUrl: sourceUrl || undefined,
         hasKlafSelection: hasKlafSelection,
         isExpertRecommended: isExpertRecommended,
+        isEventKippot: isEventKippot,
         priority: priority !== '' ? Number(priority) : 0,
         soferId: soferId || undefined,
         ...(saveGlobal ? {} : textData),
@@ -760,6 +918,11 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
             <input type="checkbox" checked={isExpertRecommended} onChange={e => setIsExpertRecommended(e.target.checked)} />
             ⭐ מומלץ על ידי המומחים שלנו
             <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>isExpertRecommended</span>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
+            <input type="checkbox" checked={isEventKippot} onChange={e => setIsEventKippot(e.target.checked)} />
+            🎩 מחשבון כיפות אירועים
+            <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>isEventKippot</span>
           </label>
           {(SOFER_EDIT_CATS.includes(cat) || !!soferId) && (
             <div>
@@ -1233,7 +1396,7 @@ export default function ProductClient() {
   const [loading, setLoading]           = useState(true);
   const [activeImg, setActiveImg]       = useState(0);
   const [cartQty, setCartQty]           = useState(0);
-  const [qty, setQty]                   = useState(1);
+  const [qty, setQty]                   = useState(1); // updated to minQty after product loads
   const [zoomVisible, setZoomVisible]   = useState(false);
   const [showWizardModal, setShowWizardModal] = useState(false);
   const [adminOpen, setAdminOpen]       = useState(false);
@@ -1283,6 +1446,13 @@ export default function ProductClient() {
     setStamPage(!!product?.cat && STAM_CHAT_CATS.has(product.cat));
     return () => setStamPage(false);
   }, [product?.cat, setStamPage]);
+
+  // A3: set initial qty to minQty for cheap non-kippot products
+  useEffect(() => {
+    if (product && product.price < 25 && product.cat !== 'כיפות') {
+      setQty(5);
+    }
+  }, [product?.id]);
 
   useEffect(() => {
     setCurrentViewers(Math.floor(Math.random() * 5) + 2);
@@ -1484,6 +1654,22 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     return true;
   }
 
+  // A1: event kippot handler — replaces existing items (qty is exact, not incremental)
+  function handleEventKippotAddToCart(eventQty: number, withPrinting: boolean, printFileUrl: string) {
+    if (!product) return;
+    removeItem(product.id);
+    removeItem(`print-${product.id}`);
+    addItem({ id: product.id, name: product.name, price: product.price, imgUrl: product.imgUrl || product.image_url, quantity: eventQty, cat: 'כיפות' });
+    if (withPrinting) {
+      const ppu = getEventPrintPricePerUnit(eventQty);
+      addItem({ id: `print-${product.id}`, name: `הדפסה לכיפות`, price: ppu, quantity: eventQty, cat: 'הדפסה', imgUrl: product.imgUrl || product.image_url, printCustomization: { uploadedImageUrl: printFileUrl, originalImageUrl: printFileUrl, productType: 'כיפות', side: 'front', bgRemoved: false } });
+    }
+    setCartQty(eventQty);
+    window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product.price * eventQty, items: [{ item_id: product.id, item_name: product.name, price: product.price, quantity: eventQty }] });
+    pixel.addToCart({ id: product.id, name: product.name, price: product.price, quantity: eventQty });
+    router.push('/cart');
+  }
+
   function handleAddToCart() {
     if (product?.outOfStock) return;
     if (selectedKlafIds.length > 0) {
@@ -1515,7 +1701,35 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       ? '🛒 אני אוסיף לעגלה את התפילין'
       : '🛒 הוסף לעגלה';
 
-  const BuyBox = ({ compact = false }: { compact?: boolean }) => (
+  // A3: qty steps for cheap products (non-kippot, price < 25)
+  const isCheapProduct = product.price < 25 && product.cat !== 'כיפות';
+  const minQty         = isCheapProduct ? 5 : 1;
+  const qtyStep        = isCheapProduct ? 5 : 1;
+
+  const BuyBox = ({ compact = false }: { compact?: boolean }) => {
+    // isEventKippot: show calculator instead of standard buy box
+    if (product.isEventKippot) {
+      return (
+        <div style={{ background: '#fff', borderRadius: compact ? 0 : 12, padding: compact ? '12px 16px' : '20px 18px' }}>
+          {!compact && (
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
+                <span style={{ fontSize: 24, fontWeight: 800, color: '#1a1a1a' }}>₪{product.price} / כיפה</span>
+              </div>
+              <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>כולל מע״מ · משלוח לכל הארץ</div>
+            </div>
+          )}
+          <EventKippotCalculator product={product} onAddToCart={handleEventKippotAddToCart} />
+          <a href={`https://wa.me/972584877770?text=${encodeURIComponent('שלום, אני מתעניין בהזמנת כיפות: ' + (product.name || ''))}`} target="_blank" rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#25D366', fontSize: 13, fontWeight: 600, textDecoration: 'none', marginTop: 10 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+            שאלות על הדפסה? דברו איתנו בוואטסאפ
+          </a>
+        </div>
+      );
+    }
+
+    return (
     <div style={{ background: '#fff', borderRadius: compact ? 0 : 12, padding: compact ? '12px 16px' : '20px 18px' }}>
       {product.outOfStock && (
         <div style={{ background: '#fef2f2', border: '2px solid #ef4444', color: '#b91c1c', padding: '10px 16px', borderRadius: 8, fontWeight: 700, textAlign: 'center', marginBottom: 14, fontSize: 15 }}>
@@ -1569,8 +1783,16 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {!compact && selectedKlafIds.length === 0 && (
         <div style={{ marginBottom: 12 }}>
           <label style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 4 }}>כמות:</label>
+          {isCheapProduct && (
+            <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginBottom: 4 }}>
+              ⚠️ מוצר זה נמכר החל מ־5 יחידות
+            </div>
+          )}
           <select value={qty} onChange={e => setQty(Number(e.target.value))} style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#f8f9fa', cursor: 'pointer' }}>
-            {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
+            {[1,2,3,4,5,6,7,8,9,10].map(n => {
+              const v = n * qtyStep;
+              return <option key={v} value={v}>{v}</option>;
+            })}
           </select>
         </div>
       )}
@@ -1816,7 +2038,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       )}
 
     </div>
-  );
+    );
+  };
 
   // ── Kashrut tab rows ─────────────────────────────────────────────────────────
   const kashrutRows = [

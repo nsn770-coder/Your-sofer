@@ -204,7 +204,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts';
 
 interface Coupon {
   id: string;
@@ -2578,6 +2578,7 @@ export default function AdminPage() {
           { key: 'emails',         label: '📧 מיילים',           color: 'bg-sky-700' },
           { key: 'coupons',        label: '🏷️ קופונים',          color: 'bg-rose-700' },
           { key: 'out_of_stock',   label: '🔴 אזל מלאי',         color: 'bg-red-700',    badge: outOfStockProducts.length },
+          { key: 'gifts',          label: '🎁 מתנות VIP',         color: 'bg-pink-600' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -3832,6 +3833,8 @@ export default function AdminPage() {
         </div>
       )}
 
+      {activeTab === 'gifts' && <GiftsTab />}
+
       {lightboxImage && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }} onClick={() => setLightboxImage(null)}>
           <img src={lightboxImage} alt="דוגמת כתיבה" style={{ maxWidth: '90vw', maxHeight: '90vh', borderRadius: 8, objectFit: 'contain', boxShadow: '0 8px 40px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()} />
@@ -4114,6 +4117,114 @@ function CurationsTab() {
           </table>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── A4: Gifts tab — manage siteConfig/gifts in Firestore ─────────────────────
+interface GiftOption {
+  id:     string;
+  name:   string;
+  imgUrl: string;
+}
+
+function GiftsTab() {
+  const EMPTY: GiftOption = { id: '', name: '', imgUrl: '' };
+  const [gifts, setGifts] = useState<[GiftOption, GiftOption, GiftOption]>([
+    { ...EMPTY }, { ...EMPTY }, { ...EMPTY },
+  ]);
+  const [loading, setLoading] = useState(true);
+  const [saving,  setSaving]  = useState(false);
+  const [saved,   setSaved]   = useState(false);
+
+  useEffect(() => {
+    getDoc(doc(db, 'siteConfig', 'gifts')).then(snap => {
+      if (snap.exists()) {
+        const opts: GiftOption[] = snap.data().options ?? [];
+        setGifts([
+          opts[0] ?? { ...EMPTY },
+          opts[1] ?? { ...EMPTY },
+          opts[2] ?? { ...EMPTY },
+        ]);
+      }
+      setLoading(false);
+    });
+  }, []);
+
+  function update(idx: number, field: keyof GiftOption, value: string) {
+    setGifts(prev => {
+      const next = [...prev] as [GiftOption, GiftOption, GiftOption];
+      next[idx] = { ...next[idx], [field]: value };
+      return next;
+    });
+    setSaved(false);
+  }
+
+  async function save() {
+    setSaving(true);
+    await setDoc(doc(db, 'siteConfig', 'gifts'), {
+      options:   gifts.filter(g => g.id && g.name),
+      updatedAt: new Date().toISOString(),
+    });
+    setSaving(false);
+    setSaved(true);
+  }
+
+  if (loading) return <div className="p-10 text-center text-gray-400">טוען...</div>;
+
+  return (
+    <div className="grid gap-6 max-w-2xl">
+      <div className="bg-white rounded-xl shadow p-6">
+        <h2 className="text-lg font-black text-pink-700 mb-1">🎁 מתנות VIP — רוטציה שבועית</h2>
+        <p className="text-sm text-gray-500 mb-6">לקוחות שמזמינים מעל ₪250 בוחרים מתנה אחת מבין 3 אפשרויות.</p>
+        <div className="grid gap-6">
+          {gifts.map((g, i) => (
+            <div key={i} className="border border-gray-100 rounded-lg p-4">
+              <h3 className="font-bold text-gray-700 mb-3">מתנה {i + 1}</h3>
+              <div className="grid gap-3">
+                <label className="text-xs text-gray-500">
+                  מזהה (ייחודי לכל מתנה)
+                  <input
+                    value={g.id}
+                    onChange={e => update(i, 'id', e.target.value)}
+                    placeholder="gift-1"
+                    className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm"
+                  />
+                </label>
+                <label className="text-xs text-gray-500">
+                  שם המתנה (יוצג ללקוח)
+                  <input
+                    value={g.name}
+                    onChange={e => update(i, 'name', e.target.value)}
+                    placeholder="שוקולד בלגי"
+                    className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm"
+                  />
+                </label>
+                <label className="text-xs text-gray-500">
+                  URL תמונה (Cloudinary)
+                  <input
+                    value={g.imgUrl}
+                    onChange={e => update(i, 'imgUrl', e.target.value)}
+                    placeholder="https://res.cloudinary.com/..."
+                    className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm"
+                    dir="ltr"
+                  />
+                </label>
+                {g.imgUrl && (
+                  <img src={g.imgUrl} alt={g.name} className="w-20 h-20 object-cover rounded border border-gray-100" />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={save}
+          disabled={saving}
+          className="mt-6 px-6 py-2 bg-pink-600 text-white rounded-lg font-bold text-sm disabled:opacity-50"
+        >
+          {saving ? 'שומר...' : saved ? '✓ נשמר!' : 'שמור מתנות'}
+        </button>
+      </div>
     </div>
   );
 }

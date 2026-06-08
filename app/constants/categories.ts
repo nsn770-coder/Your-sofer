@@ -23,6 +23,7 @@ export const CATS = [
   'קלפים',
   'קלפי מזוזה',
   'קלפי תפילין',
+  'כיפות',
 ];
 
 export const SUB_CATS: Record<string, string[]> = {

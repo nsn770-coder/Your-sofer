@@ -67,7 +67,7 @@ const SHIPPING_REGULAR = 30;
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, total, kippotDiscountActive, kippotDiscountAmount, printDiscountActive, printDiscountAmount, bundleDiscountAmount, discountableTotal } = useCart();
+  const { items, total, kippotDiscountActive, kippotDiscountAmount, bundleDiscountAmount, discountableTotal, giftEligible, amountToGift, selectedGift, setSelectedGift } = useCart();
   const { shaliach, refCode } = useShaliach();
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -87,6 +87,7 @@ export default function CheckoutPage() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' } | null>(null);
+  const [giftOptions, setGiftOptions] = useState<{ id: string; name: string; imgUrl?: string }[]>([]);
 
   // Read isMobile before first paint to prevent the false→true CLS flip on mobile
   useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
@@ -96,6 +97,13 @@ export default function CheckoutPage() {
     function onResize() { clearTimeout(timer); timer = setTimeout(() => setIsMobile(window.innerWidth < 768), 150); }
     window.addEventListener('resize', onResize);
     return () => { window.removeEventListener('resize', onResize); clearTimeout(timer); };
+  }, []);
+
+  // Fetch gift options from Firestore
+  useEffect(() => {
+    getDoc(doc(db, 'siteConfig', 'gifts'))
+      .then(snap => { if (snap.exists()) setGiftOptions(snap.data().options ?? []); })
+      .catch(() => {});
   }, []);
 
   // Meta Pixel - InitiateCheckout fires once when user enters checkout with items
@@ -127,6 +135,8 @@ export default function CheckoutPage() {
   async function applyCoupon() {
     const code = couponInputRef.current?.value.trim().toUpperCase() || '';
     if (!code) return;
+    // A2: prevent double-application in same session
+    if (appliedCoupon) { setCouponError('קופון כבר מוחל'); return; }
     setCouponLoading(true); setCouponError('');
     try {
       const snap = await getDoc(doc(db, 'coupons', code));
@@ -135,6 +145,10 @@ export default function CheckoutPage() {
       if (!data.active) { setCouponError('קוד הקופון אינו פעיל'); return; }
       if (data.expiresAt && new Date(data.expiresAt) < new Date()) { setCouponError('קוד הקופון פג תוקף'); return; }
       if (data.minOrder && total < data.minOrder) { setCouponError(`קופון זה תקף להזמנות מעל ₪${data.minOrder}`); return; }
+      // A2: single-use coupon check
+      if (data.singleUse && Array.isArray(data.usedBy) && data.usedBy.length > 0) {
+        setCouponError('קוד קופון כבר נוצל'); return;
+      }
       const couponType: 'percent' | 'fixed' = data.type === 'fixed' ? 'fixed' : 'percent';
       setAppliedCoupon({ code, discount: data.discount, type: couponType });
       if (couponInputRef.current) couponInputRef.current.value = '';
@@ -143,8 +157,8 @@ export default function CheckoutPage() {
   }
 
   const shippingCost = SHIPPING_REGULAR;
-  // Coupon applies only to items that didn't receive the kippot bulk discount.
-  const couponBase     = kippotDiscountActive ? discountableTotal : total;
+  // A2: always use discountableTotal — excludes kippot (when 30% active), bundle items, print-service
+  const couponBase     = discountableTotal;
   const discountAmount = appliedCoupon
     ? appliedCoupon.type === 'fixed'
       ? Math.min(appliedCoupon.discount, couponBase)
@@ -187,8 +201,9 @@ export default function CheckoutPage() {
       const orderRef = await addDoc(collection(db, 'orders'), {
         orderNumber, customerName: form.name, email: form.email, phone: form.phone,
         address: `${form.address}, ${form.city}`, notes: form.notes || '',
-        items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null })),
+        items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null, printCustomization: i.printCustomization || null })),
         total: finalTotal, couponCode: appliedCoupon?.code || null, couponDiscount: appliedCoupon ? discountAmount : null,
+        selectedGift: selectedGift || null,
         kippotDiscount: kippotDiscountAmount > 0 ? kippotDiscountAmount : null,
         shippingCost, shippingType: 'regular',
         status: 'pending_payment', createdAt: serverTimestamp(),
@@ -214,12 +229,12 @@ export default function CheckoutPage() {
           items: [
             ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '', bundlePromo: i.bundlePromo || undefined })),
             ...(kippotDiscountAmount > 0 ? [{ name: 'הנחת כיפות בר מצווה — 30%', price: -kippotDiscountAmount, quantity: 1, cat: '' }] : []),
-            ...(printDiscountAmount  > 0 ? [{ name: 'הנחת הדפסה — 55%',           price: -printDiscountAmount,  quantity: 1, cat: '' }] : []),
             ...(bundleDiscountAmount > 0 ? [{ name: 'מבצע כיפות — חבילות',        price: -bundleDiscountAmount, quantity: 1, cat: '' }] : []),
             ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
+            ...(selectedGift ? [{ name: `מתנה: ${giftOptions.find(g => g.id === selectedGift)?.name ?? selectedGift}`, price: 0, quantity: 1, cat: 'מתנה' }] : []),
           ],
-          total: finalTotal, customer: { name: form.name, email: form.email, phone: form.phone }, orderNumber, orderId: orderRef.id, baseUrl,
+          total: finalTotal, customer: { name: form.name, email: form.email, phone: form.phone }, orderNumber, orderId: orderRef.id, baseUrl, couponCode: appliedCoupon?.code || undefined,
         }),
       });
 
@@ -262,18 +277,12 @@ export default function CheckoutPage() {
       <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}>
           <span>סכום ביניים</span>
-          <span>{formatPrice(total + kippotDiscountAmount + printDiscountAmount + bundleDiscountAmount)}</span>
+          <span>{formatPrice(total + kippotDiscountAmount + bundleDiscountAmount)}</span>
         </div>
         {kippotDiscountAmount > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🎉 הנחת כיפות בר מצווה (30%)</span>
             <span>-{formatPrice(kippotDiscountAmount)}</span>
-          </div>
-        )}
-        {printDiscountAmount > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🖨️ הנחת הדפסה (55%)</span>
-            <span>-{formatPrice(printDiscountAmount)}</span>
           </div>
         )}
         {bundleDiscountAmount > 0 && (
@@ -290,6 +299,12 @@ export default function CheckoutPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})</span>
             <span>-{formatPrice(discountAmount)}</span>
+          </div>
+        )}
+        {selectedGift && giftOptions.find(g => g.id === selectedGift) && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🎁 מתנה: {giftOptions.find(g => g.id === selectedGift)!.name}</span>
+            <span>חינם</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17, fontWeight: 900, color: '#1E3A8A', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
@@ -314,6 +329,36 @@ export default function CheckoutPage() {
         )}
         {couponError && <div style={{ fontSize: 11, color: '#dc2626', marginTop: 5 }}>{couponError}</div>}
       </div>
+      {/* A4: Gift selector */}
+      {giftOptions.length > 0 && (
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
+          {giftEligible ? (
+            <>
+              <div style={{ fontSize: 13, fontWeight: 800, color: '#1a6b3c', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
+                🎁 בחר מתנה חינם!
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {giftOptions.map(g => (
+                  <label key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', background: selectedGift === g.id ? '#f0fdf4' : '#fafafa', border: `1px solid ${selectedGift === g.id ? '#86efac' : '#e0e0e0'}`, borderRadius: 8, padding: '8px 10px' }}>
+                    <input type="radio" name="gift" value={g.id} checked={selectedGift === g.id} onChange={() => setSelectedGift(g.id)} style={{ accentColor: '#1a6b3c', flexShrink: 0 }} />
+                    {g.imgUrl && <img src={g.imgUrl} alt={g.name} style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />}
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a' }}>{g.name}</span>
+                    <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>חינם</span>
+                  </label>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#92400e' }}>
+              🎁 הוסף עוד <strong>{formatPrice(amountToGift)}</strong> לקבלת מתנה חינם
+              <div style={{ marginTop: 6, background: '#e5e7eb', borderRadius: 4, height: 6, overflow: 'hidden' }}>
+                <div style={{ background: '#C5A028', height: '100%', width: `${Math.min(100, (total / 250) * 100)}%`, transition: 'width 0.3s' }} />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         {[{ icon: <IconLock size={13} color="#555" />, text: 'תשלום מאובטח' }, { icon: <IconTruck size={13} color="#555" />, text: 'משלוח לכל הארץ' }, { icon: <IconReturn size={13} color="#555" />, text: 'ביטול 24 שעות' }, { icon: <IconShield size={13} color="#555" />, text: 'אחריות מלאה' }].map(item => (
           <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#777' }}>{item.icon} {item.text}</div>

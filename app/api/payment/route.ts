@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAdminDb } from '@/app/lib/firebase-admin';
 
 const SUMIT_API_URL    = 'https://api.sumit.co.il/billing/payments/beginredirect/';
 const SUMIT_COMPANY_ID = process.env.SUMIT_COMPANY_ID!;
@@ -7,15 +8,20 @@ const SUMIT_API_KEY    = process.env.SUMIT_API_KEY!;
 // ── Must match app/contexts/CartContext.tsx ───────────────────────────────────
 const KIPPOT_DISCOUNT_QTY  = 100;
 const KIPPOT_DISCOUNT_RATE = 0.30;
-const PRINT_DISCOUNT_QTY   = 50;
-const PRINT_DISCOUNT_RATE  = 0.55;
+
+// ── A1: event print tiered pricing ───────────────────────────────────────────
+function getEventPrintPricePerUnit(qty: number): number {
+  if (qty >= 100) return 5;
+  if (qty >= 50)  return 7;
+  return 20;
+}
 
 interface PaymentItem {
   name:        string;
   price:       number;
   quantity:    number;
   cat?:        string;
-  bundlePromo?: string; // e.g. '4for100', '12for100'
+  bundlePromo?: string;
 }
 
 function parseBundle(key: string): { n: number; bundlePrice: number } | null {
@@ -26,7 +32,7 @@ function parseBundle(key: string): { n: number; bundlePrice: number } | null {
 
 export async function POST(req: NextRequest) {
   try {
-    const { items, total, customer, orderNumber, orderId, baseUrl } =
+    const { items, total, customer, orderNumber, orderId, baseUrl, couponCode } =
       await req.json() as {
         items:       PaymentItem[];
         total:       number;
@@ -34,52 +40,52 @@ export async function POST(req: NextRequest) {
         orderNumber: string;
         orderId:     string;
         baseUrl:     string;
+        couponCode?: string;
       };
 
-    // ── Server-side kippot discount validation ────────────────────────────────
-    // Only regular kippot (no bundlePromo) count toward the 30% threshold.
-    const kippotItems  = items.filter(i => i.cat === 'כיפות' && !i.bundlePromo);
-    const kippotQty    = kippotItems.reduce((s, i) => s + i.quantity, 0);
+    // Product items (excludes discount lines and shipping)
+    const productItems = items.filter(i =>
+      !i.name.includes('הנחת') && !i.name.includes('משלוח') && !i.name.includes('מתנה:')
+    );
+
+    // ── A3: minimum 5 units for items < ₪25 (excluding kippot and print service) ──
+    for (const item of productItems) {
+      if (item.price < 25 && item.cat !== 'כיפות' && item.cat !== 'הדפסה' && item.quantity < 5) {
+        console.error(`[payment] min-qty violation: ${item.name} qty=${item.quantity}`);
+        return NextResponse.json({ error: 'מינימום 5 יחידות למוצרים זולים' }, { status: 400 });
+      }
+    }
+
+    // ── A1: kippot 30% bulk discount validation ───────────────────────────────
+    const kippotItems = productItems.filter(i => i.cat === 'כיפות' && !i.bundlePromo);
+    const kippotQty   = kippotItems.reduce((s, i) => s + i.quantity, 0);
 
     if (kippotQty >= KIPPOT_DISCOUNT_QTY) {
       const kippotOriginal   = kippotItems.reduce((s, i) => s + i.price * i.quantity, 0);
       const expectedDiscount = Math.round(kippotOriginal * KIPPOT_DISCOUNT_RATE * 100) / 100;
-
-      const discountLine      = items.find(i => i.name.includes('הנחת כיפות'));
+      const discountLine     = items.find(i => i.name.includes('הנחת כיפות'));
       const submittedDiscount = discountLine ? -discountLine.price : 0;
 
       if (Math.abs(submittedDiscount - expectedDiscount) > 0.02) {
-        console.error(
-          `[payment] kippot discount mismatch orderId=${orderId}`,
-          `expected=${expectedDiscount} submitted=${submittedDiscount}`,
-        );
+        console.error(`[payment] kippot discount mismatch`, { expectedDiscount, submittedDiscount });
         return NextResponse.json({ error: 'שגיאה בחישוב הנחת הכיפות' }, { status: 400 });
       }
     }
 
-    // ── Server-side print discount validation ────────────────────────────────
-    const printItems = items.filter(i => i.name.includes('הדפסה') && !i.name.includes('הנחת'));
-    const printQty   = printItems.reduce((s, i) => s + i.quantity, 0);
-
-    if (printQty >= PRINT_DISCOUNT_QTY) {
-      const printOriginal      = printItems.reduce((s, i) => s + i.price * i.quantity, 0);
-      const expectedPrintDisc  = Math.round(printOriginal * PRINT_DISCOUNT_RATE * 100) / 100;
-      const printDiscountLine  = items.find(i => i.name.includes('הנחת הדפסה'));
-      const submittedPrintDisc = printDiscountLine ? -printDiscountLine.price : 0;
-
-      if (Math.abs(submittedPrintDisc - expectedPrintDisc) > 0.02) {
-        console.error(
-          `[payment] print discount mismatch orderId=${orderId}`,
-          `expected=${expectedPrintDisc} submitted=${submittedPrintDisc}`,
-        );
-        return NextResponse.json({ error: 'שגיאה בחישוב הנחת ההדפסה' }, { status: 400 });
+    // ── A1: event print tiered pricing validation ─────────────────────────────
+    const printServiceItems = productItems.filter(i => i.cat === 'הדפסה');
+    if (printServiceItems.length > 0) {
+      const totalPrintQty = printServiceItems.reduce((s, i) => s + i.quantity, 0);
+      const expectedPricePerUnit = getEventPrintPricePerUnit(totalPrintQty);
+      for (const psi of printServiceItems) {
+        if (Math.abs(psi.price - expectedPricePerUnit) > 0.02) {
+          console.error(`[payment] print price mismatch: ${psi.price} expected ${expectedPricePerUnit}`);
+          return NextResponse.json({ error: 'שגיאה בחישוב מחיר הדפסה' }, { status: 400 });
+        }
       }
     }
 
-    // ── Server-side bundle promo validation (NforX) ───────────────────────────
-    // Group product items (non-discount lines) by bundlePromo key.
-    const productItems = items.filter(i => !i.name.includes('הנחת') && !i.name.includes('משלוח'));
-
+    // ── A1: bundle promo validation (NforX) ───────────────────────────────────
     const bundleGroups = new Map<string, PaymentItem[]>();
     for (const item of productItems) {
       if (!item.bundlePromo) continue;
@@ -89,7 +95,6 @@ export async function POST(req: NextRequest) {
     }
 
     let expectedBundleDiscount = 0;
-
     for (const [promoKey, grpItems] of bundleGroups) {
       const parsed = parseBundle(promoKey);
       if (!parsed) continue;
@@ -105,24 +110,61 @@ export async function POST(req: NextRequest) {
       const promoUnits  = units.slice(0, fullBundles * n);
       const origPromo   = promoUnits.reduce((s, p) => s + p, 0);
       const discPromo   = fullBundles * bundlePrice;
-
       expectedBundleDiscount += Math.round((origPromo - discPromo) * 100) / 100;
     }
 
     if (expectedBundleDiscount > 0) {
       const bundleDiscountLine  = items.find(i => i.name.includes('מבצע כיפות — חבילות'));
       const submittedBundleDisc = bundleDiscountLine ? -bundleDiscountLine.price : 0;
-
       if (Math.abs(submittedBundleDisc - expectedBundleDiscount) > 0.02) {
-        console.error(
-          `[payment] bundle discount mismatch orderId=${orderId}`,
-          `expected=${expectedBundleDiscount} submitted=${submittedBundleDisc}`,
-        );
+        console.error(`[payment] bundle discount mismatch`, { expectedBundleDiscount, submittedBundleDisc });
         return NextResponse.json({ error: 'שגיאה בחישוב הנחת חבילות הכיפות' }, { status: 400 });
       }
     }
 
-    // ── Build Sumit payload (strip internal fields) ───────────────────────────
+    // ── A2: server-side coupon validation ─────────────────────────────────────
+    if (couponCode) {
+      const adminDb = getAdminDb();
+      const couponSnap = await adminDb.collection('coupons').doc(couponCode).get();
+
+      if (!couponSnap.exists) {
+        return NextResponse.json({ error: 'קוד קופון לא קיים' }, { status: 400 });
+      }
+      const couponData = couponSnap.data()!;
+      if (!couponData.active) {
+        return NextResponse.json({ error: 'קוד קופון לא פעיל' }, { status: 400 });
+      }
+      if (couponData.expiresAt && new Date(couponData.expiresAt) < new Date()) {
+        return NextResponse.json({ error: 'קוד הקופון פג תוקף' }, { status: 400 });
+      }
+
+      // Compute server-side discountable total (mirrors CartContext logic)
+      const kippotDiscountActiveServer = kippotQty >= KIPPOT_DISCOUNT_QTY;
+      let serverDiscountableTotal = 0;
+      for (const item of productItems) {
+        if (item.bundlePromo) continue;
+        if (item.cat === 'הדפסה') continue;
+        if (item.cat === 'כיפות' && kippotDiscountActiveServer) continue;
+        serverDiscountableTotal += item.price * item.quantity;
+      }
+
+      const couponDiscountLine = items.find(i => i.name.includes('הנחת קופון'));
+      const submittedCouponDisc = couponDiscountLine ? -couponDiscountLine.price : 0;
+
+      let expectedCouponDisc = 0;
+      if (couponData.type === 'fixed') {
+        expectedCouponDisc = Math.min(couponData.discount, serverDiscountableTotal);
+      } else {
+        expectedCouponDisc = Math.round(serverDiscountableTotal * couponData.discount / 100 * 100) / 100;
+      }
+
+      if (submittedCouponDisc > 0 && Math.abs(submittedCouponDisc - expectedCouponDisc) > 0.02) {
+        console.error('[payment] coupon discount mismatch', { submittedCouponDisc, expectedCouponDisc });
+        return NextResponse.json({ error: 'שגיאה בחישוב הנחת הקופון' }, { status: 400 });
+      }
+    }
+
+    // ── Build Sumit payload ───────────────────────────────────────────────────
     const body = {
       Customer: {
         Name:         customer.name,
