@@ -1,8 +1,10 @@
-﻿'use client';
+'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 
@@ -45,12 +47,17 @@ function IconShield() {
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, removeItem, updateQty, total, kippotDiscountActive, kippotDiscountAmount, bundleDiscountAmount } = useCart();
+  const {
+    items, removeItem, updateQty, total,
+    kippotDiscountActive, kippotDiscountAmount, bundleDiscountAmount,
+    giftEnabled, giftEligible, giftThreshold, amountToGift, selectedGift, setSelectedGift,
+  } = useCart();
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [shareLoading, setShareLoading] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [giftOptions, setGiftOptions] = useState<{ id: string; name: string; imgUrl?: string; productId?: string }[]>([]);
 
   async function shareCart() {
     setShareLoading(true);
@@ -75,6 +82,20 @@ export default function CartPage() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // Fetch gift options from Firestore
+  useEffect(() => {
+    getDoc(doc(db, 'siteConfig', 'gifts'))
+      .then(snap => { if (snap.exists()) setGiftOptions(snap.data().options ?? []); })
+      .catch(() => {});
+  }, []);
+
+  // Auto-select when exactly one gift option and user becomes eligible
+  useEffect(() => {
+    if (giftEligible && giftOptions.length === 1 && !selectedGift) {
+      setSelectedGift(giftOptions[0].id);
+    }
+  }, [giftEligible, giftOptions, selectedGift, setSelectedGift]);
 
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
 
@@ -358,6 +379,46 @@ export default function CartPage() {
                   <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע״מ · עלות משלוח תחושב בקופה</div>
                 </div>
               </div>
+
+              {/* A4: Gift selector */}
+              {giftEnabled && (
+                <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #eee' }}>
+                  {giftEligible && giftOptions.length > 0 ? (
+                    <>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: '#1a6b3c', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
+                        🎁 {giftOptions.length === 1 ? 'קיבלת מתנה חינם!' : 'בחר מתנה חינם!'}
+                      </div>
+                      {giftOptions.length === 1 ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '8px 10px' }}>
+                          {giftOptions[0].imgUrl && (
+                            <img src={giftOptions[0].imgUrl} alt={giftOptions[0].name} style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />
+                          )}
+                          <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a' }}>{giftOptions[0].name}</span>
+                          <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>חינם</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {giftOptions.map(g => (
+                            <label key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', background: selectedGift === g.id ? '#f0fdf4' : '#fafafa', border: `1px solid ${selectedGift === g.id ? '#86efac' : '#e0e0e0'}`, borderRadius: 8, padding: '8px 10px' }}>
+                              <input type="radio" name="gift" value={g.id} checked={selectedGift === g.id} onChange={() => setSelectedGift(g.id)} style={{ accentColor: '#1a6b3c', flexShrink: 0 }} />
+                              {g.imgUrl && <img src={g.imgUrl} alt={g.name} style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />}
+                              <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a' }}>{g.name}</span>
+                              <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>חינם</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : !giftEligible ? (
+                    <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#92400e' }}>
+                      🎁 הוסף עוד <strong>{formatPrice(amountToGift)}</strong> לקבלת מתנה חינם
+                      <div style={{ marginTop: 6, background: '#e5e7eb', borderRadius: 4, height: 6, overflow: 'hidden' }}>
+                        <div style={{ background: '#C5A028', height: '100%', width: `${Math.min(100, (total / giftThreshold) * 100)}%`, transition: 'width 0.3s' }} />
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              )}
 
               <button
                 onClick={() => {

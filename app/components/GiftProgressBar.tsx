@@ -40,7 +40,7 @@ export default function GiftProgressBar() {
     >
       {giftEligible ? (
         <span style={{ fontSize: 13, fontWeight: 700, color: '#1a6b3c' }}>
-          🎁 הגעת לסף! בחר מתנה חינם בעגלה
+          🎁 הגעת! בחר את המתנה שלך
         </span>
       ) : (
         <>
