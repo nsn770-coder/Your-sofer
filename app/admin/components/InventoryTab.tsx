@@ -100,7 +100,11 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
       computedInStock: getInventory(p),
       inventoryValue: getInventory(p) * (p.soferBasePrice ?? 0),
     }))
-    .filter(p => !searchTerm || p.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(p =>
+      searchTerm
+        ? p.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        : (p.receivedFromSupplier ?? 0) > 0
+    )
     .sort((a, b) => b.computedInStock - a.computedInStock);
 
   console.log(`[InventoryTab] Filtered to ${inventoryProducts.length} products in inventory (search: "${searchTerm}")`);
@@ -320,8 +324,8 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
           display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12,
         }}>
           <div>
-            <div style={{ fontSize: 11, color: '#666' }}>סה&quot;כ מוצרים</div>
-            <div style={{ fontSize: 20, fontWeight: 900 }}>{allProducts.length}</div>
+            <div style={{ fontSize: 11, color: '#666' }}>מוצרים במלאי</div>
+            <div style={{ fontSize: 20, fontWeight: 900 }}>{inventoryProducts.length}</div>
           </div>
           <div>
             <div style={{ fontSize: 11, color: '#666' }}>סה&quot;כ יחידות במלאי</div>
