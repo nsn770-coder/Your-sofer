@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, orderBy, query, where,
   doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, getCountFromServer,
-  limit as fsLimit, startAfter
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { formatPrice } from '@/app/lib/utils';
@@ -1669,10 +1668,6 @@ export default function AdminPage() {
   const [appsLoading, setAppsLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
-  const PAGE_SIZE = 20;
-  const [productsPage, setProductsPage] = useState(0);
-  const [productsTotalCount, setProductsTotalCount] = useState(0);
-  const [pageCursors, setPageCursors] = useState<any[]>([null]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [outOfStockProducts, setOutOfStockProducts] = useState<Product[]>([]);
   const [outOfStockLoading, setOutOfStockLoading] = useState(false);
@@ -1929,32 +1924,16 @@ export default function AdminPage() {
     finally { setUsersLoading(false); }
   }
 
-  async function loadProducts(pageIndex = 0) {
+  async function loadProducts() {
     setProductsLoading(true);
     try {
-      const cursorDoc = pageIndex > 0 ? pageCursors[pageIndex] : null;
-      const base = collection(db, 'products');
-      const q = cursorDoc
-        ? query(base, orderBy('name'), startAfter(cursorDoc), fsLimit(PAGE_SIZE))
-        : query(base, orderBy('name'), fsLimit(PAGE_SIZE));
-      const [snap, countSnap] = await Promise.all([getDocs(q), getCountFromServer(base)]);
+      const snap = await getDocs(query(collection(db, 'products'), orderBy('name')));
       const data: Product[] = [];
       snap.forEach(d => data.push({ id: d.id, ...d.data() } as Product));
       setProducts(data);
-      setProductsTotalCount(countSnap.data().count);
-      setProductsPage(pageIndex);
-      const lastDoc = snap.docs[snap.docs.length - 1] ?? null;
-      setPageCursors(prev => {
-        const arr = pageIndex === 0 ? [null] : [...prev];
-        if (lastDoc) arr[pageIndex + 1] = lastDoc;
-        return arr;
-      });
     } catch (e) { console.error(e); }
     finally { setProductsLoading(false); }
   }
-
-  async function goNextPage() { await loadProducts(productsPage + 1); }
-  async function goPrevPage() { if (productsPage > 0) await loadProducts(productsPage - 1); }
 
   async function loadSoferim() {
     try {
@@ -2549,7 +2528,7 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-green-700">{formatPrice(totalRevenue)}</div><div className="text-sm text-gray-500 mt-1">סה"כ הכנסות</div></div>
-        <div className="bg-white rounded-xl shadow p-4 text-center cursor-pointer" onClick={() => setActiveTab('products')}><div className="text-3xl font-black text-blue-600">{productsTotalCount || products.length}</div><div className="text-sm text-gray-500 mt-1">מוצרים</div></div>
+        <div className="bg-white rounded-xl shadow p-4 text-center cursor-pointer" onClick={() => setActiveTab('products')}><div className="text-3xl font-black text-blue-600">{products.length}</div><div className="text-sm text-gray-500 mt-1">מוצרים</div></div>
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-purple-600">{users.length}</div><div className="text-sm text-gray-500 mt-1">משתמשים</div></div>
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-orange-500">{pendingApps.length}</div><div className="text-sm text-gray-500 mt-1">בקשות סופרים</div></div>
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-blue-500">{pendingShluchimApps.length}</div><div className="text-sm text-gray-500 mt-1">בקשות שלוחים</div></div>
@@ -2693,14 +2672,10 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
-            <div className="flex items-center justify-between mt-4 px-1">
-              <button onClick={goPrevPage} disabled={productsPage === 0} className="px-4 py-2 rounded-xl text-sm font-bold border border-gray-200 disabled:opacity-40 hover:bg-gray-50">הקודם</button>
+            <div className="flex items-center justify-end mt-4 px-1">
               <span className="text-sm text-gray-500">
-                {productSearch
-                  ? `${filteredProducts.length} תוצאות מסוננות`
-                  : `${productsPage * PAGE_SIZE + 1}–${productsPage * PAGE_SIZE + products.length} מתוך ${productsTotalCount}`}
+                {productSearch ? `${filteredProducts.length} תוצאות מסוננות` : `${products.length} מוצרים`}
               </span>
-              <button onClick={goNextPage} disabled={productsPage * PAGE_SIZE + products.length >= productsTotalCount || !!productSearch} className="px-4 py-2 rounded-xl text-sm font-bold border border-gray-200 disabled:opacity-40 hover:bg-gray-50">הבא</button>
             </div>
             </>
           )}

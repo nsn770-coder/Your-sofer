@@ -38,6 +38,23 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
   const [parsedInvoice, setParsedInvoice] = useState<ParsedInvoice | null>(null);
   const [applyingInvoice, setApplyingInvoice] = useState(false);
   const [skuMap, setSkuMap] = useState<Record<string, Product>>({});
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [allProductsLoading, setAllProductsLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const snap = await getDocs(collection(db, 'products'));
+        const data: Product[] = [];
+        snap.forEach(d => data.push({ id: d.id, ...d.data() } as Product));
+        setAllProducts(data);
+      } catch (e) {
+        console.error('[InventoryTab] loadAllProducts', e);
+      } finally {
+        setAllProductsLoading(false);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (!parsedInvoice) { setSkuMap({}); return; }
@@ -68,7 +85,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
   const getInventory = (product: Product) =>
     (product.receivedFromSupplier ?? 0) - getSold(product.id);
 
-  const inventoryProducts = products
+  const inventoryProducts = allProducts
     .map(p => ({
       ...p,
       computedInStock: getInventory(p),
@@ -149,6 +166,14 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     await onSave(id, data);
     setSaving(null);
     cancelEdit(id);
+  }
+
+  if (allProductsLoading) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center', color: '#666', fontSize: 15 }}>
+        ⏳ טוען את כל המוצרים...
+      </div>
+    );
   }
 
   return (
