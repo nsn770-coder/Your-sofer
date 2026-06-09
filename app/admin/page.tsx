@@ -4124,46 +4124,52 @@ interface GiftOption {
   imgUrl: string;
 }
 
+const EMPTY_GIFT: GiftOption = { id: '', name: '', imgUrl: '' };
+
 function GiftsTab() {
-  const EMPTY: GiftOption = { id: '', name: '', imgUrl: '' };
-  const [gifts, setGifts] = useState<[GiftOption, GiftOption, GiftOption]>([
-    { ...EMPTY }, { ...EMPTY }, { ...EMPTY },
-  ]);
-  const [loading, setLoading] = useState(true);
-  const [saving,  setSaving]  = useState(false);
-  const [saved,   setSaved]   = useState(false);
+  const [enabled,   setEnabled]   = useState(false);
+  const [threshold, setThreshold] = useState(250);
+  const [gifts,     setGifts]     = useState<GiftOption[]>([{ ...EMPTY_GIFT }]);
+  const [loading,   setLoading]   = useState(true);
+  const [saving,    setSaving]    = useState(false);
+  const [saved,     setSaved]     = useState(false);
+  const [error,     setError]     = useState('');
 
   useEffect(() => {
     getDoc(doc(db, 'siteConfig', 'gifts')).then(snap => {
       if (snap.exists()) {
-        const opts: GiftOption[] = snap.data().options ?? [];
-        setGifts([
-          opts[0] ?? { ...EMPTY },
-          opts[1] ?? { ...EMPTY },
-          opts[2] ?? { ...EMPTY },
-        ]);
+        const d = snap.data();
+        setEnabled(d.enabled ?? false);
+        setThreshold(d.threshold ?? 250);
+        const opts: GiftOption[] = d.options ?? [];
+        setGifts(opts.length > 0 ? opts : [{ ...EMPTY_GIFT }]);
       }
       setLoading(false);
     });
   }, []);
 
-  function update(idx: number, field: keyof GiftOption, value: string) {
-    setGifts(prev => {
-      const next = [...prev] as [GiftOption, GiftOption, GiftOption];
-      next[idx] = { ...next[idx], [field]: value };
-      return next;
-    });
-    setSaved(false);
+  function updateGift(idx: number, field: keyof GiftOption, value: string) {
+    setGifts(prev => { const next = [...prev]; next[idx] = { ...next[idx], [field]: value }; return next; });
+    setSaved(false); setError('');
   }
 
+  function addGift() { setGifts(prev => [...prev, { ...EMPTY_GIFT }]); setSaved(false); }
+
+  function removeGift(idx: number) { setGifts(prev => prev.filter((_, i) => i !== idx)); setSaved(false); }
+
   async function save() {
-    setSaving(true);
+    const invalid = gifts.find(g => !g.id.trim() || !g.name.trim() || !g.imgUrl.trim());
+    if (invalid) { setError('כל שדות המתנה (מזהה, שם, תמונה) הם חובה'); return; }
+    if (threshold < 1) { setError('סף הזכאות חייב להיות חיובי'); return; }
+    const ids = gifts.map(g => g.id.trim());
+    if (new Set(ids).size !== ids.length) { setError('מזהי המתנות חייבים להיות ייחודיים'); return; }
+    setError(''); setSaving(true);
     await setDoc(doc(db, 'siteConfig', 'gifts'), {
-      options:   gifts.filter(g => g.id && g.name),
+      enabled, threshold,
+      options:   gifts.map(g => ({ id: g.id.trim(), name: g.name.trim(), imgUrl: g.imgUrl.trim() })),
       updatedAt: new Date().toISOString(),
     });
-    setSaving(false);
-    setSaved(true);
+    setSaving(false); setSaved(true);
   }
 
   if (loading) return <div className="p-10 text-center text-gray-400">טוען...</div>;
@@ -4171,40 +4177,58 @@ function GiftsTab() {
   return (
     <div className="grid gap-6 max-w-2xl">
       <div className="bg-white rounded-xl shadow p-6">
-        <h2 className="text-lg font-black text-pink-700 mb-1">🎁 מתנות VIP — רוטציה שבועית</h2>
-        <p className="text-sm text-gray-500 mb-6">לקוחות שמזמינים מעל ₪250 בוחרים מתנה אחת מבין 3 אפשרויות.</p>
+        <h2 className="text-lg font-black text-pink-700 mb-1">🎁 מתנות VIP</h2>
+        <p className="text-sm text-gray-500 mb-6">לקוחות שמגיעים לסף בוחרים מתנה חינם.</p>
+
+        {/* Enable/disable toggle */}
+        <div className="flex items-center gap-3 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-100">
+          <button
+            type="button"
+            onClick={() => { setEnabled(e => !e); setSaved(false); }}
+            className={`relative inline-flex w-11 h-6 rounded-full transition-colors flex-shrink-0 ${enabled ? 'bg-pink-600' : 'bg-gray-300'}`}
+          >
+            <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${enabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
+          </button>
+          <span className="text-sm font-bold text-gray-700">{enabled ? 'מבצע מתנות פעיל' : 'מבצע מתנות כבוי'}</span>
+        </div>
+
+        {/* Threshold */}
+        <label className="text-xs text-gray-500 block mb-6">
+          סף זכאות למתנה (₪)
+          <input
+            type="number" min="1"
+            value={threshold}
+            onChange={e => { setThreshold(Number(e.target.value)); setSaved(false); }}
+            className="mt-1 block w-40 border border-gray-200 rounded px-3 py-1.5 text-sm"
+            dir="ltr"
+          />
+        </label>
+
+        {/* Gift cards */}
         <div className="grid gap-6">
           {gifts.map((g, i) => (
             <div key={i} className="border border-gray-100 rounded-lg p-4">
-              <h3 className="font-bold text-gray-700 mb-3">מתנה {i + 1}</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-gray-700">מתנה {i + 1}</h3>
+                {gifts.length > 1 && (
+                  <button type="button" onClick={() => removeGift(i)} className="text-xs text-red-500 hover:text-red-700 font-medium">✕ הסר</button>
+                )}
+              </div>
               <div className="grid gap-3">
                 <label className="text-xs text-gray-500">
-                  מזהה (ייחודי לכל מתנה)
-                  <input
-                    value={g.id}
-                    onChange={e => update(i, 'id', e.target.value)}
-                    placeholder="gift-1"
-                    className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm"
-                  />
+                  מזהה (ייחודי)
+                  <input value={g.id} onChange={e => updateGift(i, 'id', e.target.value)} placeholder="gift-1"
+                    className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm" />
                 </label>
                 <label className="text-xs text-gray-500">
                   שם המתנה (יוצג ללקוח)
-                  <input
-                    value={g.name}
-                    onChange={e => update(i, 'name', e.target.value)}
-                    placeholder="שוקולד בלגי"
-                    className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm"
-                  />
+                  <input value={g.name} onChange={e => updateGift(i, 'name', e.target.value)} placeholder="שוקולד בלגי"
+                    className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm" />
                 </label>
                 <label className="text-xs text-gray-500">
                   URL תמונה (Cloudinary)
-                  <input
-                    value={g.imgUrl}
-                    onChange={e => update(i, 'imgUrl', e.target.value)}
-                    placeholder="https://res.cloudinary.com/..."
-                    className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm"
-                    dir="ltr"
-                  />
+                  <input value={g.imgUrl} onChange={e => updateGift(i, 'imgUrl', e.target.value)} placeholder="https://res.cloudinary.com/..."
+                    className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm" dir="ltr" />
                 </label>
                 {g.imgUrl && (
                   <img src={g.imgUrl} alt={g.name} className="w-20 h-20 object-cover rounded border border-gray-100" />
@@ -4213,10 +4237,18 @@ function GiftsTab() {
             </div>
           ))}
         </div>
+
         <button
-          onClick={save}
-          disabled={saving}
-          className="mt-6 px-6 py-2 bg-pink-600 text-white rounded-lg font-bold text-sm disabled:opacity-50"
+          type="button" onClick={addGift}
+          className="mt-4 w-full py-2 border border-dashed border-pink-300 text-pink-600 text-sm font-medium rounded-lg hover:bg-pink-50 transition-colors"
+        >
+          + הוסף מתנה
+        </button>
+
+        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+
+        <button onClick={save} disabled={saving}
+          className="mt-4 px-6 py-2 bg-pink-600 text-white rounded-lg font-bold text-sm disabled:opacity-50"
         >
           {saving ? 'שומר...' : saved ? '✓ נשמר!' : 'שמור מתנות'}
         </button>

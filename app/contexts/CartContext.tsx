@@ -1,10 +1,11 @@
 'use client';
 import { createContext, useContext, useState, useEffect } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 // ── Discount constants — edit here to adjust promotions ───────────────────────
 export const KIPPOT_DISCOUNT_QTY  = 100;  // minimum kippot units for 30% off
 export const KIPPOT_DISCOUNT_RATE = 0.30; // 30% off regular kippot items
-export const GIFT_THRESHOLD       = 250;  // ₪ threshold for free gift eligibility
 
 // ── Event print tiered pricing (A1) ──────────────────────────────────────────
 // Applies to print-service items (cat='הדפסה') attached to event kippot orders.
@@ -75,9 +76,11 @@ interface CartContextType {
   totalProfit: number;             // סה"כ רווח
   profitPercent: number;           // % רווח כללי
   // A4 — gift
-  giftEligible: boolean;
-  amountToGift: number;
-  selectedGift: string | null;
+  giftEnabled:   boolean;
+  giftThreshold: number;
+  giftEligible:  boolean;
+  amountToGift:  number;
+  selectedGift:  string | null;
   setSelectedGift: (id: string | null) => void;
 }
 
@@ -199,6 +202,20 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [selectedGift, setSelectedGift] = useState<string | null>(null);
+  const [giftEnabled,   setGiftEnabled]   = useState(false);
+  const [giftThreshold, setGiftThreshold] = useState(250);
+
+  useEffect(() => {
+    getDoc(doc(db, 'siteConfig', 'gifts'))
+      .then(snap => {
+        if (snap.exists()) {
+          const d = snap.data();
+          setGiftEnabled(d.enabled ?? false);
+          setGiftThreshold(d.threshold ?? 250);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem('cart');
@@ -258,11 +275,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const totalProfit  = total - totalCost;
   const profitPercent = total > 0 ? Math.round((totalProfit / total) * 1000) / 10 : 0;
 
-  // A4: gift eligibility
-  const giftEligible = total >= GIFT_THRESHOLD;
-  const amountToGift = giftEligible ? 0 : Math.round((GIFT_THRESHOLD - total) * 100) / 100;
+  // A4: gift eligibility — driven by Firestore config
+  const giftEligible = giftEnabled && total >= giftThreshold;
+  const amountToGift = giftEligible ? 0 : Math.round((giftThreshold - total) * 100) / 100;
 
-  // Clear gift selection if cart drops below threshold
+  // Clear gift selection when ineligible (threshold not met or feature disabled)
   useEffect(() => {
     if (!giftEligible && selectedGift) setSelectedGift(null);
   }, [giftEligible, selectedGift]);
@@ -275,7 +292,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       bundleDiscountAmount,
       discountableTotal,
       totalCost, totalProfit, profitPercent,
-      giftEligible, amountToGift, selectedGift, setSelectedGift,
+      giftEnabled, giftThreshold, giftEligible, amountToGift, selectedGift, setSelectedGift,
     }}>
       {children}
     </CartContext.Provider>
