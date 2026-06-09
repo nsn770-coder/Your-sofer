@@ -21,6 +21,7 @@ interface ProductDoc {
   level?: string;
   soferId?: string;
   uploadedBySofer?: boolean;
+  sku?: string;
 }
 
 const CLOUDINARY_CLOUD  = 'dyxzq3ucy';
@@ -57,6 +58,7 @@ export default function EditProductPage() {
   const [nusach, setNusach]           = useState('');
   const [size, setSize]               = useState('');
   const [level, setLevel]             = useState('');
+  const [sku, setSku]                 = useState('');
 
   useEffect(() => {
     if (!loading && !user) router.push('/');
@@ -88,6 +90,7 @@ export default function EditProductPage() {
       setNusach(d.nusach ?? '');
       setSize(d.size ?? '');
       setLevel(d.level ?? '');
+      setSku(d.sku ?? '');
     } catch (e) {
       console.error(e);
       setError('שגיאה בטעינת המוצר');
@@ -131,6 +134,7 @@ export default function EditProductPage() {
         nusach,
         size,
         level,
+        sku: sku.trim() || null,
       });
       setSaved(true);
       setTimeout(() => router.push('/sofer-dashboard'), 1500);
@@ -279,6 +283,18 @@ export default function EditProductPage() {
               <label style={labelStyle}>גודל כתב</label>
               <input style={inputStyle} value={size} onChange={e => setSize(e.target.value)} placeholder="12 שורות, גס..." />
             </div>
+          </div>
+
+          {/* SKU */}
+          <div>
+            <label style={labelStyle}>קוד SKU</label>
+            <input
+              style={{ ...inputStyle, maxWidth: 220, fontFamily: 'monospace', letterSpacing: '0.04em' }}
+              value={sku}
+              onChange={e => setSku(e.target.value)}
+              placeholder="UK12345"
+              dir="ltr"
+            />
           </div>
 
           {/* Nusach + Level */}
