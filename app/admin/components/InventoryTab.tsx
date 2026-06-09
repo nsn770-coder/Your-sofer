@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { Product } from '@/app/lib/types';
 import { Order } from '@/app/lib/types';
@@ -187,17 +187,29 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
         });
       }
 
-      // שמור חשבונית ב-Firestore למניעת כפילויות
-      await addDoc(collection(db, 'invoices'), {
-        invoiceNumber: parsedInvoice.invoiceNumber,
-        supplier:      parsedInvoice.supplier,
-        invoiceDate:   parsedInvoice.invoiceDate,
-        items:         parsedInvoice.items,
-        processedAt:   new Date(),
-      });
+      // שמור חשבונית ב-Firestore — תמיד, גם ללא מספר חשבונית
+      try {
+        await addDoc(collection(db, 'invoices'), {
+          invoiceNumber: parsedInvoice.invoiceNumber,
+          supplier:      parsedInvoice.supplier,
+          invoiceDate:   parsedInvoice.invoiceDate,
+          items: parsedInvoice.items.map(i => ({
+            code:      i.code,
+            name:      i.name,
+            quantity:  Number(i.quantity)  || 0,
+            unitPrice: Number(i.unitPrice) || 0,
+          })),
+          processedAt: serverTimestamp(),
+        });
+      } catch (invoiceErr: unknown) {
+        const msg = invoiceErr instanceof Error ? invoiceErr.message : String(invoiceErr);
+        console.error('[InventoryTab] addDoc invoices failed:', invoiceErr);
+        alert('⚠️ המלאי עודכן אך שמירת הקבלה נכשלה:\n' + msg);
+        return;
+      }
 
       setParsedInvoice(null);
-      alert('המלאי עודכן בהצלחה!');
+      alert('המלאי עודכן בהצלחה! ✅');
     } finally {
       setApplyingInvoice(false);
     }
