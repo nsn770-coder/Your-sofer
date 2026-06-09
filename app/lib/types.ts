@@ -48,7 +48,7 @@ export interface Product {
   bundlePromo?: string | null;
 
   // Profitability & Inventory
-  purchasePrice?: number;           // מחיר קנייה מהספק
+  soferBasePrice?: number;           // מחיר קנייה מהספק
   sku?: string;                     // UK codes וכו'
   stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock';
   inStock?: number;                 // כמות בחנות
@@ -121,7 +121,7 @@ export interface OrderItem {
   price: number;
 
   // Profitability tracking
-  purchasePrice?: number;
+  soferBasePrice?: number;
   finalPrice?: number;
   profit?: number;
   discountApplied?: {

@@ -10,7 +10,7 @@ interface InventoryTabProps {
 }
 
 interface EditState {
-  purchasePrice: string;
+  soferBasePrice: string;
   receivedFromSupplier: string;
 }
 
@@ -46,7 +46,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     .map(p => ({
       ...p,
       computedInStock: getInventory(p),
-      inventoryValue: getInventory(p) * (p.purchasePrice ?? 0),
+      inventoryValue: getInventory(p) * (p.soferBasePrice ?? 0),
     }))
     .filter(p => !searchTerm || p.name?.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a, b) => b.computedInStock - a.computedInStock);
@@ -57,7 +57,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     setEditing(prev => ({
       ...prev,
       [p.id]: {
-        purchasePrice: String(p.purchasePrice ?? ''),
+        soferBasePrice: String(p.soferBasePrice ?? ''),
         receivedFromSupplier: String(p.receivedFromSupplier ?? ''),
       },
     }));
@@ -99,7 +99,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
       const sold         = getSold(product.id);
       await onSave(product.id, {
         receivedFromSupplier: newReceived,
-        purchasePrice:        item.unitPrice,
+        soferBasePrice:        item.unitPrice,
         inStock:              newReceived - sold,
       });
     }
@@ -113,7 +113,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     if (!e) return;
     setSaving(id);
     const data: Partial<Product> = {};
-    if (e.purchasePrice !== '') data.purchasePrice = parseFloat(e.purchasePrice);
+    if (e.soferBasePrice !== '') data.soferBasePrice = parseFloat(e.soferBasePrice);
     if (e.receivedFromSupplier !== '') data.receivedFromSupplier = parseInt(e.receivedFromSupplier);
     // inStock = receivedFromSupplier - sold (numeric, not boolean)
     if (data.receivedFromSupplier !== undefined) {
@@ -247,11 +247,11 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
                     {e ? (
                       <input
                         type="number"
-                        value={e.purchasePrice}
-                        onChange={ev => setEditing(prev => ({ ...prev, [p.id]: { ...prev[p.id], purchasePrice: ev.target.value } }))}
+                        value={e.soferBasePrice}
+                        onChange={ev => setEditing(prev => ({ ...prev, [p.id]: { ...prev[p.id], soferBasePrice: ev.target.value } }))}
                         style={{ width: 70, padding: '2px 4px', border: '1px solid #aaa', borderRadius: 4, textAlign: 'center' }}
                       />
-                    ) : `₪${(p.purchasePrice ?? 0).toFixed(2)}`}
+                    ) : `₪${(p.soferBasePrice ?? 0).toFixed(2)}`}
                   </td>
 
                   {/* קבלנו */}
