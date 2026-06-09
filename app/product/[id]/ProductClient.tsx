@@ -58,6 +58,8 @@ interface Product {
   whyUs?: string[];
   whatYouGet?: string[];
   bundlePromo?: string | null;
+  sku?: string | null;
+  soferBasePrice?: number;
 }
 
 interface KlafItem { id: string; name: string; imageUrl: string; status: string; }
@@ -656,6 +658,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [stockVisible, setStockVisible]       = useState(product.stockVisible !== false);
   const [outOfStock, setOutOfStock]             = useState(product.outOfStock ?? false);
   const [sourceUrl, setSourceUrl]               = useState(product.sourceUrl || '');
+  const [sku, setSku]                           = useState(product.sku || '');
   const [hasKlafSelection, setHasKlafSelection] = useState(product.hasKlafSelection ?? false);
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [isEventKippot, setIsEventKippot]             = useState(product.isEventKippot ?? false);
@@ -751,6 +754,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         isEventKippot: isEventKippot,
         priority: priority !== '' ? Number(priority) : 0,
         soferId: soferId || undefined,
+        sku: sku.trim() || null,
         ...(saveGlobal ? {} : textData),
       });
       setSaved(true);
@@ -799,6 +803,16 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
                 <option value="פופולרי">פופולרי</option>
               </select>
             </div>
+          </div>
+          <div>
+            <label style={lS}>קוד SKU</label>
+            <input
+              value={sku}
+              onChange={e => setSku(e.target.value)}
+              placeholder="UK12345"
+              dir="ltr"
+              style={{ ...iS, fontFamily: 'monospace' }}
+            />
           </div>
         </div>
       </div>
