@@ -265,6 +265,10 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
             {inventoryProducts.map(p => {
               const e = editing[p.id];
               const sold = getSold(p.id);
+              const displayStock = e
+                ? parseInt(e.receivedFromSupplier || '0') - sold
+                : p.computedInStock;
+              const stockBg = displayStock < 0 ? '#fee2e2' : displayStock === 0 ? '#fee2e2' : displayStock < 5 ? '#fef3c7' : '#ecfdf5';
               return (
                 <tr key={p.id} style={{ borderBottom: '1px solid #eee', background: e ? '#fffbeb' : undefined }}>
                   <td style={{ padding: 10 }}>{p.name?.slice(0, 40)}</td>
@@ -297,13 +301,10 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
                   <td style={{ padding: 10, textAlign: 'center' }}>{sold}</td>
 
                   {/* במלאי */}
-                  <td style={{
-                    padding: 10, textAlign: 'center', fontWeight: 700,
-                    background: p.computedInStock === 0 ? '#fee2e2' : p.computedInStock < 5 ? '#fef3c7' : '#ecfdf5',
-                  }}>
-                    {e
-                      ? Math.max(0, parseInt(e.receivedFromSupplier || '0') - sold)
-                      : p.computedInStock}
+                  <td style={{ padding: 10, textAlign: 'center', fontWeight: 700, background: stockBg }}>
+                    {displayStock < 0
+                      ? <span style={{ color: '#dc2626' }}>⚠️ {displayStock}</span>
+                      : displayStock}
                   </td>
 
                   <td style={{ padding: 10, textAlign: 'center' }}>₪{p.inventoryValue.toFixed(2)}</td>
