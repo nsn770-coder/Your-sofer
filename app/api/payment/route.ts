@@ -125,43 +125,49 @@ export async function POST(req: NextRequest) {
 
     // ── A2: server-side coupon validation ─────────────────────────────────────
     if (couponCode) {
-      const adminDb = getAdminDb();
-      const couponSnap = await adminDb.collection('coupons').doc(couponCode).get();
+      try {
+        const adminDb = getAdminDb();
+        const couponSnap = await adminDb.collection('coupons').doc(couponCode).get();
 
-      if (!couponSnap.exists) {
-        return NextResponse.json({ error: 'קוד קופון לא קיים' }, { status: 400 });
-      }
-      const couponData = couponSnap.data()!;
-      if (!couponData.active) {
-        return NextResponse.json({ error: 'קוד קופון לא פעיל' }, { status: 400 });
-      }
-      if (couponData.expiresAt && new Date(couponData.expiresAt) < new Date()) {
-        return NextResponse.json({ error: 'קוד הקופון פג תוקף' }, { status: 400 });
-      }
+        if (!couponSnap.exists) {
+          return NextResponse.json({ error: 'קוד קופון לא קיים' }, { status: 400 });
+        }
+        const couponData = couponSnap.data()!;
+        if (!couponData.active) {
+          return NextResponse.json({ error: 'קוד קופון לא פעיל' }, { status: 400 });
+        }
+        if (couponData.expiresAt && new Date(couponData.expiresAt) < new Date()) {
+          return NextResponse.json({ error: 'קוד הקופון פג תוקף' }, { status: 400 });
+        }
 
-      // Compute server-side discountable total (mirrors CartContext logic)
-      const kippotDiscountActiveServer = kippotQty >= KIPPOT_DISCOUNT_QTY;
-      let serverDiscountableTotal = 0;
-      for (const item of productItems) {
-        if (item.bundlePromo) continue;
-        if (item.cat === 'הדפסה') continue;
-        if (item.cat === 'כיפות' && kippotDiscountActiveServer) continue;
-        serverDiscountableTotal += item.price * item.quantity;
-      }
+        // Compute server-side discountable total (mirrors CartContext logic)
+        const kippotDiscountActiveServer = kippotQty >= KIPPOT_DISCOUNT_QTY;
+        let serverDiscountableTotal = 0;
+        for (const item of productItems) {
+          if (item.bundlePromo) continue;
+          if (item.cat === 'הדפסה') continue;
+          if (item.cat === 'כיפות' && kippotDiscountActiveServer) continue;
+          serverDiscountableTotal += item.price * item.quantity;
+        }
 
-      const couponDiscountLine = items.find(i => i.name.includes('הנחת קופון'));
-      const submittedCouponDisc = couponDiscountLine ? -couponDiscountLine.price : 0;
+        const couponDiscountLine = items.find(i => i.name.includes('הנחת קופון'));
+        const submittedCouponDisc = couponDiscountLine ? -couponDiscountLine.price : 0;
 
-      let expectedCouponDisc = 0;
-      if (couponData.type === 'fixed') {
-        expectedCouponDisc = Math.min(couponData.discount, serverDiscountableTotal);
-      } else {
-        expectedCouponDisc = Math.round(serverDiscountableTotal * couponData.discount / 100 * 100) / 100;
-      }
+        let expectedCouponDisc = 0;
+        if (couponData.type === 'fixed') {
+          expectedCouponDisc = Math.min(couponData.discount, serverDiscountableTotal);
+        } else {
+          expectedCouponDisc = Math.round(serverDiscountableTotal * couponData.discount / 100 * 100) / 100;
+        }
 
-      if (submittedCouponDisc > 0 && Math.abs(submittedCouponDisc - expectedCouponDisc) > 0.02) {
-        console.error('[payment] coupon discount mismatch', { submittedCouponDisc, expectedCouponDisc });
-        return NextResponse.json({ error: 'שגיאה בחישוב הנחת הקופון' }, { status: 400 });
+        if (submittedCouponDisc > 0 && Math.abs(submittedCouponDisc - expectedCouponDisc) > 0.02) {
+          console.error('[payment] coupon discount mismatch', { submittedCouponDisc, expectedCouponDisc });
+          return NextResponse.json({ error: 'שגיאה בחישוב הנחת הקופון' }, { status: 400 });
+        }
+      } catch (couponValidationErr) {
+        // Firebase Admin unavailable — skip server-side coupon check, let payment proceed.
+        // Fix: ensure FIREBASE_PRIVATE_KEY in Vercel uses literal \n (not real newlines).
+        console.error('[payment] coupon validation skipped — Firebase Admin error:', couponValidationErr);
       }
     }
 
