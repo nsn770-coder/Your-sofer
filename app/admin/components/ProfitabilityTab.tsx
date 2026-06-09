@@ -42,7 +42,7 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
         const product = products.find(p => p.id === pid);
         if (!product) return;
 
-        const cost    = (product.purchasePrice ?? 0) * item.quantity;
+        const cost    = (product.soferBasePrice ?? 0) * item.quantity;
         const revenue = (item.finalPrice ?? item.price) * item.quantity;
         const profit  = revenue - cost;
 
