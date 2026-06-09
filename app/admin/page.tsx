@@ -1464,6 +1464,17 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showCancelled, setShowCancelled] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState<{
+    customerName: string; phone: string; email: string;
+    address: string; notes: string; items: OrderItem[];
+  } | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [itemSearchQuery, setItemSearchQuery] = useState('');
+  const [itemSearchResults, setItemSearchResults] = useState<Product[]>([]);
+  const [itemSearchLoading, setItemSearchLoading] = useState(false);
+  const itemSearchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const allProductsCacheRef = useRef<Product[] | null>(null);
 
   async function handleStatusChange(orderId: string, newStatus: string) {
     setUpdatingId(orderId);
@@ -1496,6 +1507,122 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
       setOrders(prev => prev.filter(o => o.id !== orderId));
     } catch (e) { console.error(e); alert('שגיאה במחיקת ההזמנה'); }
     finally { setDeletingId(null); }
+  }
+
+  function calcTotal(items: OrderItem[], shippingCost?: number): number {
+    return items.reduce((s, it) => s + it.price * it.quantity, 0) + (shippingCost ?? 0);
+  }
+
+  function startEdit(o: Order) {
+    setEditingId(o.id);
+    setExpandedId(o.id);
+    setEditDraft({
+      customerName: o.customerName || '',
+      phone: o.phone || '',
+      email: o.email || '',
+      address: o.address || '',
+      notes: o.notes || '',
+      items: (o.items || []).map(it => ({ ...it })),
+    });
+    setItemSearchQuery('');
+    setItemSearchResults([]);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditDraft(null);
+    setItemSearchQuery('');
+    setItemSearchResults([]);
+  }
+
+  function updateDraftItem(idx: number, field: 'quantity' | 'price', value: number) {
+    setEditDraft(d => {
+      if (!d) return d;
+      const items = d.items.map((it, i) => i === idx ? { ...it, [field]: value } : it);
+      return { ...d, items };
+    });
+  }
+
+  function removeDraftItem(idx: number) {
+    setEditDraft(d => d ? { ...d, items: d.items.filter((_, i) => i !== idx) } : d);
+  }
+
+  async function searchProductsForEdit(q: string) {
+    if (!q.trim()) { setItemSearchResults([]); return; }
+    setItemSearchLoading(true);
+    try {
+      if (!allProductsCacheRef.current) {
+        const snap = await getDocs(collection(db, 'products'));
+        const all: Product[] = [];
+        snap.forEach(d => all.push({ id: d.id, ...d.data() } as Product));
+        allProductsCacheRef.current = all;
+      }
+      const ql = q.toLowerCase();
+      const res = allProductsCacheRef.current
+        .filter(p => p.name?.toLowerCase().includes(ql) || p.sku?.toLowerCase().includes(ql))
+        .slice(0, 6);
+      setItemSearchResults(res);
+    } catch { setItemSearchResults([]); }
+    finally { setItemSearchLoading(false); }
+  }
+
+  function addProductToDraft(p: Product) {
+    setEditDraft(d => {
+      if (!d) return d;
+      const newItem: OrderItem = {
+        id: p.id, name: p.name, price: p.price, quantity: 1,
+        productId: p.id, productName: p.name,
+      };
+      return { ...d, items: [...d.items, newItem] };
+    });
+    setItemSearchQuery('');
+    setItemSearchResults([]);
+  }
+
+  async function saveEdit(o: Order) {
+    if (!editDraft) return;
+    setSavingEdit(true);
+    try {
+      const updatedItems = editDraft.items.map(it => ({
+        id: it.id,
+        name: it.name,
+        price: it.price,
+        quantity: it.quantity,
+        productId: it.productId ?? it.id,
+        productName: it.productName ?? it.name,
+        ...(it.embroideryText != null && { embroideryText: it.embroideryText }),
+        ...(it.selectedKlafName != null && { selectedKlafName: it.selectedKlafName }),
+        ...(it.selectedCover != null && { selectedCover: it.selectedCover }),
+        ...(it.printCustomization != null && { printCustomization: it.printCustomization }),
+        ...(it.finalPrice != null && { finalPrice: it.finalPrice }),
+      }));
+      const newTotal = calcTotal(editDraft.items, o.shippingCost);
+      await updateDoc(doc(db, 'orders', o.id), {
+        customerName: editDraft.customerName,
+        phone: editDraft.phone,
+        email: editDraft.email,
+        address: editDraft.address,
+        notes: editDraft.notes,
+        items: updatedItems,
+        total: newTotal,
+      });
+      setOrders(prev => prev.map(ord => ord.id === o.id ? {
+        ...ord,
+        customerName: editDraft.customerName,
+        phone: editDraft.phone,
+        email: editDraft.email,
+        address: editDraft.address,
+        notes: editDraft.notes,
+        items: updatedItems,
+        total: newTotal,
+      } : ord));
+      cancelEdit();
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בשמירת ההזמנה');
+    } finally {
+      setSavingEdit(false);
+    }
   }
 
   function getStatusMeta(val: string) {
@@ -1554,11 +1681,12 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
               const meta = getStatusMeta(o.status);
               const isExpanded = expandedId === o.id;
               const isCancelled = o.status === 'cancelled';
+              const isEditing = editingId === o.id;
               return (
                 <React.Fragment key={o.id}>
                   <tr
                     className={`border-t cursor-pointer ${isCancelled ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
-                    onClick={() => setExpandedId(isExpanded ? null : o.id)}
+                    onClick={() => !isEditing && setExpandedId(isExpanded ? null : o.id)}
                   >
                     <td className="p-3 font-mono text-xs">
                       {o.orderNumber}
@@ -1584,7 +1712,13 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                       {updatingId === o.id && <span className="ml-2 text-xs text-gray-400">שומר...</span>}
                     </td>
                     <td className="p-3" onClick={e => e.stopPropagation()}>
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-wrap">
+                        <button
+                          onClick={() => isEditing ? cancelEdit() : startEdit(o)}
+                          className={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap ${isEditing ? 'border-gray-300 text-gray-600 bg-gray-50 hover:bg-gray-100' : 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'}`}
+                        >
+                          {isEditing ? 'ביטול עריכה' : 'ערוך הזמנה'}
+                        </button>
                         {!isCancelled && (
                           <button
                             onClick={() => handleCancel(o.id)}
@@ -1606,62 +1740,176 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                   </tr>
                   {isExpanded && (
                     <tr className="bg-blue-50 border-t border-blue-100">
-                      <td colSpan={6} className="px-5 py-3" dir="rtl">
-                        {/* ── פרטי לקוח ── */}
-                        <div className="bg-white border border-blue-100 rounded-lg px-4 py-3 mb-3 text-xs text-gray-700">
-                          <p className="text-xs font-bold text-gray-400 mb-2">פרטי לקוח</p>
-                          <div className="grid grid-cols-2 gap-x-8 gap-y-1">
-                            {o.customerName && (
-                              <div><span className="text-gray-400 ml-1">שם:</span><span className="font-medium">{o.customerName}</span></div>
-                            )}
-                            {o.phone && (
-                              <div><span className="text-gray-400 ml-1">טלפון:</span><span className="font-medium" dir="ltr">{o.phone}</span></div>
-                            )}
-                            {o.email && (
-                              <div><span className="text-gray-400 ml-1">אימייל:</span><span className="font-medium" dir="ltr">{o.email}</span></div>
-                            )}
-                            {o.address && (
-                              <div><span className="text-gray-400 ml-1">כתובת:</span><span className="font-medium">{o.address}</span></div>
-                            )}
-                            {o.shippingCost != null && (
-                              <div><span className="text-gray-400 ml-1">משלוח:</span><span className="font-medium">₪{o.shippingCost}</span></div>
-                            )}
-                            {o.notes && (
-                              <div className="col-span-2 mt-1"><span className="text-gray-400 ml-1">הערות:</span><span className="font-medium">{o.notes}</span></div>
-                            )}
-                          </div>
-                        </div>
-                        {/* ── פריטים ── */}
-                        {o.items && o.items.length > 0 && (
-                          <>
-                            <p className="text-xs font-bold text-gray-500 mb-2">פריטים בהזמנה:</p>
-                            <div className="flex flex-col gap-1">
-                              {o.items.map((item, idx) => (
-                                <div key={idx} className="flex items-center gap-3 text-xs text-gray-700">
-                                  <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600 cursor-pointer">{item.name}</a>
-                                  <span className="text-gray-400">×{item.quantity}</span>
-                                  <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
-                                  {item.embroideryText && (
-                                    <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
-                                      ✍️ ריקמה: <strong>{item.embroideryText}</strong>
-                                    </span>
-                                  )}
-                                  {item.selectedKlafName && (
-                                    <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
-                                      📜 קלף: <strong>{item.selectedKlafName}</strong>
-                                    </span>
-                                  )}
-                                  {item.selectedCover && (
-                                    <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
-                                      כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
-                                    </span>
-                                  )}
-                                  {item.printCustomization && (
-                                    <PrintCustomizationView pc={item.printCustomization} />
-                                  )}
+                      <td colSpan={6} className="px-5 py-4" dir="rtl">
+                        {isEditing && editDraft ? (
+                          <div className="space-y-3">
+                            {/* ── פרטי לקוח — עריכה ── */}
+                            <div className="bg-white border border-blue-100 rounded-lg px-4 py-3">
+                              <p className="text-xs font-bold text-gray-400 mb-3">פרטי לקוח</p>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <label className="text-xs text-gray-500 block mb-1">שם</label>
+                                  <input value={editDraft.customerName} onChange={e => setEditDraft(d => d ? { ...d, customerName: e.target.value } : d)} className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs" />
                                 </div>
-                              ))}
+                                <div>
+                                  <label className="text-xs text-gray-500 block mb-1">טלפון</label>
+                                  <input value={editDraft.phone} onChange={e => setEditDraft(d => d ? { ...d, phone: e.target.value } : d)} className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs" dir="ltr" />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-gray-500 block mb-1">אימייל</label>
+                                  <input value={editDraft.email} onChange={e => setEditDraft(d => d ? { ...d, email: e.target.value } : d)} className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs" dir="ltr" />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-gray-500 block mb-1">כתובת</label>
+                                  <input value={editDraft.address} onChange={e => setEditDraft(d => d ? { ...d, address: e.target.value } : d)} className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs" />
+                                </div>
+                                <div className="col-span-2">
+                                  <label className="text-xs text-gray-500 block mb-1">הערות</label>
+                                  <input value={editDraft.notes} onChange={e => setEditDraft(d => d ? { ...d, notes: e.target.value } : d)} className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs" />
+                                </div>
+                              </div>
                             </div>
+
+                            {/* ── פריטים — עריכה ── */}
+                            <div className="bg-white border border-blue-100 rounded-lg px-4 py-3">
+                              <p className="text-xs font-bold text-gray-400 mb-3">פריטים</p>
+                              <div className="flex flex-col gap-2">
+                                {editDraft.items.map((item, idx) => (
+                                  <div key={idx} className="flex items-center gap-2 text-xs flex-wrap">
+                                    <span className="font-medium flex-1 min-w-0">{item.name}</span>
+                                    <label className="text-gray-400 shrink-0">כמות</label>
+                                    <input
+                                      type="number" min={1}
+                                      value={item.quantity}
+                                      onChange={e => updateDraftItem(idx, 'quantity', Math.max(1, Number(e.target.value) || 1))}
+                                      className="border border-gray-200 rounded px-2 py-1 w-16 text-center"
+                                    />
+                                    <label className="text-gray-400 shrink-0">מחיר ₪</label>
+                                    <input
+                                      type="number" min={0}
+                                      value={item.price}
+                                      onChange={e => updateDraftItem(idx, 'price', Number(e.target.value) || 0)}
+                                      className="border border-gray-200 rounded px-2 py-1 w-24 text-center"
+                                    />
+                                    <span className="text-green-700 font-bold shrink-0 w-20 text-left">
+                                      {formatPrice(item.price * item.quantity)}
+                                    </span>
+                                    <button
+                                      onClick={() => removeDraftItem(idx)}
+                                      className="text-xs text-red-600 border border-red-200 rounded px-2 py-1 hover:bg-red-50 shrink-0"
+                                    >
+                                      הסר פריט
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                              {/* חיפוש מוצר */}
+                              <div className="mt-3 pt-3 border-t border-gray-100">
+                                <div className="relative">
+                                  <input
+                                    value={itemSearchQuery}
+                                    onChange={e => {
+                                      const v = e.target.value;
+                                      setItemSearchQuery(v);
+                                      if (itemSearchTimer.current) clearTimeout(itemSearchTimer.current);
+                                      itemSearchTimer.current = setTimeout(() => searchProductsForEdit(v), 400);
+                                    }}
+                                    placeholder='הוסף פריט — חפש לפי שם או מק"ט...'
+                                    className="w-full border border-dashed border-blue-300 rounded px-3 py-2 text-xs"
+                                  />
+                                  {itemSearchLoading && <span className="absolute left-2 top-2 text-xs text-gray-400">מחפש...</span>}
+                                </div>
+                                {itemSearchResults.length > 0 && (
+                                  <div className="border border-gray-200 rounded mt-1 bg-white shadow-sm overflow-hidden">
+                                    {itemSearchResults.map(p => (
+                                      <button
+                                        key={p.id}
+                                        onClick={() => addProductToDraft(p)}
+                                        className="w-full text-right text-xs px-3 py-2 hover:bg-blue-50 border-b last:border-b-0 border-gray-100 flex justify-between items-center gap-4"
+                                      >
+                                        <span className="font-medium">{p.name}</span>
+                                        <span className="text-green-700 shrink-0">{formatPrice(p.price)}</span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* ── סה"כ + כפתורי שמירה ── */}
+                            <div className="flex items-center justify-between flex-wrap gap-3">
+                              <div className="text-sm font-bold text-gray-700">
+                                סה״כ מעודכן:{' '}
+                                <span className="text-green-700 text-base">{formatPrice(calcTotal(editDraft.items, o.shippingCost))}</span>
+                                {o.shippingCost ? <span className="text-gray-400 font-normal text-xs mr-2">(כולל משלוח ₪{o.shippingCost})</span> : null}
+                              </div>
+                              <div className="flex gap-2">
+                                <button onClick={cancelEdit} className="text-xs px-3 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 text-gray-600 font-medium">ביטול עריכה</button>
+                                <button onClick={() => saveEdit(o)} disabled={savingEdit} className="text-xs px-4 py-2 bg-blue-900 text-white rounded font-bold hover:bg-blue-800 disabled:opacity-50">
+                                  {savingEdit ? 'שומר...' : 'שמור שינויים'}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            {/* ── פרטי לקוח — תצוגה ── */}
+                            <div className="bg-white border border-blue-100 rounded-lg px-4 py-3 mb-3 text-xs text-gray-700">
+                              <p className="text-xs font-bold text-gray-400 mb-2">פרטי לקוח</p>
+                              <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+                                {o.customerName && (
+                                  <div><span className="text-gray-400 ml-1">שם:</span><span className="font-medium">{o.customerName}</span></div>
+                                )}
+                                {o.phone && (
+                                  <div><span className="text-gray-400 ml-1">טלפון:</span><span className="font-medium" dir="ltr">{o.phone}</span></div>
+                                )}
+                                {o.email && (
+                                  <div><span className="text-gray-400 ml-1">אימייל:</span><span className="font-medium" dir="ltr">{o.email}</span></div>
+                                )}
+                                {o.address && (
+                                  <div><span className="text-gray-400 ml-1">כתובת:</span><span className="font-medium">{o.address}</span></div>
+                                )}
+                                {o.shippingCost != null && (
+                                  <div><span className="text-gray-400 ml-1">משלוח:</span><span className="font-medium">₪{o.shippingCost}</span></div>
+                                )}
+                                {o.notes && (
+                                  <div className="col-span-2 mt-1"><span className="text-gray-400 ml-1">הערות:</span><span className="font-medium">{o.notes}</span></div>
+                                )}
+                              </div>
+                            </div>
+                            {/* ── פריטים — תצוגה ── */}
+                            {o.items && o.items.length > 0 && (
+                              <>
+                                <p className="text-xs font-bold text-gray-500 mb-2">פריטים בהזמנה:</p>
+                                <div className="flex flex-col gap-1">
+                                  {o.items.map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-3 text-xs text-gray-700">
+                                      <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600 cursor-pointer">{item.name}</a>
+                                      <span className="text-gray-400">×{item.quantity}</span>
+                                      <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
+                                      {item.embroideryText && (
+                                        <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
+                                          ✍️ ריקמה: <strong>{item.embroideryText}</strong>
+                                        </span>
+                                      )}
+                                      {item.selectedKlafName && (
+                                        <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                                          📜 קלף: <strong>{item.selectedKlafName}</strong>
+                                        </span>
+                                      )}
+                                      {item.selectedCover && (
+                                        <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
+                                          כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
+                                        </span>
+                                      )}
+                                      {item.printCustomization && (
+                                        <PrintCustomizationView pc={item.printCustomization} />
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </>
+                            )}
                           </>
                         )}
                       </td>
