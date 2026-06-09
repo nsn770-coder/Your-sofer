@@ -4136,16 +4136,18 @@ function GiftsTab() {
   const [error,     setError]     = useState('');
 
   useEffect(() => {
-    getDoc(doc(db, 'siteConfig', 'gifts')).then(snap => {
-      if (snap.exists()) {
-        const d = snap.data();
-        setEnabled(d.enabled ?? false);
-        setThreshold(d.threshold ?? 250);
-        const opts: GiftOption[] = d.options ?? [];
-        setGifts(opts.length > 0 ? opts : [{ ...EMPTY_GIFT }]);
-      }
-      setLoading(false);
-    });
+    getDoc(doc(db, 'siteConfig', 'gifts'))
+      .then(snap => {
+        if (snap.exists()) {
+          const d = snap.data();
+          setEnabled(d.enabled ?? false);
+          setThreshold(d.threshold ?? 250);
+          const opts: GiftOption[] = d.options ?? [];
+          setGifts(opts.length > 0 ? opts : [{ ...EMPTY_GIFT }]);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   function updateGift(idx: number, field: keyof GiftOption, value: string) {

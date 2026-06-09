@@ -96,6 +96,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── Site configuration (gift promo, thresholds — public read) ────────────
+
+    match /siteConfig/{id} {
+      allow read: if true;               // cart, checkout, and catalog read config publicly
+      allow write: if isAdmin();         // only admin can configure
+    }
+
     // ── User accounts ───────────────────────────────────────────────────────
 
     match /users/{userId} {
