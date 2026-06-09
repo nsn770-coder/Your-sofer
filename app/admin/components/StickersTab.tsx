@@ -160,7 +160,8 @@ export default function StickersTab() {
     .filter(o => o.status !== 'pending_payment' && o.status !== 'cancelled')
     .flatMap(o => o.items ?? [])
     .reduce<Record<string, number>>((m, i) => {
-      if (i.productId) m[i.productId] = (m[i.productId] ?? 0) + i.quantity;
+      const pid = i.productId ?? (i as any).id;
+      if (pid) m[pid] = (m[pid] ?? 0) + i.quantity;
       return m;
     }, {});
 

@@ -84,7 +84,8 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
   const soldMap: Record<string, number> = orders
     .flatMap(o => o.items ?? [])
     .reduce<Record<string, number>>((m, i) => {
-      if (i.productId) m[i.productId] = (m[i.productId] ?? 0) + i.quantity;
+      const pid = i.productId ?? (i as { id?: string }).id;
+      if (pid) m[pid] = (m[pid] ?? 0) + i.quantity;
       return m;
     }, {});
 

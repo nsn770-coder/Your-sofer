@@ -37,7 +37,8 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
 
     getFilteredOrders().forEach(order => {
       (order.items ?? []).forEach(item => {
-        const pid = item.productId;
+        const anyItem = item as { productId?: string; id?: string; productName?: string; name?: string };
+        const pid = anyItem.productId ?? anyItem.id;
         if (!pid) return;
         const product = products.find(p => p.id === pid);
         if (!product) return;
@@ -47,7 +48,7 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
         const profit  = revenue - cost;
 
         if (!profitMap[pid]) {
-          profitMap[pid] = { name: item.productName ?? pid, sold: 0, revenue: 0, cost: 0, profit: 0 };
+          profitMap[pid] = { name: anyItem.productName ?? anyItem.name ?? pid, sold: 0, revenue: 0, cost: 0, profit: 0 };
         }
         profitMap[pid].sold    += item.quantity;
         profitMap[pid].revenue += revenue;
