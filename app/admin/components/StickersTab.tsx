@@ -48,6 +48,7 @@ interface OrderItem {
 
 interface OrderDoc {
   id: string;
+  status?: string;
   items?: OrderItem[];
 }
 
@@ -76,6 +77,8 @@ export default function StickersTab() {
   const [products, setProducts] = useState<StickerProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<OrderDoc[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [invoicesLoading, setInvoicesLoading] = useState(true);
   const [invoicesError, setInvoicesError] = useState<string | null>(null);
@@ -87,7 +90,7 @@ export default function StickersTab() {
   const [printing, setPrinting] = useState(false);
   const printAreaRef = useRef<HTMLDivElement>(null);
 
-  // Load products
+  // Load products (no auth required — public collection)
   useEffect(() => {
     getDocs(collection(db, 'products')).then(snap => {
       setProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as StickerProduct)));
@@ -95,18 +98,16 @@ export default function StickersTab() {
     });
   }, []);
 
-  // Load orders for sold-count calculation (same logic as InventoryTab)
-  useEffect(() => {
-    getDocs(collection(db, 'orders')).then(snap => {
-      setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() } as OrderDoc)));
-    }).catch(() => {});
-  }, []);
-
-  // Wait for Firebase Auth before fetching — prevents silent permission-denied on mount
+  // Wait for Firebase Auth before fetching protected collections
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (fbUser) => {
-      if (fbUser) loadInvoices();
-      else setInvoicesLoading(false);
+      if (fbUser) {
+        loadInvoices();
+        loadOrders();
+      } else {
+        setInvoicesLoading(false);
+        setOrdersLoading(false);
+      }
     });
     return () => unsub();
   }, []);
@@ -139,8 +140,24 @@ export default function StickersTab() {
     }
   }
 
-  // soldMap: same logic as InventoryTab — sum quantities from all order items
+  async function loadOrders() {
+    setOrdersLoading(true);
+    setOrdersError(null);
+    try {
+      const snap = await getDocs(collection(db, 'orders'));
+      setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() } as OrderDoc)));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[StickersTab] orders fetch failed:', err);
+      setOrdersError(msg);
+    } finally {
+      setOrdersLoading(false);
+    }
+  }
+
+  // soldMap: exclude pending_payment and cancelled — same semantics as getSold in InventoryTab
   const soldMap: Record<string, number> = orders
+    .filter(o => o.status !== 'pending_payment' && o.status !== 'cancelled')
     .flatMap(o => o.items ?? [])
     .reduce<Record<string, number>>((m, i) => {
       if (i.productId) m[i.productId] = (m[i.productId] ?? 0) + i.quantity;
@@ -505,6 +522,13 @@ export default function StickersTab() {
         )}
       </div>
 
+      {/* ── Orders error banner ───────────────────────────────────────────── */}
+      {ordersError && (
+        <div style={{ background: '#fff0f0', border: '1px solid #f87171', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: 12, marginBottom: 12 }}>
+          ⚠️ שגיאה בטעינת הזמנות — חישוב המלאי עלול להיות שגוי: {ordersError}
+        </div>
+      )}
+
       {/* ── Manual table section ─────────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 15 }}>
         <input
@@ -529,7 +553,7 @@ export default function StickersTab() {
         </button>
       </div>
 
-      {loading ? (
+      {loading || ordersLoading ? (
         <div style={{ textAlign: 'center', color: '#999', padding: 40 }}>טוען...</div>
       ) : (
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
