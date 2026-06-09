@@ -147,6 +147,7 @@ interface Product {
   outOfStockDate?: string | null;
   soferName?: string;
   soferPrice?: number;
+  supplierCost?: number;
   createdAt?: { seconds: number };
   isExpertRecommended?: boolean;
   isBestSeller?: boolean;
@@ -384,6 +385,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
   const [imgUrl, setImgUrl] = useState('');
   const [imgUrl2, setImgUrl2] = useState('');
   const [imgUrl3, setImgUrl3] = useState('');
+  const [supplierCost, setSupplierCost] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState<string | null>(null);
   const [soferOptions, setSoferOptions] = useState<Sofer[]>([]);
@@ -433,6 +435,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
       await addDoc(collection(db, 'products'), {
         name, price: Number(price),
         was: was ? Number(was) : null,
+        supplierCost: supplierCost ? Number(supplierCost) : null,
         desc, cat,
         category: cat,
         level: LEVEL_CATS.includes(cat) ? level : '',
@@ -484,6 +487,12 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
               <input type="number" value={was} onChange={e => setWas(e.target.value)} placeholder="לא חובה"
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
             </div>
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>עלות ספק ₪ (מחיר גולמי, לפני הנחה ומע&quot;מ)</label>
+            <input type="number" value={supplierCost} onChange={e => setSupplierCost(e.target.value)} placeholder="לא חובה"
+              style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' }} />
+            <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>העלות שלך מחושבת אוטומטית: ערך זה × 0.95 × 1.18</div>
           </div>
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>קטגוריה</label>
@@ -645,6 +654,9 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [stockCountInput, setStockCountInput] = useState(
     product.stockCount != null ? String(product.stockCount) : ''
   );
+  const [supplierCost, setSupplierCost] = useState(
+    product.supplierCost != null ? String(product.supplierCost) : ''
+  );
   const [saving, setSaving]         = useState(false);
   const [duplicating, setDuplicating] = useState(false);
   const [uploadingImg, setUploadingImg] = useState<string | null>(null);
@@ -707,6 +719,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
       await updateDoc(doc(db, 'products', product.id), {
         name, price: Number(price),
         was: was ? Number(was) : null,
+        supplierCost: supplierCost ? Number(supplierCost) : null,
         desc, cat,
         category: cat,
         level: LEVEL_CATS_EDIT.includes(cat) ? level : '',
@@ -781,6 +794,11 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               <label style={labelStyle}>מחיר לפני הנחה ₪</label>
               <input type="number" value={was} onChange={e => setWas(e.target.value)} placeholder="לא חובה" style={inputStyle} />
             </div>
+          </div>
+          <div>
+            <label style={labelStyle}>עלות ספק ₪ (מחיר גולמי, לפני הנחה ומע&quot;מ)</label>
+            <input type="number" value={supplierCost} onChange={e => setSupplierCost(e.target.value)} placeholder="לא חובה" style={inputStyle} />
+            <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>העלות שלך מחושבת אוטומטית: ערך זה × 0.95 × 1.18</div>
           </div>
           <div>
             <label style={labelStyle}>קטגוריה</label>
