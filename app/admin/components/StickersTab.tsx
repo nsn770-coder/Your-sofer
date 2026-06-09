@@ -185,10 +185,10 @@ export default function StickersTab() {
     if (n) productSkuMap[n] = p;
   });
 
-  // Expand printSet into flat sticker list for the hidden print area
-  const stickerList: StickerProduct[] = printSet.flatMap(({ product, qty }) =>
-    qty > 0 ? Array.from({ length: qty }, () => product) : []
-  );
+  // One sticker per product type (regardless of quantity in stock)
+  const stickerList: StickerProduct[] = printSet
+    .filter(({ qty }) => qty > 0)
+    .map(({ product }) => product);
 
   // ── Print engine: wait for all images, then window.print() ──────────────
   useEffect(() => {
