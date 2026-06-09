@@ -189,47 +189,67 @@ export async function POST(req: NextRequest) {
       },
     };
 
+    console.log('[payment] calling Sumit — orderNumber:', orderNumber, 'total:', total, 'items:', items.length, 'CompanyID set:', !!SUMIT_COMPANY_ID);
     const response = await fetch(SUMIT_API_URL, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(body),
     });
 
-    const data = await response.json();
+    let data: unknown;
+    const rawText = await response.text();
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      console.error('[payment] Sumit returned non-JSON (status', response.status, '):', rawText.slice(0, 300));
+      return NextResponse.json({ error: 'שגיאה בקבלת דף תשלום' }, { status: 500 });
+    }
+    console.log('[payment] Sumit status:', response.status, 'RedirectURL:', (data as any)?.Data?.RedirectURL ? 'present' : 'missing');
 
-    if (data?.Data?.RedirectURL) {
-      // These writes require admin access — done here via Admin SDK to support guest checkouts
-      const adminDb = getAdminDb();
-      const sideEffects: Promise<unknown>[] = [];
+    if ((data as any)?.Data?.RedirectURL) {
+      // Side-effect writes (coupon usage, klaf reservation) via Admin SDK.
+      // Wrapped in a separate try/catch so a missing/broken Firebase Admin config
+      // never blocks the payment redirect that the customer is waiting for.
+      try {
+        const adminDb = getAdminDb();
+        const sideEffects: Promise<unknown>[] = [];
 
-      if (couponCode) {
-        sideEffects.push(
-          adminDb.collection('coupons').doc(couponCode).update({
-            usedBy: FieldValue.arrayUnion(customer.email || customer.name),
-            usedAt: FieldValue.serverTimestamp(),
-          })
-        );
-      }
-
-      if (klafIds && klafIds.length > 0) {
-        for (const kid of klafIds) {
+        if (couponCode) {
           sideEffects.push(
-            adminDb.collection('klafim').doc(kid).update({
-              status: 'reserved', orderId, reservedAt: new Date().toISOString(),
+            adminDb.collection('coupons').doc(couponCode).update({
+              usedBy: FieldValue.arrayUnion(customer.email || customer.name),
+              usedAt: FieldValue.serverTimestamp(),
             })
           );
         }
+
+        if (klafIds && klafIds.length > 0) {
+          for (const kid of klafIds) {
+            sideEffects.push(
+              adminDb.collection('klafim').doc(kid).update({
+                status: 'reserved', orderId, reservedAt: new Date().toISOString(),
+              })
+            );
+          }
+        }
+
+        const results = await Promise.allSettled(sideEffects);
+        results.forEach((r, i) => {
+          if (r.status === 'rejected') console.error(`[payment] side-effect[${i}] failed:`, r.reason);
+        });
+      } catch (adminErr) {
+        // Non-fatal — log and continue so the customer reaches the payment page
+        console.error('[payment] admin side-effects failed (non-fatal):', adminErr);
       }
 
-      await Promise.allSettled(sideEffects);
-
-      return NextResponse.json({ url: data.Data.RedirectURL });
+      return NextResponse.json({ url: (data as any).Data.RedirectURL });
     } else {
-      console.error('Sumit error:', JSON.stringify(data));
+      console.error('[payment] Sumit returned no RedirectURL:', JSON.stringify(data));
       return NextResponse.json({ error: 'שגיאה בקבלת דף תשלום' }, { status: 500 });
     }
-  } catch (e) {
-    console.error('Payment route error:', e);
+  } catch (e: unknown) {
+    const err = e instanceof Error ? e : new Error(String(e));
+    console.error('[payment] unhandled error:', err.message, err.stack);
     return NextResponse.json({ error: 'שגיאה פנימית' }, { status: 500 });
   }
 }
