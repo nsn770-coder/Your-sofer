@@ -674,6 +674,27 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [whyUsList, setWhyUsList]             = useState<string[]>(product.whyUs ?? pageDefaults?.whyUs ?? []);
   const [whatYouGetList, setWhatYouGetList]   = useState<string[]>(product.whatYouGet ?? pageDefaults?.whatYouGet ?? []);
   const [saveGlobal, setSaveGlobal]           = useState(false);
+  const [soldCount, setSoldCount]             = useState(0);
+  const [stockLoading, setStockLoading]       = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setStockLoading(true);
+    let sold = 0;
+    getDocs(collection(db, 'orders'))
+      .then(snap => {
+        snap.forEach(d => {
+          const o = d.data();
+          if (o.status === 'pending_payment' || o.status === 'cancelled') return;
+          (o.items ?? []).forEach((item: { productId?: string; quantity?: number }) => {
+            if (item.productId === product.id) sold += item.quantity ?? 0;
+          });
+        });
+        setSoldCount(sold);
+      })
+      .catch(e => console.error(e))
+      .finally(() => setStockLoading(false));
+  }, [open, product.id]);
 
   useEffect(() => {
     getDocs(collection(db, 'soferim'))
@@ -813,6 +834,38 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
               dir="ltr"
               style={{ ...iS, fontFamily: 'monospace' }}
             />
+          </div>
+
+          {/* Inventory — read-only */}
+          <div style={{ background: '#1e1e1e', border: '1px solid #333', borderRadius: 8, padding: 14 }}>
+            <div style={{ ...lS, marginBottom: 10 }}>📦 מידע מלאי</div>
+            {stockLoading ? (
+              <div style={{ color: '#6b7280', fontSize: 12 }}>טוען...</div>
+            ) : (() => {
+              const received = product.receivedFromSupplier ?? 0;
+              const inStock  = received - soldCount;
+              const color    = inStock > 5 ? '#4ade80' : inStock > 0 ? '#fbbf24' : '#f87171';
+              const label    = inStock > 5 ? '🟢 במלאי' : inStock > 0 ? '🟡 מלאי נמוך' : '🔴 אזל מלאי';
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#9ca3af' }}>קיבלנו מספק</span>
+                    <span style={{ fontWeight: 700 }}>{received}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#9ca3af' }}>נמכר</span>
+                    <span style={{ fontWeight: 700 }}>{soldCount}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #333', paddingTop: 6, marginTop: 2 }}>
+                    <span style={{ fontWeight: 700 }}>נשאר במלאי</span>
+                    <span style={{ fontWeight: 900, color }}>{inStock}</span>
+                  </div>
+                  <div style={{ textAlign: 'center', fontWeight: 700, color, fontSize: 12, marginTop: 2 }}>
+                    {label}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
