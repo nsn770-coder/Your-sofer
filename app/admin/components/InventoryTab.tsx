@@ -92,7 +92,11 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     if (!parsedInvoice) return;
     setApplyingInvoice(true);
     for (const item of parsedInvoice.items) {
-      const product = products.find(p => p.sku === item.code);
+      const itemNumber = item.code.replace(/^[A-Z]+/i, '');
+      const product = products.find(p => {
+        const pNumber = (p.sku || '').replace(/^[A-Z]+/i, '');
+        return pNumber === itemNumber && pNumber.length > 0;
+      });
       if (!product) continue;
       const prevReceived = product.receivedFromSupplier ?? 0;
       const newReceived  = prevReceived + item.quantity;
@@ -165,7 +169,11 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
               </thead>
               <tbody>
                 {parsedInvoice.items.map((item, i) => {
-                  const matched = products.find(p => p.sku === item.code);
+                  const itemNumber = item.code.replace(/^[A-Z]+/i, '');
+                  const matched = products.find(p => {
+                    const pNumber = (p.sku || '').replace(/^[A-Z]+/i, '');
+                    return pNumber === itemNumber && pNumber.length > 0;
+                  });
                   return (
                     <tr key={i} style={{ borderBottom: '1px solid #fef3c7', background: matched ? '#f0fdf4' : undefined }}>
                       <td style={{ padding: '4px 8px', fontFamily: 'monospace' }}>{item.code}</td>
