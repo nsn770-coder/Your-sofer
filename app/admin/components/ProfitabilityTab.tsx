@@ -36,21 +36,23 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
     }> = {};
 
     getFilteredOrders().forEach(order => {
-      order.items.forEach(item => {
-        const product = products.find(p => p.id === item.productId);
+      (order.items ?? []).forEach(item => {
+        const pid = item.productId;
+        if (!pid) return;
+        const product = products.find(p => p.id === pid);
         if (!product) return;
 
         const cost    = (product.purchasePrice ?? 0) * item.quantity;
         const revenue = (item.finalPrice ?? item.price) * item.quantity;
         const profit  = revenue - cost;
 
-        if (!profitMap[item.productId]) {
-          profitMap[item.productId] = { name: item.productName, sold: 0, revenue: 0, cost: 0, profit: 0 };
+        if (!profitMap[pid]) {
+          profitMap[pid] = { name: item.productName ?? pid, sold: 0, revenue: 0, cost: 0, profit: 0 };
         }
-        profitMap[item.productId].sold    += item.quantity;
-        profitMap[item.productId].revenue += revenue;
-        profitMap[item.productId].cost    += cost;
-        profitMap[item.productId].profit  += profit;
+        profitMap[pid].sold    += item.quantity;
+        profitMap[pid].revenue += revenue;
+        profitMap[pid].cost    += cost;
+        profitMap[pid].profit  += profit;
       });
     });
 

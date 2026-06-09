@@ -23,6 +23,9 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  productId?: string;    // alias used by InventoryTab / ProfitabilityTab
+  productName?: string;  // alias used by InventoryTab / ProfitabilityTab
+  finalPrice?: number;
   embroideryText?: string | null;
   selectedKlafName?: string | null;
   selectedCover?: { id: string; name: string; imgUrl: string } | null;
@@ -2584,7 +2587,7 @@ export default function AdminPage() {
           { key: 'out_of_stock',   label: '🔴 אזל מלאי',         color: 'bg-red-700',    badge: outOfStockProducts.length },
           { key: 'gifts',          label: '🎁 מתנות VIP',         color: 'bg-pink-600' },
           { key: 'inventory',      label: '📦 מלאי',               color: 'bg-teal-600' },
-          { key: 'prints',         label: '🖨️ הדפסות',             color: 'bg-orange-600' },
+          { key: 'prints',         label: '🖨️ הדפסות',             color: 'bg-amber-600' },
           { key: 'stickers',       label: '🏷️ מדבקות QR',          color: 'bg-indigo-600' },
           { key: 'profitability',  label: '📊 רווחיות',             color: 'bg-emerald-700' },
         ].map(t => (

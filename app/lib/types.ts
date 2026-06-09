@@ -108,15 +108,15 @@ export interface Order {
   status?: string;
   shaliachName?: string;
   items?: OrderItem[];
-  createdAt?: Date;
+  createdAt?: Date | { seconds: number };
   printCustomization?: unknown;
   selectedGift?: unknown;
   couponCode?: string;
 }
 
 export interface OrderItem {
-  productId: string;
-  productName: string;
+  productId?: string;
+  productName?: string;
   quantity: number;
   price: number;
 
