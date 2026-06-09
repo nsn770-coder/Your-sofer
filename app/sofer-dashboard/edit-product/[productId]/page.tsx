@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
 
@@ -22,6 +22,7 @@ interface ProductDoc {
   soferId?: string;
   uploadedBySofer?: boolean;
   sku?: string;
+  receivedFromSupplier?: number;
 }
 
 const CLOUDINARY_CLOUD  = 'dyxzq3ucy';
@@ -59,6 +60,9 @@ export default function EditProductPage() {
   const [size, setSize]               = useState('');
   const [level, setLevel]             = useState('');
   const [sku, setSku]                 = useState('');
+  const [receivedFromSupplier, setReceivedFromSupplier] = useState(0);
+  const [soldCount, setSoldCount]     = useState(0);
+  const [stockLoading, setStockLoading] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) router.push('/');
@@ -91,11 +95,33 @@ export default function EditProductPage() {
       setSize(d.size ?? '');
       setLevel(d.level ?? '');
       setSku(d.sku ?? '');
+      setReceivedFromSupplier(d.receivedFromSupplier ?? 0);
+      loadStock(productId);
     } catch (e) {
       console.error(e);
       setError('שגיאה בטעינת המוצר');
     } finally {
       setPageLoading(false);
+    }
+  }
+
+  async function loadStock(pid: string) {
+    setStockLoading(true);
+    try {
+      const snap = await getDocs(collection(db, 'orders'));
+      let sold = 0;
+      snap.forEach(d => {
+        const o = d.data();
+        if (o.status === 'pending_payment' || o.status === 'cancelled') return;
+        (o.items ?? []).forEach((item: { productId?: string; quantity?: number }) => {
+          if (item.productId === pid) sold += item.quantity ?? 0;
+        });
+      });
+      setSoldCount(sold);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setStockLoading(false);
     }
   }
 
@@ -295,6 +321,41 @@ export default function EditProductPage() {
               placeholder="UK12345"
               dir="ltr"
             />
+          </div>
+
+          {/* Inventory info — read-only */}
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: 16 }}>
+            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12, color: '#1a3a2a' }}>📦 מידע מלאי</div>
+            {stockLoading ? (
+              <div style={{ color: '#9ca3af', fontSize: 13 }}>טוען נתוני מלאי...</div>
+            ) : (() => {
+              const inStock = receivedFromSupplier - soldCount;
+              const color  = inStock > 5 ? '#16a34a' : inStock > 0 ? '#d97706' : '#dc2626';
+              const bg     = inStock > 5 ? '#f0fdf4' : inStock > 0 ? '#fffbeb' : '#fef2f2';
+              const label  = inStock > 5 ? '🟢 במלאי' : inStock > 0 ? '🟡 מלאי נמוך' : '🔴 אזל מלאי';
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#6b7280' }}>קיבלנו מספק</span>
+                    <span style={{ fontWeight: 700 }}>{receivedFromSupplier}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#6b7280' }}>נמכר</span>
+                    <span style={{ fontWeight: 700 }}>{soldCount}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e2e8f0', paddingTop: 8, marginTop: 2 }}>
+                    <span style={{ fontWeight: 700 }}>נשאר במלאי</span>
+                    <span style={{ fontWeight: 900, color }}>{inStock}</span>
+                  </div>
+                  <div style={{ background: bg, borderRadius: 6, padding: '6px 12px', textAlign: 'center', fontWeight: 700, color, fontSize: 13 }}>
+                    {label}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center' }}>
+                    עדכון מלאי נעשה דרך פאנל המנהל ← ניהול מלאי
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Nusach + Level */}
