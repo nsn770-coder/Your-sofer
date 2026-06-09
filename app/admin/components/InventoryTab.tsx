@@ -148,26 +148,28 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     if (!parsedInvoice) return;
     setApplyingInvoice(true);
     try {
-      // בדוק חשבונית כפולה
-      const dupSnap = await getDocs(
-        query(
-          collection(db, 'invoices'),
-          where('invoiceNumber', '==', parsedInvoice.invoiceNumber),
-          where('supplier', '==', parsedInvoice.supplier)
-        )
-      );
-      if (!dupSnap.empty) {
-        const existing = dupSnap.docs[0].data();
-        const pt = existing.processedAt;
-        const existingDate = pt?.toDate
-          ? pt.toDate().toLocaleDateString('he-IL')
-          : pt?.seconds
-            ? new Date(pt.seconds * 1000).toLocaleDateString('he-IL')
-            : 'תאריך לא ידוע';
-        const proceed = window.confirm(
-          `חשבונית #${parsedInvoice.invoiceNumber} כבר הוכנסה ב-${existingDate}.\nהמשך בכל זאת?`
+      // בדוק כפילות רק כשיש מספר חשבונית — קבלה ללא מספר תמיד תיכנס
+      if (parsedInvoice.invoiceNumber) {
+        const dupSnap = await getDocs(
+          query(
+            collection(db, 'invoices'),
+            where('invoiceNumber', '==', parsedInvoice.invoiceNumber),
+            where('supplier', '==', parsedInvoice.supplier)
+          )
         );
-        if (!proceed) return;
+        if (!dupSnap.empty) {
+          const existing = dupSnap.docs[0].data();
+          const pt = existing.processedAt;
+          const existingDate = pt?.toDate
+            ? pt.toDate().toLocaleDateString('he-IL')
+            : pt?.seconds
+              ? new Date(pt.seconds * 1000).toLocaleDateString('he-IL')
+              : 'תאריך לא ידוע';
+          const proceed = window.confirm(
+            `חשבונית #${parsedInvoice.invoiceNumber} כבר הוכנסה ב-${existingDate}.\nהמשך בכל זאת?`
+          );
+          if (!proceed) return;
+        }
       }
 
       for (const item of parsedInvoice.items) {
@@ -175,7 +177,8 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
         const product = skuMap[itemNumber];
         if (!product) continue;
         const prevReceived = product.receivedFromSupplier ?? 0;
-        const newReceived  = prevReceived + item.quantity;
+        const qty          = Number(item.quantity) || 0;
+        const newReceived  = prevReceived + qty;
         const sold         = getSold(product.id);
         await onSave(product.id, {
           receivedFromSupplier: newReceived,
