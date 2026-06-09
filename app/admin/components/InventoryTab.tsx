@@ -92,7 +92,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     if (!parsedInvoice) return;
     setApplyingInvoice(true);
     for (const item of parsedInvoice.items) {
-      const product = products.find(p => p.supplierCode === item.code);
+      const product = products.find(p => p.sku === item.code);
       if (!product) continue;
       const prevReceived = product.receivedFromSupplier ?? 0;
       const newReceived  = prevReceived + item.quantity;
@@ -165,7 +165,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
               </thead>
               <tbody>
                 {parsedInvoice.items.map((item, i) => {
-                  const matched = products.find(p => p.supplierCode === item.code);
+                  const matched = products.find(p => p.sku === item.code);
                   return (
                     <tr key={i} style={{ borderBottom: '1px solid #fef3c7', background: matched ? '#f0fdf4' : undefined }}>
                       <td style={{ padding: '4px 8px', fontFamily: 'monospace' }}>{item.code}</td>
@@ -240,7 +240,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
               return (
                 <tr key={p.id} style={{ borderBottom: '1px solid #eee', background: e ? '#fffbeb' : undefined }}>
                   <td style={{ padding: 10 }}>{p.name?.slice(0, 40)}</td>
-                  <td style={{ padding: 10, fontFamily: 'monospace', fontSize: 11 }}>{p.supplierCode || '-'}</td>
+                  <td style={{ padding: 10, fontFamily: 'monospace', fontSize: 11 }}>{p.sku || '-'}</td>
 
                   {/* מחיר קנייה */}
                   <td style={{ padding: 10, textAlign: 'center' }}>

@@ -49,7 +49,7 @@ export interface Product {
 
   // Profitability & Inventory
   purchasePrice?: number;           // מחיר קנייה מהספק
-  supplierCode?: string;            // UK codes וכו'
+  sku?: string;                     // UK codes וכו'
   stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock';
   inStock?: number;                 // כמות בחנות
   receivedFromSupplier?: number;    // סה"כ קבלנו
