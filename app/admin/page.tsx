@@ -4119,12 +4119,25 @@ function CurationsTab() {
 
 // ── A4: Gifts tab — manage siteConfig/gifts in Firestore ─────────────────────
 interface GiftOption {
-  id:     string;
-  name:   string;
-  imgUrl: string;
+  id:        string;  // internal gift slug (gift-1)
+  productId: string;  // real Firestore product ID — used as order line item id
+  name:      string;
+  imgUrl:    string;
 }
 
-const EMPTY_GIFT: GiftOption = { id: '', name: '', imgUrl: '' };
+const EMPTY_GIFT: GiftOption = { id: '', productId: '', name: '', imgUrl: '' };
+
+// Extract product ID from a full URL or bare ID.
+// "https://your-sofer.com/product/ABC123" → "ABC123"
+// "ABC123" → "ABC123"
+function extractProductId(val: string): string {
+  const trimmed = val.trim();
+  const idx = trimmed.indexOf('/product/');
+  if (idx !== -1) {
+    return trimmed.slice(idx + 9).split('/')[0].split('?')[0];
+  }
+  return trimmed;
+}
 
 function GiftsTab() {
   const [enabled,   setEnabled]   = useState(false);
@@ -4160,15 +4173,18 @@ function GiftsTab() {
   function removeGift(idx: number) { setGifts(prev => prev.filter((_, i) => i !== idx)); setSaved(false); }
 
   async function save() {
-    const invalid = gifts.find(g => !g.id.trim() || !g.name.trim() || !g.imgUrl.trim());
-    if (invalid) { setError('כל שדות המתנה (מזהה, שם, תמונה) הם חובה'); return; }
+    const invalid = gifts.find(g => !g.id.trim() || !g.productId.trim() || !g.name.trim() || !g.imgUrl.trim());
+    if (invalid) { setError('כל שדות המתנה (מזהה, מוצר, שם, תמונה) הם חובה'); return; }
     if (threshold < 1) { setError('סף הזכאות חייב להיות חיובי'); return; }
     const ids = gifts.map(g => g.id.trim());
     if (new Set(ids).size !== ids.length) { setError('מזהי המתנות חייבים להיות ייחודיים'); return; }
     setError(''); setSaving(true);
     await setDoc(doc(db, 'siteConfig', 'gifts'), {
       enabled, threshold,
-      options:   gifts.map(g => ({ id: g.id.trim(), name: g.name.trim(), imgUrl: g.imgUrl.trim() })),
+      options: gifts.map(g => ({
+        id: g.id.trim(), productId: g.productId.trim(),
+        name: g.name.trim(), imgUrl: g.imgUrl.trim(),
+      })),
       updatedAt: new Date().toISOString(),
     });
     setSaving(false); setSaved(true);
@@ -4218,10 +4234,25 @@ function GiftsTab() {
               </div>
               <div className="grid gap-3">
                 <label className="text-xs text-gray-500">
-                  מזהה (ייחודי)
+                  מזהה פנימי (ייחודי)
                   <input value={g.id} onChange={e => updateGift(i, 'id', e.target.value)} placeholder="gift-1"
                     className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm" />
                 </label>
+                <div>
+                  <label className="text-xs text-gray-500">
+                    קישור/מזהה מוצר
+                    <input
+                      value={g.productId}
+                      onChange={e => updateGift(i, 'productId', extractProductId(e.target.value))}
+                      placeholder="https://your-sofer.com/product/… או product ID ישיר"
+                      className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm"
+                      dir="ltr"
+                    />
+                  </label>
+                  {g.productId && (
+                    <p className="mt-1 text-xs text-emerald-600 font-medium">✓ מוצר מקושר: {g.productId}</p>
+                  )}
+                </div>
                 <label className="text-xs text-gray-500">
                   שם המתנה (יוצג ללקוח)
                   <input value={g.name} onChange={e => updateGift(i, 'name', e.target.value)} placeholder="שוקולד בלגי"

@@ -87,7 +87,7 @@ export default function CheckoutPage() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' } | null>(null);
-  const [giftOptions, setGiftOptions] = useState<{ id: string; name: string; imgUrl?: string }[]>([]);
+  const [giftOptions, setGiftOptions] = useState<{ id: string; name: string; imgUrl?: string; productId?: string }[]>([]);
 
   // Read isMobile before first paint to prevent the false→true CLS flip on mobile
   useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
@@ -210,7 +210,7 @@ export default function CheckoutPage() {
         address: `${form.address}, ${form.city}`, notes: form.notes || '',
         items: [
           ...items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null, printCustomization: i.printCustomization || null })),
-          ...(selectedGift ? [{ id: selectedGift, name: `מתנה: ${giftOptions.find(g => g.id === selectedGift)?.name ?? selectedGift}`, price: 0, quantity: 1, isGift: true }] : []),
+          ...(selectedGift ? (() => { const gift = giftOptions.find(g => g.id === selectedGift); return [{ id: gift?.productId || gift?.id || selectedGift, name: `מתנה: ${gift?.name ?? selectedGift}`, price: 0, quantity: 1, isGift: true, giftSourceId: selectedGift }]; })() : []),
         ],
         total: finalTotal, couponCode: appliedCoupon?.code || null, couponDiscount: appliedCoupon ? discountAmount : null,
         selectedGift: selectedGift || null,
