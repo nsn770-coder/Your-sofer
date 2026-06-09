@@ -28,17 +28,16 @@ export async function POST(req: NextRequest) {
         },
         {
           type: 'text',
-          text: `Extract from this supplier invoice (Hebrew/English):
-1. Invoice date, number, supplier name
-2. All line items: SKU/code, name, quantity, unit price
+          text: `Extract from this supplier invoice (Hebrew/English).
+RULES: every field is required. If a value cannot be found use "" for strings and 0 for numbers — never omit a key, never use null or undefined.
 
-Return ONLY valid JSON (no markdown):
+Return ONLY valid JSON (no markdown, no extra text):
 {
-  "invoiceDate": "YYYY-MM-DD",
-  "invoiceNumber": "string",
-  "supplier": "string",
+  "invoiceDate": "YYYY-MM-DD or ''",
+  "invoiceNumber": "string or ''",
+  "supplier": "string or ''",
   "items": [
-    { "code": "string", "name": "string", "quantity": number, "unitPrice": number }
+    { "code": "string or ''", "name": "string or ''", "quantity": number, "unitPrice": number }
   ]
 }`,
         },
@@ -50,7 +49,22 @@ Return ONLY valid JSON (no markdown):
   const json = text.replace(/^```json\n?/, '').replace(/\n?```$/, '').replace(/^```\n?/, '');
 
   try {
-    return NextResponse.json(JSON.parse(json));
+    const parsed = JSON.parse(json);
+    // Normalize: guarantee no undefined / null so Firestore query + addDoc never throw
+    const safe = {
+      invoiceDate:   String(parsed.invoiceDate   ?? ''),
+      invoiceNumber: String(parsed.invoiceNumber ?? ''),
+      supplier:      String(parsed.supplier      ?? ''),
+      items: (Array.isArray(parsed.items) ? parsed.items : []).map(
+        (item: Record<string, unknown>) => ({
+          code:      String(item.code      ?? ''),
+          name:      String(item.name      ?? ''),
+          quantity:  Number(item.quantity  ?? 0),
+          unitPrice: Number(item.unitPrice ?? 0),
+        })
+      ),
+    };
+    return NextResponse.json(safe);
   } catch {
     return NextResponse.json({ error: 'Failed to parse Claude response', raw: text }, { status: 422 });
   }

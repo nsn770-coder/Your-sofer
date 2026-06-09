@@ -239,5 +239,11 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
+
+    // ── Invoice log (duplicate-invoice detection) ────────────────────────────
+
+    match /invoices/{id} {
+      allow read, write: if isAdmin();
+    }
   }
 }
