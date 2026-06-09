@@ -209,7 +209,7 @@ export default function CheckoutPage() {
         orderNumber, customerName: form.name, email: form.email, phone: form.phone,
         address: `${form.address}, ${form.city}`, notes: form.notes || '',
         items: [
-          ...items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null, printCustomization: i.printCustomization || null })),
+          ...items.map(i => ({ id: i.id, productId: i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null, printCustomization: i.printCustomization || null })),
           ...(selectedGift ? (() => { const gift = giftOptions.find(g => g.id === selectedGift); return [{ id: gift?.productId || gift?.id || selectedGift, name: `מתנה: ${gift?.name ?? selectedGift}`, price: 0, quantity: 1, isGift: true, giftSourceId: selectedGift }]; })() : []),
         ],
         total: finalTotal, couponCode: appliedCoupon?.code || null, couponDiscount: appliedCoupon ? discountAmount : null,
