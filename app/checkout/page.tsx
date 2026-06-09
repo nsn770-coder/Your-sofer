@@ -3,7 +3,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
-import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc, setDoc, arrayUnion } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
@@ -222,15 +222,6 @@ export default function CheckoutPage() {
         guestId: sessionId, sessionId, isGuest: true,
       });
 
-      if (appliedCoupon) {
-        await updateDoc(doc(db, 'coupons', appliedCoupon.code), { usedBy: arrayUnion(form.email || form.name), usedAt: serverTimestamp() });
-      }
-
-      const klafUpdates = items.filter(i => i.selectedKlafId).map(i =>
-        updateDoc(doc(db, 'klafim', i.selectedKlafId!), { status: 'reserved', orderId: orderRef.id, reservedAt: new Date().toISOString() })
-      );
-      if (klafUpdates.length > 0) await Promise.all(klafUpdates);
-
       const baseUrl = window.location.origin;
       const paymentRes = await fetch('/api/payment', {
         method: 'POST',
@@ -244,6 +235,7 @@ export default function CheckoutPage() {
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
           ],
           total: finalTotal, customer: { name: form.name, email: form.email, phone: form.phone }, orderNumber, orderId: orderRef.id, baseUrl, couponCode: appliedCoupon?.code || undefined,
+          klafIds: items.filter(i => i.selectedKlafId).map(i => i.selectedKlafId!),
         }),
       });
 

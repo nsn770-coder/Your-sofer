@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/app/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 const SUMIT_API_URL    = 'https://api.sumit.co.il/billing/payments/beginredirect/';
 const SUMIT_COMPANY_ID = process.env.SUMIT_COMPANY_ID!;
@@ -32,7 +33,7 @@ function parseBundle(key: string): { n: number; bundlePrice: number } | null {
 
 export async function POST(req: NextRequest) {
   try {
-    const { items, total, customer, orderNumber, orderId, baseUrl, couponCode } =
+    const { items, total, customer, orderNumber, orderId, baseUrl, couponCode, klafIds } =
       await req.json() as {
         items:       PaymentItem[];
         total:       number;
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
         orderId:     string;
         baseUrl:     string;
         couponCode?: string;
+        klafIds?:    string[];
       };
 
     // Product items (excludes discount lines and shipping)
@@ -196,6 +198,31 @@ export async function POST(req: NextRequest) {
     const data = await response.json();
 
     if (data?.Data?.RedirectURL) {
+      // These writes require admin access — done here via Admin SDK to support guest checkouts
+      const adminDb = getAdminDb();
+      const sideEffects: Promise<unknown>[] = [];
+
+      if (couponCode) {
+        sideEffects.push(
+          adminDb.collection('coupons').doc(couponCode).update({
+            usedBy: FieldValue.arrayUnion(customer.email || customer.name),
+            usedAt: FieldValue.serverTimestamp(),
+          })
+        );
+      }
+
+      if (klafIds && klafIds.length > 0) {
+        for (const kid of klafIds) {
+          sideEffects.push(
+            adminDb.collection('klafim').doc(kid).update({
+              status: 'reserved', orderId, reservedAt: new Date().toISOString(),
+            })
+          );
+        }
+      }
+
+      await Promise.allSettled(sideEffects);
+
       return NextResponse.json({ url: data.Data.RedirectURL });
     } else {
       console.error('Sumit error:', JSON.stringify(data));
