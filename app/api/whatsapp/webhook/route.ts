@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { waitUntil } from '@vercel/functions';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { handleIncomingMessage } from '@/lib/whatsappAgent';
 
@@ -44,7 +45,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 // ── POST — Incoming message handler ──────────────────────────────────────────
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  // Always return 200 — Meta will retry indefinitely on non-200 responses
+  // Always return 200 to Meta — any non-200 triggers infinite retries
   let body: MetaWebhookPayload;
   try {
     body = (await req.json()) as MetaWebhookPayload;
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({});
   }
 
-  // Extract the first text message (ignore status updates and non-text types)
+  // Extract the first text message (skip status updates, media, reactions)
   const changes = body.entry?.[0]?.changes ?? [];
   let from = '';
   let text = '';
@@ -71,20 +72,24 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   if (!from || !text || !messageId) {
+    // Status update or non-text message — acknowledge and skip
     return NextResponse.json({});
   }
 
-  // Anti-duplicate check — Meta retries on any non-200, so we must be idempotent
+  console.error(`[whatsapp webhook] received from=${from} msgId=${messageId} text="${text.slice(0, 60)}"`);
+
+  // Anti-duplicate check — Meta retries on non-200, so same message can arrive multiple times
   const db = getAdminDb();
   try {
     const ref = db.collection('whatsappProcessed').doc(messageId);
     const existing = await ref.get();
     if (existing.exists) {
+      console.error(`[whatsapp webhook] duplicate msgId=${messageId}, skipping`);
       return NextResponse.json({});
     }
     await ref.set({ from, processedAt: new Date() });
   } catch (err) {
-    // Firestore failed — log and continue; risk of double reply is acceptable
+    // Firestore check failed — log and continue rather than dropping the message
     console.error('[whatsapp webhook] idempotency check error:', err);
     try {
       await db.collection('whatsappLogs').add({
@@ -95,23 +100,25 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         timestamp: new Date(),
       });
     } catch {
-      // nothing left to do
+      // nothing
     }
   }
 
-  // Fire AI processing without awaiting — return 200 to Meta immediately.
-  // Vercel serverless functions stay alive until all pending promises resolve
-  // (up to the configured timeout), so this will complete even after response is sent.
-  void handleIncomingMessage(from, text).catch((err) => {
-    console.error('[whatsapp] handleIncomingMessage unhandled error:', err);
-    db.collection('whatsappLogs').add({
-      type: 'handler_error',
-      from,
-      messageId,
-      error: String(err),
-      timestamp: new Date(),
-    }).catch(() => {});
-  });
+  // waitUntil keeps the Vercel function alive after the response is sent,
+  // so Claude + Meta send complete even though we return 200 immediately.
+  waitUntil(
+    handleIncomingMessage(from, text).catch((err) => {
+      console.error('[whatsapp webhook] handleIncomingMessage unhandled error:', err);
+      db.collection('whatsappLogs').add({
+        type: 'handler_error',
+        from,
+        messageId,
+        error: String(err),
+        timestamp: new Date(),
+      }).catch(() => {});
+    }),
+  );
 
+  console.error(`[whatsapp webhook] ack sent, processing in background for from=${from}`);
   return NextResponse.json({});
 }

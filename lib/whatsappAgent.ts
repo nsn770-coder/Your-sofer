@@ -13,7 +13,7 @@ const EVENT_PATTERNS: { pattern: RegExp; event: string }[] = [
   { pattern: /שמחה|אירוע|מסיבה|יום.?הולדת|birthday/i, event: 'שמחה' },
 ];
 
-// 20+ quantity, explicit bulk/quote keywords
+// 20+ quantity, or explicit bulk/quote keywords
 const LARGE_ORDER_PATTERN =
   /\b([2-9]\d|\d{3,})\s*(יחידות|כיפות|מזוזות|טליות|פמוטים|כיסויים|זוגות)?|כמות.?גדולה|סיטונאי|הצעת.?מחיר|bulk|wholesale/i;
 
@@ -99,21 +99,25 @@ export async function handleIncomingMessage(
   from: string,
   text: string,
 ): Promise<void> {
+  console.error(`[whatsapp agent] START from=${from} text="${text.slice(0, 60)}"`);
+
   const db = getAdminDb();
   const convRef = db.collection('whatsappConversations').doc(from);
 
-  // Load conversation history
+  // 1. Load conversation history
   let history: ConvMessage[] = [];
   try {
     const snap = await convRef.get();
     if (snap.exists) {
       history = (snap.data()?.messages as ConvMessage[] | undefined) ?? [];
     }
+    console.error(`[whatsapp agent] history loaded: ${history.length} messages`);
   } catch (err) {
+    console.error('[whatsapp agent] load history error:', err);
     await logEvent(db, 'load_history_error', from, String(err));
   }
 
-  // Build context string for intent detection (last 4 messages + current)
+  // 2. Detect intent from recent context + current message
   const recentText = history
     .slice(-4)
     .map((m) => m.content)
@@ -122,18 +126,26 @@ export async function handleIncomingMessage(
 
   const event = detectEvent(recentText);
   const isLargeOrder = detectLargeOrder(recentText);
+  console.error(`[whatsapp agent] intent: event=${event ?? 'none'} largeOrder=${isLargeOrder}`);
 
-  // Search product knowledge index
-  const products = await searchAiKnowledge(text, { limit: 3 }).catch(() => [] as SearchResult[]);
+  // 3. Search product knowledge index
+  console.error('[whatsapp agent] searching aiProductKnowledge...');
+  const products = await searchAiKnowledge(text, { limit: 3 }).catch((err) => {
+    console.error('[whatsapp agent] product search error:', err);
+    return [] as SearchResult[];
+  });
+  console.error(`[whatsapp agent] products found: ${products.length} — ${products.map(p => p.name).join(', ')}`);
 
-  // Build Claude message history (last 12, ensure starts with user role)
+  // 4. Build Claude messages (last 12 from history + current user message)
   const claudeMessages = history
     .slice(-12)
     .map((m) => ({ role: m.role, content: m.content }))
     .concat({ role: 'user' as const, content: text });
 
-  // Call Claude Haiku
   const systemPrompt = buildSystemPrompt(products, event, isLargeOrder);
+
+  // 5. Call Claude Haiku
+  console.error('[whatsapp agent] calling Claude...');
   let reply = 'שלום! אשמח לעזור. רגע אחד 🙏';
 
   try {
@@ -159,14 +171,18 @@ export async function handleIncomingMessage(
 
     const data = (await res.json()) as { content?: { text?: string }[] };
     reply = data.content?.[0]?.text ?? reply;
+    console.error(`[whatsapp agent] Claude replied, length=${reply.length} chars`);
   } catch (err) {
+    console.error('[whatsapp agent] Claude error:', err);
     await logEvent(db, 'claude_error', from, String(err));
   }
 
-  // Send reply via Meta
+  // 6. Send WhatsApp reply
+  console.error(`[whatsapp agent] sending message to ${from}...`);
   await sendWhatsAppMessage(from, reply);
+  console.error('[whatsapp agent] message sent');
 
-  // Persist updated conversation (keep last 30 messages = 15 rounds)
+  // 7. Persist updated conversation (keep last 30 messages = 15 rounds)
   const updated: ConvMessage[] = [
     ...history,
     { role: 'user' as const, content: text, ts: Date.now() },
@@ -175,7 +191,13 @@ export async function handleIncomingMessage(
 
   await convRef
     .set({ messages: updated, phone: from, updatedAt: new Date() }, { merge: true })
-    .catch((err) => logEvent(db, 'save_history_error', from, String(err)));
+    .then(() => console.error('[whatsapp agent] conversation saved'))
+    .catch((err) => {
+      console.error('[whatsapp agent] save history error:', err);
+      return logEvent(db, 'save_history_error', from, String(err));
+    });
+
+  console.error(`[whatsapp agent] DONE for from=${from}`);
 }
 
 // ── Firestore logger ──────────────────────────────────────────────────────────

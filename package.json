@@ -13,6 +13,7 @@
     "@anthropic-ai/sdk": "^0.95.0",
     "@google/generative-ai": "^0.24.1",
     "@plasmicapp/loader-nextjs": "^2.0.2",
+    "@vercel/functions": "^3.7.0",
     "@vercel/speed-insights": "^2.0.0",
     "algoliasearch": "^5.53.0",
     "csv-parse": "^6.2.1",
