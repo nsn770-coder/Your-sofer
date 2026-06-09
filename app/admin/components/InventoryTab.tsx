@@ -1,5 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '@/app/firebase';
 import { Product } from '@/app/lib/types';
 import { Order } from '@/app/lib/types';
 
@@ -35,6 +37,30 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
   const [uploading, setUploading] = useState(false);
   const [parsedInvoice, setParsedInvoice] = useState<ParsedInvoice | null>(null);
   const [applyingInvoice, setApplyingInvoice] = useState(false);
+  const [skuMap, setSkuMap] = useState<Record<string, Product>>({});
+
+  useEffect(() => {
+    if (!parsedInvoice) { setSkuMap({}); return; }
+    (async () => {
+      const numbers = new Set(
+        parsedInvoice.items
+          .map(i => i.code.replace(/^[A-Z]+/i, ''))
+          .filter(n => n.length > 0)
+      );
+      if (numbers.size === 0) return;
+      // Fetch all products that have a sku, then match by numeric suffix
+      const snap = await getDocs(
+        query(collection(db, 'products'), where('sku', '>=', ' '))
+      );
+      const map: Record<string, Product> = {};
+      snap.forEach(d => {
+        const p = { id: d.id, ...d.data() } as Product;
+        const n = (p.sku || '').replace(/^[A-Z]+/i, '');
+        if (n && numbers.has(n)) map[n] = p;
+      });
+      setSkuMap(map);
+    })();
+  }, [parsedInvoice]);
 
   const getSold = (productId: string) =>
     orders.flatMap(o => o.items ?? []).filter(i => i.productId === productId).reduce((s, i) => s + i.quantity, 0);
@@ -93,10 +119,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     setApplyingInvoice(true);
     for (const item of parsedInvoice.items) {
       const itemNumber = item.code.replace(/^[A-Z]+/i, '');
-      const product = products.find(p => {
-        const pNumber = (p.sku || '').replace(/^[A-Z]+/i, '');
-        return pNumber === itemNumber && pNumber.length > 0;
-      });
+      const product = skuMap[itemNumber];
       if (!product) continue;
       const prevReceived = product.receivedFromSupplier ?? 0;
       const newReceived  = prevReceived + item.quantity;
@@ -170,10 +193,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
               <tbody>
                 {parsedInvoice.items.map((item, i) => {
                   const itemNumber = item.code.replace(/^[A-Z]+/i, '');
-                  const matched = products.find(p => {
-                    const pNumber = (p.sku || '').replace(/^[A-Z]+/i, '');
-                    return pNumber === itemNumber && pNumber.length > 0;
-                  });
+                  const matched = skuMap[itemNumber];
                   return (
                     <tr key={i} style={{ borderBottom: '1px solid #fef3c7', background: matched ? '#f0fdf4' : undefined }}>
                       <td style={{ padding: '4px 8px', fontFamily: 'monospace' }}>{item.code}</td>
