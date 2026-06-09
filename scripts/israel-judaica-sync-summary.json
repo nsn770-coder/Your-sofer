@@ -1,0 +1,77 @@
+{
+  "date": "2026-06-08T21:29:06.009Z",
+  "dryRun": false,
+  "totalScraped": 517,
+  "withPrice": 476,
+  "updated": 504,
+  "added": 0,
+  "skipped": 13,
+  "categories": [
+    {
+      "code": "1147",
+      "label": "כיפות מיוחדות",
+      "cat": "כיפות",
+      "scraped": 112
+    },
+    {
+      "code": "1144",
+      "label": "סאטן וטריקלין",
+      "cat": "כיפות",
+      "scraped": 47
+    },
+    {
+      "code": "1143",
+      "label": "סרוגות",
+      "cat": "כיפות",
+      "scraped": 61
+    },
+    {
+      "code": "1151",
+      "label": "סרוגות ד.מ.צ.",
+      "cat": "כיפות",
+      "scraped": 47
+    },
+    {
+      "code": "1146",
+      "label": "סרוגות עם רקמה",
+      "cat": "כיפות",
+      "scraped": 29
+    },
+    {
+      "code": "1148",
+      "label": "עור",
+      "cat": "כיפות",
+      "scraped": 23
+    },
+    {
+      "code": "1149",
+      "label": "פריק",
+      "cat": "כיפות",
+      "scraped": 54
+    },
+    {
+      "code": "1181",
+      "label": "פריק עבודת יד",
+      "cat": "כיפות",
+      "scraped": 0
+    },
+    {
+      "code": "1145",
+      "label": "קטיפה",
+      "cat": "כיפות",
+      "scraped": 112
+    },
+    {
+      "code": "1150",
+      "label": "סיכות כיפה",
+      "cat": "כיפות",
+      "scraped": 6
+    },
+    {
+      "code": "1116",
+      "label": "הפרשת חלה",
+      "cat": "שבת",
+      "scraped": 26
+    }
+  ]
+}

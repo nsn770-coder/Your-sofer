@@ -162,6 +162,12 @@ export default function EditProductPage() {
         level,
         sku: sku.trim() || null,
       });
+      // Sync AI knowledge index (fire-and-forget)
+      fetch('/api/ai/products/upsert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId }),
+      }).catch(() => {});
       setSaved(true);
       setTimeout(() => router.push('/sofer-dashboard'), 1500);
     } catch (e) {

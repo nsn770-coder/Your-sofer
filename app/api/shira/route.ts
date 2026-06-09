@@ -1,79 +1,146 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb } from '@/lib/firebaseAdmin';
+import {
+  searchAiKnowledge,
+  type SearchResult,
+  EVENT_CATEGORIES,
+  CROSS_SELL,
+} from '@/lib/aiProductSearch';
 
-interface ProductResult {
-  id: string;
-  name: string;
-  price: number;
-  imgUrl: string;
-  cat: string;
-}
+// ── Intent detection ──────────────────────────────────────────────────────────
 
-const STAM_KEYWORD_MAP: { keywords: string[]; cat: string }[] = [
+const CATEGORY_KEYWORDS: { keywords: string[]; cat: string }[] = [
   { keywords: ['מזוזה', 'mezuzah', 'מזוזות', 'קלף מזוזה'], cat: 'קלפי מזוזה' },
-  { keywords: ['תפילין', 'tefillin', 'תפלין', 'קומפלט'], cat: 'תפילין קומפלט' },
+  { keywords: ['תפילין', 'tefillin', 'תפלין', 'קומפלט', 'תפילין קומפלט'], cat: 'תפילין קומפלט' },
   { keywords: ['מגילה', 'megillah', 'מגילות', 'מגילת אסתר'], cat: 'מגילות' },
   { keywords: ['ספר תורה', 'sefer torah', 'ספרי תורה'], cat: 'ספרי תורה' },
+  { keywords: ['כיפה', 'כיפות', 'kippah', 'kippa', 'yarmulke'], cat: 'כיפות' },
+  { keywords: ['טלית', 'טליתות', 'tallit', 'tallis'], cat: 'טליתות' },
+  { keywords: ['כיסוי חלה', 'כיסויי חלה', 'challah cover'], cat: 'כיסויי חלה' },
+  { keywords: ['פמוט', 'פמוטים', 'נרות שבת', 'candles', 'shabbat candles'], cat: 'פמוטים' },
+  { keywords: ['הפרשת חלה', 'ערכת חלה', 'challah set'], cat: 'ערכות הפרשת חלה' },
+  { keywords: ['תיק תפילין', 'תיקי תפילין', 'tefillin bag'], cat: 'תיקי תפילין' },
+  { keywords: ['סידור', 'סידורים', 'prayer book', 'siddur'], cat: 'סידורים' },
 ];
 
+const EVENT_KEYWORDS: { pattern: RegExp; event: string }[] = [
+  { pattern: /בר.?מצווה|bar.?mitzvah|בן.?מצווה/i, event: 'בר מצווה' },
+  { pattern: /חתונה|כלה|חתן|wedding|bride|groom/i, event: 'חתונה' },
+  { pattern: /הפרשת.?חלה|challah.?set|ערכת.?חלה/i, event: 'הפרשת חלה' },
+  { pattern: /בית.?חדש|דירה.?חדשה|new.?home|mezuzah.*house/i, event: 'בית חדש' },
+];
+
+const LARGE_ORDER_PATTERN = /\b([5-9]\d|\d{3,})\b|כמות.?גדולה|סיטונאי|הצעת.?מחיר|bulk/i;
+
+function detectCategory(text: string): string | null {
+  const lower = text.toLowerCase();
+  for (const { keywords, cat } of CATEGORY_KEYWORDS) {
+    if (keywords.some((kw) => lower.includes(kw.toLowerCase()))) return cat;
+  }
+  return null;
+}
+
+function detectEvent(text: string): string | null {
+  for (const { pattern, event } of EVENT_KEYWORDS) {
+    if (pattern.test(text)) return event;
+  }
+  return null;
+}
+
+function detectPriceRange(text: string): { min?: number; max?: number } {
+  const budget: Record<string, number> = {
+    זול: 200, זולה: 200, 'תקציב נמוך': 200, 'עד 200': 200, 'עד 150': 150,
+    'יקר': 500, 'מהודר': 500, 'מהודרת': 500,
+  };
+  for (const [kw, price] of Object.entries(budget)) {
+    if (text.includes(kw)) {
+      return kw.startsWith('עד') ? { max: price } : { min: price };
+    }
+  }
+  const upToMatch = text.match(/עד\s+₪?(\d+)/);
+  if (upToMatch) return { max: Number(upToMatch[1]) };
+  const fromMatch = text.match(/מ\s*₪?(\d+)\s+ומעלה|מעל\s+₪?(\d+)/);
+  if (fromMatch) return { min: Number(fromMatch[1] ?? fromMatch[2]) };
+  return {};
+}
+
+// ── System prompt builder ─────────────────────────────────────────────────────
+
 const BASE_SYSTEM = `You are Shira (שירה), a warm and knowledgeable STaM and Judaica advisor \
-for YourSofer.com — Israel's leading STaM marketplace.
+for YourSofer.com — Israel's leading STaM and Judaica marketplace.
 
 Your personality:
-- Warm, helpful, and patient
-- Expert in STaM (Sifrei Torah, Tefillin, Mezuzot, Megillot)
+- Warm, helpful, patient, and slightly personal
+- Expert in STaM (Sifrei Torah, Tefillin, Mezuzot, Megillot) and Judaica
 - Knowledgeable in halacha relevant to purchasing STaM
-- Speaks Hebrew naturally, can switch to English if needed
-- Never pushy — guides customers to the right product for them
+- Speaks Hebrew naturally; switches to English only if the customer writes in English
+- Never pushy — guides the customer to the right product for them
 
 Your capabilities:
 - Help customers choose between kashrut levels (כשר לכתחילה, מהודר, מהודר בתכלית)
 - Explain nusach differences (אשכנזי, ספרדי, אדמוה"ז)
 - Guide Bar Mitzvah families through tefillin selection
-- Explain what makes a quality mezuzah scroll
-- Recommend products based on budget and needs
-- Answer halachic questions about STaM at a general level
+- Recommend products based on budget and purpose
+- Suggest complementary products for events
 
-When recommending products:
-- Ask about budget, nusach, and purpose first
-- Suggest the appropriate kashrut level
-- Direct to relevant category pages with links
-- Keep responses concise 2-4 sentences max unless asked for detail
+Every STaM product is rabbinically supervised by Rav Binyamin Gelis and written by certified soferim.
 
-You represent YourSofer where every STaM product is rabbinically \
-supervised by Rav Binyamin Gelis and written by certified soferim.`;
+Response style: 2–4 sentences, clear and direct. Offer up to 3 products at once. \
+If you need to clarify, ask one short question only.`;
 
-async function getRelevantProducts(userMessage: string): Promise<ProductResult[]> {
-  const lower = userMessage.toLowerCase();
-  let matchedCat: string | null = null;
-  for (const { keywords, cat } of STAM_KEYWORD_MAP) {
-    if (keywords.some(kw => lower.includes(kw.toLowerCase()))) {
-      matchedCat = cat;
-      break;
+function buildSystemPrompt(
+  products: SearchResult[],
+  event: string | null,
+  isLargeOrder: boolean,
+): string {
+  let prompt = BASE_SYSTEM;
+
+  if (products.length > 0) {
+    prompt += `\n\n── מוצרים זמינים כעת ──
+${products
+  .map(
+    (p) =>
+      `• ${p.name} — ₪${p.price}${p.salePrice ? ` (מבצע: ₪${p.salePrice})` : ''}\n` +
+      `  קישור: ${p.productUrl}\n` +
+      `  תמונה: ${p.imageUrl}` +
+      (p.description ? `\n  תיאור: ${p.description}` : ''),
+  )
+  .join('\n')}`;
+  }
+
+  prompt += `\n\n── כללי בטיחות (קבועים — לעולם לא להפר) ──
+• הציגי רק מוצרים שרשומים ברשימה למעלה. אל תמציאי מוצרים שאינם ברשימה.
+• אל תמציאי מחירים — השתמשי אך ורק במחירים הרשומים.
+• אל תבטיחי זמן משלוח ספציפי אלא אם מצוין במפורש בפרטי המוצר.
+• אם חסר מידע — שאלי שאלה קצרה אחת ובלבד.
+• הציעי עד 3 מוצרים בכל פעם עם קישור ישיר.`;
+
+  if (event && EVENT_CATEGORIES[event]) {
+    const cats = EVENT_CATEGORIES[event].join(', ');
+    prompt += `\n\n── זוהה אירוע: ${event} ──
+הציעי מוצרים מהקטגוריות: ${cats}. \
+אם מצאת מוצר ראשי — הציעי מוצרים משלימים באופן טבעי (לא לחוץ).`;
+  }
+
+  if (products.length > 0) {
+    const mainCat = products[0].category;
+    const crossSell = CROSS_SELL[mainCat];
+    if (crossSell?.length) {
+      prompt += `\n\n── מוצרים משלימים לכיסוי הצורך ──
+לאחר שהציגת את המוצר העיקרי, הצעי בעדינות גם: ${crossSell.join(', ')}.`;
     }
   }
-  if (!matchedCat) return [];
 
-  try {
-    const db = getAdminDb();
-    const snap = await db.collection('products')
-      .where('status', '==', 'active')
-      .where('cat', '==', matchedCat)
-      .limit(50)
-      .get();
-    const docs = snap.docs.map(d => ({ id: d.id, ...(d.data() as Record<string, unknown>) })) as Array<Record<string, unknown> & { id: string }>;
-    docs.sort((a, b) => Number(b.priority ?? 0) - Number(a.priority ?? 0));
-    return docs.slice(0, 3).map(p => ({
-      id: String(p.id),
-      name: String(p.name ?? ''),
-      price: Number(p.price ?? 0),
-      imgUrl: String((p.imgUrl as string) || (p.image_url as string) || ''),
-      cat: String(p.cat ?? ''),
-    }));
-  } catch {
-    return [];
+  if (isLargeOrder) {
+    prompt += `\n\n── כמות גדולה / הצעת מחיר ──
+הלקוח מתעניין בכמות גדולה. אמרי: \
+"לכמויות ומחירים מיוחדים — כדאי לדבר ישירות עם הצוות שלנו. \
+אשמח לחבר אתכם." ואל תנסי לתמחר בעצמך.`;
   }
+
+  return prompt;
 }
+
+// ── Route ─────────────────────────────────────────────────────────────────────
 
 export async function GET() {
   return NextResponse.json({ status: 'shira route ok' });
@@ -81,48 +148,70 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { messages } = body as {
-      messages: { role: string; content: string }[];
-    };
+    const body = await req.json() as { messages: { role: string; content: string }[] };
+    const { messages } = body;
     const userMessage = messages[messages.length - 1]?.content ?? '';
 
-    const [aiResponse, products] = await Promise.all([
-      fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 400,
-          system: BASE_SYSTEM,
-          messages: messages.slice(-12),
-        }),
+    // Build a combined context from the last few messages for better intent detection
+    const recentText = messages
+      .slice(-4)
+      .map((m) => m.content)
+      .join(' ');
+
+    const detectedCat = detectCategory(recentText);
+    const detectedEvent = detectEvent(recentText);
+    const priceRange = detectPriceRange(recentText);
+    const isLargeOrder = LARGE_ORDER_PATTERN.test(recentText);
+
+    // Determine search category: direct category match takes priority, then event-based
+    const searchCategory =
+      detectedCat ??
+      (detectedEvent ? EVENT_CATEGORIES[detectedEvent]?.[0] : undefined);
+
+    const [products] = await Promise.all([
+      searchAiKnowledge(userMessage, {
+        category: searchCategory ?? undefined,
+        minPrice: priceRange.min,
+        maxPrice: priceRange.max,
+        limit: 3,
       }),
-      getRelevantProducts(userMessage),
     ]);
 
-    if (!aiResponse.ok) {
-      const errBody = await aiResponse.text();
-      console.error('Shira Anthropic error:', aiResponse.status, errBody);
-      throw new Error(`API error: ${aiResponse.status}`);
+    const systemPrompt = buildSystemPrompt(products, detectedEvent, isLargeOrder);
+
+    const aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY ?? '',
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 500,
+        system: systemPrompt,
+        messages: messages.slice(-12),
+      }),
+    });
+
+    if (!aiRes.ok) {
+      const errBody = await aiRes.text();
+      console.error('Shira Anthropic error:', aiRes.status, errBody);
+      throw new Error(`API error: ${aiRes.status}`);
     }
 
-    const data = await aiResponse.json();
+    const data = await aiRes.json() as { content?: { text?: string }[] };
     const message = data.content?.[0]?.text ?? 'סליחה, לא הצלחתי להגיב כרגע.';
 
     return NextResponse.json({
       message,
       ...(products.length > 0 && { products }),
     });
-  } catch (error) {
-    console.error('Shira API error:', error);
+  } catch (err) {
+    console.error('Shira API error:', err);
     return NextResponse.json(
       { message: 'סליחה, נתקלתי בבעיה קטנה. נסה שוב בעוד רגע 💛' },
-      { status: 200 }
+      { status: 200 },
     );
   }
 }

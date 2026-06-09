@@ -16,6 +16,8 @@ import InventoryTab from './components/InventoryTab';
 import PrintsTab from './components/PrintsTab';
 import StickersTab from './components/StickersTab';
 import ProfitabilityTab from './components/ProfitabilityTab';
+import SiteSettingsTab from './components/SiteSettingsTab';
+import PromotionsTab from './components/PromotionsTab';
 
 interface OrderItem {
   id: string;
@@ -49,6 +51,7 @@ interface Order {
   orderNumber: string;
   customerName: string;
   total: number;
+  paymentTotal?: number;    // locked: actual amount customer paid
   status: string;
   email?: string;
   phone?: string;
@@ -151,6 +154,15 @@ interface Product {
   createdAt?: { seconds: number };
   isExpertRecommended?: boolean;
   isBestSeller?: boolean;
+  // Warehouse location
+  storageColumn?: string;
+  storageShelf?: string | number;
+  storageNote?: string;
+  // Sale
+  isOnSale?: boolean;
+  salePrice?: number;
+  salePercent?: number;
+  saleCampaignId?: string | null;
 }
 
 interface Sofer {
@@ -211,7 +223,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions';
 
 interface Coupon {
   id: string;
@@ -657,6 +669,9 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [supplierCost, setSupplierCost] = useState(
     product.supplierCost != null ? String(product.supplierCost) : ''
   );
+  const [storageColumn, setStorageColumn] = useState(product.storageColumn ?? '');
+  const [storageShelf, setStorageShelf]   = useState(product.storageShelf != null ? String(product.storageShelf) : '');
+  const [storageNote, setStorageNote]     = useState(product.storageNote ?? '');
   const [saving, setSaving]         = useState(false);
   const [duplicating, setDuplicating] = useState(false);
   const [uploadingImg, setUploadingImg] = useState<string | null>(null);
@@ -737,7 +752,16 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         outOfStockDate: outOfStock ? (outOfStockDate ?? null) : null,
         isExpertRecommended: EXPERT_REC_CATS_ADMIN.includes(cat) ? isExpertRecommended : false,
         isBestSeller,
+        storageColumn: storageColumn || null,
+        storageShelf: storageShelf || null,
+        storageNote: storageNote || null,
       });
+      // Sync AI knowledge index (fire-and-forget)
+      fetch('/api/ai/products/upsert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: product.id }),
+      }).catch(() => {});
       onSave();
       onClose();
     } catch {
@@ -965,6 +989,35 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               />
             </div>
           )}
+        </div>
+
+        {/* ── מיקום במחסן ── */}
+        <div style={{ marginTop: 14, background: '#f0fff4', border: '1px solid #86efac', borderRadius: 8, padding: '12px 14px' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#166534', marginBottom: 10 }}>📦 מיקום במחסן</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <div>
+              <label style={labelStyle}>עמודה (A–G)</label>
+              <select value={storageColumn} onChange={e => setStorageColumn(e.target.value)}
+                style={{ ...inputStyle, background: '#fff' }}>
+                <option value="">לא מוגדר</option>
+                {['A','B','C','D','E','F','G'].map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>מדף (1–7)</label>
+              <select value={storageShelf} onChange={e => setStorageShelf(e.target.value)}
+                style={{ ...inputStyle, background: '#fff' }}>
+                <option value="">לא מוגדר</option>
+                {[1,2,3,4,5,6,7].map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>הערת מיקום</label>
+            <input value={storageNote} onChange={e => setStorageNote(e.target.value)}
+              placeholder='למשל: "שורה שלישית מלמעלה"'
+              style={inputStyle} />
+          </div>
         </div>
 
         {/* ── מידע ספק ── */}
@@ -1458,7 +1511,8 @@ function PrintCustomizationView({ pc }: { pc: PrintCustomizationData }) {
   );
 }
 
-function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>>; ordersError?: string | null }) {
+function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>>; ordersError?: string | null; }) {
+  const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
@@ -1475,6 +1529,30 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
   const [itemSearchLoading, setItemSearchLoading] = useState(false);
   const itemSearchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const allProductsCacheRef = useRef<Product[] | null>(null);
+  // Feature 5: warehouse info cache for order item display
+  const [productDetailsCache, setProductDetailsCache] = useState<Record<string, Product>>({});
+
+  // Feature 5: load product warehouse info when expanding an order
+  async function loadProductDetailsForOrder(orderId: string) {
+    const order = orders.find(o => o.id === orderId);
+    if (!order?.items?.length) return;
+    const missing = order.items
+      .map(it => it.productId ?? it.id)
+      .filter(pid => pid && !productDetailsCache[pid]);
+    if (missing.length === 0) return;
+    try {
+      const snaps = await Promise.all(missing.map(pid => getDoc(doc(db, 'products', pid))));
+      const updates: Record<string, Product> = {};
+      snaps.forEach((snap, i) => {
+        if (snap.exists()) updates[missing[i]] = { id: snap.id, ...snap.data() } as Product;
+      });
+      if (Object.keys(updates).length > 0) {
+        setProductDetailsCache(prev => ({ ...prev, ...updates }));
+      }
+    } catch (e) {
+      console.error('[OrdersTab] loadProductDetails:', e);
+    }
+  }
 
   async function handleStatusChange(orderId: string, newStatus: string) {
     setUpdatingId(orderId);
@@ -1596,16 +1674,40 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         ...(it.printCustomization != null && { printCustomization: it.printCustomization }),
         ...(it.finalPrice != null && { finalPrice: it.finalPrice }),
       }));
-      const newTotal = calcTotal(editDraft.items, o.shippingCost);
-      await updateDoc(doc(db, 'orders', o.id), {
+
+      // Feature 4: lock payment amount after payment; only update logistics fields
+      const isPaid = o.status !== 'pending_payment' && o.status !== 'cancelled';
+      const updateData: Record<string, unknown> = {
         customerName: editDraft.customerName,
         phone: editDraft.phone,
         email: editDraft.email,
         address: editDraft.address,
         notes: editDraft.notes,
         items: updatedItems,
-        total: newTotal,
+      };
+
+      if (!isPaid) {
+        // Pre-payment: recalculate total normally
+        updateData.total = calcTotal(editDraft.items, o.shippingCost);
+      } else {
+        // Post-payment: lock original total; stamp paymentTotal on first edit
+        if (!o.paymentTotal) {
+          updateData.paymentTotal = o.total;
+        }
+      }
+
+      await updateDoc(doc(db, 'orders', o.id), updateData);
+
+      // Log edit history in subcollection
+      await addDoc(collection(db, 'orders', o.id, 'orderEditHistory'), {
+        editedAt: serverTimestamp(),
+        editedBy: user?.email ?? 'אדמין',
+        oldItems: o.items ?? [],
+        newItems: updatedItems,
+        note: '',
       });
+
+      const newTotal = isPaid ? o.total : calcTotal(editDraft.items, o.shippingCost);
       setOrders(prev => prev.map(ord => ord.id === o.id ? {
         ...ord,
         customerName: editDraft.customerName,
@@ -1615,6 +1717,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         notes: editDraft.notes,
         items: updatedItems,
         total: newTotal,
+        paymentTotal: o.paymentTotal ?? (isPaid ? o.total : undefined),
       } : ord));
       cancelEdit();
     } catch (e) {
@@ -1686,7 +1789,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                 <React.Fragment key={o.id}>
                   <tr
                     className={`border-t cursor-pointer ${isCancelled ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
-                    onClick={() => !isEditing && setExpandedId(isExpanded ? null : o.id)}
+                    onClick={() => { if (isEditing) return; const next = isExpanded ? null : o.id; setExpandedId(next); if (next) loadProductDetailsForOrder(next); }}
                   >
                     <td className="p-3 font-mono text-xs">
                       {o.orderNumber}
@@ -1743,6 +1846,16 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                       <td colSpan={6} className="px-5 py-4" dir="rtl">
                         {isEditing && editDraft ? (
                           <div className="space-y-3">
+                            {/* ── Feature 4: payment lock warning ── */}
+                            {o.status !== 'pending_payment' && o.status !== 'cancelled' && (
+                              <div className="bg-amber-50 border border-amber-300 rounded-lg px-4 py-2.5 text-xs text-amber-800 font-medium flex items-start gap-2">
+                                <span className="text-base shrink-0">⚠️</span>
+                                <span>
+                                  <strong>שימו לב:</strong> עריכת מוצרים לאחר תשלום אינה משנה את הסכום שהלקוח שילם.
+                                  הסכום המקורי ששולם: <strong>{formatPrice(o.paymentTotal ?? o.total)}</strong> — נעול.
+                                </span>
+                              </div>
+                            )}
                             {/* ── פרטי לקוח — עריכה ── */}
                             <div className="bg-white border border-blue-100 rounded-lg px-4 py-3">
                               <p className="text-xs font-bold text-gray-400 mb-3">פרטי לקוח</p>
@@ -1883,28 +1996,48 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                                 <p className="text-xs font-bold text-gray-500 mb-2">פריטים בהזמנה:</p>
                                 <div className="flex flex-col gap-1">
                                   {o.items.map((item, idx) => (
-                                    <div key={idx} className="flex items-center gap-3 text-xs text-gray-700">
-                                      <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600 cursor-pointer">{item.name}</a>
-                                      <span className="text-gray-400">×{item.quantity}</span>
-                                      <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
-                                      {item.embroideryText && (
-                                        <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
-                                          ✍️ ריקמה: <strong>{item.embroideryText}</strong>
-                                        </span>
-                                      )}
-                                      {item.selectedKlafName && (
-                                        <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
-                                          📜 קלף: <strong>{item.selectedKlafName}</strong>
-                                        </span>
-                                      )}
-                                      {item.selectedCover && (
-                                        <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
-                                          כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
-                                        </span>
-                                      )}
-                                      {item.printCustomization && (
-                                        <PrintCustomizationView pc={item.printCustomization} />
-                                      )}
+                                    <div key={idx} className="flex items-start gap-3 text-xs text-gray-700 flex-wrap py-1 border-b border-gray-50 last:border-0">
+                                      {/* thumbnail */}
+                                      {(() => { const pd = productDetailsCache[item.productId ?? item.id]; return pd?.imgUrl ? <img src={pd.imgUrl} alt="" className="w-10 h-10 object-cover rounded border border-gray-200 shrink-0" /> : null; })()}
+                                      <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600">{item.name}</a>
+                                          <span className="text-gray-400">×{item.quantity}</span>
+                                          <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
+                                          {/* Feature 5: SKU */}
+                                          {(() => { const pd = productDetailsCache[item.productId ?? item.id]; return pd?.sku ? <span className="text-gray-400 font-mono">מק&quot;ט: {pd.sku}</span> : null; })()}
+                                        </div>
+                                        {/* Feature 5: warehouse location */}
+                                        {(() => {
+                                          const pd = productDetailsCache[item.productId ?? item.id];
+                                          if (!pd?.storageColumn && !pd?.storageShelf) return null;
+                                          return (
+                                            <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5 text-xs font-mono w-fit">
+                                              📦 {pd.storageColumn && `עמודה ${pd.storageColumn}`}{pd.storageShelf && ` · מדף ${pd.storageShelf}`}{pd.storageNote && ` · ${pd.storageNote}`}
+                                            </span>
+                                          );
+                                        })()}
+                                        <div className="flex flex-wrap gap-1">
+                                          {item.embroideryText && (
+                                            <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
+                                              ✍️ ריקמה: <strong>{item.embroideryText}</strong>
+                                            </span>
+                                          )}
+                                          {item.selectedKlafName && (
+                                            <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                                              📜 קלף: <strong>{item.selectedKlafName}</strong>
+                                            </span>
+                                          )}
+                                          {item.selectedCover && (
+                                            <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
+                                              כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
+                                            </span>
+                                          )}
+                                        </div>
+                                        {item.printCustomization && (
+                                          <PrintCustomizationView pc={item.printCustomization} />
+                                        )}
+                                      </div>
                                     </div>
                                   ))}
                                 </div>
@@ -2918,6 +3051,8 @@ export default function AdminPage() {
           { key: 'prints',         label: '🖨️ הדפסות',             color: 'bg-amber-600' },
           { key: 'stickers',       label: '🏷️ מדבקות QR',          color: 'bg-indigo-600' },
           { key: 'profitability',  label: '📊 רווחיות',             color: 'bg-emerald-700' },
+          { key: 'promotions',     label: '🏷️ מבצעים',              color: 'bg-orange-500' },
+          { key: 'site_settings',  label: '⚙️ הגדרות אתר',          color: 'bg-slate-600' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -2964,7 +3099,7 @@ export default function AdminPage() {
             <>
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">נמכר ביותר</th><th className="p-3 text-right">הסתרה</th><th className="p-3 text-right">עריכה</th><th className="p-3 text-right">מחיקה</th></tr></thead>
+                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">מחסן</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">נמכר ביותר</th><th className="p-3 text-right">הסתרה</th><th className="p-3 text-right">עריכה</th><th className="p-3 text-right">מחיקה</th></tr></thead>
                 <tbody>
                   {filteredProducts.length === 0 ? <tr><td colSpan={8} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
                   : filteredProducts.map(p => (
@@ -2972,6 +3107,9 @@ export default function AdminPage() {
                       <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
                       <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '-'}</td>
                       <td className="p-3 font-bold text-green-700">{formatPrice(p.price)}</td>
+                      <td className="p-3 text-xs font-mono text-green-700">
+                        {p.storageColumn && p.storageShelf ? `${p.storageColumn}${p.storageShelf}` : (p.storageColumn || p.storageShelf ? `${p.storageColumn ?? ''}${p.storageShelf ?? ''}` : <span className="text-gray-300">—</span>)}
+                      </td>
                       <td className="p-3">
                         {p.status === 'pending' ? (
                           <div className="flex items-center gap-1">
@@ -4179,6 +4317,10 @@ export default function AdminPage() {
       {activeTab === 'stickers' && <StickersTab />}
 
       {activeTab === 'profitability' && <ProfitabilityTab products={products} orders={orders} />}
+
+      {activeTab === 'promotions' && <PromotionsTab />}
+
+      {activeTab === 'site_settings' && <SiteSettingsTab />}
 
       {lightboxImage && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }} onClick={() => setLightboxImage(null)}>
