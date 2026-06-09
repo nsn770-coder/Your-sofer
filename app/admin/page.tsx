@@ -4155,7 +4155,14 @@ function GiftsTab() {
           const d = snap.data();
           setEnabled(d.enabled ?? false);
           setThreshold(d.threshold ?? 250);
-          const opts: GiftOption[] = d.options ?? [];
+          // Normalize: old records may lack productId — always coerce to string
+          const raw: Record<string, string>[] = d.options ?? [];
+          const opts: GiftOption[] = raw.map(g => ({
+            id:        g.id        ?? '',
+            productId: g.productId ?? '',
+            name:      g.name      ?? '',
+            imgUrl:    g.imgUrl    ?? '',
+          }));
           setGifts(opts.length > 0 ? opts : [{ ...EMPTY_GIFT }]);
         }
         setLoading(false);
@@ -4173,21 +4180,33 @@ function GiftsTab() {
   function removeGift(idx: number) { setGifts(prev => prev.filter((_, i) => i !== idx)); setSaved(false); }
 
   async function save() {
-    const invalid = gifts.find(g => !g.id.trim() || !g.productId.trim() || !g.name.trim() || !g.imgUrl.trim());
+    const invalid = gifts.find(g =>
+      !(g.id ?? '').trim() || !(g.productId ?? '').trim() ||
+      !(g.name ?? '').trim() || !(g.imgUrl ?? '').trim()
+    );
     if (invalid) { setError('כל שדות המתנה (מזהה, מוצר, שם, תמונה) הם חובה'); return; }
     if (threshold < 1) { setError('סף הזכאות חייב להיות חיובי'); return; }
-    const ids = gifts.map(g => g.id.trim());
+    const ids = gifts.map(g => (g.id ?? '').trim());
     if (new Set(ids).size !== ids.length) { setError('מזהי המתנות חייבים להיות ייחודיים'); return; }
     setError(''); setSaving(true);
-    await setDoc(doc(db, 'siteConfig', 'gifts'), {
-      enabled, threshold,
-      options: gifts.map(g => ({
-        id: g.id.trim(), productId: g.productId.trim(),
-        name: g.name.trim(), imgUrl: g.imgUrl.trim(),
-      })),
-      updatedAt: new Date().toISOString(),
-    });
-    setSaving(false); setSaved(true);
+    try {
+      await setDoc(doc(db, 'siteConfig', 'gifts'), {
+        enabled, threshold,
+        options: gifts.map(g => ({
+          id:        (g.id        ?? '').trim(),
+          productId: (g.productId ?? '').trim(),
+          name:      (g.name      ?? '').trim(),
+          imgUrl:    (g.imgUrl    ?? '').trim(),
+        })),
+        updatedAt: new Date().toISOString(),
+      });
+      setSaved(true);
+    } catch (e) {
+      console.error('GiftsTab save error:', e);
+      setError('שגיאה בשמירה — בדוק את החיבור ונסה שנית');
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (loading) return <div className="p-10 text-center text-gray-400">טוען...</div>;
@@ -4242,7 +4261,7 @@ function GiftsTab() {
                   <label className="text-xs text-gray-500">
                     קישור/מזהה מוצר
                     <input
-                      value={g.productId}
+                      value={g.productId ?? ''}
                       onChange={e => updateGift(i, 'productId', extractProductId(e.target.value))}
                       placeholder="https://your-sofer.com/product/… או product ID ישיר"
                       className="mt-1 block w-full border border-gray-200 rounded px-3 py-1.5 text-sm"
@@ -4280,7 +4299,7 @@ function GiftsTab() {
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
-        <button onClick={save} disabled={saving}
+        <button type="button" onClick={save} disabled={saving}
           className="mt-4 px-6 py-2 bg-pink-600 text-white rounded-lg font-bold text-sm disabled:opacity-50"
         >
           {saving ? 'שומר...' : saved ? '✓ נשמר!' : 'שמור מתנות'}
