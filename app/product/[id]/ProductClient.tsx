@@ -60,6 +60,8 @@ interface Product {
   bundlePromo?: string | null;
   sku?: string | null;
   soferBasePrice?: number;
+  receivedFromSupplier?: number;
+  inStock?: number;
 }
 
 interface KlafItem { id: string; name: string; imageUrl: string; status: string; }
