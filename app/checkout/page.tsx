@@ -235,7 +235,6 @@ export default function CheckoutPage() {
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
           ],
           total: finalTotal, customer: { name: form.name, email: form.email, phone: form.phone }, orderNumber, orderId: orderRef.id, baseUrl, couponCode: appliedCoupon?.code || undefined,
-          klafIds: items.filter(i => i.selectedKlafId).map(i => i.selectedKlafId!),
         }),
       });
 

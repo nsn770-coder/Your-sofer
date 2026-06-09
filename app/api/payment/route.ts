@@ -33,7 +33,7 @@ function parseBundle(key: string): { n: number; bundlePrice: number } | null {
 
 export async function POST(req: NextRequest) {
   try {
-    const { items, total, customer, orderNumber, orderId, baseUrl, couponCode, klafIds } =
+    const { items, total, customer, orderNumber, orderId, baseUrl, couponCode } =
       await req.json() as {
         items:       PaymentItem[];
         total:       number;
@@ -42,7 +42,6 @@ export async function POST(req: NextRequest) {
         orderId:     string;
         baseUrl:     string;
         couponCode?: string;
-        klafIds?:    string[];
       };
 
     // Product items (excludes discount lines and shipping)
@@ -221,16 +220,6 @@ export async function POST(req: NextRequest) {
               usedAt: FieldValue.serverTimestamp(),
             })
           );
-        }
-
-        if (klafIds && klafIds.length > 0) {
-          for (const kid of klafIds) {
-            sideEffects.push(
-              adminDb.collection('klafim').doc(kid).update({
-                status: 'reserved', orderId, reservedAt: new Date().toISOString(),
-              })
-            );
-          }
         }
 
         const results = await Promise.allSettled(sideEffects);
