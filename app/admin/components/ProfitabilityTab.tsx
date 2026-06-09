@@ -80,6 +80,30 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
   const totalAfterVat    = profitData.reduce((s, p) => s + p.profitAfterVat, 0);
   const profitPercent    = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : '0';
 
+  // שווי מלאי שטרם נמכר — דינמי, לא תלוי ב-inStock השמור
+  const unsoldInventory = (() => {
+    const soldMap: Record<string, number> = orders
+      .filter(o => o.status !== 'pending_payment' && o.status !== 'cancelled')
+      .flatMap(o => o.items ?? [])
+      .reduce<Record<string, number>>((m, i) => {
+        const pid = (i as { productId?: string; id?: string }).productId ?? (i as { productId?: string; id?: string }).id;
+        if (pid) m[pid] = (m[pid] ?? 0) + i.quantity;
+        return m;
+      }, {});
+
+    let value = 0;
+    let count = 0;
+    for (const p of products) {
+      if (!p.receivedFromSupplier || !p.supplierCost) continue;
+      const currentStock = p.receivedFromSupplier - (soldMap[p.id] ?? 0);
+      if (currentStock > 0) {
+        value += currentStock * p.supplierCost;
+        count++;
+      }
+    }
+    return { value, count };
+  })();
+
   return (
     <div>
       <h2 style={{ fontSize: 18, fontWeight: 900, marginBottom: 15 }}>📊 דוח רווחיות</h2>
@@ -125,6 +149,11 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
         <div style={{ background: '#f5f3ff', padding: 15, borderRadius: 8 }}>
           <div style={{ fontSize: 12, color: '#7c3aed', fontWeight: 700 }}>% רווח תזרימי</div>
           <div style={{ fontSize: 22, fontWeight: 900, color: '#7c3aed' }}>{profitPercent}%</div>
+        </div>
+        <div style={{ background: '#f8f8f8', padding: 15, borderRadius: 8, border: '1px solid #e5e7eb' }}>
+          <div style={{ fontSize: 12, color: '#374151', fontWeight: 700 }}>שווי מלאי (טרם נמכר)</div>
+          <div style={{ fontSize: 22, fontWeight: 900, color: '#111827' }}>₪{unsoldInventory.value.toFixed(0)}</div>
+          <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{unsoldInventory.count} מוצרים במלאי</div>
         </div>
       </div>
 
