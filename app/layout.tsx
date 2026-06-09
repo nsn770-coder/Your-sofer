@@ -20,6 +20,7 @@ import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 import ClubPopupWrapper from "@/components/ClubPopupWrapper";
 import AnnouncementTicker from "./components/AnnouncementTicker";
+import GiftProgressBar from "./components/GiftProgressBar";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
@@ -122,6 +123,7 @@ export default function RootLayout({
                 <ShiraChat />
                 <ShavuotPopupWrapper />
                 <ClubPopupWrapper />
+                <GiftProgressBar />
               </CartProvider>
             </ShaliachProvider>
           </Suspense>

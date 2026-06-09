@@ -338,10 +338,10 @@ export default function CheckoutPage() {
         )}
         {couponError && <div style={{ fontSize: 11, color: '#dc2626', marginTop: 5 }}>{couponError}</div>}
       </div>
-      {/* A4: Gift selector — only when feature is enabled in siteConfig */}
-      {giftEnabled && giftOptions.length > 0 && (
+      {/* A4: Gift — progress bar (no giftOptions needed) and selection (requires options) */}
+      {giftEnabled && (
         <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
-          {giftEligible ? (
+          {giftEligible && giftOptions.length > 0 ? (
             <>
               <div style={{ fontSize: 13, fontWeight: 800, color: '#1a6b3c', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
                 🎁 {giftOptions.length === 1 ? 'קיבלת מתנה חינם!' : 'בחר מתנה חינם!'}
@@ -365,14 +365,14 @@ export default function CheckoutPage() {
                 </div>
               )}
             </>
-          ) : (
+          ) : !giftEligible ? (
             <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#92400e' }}>
               🎁 הוסף עוד <strong>{formatPrice(amountToGift)}</strong> לקבלת מתנה חינם
               <div style={{ marginTop: 6, background: '#e5e7eb', borderRadius: 4, height: 6, overflow: 'hidden' }}>
                 <div style={{ background: '#C5A028', height: '100%', width: `${Math.min(100, (total / giftThreshold) * 100)}%`, transition: 'width 0.3s' }} />
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       )}
 

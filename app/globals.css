@@ -96,6 +96,18 @@ body {
   }
 }
 
+/* Lift WA float bubble above gift progress bar when bar is active.
+   Specificity (0,2,0) beats ShiraChat's .wa-float-wrap (0,1,0). */
+body.gift-bar-active .wa-float-wrap {
+  bottom: 68px !important;
+}
+
+/* Also push Tidio up when gift bar is active */
+body.gift-bar-active #tidio-chat-iframe,
+body.gift-bar-active #tidio-chat {
+  bottom: 114px !important;
+}
+
 /* ─── CLS Prevention ─────────────────────────────────────────────────────────
    These rules prevent layout shifts across the site.
    Never use height:auto on image containers — always reserve space.
