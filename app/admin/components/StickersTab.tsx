@@ -10,6 +10,7 @@ interface StickerProduct {
   sku?: string;
   imgUrl?: string;
   image_url?: string;
+  receivedFromSupplier?: number;
 }
 
 interface InvoiceItem {
@@ -39,6 +40,16 @@ interface PrintItem {
   qty: number;
 }
 
+interface OrderItem {
+  productId?: string;
+  quantity: number;
+}
+
+interface OrderDoc {
+  id: string;
+  items?: OrderItem[];
+}
+
 // Insert Cloudinary transform after /upload/ if applicable
 function cloudImg(url: string | undefined): string {
   if (!url) return '';
@@ -63,6 +74,7 @@ function formatProcessedAt(pt: unknown): string {
 export default function StickersTab() {
   const [products, setProducts] = useState<StickerProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState<OrderDoc[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [invoicesLoading, setInvoicesLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -81,6 +93,13 @@ export default function StickersTab() {
     });
   }, []);
 
+  // Load orders for sold-count calculation (same logic as InventoryTab)
+  useEffect(() => {
+    getDocs(collection(db, 'orders')).then(snap => {
+      setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() } as OrderDoc)));
+    }).catch(() => {});
+  }, []);
+
   // Load invoices newest-first
   useEffect(() => {
     getDocs(query(collection(db, 'invoices'), orderBy('processedAt', 'desc')))
@@ -91,10 +110,25 @@ export default function StickersTab() {
       .catch(() => setInvoicesLoading(false));
   }, []);
 
+  // soldMap: same logic as InventoryTab — sum quantities from all order items
+  const soldMap: Record<string, number> = orders
+    .flatMap(o => o.items ?? [])
+    .reduce<Record<string, number>>((m, i) => {
+      if (i.productId) m[i.productId] = (m[i.productId] ?? 0) + i.quantity;
+      return m;
+    }, {});
+
+  // Current in-stock = receivedFromSupplier − sold, clamped to ≥0
+  function getInStock(p: StickerProduct): number {
+    return Math.max(0, (p.receivedFromSupplier ?? 0) - (soldMap[p.id] ?? 0));
+  }
+
+  // Filtered for the manual table — only products with stock > 0
   const filtered = products.filter(p =>
-    !search ||
-    p.name?.toLowerCase().includes(search.toLowerCase()) ||
-    p.sku?.toLowerCase().includes(search.toLowerCase())
+    getInStock(p) > 0 &&
+    (!search ||
+      p.name?.toLowerCase().includes(search.toLowerCase()) ||
+      p.sku?.toLowerCase().includes(search.toLowerCase()))
   );
 
   // numeric-suffix SKU index built from all loaded products
@@ -145,7 +179,7 @@ export default function StickersTab() {
   // ── Table path: print filtered products with manual quantities ───────────
   function handlePrintAll() {
     const items: PrintItem[] = filtered
-      .map(p => ({ product: p, qty: quantities[p.id] ?? 1 }))
+      .map(p => ({ product: p, qty: quantities[p.id] ?? getInStock(p) }))
       .filter(x => x.qty > 0);
     if (items.length === 0) {
       alert('אין מדבקות להדפסה — הגדר כמות > 0 לפחות למוצר אחד');
@@ -157,10 +191,16 @@ export default function StickersTab() {
 
   // ── Invoice path: open modal ─────────────────────────────────────────────
   function openInvoiceModal(inv: Invoice) {
-    const rows: ModalRow[] = (inv.items ?? []).map(item => {
+    const rows: ModalRow[] = (inv.items ?? []).flatMap((item): ModalRow[] => {
       const n = item.code.replace(/^[A-Z]+/i, '');
       const product = productSkuMap[n] ?? null;
-      return { item, product, qty: Number(item.quantity) || 1 };
+      if (product) {
+        const inStock = getInStock(product);
+        if (inStock <= 0) return []; // exclude matched products with no stock
+        return [{ item, product, qty: inStock }];
+      }
+      // keep unmatched items for informational display (won't be printed)
+      return [{ item, product: null, qty: 0 }];
     });
     setModal({ invoice: inv, rows });
   }
@@ -199,7 +239,7 @@ export default function StickersTab() {
     `);
   }
 
-  const tableStickerCount = filtered.reduce((s, p) => s + Math.max(0, quantities[p.id] ?? 1), 0);
+  const tableStickerCount = filtered.reduce((s, p) => s + Math.max(0, quantities[p.id] ?? getInStock(p)), 0);
 
   return (
     <div>
@@ -477,7 +517,7 @@ export default function StickersTab() {
                 <td style={{ padding: 10, textAlign: 'center' }}>
                   <input
                     type="number" min={0} max={99}
-                    value={quantities[p.id] ?? 1}
+                    value={quantities[p.id] ?? getInStock(p)}
                     onChange={e => setQuantities(prev => ({
                       ...prev,
                       [p.id]: Math.max(0, parseInt(e.target.value) || 0),
