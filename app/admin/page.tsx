@@ -1384,7 +1384,8 @@ const ORDER_STATUSES: { value: string; label: string; color: string }[] = [
   { value: 'delivered',  label: '✅ נמסר',             color: 'bg-green-100 text-green-700' },
   { value: 'completed',  label: '🏁 הושלם',            color: 'bg-green-200 text-green-800' },
   { value: 'needs_care', label: '⚠️ דורש טיפול',      color: 'bg-red-100 text-red-700' },
-  { value: 'abandoned',  label: '🚫 בוטל',             color: 'bg-gray-200 text-gray-600' },
+  { value: 'abandoned',  label: '🚫 נטוש',             color: 'bg-gray-200 text-gray-600' },
+  { value: 'cancelled',  label: '❌ בוטל',             color: 'bg-red-100 text-red-500' },
 ];
 
 // ── Shared print-customization display block ─────────────────────────────────
@@ -1460,6 +1461,9 @@ function PrintCustomizationView({ pc }: { pc: PrintCustomizationData }) {
 function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>>; ordersError?: string | null }) {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showCancelled, setShowCancelled] = useState(false);
 
   async function handleStatusChange(orderId: string, newStatus: string) {
     setUpdatingId(orderId);
@@ -1470,9 +1474,37 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
     finally { setUpdatingId(null); }
   }
 
+  async function handleCancel(orderId: string) {
+    const ok = window.confirm('לבטל את העסקה? ההזמנה תישאר ברשומות אך לא תיחשב כהכנסה.');
+    if (!ok) return;
+    setCancellingId(orderId);
+    try {
+      await updateDoc(doc(db, 'orders', orderId), { status: 'cancelled' });
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'cancelled' } : o));
+    } catch (e) { console.error(e); alert('שגיאה בביטול ההזמנה'); }
+    finally { setCancellingId(null); }
+  }
+
+  async function handleDelete(orderId: string, orderNumber: string) {
+    const ok1 = window.confirm(`למחוק לצמיתות את הזמנה ${orderNumber}? פעולה בלתי הפיכה.`);
+    if (!ok1) return;
+    const ok2 = window.confirm('אישור נוסף: האם אתה בטוח? הנתונים יאבדו לצמיתות ולא ניתן לשחזר.');
+    if (!ok2) return;
+    setDeletingId(orderId);
+    try {
+      await deleteDoc(doc(db, 'orders', orderId));
+      setOrders(prev => prev.filter(o => o.id !== orderId));
+    } catch (e) { console.error(e); alert('שגיאה במחיקת ההזמנה'); }
+    finally { setDeletingId(null); }
+  }
+
   function getStatusMeta(val: string) {
     return ORDER_STATUSES.find(s => s.value === val) ?? { label: val, color: 'bg-gray-100 text-gray-600' };
   }
+
+  const cancelledCount = orders.filter(o => o.status === 'cancelled').length;
+  const activeCount = orders.filter(o => o.status !== 'cancelled').length;
+  const visibleOrders = orders.filter(o => showCancelled ? o.status === 'cancelled' : o.status !== 'cancelled');
 
   if (ordersError) {
     return <div className="bg-white rounded-xl shadow p-10 text-center text-red-600 font-bold">שגיאה בטעינת הזמנות: {ordersError}</div>;
@@ -1482,114 +1514,165 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
   }
 
   return (
-    <div className="bg-white rounded-xl shadow overflow-hidden" dir="rtl">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="p-3 text-right">מספר הזמנה</th>
-            <th className="p-3 text-right">לקוח</th>
-            <th className="p-3 text-right">סכום</th>
-            <th className="p-3 text-right">שליח</th>
-            <th className="p-3 text-right">סטטוס</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map(o => {
-            const meta = getStatusMeta(o.status);
-            const isExpanded = expandedId === o.id;
-            return (
-              <React.Fragment key={o.id}>
-                <tr
-                  className="border-t hover:bg-gray-50 cursor-pointer"
-                  onClick={() => setExpandedId(isExpanded ? null : o.id)}
-                >
-                  <td className="p-3 font-mono text-xs">{o.orderNumber}</td>
-                  <td className="p-3 font-bold">{o.customerName}</td>
-                  <td className="p-3 text-green-700 font-bold">{formatPrice(o.total)}</td>
-                  <td className="p-3 text-blue-600">{o.shaliachName || '-'}</td>
-                  <td className="p-3" onClick={e => e.stopPropagation()}>
-                    <select
-                      value={o.status}
-                      disabled={updatingId === o.id}
-                      onChange={e => handleStatusChange(o.id, e.target.value)}
-                      className={`text-xs font-bold px-2 py-1 rounded-full border-0 cursor-pointer outline-none ${meta.color}`}
-                      style={{ fontFamily: 'inherit' }}
-                    >
-                      {ORDER_STATUSES.map(s => (
-                        <option key={s.value} value={s.value}>{s.label}</option>
-                      ))}
-                    </select>
-                    {updatingId === o.id && <span className="ml-2 text-xs text-gray-400">שומר...</span>}
-                  </td>
-                </tr>
-                {isExpanded && (
-                  <tr className="bg-blue-50 border-t border-blue-100">
-                    <td colSpan={5} className="px-5 py-3" dir="rtl">
-                      {/* ── פרטי לקוח ── */}
-                      <div className="bg-white border border-blue-100 rounded-lg px-4 py-3 mb-3 text-xs text-gray-700">
-                        <p className="text-xs font-bold text-gray-400 mb-2">פרטי לקוח</p>
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-1">
-                          {o.customerName && (
-                            <div><span className="text-gray-400 ml-1">שם:</span><span className="font-medium">{o.customerName}</span></div>
-                          )}
-                          {o.phone && (
-                            <div><span className="text-gray-400 ml-1">טלפון:</span><span className="font-medium" dir="ltr">{o.phone}</span></div>
-                          )}
-                          {o.email && (
-                            <div><span className="text-gray-400 ml-1">אימייל:</span><span className="font-medium" dir="ltr">{o.email}</span></div>
-                          )}
-                          {o.address && (
-                            <div><span className="text-gray-400 ml-1">כתובת:</span><span className="font-medium">{o.address}</span></div>
-                          )}
-                          {o.shippingCost != null && (
-                            <div><span className="text-gray-400 ml-1">משלוח:</span><span className="font-medium">₪{o.shippingCost}</span></div>
-                          )}
-                          {o.notes && (
-                            <div className="col-span-2 mt-1"><span className="text-gray-400 ml-1">הערות:</span><span className="font-medium">{o.notes}</span></div>
-                          )}
-                        </div>
-                      </div>
-                      {/* ── פריטים ── */}
-                      {o.items && o.items.length > 0 && (
-                        <>
-                          <p className="text-xs font-bold text-gray-500 mb-2">פריטים בהזמנה:</p>
-                          <div className="flex flex-col gap-1">
-                            {o.items.map((item, idx) => (
-                              <div key={idx} className="flex items-center gap-3 text-xs text-gray-700">
-                                <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600 cursor-pointer">{item.name}</a>
-                                <span className="text-gray-400">×{item.quantity}</span>
-                                <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
-                                {item.embroideryText && (
-                                  <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
-                                    ✍️ ריקמה: <strong>{item.embroideryText}</strong>
-                                  </span>
-                                )}
-                                {item.selectedKlafName && (
-                                  <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
-                                    📜 קלף: <strong>{item.selectedKlafName}</strong>
-                                  </span>
-                                )}
-                                {item.selectedCover && (
-                                  <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
-                                    כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
-                                  </span>
-                                )}
-                                {item.printCustomization && (
-                                  <PrintCustomizationView pc={item.printCustomization} />
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </>
+    <div className="space-y-3" dir="rtl">
+      <div className="flex gap-2">
+        <button
+          onClick={() => setShowCancelled(false)}
+          className={`px-4 py-2 rounded-lg text-sm font-bold border transition-colors ${!showCancelled ? 'bg-blue-900 text-white border-blue-900' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'}`}
+        >
+          הזמנות פעילות ({activeCount})
+        </button>
+        <button
+          onClick={() => setShowCancelled(true)}
+          className={`px-4 py-2 rounded-lg text-sm font-bold border transition-colors ${showCancelled ? 'bg-gray-600 text-white border-gray-600' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'}`}
+        >
+          מבוטלות ({cancelledCount})
+        </button>
+      </div>
+
+      <div className="bg-white rounded-xl shadow overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="p-3 text-right">מספר הזמנה</th>
+              <th className="p-3 text-right">לקוח</th>
+              <th className="p-3 text-right">סכום</th>
+              <th className="p-3 text-right">שליח</th>
+              <th className="p-3 text-right">סטטוס</th>
+              <th className="p-3 text-right">פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visibleOrders.length === 0 && (
+              <tr>
+                <td colSpan={6} className="p-8 text-center text-gray-400">
+                  {showCancelled ? 'אין הזמנות מבוטלות' : 'אין הזמנות פעילות'}
+                </td>
+              </tr>
+            )}
+            {visibleOrders.map(o => {
+              const meta = getStatusMeta(o.status);
+              const isExpanded = expandedId === o.id;
+              const isCancelled = o.status === 'cancelled';
+              return (
+                <React.Fragment key={o.id}>
+                  <tr
+                    className={`border-t cursor-pointer ${isCancelled ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+                    onClick={() => setExpandedId(isExpanded ? null : o.id)}
+                  >
+                    <td className="p-3 font-mono text-xs">
+                      {o.orderNumber}
+                      {isCancelled && (
+                        <span className="mr-2 inline-block bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">בוטל</span>
                       )}
                     </td>
+                    <td className={`p-3 font-bold ${isCancelled ? 'text-gray-400' : ''}`}>{o.customerName}</td>
+                    <td className={`p-3 font-bold ${isCancelled ? 'text-gray-400 line-through' : 'text-green-700'}`}>{formatPrice(o.total)}</td>
+                    <td className="p-3 text-blue-600">{o.shaliachName || '-'}</td>
+                    <td className="p-3" onClick={e => e.stopPropagation()}>
+                      <select
+                        value={o.status}
+                        disabled={updatingId === o.id}
+                        onChange={e => handleStatusChange(o.id, e.target.value)}
+                        className={`text-xs font-bold px-2 py-1 rounded-full border-0 cursor-pointer outline-none ${meta.color}`}
+                        style={{ fontFamily: 'inherit' }}
+                      >
+                        {ORDER_STATUSES.map(s => (
+                          <option key={s.value} value={s.value}>{s.label}</option>
+                        ))}
+                      </select>
+                      {updatingId === o.id && <span className="ml-2 text-xs text-gray-400">שומר...</span>}
+                    </td>
+                    <td className="p-3" onClick={e => e.stopPropagation()}>
+                      <div className="flex gap-1">
+                        {!isCancelled && (
+                          <button
+                            onClick={() => handleCancel(o.id)}
+                            disabled={cancellingId === o.id}
+                            className="text-xs font-bold px-2 py-1 rounded border border-orange-300 text-orange-700 bg-orange-50 hover:bg-orange-100 disabled:opacity-50 whitespace-nowrap"
+                          >
+                            {cancellingId === o.id ? '...' : 'בטל עסקה'}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDelete(o.id, o.orderNumber)}
+                          disabled={deletingId === o.id}
+                          className="text-xs font-bold px-2 py-1 rounded border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 disabled:opacity-50"
+                        >
+                          {deletingId === o.id ? '...' : 'מחק'}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
-                )}
-              </React.Fragment>
-            );
-          })}
-        </tbody>
-      </table>
+                  {isExpanded && (
+                    <tr className="bg-blue-50 border-t border-blue-100">
+                      <td colSpan={6} className="px-5 py-3" dir="rtl">
+                        {/* ── פרטי לקוח ── */}
+                        <div className="bg-white border border-blue-100 rounded-lg px-4 py-3 mb-3 text-xs text-gray-700">
+                          <p className="text-xs font-bold text-gray-400 mb-2">פרטי לקוח</p>
+                          <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+                            {o.customerName && (
+                              <div><span className="text-gray-400 ml-1">שם:</span><span className="font-medium">{o.customerName}</span></div>
+                            )}
+                            {o.phone && (
+                              <div><span className="text-gray-400 ml-1">טלפון:</span><span className="font-medium" dir="ltr">{o.phone}</span></div>
+                            )}
+                            {o.email && (
+                              <div><span className="text-gray-400 ml-1">אימייל:</span><span className="font-medium" dir="ltr">{o.email}</span></div>
+                            )}
+                            {o.address && (
+                              <div><span className="text-gray-400 ml-1">כתובת:</span><span className="font-medium">{o.address}</span></div>
+                            )}
+                            {o.shippingCost != null && (
+                              <div><span className="text-gray-400 ml-1">משלוח:</span><span className="font-medium">₪{o.shippingCost}</span></div>
+                            )}
+                            {o.notes && (
+                              <div className="col-span-2 mt-1"><span className="text-gray-400 ml-1">הערות:</span><span className="font-medium">{o.notes}</span></div>
+                            )}
+                          </div>
+                        </div>
+                        {/* ── פריטים ── */}
+                        {o.items && o.items.length > 0 && (
+                          <>
+                            <p className="text-xs font-bold text-gray-500 mb-2">פריטים בהזמנה:</p>
+                            <div className="flex flex-col gap-1">
+                              {o.items.map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-3 text-xs text-gray-700">
+                                  <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600 cursor-pointer">{item.name}</a>
+                                  <span className="text-gray-400">×{item.quantity}</span>
+                                  <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
+                                  {item.embroideryText && (
+                                    <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
+                                      ✍️ ריקמה: <strong>{item.embroideryText}</strong>
+                                    </span>
+                                  )}
+                                  {item.selectedKlafName && (
+                                    <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                                      📜 קלף: <strong>{item.selectedKlafName}</strong>
+                                    </span>
+                                  )}
+                                  {item.selectedCover && (
+                                    <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
+                                      כיסוי נבחר: <strong>{item.selectedCover.name}</strong>
+                                    </span>
+                                  )}
+                                  {item.printCustomization && (
+                                    <PrintCustomizationView pc={item.printCustomization} />
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
