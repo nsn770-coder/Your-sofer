@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { Product } from '@/app/lib/types';
 import { Order } from '@/app/lib/types';
@@ -47,6 +47,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
         const snap = await getDocs(collection(db, 'products'));
         const data: Product[] = [];
         snap.forEach(d => data.push({ id: d.id, ...d.data() } as Product));
+        console.log(`[InventoryTab] Loaded ${data.length} products from Firestore`);
         setAllProducts(data);
       } catch (e) {
         console.error('[InventoryTab] loadAllProducts', e);
@@ -79,8 +80,15 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     })();
   }, [parsedInvoice]);
 
-  const getSold = (productId: string) =>
-    orders.flatMap(o => o.items ?? []).filter(i => i.productId === productId).reduce((s, i) => s + i.quantity, 0);
+  // מחושב מ-orders.items[].quantity של כל ההזמנות (לא pending_payment ולא cancelled)
+  const soldMap: Record<string, number> = orders
+    .flatMap(o => o.items ?? [])
+    .reduce<Record<string, number>>((m, i) => {
+      if (i.productId) m[i.productId] = (m[i.productId] ?? 0) + i.quantity;
+      return m;
+    }, {});
+
+  const getSold = (productId: string) => soldMap[productId] ?? 0;
 
   const getInventory = (product: Product) =>
     (product.receivedFromSupplier ?? 0) - getSold(product.id);
@@ -94,7 +102,12 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     .filter(p => !searchTerm || p.name?.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a, b) => b.computedInStock - a.computedInStock);
 
-  const totalValue = inventoryProducts.reduce((s, p) => s + p.inventoryValue, 0);
+  console.log(`[InventoryTab] Filtered to ${inventoryProducts.length} products in inventory (search: "${searchTerm}")`);
+
+  const totalValue    = inventoryProducts.reduce((s, p) => s + p.inventoryValue, 0);
+  const totalInStock  = allProducts.reduce((s, p) => s + Math.max(0, getInventory(p)), 0);
+  const totalSold     = Object.values(soldMap).reduce((s, v) => s + v, 0);
+  const totalReceived = allProducts.reduce((s, p) => s + (p.receivedFromSupplier ?? 0), 0);
 
   function startEdit(p: typeof inventoryProducts[0]) {
     setEditing(prev => ({
@@ -134,22 +147,57 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
   async function applyInvoice() {
     if (!parsedInvoice) return;
     setApplyingInvoice(true);
-    for (const item of parsedInvoice.items) {
-      const itemNumber = item.code.replace(/^[A-Z]+/i, '');
-      const product = skuMap[itemNumber];
-      if (!product) continue;
-      const prevReceived = product.receivedFromSupplier ?? 0;
-      const newReceived  = prevReceived + item.quantity;
-      const sold         = getSold(product.id);
-      await onSave(product.id, {
-        receivedFromSupplier: newReceived,
-        soferBasePrice:        item.unitPrice,
-        inStock:              newReceived - sold,
+    try {
+      // בדוק חשבונית כפולה
+      const dupSnap = await getDocs(
+        query(
+          collection(db, 'invoices'),
+          where('invoiceNumber', '==', parsedInvoice.invoiceNumber),
+          where('supplier', '==', parsedInvoice.supplier)
+        )
+      );
+      if (!dupSnap.empty) {
+        const existing = dupSnap.docs[0].data();
+        const pt = existing.processedAt;
+        const existingDate = pt?.toDate
+          ? pt.toDate().toLocaleDateString('he-IL')
+          : pt?.seconds
+            ? new Date(pt.seconds * 1000).toLocaleDateString('he-IL')
+            : 'תאריך לא ידוע';
+        const proceed = window.confirm(
+          `חשבונית #${parsedInvoice.invoiceNumber} כבר הוכנסה ב-${existingDate}.\nהמשך בכל זאת?`
+        );
+        if (!proceed) return;
+      }
+
+      for (const item of parsedInvoice.items) {
+        const itemNumber = item.code.replace(/^[A-Z]+/i, '');
+        const product = skuMap[itemNumber];
+        if (!product) continue;
+        const prevReceived = product.receivedFromSupplier ?? 0;
+        const newReceived  = prevReceived + item.quantity;
+        const sold         = getSold(product.id);
+        await onSave(product.id, {
+          receivedFromSupplier: newReceived,
+          soferBasePrice:        item.unitPrice,
+          inStock:              newReceived - sold,
+        });
+      }
+
+      // שמור חשבונית ב-Firestore למניעת כפילויות
+      await addDoc(collection(db, 'invoices'), {
+        invoiceNumber: parsedInvoice.invoiceNumber,
+        supplier:      parsedInvoice.supplier,
+        invoiceDate:   parsedInvoice.invoiceDate,
+        items:         parsedInvoice.items,
+        processedAt:   new Date(),
       });
+
+      setParsedInvoice(null);
+      alert('המלאי עודכן בהצלחה!');
+    } finally {
+      setApplyingInvoice(false);
     }
-    setApplyingInvoice(false);
-    setParsedInvoice(null);
-    alert('המלאי עודכן בהצלחה!');
   }
 
   async function saveEdit(id: string) {
@@ -253,21 +301,27 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
 
         <div style={{
           background: '#f0f9ff', padding: 12, borderRadius: 8, marginBottom: 15,
-          display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12,
+          display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12,
         }}>
           <div>
-            <div style={{ fontSize: 12, color: '#666' }}>סה&quot;כ מוצרים</div>
-            <div style={{ fontSize: 20, fontWeight: 900 }}>{inventoryProducts.length}</div>
+            <div style={{ fontSize: 11, color: '#666' }}>סה&quot;כ מוצרים</div>
+            <div style={{ fontSize: 20, fontWeight: 900 }}>{allProducts.length}</div>
           </div>
           <div>
-            <div style={{ fontSize: 12, color: '#666' }}>סה&quot;כ יחידות במלאי</div>
-            <div style={{ fontSize: 20, fontWeight: 900 }}>
-              {inventoryProducts.reduce((s, p) => s + Math.max(0, p.computedInStock), 0)}
-            </div>
+            <div style={{ fontSize: 11, color: '#666' }}>סה&quot;כ יחידות במלאי</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#0369a1' }}>{totalInStock}</div>
           </div>
           <div>
-            <div style={{ fontSize: 12, color: '#666' }}>שווי מלאי כולל</div>
-            <div style={{ fontSize: 20, fontWeight: 900 }}>₪{totalValue.toFixed(2)}</div>
+            <div style={{ fontSize: 11, color: '#666' }}>סה&quot;כ מכרנו</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#7c3aed' }}>{totalSold}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, color: '#666' }}>סה&quot;כ קיבלנו</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#059669' }}>{totalReceived}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, color: '#666' }}>שווי מלאי כולל</div>
+            <div style={{ fontSize: 20, fontWeight: 900 }}>₪{totalValue.toFixed(0)}</div>
           </div>
         </div>
       </div>
