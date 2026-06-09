@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '@/app/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { db, auth } from '@/app/firebase';
 
 interface StickerProduct {
   id: string;
@@ -65,6 +66,7 @@ export default function StickersTab() {
   const [loading, setLoading] = useState(true);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [invoicesLoading, setInvoicesLoading] = useState(true);
+  const [invoicesError, setInvoicesError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [modal, setModal] = useState<{ invoice: Invoice; rows: ModalRow[] } | null>(null);
@@ -81,15 +83,42 @@ export default function StickersTab() {
     });
   }, []);
 
-  // Load invoices newest-first
+  // Wait for Firebase Auth before fetching — prevents silent permission-denied on mount
   useEffect(() => {
-    getDocs(query(collection(db, 'invoices'), orderBy('processedAt', 'desc')))
-      .then(snap => {
-        setInvoices(snap.docs.map(d => ({ id: d.id, ...d.data() } as Invoice)));
-        setInvoicesLoading(false);
-      })
-      .catch(() => setInvoicesLoading(false));
+    const unsub = onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser) loadInvoices();
+      else setInvoicesLoading(false);
+    });
+    return () => unsub();
   }, []);
+
+  async function loadInvoices() {
+    setInvoicesLoading(true);
+    setInvoicesError(null);
+    try {
+      // No orderBy — avoids index requirement; sort client-side instead
+      const snap = await getDocs(collection(db, 'invoices'));
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Invoice));
+      // Sort descending — supports Firestore Timestamp (.seconds) and plain Date
+      data.sort((a, b) => {
+        const toSec = (x: Invoice) => {
+          if (!x.processedAt || typeof x.processedAt !== 'object') return 0;
+          const obj = x.processedAt as Record<string, unknown>;
+          if (typeof obj.seconds === 'number') return obj.seconds;
+          if (typeof (obj as unknown as Date).getTime === 'function') return (obj as unknown as Date).getTime() / 1000;
+          return 0;
+        };
+        return toSec(b) - toSec(a);
+      });
+      setInvoices(data);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[StickersTab] invoices fetch failed:', err);
+      setInvoicesError(msg);
+    } finally {
+      setInvoicesLoading(false);
+    }
+  }
 
   const filtered = products.filter(p =>
     !search ||
@@ -388,9 +417,14 @@ export default function StickersTab() {
       {/* ── Invoices section ─────────────────────────────────────────────── */}
       <div style={{ marginBottom: 24 }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 10, color: '#374151' }}>📥 קבלות שהתקבלו</h3>
+        {invoicesError && (
+          <div style={{ background: '#fff0f0', border: '1px solid #f87171', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: 12, marginBottom: 10 }}>
+            ⚠️ {invoicesError}
+          </div>
+        )}
         {invoicesLoading ? (
           <div style={{ color: '#999', fontSize: 13 }}>טוען קבלות...</div>
-        ) : invoices.length === 0 ? (
+        ) : invoices.length === 0 && !invoicesError ? (
           <div style={{ color: '#9ca3af', fontSize: 13, padding: '10px 0' }}>אין קבלות עדיין</div>
         ) : (
           <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden' }}>
