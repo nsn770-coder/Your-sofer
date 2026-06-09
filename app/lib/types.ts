@@ -48,7 +48,8 @@ export interface Product {
   bundlePromo?: string | null;
 
   // Profitability & Inventory
-  soferBasePrice?: number;           // מחיר קנייה מהספק
+  soferBasePrice?: number;           // legacy — הועתק ל-supplierCost
+  supplierCost?: number;             // מחיר ספק גולמי (לפני הנחה ומע"מ)
   sku?: string;                     // UK codes וכו'
   stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock';
   inStock?: number;                 // כמות בחנות
