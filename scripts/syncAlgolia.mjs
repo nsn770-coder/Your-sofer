@@ -53,15 +53,25 @@ async function syncProducts() {
   console.log(`   סה"כ מסמכים: ${snap.size}`);
 
   const records = [];
+  let skipped = 0;
   for (const doc of snap.docs) {
     const d = doc.data();
-    if (d.status !== 'active' || d.hidden === true) continue;
+    if (d.status !== 'active' || d.hidden === true) { skipped++; continue; }
+
+    // inStock: treat as boolean (true if inStock > 0 or explicitly true, and not outOfStock)
+    const inStockRaw = d.inStock;
+    const outOfStock = d.outOfStock === true;
+    const inStock = !outOfStock && (inStockRaw === true || (typeof inStockRaw === 'number' && inStockRaw > 0));
+
+    // createdAt as numeric timestamp (seconds) for sorting; 0 if missing
+    const createdAt = d.createdAt?.seconds ?? 0;
+
     records.push({
       objectID:    doc.id,
       id:          doc.id,
       name:        d.name        || '',
       sku:         d.sku         || '',
-      price:       d.price       ?? null,
+      price:       typeof d.price === 'number' ? d.price : 0,
       cat:         d.cat         || d.category    || '',
       subCategory: d.subCategory || d.subcategory || '',
       image:       d.imgUrl      || d.image_url   || '',
@@ -70,31 +80,64 @@ async function syncProducts() {
       lookTag:     d.lookTag     || '',
       collection:  d.collection  || '',
       soferName:   d.soferName   || '',
+      inStock,
+      createdAt,
+      // card display fields
+      isBestSeller: d.isBestSeller === true,
+      badge:        d.badge        ?? null,
+      was:          typeof d.was === 'number' ? d.was : null,
+      priority:     typeof d.priority === 'number' ? d.priority : 0,
+      outOfStock:   d.outOfStock === true,
     });
   }
 
-  console.log(`   מוצרים פעילים: ${records.length}`);
+  console.log(`   מוצרים פעילים לאינדקס: ${records.length}`);
+  console.log(`   מוצרים שסוננו (inactive/hidden): ${skipped}`);
   if (records.length === 0) { console.log('   ⚠️ אין מוצרים להעלות.'); return; }
 
-  console.log('   שולח ל-Algolia index "products"...');
-  await client.saveObjects({ indexName: 'products', objects: records });
-  console.log(`   ✅ הועלו ${records.length} records`);
-
+  // ── הגדרות לפני החלפת האינדקס ──────────────────────────────────────────────
+  // setSettings קודם כדי שהאינדקס הזמני יירש אותן דרך replaceAllObjects
   console.log('   מגדיר settings ל-index "products"...');
   await client.setSettings({
     indexName: 'products',
     indexSettings: {
       searchableAttributes: ['name', 'cat', 'subCategory', 'sku', 'styleTag', 'lookTag', 'collection', 'description'],
-      attributesForFaceting: ['cat', 'subCategory'],
+      attributesForFaceting: ['cat', 'subCategory', 'filterOnly(inStock)', 'price'],
+      attributesToRetrieve:  ['*'],
       queryLanguages:        ['he'],
       indexLanguages:        ['he'],
       ignorePlurals:         true,
       removeWordsIfNoResults: 'allOptional',
       minWordSizefor1Typo:   3,
       minWordSizefor2Typos:  6,
+      replicas: ['products_price_asc', 'products_price_desc', 'products_newest'],
     },
   });
   console.log('   ✅ Settings עודכנו');
+
+  // ── Replica settings ────────────────────────────────────────────────────────
+  console.log('   מגדיר replica "products_price_asc"...');
+  await client.setSettings({
+    indexName: 'products_price_asc',
+    indexSettings: { ranking: ['asc(price)', 'typo', 'geo', 'words', 'filters', 'proximity', 'attribute', 'exact', 'custom'] },
+  });
+  console.log('   מגדיר replica "products_price_desc"...');
+  await client.setSettings({
+    indexName: 'products_price_desc',
+    indexSettings: { ranking: ['desc(price)', 'typo', 'geo', 'words', 'filters', 'proximity', 'attribute', 'exact', 'custom'] },
+  });
+  console.log('   מגדיר replica "products_newest"...');
+  await client.setSettings({
+    indexName: 'products_newest',
+    indexSettings: { ranking: ['desc(createdAt)', 'typo', 'geo', 'words', 'filters', 'proximity', 'attribute', 'exact', 'custom'] },
+  });
+  console.log('   ✅ Replicas הוגדרו');
+
+  // ── replaceAllObjects: בונה אינדקס זמני ומחליף אטומית ────────────────────
+  // מוחק מהאינדקס כל מוצר שלא נמצא ב-records (נמחק/הוסתר/inactive בFirestore).
+  console.log('   מחליף אינדקס "products" (replaceAllObjects)...');
+  await client.replaceAllObjects({ indexName: 'products', objects: records });
+  console.log(`   ✅ האינדקס הוחלף — ${records.length} מוצרים פעילים בלבד`);
 }
 
 async function syncCategories() {
@@ -113,9 +156,9 @@ async function syncCategories() {
     };
   });
 
-  console.log('   שולח ל-Algolia index "categories"...');
-  await client.saveObjects({ indexName: 'categories', objects: records });
-  console.log(`   ✅ הועלו ${records.length} records`);
+  console.log('   מחליף אינדקס "categories" (replaceAllObjects)...');
+  await client.replaceAllObjects({ indexName: 'categories', objects: records });
+  console.log(`   ✅ האינדקס הוחלף — ${records.length} קטגוריות`);
 
   console.log('   מגדיר settings ל-index "categories"...');
   await client.setSettings({
