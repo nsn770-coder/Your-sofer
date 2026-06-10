@@ -1166,7 +1166,7 @@ export default function CategoryClient({ category }: { category: string }) {
     return () => setStamPage(false);
   }, [category, setStamPage]);
 
-  const SUBCATEGORY_PAGES = ['נטילת ידיים', 'שבת', 'חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
+  const SUBCATEGORY_PAGES = ['חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
   const SUBCATEGORY_GROUPS: Record<string, string[]> = {
     'חגים': ['חנוכה', 'פסח'],
     'חגים ומועדים': ['חנוכה', 'פסח'],
