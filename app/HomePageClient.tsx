@@ -412,9 +412,11 @@ export default function HomePageClient() {
         const snap = await getDocs(collection(db, 'categories'));
         snap.forEach(d => {
           const r   = d.data();
-          const key = (d.id || r.slug || r.name || '') as string;
           const img = (r.imageUrl || r.imgUrl || '') as string;
-          if (key && img) map[key] = img; // skip docs with empty imageUrl
+          if (!img) return;
+          // index by every identifier so lookups work regardless of doc ID type
+          const keys = [d.id, r.slug, r.name, r.displayName].filter(Boolean) as string[];
+          for (const key of keys) map[key] = img;
         });
       } catch { /* fall through to product fallback */ }
 
@@ -628,7 +630,7 @@ export default function HomePageClient() {
     { name: 'תפילין קומפלט',  emoji: '🖊️', img: catImages['תפילין קומפלט']  || '', href: '/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98' },
     { name: 'קלף מזוזה',       emoji: '📜', img: catImages['קלפי מזוזה']      || '', href: '/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94',       fallback: '#1a2744' },
     { name: 'יודאיקה',         emoji: '✡️', img: catImages['יודאיקה']         || '', href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94' },
-    { name: 'נטלות וכלים',    emoji: '🫙', img: catImages['נטלות וכלים'] || 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776283325/eolm1mte2d2q1zjaijsn.png', href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94?filter=%D7%A0%D7%98%D7%99%D7%9C%D7%AA%20%D7%99%D7%93%D7%99%D7%99%D7%9D' },
+    { name: 'נטלות וכלים',    emoji: '🫙', img: catImages['נטלות וכלים'] || 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776283325/eolm1mte2d2q1zjaijsn.png', href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94?filter=%D7%A0%D7%98%D7%99%D7%9C%D7%AA%20%D7%99%D7%93%D7%99%D7%99%D7%9D%20%D7%95%D7%9E%D7%99%D7%9D%20%D7%90%D7%97%D7%A8%D7%95%D7%A0%D7%99%D7%9D' },
     { name: 'שבתות וחגים',    emoji: '🕯️', img: catImages['שבתות וחגים'] || 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', href: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA%20%D7%95%D7%97%D7%92%D7%99%D7%9D' },
     { name: 'מגילות',          emoji: '📖', img: catImages['מגילות']          || '', href: '/category/%D7%9E%D7%92%D7%99%D7%9C%D7%95%D7%AA' },
     { name: 'בתי מזוזה',       emoji: '📜', img: catImages['בתי מזוזה']       || '', href: '/category/%D7%91%D7%AA%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94' },
@@ -1169,7 +1171,7 @@ export default function HomePageClient() {
       <div style={{ background: '#FAF8F3', padding: isMobile ? '0 20px 40px' : '0 32px 56px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <a
-            href="/bar-mitzvah-kippot"
+            href="/category/כיפות"
             style={{
               display: 'block',
               position: 'relative',

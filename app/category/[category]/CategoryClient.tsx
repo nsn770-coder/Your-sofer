@@ -1158,6 +1158,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const { addItem } = useCart();
   const isStamCat = SOFER_FETCH_CATS.has(category);
   const [showAllProducts, setShowAllProducts] = useState(false);
+  const [kippotQty, setKippotQty] = useState(50);
 
   useEffect(() => {
     const STAM_CHAT_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
@@ -1173,7 +1174,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
   // Case A: recognized ?filter= values that map to a direct subCategory query
   const SUBCAT_QUERY_OVERRIDES: Record<string, Record<string, string>> = {
-    'יודאיקה': { 'נטילת ידיים': 'נטילת ידיים', 'נטלות': 'נטילת ידיים' },
+    'יודאיקה': { 'נטילת ידיים': 'נטילת ידיים ומים אחרונים', 'נטלות': 'נטילת ידיים ומים אחרונים' },
   };
 
   // Keywords checked against subCategory for the שבתות-וחגים virtual category
@@ -1524,46 +1525,110 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       )}
 
-      {/* ── Bar-mitzvah kippot banner (כיפות only) ── */}
+      {/* ── כיפות: עצבו כיפה + מחירון סליידר ── */}
       {category === 'כיפות' && (
-        <a
-          href="/bar-mitzvah-kippot"
-          dir="rtl"
-          className="mt-8"
-          style={{
-            display: 'block',
-            position: 'relative',
-            overflow: 'hidden',
-            border: '2px solid #C5A028',
-            borderRadius: 24,
-            textDecoration: 'none',
-            minHeight: 96,
-            cursor: 'pointer',
-            backgroundImage: 'url("https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780666296/ChatGPT_Image_Jun_5_2026_04_31_21_PM_xhjqhd.png")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            transition: 'opacity 0.18s, transform 0.18s',
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '0.88'; (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-1px)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = '1'; (e.currentTarget as HTMLAnchorElement).style.transform = 'none'; }}
-        >
-          {/* gradient darkens the right (text) side in RTL */}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.72) 100%)', borderRadius: 22 }} />
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 clamp(20px, 4vw, 48px)' }}>
-            <div style={{ fontSize: 'clamp(13px, 1.4vw, 15px)', fontWeight: 800, color: '#FACC15', flexShrink: 0 }}>
-              להדפסה בכמויות כנסו ←
+        <div dir="rtl" style={{ padding: '24px 20px 8px' }}>
+          <style>{`
+            .ys-kip-range { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: #E5E0D5; outline: none; cursor: pointer; transform: scaleX(-1); }
+            .ys-kip-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; background: #C5A028; cursor: pointer; border-radius: 50%; box-shadow: 0 2px 8px rgba(197,160,40,0.4); }
+            .ys-kip-range::-moz-range-thumb { width: 26px; height: 26px; background: #C5A028; cursor: pointer; border-radius: 50%; border: none; box-shadow: 0 2px 8px rgba(197,160,40,0.4); }
+            .ys-kip-range::-webkit-slider-runnable-track { height: 6px; background: #E5E0D5; }
+          `}</style>
+
+          {/* CTA — עצבו כיפה באתר */}
+          <a
+            href={`/print-order?qty=${kippotQty}`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              background: 'linear-gradient(135deg, #111d3a 0%, #162a5c 100%)',
+              padding: 'clamp(18px, 2.5vw, 28px) clamp(20px, 3vw, 36px)',
+              textDecoration: 'none',
+              border: '2px solid #C5A028',
+              flexWrap: 'wrap',
+              marginBottom: 16,
+            }}
+          >
+            <div style={{ fontSize: 'clamp(32px, 4vw, 48px)', lineHeight: 1, flexShrink: 0 }}>🖨️</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 'clamp(17px, 2vw, 22px)', fontWeight: 900, color: '#fff', marginBottom: 6 }}>
+                עצבו כיפה באתר
+              </div>
+              <div style={{ fontSize: 'clamp(12px, 1.3vw, 14px)', color: 'rgba(255,255,255,0.72)', lineHeight: 1.6 }}>
+                בואו תראו בסימולציה איך הכיפה תיראה — הדמיה ומחיר תוך 3 שניות
+              </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 'clamp(15px, 2vw, 22px)', fontWeight: 900, color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,0.8)', lineHeight: 1.2 }}>
-                כיפות בסיטונאות —{' '}
-                <span style={{ color: '#FACC15' }}>30% הנחה</span>
+            <div style={{ flexShrink: 0, background: '#C5A028', color: '#111d3a', fontWeight: 900, fontSize: 14, padding: '10px 22px' }}>
+              לעיצוב ←
+            </div>
+          </a>
+
+          {/* מחירון סליידר */}
+          <div style={{ background: '#fff', border: '1px solid #E5E0D5', padding: 'clamp(20px, 3vw, 32px)' }}>
+            <div style={{ fontSize: 'clamp(14px, 1.5vw, 16px)', fontWeight: 700, color: '#3A2E1A', marginBottom: 20 }}>
+              כמה כיפות אתם צריכים?
+            </div>
+
+            <input
+              type="range"
+              className="ys-kip-range"
+              min={1}
+              max={300}
+              step={1}
+              value={kippotQty}
+              onChange={e => setKippotQty(Number(e.target.value))}
+              style={{ touchAction: 'pan-y' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 11, color: '#9C7B3F', fontWeight: 600 }}>
+              <span>300</span>
+              <span>1</span>
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 20 }}>
+              <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 90 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>כמות</div>
+                <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: '#111d3a' }}>{kippotQty}</div>
               </div>
-              <div style={{ fontSize: 'clamp(11px, 1.1vw, 13px)', color: 'rgba(255,255,255,0.85)', marginTop: 4, fontWeight: 600 }}>
-                ב-100 כיפות ומעלה
+              <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 110 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>מחיר ליחידה</div>
+                <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: '#C5A028' }}>
+                  ₪{kippotQty <= 49 ? 19 : kippotQty <= 99 ? 17 : kippotQty <= 150 ? 10 : 9}
+                </div>
               </div>
+              <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 130 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>סה&quot;כ משוער</div>
+                <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: '#111d3a' }}>
+                  ₪{(kippotQty * (kippotQty <= 49 ? 19 : kippotQty <= 99 ? 17 : kippotQty <= 150 ? 10 : 9)).toLocaleString('he-IL')}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 16, alignItems: 'center' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F' }}>מדרגות:</span>
+              {([
+                { range: '1–49', price: 19, active: kippotQty <= 49 },
+                { range: '50–99', price: 17, active: kippotQty >= 50 && kippotQty <= 99 },
+                { range: '100–150', price: 10, active: kippotQty >= 100 && kippotQty <= 150 },
+                { range: '151–300', price: 9, active: kippotQty >= 151 },
+              ] as { range: string; price: number; active: boolean }[]).map(({ range, price, active }) => (
+                <span
+                  key={range}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: active ? 800 : 400,
+                    color: active ? '#C5A028' : '#9C7B3F',
+                    background: active ? 'rgba(197,160,40,0.10)' : 'transparent',
+                    padding: active ? '2px 8px' : '2px 0',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {range} = ₪{price}
+                </span>
+              ))}
             </div>
           </div>
-        </a>
+        </div>
       )}
 
 
