@@ -22,8 +22,9 @@ const CATEGORIES = [
   { name: 'קלפי תפילין',     slug: 'קלפי תפילין',       emoji: '📄', href: '/category/קלפי תפילין',       staticImg: '' },
   { name: 'חנוכה',            slug: 'חנוכה',             emoji: '🕎', href: '/category/חנוכה',             staticImg: '' },
   { name: 'נטלות',            slug: 'נטלות וכלים',      emoji: '🫙', href: '/category/נטלות',             staticImg: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776283325/eolm1mte2d2q1zjaijsn.png' },
-  { name: 'כלי שולחן והגשה', slug: 'כלי שולחן והגשה',  emoji: '🍽️', href: '/category/כלי שולחן והגשה', staticImg: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png' },
-  { name: 'עיצוב הבית',      slug: 'עיצוב הבית',        emoji: '🏡', href: '/category/עיצוב הבית',        staticImg: '' },
+  // hidden: removed categories — set hidden:true to keep reversible, remove to restore
+  { name: 'כלי שולחן והגשה', slug: 'כלי שולחן והגשה',  emoji: '🍽️', href: '/category/כלי שולחן והגשה', staticImg: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png', hidden: true },
+  { name: 'עיצוב הבית',      slug: 'עיצוב הבית',        emoji: '🏡', href: '/category/עיצוב הבית',        staticImg: '', hidden: true },
 ];
 
 export default function CategoriesPage() {
@@ -70,7 +71,7 @@ export default function CategoriesPage() {
           gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)',
           gap: isMobile ? 14 : 20,
         }}>
-          {CATEGORIES.map(cat => {
+          {CATEGORIES.filter(cat => !cat.hidden).map(cat => {
             const raw = cat.staticImg || catImages[cat.slug] || '';
             const imgSrc = raw ? optimizeCloudinaryUrl(raw, 400) : '';
             return (

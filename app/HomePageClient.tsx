@@ -633,6 +633,8 @@ export default function HomePageClient() {
     { name: 'מגילות',          emoji: '📖', img: catImages['מגילות']          || '', href: '/category/%D7%9E%D7%92%D7%99%D7%9C%D7%95%D7%AA' },
     { name: 'בתי מזוזה',       emoji: '📜', img: catImages['בתי מזוזה']       || '', href: '/category/%D7%91%D7%AA%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94' },
     { name: 'סט טלית תפילין', emoji: '🕍', img: catImages['סט טלית תפילין'] || '', href: '/category/%D7%A1%D7%98%20%D7%98%D7%9C%D7%99%D7%AA%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F', fallback: '#1a2744' },
+    { name: 'כיפות',          emoji: '🎩', img: catImages['כיפות']          || '', href: '/category/%D7%9B%D7%99%D7%A4%D7%95%D7%AA' },
+    { name: 'סטים ומארזים',  emoji: '🎁', img: catImages['סטים ומארזים']  || '', href: '/category/%D7%A1%D7%98%D7%99%D7%9D%20%D7%95%D7%9E%D7%90%D7%A8%D7%96%D7%99%D7%9D' },
   ] as { name: string; emoji: string; img: string; href: string; fallback?: string }[], [catImages]);
 
   async function fetchWizardResults(budget: typeof wizardBudget, kashrut: typeof wizardKashrut) {
@@ -1121,6 +1123,9 @@ export default function HomePageClient() {
               categoryGridItems.find(c => c.name === 'בתי מזוזה'),
               categoryGridItems.find(c => c.name === 'סט טלית תפילין'),
               categoryGridItems.find(c => c.name === 'יודאיקה'),
+              categoryGridItems.find(c => c.name === 'כיפות'),
+              categoryGridItems.find(c => c.name === 'שבתות וחגים'),
+              categoryGridItems.find(c => c.name === 'סטים ומארזים'),
             ].filter(Boolean) as { name: string; emoji: string; img: string; href: string; fallback?: string }[]).map(cat => (
               <div key={cat.name}
                 onClick={() => router.push(cat.href)}
