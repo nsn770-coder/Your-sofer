@@ -1567,7 +1567,7 @@ export default function CategoryClient({ category }: { category: string }) {
           {/* מחירון סליידר */}
           <div style={{ background: '#fff', border: '1px solid #E5E0D5', padding: 'clamp(20px, 3vw, 32px)' }}>
             <div style={{ fontSize: 'clamp(14px, 1.5vw, 16px)', fontWeight: 700, color: '#3A2E1A', marginBottom: 20 }}>
-              כמה כיפות אתם צריכים?
+              כמות כיפות כולל הדפס
             </div>
 
             <input
