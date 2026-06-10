@@ -33,6 +33,25 @@ function parseBundle(key: string): { n: number; bundlePrice: number } | null {
 
 export async function POST(req: NextRequest) {
   try {
+    // ── Feature 1: server-side checkout gate ─────────────────────────────────
+    try {
+      const adminDb = getAdminDb();
+      const settingsSnap = await adminDb.collection('siteSettings').doc('global').get();
+      if (settingsSnap.exists) {
+        const settings = settingsSnap.data()!;
+        if (settings.checkoutEnabled === false) {
+          console.warn('[payment] checkout disabled by siteSettings');
+          return NextResponse.json(
+            { error: settings.checkoutDisabledMessage ?? 'הרכישות באתר אינן זמינות כעת' },
+            { status: 503 },
+          );
+        }
+      }
+    } catch (settingsErr) {
+      // Non-fatal — if Firebase Admin is unavailable, allow payment to proceed
+      console.error('[payment] siteSettings check failed (non-fatal):', settingsErr);
+    }
+
     const { items, total, customer, orderNumber, orderId, baseUrl, couponCode } =
       await req.json() as {
         items:       PaymentItem[];

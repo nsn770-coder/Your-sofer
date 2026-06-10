@@ -61,8 +61,38 @@ export interface Product {
   originalPrice?: number;           // מחיר מקורי לשחזור
   lastInventoryCheck?: Date;        // מתי עודכן לאחרונה
 
+  // Sale / Promotion
+  isOnSale?: boolean;
+  salePrice?: number;
+  salePercent?: number;
+  saleCampaignId?: string | null;
+  saleStartsAt?: string | null;
+  saleEndsAt?: string | null;
+
+  // Warehouse location
+  storageColumn?: string;           // A–G
+  storageShelf?: string | number;   // 1–7
+  storageNote?: string;
+
   // Metadata
   createdAt?: { seconds: number };
+}
+
+export interface Promotion {
+  id: string;
+  name: string;
+  description?: string;
+  discountType: 'percent';
+  discountValue: number;
+  active: boolean;
+  applyTo: 'all_in_stock' | 'manual';
+  productIds: string[];
+  startsAt?: string | null;
+  endsAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  affectedCount?: number;
 }
 
 export interface CartItem extends Product {

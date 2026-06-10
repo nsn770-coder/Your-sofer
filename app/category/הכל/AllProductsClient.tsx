@@ -57,8 +57,19 @@ interface Product {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+function productInStock(p: Product): boolean {
+  if (p.outOfStock === true) return false;
+  return true; // AllProducts page doesn't filter by inStock count
+}
+
 function applySort(products: Product[], sort: SortBy): Product[] {
   return [...products].sort((a, b) => {
+    // In-stock boost: always show available products before out-of-stock
+    const aIn = productInStock(a);
+    const bIn = productInStock(b);
+    if (aIn !== bIn) return aIn ? -1 : 1;
+
+    // Secondary: existing sort logic (unchanged)
     switch (sort) {
       case 'price_asc':  return (a.price ?? 0) - (b.price ?? 0);
       case 'price_desc': return (b.price ?? 0) - (a.price ?? 0);

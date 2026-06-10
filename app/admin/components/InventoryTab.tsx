@@ -1,9 +1,59 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, writeBatch } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { Product } from '@/app/lib/types';
 import { Order } from '@/app/lib/types';
+
+// Feature 6: update inventory from supplier receipt and auto-join active all_in_stock promotion
+export async function updateInventoryFromSupplierReceipt(
+  items: { productId: string; quantity: number; unitPrice?: number; price?: number }[],
+) {
+  if (!items.length) return;
+
+  // Find active all_in_stock promotion (if any)
+  let activePromotion: { id: string; discountValue: number; startsAt?: string | null; endsAt?: string | null } | null = null;
+  try {
+    const promoSnap = await getDocs(
+      query(collection(db, 'promotions'), where('active', '==', true), where('applyTo', '==', 'all_in_stock'))
+    );
+    if (!promoSnap.empty) {
+      const d = promoSnap.docs[0].data();
+      activePromotion = {
+        id: promoSnap.docs[0].id,
+        discountValue: d.discountValue,
+        startsAt: d.startsAt ?? null,
+        endsAt: d.endsAt ?? null,
+      };
+    }
+  } catch (e) {
+    console.error('[updateInventoryFromSupplierReceipt] promo lookup:', e);
+  }
+
+  const CHUNK = 400;
+  for (let i = 0; i < items.length; i += CHUNK) {
+    const batch = writeBatch(db);
+    const chunk = items.slice(i, i + CHUNK);
+    for (const item of chunk) {
+      const ref = doc(db, 'products', item.productId);
+      const data: Record<string, unknown> = {
+        inStock: item.quantity,
+        outOfStock: item.quantity === 0,
+        ...(item.unitPrice != null && { supplierCost: item.unitPrice }),
+      };
+      if (activePromotion && item.price != null && item.quantity > 0) {
+        data.isOnSale = true;
+        data.salePrice = Math.round(item.price * (1 - activePromotion.discountValue / 100) * 100) / 100;
+        data.salePercent = activePromotion.discountValue;
+        data.saleCampaignId = activePromotion.id;
+        data.saleStartsAt = activePromotion.startsAt ?? null;
+        data.saleEndsAt = activePromotion.endsAt ?? null;
+      }
+      batch.update(ref, data);
+    }
+    await batch.commit();
+  }
+}
 
 interface InventoryTabProps {
   products: Product[];
@@ -177,6 +227,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
         }
       }
 
+      const receiptItems: { productId: string; quantity: number; unitPrice?: number; price?: number }[] = [];
       for (const item of parsedInvoice.items) {
         const itemNumber = item.code.replace(/^[A-Z]+/i, '');
         const product = skuMap[itemNumber];
@@ -185,11 +236,21 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
         const qty          = Number(item.quantity) || 0;
         const newReceived  = prevReceived + qty;
         const sold         = getSold(product.id);
+        const newInStock   = Math.max(0, newReceived - sold);
         await onSave(product.id, {
           receivedFromSupplier: newReceived,
           soferBasePrice:        item.unitPrice,
-          inStock:              newReceived - sold,
+          inStock:              newInStock,
+          outOfStock:           newInStock === 0,
         });
+        receiptItems.push({ productId: product.id, quantity: newInStock, unitPrice: item.unitPrice, price: product.price });
+      }
+
+      // Feature 6: auto-join active all_in_stock promotion for restocked products
+      if (receiptItems.length > 0) {
+        updateInventoryFromSupplierReceipt(receiptItems).catch(e =>
+          console.error('[InventoryTab] auto-promo join failed (non-fatal):', e)
+        );
       }
 
       // שמור חשבונית ב-Firestore — תמיד, גם ללא מספר חשבונית
@@ -229,7 +290,9 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     if (e.receivedFromSupplier !== '') data.receivedFromSupplier = parseInt(e.receivedFromSupplier);
     // inStock = receivedFromSupplier - sold (numeric, not boolean)
     if (data.receivedFromSupplier !== undefined) {
-      data.inStock = data.receivedFromSupplier - getSold(id);
+      const newInStock = Math.max(0, data.receivedFromSupplier - getSold(id));
+      data.inStock = newInStock;
+      data.outOfStock = newInStock === 0;
     }
     await onSave(id, data);
     setSaving(null);

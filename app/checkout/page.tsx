@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
 import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { useAuth } from '../contexts/AuthContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 import * as pixel from '@/lib/metaPixel';
@@ -65,12 +66,19 @@ function Input({ label, name, value, onChange, placeholder, type = 'text', requi
 
 const SHIPPING_REGULAR = 30;
 
+interface SiteSettings {
+  checkoutEnabled: boolean;
+  checkoutDisabledMessage: string;
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const { items, total, kippotDiscountActive, kippotDiscountAmount, bundleDiscountAmount, discountableTotal, giftEnabled, giftThreshold, giftEligible, amountToGift, selectedGift, setSelectedGift } = useCart();
   const { shaliach, refCode } = useShaliach();
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ checkoutEnabled: true, checkoutDisabledMessage: '' });
   const [isMobile, setIsMobile] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', notes: '' });
 
@@ -88,6 +96,21 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' } | null>(null);
   const [giftOptions, setGiftOptions] = useState<{ id: string; name: string; imgUrl?: string; productId?: string }[]>([]);
+
+  // Fetch site settings (checkout enabled/disabled)
+  useEffect(() => {
+    getDoc(doc(db, 'siteSettings', 'global'))
+      .then(snap => {
+        if (snap.exists()) {
+          const d = snap.data();
+          setSiteSettings({
+            checkoutEnabled: d.checkoutEnabled ?? true,
+            checkoutDisabledMessage: d.checkoutDisabledMessage ?? '',
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Read isMobile before first paint to prevent the false→true CLS flip on mobile
   useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
@@ -451,36 +474,60 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {/* Security notice */}
-            <div style={{ background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <IconLock size={15} color="#1a6b3c" />
-              <div>
-                <div style={{ fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>תשלום מאובטח</div>
-                <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>לאחר לחיצה תועבר לדף תשלום — ויזה, מסטרקארד, ביט ועוד</div>
+            {/* ── Checkout disabled banner ─────────────────────────────────── */}
+            {!siteSettings.checkoutEnabled && (
+              <div style={{ background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
+                <div style={{ fontSize: 14, color: '#9a3412', fontWeight: 700, marginBottom: 4 }}>
+                  🔒 הרכישות זמנית אינן זמינות
+                </div>
+                <div style={{ fontSize: 13, color: '#7c2d12', lineHeight: 1.5 }}>
+                  {siteSettings.checkoutDisabledMessage ||
+                    'הרכישות באתר אינן זמינות כעת. ניתן לעיין במוצרים, והאפשרות להזמנה תחזור בקרוב.'}
+                </div>
+                {user?.role === 'admin' && (
+                  <div style={{ marginTop: 8, fontSize: 11, color: '#b45309', fontWeight: 700 }}>
+                    [אדמין] המתג כבוי — שנה ב: <a href="/admin" style={{ color: '#b45309', textDecoration: 'underline' }}>לוח הבקרה</a>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
+
+            {/* Security notice */}
+            {siteSettings.checkoutEnabled && (
+              <div style={{ background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <IconLock size={15} color="#1a6b3c" />
+                <div>
+                  <div style={{ fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>תשלום מאובטח</div>
+                  <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>לאחר לחיצה תועבר לדף תשלום — ויזה, מסטרקארד, ביט ועוד</div>
+                </div>
+              </div>
+            )}
 
             <button
-              onClick={() => isFormValid && !loading && handleSubmit()}
-              disabled={loading || !isFormValid}
+              onClick={() => siteSettings.checkoutEnabled && isFormValid && !loading && handleSubmit()}
+              disabled={loading || !isFormValid || !siteSettings.checkoutEnabled}
               style={{
                 width: '100%',
-                background: loading ? '#888' : isFormValid ? '#C9A227' : '#e0e0e0',
-                color: loading ? '#fff' : isFormValid ? '#1F3D8F' : '#999',
+                background: !siteSettings.checkoutEnabled ? '#d1d5db' : loading ? '#888' : isFormValid ? '#C9A227' : '#e0e0e0',
+                color: !siteSettings.checkoutEnabled ? '#9ca3af' : loading ? '#fff' : isFormValid ? '#1F3D8F' : '#999',
                 border: 'none', borderRadius: 14, height: 52, fontSize: 16, fontWeight: 800,
-                cursor: (isFormValid && !loading) ? 'pointer' : 'not-allowed',
+                cursor: (siteSettings.checkoutEnabled && isFormValid && !loading) ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'background 0.2s',
               }}
             >
-              {loading
-                ? <><IconLoader /> מכין תשלום...</>
-                : <><IconCreditCard size={16} color={isFormValid ? '#1F3D8F' : '#999'} /> מעבר לתשלום ←</>
+              {!siteSettings.checkoutEnabled
+                ? <>🔒 הרכישות אינן זמינות כעת</>
+                : loading
+                  ? <><IconLoader /> מכין תשלום...</>
+                  : <><IconCreditCard size={16} color={isFormValid ? '#1F3D8F' : '#999'} /> מעבר לתשלום ←</>
               }
             </button>
-            <div style={{ fontSize: 11, color: '#aaa', textAlign: 'center', marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-              <IconLock size={11} color="#aaa" /> תשלום מאובטח · ויזה · מסטרקארד · ביט
-            </div>
+            {siteSettings.checkoutEnabled && (
+              <div style={{ fontSize: 11, color: '#aaa', textAlign: 'center', marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                <IconLock size={11} color="#aaa" /> תשלום מאובטח · ויזה · מסטרקארד · ביט
+              </div>
+            )}
           </div>
         </div>
 

@@ -1952,9 +1952,13 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                             {/* ── סה"כ + כפתורי שמירה ── */}
                             <div className="flex items-center justify-between flex-wrap gap-3">
                               <div className="text-sm font-bold text-gray-700">
-                                סה״כ מעודכן:{' '}
-                                <span className="text-green-700 text-base">{formatPrice(calcTotal(editDraft.items, o.shippingCost))}</span>
-                                {o.shippingCost ? <span className="text-gray-400 font-normal text-xs mr-2">(כולל משלוח ₪{o.shippingCost})</span> : null}
+                                {o.status !== 'pending_payment' && o.status !== 'cancelled' ? 'סה״כ ששולם (נעול):' : 'סה״כ מעודכן:'}{' '}
+                                <span className="text-green-700 text-base">
+                                  {o.status !== 'pending_payment' && o.status !== 'cancelled'
+                                    ? formatPrice(o.paymentTotal ?? o.total)
+                                    : formatPrice(calcTotal(editDraft.items, o.shippingCost))}
+                                </span>
+                                {o.shippingCost && (o.status === 'pending_payment' || o.status === 'cancelled') ? <span className="text-gray-400 font-normal text-xs mr-2">(כולל משלוח ₪{o.shippingCost})</span> : null}
                               </div>
                               <div className="flex gap-2">
                                 <button onClick={cancelEdit} className="text-xs px-3 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 text-gray-600 font-medium">ביטול עריכה</button>

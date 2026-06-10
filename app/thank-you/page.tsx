@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import * as pixel from '@/lib/metaPixel';
+import { useAuth } from '../contexts/AuthContext';
 
 // ── Gematria blessing system ───────────────────────────────────────────────────
 
@@ -82,11 +83,20 @@ const GIFT_THRESHOLD = 250;
 function ThankYouContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   const orderNumber = searchParams.get('order');
   const orderId = searchParams.get('orderId');
   const [emailSent, setEmailSent] = useState(false);
   const [blessing, setBlessing] = useState<{ customerNumber: number; word: string; text: string } | null>(null);
   const [orderTotal, setOrderTotal] = useState<number>(0);
+  const [checkoutEnabled, setCheckoutEnabled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+    getDoc(doc(db, 'siteSettings', 'global'))
+      .then(snap => { if (snap.exists()) setCheckoutEnabled(snap.data().checkoutEnabled ?? true); })
+      .catch(() => {});
+  }, [user]);
 
   useEffect(() => {
     if (!orderId || emailSent) return;
@@ -246,6 +256,20 @@ function ThankYouContent() {
 
   return (
     <main style={{ maxWidth: 520, margin: '0 auto', padding: '0 16px 48px', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
+      {/* ── Admin: checkout status indicator ── */}
+      {user?.role === 'admin' && checkoutEnabled !== null && (
+        <div style={{
+          marginTop: 16, marginBottom: -8, padding: '8px 14px', borderRadius: 10,
+          background: checkoutEnabled ? '#f0fdf4' : '#fff7ed',
+          border: `1px solid ${checkoutEnabled ? '#86efac' : '#fed7aa'}`,
+          fontSize: 12, fontWeight: 700,
+          color: checkoutEnabled ? '#15803d' : '#9a3412',
+          display: 'flex', alignItems: 'center', gap: 6,
+        }}>
+          {checkoutEnabled ? '🟢 הרכישות פעילות' : '🔴 הרכישות מושבתות'}
+          <a href="/admin?tab=site_settings" style={{ fontWeight: 400, textDecoration: 'underline', opacity: 0.7 }}>שנה הגדרות</a>
+        </div>
+      )}
       {/* ── Order confirmation card ── */}
       <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', padding: '40px 32px', marginTop: 60, textAlign: 'center' }}>
         <div style={{ fontSize: 56, marginBottom: 20 }}>🎉</div>
