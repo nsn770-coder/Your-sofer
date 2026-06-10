@@ -134,7 +134,7 @@ export const navigationData: NavItem[] = [
         items: [
           { label: "שבת וחגים", href: "/category/שבתות-וחגים" },
           { label: "חנוכה 🕎",  href: "/category/יודאיקה?filter=חנוכי" },
-          { label: "פסח 🍷",    href: "/category/כלי שולחן והגשה?filter=פסח" },
+          { label: "פסח 🍷",    href: "/category/יודאיקה?filter=פסח" },
         ],
       },
     ],
@@ -165,8 +165,6 @@ export const navigationData: NavItem[] = [
       {
         title: "קטגוריות מתנה",
         items: [
-          { label: "כלי שולחן והגשה 🍽️", href: "/category/כלי שולחן והגשה" },
-          { label: "עיצוב הבית 🏠",       href: "/category/עיצוב הבית" },
           { label: "מתנות לחגים 🕍",      href: "/category/שבתות-וחגים" },
           { label: "יודאיקה ✡️",           href: "/category/יודאיקה" },
           { label: "בר מצווה 🎉",          href: "/category/בר מצווה" },
@@ -238,66 +236,10 @@ export const navigationData: NavItem[] = [
         items: [
           { label: "כל מוצרי חנוכה",    href: "/category/יודאיקה?filter=חנוכי" },
           { label: "חנוכיות",            href: "/category/יודאיקה?filter=חנוכי" },
-          { label: "עיצוב חנוכה",        href: "/category/עיצוב הבית?filter=חנוכי" },
-          { label: "פסח 🍷",             href: "/category/כלי שולחן והגשה?filter=פסח" },
+          { label: "פסח 🍷",             href: "/category/יודאיקה?filter=פסח" },
         ],
       },
     ],
   },
 
-  // ── כלי שולחן והגשה ──────────────────────────────────────────────────────
-  {
-    id: "hosting",
-    label: "כלי שולחן והגשה",
-    href: "/category/כלי שולחן והגשה",
-    columns: [
-      {
-        title: "כלי הגשה",
-        items: [
-          { label: "כל כלי ההגשה",      href: "/category/כלי שולחן והגשה" },
-          { label: "מגשים",              href: "/category/כלי שולחן והגשה?subcat=מגשים" },
-          { label: "כוסות",              href: "/category/כלי שולחן והגשה?subcat=כוסות" },
-          { label: "צלחות וקערות",       href: "/category/כלי שולחן והגשה?subcat=צלחות וקערות" },
-          { label: "קנקנים",             href: "/category/כלי שולחן והגשה?subcat=קנקנים" },
-        ],
-      },
-      {
-        title: "עוד",
-        items: [
-          { label: "ספלים",              href: "/category/כלי שולחן והגשה?subcat=ספלים" },
-          { label: "מערכות אוכל",        href: "/category/כלי שולחן והגשה?subcat=מערכות אוכל" },
-          { label: "כלי אכילה",          href: "/category/כלי שולחן והגשה?subcat=כלי אכילה" },
-          { label: "כלי הגשה כלליים",    href: "/category/כלי שולחן והגשה?subcat=כלי הגשה" },
-        ],
-      },
-    ],
-  },
-
-  // ── עיצוב הבית ────────────────────────────────────────────────────────────
-  {
-    id: "decor",
-    label: "עיצוב הבית",
-    href: "/category/עיצוב הבית",
-    columns: [
-      {
-        title: "עיצוב הבית",
-        items: [
-          { label: "כל עיצוב הבית",      href: "/category/עיצוב הבית" },
-          { label: "פמוטים",              href: "/category/עיצוב הבית?subcat=פמוטים" },
-          { label: "אגרטלים",             href: "/category/עיצוב הבית?subcat=אגרטלים" },
-          { label: "מראות",               href: "/category/עיצוב הבית?subcat=מראות" },
-          { label: "נרות ריחניים",        href: "/category/עיצוב הבית?subcat=נרות ריחניים" },
-        ],
-      },
-      {
-        title: "עוד",
-        items: [
-          { label: "עציצים",              href: "/category/עיצוב הבית?subcat=עציצים" },
-          { label: "מסגרות תמונה",        href: "/category/עיצוב הבית?subcat=מסגרות תמונה" },
-          { label: "מעמדות לנר",          href: "/category/עיצוב הבית?subcat=מעמדות לנר" },
-          { label: "קישוטים",             href: "/category/עיצוב הבית?subcat=קישוטים" },
-        ],
-      },
-    ],
-  },
 ];

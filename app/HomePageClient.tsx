@@ -1117,7 +1117,6 @@ export default function HomePageClient() {
           }}>
             {([
               { name: 'חנוכה',        emoji: '🕎', img: catImages['חנוכה']        || '', href: '/category/%D7%97%D7%A0%D7%95%D7%9B%D7%94' },
-              { name: 'עיצוב הבית',  emoji: '🏠', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780487406/%D7%A2%D7%99%D7%A6%D7%95%D7%91_%D7%94%D7%91%D7%99%D7%AA_xggfic.png', href: '/category/%D7%A2%D7%99%D7%A6%D7%95%D7%91%20%D7%94%D7%91%D7%99%D7%AA' },
               { name: 'סט בר מצווה', emoji: '✡️', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777989198/fqm7twz1berprum03u7u.png', href: '/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94' },
               categoryGridItems.find(c => c.name === 'בתי מזוזה'),
               categoryGridItems.find(c => c.name === 'סט טלית תפילין'),
@@ -1281,8 +1280,8 @@ export default function HomePageClient() {
           }>
             {[
               { id: 'יהלום',  tagline: 'הקו השקוף והמודרני',     dot: '#87CEEB', href: '/category/בתי מזוזה?collection=יהלום',                   img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919873/1777913222083_ibossf.png' },
-              { id: 'ישפה',   tagline: 'הקו האומנותי והצבעוני',  dot: 'rainbow', href: '/category/כלי שולחן והגשה?collection=ישפה',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png' },
-              { id: 'ברקת',   tagline: 'הקו החגיגי והיוקרתי',    dot: '#15803d', href: '/category/כלי שולחן והגשה?collection=ברקת',             img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919689931_fkb8c6.png' },
+              { id: 'ישפה',   tagline: 'הקו האומנותי והצבעוני',  dot: 'rainbow', href: '/category/יודאיקה?collection=ישפה',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919874/1777919845235_zcbze1.png' },
+              { id: 'ברקת',   tagline: 'הקו החגיגי והיוקרתי',    dot: '#15803d', href: '/category/יודאיקה?collection=ברקת',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919689931_fkb8c6.png' },
               { id: 'תרשיש',  tagline: 'הקו הזהוב והמאיר',       dot: '#b45309', href: '/category/יודאיקה?collection=תרשיש',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919932/1777919910394_olu4mi.png' },
               { id: 'ספיר',   tagline: 'הקו המתכתי והקריר',      dot: '#94a3b8', href: '/category/יודאיקה?collection=ספיר',                      img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777919875/1777919702083_vflhuc.png' },
               { id: 'שוהם',   tagline: 'הקו הטבעי והכהה',        dot: '#78350f', href: '/category/בתי מזוזה?collection=שוהם',                     img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_600,q_auto,f_auto/v1777920809/1777920771814_vikmum.png' },

@@ -62,8 +62,6 @@ async function getActiveSoferIds(): Promise<string[]> {
 // Categories with confirmed products in Firestore (queried 2026-04-26).
 // Sorted by product count descending. 'קלפי תפילין' removed (0 products).
 const CATEGORIES = [
-  'כלי שולחן והגשה',    // 1703
-  'עיצוב הבית',          // 1285
   'בתי מזוזה',           // 353
   'יודאיקה',             // 324
   'כיפות',               // 303

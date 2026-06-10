@@ -410,10 +410,54 @@ export default function CartPage() {
                       )}
                     </>
                   ) : !giftEligible ? (
-                    <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#92400e' }}>
-                      🎁 הוסף עוד <strong>{formatPrice(amountToGift)}</strong> לקבלת מתנה חינם
-                      <div style={{ marginTop: 6, background: '#e5e7eb', borderRadius: 4, height: 6, overflow: 'hidden' }}>
-                        <div style={{ background: '#C5A028', height: '100%', width: `${Math.min(100, (total / giftThreshold) * 100)}%`, transition: 'width 0.3s' }} />
+                    <div dir="rtl" style={{
+                      borderRadius: 9999,
+                      background:   '#1a1a1a',
+                      padding:      '9px 12px 9px 10px',
+                      display:      'flex',
+                      alignItems:   'center',
+                      gap:          10,
+                    }}>
+                      {/* Gift icon + badge */}
+                      <div style={{ position: 'relative', flexShrink: 0 }}>
+                        <div style={{
+                          width: 36, height: 36, borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #C9A227, #E6C25A)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 17,
+                        }}>
+                          🎁
+                        </div>
+                        {totalItems > 0 && (
+                          <div style={{
+                            position: 'absolute', top: -3, right: -3,
+                            minWidth: 16, height: 16, borderRadius: 9999,
+                            background: '#e53e3e', color: '#fff',
+                            fontSize: 9, fontWeight: 800, lineHeight: 1,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            padding: '0 3px',
+                            border: '1.5px solid #1a1a1a',
+                          }}>
+                            {totalItems}
+                          </div>
+                        )}
+                      </div>
+                      {/* Text + bar */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ color: '#fff', fontSize: 12, fontWeight: 600, marginBottom: 5 }}>
+                          הוסף עוד{' '}
+                          <strong style={{ color: '#E6C25A' }}>{formatPrice(amountToGift)}</strong>
+                          {' '}לקבלת מתנה חינם
+                        </div>
+                        <div style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 9999, height: 4, overflow: 'hidden' }}>
+                          <div style={{
+                            background:   'linear-gradient(90deg, #C9A227, #E6C25A)',
+                            height:       '100%',
+                            width:        `${Math.min(100, (total / giftThreshold) * 100)}%`,
+                            borderRadius: 9999,
+                            transition:   'width 0.4s ease',
+                          }} />
+                        </div>
                       </div>
                     </div>
                   ) : null}

@@ -79,6 +79,23 @@ const nextConfig: NextConfig = {
         destination: '/category/%D7%A1%D7%98%20%D7%98%D7%9C%D7%99%D7%AA%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F',
         permanent: true,
       },
+      // כלי שולחן והגשה, הגשה ואירוח, עיצוב הבית — categories removed 2026-06-10
+      // All three redirect to יודאיקה — confirmed active category with 300+ products
+      {
+        source: '/category/%D7%9B%D7%9C%D7%99%20%D7%A9%D7%95%D7%9C%D7%97%D7%9F%20%D7%95%D7%94%D7%92%D7%A9%D7%94',
+        destination: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94',
+        permanent: true,
+      },
+      {
+        source: '/category/%D7%94%D7%92%D7%A9%D7%94%20%D7%95%D7%90%D7%99%D7%A8%D7%95%D7%97',
+        destination: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94',
+        permanent: true,
+      },
+      {
+        source: '/category/%D7%A2%D7%99%D7%A6%D7%95%D7%91%20%D7%94%D7%91%D7%99%D7%AA',
+        destination: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94',
+        permanent: true,
+      },
     ];
   },
 };

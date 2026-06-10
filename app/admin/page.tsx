@@ -2466,8 +2466,6 @@ export default function AdminPage() {
     { slug: 'תיקי טלית ותפילין', displayName: 'תיקי טלית ותפילין', priority: 16 },
     { slug: 'טליתות וציציות', displayName: 'טליתות וציציות', priority: 17 },
     { slug: 'כיפות',           displayName: 'כיפות',           priority: 18 },
-    { slug: 'כלי שולחן והגשה', displayName: 'כלי שולחן והגשה', priority: 19 },
-    { slug: 'עיצוב הבית',      displayName: 'עיצוב הבית',      priority: 20 },
   ];
 
   async function loadCategories() {

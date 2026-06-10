@@ -1,31 +1,18 @@
 'use client';
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/app/contexts/CartContext';
 import { formatPrice } from '@/app/lib/utils';
 
-const G = {
-  gold:      '#D4AF37',
-  goldBright:'#C9A227',
-  goldBorder:'rgba(201,162,39,0.30)',
-  goldTrack: 'rgba(201,162,39,0.14)',
-  cream:     '#FAF7F0',
-  text:      '#2B2418',
-} as const;
-
 export default function GiftProgressBar() {
   const pathname = usePathname();
-  const { giftEnabled, giftThreshold, total, amountToGift, giftEligible } = useCart();
+  const router   = useRouter();
+  const { giftEnabled, giftThreshold, total, amountToGift, giftEligible, count } = useCart();
 
   const visible = giftEnabled && total > 0 && !pathname.startsWith('/checkout');
 
-  // Nudge the WA float bubble above the bar when visible
   useEffect(() => {
-    if (visible) {
-      document.body.classList.add('gift-bar-active');
-    } else {
-      document.body.classList.remove('gift-bar-active');
-    }
+    document.body.classList.toggle('gift-bar-active', visible);
     return () => { document.body.classList.remove('gift-bar-active'); };
   }, [visible]);
 
@@ -36,78 +23,110 @@ export default function GiftProgressBar() {
   return (
     <>
       <style>{`
-        @keyframes gift-glow {
-          0%, 100% { filter: drop-shadow(0 0 0px rgba(212,175,55,0)); }
-          50%       { filter: drop-shadow(0 0 7px rgba(212,175,55,0.55)); }
+        @keyframes gift-bounce {
+          0%, 100% { transform: scale(1); }
+          50%       { transform: scale(1.14); }
         }
-        .gift-bar-eligible-icon { animation: gift-glow 2.8s ease-in-out infinite; }
+        .gift-icon-pulse { animation: gift-bounce 2.2s ease-in-out infinite; }
       `}</style>
 
       <div
         dir="rtl"
         style={{
-          position:   'fixed',
-          bottom:     0,
-          left:       0,
-          right:      0,
-          height:     50,
-          zIndex:     9990,
-          background: G.cream,
-          borderTop:  `1px solid ${G.goldBorder}`,
-          boxShadow:  '0 -4px 20px rgba(0,0,0,0.06)',
-          display:    'flex',
-          alignItems: 'center',
-          padding:    '0 16px',
-          gap:        10,
-          fontFamily: 'var(--font-heebo), Arial, sans-serif',
+          position:     'fixed',
+          bottom:       'calc(14px + env(safe-area-inset-bottom, 0px))',
+          left:         16,
+          right:        16,
+          zIndex:       9990,
+          borderRadius: 9999,
+          background:   '#1a1a1a',
+          boxShadow:    '0 6px 28px rgba(0,0,0,0.38)',
+          display:      'flex',
+          alignItems:   'center',
+          padding:      '8px 8px 8px 10px',
+          gap:          10,
+          fontFamily:   'var(--font-heebo), Arial, sans-serif',
         }}
       >
-        {giftEligible ? (
-          /* ── Reached threshold ── */
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', justifyContent: 'center' }}>
-            <span className="gift-bar-eligible-icon" style={{ fontSize: 19, lineHeight: 1, display: 'inline-block' }}>
-              🎁
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: G.gold, letterSpacing: '0.01em' }}>
-              הגעת! בחר את המתנה שלך
-            </span>
+        {/* ── Gift icon + item-count badge ── */}
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <div
+            className={giftEligible ? 'gift-icon-pulse' : ''}
+            style={{
+              width: 42, height: 42, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #C9A227, #E6C25A)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 20,
+            }}
+          >
+            🎁
           </div>
-        ) : (
-          /* ── Progress toward threshold ── */
-          <>
-            <span style={{
-              fontSize:   'clamp(11px, 3.3vw, 13px)',
-              fontWeight: 600,
-              color:      G.text,
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-              display:    'flex',
-              alignItems: 'center',
-              gap:        5,
-            }}>
-              <span style={{ fontSize: 15, lineHeight: 1 }}>🎁</span>
-              עוד {formatPrice(amountToGift)} למתנה חינם
-            </span>
-
-            {/* Progress track */}
+          {count > 0 && (
             <div style={{
-              flex:         1,
-              background:   G.goldTrack,
-              borderRadius: 999,
-              height:       5,
-              overflow:     'hidden',
-              minWidth:     40,
+              position: 'absolute', top: -4, right: -4,
+              minWidth: 18, height: 18, borderRadius: 9999,
+              background: '#e53e3e', color: '#fff',
+              fontSize: 10, fontWeight: 800, lineHeight: 1,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0 4px',
+              border: '1.5px solid #1a1a1a',
             }}>
-              <div style={{
-                background:   `linear-gradient(90deg, ${G.goldBright}, ${G.gold})`,
-                height:       '100%',
-                width:        `${pct}%`,
-                borderRadius: 999,
-                transition:   'width 0.5s ease',
-              }} />
+              {count}
             </div>
-          </>
-        )}
+          )}
+        </div>
+
+        {/* ── Text + progress bar ── */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            color:      '#fff',
+            fontSize:   'clamp(11px, 3.2vw, 13px)',
+            fontWeight: 600,
+            whiteSpace: 'nowrap',
+            overflow:   'hidden',
+            textOverflow: 'ellipsis',
+            marginBottom: 5,
+          }}>
+            {giftEligible
+              ? 'זכית במתנה חינם! 🎉'
+              : `עוד ${formatPrice(amountToGift)} למתנה חינם`}
+          </div>
+          <div style={{
+            background:   'rgba(255,255,255,0.18)',
+            borderRadius: 9999,
+            height:       4,
+            overflow:     'hidden',
+          }}>
+            <div style={{
+              background:   'linear-gradient(90deg, #C9A227, #E6C25A)',
+              height:       '100%',
+              width:        `${pct}%`,
+              borderRadius: 9999,
+              transition:   'width 0.4s ease',
+            }} />
+          </div>
+        </div>
+
+        {/* ── Checkout button ── */}
+        <button
+          onClick={() => router.push('/checkout')}
+          style={{
+            flexShrink:     0,
+            background:     '#fff',
+            color:          '#1a1a1a',
+            border:         'none',
+            borderRadius:   9999,
+            padding:        '6px 14px',
+            cursor:         'pointer',
+            display:        'flex',
+            flexDirection:  'column',
+            alignItems:     'center',
+            gap:            1,
+          }}
+        >
+          <span style={{ fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap' }}>המשך לתשלום</span>
+          <span style={{ fontSize: 10, color: '#666', fontWeight: 600 }}>{formatPrice(total)}</span>
+        </button>
       </div>
     </>
   );

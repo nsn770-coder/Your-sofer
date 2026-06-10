@@ -514,9 +514,7 @@ const CAT_SCROLL_ITEMS: { label: string; href?: string; imgKey?: string }[] = [
   { label: 'בר מצווה' },
   { label: 'מתנות' },
   { label: 'מגילות' },
-  { label: 'כלי שולחן והגשה' },
-  { label: 'עיצוב הבית' },
-  { label: 'שבת וחגים', href: `/category/${encodeURIComponent('כלי שולחן והגשה')}?filter=${encodeURIComponent('שבת')}`, imgKey: 'כלי שולחן והגשה' },
+  { label: 'שבת וחגים', href: `/category/שבתות-וחגים`, imgKey: 'שבתות-וחגים' },
 ];
 
 function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<string, string>; currentCategory: string }) {
@@ -528,7 +526,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
       {CAT_SCROLL_ITEMS.map(({ label, href, imgKey }) => {
         const img = catImages[imgKey ?? label] ?? '';
         const dest = href ?? `/category/${encodeURIComponent(label)}`;
-        const isActive = label === currentCategory || (label === 'שבת וחגים' && currentCategory === 'כלי שולחן והגשה');
+        const isActive = label === currentCategory || (label === 'שבת וחגים' && (currentCategory === 'שבתות-וחגים' || currentCategory === 'שבתות וחגים'));
         return (
           <Link
             key={label}
@@ -644,7 +642,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
       {/* Category filter (מתנות only) */}
       {category === 'מתנות' && onCatFilter && (
         <Section title="קטגוריה">
-          {([{ value: 'הכל', label: 'הכל' }, { value: 'מתנות', label: 'מתנות לחתן ובר מצוה' }, { value: 'כלי שולחן והגשה', label: 'כלי שולחן והגשה' }, { value: 'עיצוב הבית', label: 'עיצוב הבית' }, { value: 'יודאיקה', label: 'יודאיקה' }] as { value: string; label: string }[]).map(({ value, label }) => (
+          {([{ value: 'הכל', label: 'הכל' }, { value: 'מתנות', label: 'מתנות לחתן ובר מצוה' }, { value: 'יודאיקה', label: 'יודאיקה' }] as { value: string; label: string }[]).map(({ value, label }) => (
             <label key={value} className="flex items-center gap-2 py-1 cursor-pointer group">
               <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${(catFilter ?? 'הכל') === value ? 'border-[#1a1a1a] bg-[#1a1a1a]' : 'border-gray-300 group-hover:border-gray-400'}`}>
                 {(catFilter ?? 'הכל') === value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -1176,17 +1174,6 @@ export default function CategoryClient({ category }: { category: string }) {
   // Case A: recognized ?filter= values that map to a direct subCategory query
   const SUBCAT_QUERY_OVERRIDES: Record<string, Record<string, string>> = {
     'יודאיקה': { 'נטילת ידיים': 'נטילת ידיים', 'נטלות': 'נטילת ידיים' },
-    'כלי שולחן והגשה': {
-      'מגשים': 'מגשים', 'כוסות': 'כוסות', 'צלחות וקערות': 'צלחות וקערות',
-      'קנקנים': 'קנקנים', 'ספלים': 'ספלים', 'מערכות אוכל': 'מערכות אוכל',
-      'שבת': 'שבת', 'פסח': 'פסח', 'חנוכה': 'חנוכה',
-    },
-    'עיצוב הבית': {
-      'פמוטים': 'פמוטים', 'אגרטלים': 'אגרטלים', 'מראות': 'מראות',
-      'נרות ריחניים': 'נרות ריחניים', 'קישוטים': 'קישוטים',
-      'מסגרות תמונה': 'מסגרות תמונה', 'מעמדות לנר': 'מעמדות לנר',
-      'קופסאות תכשיטים': 'קופסאות תכשיטים',
-    },
   };
 
   // Keywords checked against subCategory for the שבתות-וחגים virtual category
@@ -1194,8 +1181,8 @@ export default function CategoryClient({ category }: { category: string }) {
 
   // Case B: category slugs that don't exist as a cat field in Firestore
   const VIRTUAL_CATS: Record<string, { cats: string[] }> = {
-    'שבתות וחגים':  { cats: ['יודאיקה', 'כלי שולחן והגשה'] },
-    'שבתות-וחגים': { cats: ['יודאיקה', 'כלי שולחן והגשה'] },
+    'שבתות וחגים':  { cats: ['יודאיקה'] },
+    'שבתות-וחגים': { cats: ['יודאיקה'] },
   };
 
   // When this is non-null, fetchAll does a direct subCategory query and re-runs if
@@ -1260,7 +1247,7 @@ export default function CategoryClient({ category }: { category: string }) {
     }
 
     if (category === 'מתנות') {
-      const MATANOT_CATS = ['מתנות', 'כלי שולחן והגשה', 'עיצוב הבית', 'יודאיקה'];
+      const MATANOT_CATS = ['מתנות', 'יודאיקה'];
       const snaps = await Promise.all(
         MATANOT_CATS.map(cat => getDocs(query(collection(db, 'products'), where('cat', '==', cat), orderBy('priority', 'desc'), limit(500))))
       );
@@ -1281,9 +1268,7 @@ export default function CategoryClient({ category }: { category: string }) {
     } else if (SUBCATEGORY_PAGES.includes(category)) {
       snap = await getDocs(query(collection(db, 'products'), where('subCategory', '==', category), limit(500)));
     } else {
-      const LARGE_CATS = new Set(['כלי שולחן והגשה', 'עיצוב הבית']);
-      const fetchLimit = LARGE_CATS.has(category) ? 2000 : 1000;
-      snap = await getDocs(query(collection(db, 'products'), where('cat', '==', category), orderBy('priority', 'desc'), limit(fetchLimit)));
+      snap = await getDocs(query(collection(db, 'products'), where('cat', '==', category), orderBy('priority', 'desc'), limit(1000)));
     }
     setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true));
   }
@@ -1581,25 +1566,6 @@ export default function CategoryClient({ category }: { category: string }) {
         </a>
       )}
 
-      {/* ── Subcategory banner (מתנות only) ── */}
-      {category === 'מתנות' && (
-        <div className="bg-white border-b border-gray-100 px-4 py-4" dir="rtl">
-          <div className="max-w-7xl mx-auto flex gap-3 justify-end">
-            <Link href="/category/כלי שולחן והגשה" className="group flex items-center gap-2 bg-amber-50 hover:bg-amber-100 border border-amber-100 hover:border-amber-300 rounded-xl px-4 py-2.5 transition-all">
-              <div className="text-right">
-                <p className="font-bold text-gray-800 text-xs group-hover:text-amber-800">כלי שולחן והגשה</p>
-                <p className="text-[10px] text-amber-600 mt-0.5">לצפייה ←</p>
-              </div>
-            </Link>
-            <Link href="/category/עיצוב הבית" className="group flex items-center gap-2 bg-blue-50 hover:bg-blue-100 border border-blue-100 hover:border-blue-300 rounded-xl px-4 py-2.5 transition-all">
-              <div className="text-right">
-                <p className="font-bold text-gray-800 text-xs group-hover:text-blue-800">עיצוב הבית</p>
-                <p className="text-[10px] text-blue-600 mt-0.5">לצפייה ←</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-      )}
 
       {/* ── סט טלית תפילין tab bar ── */}
       {category === 'סט טלית תפילין' && (
@@ -2005,7 +1971,7 @@ export default function CategoryClient({ category }: { category: string }) {
               relatedCats={
                 active
                   ? []
-                  : (VIRTUAL_CATS[category]?.cats ?? ['יודאיקה', 'כלי שולחן והגשה', 'עיצוב הבית', 'מתנות'])
+                  : (VIRTUAL_CATS[category]?.cats ?? ['יודאיקה', 'מתנות'])
               }
             />
           ) : (
