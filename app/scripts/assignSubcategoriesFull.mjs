@@ -97,7 +97,7 @@ const CODE_TO_SUBCAT = {
   '1161': 'פמוטים',             // מנורות → פמוטים (מנורות = candelabras)
   '1173': 'כיסויי פלטה',        // מפות שולחן ורנרים → כיסויי פלטה (closest)
   '1118': 'ברכונים',            // ברכות → ברכונים (blessing-related items)
-  '1116': 'מארזי קדושה',        // חתן וכלה → מארזי קדושה (new subcat proposed)
+  '1116': 'חתן וכלה',            // חתן וכלה (new subcat)
   '1140': 'ילדים',              // ילדים → ילדים (new subcat proposed)
   '1141': 'כריות לברית',        // כריות לברית → כריות לברית (new subcat proposed)
   '1185': 'קיטלים',             // קיטלים → קיטלים (new subcat proposed)
@@ -221,7 +221,7 @@ for (const code of [...PROPOSED_CODES]) {
   const name  = entry?.name || '?';
   const inDb  = proposedCodeStats[code] || 0;
   const sub   = CODE_TO_SUBCAT[code] || '?';
-  const isNew = !['פמוטים','כיסויי פלטה','ברכונים'].includes(sub);
+  const isNew = !['פמוטים','כיסויי פלטה','ברכונים','חתן וכלה','קיטלים','ילדים','כריות לברית'].includes(sub) || ['חתן וכלה','קיטלים','ילדים','כריות לברית'].includes(sub);
   console.log(`${code.padEnd(6)} ${name.padEnd(36)} ${String(inDb).padEnd(6)} "${sub}"${isNew ? '  ← קטגוריה חדשה' : ''}`);
 }
 
