@@ -32,19 +32,25 @@ service cloud.firestore {
 
     match /products/{id} {
       allow read: if true;                // anyone can browse products
-      allow write: if isAdmin();
 
-      // Sofer can create a pending product for themselves
-      allow create: if isSignedIn()
-                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'sofer'
-                    && request.resource.data.uploadedBySofer == true
-                    && request.resource.data.status == 'pending'
-                    && request.resource.data.soferId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.soferId;
+      // Admin can create or update any product
+      allow create: if isAdmin()
+                    // Sofer can create a pending product for themselves
+                    || (isSignedIn()
+                        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'sofer'
+                        && request.resource.data.uploadedBySofer == true
+                        && request.resource.data.status == 'pending'
+                        && request.resource.data.soferId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.soferId);
 
-      // Sofer can edit their own uploadedBySofer products
-      allow update: if isSignedIn()
-                    && resource.data.uploadedBySofer == true
-                    && resource.data.soferId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.soferId;
+      // Admin can update any product; sofer can edit their own uploadedBySofer products
+      allow update: if isAdmin()
+                    || (isSignedIn()
+                        && resource.data.uploadedBySofer == true
+                        && resource.data.soferId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.soferId);
+
+      // Explicit delete rule — request.resource is null during delete so it must
+      // not appear in this condition (unlike create/update rules above).
+      allow delete: if isAdmin();
     }
 
     match /soferim/{id} {
