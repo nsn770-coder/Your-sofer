@@ -250,13 +250,6 @@ function SkeletonCategoryCard() {
   );
 }
 
-// ── Pinned best-seller IDs — always displayed first in the scroll, in this order ──
-const PINNED_BEST_SELLER_IDS = [
-  '0J65t9lZf1p0TxIpKmEy',
-  '0MwwFAvEK5XgDUqtL9wH',
-  'iIvJdvNHHQDybt6rC4id',
-  'CfdAck8YnbnFhfdwhuSz',
-];
 
 // ── Static data (outside component - never re-created on render) ───────────────
 
@@ -457,25 +450,24 @@ export default function HomePageClient() {
           !BLOCKED_NAMES.test(p.name ?? '') &&
           !!(p.imgUrl || p.image_url);
 
-        // Fetch pinned products first, in the declared order, skip missing/hidden ones
-        const pinnedSnaps = await Promise.all(
-          PINNED_BEST_SELLER_IDS.map(id =>
-            getDoc(doc(db, 'products', id)).catch(() => null)
-          )
+        // Load manual product IDs from Firestore (admin-controlled, shown first in scroll)
+        let manualIds: string[] = [];
+        try {
+          const configSnap = await getDoc(doc(db, 'siteConfig', 'bestSellers'));
+          if (configSnap.exists()) {
+            manualIds = (configSnap.data().manualProductIds ?? []) as string[];
+          }
+        } catch { /* fall back to empty — auto-only */ }
+
+        // Fetch manual products in declared order, skip missing/hidden ones
+        const manualSnaps = await Promise.all(
+          manualIds.map(id => getDoc(doc(db, 'products', id)).catch(() => null))
         );
-        const pinnedProducts: Product[] = pinnedSnaps
-          .map((s, i) => {
-            const id = PINNED_BEST_SELLER_IDS[i];
-            if (s === null || !s.exists()) {
-              console.warn(`[FeaturedProducts] pinned ID not found in Firestore: ${id}`);
-              return null;
-            }
+        const pinnedProducts: Product[] = manualSnaps
+          .map(s => {
+            if (s === null || !s.exists()) return null;
             const p = { id: s.id, ...s.data() } as Product;
-            if (!isShowable(p)) {
-              console.warn(`[FeaturedProducts] pinned ID failed isShowable filter: ${id}`);
-              return null;
-            }
-            return p;
+            return isShowable(p) ? p : null;
           })
           .filter((p): p is Product => p !== null);
 

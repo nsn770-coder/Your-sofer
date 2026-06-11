@@ -1,6 +1,6 @@
 'use client';
-import { useState, useMemo } from 'react';
-import { doc, updateDoc } from 'firebase/firestore';
+import { useState, useMemo, useEffect } from 'react';
+import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { formatPrice } from '@/app/lib/utils';
 
@@ -58,6 +58,38 @@ export default function BestSellersTab({
   );
   const [saving, setSaving] = useState<string | null>(null);
 
+  // Manual pinning state
+  const [manualIds, setManualIds] = useState<string[]>([]);
+  const [manualLoading, setManualLoading] = useState(true);
+  const [manualSaving, setManualSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const snap = await getDoc(doc(db, 'siteConfig', 'bestSellers'));
+        if (snap.exists()) {
+          setManualIds((snap.data().manualProductIds ?? []) as string[]);
+        }
+      } catch { /* non-fatal */ } finally {
+        setManualLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  async function saveManualIds(ids: string[]) {
+    setManualSaving(true);
+    try {
+      await setDoc(doc(db, 'siteConfig', 'bestSellers'), { manualProductIds: ids });
+      setManualIds(ids);
+    } catch {
+      alert('שגיאה בשמירה');
+    } finally {
+      setManualSaving(false);
+    }
+  }
+
   // Aggregate from paid orders only.
   // Use item.productId || item.id to handle the old bug where productId was missing.
   // Name/cat/image come from products collection (authoritative), with item name as fallback.
@@ -101,71 +133,246 @@ export default function BestSellersTab({
     }
   }
 
+  const manualProducts = manualIds
+    .map(id => productLookup[id])
+    .filter((p): p is Product => !!p);
+
+  const searchResults = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
+    return products
+      .filter(p =>
+        !manualIds.includes(p.id) &&
+        (p.name?.toLowerCase().includes(q) || p.id.toLowerCase().includes(q))
+      )
+      .slice(0, 8);
+  }, [searchQuery, products, manualIds]);
+
   const paidOrderCount = orders.filter(o => PAID_STATUSES.has(o.status)).length;
 
   return (
-    <div className="bg-white rounded-xl shadow overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-        <h2 className="text-lg font-black text-gray-800">🏆 מוצרים נמכרים ביותר</h2>
-        <span className="text-sm text-gray-400">
-          מבוסס על {paidOrderCount} הזמנות ששולמו · {rows.length} מוצרים שונים
-        </span>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="p-3 text-right w-8">#</th>
-              <th className="p-3 text-right">מוצר</th>
-              <th className="p-3 text-right">קטגוריה</th>
-              <th className="p-3 text-center">יחידות נמכרות</th>
-              <th className="p-3 text-center">הכנסה</th>
-              <th className="p-3 text-center">נמכר ביותר (דף הבית)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
-              <tr
-                key={row.productId}
-                className={`border-t hover:bg-gray-50 ${bestSellerMap[row.productId] ? 'bg-amber-50' : ''}`}
-              >
-                <td className="p-3 text-gray-400 font-mono text-xs">{i + 1}</td>
-                <td className="p-3">
-                  <div className="flex items-center gap-3">
-                    {row.imgUrl ? (
-                      <img src={row.imgUrl} alt="" className="w-10 h-10 object-contain rounded" />
-                    ) : (
-                      <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-lg">📦</div>
-                    )}
-                    <span className="font-medium text-gray-800 max-w-xs truncate">{row.name}</span>
-                  </div>
-                </td>
-                <td className="p-3 text-gray-500 text-xs">{row.cat || '—'}</td>
-                <td className="p-3 text-center font-bold text-blue-700">{row.units}</td>
-                <td className="p-3 text-center font-bold text-green-700">{formatPrice(row.revenue)}</td>
-                <td className="p-3 text-center">
-                  <button
-                    onClick={() => toggleBestSeller(row.productId)}
-                    disabled={saving === row.productId}
-                    className={`px-3 py-1 rounded-full text-xs font-bold transition ${
-                      bestSellerMap[row.productId]
-                        ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
-                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                    }`}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+      {/* ── Manual pinning section ── */}
+      <div className="bg-white rounded-xl shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-black text-gray-800">📌 הצגה ידנית בסקרול</h2>
+          <p className="text-sm text-gray-400 mt-1">
+            מוצרים אלו יופיעו ראשונים בסקרול &ldquo;הנמכרים ביותר&rdquo; בדף הבית, לפי הסדר שנבחר.
+            מוצר שמופיע כאן ונמכר גם אוטומטית — יופיע פעם אחת בלבד (במיקום הידני).
+          </p>
+        </div>
+
+        {manualLoading ? (
+          <div className="p-6 text-gray-400 text-sm">טוען...</div>
+        ) : (
+          <div className="p-6" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+            {/* Current manual list */}
+            {manualProducts.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {manualProducts.map((p, idx) => (
+                  <div
+                    key={p.id}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '8px 12px', background: '#fafafa',
+                      border: '1px solid #e8e8ea',
+                    }}
                   >
-                    {saving === row.productId ? '...' : bestSellerMap[row.productId] ? '🏆 כן' : '— לא'}
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={6} className="p-10 text-center text-gray-400">אין נתוני מכירות עדיין</td>
-              </tr>
+                    <span style={{ width: 20, textAlign: 'center', fontSize: 12, color: '#aaa', fontFamily: 'monospace' }}>
+                      {idx + 1}
+                    </span>
+                    {(p.imgUrl || p.image_url) && (
+                      <img
+                        src={p.imgUrl || p.image_url}
+                        alt=""
+                        style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
+                      />
+                    )}
+                    <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {p.name}
+                    </span>
+                    <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                      <button
+                        disabled={idx === 0 || manualSaving}
+                        onMouseDown={e => {
+                          e.preventDefault();
+                          if (idx === 0) return;
+                          const next = [...manualIds];
+                          [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+                          saveManualIds(next);
+                        }}
+                        style={{
+                          padding: '2px 8px', border: '1px solid #d0d0d0',
+                          background: 'transparent', cursor: idx === 0 ? 'default' : 'pointer',
+                          opacity: idx === 0 ? 0.3 : 1, fontSize: 11,
+                        }}
+                        title="הזז למעלה"
+                      >▲</button>
+                      <button
+                        disabled={idx === manualIds.length - 1 || manualSaving}
+                        onMouseDown={e => {
+                          e.preventDefault();
+                          if (idx === manualIds.length - 1) return;
+                          const next = [...manualIds];
+                          [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
+                          saveManualIds(next);
+                        }}
+                        style={{
+                          padding: '2px 8px', border: '1px solid #d0d0d0',
+                          background: 'transparent', cursor: idx === manualIds.length - 1 ? 'default' : 'pointer',
+                          opacity: idx === manualIds.length - 1 ? 0.3 : 1, fontSize: 11,
+                        }}
+                        title="הזז למטה"
+                      >▼</button>
+                      <button
+                        disabled={manualSaving}
+                        onMouseDown={e => {
+                          e.preventDefault();
+                          saveManualIds(manualIds.filter(x => x !== p.id));
+                        }}
+                        style={{
+                          padding: '2px 10px', border: '1px solid #fca5a5',
+                          background: 'transparent', color: '#dc2626', cursor: 'pointer', fontSize: 11,
+                        }}
+                        title="הסר"
+                      >✕</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400">
+                אין מוצרים ידניים — הסקרול מציג רק את הנמכרים ביותר אוטומטית
+              </p>
             )}
-          </tbody>
-        </table>
+
+            {/* Search / add */}
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="חפש מוצר לפי שם או מזהה להוספה..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onBlur={() => setTimeout(() => setSearchQuery(''), 150)}
+                style={{
+                  width: '100%', padding: '8px 12px',
+                  border: '1px solid #d0d0d0', fontSize: 14,
+                  direction: 'rtl', outline: 'none', boxSizing: 'border-box',
+                }}
+              />
+              {searchResults.length > 0 && (
+                <div style={{
+                  position: 'absolute', top: '100%', right: 0, left: 0,
+                  background: '#fff', border: '1px solid #e0e0e0',
+                  zIndex: 50, maxHeight: 280, overflowY: 'auto',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
+                }}>
+                  {searchResults.map(p => (
+                    <button
+                      key={p.id}
+                      onMouseDown={e => {
+                        e.preventDefault();
+                        saveManualIds([...manualIds, p.id]);
+                        setSearchQuery('');
+                      }}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '8px 12px', background: 'transparent', border: 'none',
+                        cursor: 'pointer', textAlign: 'right', direction: 'rtl',
+                      }}
+                      className="hover:bg-gray-50"
+                    >
+                      {(p.imgUrl || p.image_url) && (
+                        <img
+                          src={p.imgUrl || p.image_url}
+                          alt=""
+                          style={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }}
+                        />
+                      )}
+                      <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {p.name}
+                      </span>
+                      <span style={{ fontSize: 11, color: '#aaa', fontFamily: 'monospace', flexShrink: 0 }}>
+                        {p.id.slice(0, 8)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {manualSaving && <p className="text-xs text-gray-400">שומר...</p>}
+          </div>
+        )}
       </div>
+
+      {/* ── Auto best sellers table ── */}
+      <div className="bg-white rounded-xl shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="text-lg font-black text-gray-800">🏆 מוצרים נמכרים ביותר</h2>
+          <span className="text-sm text-gray-400">
+            מבוסס על {paidOrderCount} הזמנות ששולמו · {rows.length} מוצרים שונים
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="p-3 text-right w-8">#</th>
+                <th className="p-3 text-right">מוצר</th>
+                <th className="p-3 text-right">קטגוריה</th>
+                <th className="p-3 text-center">יחידות נמכרות</th>
+                <th className="p-3 text-center">הכנסה</th>
+                <th className="p-3 text-center">נמכר ביותר (דף הבית)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, i) => (
+                <tr
+                  key={row.productId}
+                  className={`border-t hover:bg-gray-50 ${bestSellerMap[row.productId] ? 'bg-amber-50' : ''}`}
+                >
+                  <td className="p-3 text-gray-400 font-mono text-xs">{i + 1}</td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-3">
+                      {row.imgUrl ? (
+                        <img src={row.imgUrl} alt="" className="w-10 h-10 object-contain rounded" />
+                      ) : (
+                        <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-lg">📦</div>
+                      )}
+                      <span className="font-medium text-gray-800 max-w-xs truncate">{row.name}</span>
+                    </div>
+                  </td>
+                  <td className="p-3 text-gray-500 text-xs">{row.cat || '—'}</td>
+                  <td className="p-3 text-center font-bold text-blue-700">{row.units}</td>
+                  <td className="p-3 text-center font-bold text-green-700">{formatPrice(row.revenue)}</td>
+                  <td className="p-3 text-center">
+                    <button
+                      onClick={() => toggleBestSeller(row.productId)}
+                      disabled={saving === row.productId}
+                      className={`px-3 py-1 rounded-full text-xs font-bold transition ${
+                        bestSellerMap[row.productId]
+                          ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                      }`}
+                    >
+                      {saving === row.productId ? '...' : bestSellerMap[row.productId] ? '🏆 כן' : '— לא'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {rows.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="p-10 text-center text-gray-400">אין נתוני מכירות עדיין</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   );
 }
