@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
+import { verifyAdminToken } from '@/lib/verifyAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 
 export const dynamic = 'force-dynamic';
@@ -9,15 +10,12 @@ export async function POST(req: NextRequest) {
     const adminDb   = getAdminDb();
     const adminAuth = getAdminAuth();
 
-    // Verify caller is admin
     const authHeader = req.headers.get('Authorization') ?? '';
     const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
     if (!idToken) {
       return NextResponse.json({ error: 'Missing auth token' }, { status: 401 });
     }
-    const decoded = await adminAuth.verifyIdToken(idToken);
-    const callerDoc = await adminDb.collection('users').doc(decoded.uid).get();
-    if (!callerDoc.exists || callerDoc.data()?.role !== 'admin') {
+    if (!(await verifyAdminToken(idToken))) {
       return NextResponse.json({ error: 'Forbidden — admin role required' }, { status: 403 });
     }
 

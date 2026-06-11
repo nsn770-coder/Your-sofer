@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
+import { getAdminDb } from '@/lib/firebaseAdmin';
+import { verifyAdminToken } from '@/lib/verifyAdmin';
 import { algoliasearch } from 'algoliasearch';
 
 export const dynamic = 'force-dynamic';
@@ -10,15 +11,6 @@ const algoliaClient = (() => {
   return appId && key ? algoliasearch(appId, key) : null;
 })();
 
-// Mirrors the AuthContext isAdmin check: admins/{uid} collection (primary) OR users.role == 'admin'
-async function isAdmin(uid: string): Promise<boolean> {
-  const db = getAdminDb();
-  const adminDoc = await db.collection('admins').doc(uid).get();
-  if (adminDoc.exists) return true;
-  const userDoc = await db.collection('users').doc(uid).get();
-  return userDoc.exists && userDoc.data()?.role === 'admin';
-}
-
 export async function DELETE(req: NextRequest) {
   try {
     const authHeader = req.headers.get('Authorization') ?? '';
@@ -26,10 +18,7 @@ export async function DELETE(req: NextRequest) {
     if (!idToken) {
       return NextResponse.json({ error: 'Missing auth token' }, { status: 401 });
     }
-
-    const adminAuth = getAdminAuth();
-    const decoded   = await adminAuth.verifyIdToken(idToken);
-    if (!(await isAdmin(decoded.uid))) {
+    if (!(await verifyAdminToken(idToken))) {
       return NextResponse.json({ error: 'Forbidden — admin required' }, { status: 403 });
     }
 

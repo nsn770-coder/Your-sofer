@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/app/lib/firebase-admin';
+import { verifyAdminToken } from '@/lib/verifyAdmin';
 
 const DEFAULTS = {
   checkoutEnabled: true,
@@ -28,14 +29,8 @@ export async function POST(req: NextRequest) {
     const idToken = authHeader.slice(7);
 
     const db = getAdminDb();
-    const { getAuth } = await import('firebase-admin/auth');
-    const { getApps } = await import('firebase-admin/app');
-    const app = getApps().find(a => a.name === 'your-sofer-admin');
-    if (!app) return NextResponse.json({ error: 'Server config error' }, { status: 500 });
-
-    const decoded = await getAuth(app).verifyIdToken(idToken);
-    const adminSnap = await db.collection('admins').doc(decoded.uid).get();
-    if (!adminSnap.exists) {
+    const decoded = await verifyAdminToken(idToken);
+    if (!decoded) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
