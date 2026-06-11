@@ -233,6 +233,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── Promotions (sale campaigns — public read so catalog can check active sales) ──
+
+    match /promotions/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ── Saved carts (shared cart links) ─────────────────────────────────────
 
     match /savedCarts/{id} {
