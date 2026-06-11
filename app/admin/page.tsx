@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
 import { CATS } from '../constants/categories';
 import HomepageConfigTab from './components/HomepageConfigTab';
+import BestSellersTab from './components/BestSellersTab';
 import InventoryTab from './components/InventoryTab';
 import PrintsTab from './components/PrintsTab';
 import StickersTab from './components/StickersTab';
@@ -223,7 +224,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions' | 'best_sellers';
 
 interface Coupon {
   id: string;
@@ -3055,6 +3056,7 @@ export default function AdminPage() {
           { key: 'profitability',  label: '📊 רווחיות',             color: 'bg-emerald-700' },
           { key: 'promotions',     label: '🏷️ מבצעים',              color: 'bg-orange-500' },
           { key: 'site_settings',  label: '⚙️ הגדרות אתר',          color: 'bg-slate-600' },
+          { key: 'best_sellers',   label: '🏆 נמכרים ביותר',         color: 'bg-amber-500' },
         ].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
             className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
@@ -4323,6 +4325,8 @@ export default function AdminPage() {
       {activeTab === 'promotions' && <PromotionsTab />}
 
       {activeTab === 'site_settings' && <SiteSettingsTab />}
+
+      {activeTab === 'best_sellers' && <BestSellersTab orders={orders} products={products} />}
 
       {lightboxImage && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }} onClick={() => setLightboxImage(null)}>
