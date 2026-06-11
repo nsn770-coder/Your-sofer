@@ -2637,6 +2637,16 @@ export default function AdminPage() {
       await deleteDoc(doc(db, 'products', productId));
       setProducts(prev => prev.filter(p => p.id !== productId));
       setProductDeleteConfirm(null);
+
+      const _auth = await getAuthLazy();
+      const idToken = await _auth.currentUser?.getIdToken(true);
+      if (idToken) {
+        await fetch('/api/admin/algolia-delete', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+          body: JSON.stringify({ objectID: productId }),
+        }).catch(err => console.warn('[algolia-delete]', err));
+      }
     } catch (e) { console.error(e); alert('שגיאה במחיקה'); }
   }
 
