@@ -9,6 +9,8 @@
 export interface CategoryFilter {
   category: string;
   subCategories: 'all' | string[];
+  nameContains?: string[];
+  tabLabel?: string;
 }
 
 export interface LifeEvent {
@@ -33,8 +35,9 @@ export const lifeEvents: LifeEvent[] = [
       { category: 'סט טלית תפילין',  subCategories: 'all' },
       { category: 'טליתות וציציות',   subCategories: 'all' },
       { category: 'תכשיטים',          subCategories: 'all' },
-      { category: 'עיצוב הבית',       subCategories: ['פמוטים'] },
-      { category: 'שבת',              subCategories: ['הפרשת חלה'] },
+      { category: 'שבת', subCategories: ['הפרשת חלה'],                                  tabLabel: 'הפרשת חלה' },
+      { category: 'שבת', subCategories: ['חתן וכלה'], nameContains: ['חלה', 'הפרשת'], tabLabel: 'הפרשת חלה' },
+      { category: 'שבת', subCategories: ['חתן וכלה'],                                   tabLabel: 'חתן וכלה'  },
     ],
   },
   {

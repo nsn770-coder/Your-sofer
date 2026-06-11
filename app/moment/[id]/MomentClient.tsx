@@ -31,6 +31,8 @@ interface Product {
   outOfStock?: boolean;
 }
 
+type ProductWithTab = Product & { _tabLabel?: string };
+
 const ATTR_KEYS = ['סוג חומר', 'חומר', 'צבע', 'סגנון'];
 
 // ── Scroll-reveal wrapper ──────────────────────────────────────────────────────
@@ -107,7 +109,7 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
 
 // ── Main client component ──────────────────────────────────────────────────────
 export default function MomentClient({ event }: { event: LifeEvent }) {
-  const [products, setProducts]   = useState<Product[]>([]);
+  const [products, setProducts]   = useState<ProductWithTab[]>([]);
   const [loading, setLoading]     = useState(true);
   const [catFilter, setCatFilter] = useState('הכל');
   const [attrFilters, setAttrFilters] = useState<Record<string, string>>({});
@@ -128,42 +130,35 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
           )
         );
 
-        // 2. Build cat → allowed-subCategory set (or 'all')
-        const catSubMap = new Map<string, 'all' | Set<string>>();
-        for (const cf of event.relatedCategories) {
-          if (cf.subCategories === 'all') {
-            catSubMap.set(cf.category, 'all');
-          } else {
-            const existing = catSubMap.get(cf.category);
-            if (existing === 'all') continue;
-            if (!existing) {
-              catSubMap.set(cf.category, new Set(cf.subCategories as string[]));
-            } else {
-              for (const s of cf.subCategories as string[]) (existing as Set<string>).add(s);
-            }
-          }
-        }
+        // 2. Map cat → docs for lookup
+        const catDocs = new Map<string, typeof snapshots[0]['docs']>();
+        uniqueCats.forEach((cat, i) => catDocs.set(cat, snapshots[i].docs));
 
-        // 3. Collect products with dedup
+        // 3. Process each CategoryFilter in order — earlier entries claim products first.
+        //    nameContains and tabLabel are applied per-entry, enabling multiple tabs
+        //    from the same category.
         const seen = new Set<string>();
-        const all: Product[] = [];
+        const all: ProductWithTab[] = [];
 
-        for (let i = 0; i < uniqueCats.length; i++) {
-          const cat = uniqueCats[i];
-          const allowedSubs = catSubMap.get(cat);
-
-          for (const snap of snapshots[i].docs) {
+        for (const cf of event.relatedCategories) {
+          const docs = catDocs.get(cf.category) ?? [];
+          for (const snap of docs) {
             if (seen.has(snap.id)) continue;
             const p = { id: snap.id, ...snap.data() } as Product;
             if (p.hidden === true) continue;
 
-            if (allowedSubs !== 'all') {
-              const subs = allowedSubs as Set<string>;
-              if (!p.subCategory || !subs.has(p.subCategory)) continue;
+            if (cf.subCategories !== 'all') {
+              const allowed = cf.subCategories as string[];
+              if (!allowed.includes(p.subCategory ?? '')) continue;
+            }
+
+            if (cf.nameContains?.length) {
+              const n = (p.name ?? '').toLowerCase();
+              if (!cf.nameContains.some(kw => n.includes(kw.toLowerCase()))) continue;
             }
 
             seen.add(snap.id);
-            all.push(p);
+            all.push({ ...p, _tabLabel: cf.tabLabel });
           }
         }
 
@@ -177,9 +172,9 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
     })();
   }, [event.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Category tabs — derived from fetched products
-  const availableCats = useMemo(
-    () => [...new Set(products.map(p => p.cat).filter(Boolean) as string[])],
+  // Tabs derive from _tabLabel when set, else from p.cat
+  const availableTabs = useMemo(
+    () => [...new Set(products.map(p => p._tabLabel ?? p.cat).filter(Boolean) as string[])],
     [products]
   );
 
@@ -204,7 +199,7 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
 
   const filtered = useMemo(() => {
     let r = products;
-    if (catFilter !== 'הכל') r = r.filter(p => p.cat === catFilter);
+    if (catFilter !== 'הכל') r = r.filter(p => (p._tabLabel ?? p.cat) === catFilter);
     for (const [key, val] of Object.entries(attrFilters)) {
       if (val) r = r.filter(p => p.filterAttributes?.[key] === val);
     }
@@ -219,7 +214,7 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
     ).entries(),
   ];
 
-  const showFilterBar = !loading && (availableCats.length > 1 || Object.keys(availableAttrs).length > 0);
+  const showFilterBar = !loading && (availableTabs.length > 1 || Object.keys(availableAttrs).length > 0);
 
   return (
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif" }}>
@@ -237,11 +232,11 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
           <div style={{ maxWidth: 1400, margin: '0 auto', padding: '14px 24px' }}>
 
             {/* Category tabs */}
-            {availableCats.length > 1 && (
+            {availableTabs.length > 1 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: Object.keys(availableAttrs).length > 0 ? 12 : 0 }}>
                 <Pill label="הכל" active={catFilter === 'הכל'} onClick={() => setCatFilter('הכל')} />
-                {availableCats.map(cat => (
-                  <Pill key={cat} label={cat} active={catFilter === cat} onClick={() => setCatFilter(cat)} />
+                {availableTabs.map(tab => (
+                  <Pill key={tab} label={tab} active={catFilter === tab} onClick={() => setCatFilter(tab)} />
                 ))}
               </div>
             )}
