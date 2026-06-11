@@ -184,7 +184,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
-    setup();
+    setup().catch((e) => {
+      console.error('[AuthContext] Firebase setup failed:', e);
+      if (!cancelled) setLoading(false);
+    });
 
     return () => {
       cancelled = true;
