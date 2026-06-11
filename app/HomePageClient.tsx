@@ -26,6 +26,7 @@ import {
 import type { CardDef, SubItem } from './constants/homepageCards';
 import lifeEvents from '@/data/lifeEvents';
 import AlgoliaSearch from '@/app/components/search/AlgoliaSearch';
+import ProductCardVideo from '@/app/components/ProductCardVideo';
 
 // Activity bar icons
 function IconActivityCheck() {
@@ -132,6 +133,7 @@ interface Product {
   createdAt?: { seconds: number } | null;
   hidden?: boolean;
   cat?: string;
+  videoUrl?: string;
 }
 
 // ── Sub-image slot ─────────────────────────────────────────────────────────────
@@ -1359,20 +1361,13 @@ export default function HomePageClient() {
                   onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.12)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)'; }}
                 >
-                  <div style={{ height: 155, overflow: 'hidden', position: 'relative' }}>
-                    {imgSrc ? (
-                      <Image fill unoptimized loading="lazy" src={imgSrc} alt={p.name} style={{ objectFit: 'cover' }} sizes="160px" />
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', background: '#e8e8e8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: 32, color: '#ccc' }}>📦</span>
-                      </div>
-                    )}
+                  <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl}>
                     {p.isBestSeller && (
                       <div style={{ position: 'absolute', top: 7, right: 7, zIndex: 1, background: '#fff3e0', border: '1px solid #e8920a', borderRadius: 20, fontSize: 10, fontWeight: 800, color: '#c45e00', padding: '2px 8px', letterSpacing: '0.01em' }}>
                         הכי נמכר
                       </div>
                     )}
-                  </div>
+                  </ProductCardVideo>
                   <div style={{ padding: '10px 12px 14px' }}>
                     <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
                     <p style={{ fontSize: 14, fontWeight: 800, color: '#C5A028', marginBottom: 10 }}>{formatPrice(p.price)}</p>
