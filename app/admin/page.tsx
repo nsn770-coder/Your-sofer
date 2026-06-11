@@ -2634,19 +2634,22 @@ export default function AdminPage() {
 
   async function deleteProduct(productId: string) {
     try {
-      await deleteDoc(doc(db, 'products', productId));
-      setProducts(prev => prev.filter(p => p.id !== productId));
-      setProductDeleteConfirm(null);
-
       const _auth = await getAuthLazy();
       const idToken = await _auth.currentUser?.getIdToken(true);
-      if (idToken) {
-        await fetch('/api/admin/algolia-delete', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
-          body: JSON.stringify({ objectID: productId }),
-        }).catch(err => console.warn('[algolia-delete]', err));
+      if (!idToken) throw new Error('לא מחובר');
+
+      const res = await fetch('/api/admin/product-delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ productId }),
+      });
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(error ?? res.statusText);
       }
+
+      setProducts(prev => prev.filter(p => p.id !== productId));
+      setProductDeleteConfirm(null);
     } catch (e) { console.error(e); alert('שגיאה במחיקה'); }
   }
 
