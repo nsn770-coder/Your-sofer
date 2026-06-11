@@ -14,6 +14,9 @@ export default function SiteSettingsTab() {
   const [saving, setSaving] = useState(false);
   const [savedInfo, setSavedInfo] = useState<{ at: string; by: string } | null>(null);
 
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<{ ok: boolean; msg: string } | null>(null);
+
   useEffect(() => {
     (async () => {
       try {
@@ -121,6 +124,48 @@ export default function SiteSettingsTab() {
             עודכן: {savedInfo.at} על-ידי {savedInfo.by}
           </span>
         )}
+      </div>
+
+      {/* ── algolia resync ── */}
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 space-y-3">
+        <div>
+          <div className="text-base font-black">🔍 חיפוש (Algolia)</div>
+          <div className="text-xs text-gray-500 mt-0.5">
+            מסנכרן את אינדקס החיפוש מול Firestore — מוצרים שנמחקו ייעלמו משורת החיפוש.
+          </div>
+        </div>
+        <div className="flex items-center gap-4 flex-wrap">
+          <button
+            onClick={async () => {
+              setSyncing(true);
+              setSyncResult(null);
+              try {
+                const auth    = await getAuthLazy();
+                const idToken = await auth.currentUser?.getIdToken(true);
+                const res     = await fetch('/api/admin/algolia-resync', {
+                  method:  'POST',
+                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error ?? 'שגיאה לא ידועה');
+                setSyncResult({ ok: true, msg: `החיפוש סונכרן — ${json.products} מוצרים פעילים` });
+              } catch (e) {
+                setSyncResult({ ok: false, msg: e instanceof Error ? e.message : 'שגיאה בסנכרון' });
+              } finally {
+                setSyncing(false);
+              }
+            }}
+            disabled={syncing}
+            className="bg-slate-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {syncing ? 'מסנכרן...' : '🔄 סנכרן חיפוש (Algolia)'}
+          </button>
+          {syncResult && (
+            <span className={`text-xs font-semibold ${syncResult.ok ? 'text-green-600' : 'text-red-600'}`}>
+              {syncResult.ok ? '✅' : '❌'} {syncResult.msg}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* ── info box ── */}
