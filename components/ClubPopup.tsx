@@ -2,12 +2,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 // sessionStorage → shows once per browser session, resets on each new visit
 const SESSION_KEY = 'ys_club_popup_seen';
 const COUPON_CODE = 'AM_ISRAEL_CHAI10';
 const DELAY_MS    = 8000;
-const IMAGE_URL   = 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780510230/%D7%A4%D7%95%D7%A4%D7%90%D7%A4_rnyoth.png';
+const IMAGE_URL   = optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780510230/%D7%A4%D7%95%D7%A4%D7%90%D7%A4_rnyoth.png', 800);
 
 const GOLD   = '#C9A14A';
 const GOLD_D = '#a07c30';

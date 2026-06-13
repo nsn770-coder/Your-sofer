@@ -902,7 +902,7 @@ export default function HomePageClient() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '110%', objectFit: 'cover', objectPosition: 'top', zIndex: 0 }}
         >
           <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/v1780438734/Video_sxnlwo.mp4" type="video/mp4" />
@@ -1021,7 +1021,7 @@ export default function HomePageClient() {
           className="ys-hscroll"
           style={{ display: 'flex', overflowX: 'auto', gap: 14, padding: '4px 20px 16px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
         >
-          {lifeEvents.map(ev => (
+          {lifeEvents.map((ev, evIdx) => (
             <a
               key={ev.id}
               href={`/moment/${ev.id}`}
@@ -1042,8 +1042,10 @@ export default function HomePageClient() {
             >
               {ev.image && (
                 <img
-                  src={ev.image}
+                  src={optimizeCloudinaryUrl(ev.image, 400)}
                   alt={ev.title}
+                  fetchPriority={evIdx === 0 ? 'high' : 'auto'}
+                  loading={evIdx === 0 ? 'eager' : 'lazy'}
                   style={{ width: '100%', height: 140, objectFit: 'cover', display: 'block', flexShrink: 0 }}
                 />
               )}
@@ -1115,7 +1117,7 @@ export default function HomePageClient() {
           }}>
             {([
               { name: 'חנוכה',        emoji: '🕎', img: catImages['חנוכה']        || '', href: '/category/%D7%97%D7%A0%D7%95%D7%9B%D7%94' },
-              { name: 'סט בר מצווה', emoji: '✡️', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777989198/fqm7twz1berprum03u7u.png', href: '/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94' },
+              { name: 'סט בר מצווה', emoji: '✡️', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777989198/fqm7twz1berprum03u7u.png', 400), href: '/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94' },
               categoryGridItems.find(c => c.name === 'בתי מזוזה'),
               categoryGridItems.find(c => c.name === 'סט טלית תפילין'),
               categoryGridItems.find(c => c.name === 'יודאיקה'),
@@ -1254,7 +1256,7 @@ export default function HomePageClient() {
               }}
             >
               <Image
-                src={src}
+                src={optimizeCloudinaryUrl(src, 400)}
                 alt={`רקמה והדפסה אישית ${i + 1}`}
                 fill
                 unoptimized
