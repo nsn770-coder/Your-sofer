@@ -298,39 +298,39 @@ export default function CheckoutPage() {
         ))}
       </div>
       <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#777' }}>
           <span style={{ minWidth: 0 }}>סכום ביניים</span>
           <span style={{ paddingLeft: 4 }}>{formatPrice(total + kippotDiscountAmount + bundleDiscountAmount)}</span>
         </div>
         {kippotDiscountAmount > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎉 הנחת כיפות בר מצווה (30%)</span>
             <span style={{ paddingLeft: 4 }}>-{formatPrice(kippotDiscountAmount)}</span>
           </div>
         )}
         {bundleDiscountAmount > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מבצע כיפות חבילות</span>
             <span style={{ paddingLeft: 4 }}>-{formatPrice(bundleDiscountAmount)}</span>
           </div>
         )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13 }}>
           <span style={{ color: '#777', minWidth: 0 }}>משלוח</span>
           <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(SHIPPING_REGULAR)}</span>
         </div>
         {appliedCoupon && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})</span>
             <span style={{ paddingLeft: 4 }}>-{formatPrice(discountAmount)}</span>
           </div>
         )}
         {selectedGift && giftOptions.find(g => g.id === selectedGift) && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מתנה: {giftOptions.find(g => g.id === selectedGift)!.name}</span>
             <span style={{ paddingLeft: 4 }}>חינם</span>
           </div>
         )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17, fontWeight: 900, color: '#1E3A8A', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 17, fontWeight: 900, color: '#1E3A8A', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
           <span style={{ minWidth: 0 }}>סה"כ לתשלום</span><span style={{ paddingLeft: 4 }}>{formatPrice(finalTotal)}</span>
         </div>
         <div style={{ fontSize: 11, color: '#aaa' }}>כולל מע"מ</div>
