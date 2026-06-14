@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     // ── A3: minimum 5 units for items < ₪25 (excluding kippot and print service) ──
     for (const item of productItems) {
-      if (item.price < 25 && item.cat !== 'כיפות' && item.cat !== 'הדפסה' && item.quantity < 5) {
+      if (item.price > 0 && item.price < 25 && item.cat !== 'כיפות' && item.cat !== 'הדפסה' && item.quantity < 5) {
         console.error(`[payment] min-qty violation: ${item.name} qty=${item.quantity}`);
         return NextResponse.json({ error: 'מינימום 5 יחידות למוצרים זולים' }, { status: 400 });
       }

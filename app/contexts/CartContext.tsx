@@ -262,7 +262,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   function updateQty(id: string, qty: number) {
     if (qty <= 0) { removeItem(id); return; }
     const item = items.find(x => x.id === id);
-    const minQty = (item && item.price < 25 && item.cat !== 'כיפות') ? 5 : 1;
+    const minQty = (item && item.price > 0 && item.price < 25 && item.cat !== 'כיפות') ? 5 : 1;
     setItems(prev => prev.map(x => x.id === id ? { ...x, quantity: Math.max(qty, minQty) } : x));
   }
 
