@@ -411,7 +411,9 @@ export default function CheckoutPage() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', overflowX: 'hidden', width: '100%' }}>
+      {/* Force single-column before JS runs on narrow screens — prevents SSR 2-col overflow flash */}
+      <style>{`@media(max-width:767px){.checkout-grid{grid-template-columns:1fr!important}.checkout-summary-desktop{display:none!important}.checkout-summary-mobile{display:block!important}}`}</style>
       {/* Header */}
       <div style={{ background: '#1E3A8A', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
@@ -436,15 +438,16 @@ export default function CheckoutPage() {
       )}
 
       {/* Main layout — single-column mobile, two-column desktop */}
-      <div style={{
+      <div className="checkout-grid" style={{
         maxWidth: 1000, margin: '28px auto', padding: '0 16px',
+        width: '100%', boxSizing: 'border-box',
         display: 'grid',
         gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) 320px',
         gap: 20, alignItems: 'start',
       }}>
 
         {/* Order summary first on mobile so user sees total before filling form */}
-        {isMobile && <OrderSummary />}
+        <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}><OrderSummary /></div>
 
         {/* Shipping form */}
         <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', overflow: 'hidden' }}>
@@ -537,8 +540,8 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Order summary — desktop: sticky right column; mobile: rendered above form */}
-        {!isMobile && <OrderSummary />}
+        {/* Order summary — desktop: sticky right column; mobile: hidden via CSS */}
+        <div className="checkout-summary-desktop" style={{ display: isMobile ? 'none' : 'block' }}><OrderSummary /></div>
       </div>
     </div>
   );
