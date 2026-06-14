@@ -277,12 +277,12 @@ export default function CheckoutPage() {
 
   const isFormValid = !!(form.name && form.email && form.phone && form.address && form.city);
 
-  const OrderSummary = () => (
-    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: 20, position: isMobile ? 'static' : 'sticky', top: 20, width: '100%', boxSizing: 'border-box' }}>
+  const OrderSummary = ({ isSticky }: { isSticky: boolean }) => (
+    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: 20, position: isSticky ? 'sticky' : 'static', top: 20, width: '100%', boxSizing: 'border-box' }}>
       <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
         <IconCart size={15} color="#1E3A8A" /> סיכום הזמנה
       </h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
         {items.map(item => (
           <div key={item.id} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{ width: 44, height: 44, borderRadius: 8, overflow: 'hidden', background: '#f8f6f2', flexShrink: 0, border: '1px solid #e8e2d8' }}>
@@ -297,7 +297,7 @@ export default function CheckoutPage() {
           </div>
         ))}
       </div>
-      <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
+      <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}>
           <span style={{ minWidth: 0 }}>סכום ביניים</span>
           <span style={{ flexShrink: 0, paddingRight: 4 }}>{formatPrice(total + kippotDiscountAmount + bundleDiscountAmount)}</span>
@@ -411,7 +411,7 @@ export default function CheckoutPage() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', overflowX: 'hidden', width: '100%' }}>
+    <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', width: '100%' }}>
       {/* Header */}
       <div style={{ background: '#1E3A8A', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
@@ -445,7 +445,7 @@ export default function CheckoutPage() {
       }}>
 
         {/* Order summary first on mobile so user sees total before filling form */}
-        <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}><OrderSummary /></div>
+        <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}><OrderSummary isSticky={false} /></div>
 
         {/* Shipping form */}
         <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', overflow: 'hidden' }}>
@@ -539,7 +539,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* Order summary — desktop: sticky right column; mobile: hidden via CSS */}
-        <div className="checkout-summary-desktop" style={{ display: isMobile ? 'none' : 'block' }}><OrderSummary /></div>
+        <div className="checkout-summary-desktop" style={{ display: isMobile ? 'none' : 'block' }}><OrderSummary isSticky={!isMobile} /></div>
       </div>
     </div>
   );
