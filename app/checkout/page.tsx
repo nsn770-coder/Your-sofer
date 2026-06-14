@@ -278,7 +278,7 @@ export default function CheckoutPage() {
   const isFormValid = !!(form.name && form.email && form.phone && form.address && form.city);
 
   const OrderSummary = ({ isSticky }: { isSticky: boolean }) => (
-    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: 20, position: isSticky ? 'sticky' : 'static', top: 20, width: '100%', boxSizing: 'border-box' }}>
+    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: 16, position: isSticky ? 'sticky' : 'static', top: 20, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
       <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
         <IconCart size={15} color="#1E3A8A" /> סיכום הזמנה
       </h3>
@@ -413,7 +413,7 @@ export default function CheckoutPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', width: '100%', maxWidth: '100%' }}>
       {/* Header */}
-      <div style={{ background: '#1E3A8A', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ background: '#1E3A8A', padding: '12px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', width: '100%', boxSizing: 'border-box' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -0.5 }}>Your Sofer</div>
           <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700, letterSpacing: 1 }}>ישראל ✡</div>
@@ -426,7 +426,7 @@ export default function CheckoutPage() {
       </div>
 
       {shaliach && (
-        <div style={{ background: 'linear-gradient(135deg, #1E3A8A, #2563EB)', borderBottom: '2px solid #C5A028', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ background: 'linear-gradient(135deg, #1E3A8A, #2563EB)', borderBottom: '2px solid #C5A028', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box' }}>
           <IconHandshake size={16} color="#C5A028" />
           <div style={{ fontSize: 13, color: '#a8c0d8' }}>
             הזמנה זו מיוחסת לרב הקהילה: <strong style={{ color: '#fff' }}>{shaliach.chabadName || shaliach.name}</strong>
@@ -437,7 +437,7 @@ export default function CheckoutPage() {
 
       {/* Main layout — single-column mobile, two-column desktop */}
       <div className="checkout-grid" style={{
-        maxWidth: 1000, margin: '28px auto', padding: isMobile ? '0 12px' : '0 16px',
+        maxWidth: '100%', margin: '28px auto', padding: isMobile ? '0 20px' : '0 16px',
         width: '100%', boxSizing: 'border-box',
         display: 'grid',
         gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) 320px',
