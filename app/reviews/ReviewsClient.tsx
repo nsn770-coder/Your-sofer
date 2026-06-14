@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 
 interface Review {
@@ -45,10 +45,10 @@ export default function ReviewsClient() {
         const snap = await getDocs(query(
           collection(db, 'reviews'),
           where('approved', '==', true),
-          orderBy('createdAt', 'desc'),
         ));
         const list: Review[] = [];
         snap.forEach(d => list.push({ id: d.id, ...d.data() } as Review));
+        list.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
         setReviews(list);
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
