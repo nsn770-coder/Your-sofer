@@ -437,8 +437,8 @@ export default function CheckoutPage() {
 
       {/* Main layout — single-column mobile, two-column desktop */}
       <div className="checkout-grid" style={{
-        maxWidth: 1100, margin: '20px auto', padding: isMobile ? '0 12px' : '0 16px',
-        width: '100%', boxSizing: 'border-box',
+        maxWidth: '80%', margin: '20px auto', padding: isMobile ? '0 12px' : '0 16px',
+        width: '80%', boxSizing: 'border-box',
         display: 'grid',
         gridTemplateColumns: isMobile ? '1fr' : '1fr 320px',
         gap: 20, alignItems: 'start',
