@@ -411,9 +411,9 @@ export default function CheckoutPage() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', width: '100%' }}>
+    <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', width: '100%', maxWidth: '100vw' }}>
       {/* Header */}
-      <div style={{ background: '#1E3A8A', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
+      <div style={{ background: '#1E3A8A', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -0.5 }}>Your Sofer</div>
           <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700, letterSpacing: 1 }}>ישראל ✡</div>
@@ -437,10 +437,10 @@ export default function CheckoutPage() {
 
       {/* Main layout — single-column mobile, two-column desktop */}
       <div className="checkout-grid" style={{
-        maxWidth: 1000, margin: '28px auto', padding: '0 16px',
+        maxWidth: 1000, margin: '28px auto', padding: isMobile ? '0 12px' : '0 16px',
         width: '100%', boxSizing: 'border-box',
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) 320px',
+        gridTemplateColumns: isMobile ? '1fr' : '1fr 320px',
         gap: 20, alignItems: 'start',
       }}>
 
