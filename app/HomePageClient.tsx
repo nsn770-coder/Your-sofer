@@ -582,11 +582,11 @@ export default function HomePageClient() {
         const snap = await getDocs(query(
           collection(db, 'reviews'),
           where('approved', '==', true),
-          orderBy('createdAt', 'desc'),
           limit(20),
         ));
         const list: LiveReview[] = [];
         snap.forEach(d => list.push({ id: d.id, ...d.data() } as LiveReview));
+        list.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
         setLiveReviews(list);
       } catch { /* non-fatal */ }
     }
@@ -1633,15 +1633,6 @@ export default function HomePageClient() {
         </div>
       )}
 
-      {/* ── Testimonials carousel - self-contained timer ── */}
-      <div style={{ minHeight: 450 }}>
-        {testimonials.length > 0 && (
-          <TestimonialsCarousel
-            testimonials={testimonials}
-            isMobile={isMobile}
-          />
-        )}
-      </div>
 
     </div>
   );
