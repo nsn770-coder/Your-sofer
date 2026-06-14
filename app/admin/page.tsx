@@ -467,8 +467,10 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
       });
       onSave();
       onClose();
-    } catch {
-      alert('שגיאה בשמירה');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[AddProduct] save failed:', err);
+      alert('שגיאה בשמירה: ' + msg);
     } finally {
       setSaving(false);
     }
@@ -765,8 +767,10 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
       }).catch(() => {});
       onSave();
       onClose();
-    } catch {
-      alert('שגיאה בשמירה');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[EditProduct] save failed:', err);
+      alert('שגיאה בשמירה: ' + msg);
     } finally {
       setSaving(false);
     }
@@ -2653,7 +2657,11 @@ export default function AdminPage() {
 
       setProducts(prev => prev.filter(p => p.id !== productId));
       setProductDeleteConfirm(null);
-    } catch (e) { console.error(e); alert('שגיאה במחיקה'); }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error('[deleteProduct] failed:', e);
+      alert('שגיאה במחיקה: ' + msg);
+    }
   }
 
   async function duplicateProduct(product: Product) {

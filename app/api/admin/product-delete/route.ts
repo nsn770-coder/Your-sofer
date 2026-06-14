@@ -6,9 +6,14 @@ import { algoliasearch } from 'algoliasearch';
 export const dynamic = 'force-dynamic';
 
 const algoliaClient = (() => {
-  const appId = process.env.ALGOLIA_APP_ID ?? '';
-  const key   = process.env.ALGOLIA_ADMIN_KEY ?? '';
-  return appId && key ? algoliasearch(appId, key) : null;
+  try {
+    const appId = process.env.ALGOLIA_APP_ID ?? '';
+    const key   = process.env.ALGOLIA_ADMIN_KEY ?? '';
+    return appId && key ? algoliasearch(appId, key) : null;
+  } catch (err) {
+    console.warn('[product-delete] Failed to init Algolia client — delete will still work:', err);
+    return null;
+  }
 })();
 
 export async function DELETE(req: NextRequest) {
