@@ -39,7 +39,7 @@ function ProfileCard({
   initials: string; name: string; title: string;
   description: string; badge: string; isMobile: boolean; imageUrl?: string;
 }) {
-  const avatarSize = isMobile ? 76 : 88;
+  const avatarSize = isMobile ? 110 : 132;
   return (
     <div style={{
       flex: 1,
