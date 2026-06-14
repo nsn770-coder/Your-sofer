@@ -278,11 +278,11 @@ export default function CheckoutPage() {
   const isFormValid = !!(form.name && form.email && form.phone && form.address && form.city);
 
   const OrderSummary = () => (
-    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: 20, position: isMobile ? 'static' : 'sticky', top: 20 }}>
+    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: 20, position: isMobile ? 'static' : 'sticky', top: 20, width: '100%', boxSizing: 'border-box' }}>
       <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
         <IconCart size={15} color="#1E3A8A" /> סיכום הזמנה
       </h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14, overflow: 'hidden' }}>
         {items.map(item => (
           <div key={item.id} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{ width: 44, height: 44, borderRadius: 8, overflow: 'hidden', background: '#f8f6f2', flexShrink: 0, border: '1px solid #e8e2d8' }}>
@@ -297,41 +297,41 @@ export default function CheckoutPage() {
           </div>
         ))}
       </div>
-      <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#777' }}>
-          <span>סכום ביניים</span>
-          <span>{formatPrice(total + kippotDiscountAmount + bundleDiscountAmount)}</span>
+          <span style={{ minWidth: 0 }}>סכום ביניים</span>
+          <span style={{ flexShrink: 0, paddingRight: 4 }}>{formatPrice(total + kippotDiscountAmount + bundleDiscountAmount)}</span>
         </div>
         {kippotDiscountAmount > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🎉 הנחת כיפות בר מצווה (30%)</span>
-            <span>-{formatPrice(kippotDiscountAmount)}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎉 הנחת כיפות בר מצווה (30%)</span>
+            <span style={{ flexShrink: 0, paddingRight: 4 }}>-{formatPrice(kippotDiscountAmount)}</span>
           </div>
         )}
         {bundleDiscountAmount > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🎁 מבצע כיפות חבילות</span>
-            <span>-{formatPrice(bundleDiscountAmount)}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מבצע כיפות חבילות</span>
+            <span style={{ flexShrink: 0, paddingRight: 4 }}>-{formatPrice(bundleDiscountAmount)}</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-          <span style={{ color: '#777' }}>משלוח</span>
-          <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(SHIPPING_REGULAR)}</span>
+          <span style={{ color: '#777', minWidth: 0 }}>משלוח</span>
+          <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, paddingRight: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(SHIPPING_REGULAR)}</span>
         </div>
         {appliedCoupon && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})</span>
-            <span>-{formatPrice(discountAmount)}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})</span>
+            <span style={{ flexShrink: 0, paddingRight: 4 }}>-{formatPrice(discountAmount)}</span>
           </div>
         )}
         {selectedGift && giftOptions.find(g => g.id === selectedGift) && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>🎁 מתנה: {giftOptions.find(g => g.id === selectedGift)!.name}</span>
-            <span>חינם</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מתנה: {giftOptions.find(g => g.id === selectedGift)!.name}</span>
+            <span style={{ flexShrink: 0, paddingRight: 4 }}>חינם</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17, fontWeight: 900, color: '#1E3A8A', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
-          <span>סה"כ לתשלום</span><span>{formatPrice(finalTotal)}</span>
+          <span style={{ minWidth: 0 }}>סה"כ לתשלום</span><span style={{ flexShrink: 0, paddingRight: 4 }}>{formatPrice(finalTotal)}</span>
         </div>
         <div style={{ fontSize: 11, color: '#aaa' }}>כולל מע"מ</div>
       </div>
@@ -344,9 +344,9 @@ export default function CheckoutPage() {
           </div>
         )}
         {appliedCoupon ? (
-          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} — {appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה</span>
-            <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', display: 'flex' }}><IconX size={14} /></button>
+          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflow: 'hidden' }}>
+            <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} — {appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה</span>
+            <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', display: 'flex', flexShrink: 0 }}><IconX size={14} /></button>
           </div>
         ) : (
           <div style={{ display: 'flex', gap: 6 }}>
