@@ -140,7 +140,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
               onNavigate?.();
             }
           }}
-          style={{ background: '#000', border: 'none', padding: '0 14px', cursor: 'pointer', flexShrink: 0 }}
+          style={{ background: '#C5A028', border: 'none', padding: '0 14px', cursor: 'pointer', flexShrink: 0 }}
           aria-label="חפש"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
