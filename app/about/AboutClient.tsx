@@ -131,7 +131,7 @@ export default function AboutClient() {
             </div>
             <div>
               <strong>וואטסאפ שירות לקוחות: </strong>
-              <a href="https://wa.me/972584877770" style={{ color: '#1a1a1a', fontWeight: 700, textDecoration: 'none' }}>058-487-7770</a>
+              <a href="https://wa.me/972587479933" style={{ color: '#1a1a1a', fontWeight: 700, textDecoration: 'none' }}>058-747-9933</a>
             </div>
             <div>
               <strong>מייל: </strong>

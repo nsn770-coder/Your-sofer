@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-const WA_URL = 'https://wa.me/972584877770';
+const WA_URL = 'https://wa.me/972587479933';
 
 export default function ContactPage() {
   const [name, setName] = useState('');
@@ -60,7 +60,7 @@ export default function ContactPage() {
             {[
               { icon: '📍', label: 'כתובת', value: 'רחוב האורן 18, דימונה, ישראל' },
               { icon: '📞', label: 'טלפון ראשי', value: '058-4877-770', href: 'tel:0584877770' },
-              { icon: '💬', label: 'וואטסאפ שירות לקוחות', value: '058-487-7770', href: 'https://wa.me/972584877770' },
+              { icon: '💬', label: 'וואטסאפ שירות לקוחות', value: '058-747-9933', href: 'https://wa.me/972587479933' },
               { icon: '📧', label: 'מייל', value: 'support@your-sofer.com', href: 'mailto:support@your-sofer.com' },
               { icon: '🕐', label: 'שעות פעילות', value: 'ימים א\'–ה\', 09:00–18:00' },
             ].map(({ icon, label, value, href }) => (

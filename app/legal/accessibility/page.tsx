@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useRouter } from 'next/navigation';
 
 export default function AccessibilityPage() {
@@ -33,7 +33,7 @@ export default function AccessibilityPage() {
           <Section title="פנייה בנושא נגישות">
             נתקלתם בבעיית נגישות? נשמח לדעת ולתקן. פנו אלינו:
             {'\n'}טלפון ראשי: 058-4877-770
-            {'\n'}וואטסאפ: 058-487-7770
+            {'\n'}וואטסאפ: 058-747-9933
             {'\n'}אימייל: support@your-sofer.com
             {'\n'}אנו נשתדל להגיב תוך 5 ימי עסקים.
           </Section>

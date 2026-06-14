@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useRouter } from 'next/navigation';
 
 export default function PrivacyPage() {
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
           </Section>
 
           <Section title="7. יצירת קשר">
-            לשאלות הנוגעות לפרטיות: support@your-sofer.com | טלפון: 058-4877-770 | וואטסאפ: 058-487-7770
+            לשאלות הנוגעות לפרטיות: support@your-sofer.com | טלפון: 058-4877-770 | וואטסאפ: 058-747-9933
           </Section>
         </div>
       </div>

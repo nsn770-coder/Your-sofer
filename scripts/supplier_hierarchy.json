@@ -1,0 +1,393 @@
+{
+  "גביעי קידוש וסטים ליין": {
+    "code": "1122",
+    "skusAtSupplier": 0,
+    "productsInFirestore": null,
+    "subcategories": [
+      {
+        "code": "1123",
+        "name": "גביעי קידוש קריסטל וקרמיקה",
+        "skusAtSupplier": 129,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1124",
+        "name": "גביעי קידוש מתכת",
+        "skusAtSupplier": 24,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1125",
+        "name": "מחלקי יין ואביזרים",
+        "skusAtSupplier": 35,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1193",
+        "name": "גביעי קידוש פולימר",
+        "skusAtSupplier": 11,
+        "productsInFirestore": 0
+      }
+    ]
+  },
+  "הבדלה": {
+    "code": "1126",
+    "skusAtSupplier": 96,
+    "productsInFirestore": 94,
+    "subcategories": []
+  },
+  "חגים": {
+    "code": "1128",
+    "skusAtSupplier": 0,
+    "productsInFirestore": null,
+    "subcategories": [
+      {
+        "code": "1129",
+        "name": "חנוכה",
+        "skusAtSupplier": 139,
+        "productsInFirestore": 134
+      },
+      {
+        "code": "1130",
+        "name": "סוכות",
+        "skusAtSupplier": 35,
+        "productsInFirestore": 35
+      },
+      {
+        "code": "1131",
+        "name": "פורים",
+        "skusAtSupplier": 50,
+        "productsInFirestore": 50
+      },
+      {
+        "code": "1132",
+        "name": "פסח",
+        "skusAtSupplier": 144,
+        "productsInFirestore": 156
+      },
+      {
+        "code": "1133",
+        "name": "ראש השנה",
+        "skusAtSupplier": 80,
+        "productsInFirestore": 82
+      }
+    ]
+  },
+  "טלית ותפילין": {
+    "code": "1134",
+    "skusAtSupplier": 0,
+    "productsInFirestore": null,
+    "subcategories": [
+      {
+        "code": "1135",
+        "name": "בתי תפילין ומראות",
+        "skusAtSupplier": 16,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1136",
+        "name": "תיקי טלית",
+        "skusAtSupplier": 130,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1137",
+        "name": "מחזיקי טלית, עטרות וניילונים",
+        "skusAtSupplier": 59,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1138",
+        "name": "טליתות",
+        "skusAtSupplier": 5,
+        "productsInFirestore": 5
+      },
+      {
+        "code": "1139",
+        "name": "סטים טלית ותפילין",
+        "skusAtSupplier": 236,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1184",
+        "name": "תיקי-תפ",
+        "skusAtSupplier": 25,
+        "productsInFirestore": 0
+      }
+    ]
+  },
+  "כיפות": {
+    "code": "1142",
+    "skusAtSupplier": 0,
+    "productsInFirestore": null,
+    "subcategories": [
+      {
+        "code": "1143",
+        "name": "כיפות סרוגות",
+        "skusAtSupplier": 61,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1144",
+        "name": "כיפות סאטן וטרילין",
+        "skusAtSupplier": 47,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1145",
+        "name": "כיפות קטיפה",
+        "skusAtSupplier": 214,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1146",
+        "name": "כיפות סרוגות עם רקמה",
+        "skusAtSupplier": 29,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1147",
+        "name": "כיפות מיוחדות",
+        "skusAtSupplier": 274,
+        "productsInFirestore": 304
+      },
+      {
+        "code": "1148",
+        "name": "כיפות עור",
+        "skusAtSupplier": 23,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1149",
+        "name": "כיפות פריק",
+        "skusAtSupplier": 54,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1150",
+        "name": "סיכות לכיפה",
+        "skusAtSupplier": 6,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1151",
+        "name": "כיפות סרוגות DMC",
+        "skusAtSupplier": 47,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1181",
+        "name": "כיפות פריק עבודת יד",
+        "skusAtSupplier": 0,
+        "productsInFirestore": 0
+      }
+    ]
+  },
+  "מזוזות": {
+    "code": "1152",
+    "skusAtSupplier": 0,
+    "productsInFirestore": null,
+    "subcategories": [
+      {
+        "code": "1153",
+        "name": "מזוזות זכוכית",
+        "skusAtSupplier": 13,
+        "productsInFirestore": 5
+      },
+      {
+        "code": "1154",
+        "name": "מזוזות אלומיניום",
+        "skusAtSupplier": 84,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1156",
+        "name": "מזוזות לרכב",
+        "skusAtSupplier": 3,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1157",
+        "name": "מזוזות מתכת",
+        "skusAtSupplier": 7,
+        "productsInFirestore": 76
+      },
+      {
+        "code": "1158",
+        "name": "מזוזות עץ",
+        "skusAtSupplier": 3,
+        "productsInFirestore": 4
+      },
+      {
+        "code": "1159",
+        "name": "מזוזות פלסטיק",
+        "skusAtSupplier": 111,
+        "productsInFirestore": 42
+      }
+    ]
+  },
+  "תכשיטים": {
+    "code": "1176",
+    "skusAtSupplier": 0,
+    "productsInFirestore": null,
+    "subcategories": [
+      {
+        "code": "1177",
+        "name": "צמידים, טבעות ועגילים",
+        "skusAtSupplier": 14,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1178",
+        "name": "תכשיטי כסף טהור",
+        "skusAtSupplier": 38,
+        "productsInFirestore": 0
+      },
+      {
+        "code": "1180",
+        "name": "נירוסטה ורודיום",
+        "skusAtSupplier": 4,
+        "productsInFirestore": 0
+      }
+    ]
+  },
+  "חתן וכלה": {
+    "code": "1116",
+    "skusAtSupplier": 26,
+    "productsInFirestore": 26,
+    "subcategories": []
+  },
+  "ברכות": {
+    "code": "1118",
+    "skusAtSupplier": 194,
+    "productsInFirestore": 0,
+    "subcategories": []
+  },
+  "חמסות וסגולות": {
+    "code": "1119",
+    "skusAtSupplier": 70,
+    "productsInFirestore": 66,
+    "subcategories": []
+  },
+  "גופיות ציצית": {
+    "code": "1121",
+    "skusAtSupplier": 0,
+    "productsInFirestore": 26,
+    "subcategories": []
+  },
+  "דמויות חסידים": {
+    "code": "1127",
+    "skusAtSupplier": 68,
+    "productsInFirestore": 67,
+    "subcategories": []
+  },
+  "ילדים": {
+    "code": "1140",
+    "skusAtSupplier": 32,
+    "productsInFirestore": 0,
+    "subcategories": []
+  },
+  "כריות לברית": {
+    "code": "1141",
+    "skusAtSupplier": 17,
+    "productsInFirestore": 0,
+    "subcategories": []
+  },
+  "מוצרי בית כנסת וסטנדרים": {
+    "code": "1160",
+    "skusAtSupplier": 68,
+    "productsInFirestore": null,
+    "subcategories": [
+      {
+        "code": "1161",
+        "name": "מנורות",
+        "skusAtSupplier": 9,
+        "productsInFirestore": 0
+      }
+    ]
+  },
+  "מגנטים": {
+    "code": "1163",
+    "skusAtSupplier": 13,
+    "productsInFirestore": 12,
+    "subcategories": []
+  },
+  "מחזיקי מפתחות": {
+    "code": "1164",
+    "skusAtSupplier": 210,
+    "productsInFirestore": 212,
+    "subcategories": []
+  },
+  "נטילת ידיים ומים אחרונים": {
+    "code": "1165",
+    "skusAtSupplier": 263,
+    "productsInFirestore": 0,
+    "subcategories": []
+  },
+  "סידורים ותהילים": {
+    "code": "1166",
+    "skusAtSupplier": 41,
+    "productsInFirestore": 44,
+    "subcategories": []
+  },
+  "עטים": {
+    "code": "1167",
+    "skusAtSupplier": 12,
+    "productsInFirestore": 12,
+    "subcategories": []
+  },
+  "פמוטים": {
+    "code": "1168",
+    "skusAtSupplier": 271,
+    "productsInFirestore": 547,
+    "subcategories": []
+  },
+  "קופות צדקה": {
+    "code": "1169",
+    "skusAtSupplier": 74,
+    "productsInFirestore": 142,
+    "subcategories": []
+  },
+  "כיסויי חלה": {
+    "code": "1171",
+    "skusAtSupplier": 140,
+    "productsInFirestore": 270,
+    "subcategories": []
+  },
+  "כיסויי פלטה": {
+    "code": "1172",
+    "skusAtSupplier": 21,
+    "productsInFirestore": 42,
+    "subcategories": []
+  },
+  "מפות שולחן ורנרים": {
+    "code": "1173",
+    "skusAtSupplier": 25,
+    "productsInFirestore": 0,
+    "subcategories": []
+  },
+  "קרשי חלה, סכינים ומפיונים": {
+    "code": "1174",
+    "skusAtSupplier": 90,
+    "productsInFirestore": 0,
+    "subcategories": []
+  },
+  "מצתים, מלחיות ומתקנים לגפרורים": {
+    "code": "1175",
+    "skusAtSupplier": 109,
+    "productsInFirestore": 0,
+    "subcategories": []
+  },
+  "קיטלים": {
+    "code": "1185",
+    "skusAtSupplier": 4,
+    "productsInFirestore": 4,
+    "subcategories": []
+  },
+  "ברכונים": {
+    "code": "1187",
+    "skusAtSupplier": 92,
+    "productsInFirestore": 362,
+    "subcategories": []
+  }
+}

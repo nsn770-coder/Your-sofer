@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
-const WA_LINK = 'https://wa.me/972584877770?text=שלום אני מעוניין בעזרה ופרטים נוספים';
+const WA_LINK = 'https://wa.me/972587479933?text=שלום אני מעוניין בעזרה ופרטים נוספים';
 
 interface LinkItem { label: string; path?: string; href?: string; }
 interface Column { title: string; links: LinkItem[]; }
@@ -204,7 +204,7 @@ export default function Footer() {
           <div style={{ marginBottom: 10, fontSize: 12, color: 'rgba(255,255,255,0.45)', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px' }}>
             <span>📍 רחוב האורן 18, דימונה</span>
             <a href="tel:0584877770" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📞 058-4877-770</a>
-            <a href="https://wa.me/972584877770" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>💬 058-487-7770</a>
+            <a href="https://wa.me/972587479933" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>💬 058-747-9933</a>
             <a href="mailto:support@your-sofer.com" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>✉️ support@your-sofer.com</a>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>

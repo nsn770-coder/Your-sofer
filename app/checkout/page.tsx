@@ -412,8 +412,6 @@ export default function CheckoutPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', overflowX: 'hidden', width: '100%' }}>
-      {/* Force single-column before JS runs on narrow screens — prevents SSR 2-col overflow flash */}
-      <style>{`@media(max-width:767px){.checkout-grid{grid-template-columns:1fr!important}.checkout-summary-desktop{display:none!important}.checkout-summary-mobile{display:block!important}}`}</style>
       {/* Header */}
       <div style={{ background: '#1E3A8A', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>

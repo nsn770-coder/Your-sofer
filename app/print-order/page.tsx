@@ -731,7 +731,7 @@ export default function PrintOrderPage() {
                 אבל אפשר להזמין רגיל — צרו קשר ונעזור עם עיצוב מותאם אישית.
               </div>
               <a
-                href="https://wa.me/972584877770"
+                href="https://wa.me/972587479933"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -760,7 +760,7 @@ export default function PrintOrderPage() {
             <div style={{ padding: '16px', background: '#FEF2F2', border: '1px solid #FCA5A5', fontSize: 14, color: '#991B1B' }}>
               <div style={{ fontWeight: 700, marginBottom: 4 }}>משהו השתבש</div>
               <div>נסו שוב. אם הבעיה נמשכת —{' '}
-                <a href="https://wa.me/972584877770" target="_blank" rel="noopener noreferrer" style={{ color: '#991B1B' }}>צרו קשר</a>.
+                <a href="https://wa.me/972587479933" target="_blank" rel="noopener noreferrer" style={{ color: '#991B1B' }}>צרו קשר</a>.
               </div>
               <button
                 onClick={handleGenerateMockup}

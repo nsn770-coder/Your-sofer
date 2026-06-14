@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
       <p style="color:#888;font-size:12px;line-height:1.7;margin:0;">
         לשאלות ניתן לפנות אלינו בוואטסאפ:
-        <a href="https://wa.me/972584877770" style="color:#2563EB;text-decoration:none;">058-487-7770</a>
+        <a href="https://wa.me/972587479933" style="color:#2563EB;text-decoration:none;">058-747-9933</a>
       </p>
     </div>
 

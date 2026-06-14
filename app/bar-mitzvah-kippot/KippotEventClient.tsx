@@ -77,12 +77,11 @@ export const BAR_MITZVAH_CONFIG: EventKippotConfig = {
 };
 
 const BENEFITS = [
-  '✓ מגוון עצום של כיפות',
-  '✓ הדפסה אישית',
-  '✓ מחירים מיוחדים לבר מצווה',
-  '✓ משלוח לכל הארץ',
-  '✓ אישור גרפי לפני ייצור',
-  '✓ שירות מהיר',
+  '🔥 הדמיה ומחיר תוך 3 שניות',
+  '🛡️ אספקה בזמן לאירוע — או פיצוי',
+  '⭐ שירות מטורף',
+  '👨‍👩‍👧‍👦 מעל 1,200 משפחות בחרו בנו',
+  '📦 מבחר ענק של כיפות',
 ];
 
 // ── Sort helper (copied from CategoryClient) ──────────────────────────────────
@@ -342,11 +341,14 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)',
             gap: 10, marginBottom: 32, textAlign: 'right',
           }}>
-            {BENEFITS.map(b => (
+            {BENEFITS.map((b, i) => (
               <div key={b} style={{
-                fontSize: 13, color: 'rgba(255,255,255,0.85)',
-                background: 'rgba(255,255,255,0.07)',
-                padding: '8px 12px', fontWeight: 600,
+                fontSize: i === 0 ? 14 : 13,
+                color: i === 0 ? '#FACC15' : 'rgba(255,255,255,0.85)',
+                background: i === 0 ? 'rgba(197,160,40,0.18)' : 'rgba(255,255,255,0.07)',
+                padding: '8px 12px',
+                fontWeight: i === 0 ? 900 : 600,
+                border: i === 0 ? '1px solid rgba(197,160,40,0.55)' : 'none',
               }}>
                 {b}
               </div>
@@ -707,7 +709,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
 
           <p style={{ marginTop: 32, padding: '16px 20px', background: '#FBF8F3', borderRight: `4px solid ${GOLD}`, fontSize: 14, color: '#555' }}>
             יש שאלות?{' '}
-            <a href="https://wa.me/972584877770" target="_blank" rel="noopener noreferrer" style={{ color: GOLD, fontWeight: 700, textDecoration: 'none' }}>
+            <a href="https://wa.me/972587479933" target="_blank" rel="noopener noreferrer" style={{ color: GOLD, fontWeight: 700, textDecoration: 'none' }}>
               כתבו לנו בוואטסאפ
             </a>{' '}
             — נשמח לעזור לכם לבחור את הכיפה המושלמת לאירוע.

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useRouter } from 'next/navigation';
 
 export default function TakanonPage() {
@@ -47,7 +47,7 @@ export default function TakanonPage() {
           </Section>
 
           <Section title="9. יצירת קשר">
-            לכל שאלה: טלפון 058-4877-770 | וואטסאפ: 058-487-7770 | אימייל: support@your-sofer.com
+            לכל שאלה: טלפון 058-4877-770 | וואטסאפ: 058-747-9933 | אימייל: support@your-sofer.com
           </Section>
         </div>
       </div>

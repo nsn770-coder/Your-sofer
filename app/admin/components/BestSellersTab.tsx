@@ -40,6 +40,43 @@ interface AggRow {
   revenue: number;
 }
 
+/**
+ * Extract a product id from raw user input.
+ * Accepts:
+ *  - a bare product id / sku  ("aB12xY9")
+ *  - a full product url        ("https://your-sofer.com/product/aB12xY9")
+ *  - a url with query/hash     (".../product/aB12xY9?utm=...#x")
+ *  - a slug-style url where the id is the last path segment
+ */
+function extractProductId(raw: string): string | null {
+  const s = raw.trim();
+  if (!s) return null;
+
+  // Not a URL → treat as a direct id/sku
+  if (!/^https?:\/\//i.test(s) && !s.includes('/')) {
+    return s;
+  }
+
+  try {
+    const url = new URL(s.startsWith('http') ? s : `https://${s}`);
+    // Strip query + hash, split path
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts.length === 0) return null;
+
+    // Prefer the segment right after /product/ or /p/
+    const idx = parts.findIndex(p => p === 'product' || p === 'p');
+    if (idx !== -1 && parts[idx + 1]) {
+      return decodeURIComponent(parts[idx + 1]);
+    }
+    // Otherwise last path segment
+    return decodeURIComponent(parts[parts.length - 1]);
+  } catch {
+    // Not a parseable url → fall back to last "/" segment
+    const tail = s.split('?')[0].split('#')[0].split('/').filter(Boolean).pop();
+    return tail ? decodeURIComponent(tail) : null;
+  }
+}
+
 export default function BestSellersTab({
   orders,
   products,
@@ -64,6 +101,18 @@ export default function BestSellersTab({
   const [manualSaving, setManualSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Products fetched on-demand by id/url (not necessarily in the loaded `products` prop)
+  const [fetchedProducts, setFetchedProducts] = useState<Record<string, Product>>({});
+
+  // Add-by-link/code state
+  const [linkInput, setLinkInput] = useState('');
+  const [addingByLink, setAddingByLink] = useState(false);
+  const [linkError, setLinkError] = useState('');
+
+  // Drag & drop state
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+
   useEffect(() => {
     async function load() {
       try {
@@ -78,15 +127,77 @@ export default function BestSellersTab({
     load();
   }, []);
 
+  // After manualIds load, fetch any that aren't in the loaded products prop
+  // so the row renders with name/image even for non-loaded products.
+  useEffect(() => {
+    const missing = manualIds.filter(id => !productLookup[id] && !fetchedProducts[id]);
+    if (missing.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const found: Record<string, Product> = {};
+      for (const id of missing) {
+        try {
+          const snap = await getDoc(doc(db, 'products', id));
+          if (snap.exists()) found[id] = { id: snap.id, ...(snap.data() as Omit<Product, 'id'>) };
+        } catch { /* skip */ }
+      }
+      if (!cancelled && Object.keys(found).length) {
+        setFetchedProducts(prev => ({ ...prev, ...found }));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [manualIds, productLookup, fetchedProducts]);
+
+  // Unified lookup: loaded products first, then on-demand fetched ones
+  function resolveProduct(id: string): Product | undefined {
+    return productLookup[id] || fetchedProducts[id];
+  }
+
   async function saveManualIds(ids: string[]) {
     setManualSaving(true);
     try {
-      await setDoc(doc(db, 'siteConfig', 'bestSellers'), { manualProductIds: ids });
+      await setDoc(doc(db, 'siteConfig', 'bestSellers'), { manualProductIds: ids }, { merge: true });
       setManualIds(ids);
     } catch {
       alert('שגיאה בשמירה');
     } finally {
       setManualSaving(false);
+    }
+  }
+
+  // Add a product to the manual list by pasted link or product code.
+  async function addByLink() {
+    setLinkError('');
+    const id = extractProductId(linkInput);
+    if (!id) {
+      setLinkError('לא זוהה מזהה מוצר — הדבק קישור מלא או קוד מוצר');
+      return;
+    }
+    if (manualIds.includes(id)) {
+      setLinkError('המוצר כבר ברשימה');
+      return;
+    }
+
+    setAddingByLink(true);
+    try {
+      // Verify the product exists in Firestore (even if not in loaded products)
+      let prod = productLookup[id];
+      if (!prod) {
+        const snap = await getDoc(doc(db, 'products', id));
+        if (!snap.exists()) {
+          setLinkError(`מוצר עם מזהה "${id}" לא נמצא במאגר`);
+          setAddingByLink(false);
+          return;
+        }
+        prod = { id: snap.id, ...(snap.data() as Omit<Product, 'id'>) };
+        setFetchedProducts(prev => ({ ...prev, [id]: prod! }));
+      }
+      await saveManualIds([...manualIds, id]);
+      setLinkInput('');
+    } catch {
+      setLinkError('שגיאה באימות המוצר');
+    } finally {
+      setAddingByLink(false);
     }
   }
 
@@ -134,8 +245,7 @@ export default function BestSellersTab({
   }
 
   const manualProducts = manualIds
-    .map(id => productLookup[id])
-    .filter((p): p is Product => !!p);
+    .map(id => resolveProduct(id) ?? { id, name: id } as Product);
 
   const searchResults = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -150,6 +260,15 @@ export default function BestSellersTab({
 
   const paidOrderCount = orders.filter(o => PAID_STATUSES.has(o.status)).length;
 
+  // Reorder helper for drag & drop
+  function moveItem(from: number, to: number) {
+    if (from === to) return;
+    const next = [...manualIds];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    saveManualIds(next);
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
@@ -159,6 +278,7 @@ export default function BestSellersTab({
           <h2 className="text-lg font-black text-gray-800">📌 הצגה ידנית בסקרול</h2>
           <p className="text-sm text-gray-400 mt-1">
             מוצרים אלו יופיעו ראשונים בסקרול &ldquo;הנמכרים ביותר&rdquo; בדף הבית, לפי הסדר שנבחר.
+            גרור כדי לסדר, או הוסף מוצר חדש לפי קישור / קוד מוצר.
             מוצר שמופיע כאן ונמכר גם אוטומטית — יופיע פעם אחת בלבד (במיקום הידני).
           </p>
         </div>
@@ -171,76 +291,93 @@ export default function BestSellersTab({
             {/* Current manual list */}
             {manualProducts.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {manualProducts.map((p, idx) => (
-                  <div
-                    key={p.id}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 12,
-                      padding: '8px 12px', background: '#fafafa',
-                      border: '1px solid #e8e8ea',
-                    }}
-                  >
-                    <span style={{ width: 20, textAlign: 'center', fontSize: 12, color: '#aaa', fontFamily: 'monospace' }}>
-                      {idx + 1}
-                    </span>
-                    {(p.imgUrl || p.image_url) && (
-                      <img
-                        src={p.imgUrl || p.image_url}
-                        alt=""
-                        style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
-                      />
-                    )}
-                    <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {p.name}
-                    </span>
-                    <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                      <button
-                        disabled={idx === 0 || manualSaving}
-                        onMouseDown={e => {
-                          e.preventDefault();
-                          if (idx === 0) return;
-                          const next = [...manualIds];
-                          [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
-                          saveManualIds(next);
-                        }}
-                        style={{
-                          padding: '2px 8px', border: '1px solid #d0d0d0',
-                          background: 'transparent', cursor: idx === 0 ? 'default' : 'pointer',
-                          opacity: idx === 0 ? 0.3 : 1, fontSize: 11,
-                        }}
-                        title="הזז למעלה"
-                      >▲</button>
-                      <button
-                        disabled={idx === manualIds.length - 1 || manualSaving}
-                        onMouseDown={e => {
-                          e.preventDefault();
-                          if (idx === manualIds.length - 1) return;
-                          const next = [...manualIds];
-                          [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
-                          saveManualIds(next);
-                        }}
-                        style={{
-                          padding: '2px 8px', border: '1px solid #d0d0d0',
-                          background: 'transparent', cursor: idx === manualIds.length - 1 ? 'default' : 'pointer',
-                          opacity: idx === manualIds.length - 1 ? 0.3 : 1, fontSize: 11,
-                        }}
-                        title="הזז למטה"
-                      >▼</button>
-                      <button
-                        disabled={manualSaving}
-                        onMouseDown={e => {
-                          e.preventDefault();
-                          saveManualIds(manualIds.filter(x => x !== p.id));
-                        }}
-                        style={{
-                          padding: '2px 10px', border: '1px solid #fca5a5',
-                          background: 'transparent', color: '#dc2626', cursor: 'pointer', fontSize: 11,
-                        }}
-                        title="הסר"
-                      >✕</button>
+                {manualProducts.map((p, idx) => {
+                  const isDragging = dragIndex === idx;
+                  const isOver = overIndex === idx && dragIndex !== null && dragIndex !== idx;
+                  return (
+                    <div
+                      key={p.id}
+                      draggable={!manualSaving}
+                      onDragStart={() => setDragIndex(idx)}
+                      onDragEnter={() => setOverIndex(idx)}
+                      onDragOver={e => e.preventDefault()}
+                      onDrop={() => {
+                        if (dragIndex !== null) moveItem(dragIndex, idx);
+                        setDragIndex(null);
+                        setOverIndex(null);
+                      }}
+                      onDragEnd={() => { setDragIndex(null); setOverIndex(null); }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '8px 12px',
+                        background: isOver ? '#eef6ff' : '#fafafa',
+                        border: isOver ? '1px solid #93c5fd' : '1px solid #e8e8ea',
+                        opacity: isDragging ? 0.4 : 1,
+                        cursor: 'grab',
+                        transition: 'background 0.12s, border 0.12s',
+                      }}
+                    >
+                      <span style={{ color: '#c4c4c8', fontSize: 16, cursor: 'grab', flexShrink: 0, lineHeight: 1 }} title="גרור לסידור">
+                        ⠿
+                      </span>
+                      <span style={{ width: 20, textAlign: 'center', fontSize: 12, color: '#aaa', fontFamily: 'monospace' }}>
+                        {idx + 1}
+                      </span>
+                      {(p.imgUrl || p.image_url) && (
+                        <img
+                          src={p.imgUrl || p.image_url}
+                          alt=""
+                          style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
+                        />
+                      )}
+                      <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {p.name}
+                      </span>
+                      <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                        <button
+                          disabled={idx === 0 || manualSaving}
+                          onMouseDown={e => {
+                            e.preventDefault();
+                            if (idx === 0) return;
+                            moveItem(idx, idx - 1);
+                          }}
+                          style={{
+                            padding: '2px 8px', border: '1px solid #d0d0d0',
+                            background: 'transparent', cursor: idx === 0 ? 'default' : 'pointer',
+                            opacity: idx === 0 ? 0.3 : 1, fontSize: 11,
+                          }}
+                          title="הזז למעלה"
+                        >▲</button>
+                        <button
+                          disabled={idx === manualIds.length - 1 || manualSaving}
+                          onMouseDown={e => {
+                            e.preventDefault();
+                            if (idx === manualIds.length - 1) return;
+                            moveItem(idx, idx + 1);
+                          }}
+                          style={{
+                            padding: '2px 8px', border: '1px solid #d0d0d0',
+                            background: 'transparent', cursor: idx === manualIds.length - 1 ? 'default' : 'pointer',
+                            opacity: idx === manualIds.length - 1 ? 0.3 : 1, fontSize: 11,
+                          }}
+                          title="הזז למטה"
+                        >▼</button>
+                        <button
+                          disabled={manualSaving}
+                          onMouseDown={e => {
+                            e.preventDefault();
+                            saveManualIds(manualIds.filter(x => x !== p.id));
+                          }}
+                          style={{
+                            padding: '2px 10px', border: '1px solid #fca5a5',
+                            background: 'transparent', color: '#dc2626', cursor: 'pointer', fontSize: 11,
+                          }}
+                          title="הסר"
+                        >✕</button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-sm text-gray-400">
@@ -248,11 +385,43 @@ export default function BestSellersTab({
               </p>
             )}
 
-            {/* Search / add */}
+            {/* Add by link / product code */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  type="text"
+                  placeholder="הדבק קישור מלא או קוד מוצר..."
+                  value={linkInput}
+                  onChange={e => { setLinkInput(e.target.value); setLinkError(''); }}
+                  onKeyDown={e => { if (e.key === 'Enter' && !addingByLink) addByLink(); }}
+                  style={{
+                    flex: 1, padding: '8px 12px',
+                    border: '1px solid #d0d0d0', fontSize: 14,
+                    direction: 'rtl', outline: 'none', boxSizing: 'border-box',
+                  }}
+                />
+                <button
+                  disabled={addingByLink || !linkInput.trim()}
+                  onClick={addByLink}
+                  style={{
+                    padding: '8px 18px', border: 'none',
+                    background: addingByLink || !linkInput.trim() ? '#d4b896' : '#b8860b',
+                    color: '#fff', fontSize: 14, fontWeight: 700,
+                    cursor: addingByLink || !linkInput.trim() ? 'default' : 'pointer',
+                    whiteSpace: 'nowrap', flexShrink: 0,
+                  }}
+                >
+                  {addingByLink ? '...' : 'הוסף'}
+                </button>
+              </div>
+              {linkError && <p style={{ fontSize: 12, color: '#dc2626', margin: 0 }}>{linkError}</p>}
+            </div>
+
+            {/* Search / add from loaded catalog */}
             <div style={{ position: 'relative' }}>
               <input
                 type="text"
-                placeholder="חפש מוצר לפי שם או מזהה להוספה..."
+                placeholder="או חפש מוצר לפי שם / מזהה..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onBlur={() => setTimeout(() => setSearchQuery(''), 150)}

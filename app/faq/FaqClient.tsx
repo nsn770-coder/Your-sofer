@@ -104,7 +104,7 @@ export default function FaqClient() {
           <div style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>לא מצאת תשובה?</div>
           <div style={{ fontSize: 14, color: '#666', marginBottom: 16 }}>צור איתנו קשר בוואטסאפ ונענה תוך דקות</div>
           <a
-            href="https://wa.me/972584877770"
+            href="https://wa.me/972587479933"
             target="_blank"
             rel="noopener noreferrer"
             style={{ display: 'inline-block', background: '#25D366', color: '#fff', padding: '12px 28px', borderRadius: 8, fontSize: 15, fontWeight: 700, textDecoration: 'none' }}

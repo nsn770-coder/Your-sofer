@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useRouter } from 'next/navigation';
 
 export default function ShippingPage() {
@@ -38,7 +38,7 @@ export default function ShippingPage() {
           </Section>
 
           <Section title="יצירת קשר">
-            טלפון: 058-4877-770 | וואטסאפ: 058-487-7770 | אימייל: support@your-sofer.com
+            טלפון: 058-4877-770 | וואטסאפ: 058-747-9933 | אימייל: support@your-sofer.com
           </Section>
         </div>
       </div>

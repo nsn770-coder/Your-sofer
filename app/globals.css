@@ -88,6 +88,14 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Checkout: force single-column on mobile — must live in <head> CSS so iOS Safari
+   doesn't lock scroll width from the SSR 2-column paint before body <style> fires */
+@media (max-width: 767px) {
+  .checkout-grid { grid-template-columns: 1fr !important; }
+  .checkout-summary-desktop { display: none !important; }
+  .checkout-summary-mobile { display: block !important; }
+}
+
 /* Push Tidio chat widget up on mobile so it doesn't cover pagination */
 @media (max-width: 768px) {
   #tidio-chat-iframe,

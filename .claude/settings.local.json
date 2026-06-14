@@ -193,7 +193,12 @@
       "Bash(2>&1)",
       "Bash(python -c \"import urllib.request; print\\(urllib.request.urlopen\\('https://www.art-judaica.co.il', timeout=5\\).read\\(500\\).decode\\('utf-8', errors='ignore'\\)\\)\")",
       "Bash(tee scrape.log)",
-      "Bash(Get-Content app/scripts/dailyInventoryClearance.mjs -TotalCount 30)"
+      "Bash(Get-Content app/scripts/dailyInventoryClearance.mjs -TotalCount 30)",
+      "Bash(Select-String \"env\")",
+      "Bash(findstr /i \"חתן וכלה\\\\|הפרשת חלה\\\\|category\\\\|CategoryClient\\\\|tabLabel\\\\|tab\")",
+      "Bash(findstr -i \"moment\\\\|wedding\\\\|event\\\\|lifeEvent\\\\|life-event\")",
+      "Bash(Select-Object Name, FullName)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\"; powershell -ExecutionPolicy Bypass -File \"scripts\\\\replace_wa.ps1\")"
     ]
   }
 }

@@ -1,0 +1,389 @@
+[
+  {
+    "id": "2XS51qq5pLRVUhosUQEN",
+    "data": {
+      "name": "קלפי מזוזה",
+      "sub": "קלפי מזוזה מסופרים מוסמכים",
+      "order": 13,
+      "imgUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/q_auto/f_auto/v1775969903/suri-mezuzah-klafim-open-natural-background_qkxvkg.jpg",
+      "displayName": "קלפי מזוזה",
+      "priority": 13,
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777991033/s0wrkv5zslpnwhz2bwrx.png"
+    }
+  },
+  {
+    "id": "AUzSweQCDxZGM0ji60Mw",
+    "data": {
+      "slug": "סטים ומארזים",
+      "displayName": "סטים ומארזים 🎁",
+      "priority": 4,
+      "parentCategory": "יודאיקה",
+      "createdAt": {
+        "_seconds": 1776277499,
+        "_nanoseconds": 616000000
+      },
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780241154/sfl2g9ulcmgbwhtzvlfn.png"
+    }
+  },
+  {
+    "id": "KLtjkkbf3z8mzwnobNla",
+    "data": {
+      "slug": "חגים",
+      "displayName": "חגים 🕍",
+      "priority": 3,
+      "parentCategory": "יודאיקה",
+      "createdAt": {
+        "_seconds": 1776277499,
+        "_nanoseconds": 250000000
+      },
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780241079/xpxqmlpvpgmxwqnlqczi.png"
+    }
+  },
+  {
+    "id": "UeuDYevErbIeUEBNqas1",
+    "data": {
+      "name": "קלפי תפילין",
+      "sub": "קלפי תפילין מסופרים מוסמכים",
+      "order": 14,
+      "imgUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/q_auto/f_auto/v1775969903/images_3_hy4if1.jpg",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/q_auto/f_auto/v1775969903/images_3_hy4if1.jpg"
+    }
+  },
+  {
+    "id": "atim",
+    "data": {
+      "displayName": "עטים",
+      "name": "עטים",
+      "slug": "atim"
+    }
+  },
+  {
+    "id": "bDIB8PkTnjuH2ZwA3d5x",
+    "data": {
+      "slug": "נטילת ידיים",
+      "priority": 1,
+      "parentCategory": "יודאיקה",
+      "createdAt": {
+        "_seconds": 1776277498,
+        "_nanoseconds": 857000000
+      },
+      "displayName": "נטלות וכלים",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778010155/mj5uwmjgiyvguenegipa.png"
+    }
+  },
+  {
+    "id": "kupot-tzedaka",
+    "data": {
+      "displayName": "קופות צדקה",
+      "name": "קופות צדקה",
+      "slug": "kupot-tzedaka"
+    }
+  },
+  {
+    "id": "lABBExz8w4YfQjZqSamY",
+    "data": {
+      "slug": "שבת",
+      "priority": 2,
+      "parentCategory": "יודאיקה",
+      "createdAt": {
+        "_seconds": 1776277499,
+        "_nanoseconds": 146000000
+      },
+      "displayName": "שבתות וחגים",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780241033/ionfc7zoct8tfh1acise.png"
+    }
+  },
+  {
+    "id": "lmvJ0NXwWJVUUj5eHcCU",
+    "data": {
+      "slug": "פסח",
+      "priority": 2,
+      "parentCategory": "חגים",
+      "createdAt": {
+        "_seconds": 1776277499,
+        "_nanoseconds": 540000000
+      },
+      "displayName": "פסח ",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780805780/%D7%A4%D7%A1%D7%97_a9tvtd.png"
+    }
+  },
+  {
+    "id": "mAutRmUezBhJQ1vHULHM",
+    "data": {
+      "slug": "חנוכה",
+      "parentCategory": "חגים",
+      "createdAt": {
+        "_seconds": 1776277499,
+        "_nanoseconds": 422000000
+      },
+      "displayName": "חנוכה ",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781103553/ofo69ikq3etnggkrimhm.png",
+      "priority": 6
+    }
+  },
+  {
+    "id": "mapot-shulchan",
+    "data": {
+      "displayName": "מפות שולחן",
+      "name": "מפות שולחן",
+      "slug": "mapot-shulchan"
+    }
+  },
+  {
+    "id": "matzatim-melachiot",
+    "data": {
+      "displayName": "מצתים ומלחיות",
+      "name": "מצתים ומלחיות",
+      "slug": "matzatim-melachiot"
+    }
+  },
+  {
+    "id": "netilat-yadaim",
+    "data": {
+      "displayName": "נטילת ידיים",
+      "name": "נטילת ידיים",
+      "slug": "netilat-yadaim",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068231/n0mvzaxlhvjmsnnzapp1.png",
+      "priority": 0
+    }
+  },
+  {
+    "id": "paamotim",
+    "data": {
+      "displayName": "פמוטים",
+      "name": "פמוטים",
+      "slug": "paamotim"
+    }
+  },
+  {
+    "id": "qywvGKCqIixlxMI8ldWT",
+    "data": {
+      "slug": "יודאיקה כללי",
+      "displayName": "יודאיקה כללי ✡️",
+      "priority": 5,
+      "parentCategory": "יודאיקה",
+      "createdAt": {
+        "_seconds": 1776277499,
+        "_nanoseconds": 702000000
+      },
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778008761/c78awuv9toccez1ihfph.png"
+    }
+  },
+  {
+    "id": "בר מצוה",
+    "data": {
+      "displayName": "בר מצוה",
+      "priority": 8,
+      "slug": "בר מצוה",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778007148/ndntalfb9x4hxx13d76e.jpg"
+    }
+  },
+  {
+    "id": "בר מצווה",
+    "data": {
+      "displayName": "בר מצווה",
+      "priority": 8,
+      "slug": "בר מצווה",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781101611/p3uuqtxaaath1o9qkzsa.jpg"
+    }
+  },
+  {
+    "id": "בתי מזוזה",
+    "data": {
+      "sub": "מכל הסוגים והגדלים",
+      "order": 1,
+      "imgUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1775970130/WhatsApp_Image_2026-03-08_at_13.20.41_2_alfat3_h4q3ap.jpg",
+      "priority": 1,
+      "name": "בתי מזוזה",
+      "slug": "בתי מזוזה",
+      "displayName": "בתי מזוזה",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068225/djgypdp8oiurclsgaunz.png"
+    }
+  },
+  {
+    "id": "חנוכה",
+    "data": {
+      "displayName": "חנוכה",
+      "priority": 13,
+      "slug": "חנוכה",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068340/by9lw3b5gl3lwzoq9wov.png"
+    }
+  },
+  {
+    "id": "טליתות וציציות",
+    "data": {
+      "displayName": "טליתות וציציות",
+      "priority": 17,
+      "slug": "טליתות וציציות",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781101851/zuodsnuzylar2hhy9rd5.png"
+    }
+  },
+  {
+    "id": "יודאיקה",
+    "data": {
+      "name": "יודאיקה",
+      "sub": "מכל הסוגים והגדלים",
+      "order": 1,
+      "imgUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1773775676/1773774184162_ktblvt.png",
+      "displayName": "יודאיקה",
+      "priority": 7,
+      "slug": "יודאיקה",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068306/kyqtktnp1xik77ogreue.png"
+    }
+  },
+  {
+    "id": "כיסוי תפילין",
+    "data": {
+      "displayName": "כיסוי תפילין",
+      "priority": 5,
+      "slug": "כיסוי תפילין",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780241164/b1fvgdoly1bgttjwqnqz.png"
+    }
+  },
+  {
+    "id": "כיפות",
+    "data": {
+      "displayName": "כיפות",
+      "slug": "כיפות",
+      "priority": 1,
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781101865/qjxz2npn0cyrgupj7fr5.png"
+    }
+  },
+  {
+    "id": "מגילות",
+    "data": {
+      "name": "מגילות",
+      "sub": "מכל הסוגים והגדלים",
+      "order": 1,
+      "imgUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1773696128/Gemini_Generated_Image_4gbxz34gbxz34gbx_wehtst.png",
+      "displayName": "מגילות",
+      "priority": 10,
+      "slug": "מגילות",
+      "imageUrl": ""
+    }
+  },
+  {
+    "id": "מזוזות",
+    "data": {
+      "displayName": "מזוזות",
+      "priority": 1,
+      "slug": "מזוזות",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780241809/dls3vzvbto8iddz0983a.jpg"
+    }
+  },
+  {
+    "id": "מתנות",
+    "data": {
+      "name": "מתנות",
+      "u=sub": "מכל הסוגים והגדלים",
+      "order": 1,
+      "imgUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1773777247/1773776953997_vwruhd.png",
+      "sub": "",
+      "displayName": "מתנות",
+      "priority": 9,
+      "slug": "מתנות",
+      "imageUrl": ""
+    }
+  },
+  {
+    "id": "נטלות וכלים",
+    "data": {
+      "displayName": "נטלות וכלים",
+      "priority": 15,
+      "slug": "נטלות וכלים",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068357/dpase57aewfqj2s9neb4.png"
+    }
+  },
+  {
+    "id": "סט טלית תפילין",
+    "data": {
+      "name": "סט טלית תפילין",
+      "order": 1,
+      "sub": "מכל הסוגים והגדלים",
+      "imgUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1773777247/1773777210990_nhdryj.png",
+      "displayName": "סט טלית תפילין",
+      "priority": 6,
+      "slug": "סט טלית תפילין",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068284/oaiknd5nwu9lushy0ztq.png"
+    }
+  },
+  {
+    "id": "ספרי תורה",
+    "data": {
+      "name": "ספרי תורה",
+      "sub": "מכל הסוגים והגדלים",
+      "order": 1,
+      "imgUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1773696500/Gemini_Generated_Image_v7ffdvv7ffdvv7ff_vqg8dx.png",
+      "displayName": "ספרי תורה",
+      "priority": 11,
+      "slug": "ספרי תורה",
+      "imageUrl": ""
+    }
+  },
+  {
+    "id": "פסח",
+    "data": {
+      "displayName": "פסח",
+      "priority": 12,
+      "slug": "פסח",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068333/cv1auv5rs3gl7tzh3hyx.png"
+    }
+  },
+  {
+    "id": "קלפי מזוזה",
+    "data": {
+      "displayName": "קלפי מזוזה",
+      "priority": 2,
+      "slug": "קלפי מזוזה",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068256/yyerr2i2uw1fsngne90d.jpg"
+    }
+  },
+  {
+    "id": "קלפי תפילין",
+    "data": {
+      "displayName": "קלפי תפילין",
+      "priority": 3,
+      "slug": "קלפי תפילין",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068250/p4ziqmecfjqrjfvd2nm4.jpg"
+    }
+  },
+  {
+    "id": "שבתות וחגים",
+    "data": {
+      "displayName": "שבתות וחגים",
+      "priority": 14,
+      "slug": "שבתות וחגים",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068350/cpkmkfjmbj4huyzkifsx.png"
+    }
+  },
+  {
+    "id": "תיקי טלית ותפילין",
+    "data": {
+      "displayName": "תיקי טלית ותפילין",
+      "priority": 16,
+      "slug": "תיקי טלית ותפילין",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781068370/dbtrltin313e95iomzan.png"
+    }
+  },
+  {
+    "id": "תפילין",
+    "data": {
+      "name": "תפילין",
+      "sub": "",
+      "order": 1,
+      "imgUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1773775676/1773775082169_za6zrb.png",
+      "displayName": "תפילין",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778005996/grxgizxjt8hw8wrmrwqg.png",
+      "priority": 1
+    }
+  },
+  {
+    "id": "תפילין קומפלט",
+    "data": {
+      "displayName": "תפילין קומפלט",
+      "priority": 4,
+      "slug": "תפילין קומפלט",
+      "imageUrl": "https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781101589/nobeaqxv3ll1utft09be.jpg"
+    }
+  }
+]

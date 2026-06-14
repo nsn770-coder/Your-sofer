@@ -47,3 +47,7 @@ serviceAccountKey*.json
 your-sofer-firebase-adminsdk-*.json
 *firebase-adminsdk*.json
 .env.israel-judaica
+
+# generated import/export data (may contain supplier pricing)
+scripts/import_plan.json
+scripts/categories_backup.json
