@@ -2094,7 +2094,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   ];
 
   const shippingRows = [
-    { icon: <Icon.Truck />,   k: 'משלוח',  v: `₪30 עד הבית · ${product.days || '7-10'} ימי עסקים` },
+    { icon: <Icon.Truck />,   k: 'משלוח',  v: `₪35 עד הבית · ${product.days || '7-10'} ימי עסקים` },
     { icon: <Icon.Package />, k: 'אריזה',  v: 'אריזה מוגנת ומהודרת לכל הזמנה' },
     { icon: <Icon.Return />,  k: 'החזרות', v: 'ניתן להחזיר תוך 14 יום ממועד קבלת המוצר' },
     { icon: <Icon.X size={14} />, k: 'ביטול', v: 'ביטול אפשרי עד 24 שעות מהרכישה ללא עלות' },

@@ -77,11 +77,12 @@ export async function POST(req: NextRequest) {
     }
 
     // ── A1: kippot 30% bulk discount validation ───────────────────────────────
-    const kippotItems = productItems.filter(i => i.cat === 'כיפות' && !i.bundlePromo);
-    const kippotQty   = kippotItems.reduce((s, i) => s + i.quantity, 0);
+    const kippotAllItems       = productItems.filter(i => i.cat === 'כיפות');
+    const kippotQty            = kippotAllItems.reduce((s, i) => s + i.quantity, 0);
+    const kippotDiscountActive = kippotQty >= KIPPOT_DISCOUNT_QTY;
 
-    if (kippotQty >= KIPPOT_DISCOUNT_QTY) {
-      const kippotOriginal   = kippotItems.reduce((s, i) => s + i.price * i.quantity, 0);
+    if (kippotDiscountActive) {
+      const kippotOriginal   = kippotAllItems.reduce((s, i) => s + i.price * i.quantity, 0);
       const expectedDiscount = Math.round(kippotOriginal * KIPPOT_DISCOUNT_RATE * 100) / 100;
       const discountLine     = items.find(i => i.name.includes('הנחת כיפות'));
       const submittedDiscount = discountLine ? -discountLine.price : 0;
@@ -115,22 +116,38 @@ export async function POST(req: NextRequest) {
     }
 
     let expectedBundleDiscount = 0;
+    let bundleDiscountedTotal  = 0;
     for (const [promoKey, grpItems] of bundleGroups) {
+      // When 30% wins, kippot bundlePromo are handled by the kippot discount mechanism
+      const activeItems = kippotDiscountActive
+        ? grpItems.filter(i => i.cat !== 'כיפות')
+        : grpItems;
+
+      if (activeItems.length === 0) continue;
+
       const parsed = parseBundle(promoKey);
-      if (!parsed) continue;
+      if (!parsed) {
+        for (const item of activeItems) {
+          bundleDiscountedTotal += item.price * item.quantity;
+        }
+        continue;
+      }
       const { n, bundlePrice } = parsed;
 
       const units: number[] = [];
-      for (const item of grpItems) {
+      for (const item of activeItems) {
         for (let i = 0; i < item.quantity; i++) units.push(item.price);
       }
       units.sort((a, b) => b - a);
 
-      const fullBundles = Math.floor(units.length / n);
-      const promoUnits  = units.slice(0, fullBundles * n);
-      const origPromo   = promoUnits.reduce((s, p) => s + p, 0);
-      const discPromo   = fullBundles * bundlePrice;
+      const fullBundles    = Math.floor(units.length / n);
+      const promoUnits     = units.slice(0, fullBundles * n);
+      const remainderUnits = units.slice(fullBundles * n);
+      const origPromo      = promoUnits.reduce((s, p) => s + p, 0);
+      const discPromo      = fullBundles * bundlePrice;
+      const remainderCost  = remainderUnits.reduce((s, p) => s + p, 0);
       expectedBundleDiscount += Math.round((origPromo - discPromo) * 100) / 100;
+      bundleDiscountedTotal  += discPromo + remainderCost;
     }
 
     if (expectedBundleDiscount > 0) {
@@ -160,12 +177,11 @@ export async function POST(req: NextRequest) {
         }
 
         // Compute server-side discountable total (mirrors CartContext logic)
-        const kippotDiscountActiveServer = kippotQty >= KIPPOT_DISCOUNT_QTY;
-        let serverDiscountableTotal = 0;
+        let serverDiscountableTotal = bundleDiscountedTotal; // bundle-discounted net amounts
         for (const item of productItems) {
-          if (item.bundlePromo) continue;
+          if (item.bundlePromo) continue; // already counted in bundleDiscountedTotal
           if (item.cat === 'הדפסה') continue;
-          if (item.cat === 'כיפות' && kippotDiscountActiveServer) continue;
+          if (item.cat === 'כיפות' && kippotDiscountActive) continue;
           serverDiscountableTotal += item.price * item.quantity;
         }
 

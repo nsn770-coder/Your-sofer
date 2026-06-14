@@ -64,7 +64,7 @@ function Input({ label, name, value, onChange, placeholder, type = 'text', requi
   );
 }
 
-const SHIPPING_REGULAR = 30;
+const SHIPPING_REGULAR = 35;
 
 interface SiteSettings {
   checkoutEnabled: boolean;
@@ -337,6 +337,12 @@ export default function CheckoutPage() {
       </div>
       <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#555" /> קוד קופון</div>
+        {kippotDiscountActive && (
+          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#15803d', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <IconCheck size={11} color="#15803d" />
+            קיבלת הנחת ענק של 30% — גדולה יותר מ-10% הקופון!
+          </div>
+        )}
         {appliedCoupon ? (
           <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} — {appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה</span>

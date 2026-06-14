@@ -808,7 +808,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
           </div>
           <span className={`text-xs flex items-center gap-1 ${filters.freeShipping ? 'font-bold text-[#1a1a1a]' : 'text-gray-600'}`}>
             <IconTruck size={12} />
-            משלוח ₪30
+            משלוח ₪35
           </span>
         </label>
       </Section>
@@ -894,7 +894,7 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
     pills.push({ label: `${filters.minRating}★ ומעלה`, onRemove: () => onChange({ ...filters, minRating: 0 }) });
   }
   if (filters.freeShipping) {
-    pills.push({ label: 'משלוח ₪30', onRemove: () => onChange({ ...filters, freeShipping: false }) });
+    pills.push({ label: 'משלוח ₪35', onRemove: () => onChange({ ...filters, freeShipping: false }) });
   }
   if (filters.sizeMin > 0 || filters.sizeMax < 100) {
     pills.push({
