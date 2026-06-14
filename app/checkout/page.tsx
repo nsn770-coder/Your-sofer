@@ -435,10 +435,12 @@ export default function CheckoutPage() {
         </div>
       )}
 
+      {/* Centering wrapper — flex justify-center is RTL-safe on iOS Safari; margin:auto alone isn't */}
+      <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
       {/* Main layout — single-column mobile, two-column desktop */}
       <div className="checkout-grid" style={{
-        maxWidth: '80%', margin: '20px auto', padding: isMobile ? '0 12px' : '0 16px',
-        width: '80%', boxSizing: 'border-box',
+        maxWidth: 1100, marginTop: 20, marginBottom: 20, padding: isMobile ? '0 12px' : '0 16px',
+        width: '100%', boxSizing: 'border-box',
         display: 'grid',
         gridTemplateColumns: isMobile ? '1fr' : '1fr 320px',
         gap: 20, alignItems: 'start',
@@ -541,6 +543,7 @@ export default function CheckoutPage() {
         {/* Order summary — desktop: sticky right column; mobile: hidden via CSS */}
         <div className="checkout-summary-desktop" style={{ display: isMobile ? 'none' : 'block' }}><OrderSummary isSticky={!isMobile} /></div>
       </div>
+      </div>{/* /centering wrapper */}
     </div>
   );
 }
