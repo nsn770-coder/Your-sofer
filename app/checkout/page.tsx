@@ -79,7 +79,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ checkoutEnabled: true, checkoutDisabledMessage: '' });
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', notes: '' });
 
   const [sessionId] = useState<string>(() => {
