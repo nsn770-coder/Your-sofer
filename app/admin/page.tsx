@@ -2504,10 +2504,13 @@ export default function AdminPage() {
       await Promise.all(
         REQUIRED_CATS
           .filter(c => !existingSlugs.has(c.slug))
-          .map(c => setDoc(doc(db, 'categories', c.slug), {
-            slug: c.slug, displayName: c.displayName, priority: c.priority,
-            imageUrl: slugToImg.get(c.slug) || '', // inherit from old doc if available
-          }, { merge: true }))
+          .map(c => {
+            const img = slugToImg.get(c.slug);
+            return setDoc(doc(db, 'categories', c.slug), {
+              slug: c.slug, displayName: c.displayName, priority: c.priority,
+              ...(img ? { imageUrl: img } : {}),
+            }, { merge: true });
+          })
       );
 
       if (REQUIRED_CATS.some(c => !existingSlugs.has(c.slug))) {
