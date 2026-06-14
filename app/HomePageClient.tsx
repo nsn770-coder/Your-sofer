@@ -136,6 +136,31 @@ interface Product {
   videoUrl?: string;
 }
 
+interface LiveReview {
+  id: string;
+  reviewerName: string;
+  stars: number;
+  text: string;
+  mediaUrl: string;
+  createdAt: { seconds: number } | null;
+  productName?: string;
+}
+
+function squareCropUrl(url: string): string {
+  if (!url) return url;
+  return url.replace('/upload/', '/upload/c_fill,g_auto,w_400,h_400/');
+}
+
+function formatReviewerName(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length < 2) return name;
+  return parts[0] + ' ' + parts[1].charAt(0) + '.';
+}
+
+function formatHeDate(seconds: number): string {
+  return new Date(seconds * 1000).toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
 // ── Sub-image slot ─────────────────────────────────────────────────────────────
 
 function SubSlot({ imgUrl, label, href }: { imgUrl: string; label: string; href: string }) {
@@ -345,6 +370,7 @@ export default function HomePageClient() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [promoProducts, setPromoProducts]       = useState<Product[]>([]);
   const [testimonials, setTestimonials]         = useState<Testimonial[]>([]);
+  const [liveReviews, setLiveReviews]           = useState<LiveReview[]>([]);
   const [newsletterEmail, setNewsletterEmail]   = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
@@ -548,6 +574,23 @@ export default function HomePageClient() {
       }
     }
     fetchSoferim();
+  }, []);
+
+  useEffect(() => {
+    async function fetchLiveReviews() {
+      try {
+        const snap = await getDocs(query(
+          collection(db, 'reviews'),
+          where('approved', '==', true),
+          orderBy('createdAt', 'desc'),
+          limit(20),
+        ));
+        const list: LiveReview[] = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() } as LiveReview));
+        setLiveReviews(list);
+      } catch { /* non-fatal */ }
+    }
+    fetchLiveReviews();
   }, []);
 
   useEffect(() => {
@@ -1529,51 +1572,72 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── Static Social Proof ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '64px 20px' : '96px 32px', direction: 'rtl' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 26 : 32, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>
-            מה הלקוחות אומרים
-          </h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 48, fontWeight: 400 }}>אלפי לקוחות מרוצים ברחבי הארץ</p>
-          <div className="ys-quotes-grid" style={{ display: 'grid', gap: 24 }}>
-            {STATIC_QUOTES.slice(0, 3).map((q, i) => (
-              <div key={i} style={{
-                background: '#FFFFFF',
-                borderRadius: 0,
-                padding: isMobile ? '28px 20px' : '36px 32px',
-                boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-              }}>
-                <div style={{ marginBottom: 14, display: 'flex', gap: 3 }}>
-                  {Array.from({ length: q.stars }).map((_, si) => (
-                    <span key={si} style={{ color: '#C9A227', fontSize: 15 }}>★</span>
-                  ))}
+      {/* ── Live Reviews Carousel ── */}
+      {liveReviews.length > 0 && (
+        <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 0 48px' : '88px 0 72px', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
+            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 26 : 32, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>
+              מה הלקוחות אומרים
+            </h2>
+            <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 40, fontWeight: 400 }}>
+              אלפי לקוחות מרוצים ברחבי הארץ
+            </p>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              overflowX: 'auto',
+              gap: 16,
+              padding: '0 20px 16px',
+              scrollbarWidth: 'none',
+              scrollSnapType: 'x mandatory',
+            } as React.CSSProperties}
+          >
+            {liveReviews.map(r => (
+              <div
+                key={r.id}
+                style={{
+                  flexShrink: 0,
+                  width: isMobile ? 220 : 260,
+                  background: '#FFFFFF',
+                  borderRadius: 0,
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
+                  overflow: 'hidden',
+                  scrollSnapAlign: 'start',
+                } as React.CSSProperties}
+              >
+                <div style={{ width: '100%', aspectRatio: '1/1', overflow: 'hidden' }}>
+                  <img
+                    src={squareCropUrl(r.mediaUrl)}
+                    alt={r.reviewerName}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    loading="lazy"
+                  />
                 </div>
-                <p style={{ fontSize: 15, color: '#4B5563', lineHeight: 1.7, marginBottom: 20, fontStyle: 'italic' }}>
-                  &ldquo;{q.text}&rdquo;
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ color: '#1a1a1a', fontWeight: 700, fontSize: 14 }}>{q.name.charAt(0)}</span>
+                <div style={{ padding: '16px 16px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', gap: 2 }}>
+                    {Array.from({ length: r.stars }).map((_, i) => (
+                      <span key={i} style={{ color: '#C9A227', fontSize: 13 }}>★</span>
+                    ))}
                   </div>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: '#1F2937' }}>{q.name}</div>
-                    <div style={{ fontSize: 13, color: '#9CA3AF' }}>{q.city}</div>
+                  <p style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.65, margin: 0, fontStyle: 'italic' }}>
+                    &ldquo;{r.text}&rdquo;
+                  </p>
+                  <div style={{ marginTop: 4 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{formatReviewerName(r.reviewerName)}</div>
+                    {r.createdAt && (
+                      <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{formatHeDate(r.createdAt.seconds)}</div>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginTop: 40 }}>
-            <a
-              href="/reviews"
-              className="ys-outline-btn"
-            >
-              לכל הביקורות ←
-            </a>
+          <div style={{ textAlign: 'center', marginTop: 32, padding: '0 20px' }}>
+            <a href="/reviews" className="ys-outline-btn">לכל הביקורות ←</a>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ── Testimonials carousel - self-contained timer ── */}
       <div style={{ minHeight: 450 }}>

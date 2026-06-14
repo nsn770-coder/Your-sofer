@@ -10,7 +10,6 @@ import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } fro
 import * as pixel from '@/lib/metaPixel';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
-import { getRelevantReviews } from '@/app/data/demoReviews';
 import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import NextImage from 'next/image';
 import CertificatesSection, { type Certificate } from '@/app/components/CertificatesSection';
@@ -1177,16 +1176,14 @@ function ReviewsSection({ productId, productName, cat }: { productId: string; pr
 
   async function handleSubmit() {
     if (!name.trim() || !text.trim()) { alert('נא למלא שם וטקסט ביקורת'); return; }
+    if (!mediaUrl) { alert('נא להעלות תמונה — התמונה נדרשת לשליחת ביקורת'); return; }
     setSubmitting(true);
     try {
-      const hasMedia = !!mediaUrl;
-      await addDoc(collection(db, 'reviews'), { productId, productName, reviewerName: name.trim(), stars, text: text.trim(), mediaUrl: mediaUrl || null, mediaType: mediaType || null, approved: false, createdAt: serverTimestamp() });
-      if (hasMedia) {
-        const code = 'REVIEW-' + Math.random().toString(36).toUpperCase().slice(2, 7);
-        await setDoc(doc(db, 'coupons', code), { code, discount: 5, type: 'percent', active: true, usedBy: null, createdAt: serverTimestamp() });
-        setEarnedCoupon(code);
-        setSubmitted('with_coupon');
-      } else { setSubmitted('no_media'); }
+      await addDoc(collection(db, 'reviews'), { productId, productName, reviewerName: name.trim(), stars, text: text.trim(), mediaUrl, mediaType: mediaType || null, approved: false, createdAt: serverTimestamp() });
+      const code = 'REVIEW-' + Math.random().toString(36).toUpperCase().slice(2, 7);
+      await setDoc(doc(db, 'coupons', code), { code, discount: 5, type: 'percent', active: true, usedBy: null, createdAt: serverTimestamp() });
+      setEarnedCoupon(code);
+      setSubmitted('with_coupon');
       setShowForm(false);
       setName(''); setStars(5); setText(''); setMediaUrl(''); setMediaType(null);
     } catch (e) { console.error(e); alert('שגיאה בשליחת הביקורת'); }
@@ -1194,7 +1191,6 @@ function ReviewsSection({ productId, productName, cat }: { productId: string; pr
   }
 
   const avgStars = reviews.length > 0 ? reviews.reduce((s, r) => s + r.stars, 0) / reviews.length : 0;
-  const demoReviews = getRelevantReviews(cat, productName);
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px 40px' }}>
@@ -1317,27 +1313,6 @@ function ReviewsSection({ productId, productName, cat }: { productId: string; pr
         )}
       </div>
 
-      {demoReviews.length > 0 && reviews.length === 0 && (
-        <div style={{ marginTop: 24, padding: '24px 20px', background: '#fff', borderRadius: 12, border: '1px solid #e8e8e8' }}>
-          <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1F2937', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            ⭐ לקוחות שרכשו מוצר זה אומרים
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {demoReviews.map(r => (
-              <div key={r.id} style={{ padding: '12px 14px', background: '#FAFAF8', borderRadius: 10, border: '1px solid #EDE9DF' }}>
-                <div style={{ display: 'flex', gap: 2, marginBottom: 6 }}>
-                  {Array.from({ length: r.stars }).map((_, i) => (
-                    <span key={i} style={{ color: '#C9A227', fontSize: 13 }}>★</span>
-                  ))}
-                </div>
-                <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.6, margin: '0 0 8px', fontStyle: 'italic' }}>"{r.text}"</p>
-                <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>{r.name} · {r.city}</div>
-              </div>
-            ))}
-          </div>
-          <p style={{ fontSize: 10, color: '#CBD5E1', marginTop: 12, textAlign: 'center' }}>* ביקורות אלו הן ביקורות לדוגמה בלבד</p>
-        </div>
-      )}
     </div>
   );
 }

@@ -84,7 +84,9 @@ service cloud.firestore {
 
     match /reviews/{id} {
       allow read: if true;
-      allow create: if isSignedIn();      // logged-in users can submit reviews
+      allow create: if request.resource.data.approved == false
+                    && request.resource.data.reviewerName is string
+                    && request.resource.data.mediaUrl is string;
       allow update, delete: if isAdmin();
     }
 
@@ -99,6 +101,13 @@ service cloud.firestore {
 
     match /settings/{id} {
       allow read: if true;               // popups and config read publicly
+      allow write: if isAdmin();
+    }
+
+    // ── Site settings (checkout kill switch — public read) ────────────────────
+
+    match /siteSettings/{id} {
+      allow read: if true;               // guests need to read checkout status
       allow write: if isAdmin();
     }
 
