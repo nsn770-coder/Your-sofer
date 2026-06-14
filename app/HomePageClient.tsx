@@ -1472,21 +1472,8 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── Emotional intro (moved below products for better browse flow) ── */}
-      <div dir="rtl" style={{ padding: isMobile ? '56px 24px' : '88px 24px', background: '#F8F6F1', fontFamily: "'Frank Ruhl Libre', serif" }}>
-        <div style={{ maxWidth: 580, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300 }}>
-            יש אנשים שמבינים שהדברים הכי חשובים בחיים — הם דווקא אלה שלא תמיד רואים.
-          </p>
-          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300, marginTop: 18 }}>
-            מזוזה ותפילין הם לא עוד מוצר.<br/>
-            הם הקדושה והברכה שנכנסת לבית שלך, והחיבור השקט שלך לדבר אמיתי וגדול יותר.
-          </p>
-        </div>
-      </div>
-
       {/* ── Soferim CTA ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '0 16px 56px' : '0 16px 72px', direction: 'rtl', textAlign: 'center' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 16px' : '72px 16px', direction: 'rtl', textAlign: 'center' }}>
         <button
           onClick={() => router.push('/soferim')}
           style={{
@@ -1507,25 +1494,6 @@ export default function HomePageClient() {
         >
           לצפייה במאגר הסופרים שלנו ←
         </button>
-      </div>
-
-      <div dir="rtl" style={{ padding: isMobile ? '64px 24px' : '96px 24px', background: '#F5F2EC', margin: '0', fontFamily: "'Frank Ruhl Libre', serif" }}>
-        <div style={{ maxWidth: 580, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300 }}>
-            כי קל להשקיע במה שמרשים אחרים.
-          </p>
-          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300, marginTop: 18 }}>
-            אבל אנשים עם יראת שמים אמיתית משקיעים גם בדברים שנמצאים בתוך המזוזה שעל הדלת — אפילו שאף אחד אחר לא יראה אותם לעולם.
-          </p>
-          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 500, marginTop: 28 }}>
-            אלו אנשים שלא מחפשים "בערך".<br/>
-            הם מחפשים אמת, דיוק ואמון.
-          </p>
-          <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300, marginTop: 20 }}>
-            לכן הקמנו את Your Sofer — לאנשים שמבינים את החשיבות של סת״מ מהודר, רוצים לדעת בדיוק:<br/>
-            מי כתב את הקלף שלהם, מי בדק אותו, ושרוצים לדעת שיש על מי לסמוך.
-          </p>
-        </div>
       </div>
 
       {/* ── Rabbinical Supervision ── */}
@@ -1559,24 +1527,6 @@ export default function HomePageClient() {
             ))}
           </div>
         </div>
-      </div>
-
-      <div dir="rtl" style={{ padding: isMobile ? '56px 24px' : '88px 24px', maxWidth: 680, margin: '0 auto', textAlign: 'center', fontFamily: "'Frank Ruhl Libre', serif" }}>
-        <h2 style={{ fontSize: isMobile ? 28 : 34, fontWeight: 300, color: '#1F2937', marginBottom: 20, lineHeight: 1.4, fontFamily: "'Cormorant Garamond', serif", letterSpacing: '-0.01em' }}>
-          הקמנו את Your Sofer.
-        </h2>
-        <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300 }}>
-          מקום שמאפשר לך לקנות סת״מ בצורה אחרת.
-        </p>
-        <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 300, marginTop: 18 }}>
-          לראות את הקלף האמיתי.<br/>
-          להכיר את הסופר שכתב אותו.<br/>
-          לקבל תיעוד, בדיקה ושקיפות מלאה — ברמה שלא הייתה קיימת עד היום בעולם הסת״מ.
-        </p>
-        <p style={{ fontSize: isMobile ? 18 : 17, lineHeight: 1.85, color: '#4B4F54', fontWeight: 400, marginTop: 24, fontStyle: 'italic' }}>
-          כי כשמדובר בדברים שמלווים את החיים עצמם —<br/>
-          לא מתפשרים על הדבר האמיתי.
-        </p>
       </div>
 
       {/* ── Static Social Proof ── */}
