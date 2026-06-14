@@ -437,10 +437,10 @@ export default function CheckoutPage() {
 
       {/* Main layout — single-column mobile, two-column desktop */}
       <div className="checkout-grid" style={{
-        maxWidth: '100%', margin: '28px auto', padding: isMobile ? '0 20px' : '0 16px',
+        maxWidth: 1100, margin: '20px auto', padding: isMobile ? '0 12px' : '0 16px',
         width: '100%', boxSizing: 'border-box',
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) 320px',
+        gridTemplateColumns: isMobile ? '1fr' : '1fr 320px',
         gap: 20, alignItems: 'start',
       }}>
 
@@ -448,7 +448,7 @@ export default function CheckoutPage() {
         <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}><OrderSummary isSticky={false} /></div>
 
         {/* Shipping form */}
-        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', width: '100%', maxWidth: '100%', boxSizing: 'border-box', minWidth: 0 }}>
           <div style={{ background: '#f8f6f2', borderBottom: '1px solid #e8e2d8', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#C5A028', color: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>📦</div>
             <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>פרטי משלוח</h2>
