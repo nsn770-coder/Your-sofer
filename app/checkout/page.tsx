@@ -284,7 +284,7 @@ export default function CheckoutPage() {
       </h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
         {items.map(item => (
-          <div key={item.id} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <div key={item.id} style={{ display: 'flex', gap: 10, alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
             <div style={{ width: 44, height: 44, borderRadius: 8, overflow: 'hidden', background: '#f8f6f2', flexShrink: 0, border: '1px solid #e8e2d8' }}>
               {item.imgUrl ? <img src={optimizeCloudinaryUrl(item.imgUrl, 100)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCart size={18} color="#ccc" /></div>}
             </div>
@@ -293,7 +293,7 @@ export default function CheckoutPage() {
               <div style={{ fontSize: 11, color: '#999' }}>כמות: {item.quantity}</div>
               {item.selectedKlafName && <div style={{ fontSize: 10, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 3 }}><IconCheck size={9} color="#1a6b3c" /> {item.selectedKlafName}</div>}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', flexShrink: 0 }}>{formatPrice(item.price * item.quantity)}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', flexShrink: 1, minWidth: 0 }}>{formatPrice(item.price * item.quantity)}</div>
           </div>
         ))}
       </div>
