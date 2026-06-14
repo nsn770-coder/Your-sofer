@@ -82,7 +82,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100vw' }} className={`overflow-x-hidden ${frankRuhl.variable} ${cormorant.variable}`}>
+    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100%' }} className={`overflow-x-hidden ${frankRuhl.variable} ${cormorant.variable}`}>
       <head>
         <meta name="facebook-domain-verification" content="xuwtu57l434nldfe7p4s8l2sr829jw" />
         <CanonicalTag />
@@ -107,7 +107,7 @@ export default function RootLayout({
           })(window,document,"clarity","script","wiozsdfcgm");
         ` }} />
       </head>
-      <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100vw', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
+      <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100%', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
         <AnnouncementTicker />
         <ChatPersonaProvider>
         <AuthProvider>

@@ -198,7 +198,8 @@
       "Bash(findstr /i \"חתן וכלה\\\\|הפרשת חלה\\\\|category\\\\|CategoryClient\\\\|tabLabel\\\\|tab\")",
       "Bash(findstr -i \"moment\\\\|wedding\\\\|event\\\\|lifeEvent\\\\|life-event\")",
       "Bash(Select-Object Name, FullName)",
-      "PowerShell(Set-Location \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\"; powershell -ExecutionPolicy Bypass -File \"scripts\\\\replace_wa.ps1\")"
+      "PowerShell(Set-Location \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\"; powershell -ExecutionPolicy Bypass -File \"scripts\\\\replace_wa.ps1\")",
+      "Bash(del scripts\\\\replace_wa.ps1)"
     ]
   }
 }
