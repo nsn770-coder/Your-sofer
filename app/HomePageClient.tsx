@@ -1584,29 +1584,23 @@ export default function HomePageClient() {
             </p>
           </div>
           <div
-            style={{
-              display: 'flex',
-              overflowX: 'auto',
-              gap: 16,
-              padding: '0 20px 16px',
-              scrollbarWidth: 'none',
-              scrollSnapType: 'x mandatory',
-            } as React.CSSProperties}
+            className="ys-hscroll"
+            style={{ display: 'flex', overflowX: 'auto', gap: 16, padding: '4px 20px 16px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
           >
             {liveReviews.map(r => (
               <div
                 key={r.id}
                 style={{
                   flexShrink: 0,
-                  width: isMobile ? 220 : 260,
+                  width: isMobile ? 260 : 300,
                   background: '#FFFFFF',
                   borderRadius: 0,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
+                  border: '1px solid #EDE8DC',
                   overflow: 'hidden',
-                  scrollSnapAlign: 'start',
-                } as React.CSSProperties}
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+                }}
               >
-                <div style={{ width: '100%', aspectRatio: '1/1', overflow: 'hidden' }}>
+                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden' }}>
                   <img
                     src={squareCropUrl(r.mediaUrl)}
                     alt={r.reviewerName}
