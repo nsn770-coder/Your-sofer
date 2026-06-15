@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ cartId: ref.id });
   } catch (e) {
-    console.error('[save-cart]', e);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('[save-cart] failed:', e);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

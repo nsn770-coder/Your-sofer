@@ -63,11 +63,19 @@ export default function CartPage() {
     setShareLoading(true);
     try {
       const res = await fetch('/api/save-cart', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }) });
-      const { cartId } = await res.json();
-      const url = `${window.location.origin}/shared-cart/${cartId}`;
-      setShareUrl(url);
-    } catch { alert('שגיאה ביצירת קישור שיתוף'); }
-    finally { setShareLoading(false); }
+      const data = await res.json();
+      if (!res.ok || !data.cartId) {
+        console.error('[shareCart] API error:', data.error);
+        alert('שגיאה ביצירת קישור שיתוף: ' + (data.error || 'שגיאת שרת'));
+        return;
+      }
+      setShareUrl(`${window.location.origin}/shared-cart/${data.cartId}`);
+    } catch (err) {
+      console.error('[shareCart]', err);
+      alert('שגיאה ביצירת קישור שיתוף');
+    } finally {
+      setShareLoading(false);
+    }
   }
 
   function copyShareUrl() {
