@@ -91,7 +91,7 @@ export default function CheckoutPage() {
 
   const formRef = useRef(form);
   useEffect(() => { formRef.current = form; }, [form]);
-  const couponInputRef = useRef<HTMLInputElement>(null);
+  const [couponInput, setCouponInput] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' } | null>(null);
@@ -163,7 +163,7 @@ export default function CheckoutPage() {
   }
 
   async function applyCoupon() {
-    const code = couponInputRef.current?.value.trim().toUpperCase() || '';
+    const code = couponInput.trim().toUpperCase();
     if (!code) return;
     // A2: prevent double-application in same session
     if (appliedCoupon) { setCouponError('קופון כבר מוחל'); return; }
@@ -181,7 +181,7 @@ export default function CheckoutPage() {
       }
       const couponType: 'percent' | 'fixed' = data.type === 'fixed' ? 'fixed' : 'percent';
       setAppliedCoupon({ code, discount: data.discount, type: couponType });
-      if (couponInputRef.current) couponInputRef.current.value = '';
+      setCouponInput('');
     } catch { setCouponError('שגיאה בבדיקת הקופון'); }
     finally { setCouponLoading(false); }
   }
@@ -350,7 +350,7 @@ export default function CheckoutPage() {
           </div>
         ) : (
           <div style={{ display: 'flex', gap: 6 }}>
-            <input ref={couponInputRef} defaultValue="" onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }} />
+            <input value={couponInput} onChange={e => setCouponInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }} />
             <button onClick={applyCoupon} disabled={couponLoading} style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: couponLoading ? 0.5 : 1, whiteSpace: 'nowrap' }}>
               {couponLoading ? '...' : 'החל'}
             </button>
