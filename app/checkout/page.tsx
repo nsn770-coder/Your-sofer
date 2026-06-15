@@ -289,7 +289,7 @@ export default function CheckoutPage() {
               {item.imgUrl ? <img src={optimizeCloudinaryUrl(item.imgUrl, 100)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCart size={18} color="#ccc" /></div>}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', lineHeight: 1.4, overflowWrap: 'break-word' }}>{item.name}</div>
               <div style={{ fontSize: 11, color: '#999' }}>כמות: {item.quantity}</div>
               {item.selectedKlafName && <div style={{ fontSize: 10, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 3 }}><IconCheck size={9} color="#1a6b3c" /> {item.selectedKlafName}</div>}
             </div>
