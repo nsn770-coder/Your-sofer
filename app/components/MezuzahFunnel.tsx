@@ -171,7 +171,7 @@ function KlafCard({
 }) {
   const [hovered, setHovered] = useState(false);
   const [sofer, setSofer] = useState<SoferInfo | null>(null);
-  const img = product.imgUrl || product.image_url || '';
+  const img = optimizeCloudinaryUrl(product.imgUrl || product.image_url || '', 400);
   const hasSale = typeof product.was === 'number' && product.was > product.price;
   const savePct = hasSale ? Math.round((1 - product.price / product.was!) * 100) : 0;
 

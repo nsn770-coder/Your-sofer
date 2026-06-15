@@ -5,6 +5,7 @@ import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firesto
 import { db } from '../../firebase';
 import { useCart } from '../../contexts/CartContext';
 import { formatPrice } from '@/app/lib/utils';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 interface Sofer {
   id: string;
@@ -340,7 +341,7 @@ export default function SoferProfileClient({ id }: { id: string }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14 }}>
                 {products.map(p => {
                   const discount = p.was ? Math.round((1 - p.price / p.was) * 100) : 0;
-                  const img = p.imgUrl || p.image_url;
+                  const img = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 400);
                   return (
                     <div key={p.id}
                       onClick={() => router.push(`/product/${p.id}`)}
