@@ -1327,6 +1327,12 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
   const useCases      = product.whoIsItFor    ?? (isStam ? hardcoded.whoIsItFor  : (pageDefaults?.whoIsItFor  ?? hardcoded.whoIsItFor));
   const whyDifferent  = product.whyUs         ?? (isStam ? hardcoded.whyUs       : (pageDefaults?.whyUs       ?? hardcoded.whyUs));
   const benefits      = product.whatYouGet    ?? (isStam ? hardcoded.whatYouGet  : (pageDefaults?.whatYouGet  ?? hardcoded.whatYouGet));
+  const hasKlaf = product.name.includes('קלף');
+  const displayBenefits = benefits.map((b: string) =>
+    b === 'כולל תעודת כשרות מוסמכת'
+      ? (hasKlaf ? b : 'אינו כולל קלף מזוזה — בית בלבד')
+      : b
+  );
   const emotionalHook = product.marketingIntro ?? (isStam ? hardcoded.marketingIntro : (pageDefaults?.marketingIntro ?? hardcoded.marketingIntro));
 
   const faqs: { q: string; a: string }[] = isStam
@@ -1383,7 +1389,7 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
       <div style={{ marginBottom: 24 }}>
         <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a', marginBottom: 10, margin: '0 0 10px' }}>מה מקבלים עם המוצר</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px' }}>
-          {benefits.map((b, i) => (
+          {displayBenefits.map((b, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: 12, color: '#444' }}>
               <span style={{ color: '#27ae60', fontWeight: 900, flexShrink: 0, marginTop: 1 }}>✓</span>
               <span style={{ lineHeight: 1.5 }}>{b}</span>
@@ -1748,7 +1754,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   // A3: qty steps for cheap products (non-kippot, price < 25)
   const isCheapProduct = product.price < 25 && product.cat !== 'כיפות';
   const minQty         = isCheapProduct ? 5 : 1;
-  const qtyStep        = isCheapProduct ? 5 : 1;
+  const qtyStep        = 1; // step always 1; minQty=5 enforces the minimum
 
   const BuyBox = ({ compact = false }: { compact?: boolean }) => {
     // isEventKippot: show calculator instead of standard buy box
@@ -1833,10 +1839,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             </div>
           )}
           <select value={qty} onChange={e => setQty(Number(e.target.value))} style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#f8f9fa', cursor: 'pointer' }}>
-            {[1,2,3,4,5,6,7,8,9,10].map(n => {
-              const v = n * qtyStep;
-              return <option key={v} value={v}>{v}</option>;
-            })}
+            {Array.from({ length: 10 }, (_, i) => minQty + i * qtyStep).map(v => (
+              <option key={v} value={v}>{v}</option>
+            ))}
           </select>
         </div>
       )}
