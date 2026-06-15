@@ -44,9 +44,10 @@ function IconHandshake({ size = 14, color = 'currentColor' }: { size?: number; c
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>;
 }
 
-function Input({ label, name, value, onChange, placeholder, type = 'text', required = false }: {
+function Input({ label, name, value, onChange, onBlur: onBlurProp, placeholder, type = 'text', required = false }: {
   label: string; name: string; value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   placeholder?: string; type?: string; required?: boolean;
 }) {
   const [focused, setFocused] = useState(false);
@@ -57,7 +58,7 @@ function Input({ label, name, value, onChange, placeholder, type = 'text', requi
       </label>
       <input
         name={name} value={value} onChange={onChange} placeholder={placeholder} type={type}
-        onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+        onFocus={() => setFocused(true)} onBlur={(e) => { setFocused(false); onBlurProp?.(e); }}
         style={{ width: '100%', border: `1.5px solid ${focused ? '#C5A028' : '#e0e0e0'}`, borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.15s', background: '#fafafa' }}
       />
     </div>
@@ -258,6 +259,7 @@ export default function CheckoutPage() {
 
   const formRef = useRef(form);
   useEffect(() => { formRef.current = form; }, [form]);
+  const abandonedSavedRef = useRef(false);
   const [couponInput, setCouponInput] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
@@ -329,6 +331,52 @@ export default function CheckoutPage() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
+  function savePartialAbandonedCart(latest?: Partial<typeof form>) {
+    const f = { ...formRef.current, ...latest };
+    console.log('[abandon] fired', { sessionId, phone: f.phone, email: f.email, items: items.length });
+    if (!sessionId || items.length === 0) return;
+    if (!f.phone && !f.email) return;
+
+    const isFirst = !abandonedSavedRef.current;
+    const cartItemsSnap = items.map(i => ({
+      id: i.id, name: i.name, price: i.price, quantity: i.quantity,
+      imgUrl: i.imgUrl ?? null,
+      printCustomization: i.printCustomization ?? null,
+    }));
+
+    setDoc(doc(db, 'abandoned_carts', sessionId), {
+      sessionId,
+      name: f.name || null,
+      phone: f.phone || null,
+      email: f.email || null,
+      address: f.address ? `${f.address}${f.city ? ', ' + f.city : ''}` : null,
+      cartItems: cartItemsSnap,
+      cartTotal: total,
+      updatedAt: serverTimestamp(),
+      converted: false,
+      convertedOrderId: null,
+      ...(isFirst && { createdAt: serverTimestamp() }),
+    }, { merge: true })
+      .then(() => {
+        if (isFirst) {
+          abandonedSavedRef.current = true;
+          fetch('/api/notify-abandoned-cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: f.name || null,
+              phone: f.phone || null,
+              email: f.email || null,
+              cartItems: cartItemsSnap,
+              cartTotal: total,
+              sessionId,
+            }),
+          }).catch(e => console.error('[checkout] notify-abandoned-cart FAILED:', e));
+        }
+      })
+      .catch(e => console.error('[checkout] partial abandoned_cart FAILED:', e));
+  }
+
   async function applyCoupon() {
     const code = couponInput.trim().toUpperCase();
     if (!code) return;
@@ -381,11 +429,11 @@ export default function CheckoutPage() {
           printCustomization: i.printCustomization ?? null,
         })),
         cartTotal: total,
-        createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         converted: false,
         convertedOrderId: null,
-      }).catch(e => console.error('[checkout] abandoned_cart save FAILED:', e));
+        ...(abandonedSavedRef.current ? {} : { createdAt: serverTimestamp() }),
+      }, { merge: true }).catch(e => console.error('[checkout] abandoned_cart save FAILED:', e));
     }
 
     setSubmitError(null);
@@ -493,22 +541,22 @@ export default function CheckoutPage() {
           </div>
           <div style={{ padding: '24px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
-              <Input label="שם מלא" name="name" value={form.name} onChange={handleChange} placeholder="ישראל ישראלי" required />
-              <Input label="טלפון" name="phone" value={form.phone} onChange={handleChange} placeholder="050-0000000" type="tel" required />
+              <Input label="שם מלא" name="name" value={form.name} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ name: e.target.value })} placeholder="ישראל ישראלי" required />
+              <Input label="טלפון" name="phone" value={form.phone} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ phone: e.target.value })} placeholder="050-0000000" type="tel" required />
             </div>
             <div style={{ marginBottom: 14 }}>
-              <Input label="אימייל" name="email" value={form.email} onChange={handleChange} placeholder="your@email.com" type="email" required />
+              <Input label="אימייל" name="email" value={form.email} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ email: e.target.value })} placeholder="your@email.com" type="email" required />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: 14, marginBottom: 14 }}>
-              <Input label="רחוב ומספר בית" name="address" value={form.address} onChange={handleChange} placeholder="רחוב הרצל 5" required />
-              <Input label="עיר" name="city" value={form.city} onChange={handleChange} placeholder="תל אביב" required />
+              <Input label="רחוב ומספר בית" name="address" value={form.address} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ address: e.target.value })} placeholder="רחוב הרצל 5" required />
+              <Input label="עיר" name="city" value={form.city} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ city: e.target.value })} placeholder="תל אביב" required />
             </div>
             <div style={{ marginBottom: 24 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>הערות למשלוח</label>
               <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="הוראות מיוחדות, קומה, דירה..." rows={2}
                 style={{ width: '100%', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', resize: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa', transition: 'border-color 0.15s' }}
                 onFocus={e => (e.currentTarget.style.borderColor = '#C5A028')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#e0e0e0')} />
+                onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; savePartialAbandonedCart(); }} />
             </div>
 
             {/* Payment error banner */}
