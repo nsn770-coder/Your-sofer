@@ -28,13 +28,21 @@ export function optimizeCloudinaryUrl(
   width: number = 800,
   _quality?: string        // ignored — kept so existing call-sites don't break
 ): string {
-  if (!url || !url.includes('cloudinary.com')) return url;
+  if (!url) return url;
 
-  // If a transform is already present, strip it first to avoid double-transforms
-  const cleaned = url.replace(/\/upload\/[^/]+\//, '/upload/');
+  if (url.includes('cloudinary.com')) {
+    // If a transform is already present, strip it first to avoid double-transforms
+    const cleaned = url.replace(/\/upload\/[^/]+\//, '/upload/');
+    const w = snapWidth(width);
+    return cleaned.replace('/upload/', `/upload/f_auto,q_auto,w_${w}/`);
+  }
 
-  const w = snapWidth(width);
-  return cleaned.replace('/upload/', `/upload/f_auto,q_auto,w_${w}/`);
+  if (url.includes('israel-judaica.com')) {
+    const w = snapWidth(width);
+    return `https://res.cloudinary.com/dyxzq3ucy/image/fetch/f_auto,q_auto,w_${w}/${encodeURIComponent(url)}`;
+  }
+
+  return url;
 }
 
 // ── Context-based helper — use when you know the display context ──────────────
