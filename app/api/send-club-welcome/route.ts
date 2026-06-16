@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       <!-- Coupon -->
       <p style="color:#444;font-size:14px;margin:0 0 12px;">הנה קוד ההנחה שלכם ל-10% על הרכישה הראשונה:</p>
       <div style="border:2px dashed #2563EB;border-radius:10px;padding:16px;text-align:center;margin-bottom:24px;background:#F8FAFF;">
-        <div style="font-size:24px;font-weight:900;color:#1E3A8A;letter-spacing:3px;direction:ltr;">AM_ISRAEL_CHAI10</div>
+        <div style="font-size:24px;font-weight:900;color:#1E3A8A;letter-spacing:3px;direction:ltr;">TAMUZ10</div>
         <div style="font-size:12px;color:#666;margin-top:6px;">הכניסו את הקוד בשדה ״קוד קופון״ בעמוד הקופה</div>
       </div>
 
