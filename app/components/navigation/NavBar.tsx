@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -251,12 +251,17 @@ function NavBarContent() {
   const [activeId,    setActiveId]    = useState<string | null>(null);
   const [mobileOpen,  setMobileOpen]  = useState(false);
   const [isMobile,    setIsMobile]    = useState(false);
-  const [kipotSubcats, setKipotSubcats] = useState<Array<{ slug: string; displayName: string }>>([]);
+  const [kipotSubcats, setKipotSubcats] = useState<Array<{ slug: string; displayName: string; priority?: number }>>([]);
 
   useEffect(() => {
-    getDocs(query(collection(db, 'categories'), where('parentCategory', '==', 'כיפות'), orderBy('priority', 'asc')))
-      .then(snap => setKipotSubcats(snap.docs.map(d => d.data() as { slug: string; displayName: string })))
-      .catch(() => {});
+    getDocs(query(collection(db, 'categories'), where('parentCategory', '==', 'כיפות')))
+      .then(snap => {
+        const docs = snap.docs
+          .map(d => d.data() as { slug: string; displayName: string; priority?: number })
+          .sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
+        setKipotSubcats(docs);
+      })
+      .catch((e) => console.error('Failed to load kippot subcategories:', e));
   }, []);
 
   const menuData = useMemo<NavMenuItem[]>(() => {
