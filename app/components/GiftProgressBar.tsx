@@ -32,6 +32,7 @@ export default function GiftProgressBar() {
 
       <div
         dir="rtl"
+        className="gift-progress-bar"
         style={{
           position:     'fixed',
           bottom:       'calc(14px + env(safe-area-inset-bottom, 0px))',

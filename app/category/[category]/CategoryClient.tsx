@@ -1161,6 +1161,11 @@ export default function CategoryClient({ category }: { category: string }) {
   const [kippotQty, setKippotQty] = useState(50);
 
   useEffect(() => {
+    document.body.classList.toggle('filter-drawer-open', drawerOpen);
+    return () => { document.body.classList.remove('filter-drawer-open'); };
+  }, [drawerOpen]);
+
+  useEffect(() => {
     const STAM_CHAT_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
     setStamPage(STAM_CHAT_CATS.has(category));
     return () => setStamPage(false);

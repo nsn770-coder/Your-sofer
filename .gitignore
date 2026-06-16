@@ -51,3 +51,6 @@ your-sofer-firebase-adminsdk-*.json
 # generated import/export data (may contain supplier pricing)
 scripts/import_plan.json
 scripts/categories_backup.json
+
+# local backups (Firestore pre-write snapshots)
+backups/

@@ -116,6 +116,11 @@ body.gift-bar-active #tidio-chat {
   bottom: 136px !important;
 }
 
+/* Hide gift progress bar while mobile filter drawer is open */
+body.filter-drawer-open .gift-progress-bar {
+  display: none;
+}
+
 /* ─── CLS Prevention ─────────────────────────────────────────────────────────
    These rules prevent layout shifts across the site.
    Never use height:auto on image containers — always reserve space.
