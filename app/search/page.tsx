@@ -23,7 +23,6 @@ interface AlgoliaHit {
   image: string;
   cat: string;
   subCategory: string;
-  inStock: boolean;
   createdAt: number;
   isBestSeller?: boolean;
   badge?: string | null;
@@ -37,7 +36,6 @@ interface SearchState {
   cat:      string;
   minPrice: string;
   maxPrice: string;
-  inStock:  boolean;
   page:     number;
 }
 
@@ -87,7 +85,6 @@ function stateFromParams(params: URLSearchParams): SearchState {
     cat:      params.get('cat') ?? '',
     minPrice: params.get('minPrice') ?? '',
     maxPrice: params.get('maxPrice') ?? '',
-    inStock:  params.get('inStock') === 'true',
     page:     Math.max(1, parseInt(params.get('page') ?? '1', 10)),
   };
 }
@@ -99,7 +96,6 @@ function buildParams(s: SearchState): URLSearchParams {
   if (s.cat)      p.set('cat', s.cat);
   if (s.minPrice) p.set('minPrice', s.minPrice);
   if (s.maxPrice) p.set('maxPrice', s.maxPrice);
-  if (s.inStock)  p.set('inStock', 'true');
   if (s.page > 1) p.set('page', String(s.page));
   return p;
 }
@@ -151,8 +147,7 @@ export default function SearchPage() {
     if (state.maxPrice) numericFilters.push(`price <= ${parseFloat(state.maxPrice)}`);
 
     const facetFilters: string[][] = [];
-    if (state.cat)     facetFilters.push([`cat:${state.cat}`]);
-    if (state.inStock) facetFilters.push(['inStock:true']);
+    if (state.cat) facetFilters.push([`cat:${state.cat}`]);
 
     algolia.searchSingleIndex({
       indexName: state.sort,
@@ -165,7 +160,7 @@ export default function SearchPage() {
         facets:        ['cat'],
         attributesToRetrieve: [
           'id', 'name', 'price', 'image', 'cat', 'subCategory',
-          'inStock', 'createdAt', 'isBestSeller', 'badge', 'was', 'priority',
+          'createdAt', 'isBestSeller', 'badge', 'was', 'priority',
         ],
       },
     }).then(res => {
@@ -184,17 +179,17 @@ export default function SearchPage() {
     }).finally(() => {
       if (id === searchId.current) setLoading(false);
     });
-  }, [state.query, state.sort, state.cat, state.minPrice, state.maxPrice, state.inStock, state.page]);
+  }, [state.query, state.sort, state.cat, state.minPrice, state.maxPrice, state.page]);
 
   // Meta Pixel
   useEffect(() => { if (state.query) pixelSearch(state.query); }, [state.query]);
 
   // ── Filter helpers ───────────────────────────────────────────────────────────
 
-  const hasActiveFilters = !!(state.cat || state.minPrice || state.maxPrice || state.inStock);
+  const hasActiveFilters = !!(state.cat || state.minPrice || state.maxPrice);
 
   function clearFilters() {
-    setState(s => ({ ...s, cat: '', minPrice: '', maxPrice: '', inStock: false, page: 1 }));
+    setState(s => ({ ...s, cat: '', minPrice: '', maxPrice: '', page: 1 }));
   }
 
   function goPage(n: number) {
@@ -274,20 +269,6 @@ export default function SearchPage() {
         </div>
       </SidebarSection>
 
-      {/* In stock toggle */}
-      <SidebarSection title="זמינות">
-        <label className="flex items-center gap-2 cursor-pointer group">
-          <div
-            onClick={() => setState(s => ({ ...s, inStock: !s.inStock, page: 1 }))}
-            className={`w-9 h-5 rounded-full transition-all flex items-center cursor-pointer flex-shrink-0 ${state.inStock ? 'bg-[#1a1a1a]' : 'bg-gray-200'}`}
-          >
-            <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform mx-0.5 ${state.inStock ? 'translate-x-4' : 'translate-x-0'}`} />
-          </div>
-          <span className={`text-xs ${state.inStock ? 'font-bold text-[#1a1a1a]' : 'text-gray-600'}`}>
-            רק מוצרים במלאי
-          </span>
-        </label>
-      </SidebarSection>
     </div>
   );
 
@@ -299,7 +280,6 @@ export default function SearchPage() {
     label: `מחיר: ${state.minPrice || '0'} - ${state.maxPrice || '∞'} ₪`,
     onRemove: () => setState(s => ({ ...s, minPrice: '', maxPrice: '', page: 1 })),
   });
-  if (state.inStock) pills.push({ label: 'במלאי בלבד', onRemove: () => setState(s => ({ ...s, inStock: false, page: 1 })) });
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
