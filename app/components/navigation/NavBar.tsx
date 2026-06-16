@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 import { useRouter, usePathname } from "next/navigation";
 
 import { useCart } from "@/app/contexts/CartContext";
@@ -249,6 +251,31 @@ function NavBarContent() {
   const [activeId,    setActiveId]    = useState<string | null>(null);
   const [mobileOpen,  setMobileOpen]  = useState(false);
   const [isMobile,    setIsMobile]    = useState(false);
+  const [kipotSubcats, setKipotSubcats] = useState<Array<{ slug: string; displayName: string }>>([]);
+
+  useEffect(() => {
+    getDocs(query(collection(db, 'categories'), where('parentCategory', '==', 'כיפות'), orderBy('priority', 'asc')))
+      .then(snap => setKipotSubcats(snap.docs.map(d => d.data() as { slug: string; displayName: string })))
+      .catch(() => {});
+  }, []);
+
+  const menuData = useMemo<NavMenuItem[]>(() => {
+    const allItems: NavSubItem[] = [
+      { label: 'כל הכיפות', cat: 'כיפות' },
+      ...kipotSubcats.map(s => ({ label: s.displayName, cat: 'כיפות', filter: s.slug })),
+    ];
+    const mid = Math.ceil(allItems.length / 2);
+    const kipotEntry: NavMenuItem = {
+      id: 'kipot', label: 'כיפות', cat: 'כיפות',
+      columns: allItems.length <= 6
+        ? [{ title: 'כיפות', items: allItems }]
+        : [
+            { title: 'כיפות', items: allItems.slice(0, mid) },
+            { title: 'עוד',   items: allItems.slice(mid) },
+          ],
+    };
+    return MEGA_MENU_DATA.map(item => (item.id === 'kipot' ? kipotEntry : item));
+  }, [kipotSubcats]);
   const openTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
@@ -415,7 +442,7 @@ function NavBarContent() {
         {!isMobile && (
           <div style={{ background: "#FAF8F3", borderTop: "1px solid #E7E2D8", position: "relative" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
-              {MEGA_MENU_DATA.map(item => (
+              {menuData.map(item => (
                 <div key={item.id} style={{ position: "relative" }}
                   onMouseEnter={() => handleEnter(item.id)}
                   onMouseLeave={handleLeave}
@@ -452,7 +479,7 @@ function NavBarContent() {
       <MobileDrawerMenu
         isOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
-        menuData={MEGA_MENU_DATA}
+        menuData={menuData}
         simpleNav={SIMPLE_NAV}
         onSelect={handleSelect}
         onAction={handleAction}
