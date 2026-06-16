@@ -613,13 +613,18 @@ export default function CheckoutPage() {
                 ? <>🔒 הרכישות אינן זמינות כעת</>
                 : loading
                   ? <><IconLoader /> מכין תשלום...</>
-                  : <><IconCreditCard size={16} color={isFormValid ? '#1F3D8F' : '#999'} /> מעבר לתשלום ←</>
+                  : <><IconCreditCard size={16} color={isFormValid ? '#1F3D8F' : '#999'} /> מעבר מאובטח לתשלום באשראי</>
               }
             </button>
             {siteSettings.checkoutEnabled && (
-              <div style={{ fontSize: 11, color: '#aaa', textAlign: 'center', marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-                <IconLock size={11} color="#aaa" /> תשלום מאובטח · ויזה · מסטרקארד · ביט
-              </div>
+              <>
+                <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', margin: '12px auto 0', maxWidth: 340, lineHeight: 1.6 }}>
+                  בלחיצה תועברו לדף תשלום מאובטח של חברת הסליקה. ההזמנה שלכם נשמרת אצלנו ותחזרו לאתר לאחר התשלום.
+                </p>
+                <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', marginTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 6 }}>
+                  🔒 תשלום מאובטח · 💳 אשראי · ✅ חזרה לאתר לאחר התשלום
+                </div>
+              </>
             )}
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const COUPON_CODE = 'AM_ISRAEL_CHAI10';
+const COUPON_CODE = 'TAMUZ10';
 
 export default function CouponStrip() {
   const [copied, setCopied] = useState(false);
