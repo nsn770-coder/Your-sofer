@@ -7,7 +7,9 @@ const COUPON_CODE = 'TAMUZ10';
 export default function CouponStrip() {
   const [copied, setCopied] = useState(false);
 
-  async function handleCopy() {
+  async function handleCopy(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
     try {
       await navigator.clipboard.writeText(COUPON_CODE);
       setCopied(true);
@@ -43,6 +45,11 @@ export default function CouponStrip() {
           onClick={handleCopy}
           className={`coupon-btn${copied ? ' coupon-btn--copied' : ''}`}
           aria-label="העתק קוד קופון"
+          style={{
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            WebkitTouchCallout: 'none',
+          }}
         >
           {copied ? '✓ הועתק!' : 'העתק'}
         </button>
@@ -62,6 +69,9 @@ export default function CouponStrip() {
           color: #C5A028;
           letter-spacing: 1.2px;
           white-space: nowrap;
+          user-select: none;
+          -webkit-user-select: none;
+          -webkit-touch-callout: none;
         }
         .coupon-btn {
           background: none;
