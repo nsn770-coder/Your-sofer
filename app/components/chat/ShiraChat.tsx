@@ -352,6 +352,7 @@ export default function ShiraChat() {
   const pathname = usePathname();
 
   if (pathname?.startsWith('/bar-mitzvah')) return null;
+  if (pathname?.startsWith('/admin')) return null;
 
   if (SHOW_WHATSAPP_ONLY) {
     return <WaFloatBubble />;

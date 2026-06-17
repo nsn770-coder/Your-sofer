@@ -13,10 +13,10 @@ interface DayStat {
 const navy = '#1E3A8A';
 const gold = '#C5A028';
 
-export default function AnalyticsLineChart({ data }: { data: DayStat[] }) {
+export default function AnalyticsLineChart({ data, title }: { data: DayStat[]; title?: string }) {
   return (
     <div style={{ background: '#fff', borderRadius: 14, padding: '24px 20px', marginBottom: 28, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-      <h2 style={{ fontSize: 16, fontWeight: 800, color: navy, margin: '0 0 20px' }}>📈 הזמנות - 7 ימים אחרונים</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: navy, margin: '0 0 20px' }}>{title ?? '📈 רכישות ששולמו בטווח הנבחר'}</h2>
       <ResponsiveContainer width="100%" height={260}>
         <LineChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -26,7 +26,7 @@ export default function AnalyticsLineChart({ data }: { data: DayStat[] }) {
             formatter={(val, name) =>
               name === 'revenue'
                 ? [formatPrice(Number(val)), 'הכנסות']
-                : [val, 'הזמנות']
+                : [val, 'רכישות']
             }
             labelStyle={{ fontFamily: 'Heebo, Arial', direction: 'rtl' }}
             contentStyle={{ borderRadius: 8, fontSize: 13 }}
@@ -37,7 +37,7 @@ export default function AnalyticsLineChart({ data }: { data: DayStat[] }) {
       </ResponsiveContainer>
       <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: 12 }}>
         <span style={{ fontSize: 12, color: '#555', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 24, height: 3, background: navy, display: 'inline-block', borderRadius: 2 }} /> הזמנות
+          <span style={{ width: 24, height: 3, background: navy, display: 'inline-block', borderRadius: 2 }} /> רכישות
         </span>
         <span style={{ fontSize: 12, color: '#555', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 24, height: 3, background: gold, display: 'inline-block', borderRadius: 2, borderTop: '2px dashed ' + gold }} /> הכנסות (₪)

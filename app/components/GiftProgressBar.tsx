@@ -9,7 +9,7 @@ export default function GiftProgressBar() {
   const router   = useRouter();
   const { giftEnabled, giftThreshold, total, amountToGift, giftEligible, count } = useCart();
 
-  const visible = giftEnabled && total > 0 && !pathname.startsWith('/checkout');
+  const visible = giftEnabled && total > 0 && !pathname.startsWith('/checkout') && !pathname.startsWith('/admin');
 
   useEffect(() => {
     document.body.classList.toggle('gift-bar-active', visible);
