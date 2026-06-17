@@ -7,6 +7,9 @@ import { db } from '../firebase';
 export const KIPPOT_DISCOUNT_QTY  = 100;  // minimum kippot units for 30% off
 export const KIPPOT_DISCOUNT_RATE = 0.30; // 30% off regular kippot items
 
+// ── Shipping constant — single source of truth used in cart + checkout ────────
+export const SHIPPING_REGULAR = 35;
+
 // ── Event print tiered pricing (A1) ──────────────────────────────────────────
 // Applies to print-service items (cat='הדפסה') attached to event kippot orders.
 export function getEventPrintPricePerUnit(qty: number): number {
@@ -82,6 +85,15 @@ interface CartContextType {
   amountToGift:  number;
   selectedGift:  string | null;
   setSelectedGift: (id: string | null) => void;
+  // ── coupon — shared between cart and checkout ─────────────────────────────
+  appliedCoupon: { code: string; discount: number; type: 'percent' | 'fixed' } | null;
+  setAppliedCoupon: (c: { code: string; discount: number; type: 'percent' | 'fixed' } | null) => void;
+  couponInput: string;
+  setCouponInput: (v: string) => void;
+  couponLoading: boolean;
+  couponError: string;
+  applyCoupon: () => Promise<void>;
+  discountAmount: number;
 }
 
 // ── Bundle promo parser ────────────────────────────────────────────────────────
@@ -214,6 +226,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [giftEnabled,   setGiftEnabled]   = useState(false);
   const [giftThreshold, setGiftThreshold] = useState(250);
 
+  // ── Coupon state — shared between cart page and checkout page ─────────────
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' } | null>(null);
+  const [couponInput, setCouponInput] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+
   useEffect(() => {
     getDoc(doc(db, 'siteConfig', 'gifts'))
       .then(snap => {
@@ -269,6 +287,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   function clearCart() {
     setItems([]);
     setSelectedGift(null);
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError('');
   }
 
   const regularTotal = items.reduce((sum, x) => sum + x.price * x.quantity, 0);
@@ -293,6 +314,36 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!giftEligible && selectedGift) setSelectedGift(null);
   }, [giftEligible, selectedGift]);
 
+  // ── Coupon discount — same formula as checkout ────────────────────────────
+  const discountAmount = appliedCoupon
+    ? appliedCoupon.type === 'fixed'
+      ? Math.min(appliedCoupon.discount, discountableTotal)
+      : Math.round(discountableTotal * appliedCoupon.discount / 100 * 100) / 100
+    : 0;
+
+  async function applyCoupon() {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    if (appliedCoupon) { setCouponError('קופון כבר מוחל'); return; }
+    setCouponLoading(true); setCouponError('');
+    try {
+      const snap = await getDoc(doc(db, 'coupons', code));
+      if (!snap.exists()) { setCouponError('קוד קופון לא נמצא'); return; }
+      const data = snap.data();
+      if (!data.active) { setCouponError('קוד הקופון אינו פעיל'); return; }
+      if (data.expiresAt && new Date(data.expiresAt) < new Date()) { setCouponError('קוד הקופון פג תוקף'); return; }
+      if (data.minOrder && total < data.minOrder) { setCouponError(`קופון זה תקף להזמנות מעל ₪${data.minOrder}`); return; }
+      // A2: single-use coupon check
+      if (data.singleUse && Array.isArray(data.usedBy) && data.usedBy.length > 0) {
+        setCouponError('קוד קופון כבר נוצל'); return;
+      }
+      const couponType: 'percent' | 'fixed' = data.type === 'fixed' ? 'fixed' : 'percent';
+      setAppliedCoupon({ code, discount: data.discount, type: couponType });
+      setCouponInput('');
+    } catch { setCouponError('שגיאה בבדיקת הקופון'); }
+    finally { setCouponLoading(false); }
+  }
+
   return (
     <CartContext.Provider value={{
       items, addItem, removeItem, updateQty, clearCart,
@@ -302,6 +353,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       discountableTotal,
       totalCost, totalProfit, profitPercent,
       giftEnabled, giftThreshold, giftEligible, amountToGift, selectedGift, setSelectedGift,
+      appliedCoupon, setAppliedCoupon,
+      couponInput, setCouponInput,
+      couponLoading, couponError,
+      applyCoupon,
+      discountAmount,
     }}>
       {children}
     </CartContext.Provider>

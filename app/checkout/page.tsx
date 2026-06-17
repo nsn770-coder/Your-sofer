@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart, CartItem } from '../contexts/CartContext';
+import { useCart, CartItem, SHIPPING_REGULAR } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
 import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -64,8 +64,6 @@ function Input({ label, name, value, onChange, onBlur: onBlurProp, placeholder, 
     </div>
   );
 }
-
-const SHIPPING_REGULAR = 35;
 
 interface SiteSettings {
   checkoutEnabled: boolean;
@@ -242,7 +240,12 @@ function OrderSummary({
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { items, total, kippotDiscountActive, kippotDiscountAmount, bundleDiscountAmount, discountableTotal, giftEnabled, giftThreshold, giftEligible, amountToGift, selectedGift, setSelectedGift } = useCart();
+  const {
+    items, total, kippotDiscountActive, kippotDiscountAmount, bundleDiscountAmount,
+    giftEnabled, giftThreshold, giftEligible, amountToGift, selectedGift, setSelectedGift,
+    appliedCoupon, setAppliedCoupon, couponInput, setCouponInput, applyCoupon, couponLoading, couponError,
+    discountAmount,
+  } = useCart();
   const { shaliach, refCode } = useShaliach();
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -260,10 +263,6 @@ export default function CheckoutPage() {
   const formRef = useRef(form);
   useEffect(() => { formRef.current = form; }, [form]);
   const abandonedSavedRef = useRef(false);
-  const [couponInput, setCouponInput] = useState('');
-  const [couponLoading, setCouponLoading] = useState(false);
-  const [couponError, setCouponError] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' } | null>(null);
   const [giftOptions, setGiftOptions] = useState<{ id: string; name: string; imgUrl?: string; productId?: string }[]>([]);
 
   // Fetch site settings (checkout enabled/disabled)
@@ -377,38 +376,7 @@ export default function CheckoutPage() {
       .catch(e => console.error('[checkout] partial abandoned_cart FAILED:', e));
   }
 
-  async function applyCoupon() {
-    const code = couponInput.trim().toUpperCase();
-    if (!code) return;
-    // A2: prevent double-application in same session
-    if (appliedCoupon) { setCouponError('קופון כבר מוחל'); return; }
-    setCouponLoading(true); setCouponError('');
-    try {
-      const snap = await getDoc(doc(db, 'coupons', code));
-      if (!snap.exists()) { setCouponError('קוד קופון לא נמצא'); return; }
-      const data = snap.data();
-      if (!data.active) { setCouponError('קוד הקופון אינו פעיל'); return; }
-      if (data.expiresAt && new Date(data.expiresAt) < new Date()) { setCouponError('קוד הקופון פג תוקף'); return; }
-      if (data.minOrder && total < data.minOrder) { setCouponError(`קופון זה תקף להזמנות מעל ₪${data.minOrder}`); return; }
-      // A2: single-use coupon check
-      if (data.singleUse && Array.isArray(data.usedBy) && data.usedBy.length > 0) {
-        setCouponError('קוד קופון כבר נוצל'); return;
-      }
-      const couponType: 'percent' | 'fixed' = data.type === 'fixed' ? 'fixed' : 'percent';
-      setAppliedCoupon({ code, discount: data.discount, type: couponType });
-      setCouponInput('');
-    } catch { setCouponError('שגיאה בבדיקת הקופון'); }
-    finally { setCouponLoading(false); }
-  }
-
   const shippingCost = SHIPPING_REGULAR;
-  // A2: always use discountableTotal — excludes kippot (when 30% active), bundle items, print-service
-  const couponBase     = discountableTotal;
-  const discountAmount = appliedCoupon
-    ? appliedCoupon.type === 'fixed'
-      ? Math.min(appliedCoupon.discount, couponBase)
-      : Math.round(couponBase * appliedCoupon.discount / 100 * 100) / 100
-    : 0;
   const finalTotal = total - discountAmount + shippingCost;
 
   async function handleSubmit() {
@@ -535,9 +503,13 @@ export default function CheckoutPage() {
 
         {/* Shipping form */}
         <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', width: '100%', maxWidth: '100%', boxSizing: 'border-box', minWidth: 0 }}>
+          {/* Form header with call-to-action subtitle */}
           <div style={{ background: '#f8f6f2', borderBottom: '1px solid #e8e2d8', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#C5A028', color: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>📦</div>
-            <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>פרטי משלוח</h2>
+            <div>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>פרטי משלוח</h2>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#C5A028', marginTop: 3 }}>למלא פרטים ולהתקדם לרכישה</div>
+            </div>
           </div>
           <div style={{ padding: '24px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
@@ -596,13 +568,20 @@ export default function CheckoutPage() {
               </div>
             )}
 
+            {/* Call-to-action heading above payment button */}
+            {siteSettings.checkoutEnabled && (
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', textAlign: 'center', marginBottom: 10 }}>
+                למלא פרטים ולהתקדם לרכישה
+              </div>
+            )}
+
             <button
               onClick={() => siteSettings.checkoutEnabled && isFormValid && !loading && handleSubmit()}
               disabled={loading || !isFormValid || !siteSettings.checkoutEnabled}
               style={{
                 width: '100%',
-                background: !siteSettings.checkoutEnabled ? '#d1d5db' : loading ? '#888' : isFormValid ? '#C9A227' : '#e0e0e0',
-                color: !siteSettings.checkoutEnabled ? '#9ca3af' : loading ? '#fff' : isFormValid ? '#1F3D8F' : '#999',
+                background: !siteSettings.checkoutEnabled ? '#d1d5db' : loading ? '#888' : '#C9A227',
+                color: !siteSettings.checkoutEnabled ? '#9ca3af' : loading ? '#fff' : '#1F3D8F',
                 border: 'none', borderRadius: 14, height: 52, fontSize: 16, fontWeight: 800,
                 cursor: (siteSettings.checkoutEnabled && isFormValid && !loading) ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -613,7 +592,7 @@ export default function CheckoutPage() {
                 ? <>🔒 הרכישות אינן זמינות כעת</>
                 : loading
                   ? <><IconLoader /> מכין תשלום...</>
-                  : <><IconCreditCard size={16} color={isFormValid ? '#1F3D8F' : '#999'} /> מעבר מאובטח לתשלום באשראי</>
+                  : <><IconCreditCard size={16} color="#1F3D8F" /> מעבר מאובטח לתשלום באשראי</>
               }
             </button>
             {siteSettings.checkoutEnabled && (

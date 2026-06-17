@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart } from '../contexts/CartContext';
+import { useCart, SHIPPING_REGULAR } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -51,6 +51,8 @@ export default function CartPage() {
     items, removeItem, updateQty, total,
     kippotDiscountActive, kippotDiscountAmount, bundleDiscountAmount,
     giftEnabled, giftEligible, giftThreshold, amountToGift, selectedGift, setSelectedGift,
+    appliedCoupon, setAppliedCoupon, couponInput, setCouponInput, applyCoupon, couponLoading, couponError,
+    discountAmount,
   } = useCart();
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
@@ -106,6 +108,9 @@ export default function CartPage() {
   }, [giftEligible, giftOptions, selectedGift, setSelectedGift]);
 
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
+
+  // Final total shown in cart: products + shipping - coupon
+  const cartFinalTotal = total - discountAmount + SHIPPING_REGULAR;
 
   return (
     <div style={{
@@ -358,6 +363,7 @@ export default function CartPage() {
               position: isMobile ? 'static' : 'sticky',
               top: 20,
             }}>
+              {/* Pricing breakdown */}
               <div style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
                   <span style={{ color: '#555' }}>סכום ביניים ({totalItems} פריטים):</span>
@@ -376,19 +382,61 @@ export default function CartPage() {
                   </div>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: '#555' }}>משלוח:</span>
-                  <span style={{ fontWeight: 700, color: '#555' }}>יחושב בקופה</span>
+                  <span style={{ color: '#555' }}>משלוח עד הבית:</span>
+                  <span style={{ fontWeight: 700, color: '#1a1a1a' }}>{formatPrice(SHIPPING_REGULAR)}</span>
                 </div>
+                {appliedCoupon && discountAmount > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
+                    <span>🏷️ קופון ({appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`}):</span>
+                    <span>-{formatPrice(discountAmount)}</span>
+                  </div>
+                )}
                 <div style={{ borderTop: '1px solid #eee', paddingTop: 12, marginTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 900 }}>
-                    <span>סכום ביניים:</span>
-                    <span style={{ color: '#1a1a1a' }}>{formatPrice(total)}</span>
+                    <span>סה"כ לתשלום:</span>
+                    <span style={{ color: '#1a1a1a' }}>{formatPrice(cartFinalTotal)}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע״מ · עלות משלוח תחושב בקופה</div>
+                  <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע״מ</div>
                 </div>
               </div>
 
-              {/* A4: Gift selector */}
+              {/* Coupon section */}
+              <div style={{ marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid #eee' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8 }}>🏷️ קוד קופון</div>
+                {kippotDiscountActive && (
+                  <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#15803d', marginBottom: 8 }}>
+                    ✓ קיבלת הנחת ענק של 30% — גדולה יותר מ-10% הקופון!
+                  </div>
+                )}
+                {appliedCoupon ? (
+                  <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700 }}>
+                      ✓ {appliedCoupon.code} — {appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה
+                    </span>
+                    <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 2px' }}>×</button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <input
+                      value={couponInput}
+                      onChange={e => setCouponInput(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && applyCoupon()}
+                      placeholder="הזן קוד קופון"
+                      style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }}
+                    />
+                    <button
+                      onClick={applyCoupon}
+                      disabled={couponLoading}
+                      style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: couponLoading ? 'default' : 'pointer', opacity: couponLoading ? 0.5 : 1, whiteSpace: 'nowrap' }}
+                    >
+                      {couponLoading ? '...' : 'החל'}
+                    </button>
+                  </div>
+                )}
+                {couponError && <div style={{ fontSize: 11, color: '#dc2626', marginTop: 5 }}>{couponError}</div>}
+              </div>
+
+              {/* Gift selector */}
               {giftEnabled && (
                 <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #eee' }}>
                   {giftEligible && giftOptions.length > 0 ? (
