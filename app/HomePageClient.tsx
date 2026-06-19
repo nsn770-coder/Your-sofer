@@ -375,7 +375,9 @@ export default function HomePageClient() {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
+  const [bsVisible, setBsVisible] = useState(false);
   const videoWrapperRef = useRef<HTMLDivElement>(null);
+  const bsSectionRef = useRef<HTMLDivElement>(null);
   const cardsRef   = useRef<HTMLDivElement>(null);
   const router     = useRouter();
   const { shaliach } = useShaliach();
@@ -656,6 +658,20 @@ export default function HomePageClient() {
     obs.observe(el);
     return () => obs.disconnect();
   }, [videoStarted]);
+
+  // Section-level IO for BestSellers: preload first 2 videos when section is 300px away
+  useEffect(() => {
+    const el = bsSectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) { setBsVisible(true); obs.disconnect(); }
+      },
+      { rootMargin: '700px 0px' },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   // popups disabled
   useEffect(() => {}, []);
@@ -1315,12 +1331,12 @@ export default function HomePageClient() {
       {/* ── 5. Featured products horizontal scroll ── */}
       <div style={{ minHeight: isMobile ? 290 : 330 }}>
       {featuredProducts.length > 0 && (
-        <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 0' : '88px 0', direction: 'rtl' }}>
+        <div ref={bsSectionRef} style={{ background: '#F8F6F1', padding: isMobile ? '56px 0' : '88px 0', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 20 }}>
             <h2 style={{ fontSize: isMobile ? 20 : 26, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>המוצרים הנמכרים ביותר</h2>
           </div>
           <div style={{ display: 'flex', overflowX: 'auto', gap: 16, padding: '0 20px 12px', scrollbarWidth: 'none' } as React.CSSProperties}>
-            {featuredProducts.map(p => {
+            {featuredProducts.map((p, idx) => {
               const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
               return (
                 <div key={p.id}
@@ -1329,7 +1345,7 @@ export default function HomePageClient() {
                   onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.12)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)'; }}
                 >
-                  <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl}>
+                  <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
                     {p.isBestSeller && (
                       <div style={{ position: 'absolute', top: 7, right: 7, zIndex: 1, background: '#fff3e0', border: '1px solid #e8920a', borderRadius: 20, fontSize: 10, fontWeight: 800, color: '#c45e00', padding: '2px 8px', letterSpacing: '0.01em' }}>
                         הכי נמכר

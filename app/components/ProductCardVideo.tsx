@@ -1,76 +1,99 @@
 'use client';
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
 import Image from 'next/image';
 
 interface Props {
   imgSrc: string;
   alt: string;
   videoUrl?: string;
-  children?: React.ReactNode; // badge / overlays
+  index?: number;
+  preloadTrigger?: boolean; // for index 0,1 — fires when section IO triggers
+  children?: React.ReactNode;
 }
 
-// Renders the 155px media area of a product card.
-// If videoUrl is set and the card is visible for >1s, the video auto-plays.
-// When the card leaves the viewport the video pauses and resets.
-export default function ProductCardVideo({ imgSrc, alt, videoUrl, children }: Props) {
+function injectCloudinaryParams(url: string): string {
+  if (!url || url.includes('f_auto')) return url;
+  return url.replace('/upload/', '/upload/f_auto,q_auto/');
+}
+
+export default function ProductCardVideo({
+  imgSrc, alt, videoUrl, index = 0, preloadTrigger = false, children,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef     = useRef<HTMLVideoElement>(null);
-  const timerRef     = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [playing, setPlaying] = useState(false);
+  const imgLayerRef  = useRef<HTMLDivElement>(null);
+  const playedRef    = useRef(false); // gates initial load() only, not play/pause
 
-  const startPlay = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.play().catch(() => {}); // swallow autoplay-policy rejections
-    setPlaying(true);
-  }, []);
+  const optimizedUrl = videoUrl ? injectCloudinaryParams(videoUrl) : undefined;
+  const isEager      = index < 2;
 
-  const stopPlay = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.pause();
-    video.currentTime = 0;
-    setPlaying(false);
-  }, []);
-
+  // Eager videos (index 0,1): load+play when section IO fires, then pause/resume on visibility
   useEffect(() => {
-    if (!videoUrl) return;
+    if (!isEager || !preloadTrigger || !optimizedUrl) return;
+    const video = videoRef.current;
+    const container = containerRef.current;
+    if (!video || !container || playedRef.current) return;
+    playedRef.current = true;
+    video.preload = 'auto';
+    video.load();
+    video.play().catch(() => {});
+    video.addEventListener('playing', () => {
+      video.style.opacity = '1';
+      if (imgLayerRef.current) imgLayerRef.current.style.opacity = '0';
+    }, { once: true });
+
+    // Pause when scrolled off-screen, resume when back in view
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        const v = videoRef.current;
+        if (!v) return;
+        if (entry.isIntersecting) { v.play().catch(() => {}); }
+        else { v.pause(); }
+      },
+      { threshold: 0.1 },
+    );
+    obs.observe(container);
+    return () => obs.disconnect();
+  }, [isEager, preloadTrigger, optimizedUrl]);
+
+  // Lazy videos (index >= 2): load+play on first enter, pause on exit, resume on re-enter
+  useEffect(() => {
+    if (isEager || !optimizedUrl) return;
     const container = containerRef.current;
     if (!container) return;
 
-    const observer = new IntersectionObserver(
+    const obs = new IntersectionObserver(
       ([entry]) => {
+        const video = videoRef.current;
+        if (!video) return;
         if (entry.isIntersecting) {
-          // Wait 1 s of continuous visibility before playing
-          timerRef.current = setTimeout(startPlay, 1000);
-        } else {
-          if (timerRef.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = null;
+          if (!playedRef.current) {
+            playedRef.current = true;
+            video.load();
+            video.play().catch(() => {});
+            video.addEventListener('playing', () => {
+              video.style.opacity = '1';
+              if (imgLayerRef.current) imgLayerRef.current.style.opacity = '0';
+            }, { once: true });
+          } else {
+            video.play().catch(() => {});
           }
-          stopPlay();
+        } else {
+          video.pause();
         }
       },
-      { threshold: 0.6 },
+      { rootMargin: '400px 0px', threshold: 0 },
     );
 
-    observer.observe(container);
-    return () => {
-      observer.disconnect();
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [videoUrl, startPlay, stopPlay]);
+    obs.observe(container);
+    return () => obs.disconnect();
+  }, [isEager, optimizedUrl]);
 
   return (
     <div ref={containerRef} style={{ height: 155, overflow: 'hidden', position: 'relative' }}>
 
-      {/* ── Image layer — fades out when video plays ── */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        opacity: playing ? 0 : 1,
-        transition: 'opacity 0.35s',
-        pointerEvents: playing ? 'none' : 'auto',
-      }}>
+      {/* Image layer — visible by default, fades out when video starts playing */}
+      <div ref={imgLayerRef} style={{ position: 'absolute', inset: 0, transition: 'opacity 0.35s' }}>
         {imgSrc ? (
           <Image
             fill unoptimized loading="lazy"
@@ -85,26 +108,27 @@ export default function ProductCardVideo({ imgSrc, alt, videoUrl, children }: Pr
         )}
       </div>
 
-      {/* ── Video layer — rendered only when videoUrl exists, fades in on play ── */}
-      {videoUrl && (
+      {/* Video layer — hidden until playing, fades in on play */}
+      {optimizedUrl && (
         <video
           ref={videoRef}
-          src={videoUrl}
+          src={optimizedUrl}
           muted
           playsInline
           loop
           preload="none"
+          poster={imgSrc}
           style={{
             position: 'absolute', inset: 0,
             width: '100%', height: '100%',
             objectFit: 'cover',
-            opacity: playing ? 1 : 0,
+            opacity: 0,
             transition: 'opacity 0.35s',
           }}
         />
       )}
 
-      {/* ── Badge / overlay slot (e.g. "הכי נמכר") ── */}
+      {/* Badge / overlay slot */}
       {children}
     </div>
   );
