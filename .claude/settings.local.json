@@ -199,7 +199,16 @@
       "Bash(findstr -i \"moment\\\\|wedding\\\\|event\\\\|lifeEvent\\\\|life-event\")",
       "Bash(Select-Object Name, FullName)",
       "PowerShell(Set-Location \"C:\\\\Users\\\\Owner\\\\Downloads\\\\projects\\\\Your-sofer\"; powershell -ExecutionPolicy Bypass -File \"scripts\\\\replace_wa.ps1\")",
-      "Bash(del scripts\\\\replace_wa.ps1)"
+      "Bash(del scripts\\\\replace_wa.ps1)",
+      "Bash(head -c 300 app/scripts/serviceAccountKey.json)",
+      "Bash(head -c 300 serviceAccountKey.json.json)",
+      "Bash(npx playwright *)",
+      "Bash(echo \"---DIFFSTATUS:$?\")",
+      "Bash(powershell -c \"echo test\")",
+      "WebFetch(domain:help.sumit.co.il)",
+      "WebFetch(domain:app.sumit.co.il)",
+      "WebFetch(domain:plugins.trac.wordpress.org)",
+      "Bash(unzip -o -q officeguy.zip -d officeguy)"
     ]
   }
 }

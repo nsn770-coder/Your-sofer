@@ -1439,7 +1439,7 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
 }
 
 const ORDER_STATUSES: { value: string; label: string; color: string }[] = [
-  { value: 'new',        label: '⏳ חדש',            color: 'bg-yellow-100 text-yellow-700' },
+  { value: 'paid',       label: '⏳ חדש',            color: 'bg-yellow-100 text-yellow-700' },
   { value: 'pending',    label: '🕐 ממתין',           color: 'bg-orange-100 text-orange-700' },
   { value: 'magiah',     label: '✅ מגיע',             color: 'bg-teal-100 text-teal-700' },
   { value: 'sofer',      label: '✍️ אצל הסופר',       color: 'bg-blue-100 text-blue-700' },
@@ -1746,6 +1746,14 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
     return ORDER_STATUSES.find(s => s.value === val) ?? { label: val, color: 'bg-gray-100 text-gray-600' };
   }
 
+  function formatOrderDate(o: Order): string {
+    if (!o.createdAt) return '—';
+    const d = new Date(o.createdAt.seconds * 1000);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${dd}/${mm}/${d.getFullYear()}`;
+  }
+
   const cancelledCount = orders.filter(o => o.status === 'cancelled').length;
   const activeCount = orders.filter(o => o.status !== 'cancelled').length;
   const filtersActive = statusFilter !== 'all' || !!dateFrom || !!dateTo;
@@ -1834,6 +1842,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
           <thead className="bg-gray-50">
             <tr>
               <th className="p-3 text-right">מספר הזמנה</th>
+              <th className="p-3 text-right">תאריך הזמנה</th>
               <th className="p-3 text-right">לקוח</th>
               <th className="p-3 text-right">סכום</th>
               <th className="p-3 text-right">שליח</th>
@@ -1844,7 +1853,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
           <tbody>
             {visibleOrders.length === 0 && (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-gray-400">
+                <td colSpan={7} className="p-8 text-center text-gray-400">
                   {filtersActive ? 'אין הזמנות התואמות לסינון' : (showCancelled ? 'אין הזמנות מבוטלות' : 'אין הזמנות פעילות')}
                 </td>
               </tr>
@@ -1865,6 +1874,9 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                       {isCancelled && (
                         <span className="mr-2 inline-block bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">בוטל</span>
                       )}
+                    </td>
+                    <td className="p-3 text-xs text-gray-500">
+                      {formatOrderDate(o)}
                     </td>
                     <td className={`p-3 font-bold ${isCancelled ? 'text-gray-400' : ''}`}>{o.customerName}</td>
                     <td className={`p-3 font-bold ${isCancelled ? 'text-gray-400 line-through' : 'text-green-700'}`}>{formatPrice(o.total)}</td>
@@ -1912,7 +1924,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                   </tr>
                   {isExpanded && (
                     <tr className="bg-blue-50 border-t border-blue-100">
-                      <td colSpan={6} className="px-5 py-4" dir="rtl">
+                      <td colSpan={7} className="px-5 py-4" dir="rtl">
                         {isEditing && editDraft ? (
                           <div className="space-y-3">
                             {/* ── Feature 4: payment lock warning ── */}

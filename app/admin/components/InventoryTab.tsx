@@ -188,7 +188,7 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
       form.append('image', file);
       const res = await fetch('/api/parse-receipt', { method: 'POST', body: form });
       const data = await res.json();
-      if (data.error) { alert('שגיאה בניתוח: ' + data.error); return; }
+      if (!data.success) { alert('שגיאה בניתוח: ' + (data.error ?? 'שגיאה לא ידועה')); return; }
       setParsedInvoice(data as ParsedInvoice);
     } catch (err) {
       alert('שגיאה בשליחה');

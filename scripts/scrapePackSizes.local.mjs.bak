@@ -1,0 +1,263 @@
+/**
+ * scrapePackSizes.mjs
+ *
+ * שלב א'+ב' (ברירת מחדל): מיפוי תת-קטגוריות + טבלת דגימה — ללא סריקה
+ * שלב ג':                  הרץ עם --scrape אחרי אישור
+ *
+ * קרא: scripts/supplier_subcategory_skus.json
+ * כתיבה: scripts/supplier_pack_sizes_sample.json (רק בשלב ג')
+ * Credentials: .env.local ← SUPPLIER_EMAIL, SUPPLIER_PASSWORD
+ */
+
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const SCRAPE = process.argv.includes('--scrape');
+
+const SKUS_FILE   = join(__dirname, 'supplier_subcategory_skus.json');
+const OUTPUT_FILE = join(__dirname, 'supplier_pack_sizes_sample.json');
+const ENV_FILE    = join(__dirname, '..', '.env.local');
+const BASE_URL    = 'https://www.israel-judaica.com';
+const SEED        = 42;
+const MIN_SAMPLE  = 3;
+const DELAY_MS    = 900;      // ≥800ms בין מוצרים
+const SAVE_EVERY  = 25;
+const MAX_CONSEC_ERRORS = 10;
+
+// ─── א': טעינת נתונים ──────────────────────────────────────────────────────────
+
+if (!existsSync(SKUS_FILE)) {
+  console.error(`✗ לא נמצא: ${SKUS_FILE}`);
+  process.exit(1);
+}
+
+const raw = JSON.parse(readFileSync(SKUS_FILE, 'utf8'));
+
+const subcategories = {};
+for (const [code, info] of Object.entries(raw)) {
+  if (Array.isArray(info.skus) && info.skus.length > 0) {
+    subcategories[code] = { name: info.name || `קוד ${code}`, skus: info.skus };
+  }
+}
+
+const totalSubcats = Object.keys(subcategories).length;
+const totalSkus    = Object.values(subcategories).reduce((s, c) => s + c.skus.length, 0);
+
+console.log('\n══════════════════════════════════════════════════════════════════');
+console.log('  שלב א\' — מיפוי תת-קטגוריות');
+console.log('══════════════════════════════════════════════════════════════════');
+console.log(`  מקור:           supplier_subcategory_skus.json`);
+console.log(`  תת-קטגוריות:   ${totalSubcats}`);
+console.log(`  סה"כ SKUs:      ${totalSkus}`);
+
+// פרסם טבלת תת-קטגוריות לפי קוד
+console.log('\n  קוד   | שם תת-קטגוריה                          | SKUs');
+console.log('  ──────┼─────────────────────────────────────────┼──────');
+for (const [code, { name, skus }] of Object.entries(subcategories)) {
+  console.log(`  ${code.padEnd(5)} | ${name.padEnd(40)} | ${skus.length}`);
+}
+
+// ─── ב': דגימה ─────────────────────────────────────────────────────────────────
+
+function mulberry32(seed) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededSample(arr, n, seed) {
+  const rng = mulberry32(seed);
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, n);
+}
+
+const plan = {};
+for (const [code, { name, skus }] of Object.entries(subcategories)) {
+  const total       = skus.length;
+  const rawN        = Math.ceil(total * 0.2);
+  const sampleCount = Math.max(rawN, Math.min(MIN_SAMPLE, total));
+  plan[code] = { name, total, sampleCount, sample: seededSample(skus, sampleCount, SEED + parseInt(code, 10)) };
+}
+
+const totalSampled = Object.values(plan).reduce((s, c) => s + c.sampleCount, 0);
+
+console.log('\n══════════════════════════════════════════════════════════════════');
+console.log('  שלב ב\' — תוכנית דגימה  (seed=42, מינימום 3 לתת-קטגוריה)');
+console.log('══════════════════════════════════════════════════════════════════');
+console.log(`  ${'תת-קטגוריה'.padEnd(40)} | ${'סה"כ'.padStart(5)} | ${'נדגמו'.padStart(6)} | ${' %'.padStart(4)}`);
+console.log('  ' + '─'.repeat(62));
+for (const { name, total, sampleCount } of Object.values(plan)) {
+  const pct = ((sampleCount / total) * 100).toFixed(0).padStart(3);
+  console.log(`  ${name.padEnd(40)} | ${String(total).padStart(5)} | ${String(sampleCount).padStart(6)} | ${pct}%`);
+}
+console.log('  ' + '─'.repeat(62));
+console.log(`  ${'סה"כ'.padEnd(40)} | ${String(totalSkus).padStart(5)} | ${String(totalSampled).padStart(6)} |`);
+console.log('\n  ► להמשך סריקה הרץ:  node scripts/scrapePackSizes.mjs --scrape');
+console.log('    (קודם: npm install playwright && npx playwright install chromium)');
+console.log('    (קודם: הוסף SUPPLIER_EMAIL ו-SUPPLIER_PASSWORD ל-.env.local)\n');
+
+if (!SCRAPE) process.exit(0);
+
+// ─── ג': סריקה ─────────────────────────────────────────────────────────────────
+
+// בדיקת credentials
+function loadEnv(path) {
+  const vars = {};
+  if (!existsSync(path)) return vars;
+  const lines = readFileSync(path, 'utf8').replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const idx = trimmed.indexOf('=');
+    if (idx < 1) continue;
+    vars[trimmed.slice(0, idx).trim()] = trimmed.slice(idx + 1).trim();
+  }
+  return vars;
+}
+
+const env = loadEnv(ENV_FILE);
+const EMAIL    = env['SUPPLIER_EMAIL'];
+const PASSWORD = env['SUPPLIER_PASSWORD'];
+
+if (!EMAIL || !PASSWORD) {
+  console.error('✗ חסרים SUPPLIER_EMAIL / SUPPLIER_PASSWORD ב-.env.local — עצור.');
+  process.exit(1);
+}
+
+// טעינת תוצאות קיימות (resume)
+let results = {};
+if (existsSync(OUTPUT_FILE)) {
+  try {
+    results = JSON.parse(readFileSync(OUTPUT_FILE, 'utf8'));
+    const done = Object.keys(results).length;
+    console.log(`  ↻ resume: ${done} מוצרים כבר סרוקים — מדלג עליהם`);
+  } catch { results = {}; }
+}
+
+// בניית רשימת עבודה (הכל ב-plan, ללא כאלה שכבר ב-results)
+const workQueue = [];
+for (const [code, { name, sample }] of Object.entries(plan)) {
+  for (const sku of sample) {
+    if (!results[sku]) workQueue.push({ sku, subCategory: name });
+  }
+}
+console.log(`  עבודה: ${workQueue.length} מוצרים לסריקה`);
+
+// playwright
+const { chromium } = await import('playwright');
+
+const browser = await chromium.launch({ headless: true });
+const context = await browser.newContext({
+  locale: 'he-IL',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+});
+const page = await context.newPage();
+
+// Login
+console.log('\n  ← מתחבר לאתר…');
+try {
+  await page.goto(`${BASE_URL}/index.php?option=com_art&view=login&lang=he`, { waitUntil: 'domcontentloaded' });
+  await page.fill('input[name="username"], input[type="email"]', EMAIL);
+  await page.fill('input[name="password"], input[type="password"]', PASSWORD);
+  await page.click('button[type="submit"], input[type="submit"]');
+  await page.waitForLoadState('domcontentloaded');
+
+  // בדיקת הצלחה
+  const url = page.url();
+  const body = await page.content();
+  const loggedIn = !body.includes('שגיאה בהתחברות') && !body.includes('incorrect') && !url.includes('login');
+  if (!loggedIn) {
+    console.error('✗ התחברות נכשלה — בדוק credentials. עצור.');
+    await browser.close();
+    process.exit(1);
+  }
+  console.log('  ✓ מחובר');
+} catch (err) {
+  console.error('✗ שגיאה בהתחברות:', err.message);
+  await browser.close();
+  process.exit(1);
+}
+
+// פונקציית שמירה
+function saveResults() {
+  writeFileSync(OUTPUT_FILE, JSON.stringify(results, null, 2), 'utf8');
+}
+
+// לולאת סריקה
+const PACK_RE = /נמכר\s+באריזה\s+של\s+(\d+)\s+יחידות/;
+let consecErrors = 0;
+let scannedSince = 0;
+
+for (let i = 0; i < workQueue.length; i++) {
+  const { sku, subCategory } = workQueue[i];
+  const url = `${BASE_URL}/index.php?option=com_art&view=product&sku=${encodeURIComponent(sku)}&lang=he`;
+
+  try {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    const body = await page.content();
+
+    const match = PACK_RE.exec(body);
+    const packSize = match ? parseInt(match[1], 10) : 1;
+
+    // שם המוצר מה-<title> או h1
+    let name = '';
+    try { name = await page.$eval('h1', el => el.textContent.trim()); } catch {}
+
+    results[sku] = { packSize, subCategory, name };
+    consecErrors = 0;
+    scannedSince++;
+
+    console.log(`  [${i + 1}/${workQueue.length}] ${sku} | pack=${packSize} | ${subCategory} | ${name.slice(0, 35)}`);
+
+    if (scannedSince % SAVE_EVERY === 0) saveResults();
+
+  } catch (err) {
+    consecErrors++;
+    console.error(`  ✗ [${i + 1}] ${sku}: ${err.message}`);
+    if (consecErrors >= MAX_CONSEC_ERRORS) {
+      console.error(`\n✗ ${MAX_CONSEC_ERRORS} כשלים ברצף — עצור.`);
+      saveResults();
+      await browser.close();
+      process.exit(1);
+    }
+  }
+
+  if (i < workQueue.length - 1) await new Promise(r => setTimeout(r, DELAY_MS));
+}
+
+saveResults();
+await browser.close();
+
+// ─── ד': סיכום ─────────────────────────────────────────────────────────────────
+
+console.log('\n══════════════════════════════════════════════════════════════════');
+console.log('  שלב ד\' — סיכום אינדיקטיבי לפי תת-קטגוריה');
+console.log('══════════════════════════════════════════════════════════════════');
+
+const bySubcat = {};
+for (const { packSize, subCategory } of Object.values(results)) {
+  if (!bySubcat[subCategory]) bySubcat[subCategory] = {};
+  bySubcat[subCategory][packSize] = (bySubcat[subCategory][packSize] || 0) + 1;
+}
+
+for (const [subCat, dist] of Object.entries(bySubcat)) {
+  const total = Object.values(dist).reduce((s, n) => s + n, 0);
+  const mode  = Object.entries(dist).sort((a, b) => b[1] - a[1])[0][0];
+  const distStr = Object.entries(dist)
+    .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
+    .map(([ps, n]) => `${ps}יח×${n}`)
+    .join(', ');
+  console.log(`  ${subCat}`);
+  console.log(`    נדגמו: ${total}  |  mode: ${mode} יח׳  |  ${distStr}`);
+}
+console.log(`\n  ✓ שמור ב: ${OUTPUT_FILE}\n`);
