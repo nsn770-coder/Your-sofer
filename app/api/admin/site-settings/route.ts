@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb } from '@/app/lib/firebase-admin';
+import { getAdminDb } from '@/lib/firebaseAdmin';
 import { verifyAdminToken } from '@/lib/verifyAdmin';
 
 const DEFAULTS = {
