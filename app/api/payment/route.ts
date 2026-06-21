@@ -284,11 +284,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'שגיאה בביצוע התשלום' }, { status: 500 });
     }
 
-    const chargeSucceeded = (data as any)?.Status === 'Success';
-    console.log('[payment] Sumit charge status:', response.status, 'Status field:', (data as any)?.Status);
+    // Sumit's top-level Status field is not a reliable success indicator — the real
+    // confirmation is Data.Payment.ValidPayment (confirmed against production logs,
+    // where a successful charge issuing a final invoice still came back with this shape).
+    const payment = (data as any)?.Data?.Payment;
+    const chargeSucceeded = payment?.ValidPayment === true;
+    console.log('[payment] Sumit charge response (status', response.status, '):', JSON.stringify(data));
 
     if (!chargeSucceeded) {
-      console.error('[payment] Sumit charge failed:', JSON.stringify(data));
       const errorMessage = (data as any)?.UserErrorMessage || (data as any)?.TechnicalErrorMessage || 'התשלום נכשל, נסה כרטיס אחר';
       return NextResponse.json({ error: errorMessage }, { status: 402 });
     }
