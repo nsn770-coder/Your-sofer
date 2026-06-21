@@ -3,12 +3,13 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart, CartItem, SHIPPING_REGULAR } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
-import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
+import { serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 import * as pixel from '@/lib/metaPixel';
+import SumitPaymentForm from '../components/SumitPaymentForm';
 
 function IconLock({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
@@ -36,9 +37,6 @@ function IconTag({ size = 14, color = 'currentColor' }: { size?: number; color?:
 }
 function IconX({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
-}
-function IconLoader() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12a9 9 0 11-6.22-8.56" style={{animation:'spin 1s linear infinite'}}/><style>{`@keyframes spin{from{transform-origin:center;transform:rotate(0)}to{transform-origin:center;transform:rotate(360deg)}}`}</style></svg>;
 }
 function IconHandshake({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>;
@@ -379,60 +377,39 @@ export default function CheckoutPage() {
   const shippingCost = SHIPPING_REGULAR;
   const finalTotal = total - discountAmount + shippingCost;
 
-  async function handleSubmit() {
-    if (!form.name || !form.email || !form.phone || !form.address || !form.city) {
-      alert('נא למלא את כל השדות החובה'); return;
-    }
+  function saveAbandonedCartBeforePayment() {
+    if (!sessionId || items.length === 0) return;
+    const f = formRef.current;
+    setDoc(doc(db, 'abandoned_carts', sessionId), {
+      sessionId,
+      name: f.name, phone: f.phone, email: f.email,
+      address: `${f.address}, ${f.city}`,
+      cartItems: items.map(i => ({
+        id: i.id, name: i.name, price: i.price, quantity: i.quantity,
+        imgUrl: i.imgUrl ?? null,
+        printCustomization: i.printCustomization ?? null,
+      })),
+      cartTotal: total,
+      updatedAt: serverTimestamp(),
+      converted: false,
+      convertedOrderId: null,
+      ...(abandonedSavedRef.current ? {} : { createdAt: serverTimestamp() }),
+    }, { merge: true }).catch(e => console.error('[checkout] abandoned_cart save FAILED:', e));
+  }
 
-    // Save abandoned cart before proceeding to payment (fire-and-forget)
-    if (sessionId && items.length > 0) {
-      const f = formRef.current;
-      setDoc(doc(db, 'abandoned_carts', sessionId), {
-        sessionId,
-        name: f.name, phone: f.phone, email: f.email,
-        address: `${f.address}, ${f.city}`,
-        cartItems: items.map(i => ({
-          id: i.id, name: i.name, price: i.price, quantity: i.quantity,
-          imgUrl: i.imgUrl ?? null,
-          printCustomization: i.printCustomization ?? null,
-        })),
-        cartTotal: total,
-        updatedAt: serverTimestamp(),
-        converted: false,
-        convertedOrderId: null,
-        ...(abandonedSavedRef.current ? {} : { createdAt: serverTimestamp() }),
-      }, { merge: true }).catch(e => console.error('[checkout] abandoned_cart save FAILED:', e));
-    }
-
+  async function handlePaymentToken(singleUseToken: string, paymentsCount: number) {
     setSubmitError(null);
     setLoading(true);
+    saveAbandonedCartBeforePayment();
     try {
-      const orderNumber = 'YS-' + Date.now().toString().slice(-6);
       const commissionPercent = shaliach?.commissionPercent || 0;
-      const commissionAmount = commissionPercent > 0 ? Math.round(total * commissionPercent / 100 * 100) / 100 : 0;
+      const gift = selectedGift ? giftOptions.find(g => g.id === selectedGift) : null;
 
-      const orderRef = await addDoc(collection(db, 'orders'), {
-        orderNumber, customerName: form.name, email: form.email, phone: form.phone,
-        address: `${form.address}, ${form.city}`, notes: form.notes || '',
-        items: [
-          ...items.map(i => ({ id: i.id, productId: i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity, selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null, embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null, printCustomization: i.printCustomization || null })),
-          ...(selectedGift ? (() => { const gift = giftOptions.find(g => g.id === selectedGift); return [{ id: gift?.productId || gift?.id || selectedGift, name: `מתנה: ${gift?.name ?? selectedGift}`, price: 0, quantity: 1, isGift: true, giftSourceId: selectedGift }]; })() : []),
-        ],
-        total: finalTotal, couponCode: appliedCoupon?.code || null, couponDiscount: appliedCoupon ? discountAmount : null,
-        selectedGift: selectedGift || null,
-        kippotDiscount: kippotDiscountAmount > 0 ? kippotDiscountAmount : null,
-        shippingCost, shippingType: 'regular',
-        status: 'pending_payment', createdAt: serverTimestamp(),
-        shaliachRef: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
-        commissionPercent, commissionAmount,
-        guestId: sessionId, sessionId, isGuest: true,
-      });
-
-      const baseUrl = window.location.origin;
       const paymentRes = await fetch('/api/payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          singleUseToken, paymentsCount,
           items: [
             ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '', bundlePromo: i.bundlePromo || undefined })),
             ...(kippotDiscountAmount > 0 ? [{ name: 'הנחת כיפות בר מצווה — 30%', price: -kippotDiscountAmount, quantity: 1, cat: '' }] : []),
@@ -440,22 +417,37 @@ export default function CheckoutPage() {
             ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
           ],
-          total: finalTotal, customer: { name: form.name, email: form.email, phone: form.phone }, orderNumber, orderId: orderRef.id, baseUrl, couponCode: appliedCoupon?.code || undefined,
+          total: finalTotal,
+          customer: { name: form.name, email: form.email, phone: form.phone },
+          couponCode: appliedCoupon?.code || undefined,
+          cartItems: items,
+          address: `${form.address}, ${form.city}`,
+          notes: form.notes || '',
+          selectedGift: selectedGift || null,
+          giftLine: gift ? { id: gift.id, name: gift.name, productId: gift.productId } : null,
+          shippingCost, shippingType: 'regular',
+          sessionId,
+          refCode: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
+          commissionPercent,
         }),
       });
 
       const paymentData = await paymentRes.json();
-      if (paymentData.url) {
-        window.location.href = paymentData.url;
+      if (paymentData.success) {
+        router.push(`/thank-you?order=${paymentData.orderNumber}&orderId=${paymentData.orderId}`);
       } else {
-        throw new Error(paymentData.error || 'שגיאה בקבלת דף תשלום');
+        throw new Error(paymentData.error || 'התשלום נכשל');
       }
     } catch (e: any) {
       setSubmitError('שגיאה: ' + (e.message || 'נסה שוב'));
       console.error(e);
-    } finally {
       setLoading(false);
     }
+  }
+
+  function handlePaymentError(message: string) {
+    setSubmitError(message);
+    setLoading(false);
   }
 
   const isFormValid = !!(form.name && form.email && form.phone && form.address && form.city);
@@ -563,47 +555,37 @@ export default function CheckoutPage() {
                 <IconLock size={15} color="#1a6b3c" />
                 <div>
                   <div style={{ fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>תשלום מאובטח</div>
-                  <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>לאחר לחיצה תועבר לדף תשלום — ויזה, מסטרקארד, ביט ועוד</div>
+                  <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>פרטי האשראי מוצפנים ונשלחים ישירות לחברת הסליקה</div>
                 </div>
               </div>
             )}
 
-            {/* Call-to-action heading above payment button */}
+            {/* Call-to-action heading above card form */}
             {siteSettings.checkoutEnabled && (
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', textAlign: 'center', marginBottom: 10 }}>
-                למלא פרטים ולהתקדם לרכישה
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', textAlign: 'center', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <IconCreditCard size={16} color="#1E3A8A" /> פרטי תשלום
               </div>
             )}
 
-            <button
-              onClick={() => siteSettings.checkoutEnabled && isFormValid && !loading && handleSubmit()}
-              disabled={loading || !isFormValid || !siteSettings.checkoutEnabled}
-              style={{
-                width: '100%',
-                background: !siteSettings.checkoutEnabled ? '#d1d5db' : loading ? '#888' : '#C9A227',
-                color: !siteSettings.checkoutEnabled ? '#9ca3af' : loading ? '#fff' : '#1F3D8F',
-                border: 'none', borderRadius: 14, height: 52, fontSize: 16, fontWeight: 800,
-                cursor: (siteSettings.checkoutEnabled && isFormValid && !loading) ? 'pointer' : 'not-allowed',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                transition: 'background 0.2s',
-              }}
-            >
-              {!siteSettings.checkoutEnabled
-                ? <>🔒 הרכישות אינן זמינות כעת</>
-                : loading
-                  ? <><IconLoader /> מכין תשלום...</>
-                  : <><IconCreditCard size={16} color="#1F3D8F" /> מעבר מאובטח לתשלום באשראי</>
-              }
-            </button>
             {siteSettings.checkoutEnabled && (
-              <>
-                <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', margin: '12px auto 0', maxWidth: 340, lineHeight: 1.6 }}>
-                  בלחיצה תועברו לדף תשלום מאובטח של חברת הסליקה. ההזמנה שלכם נשמרת אצלנו ותחזרו לאתר לאחר התשלום.
-                </p>
-                <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', marginTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 6 }}>
-                  🔒 תשלום מאובטח · 💳 אשראי · ✅ חזרה לאתר לאחר התשלום
+              !isFormValid ? (
+                <div style={{ textAlign: 'center', fontSize: 13, color: '#9ca3af', padding: '12px 0' }}>
+                  למלא את פרטי המשלוח למעלה כדי להמשיך לתשלום
                 </div>
-              </>
+              ) : (
+                <SumitPaymentForm
+                  companyId={Number(process.env.NEXT_PUBLIC_SUMIT_COMPANY_ID)}
+                  apiPublicKey={process.env.NEXT_PUBLIC_SUMIT_API_PUBLIC_KEY || ''}
+                  disabled={loading}
+                  onToken={handlePaymentToken}
+                  onError={handlePaymentError}
+                />
+              )
+            )}
+            {siteSettings.checkoutEnabled && (
+              <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 6 }}>
+                🔒 תשלום מאובטח · 💳 אשראי · ✅ אישור הזמנה מיידי
+              </div>
             )}
           </div>
         </div>

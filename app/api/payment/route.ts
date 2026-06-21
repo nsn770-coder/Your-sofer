@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/app/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import type { CartItem } from '@/app/contexts/CartContext';
 
-const SUMIT_API_URL    = 'https://api.sumit.co.il/billing/payments/beginredirect/';
-const SUMIT_COMPANY_ID = process.env.SUMIT_COMPANY_ID!;
-const SUMIT_API_KEY    = process.env.SUMIT_API_KEY!;
+const SUMIT_API_URL        = 'https://api.sumit.co.il/billing/payments/charge/';
+const SUMIT_COMPANY_ID     = process.env.SUMIT_COMPANY_ID!;
+const SUMIT_API_PRIVATE_KEY = process.env.SUMIT_API_PRIVATE_KEY!;
+
+// Klaf-bearing items (mezuzah/tefillin scrolls) earn a reduced shaliach commission —
+// thinner margin on these than on general merchandise.
+const KLAF_COMMISSION_PERCENT = 4;
+
+function computeCommissionAmount(cartItems: CartItem[], commissionPercent: number): number {
+  if (!commissionPercent) return 0;
+  let amount = 0;
+  for (const item of cartItems) {
+    const rate = item.selectedKlafId ? KLAF_COMMISSION_PERCENT : commissionPercent;
+    amount += item.price * item.quantity * rate / 100;
+  }
+  return Math.round(amount * 100) / 100;
+}
 
 // ── Must match app/contexts/CartContext.tsx ───────────────────────────────────
 const KIPPOT_DISCOUNT_QTY  = 100;
@@ -52,16 +67,36 @@ export async function POST(req: NextRequest) {
       console.error('[payment] siteSettings check failed (non-fatal):', settingsErr);
     }
 
-    const { items, total, customer, orderNumber, orderId, baseUrl, couponCode } =
-      await req.json() as {
-        items:       PaymentItem[];
-        total:       number;
-        customer:    { name: string; email: string; phone: string };
-        orderNumber: string;
-        orderId:     string;
-        baseUrl:     string;
-        couponCode?: string;
-      };
+    const {
+      items, total, customer, couponCode,
+      singleUseToken, paymentsCount,
+      cartItems, address, notes, selectedGift, giftLine,
+      shippingCost, shippingType,
+      sessionId, refCode, shaliachId, shaliachName, commissionPercent,
+    } = await req.json() as {
+      items:          PaymentItem[];
+      total:          number;
+      customer:       { name: string; email: string; phone: string };
+      couponCode?:    string;
+      singleUseToken: string;
+      paymentsCount:  number;
+      cartItems:      CartItem[];
+      address:        string;
+      notes?:         string;
+      selectedGift?:  string | null;
+      giftLine?:      { id: string; name: string; productId?: string } | null;
+      shippingCost:   number;
+      shippingType:   string;
+      sessionId?:     string;
+      refCode?:       string | null;
+      shaliachId?:    string | null;
+      shaliachName?:  string | null;
+      commissionPercent?: number;
+    };
+
+    if (!singleUseToken) {
+      return NextResponse.json({ error: 'חסר טוקן תשלום' }, { status: 400 });
+    }
 
     // Product items (excludes discount lines and shipping)
     const productItems = items.filter(i =>
@@ -81,6 +116,7 @@ export async function POST(req: NextRequest) {
     const kippotQty            = kippotAllItems.reduce((s, i) => s + i.quantity, 0);
     const kippotDiscountActive = kippotQty >= KIPPOT_DISCOUNT_QTY;
 
+    let kippotDiscountAmount = 0;
     if (kippotDiscountActive) {
       const kippotOriginal   = kippotAllItems.reduce((s, i) => s + i.price * i.quantity, 0);
       const expectedDiscount = Math.round(kippotOriginal * KIPPOT_DISCOUNT_RATE * 100) / 100;
@@ -91,6 +127,7 @@ export async function POST(req: NextRequest) {
         console.error(`[payment] kippot discount mismatch`, { expectedDiscount, submittedDiscount });
         return NextResponse.json({ error: 'שגיאה בחישוב הנחת הכיפות' }, { status: 400 });
       }
+      kippotDiscountAmount = submittedDiscount;
     }
 
     // ── A1: event print tiered pricing validation ─────────────────────────────
@@ -160,6 +197,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── A2: server-side coupon validation ─────────────────────────────────────
+    let couponDiscountAmount = 0;
     if (couponCode) {
       try {
         const adminDb = getAdminDb();
@@ -199,6 +237,7 @@ export async function POST(req: NextRequest) {
           console.error('[payment] coupon discount mismatch', { submittedCouponDisc, expectedCouponDisc });
           return NextResponse.json({ error: 'שגיאה בחישוב הנחת הקופון' }, { status: 400 });
         }
+        couponDiscountAmount = submittedCouponDisc;
       } catch (couponValidationErr) {
         // Firebase Admin unavailable — skip server-side coupon check, let payment proceed.
         // Fix: ensure FIREBASE_PRIVATE_KEY in Vercel uses literal \n (not real newlines).
@@ -206,8 +245,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── Build Sumit payload ───────────────────────────────────────────────────
-    const body = {
+    // ── Charge the card via the SingleUseToken (PCI: never touches our server) ──
+    const chargeBody = {
+      SingleUseToken: singleUseToken,
+      Credentials: {
+        CompanyID: parseInt(SUMIT_COMPANY_ID),
+        APIKey:    SUMIT_API_PRIVATE_KEY,
+      },
       Customer: {
         Name:         customer.name,
         EmailAddress: customer.email,
@@ -215,25 +259,20 @@ export async function POST(req: NextRequest) {
         SearchMode:   0,
       },
       Items: items.map(item => ({
-        Item:      { Name: item.name, Price: item.price },
+        Item:      { Name: item.name },
         Quantity:  item.quantity,
         UnitPrice: item.price,
       })),
+      Payments_Count:      paymentsCount,
       VATIncluded:         true,
-      RedirectURL:         `${baseUrl}/thank-you?order=${orderNumber}&orderId=${orderId}`,
-      CancelRedirectURL:   `${baseUrl}/checkout?error=payment_cancelled`,
-      ExternalIdentifier:  orderNumber,
-      Credentials: {
-        CompanyID: parseInt(SUMIT_COMPANY_ID),
-        APIKey:    SUMIT_API_KEY,
-      },
+      SendDocumentByEmail: true,
     };
 
-    console.log('[payment] calling Sumit — orderNumber:', orderNumber, 'total:', total, 'items:', items.length, 'CompanyID set:', !!SUMIT_COMPANY_ID);
+    console.log('[payment] charging Sumit — total:', total, 'items:', items.length, 'paymentsCount:', paymentsCount, 'CompanyID set:', !!SUMIT_COMPANY_ID);
     const response = await fetch(SUMIT_API_URL, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(body),
+      body:    JSON.stringify(chargeBody),
     });
 
     let data: unknown;
@@ -242,41 +281,67 @@ export async function POST(req: NextRequest) {
       data = JSON.parse(rawText);
     } catch {
       console.error('[payment] Sumit returned non-JSON (status', response.status, '):', rawText.slice(0, 300));
-      return NextResponse.json({ error: 'שגיאה בקבלת דף תשלום' }, { status: 500 });
+      return NextResponse.json({ error: 'שגיאה בביצוע התשלום' }, { status: 500 });
     }
-    console.log('[payment] Sumit status:', response.status, 'RedirectURL:', (data as any)?.Data?.RedirectURL ? 'present' : 'missing');
 
-    if ((data as any)?.Data?.RedirectURL) {
-      // Side-effect writes (coupon usage, klaf reservation) via Admin SDK.
-      // Wrapped in a separate try/catch so a missing/broken Firebase Admin config
-      // never blocks the payment redirect that the customer is waiting for.
-      try {
-        const adminDb = getAdminDb();
-        const sideEffects: Promise<unknown>[] = [];
+    const chargeSucceeded = (data as any)?.Status === 'Success';
+    console.log('[payment] Sumit charge status:', response.status, 'Status field:', (data as any)?.Status);
 
-        if (couponCode) {
-          sideEffects.push(
-            adminDb.collection('coupons').doc(couponCode).update({
-              usedBy: FieldValue.arrayUnion(customer.email || customer.name),
-              usedAt: FieldValue.serverTimestamp(),
-            })
-          );
-        }
+    if (!chargeSucceeded) {
+      console.error('[payment] Sumit charge failed:', JSON.stringify(data));
+      const errorMessage = (data as any)?.UserErrorMessage || (data as any)?.TechnicalErrorMessage || 'התשלום נכשל, נסה כרטיס אחר';
+      return NextResponse.json({ error: errorMessage }, { status: 402 });
+    }
 
-        const results = await Promise.allSettled(sideEffects);
-        results.forEach((r, i) => {
-          if (r.status === 'rejected') console.error(`[payment] side-effect[${i}] failed:`, r.reason);
-        });
-      } catch (adminErr) {
-        // Non-fatal — log and continue so the customer reaches the payment page
-        console.error('[payment] admin side-effects failed (non-fatal):', adminErr);
+    // ── Charge succeeded — create the order now (never create one for a failed charge) ──
+    const orderNumber = 'YS-' + Date.now().toString().slice(-6);
+    const commissionAmount = shaliachId ? computeCommissionAmount(cartItems, commissionPercent || 0) : 0;
+
+    let orderRef;
+    try {
+      const adminDb = getAdminDb();
+      orderRef = await adminDb.collection('orders').add({
+        orderNumber,
+        customerName: customer.name, email: customer.email, phone: customer.phone,
+        address: address || '', notes: notes || '',
+        items: [
+          ...cartItems.map(i => ({
+            id: i.id, productId: i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity,
+            selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null,
+            embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null,
+            printCustomization: i.printCustomization || null,
+          })),
+          ...(giftLine ? [{ id: giftLine.productId || giftLine.id, name: `מתנה: ${giftLine.name}`, price: 0, quantity: 1, isGift: true, giftSourceId: giftLine.id }] : []),
+        ],
+        total, couponCode: couponCode || null, couponDiscount: couponDiscountAmount > 0 ? couponDiscountAmount : null,
+        selectedGift: selectedGift || null,
+        kippotDiscount: kippotDiscountAmount > 0 ? kippotDiscountAmount : null,
+        shippingCost: shippingCost || 0, shippingType: shippingType || 'regular',
+        status: 'paid', createdAt: FieldValue.serverTimestamp(), paidAt: FieldValue.serverTimestamp(),
+        shaliachRef: refCode || null, shaliachId: shaliachId || null, shaliachName: shaliachName || null,
+        commissionPercent: commissionPercent || 0, commissionAmount,
+        guestId: sessionId || null, sessionId: sessionId || null, isGuest: true,
+      });
+
+      const sideEffects: Promise<unknown>[] = [];
+      if (couponCode) {
+        sideEffects.push(
+          adminDb.collection('coupons').doc(couponCode).update({
+            usedBy: FieldValue.arrayUnion(customer.email || customer.name),
+            usedAt: FieldValue.serverTimestamp(),
+          })
+        );
       }
-
-      return NextResponse.json({ url: (data as any).Data.RedirectURL });
-    } else {
-      console.error('[payment] Sumit returned no RedirectURL:', JSON.stringify(data));
-      return NextResponse.json({ error: 'שגיאה בקבלת דף תשלום' }, { status: 500 });
+      const results = await Promise.allSettled(sideEffects);
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') console.error(`[payment] side-effect[${i}] failed:`, r.reason);
+      });
+    } catch (adminErr) {
+      console.error('[payment] order creation failed after successful charge:', adminErr);
+      return NextResponse.json({ error: 'התשלום בוצע אך שמירת ההזמנה נכשלה, פנה אלינו בהקדם' }, { status: 500 });
     }
+
+    return NextResponse.json({ success: true, orderId: orderRef.id, orderNumber });
   } catch (e: unknown) {
     const err = e instanceof Error ? e : new Error(String(e));
     console.error('[payment] unhandled error:', err.message, err.stack);
