@@ -90,6 +90,11 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
   const [skuMap, setSkuMap] = useState<Record<string, Product>>({});
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [allProductsLoading, setAllProductsLoading] = useState(true);
+  const [manualFormOpen, setManualFormOpen] = useState(false);
+  const [manualRows, setManualRows] = useState<{ code: string; unitPrice: number; quantity: number }[]>([
+    { code: '', unitPrice: 0, quantity: 0 },
+  ]);
+  const [applyingManual, setApplyingManual] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -281,6 +286,93 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
     }
   }
 
+  function addManualRow() {
+    setManualRows(prev => [...prev, { code: '', unitPrice: 0, quantity: 0 }]);
+  }
+
+  function updateManualRow(index: number, field: 'code' | 'unitPrice' | 'quantity', value: string) {
+    setManualRows(prev => prev.map((row, i) => {
+      if (i !== index) return row;
+      if (field === 'code') return { ...row, code: value };
+      if (field === 'unitPrice') return { ...row, unitPrice: parseFloat(value) || 0 };
+      return { ...row, quantity: parseInt(value) || 0 };
+    }));
+  }
+
+  function removeManualRow(index: number) {
+    setManualRows(prev => prev.filter((_, i) => i !== index));
+  }
+
+  // בונה מפה code(ספרות)→Product עבור קודים שהוזנו ידנית, באותה שיטה כמו ה-useEffect של skuMap
+  async function findProductsByCodes(codes: string[]): Promise<Record<string, Product>> {
+    const numbers = new Set(
+      codes.map(c => c.replace(/^[A-Z]+/i, '')).filter(n => n.length > 0)
+    );
+    if (numbers.size === 0) return {};
+    const snap = await getDocs(
+      query(collection(db, 'products'), where('sku', '>=', ' '))
+    );
+    const map: Record<string, Product> = {};
+    snap.forEach(d => {
+      const p = { id: d.id, ...d.data() } as Product;
+      const n = (p.sku || '').replace(/^[A-Z]+/i, '');
+      if (n && numbers.has(n)) map[n] = p;
+    });
+    return map;
+  }
+
+  async function applyManualRows() {
+    const rows = manualRows.filter(r => r.code.trim() !== '');
+    if (rows.length === 0) { alert('אין שורות להחלה'); return; }
+    setApplyingManual(true);
+    try {
+      const map = await findProductsByCodes(rows.map(r => r.code));
+
+      const receiptItems: { productId: string; quantity: number; unitPrice?: number; price?: number }[] = [];
+      const notFound: string[] = [];
+      let updatedCount = 0;
+
+      for (const row of rows) {
+        const itemNumber = row.code.replace(/^[A-Z]+/i, '');
+        const product = map[itemNumber];
+        if (!product) { notFound.push(row.code); continue; }
+
+        const prevReceived = product.receivedFromSupplier ?? 0;
+        const qty          = Number(row.quantity) || 0;
+        const newReceived  = prevReceived + qty;
+        const sold         = getSold(product.id);
+        const newInStock   = Math.max(0, newReceived - sold);
+
+        await onSave(product.id, {
+          receivedFromSupplier: newReceived,
+          soferBasePrice:        row.unitPrice,
+          inStock:              newInStock,
+          outOfStock:           newInStock === 0,
+        });
+
+        receiptItems.push({ productId: product.id, quantity: newInStock, unitPrice: row.unitPrice, price: product.price });
+        updatedCount++;
+      }
+
+      // Feature 6: אותו צירוף אוטומטי למבצע all_in_stock כמו בהזנה מה-OCR
+      if (receiptItems.length > 0) {
+        updateInventoryFromSupplierReceipt(receiptItems).catch(e =>
+          console.error('[InventoryTab] manual auto-promo join failed (non-fatal):', e)
+        );
+      }
+
+      setManualRows([{ code: '', unitPrice: 0, quantity: 0 }]);
+      setManualFormOpen(false);
+
+      alert(
+        `עודכנו ${updatedCount} מוצרים בהצלחה.` +
+        (notFound.length > 0 ? `\n⚠️ לא נמצאו ${notFound.length} קודים: ${notFound.join(', ')}` : '')
+      );
+    } finally {
+      setApplyingManual(false);
+    }
+  }
+
   async function saveEdit(id: string) {
     const e = editing[id];
     if (!e) return;
@@ -328,7 +420,88 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
             {uploading ? '⏳ מנתח...' : '📤 העלה קבלה מהספק'}
             <input type="file" accept="image/*" onChange={handleReceiptUpload} style={{ display: 'none' }} disabled={uploading} />
           </label>
+          <button
+            onClick={() => setManualFormOpen(o => !o)}
+            className="whitespace-nowrap rounded-md border border-[#d1d5db] bg-[#f3f4f6] px-4 py-2 text-[13px] font-bold text-[#374151]"
+          >
+            ✍️ הזנה ידנית
+          </button>
         </div>
+
+        {/* טופס הזנה ידנית — גיבוי לקבלות שה-OCR לא קורא */}
+        {manualFormOpen && (
+          <div dir="rtl" className="mb-4 rounded-lg border border-[#d1d5db] bg-[#f9fafb] p-4">
+            <div className="mb-2 font-bold">✍️ הזנה ידנית של קבלת מלאי</div>
+            <table className="w-full border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-[#d1d5db]">
+                  <th className="px-2 py-1 text-right">קוד מוצר</th>
+                  <th className="px-2 py-1 text-center">עלות ספק</th>
+                  <th className="px-2 py-1 text-center">כמות יחידות</th>
+                  <th className="px-2 py-1 text-center"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {manualRows.map((row, i) => (
+                  <tr key={i} className="border-b border-[#eee]">
+                    <td className="px-2 py-1">
+                      <input
+                        type="text"
+                        value={row.code}
+                        onChange={ev => updateManualRow(i, 'code', ev.target.value)}
+                        placeholder="לדוגמה: SKU1234"
+                        className="w-full rounded border border-[#aaa] px-2 py-1 text-right font-mono"
+                      />
+                    </td>
+                    <td className="px-2 py-1">
+                      <input
+                        type="number"
+                        value={row.unitPrice}
+                        onChange={ev => updateManualRow(i, 'unitPrice', ev.target.value)}
+                        className="w-20 rounded border border-[#aaa] px-2 py-1 text-center"
+                      />
+                    </td>
+                    <td className="px-2 py-1">
+                      <input
+                        type="number"
+                        value={row.quantity}
+                        onChange={ev => updateManualRow(i, 'quantity', ev.target.value)}
+                        className="w-20 rounded border border-[#aaa] px-2 py-1 text-center"
+                      />
+                    </td>
+                    <td className="px-2 py-1 text-center">
+                      <button
+                        onClick={() => removeManualRow(i)}
+                        className="rounded bg-[#fee2e2] px-2 py-1 text-[#dc2626]"
+                      >
+                        ✕
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="mt-3 flex items-center gap-3">
+              <button
+                onClick={addManualRow}
+                className="rounded-md border border-[#d1d5db] bg-[#fff] px-3 py-2 text-[13px] font-bold"
+              >
+                + הוסף שורה
+              </button>
+              <button
+                onClick={applyManualRows}
+                disabled={applyingManual}
+                className="rounded-md bg-[#16a34a] px-5 py-2 text-[13px] font-bold text-white"
+              >
+                {applyingManual ? '⏳ מעדכן...' : '✓ החל על המלאי'}
+              </button>
+              <span className="text-[12px] text-[#666]">
+                {manualRows.filter(r => r.code.trim() !== '').length} שורות יוחלו
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Invoice preview after OCR */}
         {parsedInvoice && (
