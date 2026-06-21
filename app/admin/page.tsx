@@ -1529,6 +1529,9 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showCancelled, setShowCancelled] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<{
     customerName: string; phone: string; email: string;
@@ -1745,7 +1748,20 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
 
   const cancelledCount = orders.filter(o => o.status === 'cancelled').length;
   const activeCount = orders.filter(o => o.status !== 'cancelled').length;
-  const visibleOrders = orders.filter(o => showCancelled ? o.status === 'cancelled' : o.status !== 'cancelled');
+  const filtersActive = statusFilter !== 'all' || !!dateFrom || !!dateTo;
+  const fromDateObj = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
+  const toDateObj = dateTo ? new Date(`${dateTo}T23:59:59.999`) : null;
+  const visibleOrders = orders
+    .filter(o => showCancelled ? o.status === 'cancelled' : o.status !== 'cancelled')
+    .filter(o => statusFilter === 'all' || o.status === statusFilter)
+    .filter(o => {
+      if (!fromDateObj && !toDateObj) return true;
+      if (!o.createdAt) return false;
+      const d = new Date(o.createdAt.seconds * 1000);
+      if (fromDateObj && d < fromDateObj) return false;
+      if (toDateObj && d > toDateObj) return false;
+      return true;
+    });
 
   if (ordersError) {
     return <div className="bg-white rounded-xl shadow p-10 text-center text-red-600 font-bold">שגיאה בטעינת הזמנות: {ordersError}</div>;
@@ -1771,6 +1787,48 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         </button>
       </div>
 
+      <div className="flex flex-wrap items-end gap-3 bg-white rounded-xl shadow p-3">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-bold text-gray-500">מתאריך</label>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={e => setDateFrom(e.target.value)}
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-bold text-gray-500">עד תאריך</label>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={e => setDateTo(e.target.value)}
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm"
+          />
+        </div>
+        {(dateFrom || dateTo) && (
+          <button
+            onClick={() => { setDateFrom(''); setDateTo(''); }}
+            className="text-xs font-bold px-3 py-2 rounded-xl border border-gray-300 text-gray-600 bg-gray-50 hover:bg-gray-100"
+          >
+            נקה
+          </button>
+        )}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-bold text-gray-500">סטטוס</label>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm"
+          >
+            <option value="all">הכל</option>
+            {ORDER_STATUSES.map(s => (
+              <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl shadow overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
@@ -1787,7 +1845,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
             {visibleOrders.length === 0 && (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-gray-400">
-                  {showCancelled ? 'אין הזמנות מבוטלות' : 'אין הזמנות פעילות'}
+                  {filtersActive ? 'אין הזמנות התואמות לסינון' : (showCancelled ? 'אין הזמנות מבוטלות' : 'אין הזמנות פעילות')}
                 </td>
               </tr>
             )}
