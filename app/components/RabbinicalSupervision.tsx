@@ -24,7 +24,7 @@ function BadgePill({ children }: { children: React.ReactNode }) {
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 5,
       background: '#EEF3FF',
-      borderRadius: 0, padding: '5px 14px',
+      borderRadius: 999, padding: '5px 14px',
       fontSize: 12, fontWeight: 600, color: '#1a1a1a',
       letterSpacing: 0.4,
     }}>
@@ -44,11 +44,12 @@ function ProfileCard({
     <div style={{
       flex: 1,
       background: '#FFFFFF',
-      borderRadius: 0,
+      borderRadius: 20,
       padding: isMobile ? '32px 24px' : '40px 32px',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       gap: 16, textAlign: 'center',
       boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+      transition: 'transform 0.2s ease',
     }}>
       {imageUrl ? (
         <img
@@ -80,8 +81,8 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
     <section
       dir="rtl"
       style={{
-        background: '#FAF8F3',
-        padding: isMobile ? '72px 20px' : '112px 48px',
+        background: '#F8F6F1',
+        padding: isMobile ? '56px 20px' : '96px 48px',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -94,7 +95,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
             display: 'inline-flex', alignItems: 'center', gap: 8,
             background: GOLD_LIGHT,
             border: `1px solid rgba(201,162,39,0.35)`,
-            borderRadius: 0, padding: '6px 16px',
+            borderRadius: 999, padding: '6px 16px',
             fontSize: 12, fontWeight: 600, color: GOLD,
             marginBottom: 16, letterSpacing: 0.6,
           }}>
@@ -102,7 +103,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
           </div>
 
           <h2 style={{
-            fontSize: isMobile ? 26 : 32,
+            fontSize: isMobile ? 28 : 36,
             fontWeight: 300, color: '#1F2937',
             lineHeight: 1.4, margin: '0 0 14px',
             letterSpacing: '-0.01em',
@@ -153,11 +154,11 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
               background: 'transparent',
               color: GOLD,
               border: `2px solid ${GOLD}`,
-              borderRadius: 0, padding: isMobile ? '11px 28px' : '13px 36px',
+              borderRadius: 10, padding: isMobile ? '11px 28px' : '13px 36px',
               fontSize: isMobile ? 14 : 15, fontWeight: 700,
               textDecoration: 'none',
               letterSpacing: 0.3,
-              transition: 'background 0.25s, color 0.25s',
+              transition: 'all 0.2s ease',
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = GOLD; (e.currentTarget as HTMLAnchorElement).style.color = NAVY; }}
             onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; (e.currentTarget as HTMLAnchorElement).style.color = GOLD; }}
@@ -180,8 +181,8 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
           ].map(item => (
             <div key={item} style={{
               display: 'flex', alignItems: 'center', gap: 7,
-              background: '#F8F6F1',
-              borderRadius: 0, padding: '7px 16px',
+              background: '#FFFFFF',
+              borderRadius: 999, padding: '7px 16px',
               fontSize: 12, color: '#1a1a1a', fontWeight: 600,
             }}>
               <span style={{ color: GOLD, fontSize: 13 }}>✓</span> {item}

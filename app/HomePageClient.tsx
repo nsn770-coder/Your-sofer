@@ -756,52 +756,32 @@ export default function HomePageClient() {
       dir="rtl"
       style={{
         background: '#F8F6F1',
-        fontFamily: "'Heebo', Arial, sans-serif",
+        fontFamily: "var(--font-heebo), 'Heebo', Arial, sans-serif",
         overflowX: 'hidden',
         maxWidth: '100vw',
       }}
     >
       <style>{`
-        .ys-hero-clip { height: 500px; }
-        .ys-cats-section { min-height: 560px; }
-        .ys-cats-grid { grid-template-columns: repeat(3, 1fr); min-height: 300px; }
-        .ys-quotes-grid { grid-template-columns: repeat(2, 1fr); }
-        @media (max-width: 767px) {
-          .ys-hero-clip { height: 260px; }
-          .ys-cats-section { min-height: 700px; }
-          .ys-cats-grid { grid-template-columns: repeat(2, 1fr); min-height: 450px; }
-          .ys-quotes-grid { grid-template-columns: 1fr; }
-        }
         .ys-hero-btn-primary {
           display: inline-flex; align-items: center; justify-content: center;
-          background: transparent; color: #C9A227;
+          background: #C9A227; color: #1a1a1a;
           border: 2px solid #C9A227;
-          height: 52px; padding: 0 36px; border-radius: 0;
+          height: 54px; padding: 0 40px; border-radius: 10px;
           font-weight: 800; font-size: 16px; text-decoration: none;
-          white-space: nowrap; transition: background 0.25s, color 0.25s; cursor: pointer;
-          font-family: inherit;
+          white-space: nowrap; transition: all 0.2s ease; cursor: pointer;
+          font-family: inherit; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
         }
-        .ys-hero-btn-primary:hover { background: #C9A227; color: #1F3D8F; }
-        .ys-hero-btn-secondary {
-          display: inline-flex; align-items: center; justify-content: center;
-          background: transparent; color: #FFFFFF;
-          border: 1.5px solid rgba(255,255,255,0.7);
-          height: 52px; padding: 0 36px; border-radius: 0;
-          font-weight: 700; font-size: 16px; text-decoration: none;
-          white-space: nowrap; transition: background 0.25s; cursor: pointer;
-          font-family: inherit;
-        }
-        .ys-hero-btn-secondary:hover { background: rgba(255,255,255,0.12); }
+        .ys-hero-btn-primary:hover { background: transparent; color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.22); }
         .ys-hscroll::-webkit-scrollbar { display: none; }
         .ys-outline-btn {
           display: inline-flex; align-items: center; justify-content: center;
           background: #FFFFFF; color: #1a1a1a;
-          border: 1.5px solid #1a1a1a; border-radius: 0;
+          border: 1.5px solid #1a1a1a; border-radius: 10px;
           height: 52px; padding: 0 36px;
           font-weight: 700; font-size: 14px; text-decoration: none;
-          transition: background 0.2s, color 0.2s; cursor: pointer; font-family: inherit;
+          transition: all 0.2s ease; cursor: pointer; font-family: inherit;
         }
-        .ys-outline-btn:hover { background: #1a1a1a; color: #fff; }
+        .ys-outline-btn:hover { background: #1a1a1a; color: #fff; transform: translateY(-1px); }
       `}</style>
 
       {/* ── Newsletter popup ── */}
@@ -973,18 +953,19 @@ export default function HomePageClient() {
         {/* Content — absolute so it doesn't push container height */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 2,
-          padding: isMobile ? '48px 24px 40px' : '80px 64px 72px',
+          padding: isMobile ? '40px 24px 36px' : '0 72px',
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }}>
           {/* Emotional title — visual prominence, NOT the h1 */}
           <p style={{
-            fontSize: isMobile ? 26 : 42,
+            fontSize: isMobile ? 28 : 48,
             fontWeight: 300,
+            fontFamily: 'var(--font-cormorant), serif',
             color: '#FFFFFF',
-            lineHeight: 1.25,
-            maxWidth: '85%',
-            textShadow: '0 2px 12px rgba(0,0,0,0.35)',
-            margin: '0 0 14px',
+            lineHeight: 1.2,
+            maxWidth: isMobile ? '92%' : '70%',
+            textShadow: '0 2px 16px rgba(0,0,0,0.4)',
+            margin: '0 0 16px',
             letterSpacing: '-0.01em',
           }}>
             הבית היהודי שתמיד דמיינתם
@@ -996,15 +977,20 @@ export default function HomePageClient() {
           </h1>
 
           <p style={{
-            fontSize: isMobile ? 15 : 17,
+            fontSize: isMobile ? 15 : 18,
             fontWeight: 400,
-            color: 'rgba(255,255,255,0.82)',
+            color: 'rgba(255,255,255,0.88)',
             marginTop: 0,
-            maxWidth: '80%',
+            marginBottom: isMobile ? 28 : 36,
+            maxWidth: isMobile ? '88%' : '60%',
             lineHeight: 1.7,
           }}>
-            להתחבר לטוב ביותר
+            להתחבר לטוב ביותר — קלף אמיתי, סופר אמיתי, שקיפות מלאה
           </p>
+
+          <Link href="/category/הכל" className="ys-hero-btn-primary" style={{ alignSelf: 'flex-start' }}>
+            לכל המוצרים ←
+          </Link>
         </div>
       </div>
 
@@ -1017,27 +1003,29 @@ export default function HomePageClient() {
 
       {/* ── Promo 2+1 section ── */}
       {promoProducts.length > 0 && (
-        <section style={{ background: '#1a1a1a', padding: isMobile ? '36px 16px 32px' : '52px 32px 44px', direction: 'rtl' }}>
+        <section style={{ background: '#1a1a1a', padding: isMobile ? '48px 16px' : '80px 32px', direction: 'rtl' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 20 : 28, flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 24 : 32, flexWrap: 'wrap', gap: 10 }}>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.16em', textTransform: 'uppercase', margin: '0 0 6px' }}>מבצע מיוחד</p>
-                <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>🏷️ קנו 3, שלמו על 2</h2>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A227', letterSpacing: '0.16em', textTransform: 'uppercase', margin: '0 0 6px' }}>מבצע מיוחד</p>
+                <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 300, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>🏷️ קנו 3, שלמו על 2</h2>
               </div>
-              <a href="/promo/2plus1" style={{ fontSize: 13, fontWeight: 700, color: '#C5A028', textDecoration: 'none', border: '1px solid #C5A028', padding: '8px 18px', whiteSpace: 'nowrap' }}>
+              <a href="/promo/2plus1" style={{ fontSize: 13, fontWeight: 700, color: '#C9A227', textDecoration: 'none', border: '1px solid #C9A227', borderRadius: 10, padding: '9px 20px', whiteSpace: 'nowrap', transition: 'all 0.2s ease' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#C9A227'; e.currentTarget.style.color = '#1a1a1a'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#C9A227'; }}>
                 לכל המבצעים ←
               </a>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 12 : 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 14 : 20 }}>
               {promoProducts.slice(0, isMobile ? 4 : 8).map(p => {
                 const img = p.imgUrl || p.image_url || '';
                 const promoPrice = (p as any).promoPrice as number | undefined;
                 return (
-                  <a key={p.id} href={`/product/${p.id}`} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', background: '#2a2a2a', overflow: 'hidden', position: 'relative', border: '1px solid rgba(255,255,255,0.08)', transition: 'transform 0.2s' }}
-                    onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                    onMouseLeave={e => (e.currentTarget.style.transform = 'none')}>
-                    <div style={{ position: 'absolute', top: 8, right: 8, background: '#C5A028', color: '#1a1a1a', fontSize: 10, fontWeight: 900, padding: '2px 7px', zIndex: 1, letterSpacing: '0.06em' }}>2+1</div>
-                    <div style={{ height: isMobile ? 140 : 180, overflow: 'hidden', background: '#333' }}>
+                  <a key={p.id} href={`/product/${p.id}`} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', background: '#2a2a2a', overflow: 'hidden', position: 'relative', borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', transition: 'all 0.2s ease' }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(0,0,0,0.35)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
+                    <div style={{ position: 'absolute', top: 10, right: 10, background: '#C9A227', color: '#1a1a1a', fontSize: 10, fontWeight: 900, padding: '3px 8px', borderRadius: 999, zIndex: 1, letterSpacing: '0.06em' }}>2+1</div>
+                    <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: '#333' }}>
                       {img ? (
                         <img src={optimizeCloudinaryUrl(img, 400)} alt={p.name} loading="lazy"
                           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -1045,13 +1033,13 @@ export default function HomePageClient() {
                         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>🕍</div>
                       )}
                     </div>
-                    <div style={{ padding: '10px 12px 14px', flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    <div style={{ padding: '12px 14px 16px', flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
                       <span style={{ fontSize: 12, fontWeight: 600, color: '#e5e7eb', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>
                         {p.name}
                       </span>
                       <span style={{ fontSize: 11, color: '#9ca3af' }}>יחיד: {formatPrice(p.price)}</span>
                       {promoPrice && (
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#C5A028' }}>3 ב-{formatPrice(Math.round(p.price * 2 * 100) / 100)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#C9A227' }}>3 ב-{formatPrice(Math.round(p.price * 2 * 100) / 100)}</span>
                       )}
                     </div>
                   </a>
@@ -1065,13 +1053,13 @@ export default function HomePageClient() {
       {/* ── Life events horizontal scroll ── */}
       <section
         id="life-events"
-        style={{ background: '#FBF8F3', padding: isMobile ? '36px 0 24px' : '52px 0 32px', direction: 'rtl' }}
+        style={{ background: '#F8F6F1', padding: isMobile ? '48px 0 40px' : '80px 0 56px', direction: 'rtl' }}
       >
-        <div style={{ textAlign: 'center', padding: '0 20px', marginBottom: isMobile ? 20 : 32 }}>
+        <div style={{ textAlign: 'center', padding: '0 20px', marginBottom: isMobile ? 24 : 36 }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, marginTop: 0 }}>
             רגעי חיים
           </p>
-          <p style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
+          <p style={{ fontSize: isMobile ? 24 : 30, fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
             מה מביא אתכם אלינו?
           </p>
         </div>
@@ -1092,21 +1080,25 @@ export default function HomePageClient() {
                 width: isMobile ? 200 : 240,
                 background: '#FFFFFF',
                 border: '1px solid #EDE8DC',
+                borderRadius: 16,
                 overflow: 'hidden',
-                transition: 'box-shadow 0.2s, transform 0.2s',
+                boxShadow: '0 2px 10px rgba(58,46,26,0.06)',
+                transition: 'all 0.2s ease',
                 cursor: 'pointer',
               }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(58,46,26,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 28px rgba(58,46,26,0.14)'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 10px rgba(58,46,26,0.06)'; e.currentTarget.style.transform = 'none'; }}
             >
               {ev.image && (
-                <img
-                  src={optimizeCloudinaryUrl(ev.image, 400)}
-                  alt={ev.title}
-                  fetchPriority={evIdx === 0 ? 'high' : 'auto'}
-                  loading={evIdx === 0 ? 'eager' : 'lazy'}
-                  style={{ width: '100%', height: 140, objectFit: 'cover', display: 'block', flexShrink: 0 }}
-                />
+                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', flexShrink: 0 }}>
+                  <img
+                    src={optimizeCloudinaryUrl(ev.image, 400)}
+                    alt={ev.title}
+                    fetchPriority={evIdx === 0 ? 'high' : 'auto'}
+                    loading={evIdx === 0 ? 'eager' : 'lazy'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                </div>
               )}
               <div style={{ padding: '12px 18px 16px' }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', margin: 0 }}>
@@ -1123,13 +1115,13 @@ export default function HomePageClient() {
       <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
 
       {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '24px 16px' : '40px 32px', borderBottom: '1px solid #f0ece4' }}>
+      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '32px 16px' : '48px 32px', borderBottom: '1px solid #f0ece4' }}>
         <div style={{
           maxWidth: 900, margin: '0 auto',
           background: '#fff',
-          padding: isMobile ? '20px 16px' : '28px 40px',
-          borderRadius: 0,
-          boxShadow: '0 2px 16px rgba(0,0,0,0.05)',
+          padding: isMobile ? '24px 16px' : '32px 40px',
+          borderRadius: 20,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
           border: '1px solid #EEEBE4',
           display: 'flex',
           justifyContent: 'space-around',
@@ -1165,10 +1157,10 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 4. Category grid ── */}
-      <div id="categories" style={{ background: '#F8F6F1', padding: isMobile ? '56px 20px' : '88px 32px', direction: 'rtl' }}>
+      <div id="categories" style={{ background: '#F8F6F1', padding: isMobile ? '56px 20px' : '96px 32px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 26 : 32, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 36, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 44, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
@@ -1187,31 +1179,31 @@ export default function HomePageClient() {
               <div key={cat.name}
                 onClick={() => router.push(cat.href)}
                 style={{
-                  borderRadius: 0,
+                  borderRadius: 16,
                   overflow: 'hidden',
                   cursor: 'pointer',
                   background: '#FFFFFF',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
-                  transition: 'transform 0.25s, box-shadow 0.25s',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                  transition: 'all 0.2s ease',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 32px rgba(0,0,0,0.12)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.07)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px) scale(1.01)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; }}
               >
-                <div style={{ height: 190, overflow: 'hidden', position: 'relative' }}>
+                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', position: 'relative' }}>
                   {cat.img ? (
                     <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4' }}>{cat.emoji}</div>
                   )}
-                  {/* SURI-style: floating label over bottom of image */}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.92)', padding: '10px 14px', textAlign: 'center' }}>
+                  {/* floating label over bottom of image */}
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.94)', padding: '10px 14px', textAlign: 'center' }}>
                     <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', letterSpacing: '0.01em' }}>{cat.name}</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginTop: 36 }}>
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
             <a
               href="/categories"
               className="ys-outline-btn"
@@ -1223,7 +1215,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Bar-Mitzvah Kippot CTA ── */}
-      <div style={{ background: '#FAF8F3', padding: isMobile ? '0 20px 40px' : '0 32px 56px', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '0 20px 48px' : '0 32px 64px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <a
             href="/category/כיפות"
@@ -1231,11 +1223,16 @@ export default function HomePageClient() {
               display: 'block',
               position: 'relative',
               overflow: 'hidden',
-              border: '2px solid #C5A028',
+              borderRadius: 20,
+              border: '2px solid #C9A227',
               textDecoration: 'none',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              transition: 'all 0.2s ease',
               aspectRatio: isMobile ? '3 / 1' : '8 / 1.4',
               minHeight: isMobile ? 90 : undefined,
             }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(0,0,0,0.14)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)'; }}
           >
             <Image
               src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780666296/ChatGPT_Image_Jun_5_2026_04_31_21_PM_xhjqhd.png"
@@ -1266,12 +1263,12 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Embroidery & Print scroll ── */}
-      <div style={{ background: '#FAF8F3', padding: isMobile ? '48px 0 40px' : '72px 0 56px', direction: 'rtl' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: isMobile ? 20 : 32, textAlign: 'center' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 0 40px' : '80px 0 56px', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: isMobile ? 24 : 36, textAlign: 'center' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, marginTop: 0 }}>
             עבודות לדוגמה
           </p>
-          <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
+          <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
             רקמה והדפסה אישית
           </h2>
         </div>
@@ -1306,12 +1303,13 @@ export default function HomePageClient() {
                 flexShrink: 0,
                 width: 'clamp(220px, 60vw, 300px)',
                 aspectRatio: '4/5',
-                borderRadius: 20,
+                borderRadius: 16,
                 overflow: 'hidden',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+                boxShadow: '0 6px 24px rgba(0,0,0,0.10)',
                 background: '#fff',
                 scrollSnapAlign: 'start',
                 position: 'relative',
+                transition: 'transform 0.2s ease',
               }}
             >
               <Image
@@ -1331,19 +1329,19 @@ export default function HomePageClient() {
       {/* ── 5. Featured products horizontal scroll ── */}
       <div style={{ minHeight: isMobile ? 290 : 330 }}>
       {featuredProducts.length > 0 && (
-        <div ref={bsSectionRef} style={{ background: '#F8F6F1', padding: isMobile ? '56px 0' : '88px 0', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 20 }}>
-            <h2 style={{ fontSize: isMobile ? 20 : 26, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>המוצרים הנמכרים ביותר</h2>
+        <div ref={bsSectionRef} style={{ background: '#F8F6F1', padding: isMobile ? '56px 0' : '96px 0', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24 }}>
+            <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>המוצרים הנמכרים ביותר</h2>
           </div>
           <div style={{ display: 'flex', overflowX: 'auto', gap: 16, padding: '0 20px 12px', scrollbarWidth: 'none' } as React.CSSProperties}>
             {featuredProducts.map((p, idx) => {
               const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
               return (
                 <div key={p.id}
-                  style={{ width: 172, flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 0, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)', transition: 'transform 0.2s, box-shadow 0.2s' }}
+                  style={{ width: 172, flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', transition: 'all 0.2s ease' }}
                   onClick={() => router.push(`/product/${p.id}`)}
-                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.12)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)'; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 26px rgba(0,0,0,0.13)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
                 >
                   <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
                     {p.isBestSeller && (
@@ -1352,15 +1350,15 @@ export default function HomePageClient() {
                       </div>
                     )}
                   </ProductCardVideo>
-                  <div style={{ padding: '10px 12px 14px' }}>
+                  <div style={{ padding: '12px 14px 16px' }}>
                     <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
-                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C5A028', marginBottom: 10 }}>{formatPrice(p.price)}</p>
+                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C9A227', marginBottom: 10 }}>{formatPrice(p.price)}</p>
                     <button
                       onClick={e => {
                         e.stopPropagation();
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1, cat: p.cat || undefined });
                       }}
-                      style={{ background: 'transparent', color: '#1a1a1a', border: '1.5px solid #1a1a1a', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '5px 10px', cursor: 'pointer', width: '100%', transition: 'background 0.2s, color 0.2s' }}
+                      style={{ background: 'transparent', color: '#1a1a1a', border: '1.5px solid #1a1a1a', borderRadius: 8, fontSize: 11, fontWeight: 700, padding: '6px 10px', cursor: 'pointer', width: '100%', transition: 'all 0.2s ease' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1a1a1a'; }}
                     >
@@ -1386,9 +1384,9 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 6. More categories horizontal scroll ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 0' : '72px 0', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 0' : '80px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
-          <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 300, color: '#111111', marginBottom: 24, letterSpacing: '-0.01em' }}>עוד קטגוריות</h2>
+          <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 300, color: '#111111', marginBottom: 28, letterSpacing: '-0.01em' }}>עוד קטגוריות</h2>
         </div>
         <div
           className="no-scrollbar"
@@ -1407,16 +1405,18 @@ export default function HomePageClient() {
             return (
               <div key={cat.slug}
                 onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
-                style={{ cursor: 'pointer', flexShrink: 0, width: isMobile ? 160 : 200, scrollSnapAlign: 'start' } as React.CSSProperties}
+                style={{ cursor: 'pointer', flexShrink: 0, width: isMobile ? 160 : 200, scrollSnapAlign: 'start', transition: 'transform 0.2s ease' } as React.CSSProperties}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}
               >
-                <div style={{ height: 100, width: '100%', borderRadius: 0, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
+                <div style={{ width: '100%', aspectRatio: '4 / 3', borderRadius: 16, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative', boxShadow: '0 3px 14px rgba(0,0,0,0.07)' }}>
                   {img ? (
                     <Image fill unoptimized loading="lazy" src={img} alt={cat.slug} style={{ objectFit: 'cover' }} sizes="200px" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{cat.emoji}</div>
                   )}
                 </div>
-                <p style={{ fontSize: 11, textAlign: 'center', color: '#1a1a1a', fontWeight: 600, marginTop: 6 }}>{cat.slug}</p>
+                <p style={{ fontSize: 11, textAlign: 'center', color: '#1a1a1a', fontWeight: 600, marginTop: 8 }}>{cat.slug}</p>
               </div>
             );
           })}
@@ -1424,8 +1424,8 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Cloudinary video ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '32px 16px' : '56px 32px' }}>
-        <div style={{ maxWidth: 896, margin: '0 auto', textAlign: 'center', direction: 'rtl', marginBottom: isMobile ? 20 : 28 }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 16px' : '80px 32px' }}>
+        <div style={{ maxWidth: 896, margin: '0 auto', textAlign: 'center', direction: 'rtl', marginBottom: isMobile ? 24 : 32 }}>
           <p style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: '#1E3A8A', margin: 0, lineHeight: 1.25 }}>
             רק אצלנו ב&nbsp;<span dir="ltr" style={{ unicodeBidi: 'embed' }}>Your Sofer</span>
           </p>
@@ -1435,7 +1435,7 @@ export default function HomePageClient() {
         </div>
         <div
           ref={videoWrapperRef}
-          style={{ maxWidth: 896, margin: '0 auto', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', aspectRatio: '16 / 9' }}
+          style={{ maxWidth: 896, margin: '0 auto', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', aspectRatio: '16 / 9' }}
         >
           <iframe
             src={`https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=${videoStarted ? 'true' : 'false'}&muted=true`}
@@ -1448,19 +1448,22 @@ export default function HomePageClient() {
 
       {/* ── Soferim horizontal row ── */}
       {soferimList.length > 0 && (
-        <div style={{ background: '#F8F6F1', padding: isMobile ? '28px 0 16px' : '40px 0 24px', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 16 }}>
-            <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הסופרים שלנו</h2>
+        <div style={{ background: '#F8F6F1', padding: isMobile ? '40px 0 24px' : '56px 0 32px', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 20 }}>
+            <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הסופרים שלנו</h2>
           </div>
           <div
             className="ys-hscroll"
-            style={{ display: 'flex', overflowX: 'auto', gap: 12, padding: '0 20px 8px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
+            style={{ display: 'flex', overflowX: 'auto', gap: 20, padding: '0 20px 8px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
           >
             {soferimList.map(sofer => {
               const img = optimizeCloudinaryUrl(sofer.profileImage || '', 200);
               return (
-                <a key={sofer.id} href={`/soferim/${sofer.id}`} style={{ textDecoration: 'none', flexShrink: 0, display: 'block' }}>
-                  <div style={{ width: 112, height: 112, borderRadius: 0, overflow: 'hidden', position: 'relative', boxShadow: '0 2px 10px rgba(0,0,0,0.10)' }}>
+                <a key={sofer.id} href={`/soferim/${sofer.id}`} style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: 96, transition: 'transform 0.2s ease' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'none'; }}
+                >
+                  <div style={{ width: 96, height: 96, borderRadius: '50%', overflow: 'hidden', position: 'relative', boxShadow: '0 3px 12px rgba(0,0,0,0.12)', border: '2px solid #fff' }}>
                     <Image
                       fill
                       unoptimized
@@ -1468,14 +1471,12 @@ export default function HomePageClient() {
                       src={img}
                       alt={sofer.name}
                       style={{ objectFit: 'cover' }}
-                      sizes="112px"
+                      sizes="96px"
                     />
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)', padding: '20px 6px 7px' }}>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: '#fff', margin: 0, textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {sofer.name}
-                      </p>
-                    </div>
                   </div>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', margin: 0, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>
+                    {sofer.name}
+                  </p>
                 </a>
               );
             })}
@@ -1484,10 +1485,10 @@ export default function HomePageClient() {
       )}
 
       {/* ── Sofer STaM categories grid ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 20px' : '88px 32px', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 20px' : '96px 32px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 26 : 32, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות סת״מ</h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 36, fontWeight: 400 }}>כל מוצרי הסופר סת״מ</p>
+          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות סת״מ</h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 44, fontWeight: 400 }}>כל מוצרי הסופר סת״מ</p>
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
@@ -1505,23 +1506,23 @@ export default function HomePageClient() {
                 key={cat.name}
                 onClick={() => router.push(cat.href)}
                 style={{
-                  borderRadius: 0,
+                  borderRadius: 16,
                   overflow: 'hidden',
                   cursor: 'pointer',
                   background: '#FFFFFF',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
-                  transition: 'transform 0.25s, box-shadow 0.25s',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                  transition: 'all 0.2s ease',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 32px rgba(0,0,0,0.12)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.07)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px) scale(1.01)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; }}
               >
-                <div style={{ height: 190, overflow: 'hidden', position: 'relative' }}>
+                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', position: 'relative' }}>
                   {cat.img ? (
                     <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f4' }}>{cat.emoji}</div>
                   )}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.92)', padding: '10px 14px', textAlign: 'center' }}>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.94)', padding: '10px 14px', textAlign: 'center' }}>
                     <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', letterSpacing: '0.01em' }}>{cat.name}</span>
                   </div>
                 </div>
@@ -1532,25 +1533,8 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Soferim CTA ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 16px' : '72px 16px', direction: 'rtl', textAlign: 'center' }}>
-        <button
-          onClick={() => router.push('/soferim')}
-          style={{
-            background: 'transparent',
-            color: '#C9A227',
-            fontWeight: 800,
-            fontSize: 15,
-            padding: '0 48px',
-            height: 52,
-            borderRadius: 0,
-            border: '2px solid #C9A227',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            transition: 'background 0.25s, color 0.25s',
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#C9A227'; (e.currentTarget as HTMLButtonElement).style.color = '#1F3D8F'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#C9A227'; }}
-        >
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 16px' : '80px 16px', direction: 'rtl', textAlign: 'center' }}>
+        <button onClick={() => router.push('/soferim')} className="ys-hero-btn-primary">
           לצפייה במאגר הסופרים שלנו ←
         </button>
       </div>
@@ -1559,16 +1543,16 @@ export default function HomePageClient() {
       <RabbinicalSupervision isMobile={isMobile} />
 
       {/* ── Why Your Sofer trust block ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 16px' : '88px 32px', direction: 'rtl' }}>
+      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 16px' : '96px 32px', direction: 'rtl' }}>
         <div style={{
           maxWidth: 640, margin: '0 auto',
           background: '#FFFFFF',
-          borderRadius: 0,
+          borderRadius: 20,
           padding: isMobile ? '40px 24px' : '56px 48px',
           textAlign: 'center',
           boxShadow: '0 4px 32px rgba(0,0,0,0.06)',
         }}>
-          <p style={{ fontSize: isMobile ? 24 : 26, fontWeight: 300, color: '#1F2937', marginBottom: 32, lineHeight: 1.5, letterSpacing: '-0.01em' }}>
+          <p style={{ fontSize: isMobile ? 24 : 28, fontWeight: 300, color: '#1F2937', marginBottom: 32, lineHeight: 1.5, letterSpacing: '-0.01em' }}>
             רוב האנשים לא יודעים מי כתב את המזוזה שלהם — אבל אצלנו:
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'right' }}>
@@ -1579,7 +1563,7 @@ export default function HomePageClient() {
               'ניתן לבחור קלף ספציפי',
               'כל סופר עובר אצלנו אבחון',
             ].map(row => (
-              <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#F8F6F1', borderRadius: 0, padding: '14px 18px' }}>
+              <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#F8F6F1', borderRadius: 12, padding: '14px 18px' }}>
                 <span style={{ color: '#C9A227', fontSize: 15, flexShrink: 0, fontWeight: 900, lineHeight: 1 }}>✓</span>
                 <span style={{ fontSize: 15, fontWeight: 500, color: '#1F2937', lineHeight: 1.5 }}>{row}</span>
               </div>
@@ -1590,12 +1574,12 @@ export default function HomePageClient() {
 
       {/* ── Live Reviews Carousel ── */}
       {liveReviews.length > 0 && (
-        <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 0 48px' : '88px 0 72px', direction: 'rtl' }}>
+        <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 0 48px' : '96px 0 80px', direction: 'rtl' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
-            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 26 : 32, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>
+            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>
               מה הלקוחות אומרים
             </h2>
-            <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 40, fontWeight: 400 }}>
+            <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 44, fontWeight: 400 }}>
               אלפי לקוחות מרוצים ברחבי הארץ
             </p>
           </div>
@@ -1610,11 +1594,14 @@ export default function HomePageClient() {
                   flexShrink: 0,
                   width: isMobile ? 260 : 300,
                   background: '#FFFFFF',
-                  borderRadius: 0,
+                  borderRadius: 16,
                   border: '1px solid #EDE8DC',
                   overflow: 'hidden',
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                  transition: 'all 0.2s ease',
                 }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 26px rgba(0,0,0,0.12)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
               >
                 <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden' }}>
                   <img
