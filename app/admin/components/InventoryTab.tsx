@@ -59,6 +59,16 @@ interface InventoryTabProps {
   products: Product[];
   orders: Order[];
   onSave: (productId: string, data: Partial<Product>) => Promise<void>;
+  // נקראת כשאדמין רוצה להשלים פרטים למוצר טיוטה — ההורה פותח את טופס עריכת המוצר
+  onEditProduct?: (product: Product) => void;
+}
+
+// מוצרי טיוטה שנוצרו אוטומטית מהזנת מלאי (ידנית/OCR) ועדיין לא הושלמו על ידי אדמין.
+// status: 'draft' מסומן רק על ידי הקוד הזה (לא 'pending' — זה שמור לזרימת אישור סופרים).
+// בדיקת תחילית השם היא רשת ביטחון לטיוטות ישנות / שינויים חיצוניים.
+const DRAFT_NAME_PREFIX = 'מוצר חדש (';
+function needsCompletion(p: Product): boolean {
+  return p.status === 'draft' || !!p.name?.startsWith(DRAFT_NAME_PREFIX);
 }
 
 interface EditState {
@@ -80,8 +90,9 @@ interface ParsedInvoice {
   items: ParsedItem[];
 }
 
-export default function InventoryTab({ products, orders, onSave }: InventoryTabProps) {
+export default function InventoryTab({ products, orders, onSave, onEditProduct }: InventoryTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showPendingOnly, setShowPendingOnly] = useState(false);
   const [editing, setEditing] = useState<Record<string, EditState>>({});
   const [saving, setSaving] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -149,17 +160,23 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
   const getInventory = (product: Product) =>
     (product.receivedFromSupplier ?? 0) - getSold(product.id);
 
+  const pendingProducts = allProducts.filter(needsCompletion);
+  const pendingCount = pendingProducts.length;
+
   const inventoryProducts = allProducts
     .map(p => ({
       ...p,
       computedInStock: getInventory(p),
       inventoryValue: getInventory(p) * (p.soferBasePrice ?? 0),
     }))
-    .filter(p =>
-      searchTerm
+    .filter(p => {
+      if (showPendingOnly) {
+        return needsCompletion(p) && (!searchTerm || p.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+      }
+      return searchTerm
         ? p.name?.toLowerCase().includes(searchTerm.toLowerCase())
-        : (p.receivedFromSupplier ?? 0) > 0
-    )
+        : (p.receivedFromSupplier ?? 0) > 0;
+    })
     .sort((a, b) => b.computedInStock - a.computedInStock);
 
   console.log(`[InventoryTab] Filtered to ${inventoryProducts.length} products in inventory (search: "${searchTerm}")`);
@@ -329,16 +346,39 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
       const map = await findProductsByCodes(rows.map(r => r.code));
 
       const receiptItems: { productId: string; quantity: number; unitPrice?: number; price?: number }[] = [];
-      const notFound: string[] = [];
+      const createdCodes: string[] = [];
+      const createdProducts: Product[] = [];
       let updatedCount = 0;
 
       for (const row of rows) {
         const itemNumber = row.code.replace(/^[A-Z]+/i, '');
         const product = map[itemNumber];
-        if (!product) { notFound.push(row.code); continue; }
+        const qty = Number(row.quantity) || 0;
+
+        if (!product) {
+          // קוד SKU לא קיים — יוצרים מוצר חדש (טיוטה) כדי לא לאבד את הכמות שהתקבלה.
+          // מוסתר מהחנות עד שאדמין ימלא שם/מחיר/תמונה דרך מסך עריכת מוצר.
+          const newProductData = {
+            name: `מוצר חדש (${row.code.trim()})`,
+            sku: row.code.trim(),
+            price: row.unitPrice,
+            soferBasePrice: row.unitPrice,
+            receivedFromSupplier: qty,
+            inStock: qty,
+            outOfStock: qty === 0,
+            hidden: true,
+            status: 'draft',
+            createdAt: serverTimestamp(),
+          };
+          const newDoc = await addDoc(collection(db, 'products'), newProductData);
+          receiptItems.push({ productId: newDoc.id, quantity: qty, unitPrice: row.unitPrice, price: row.unitPrice });
+          createdCodes.push(row.code);
+          createdProducts.push({ id: newDoc.id, ...newProductData } as unknown as Product);
+          updatedCount++;
+          continue;
+        }
 
         const prevReceived = product.receivedFromSupplier ?? 0;
-        const qty          = Number(row.quantity) || 0;
         const newReceived  = prevReceived + qty;
         const sold         = getSold(product.id);
         const newInStock   = Math.max(0, newReceived - sold);
@@ -361,12 +401,18 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
         );
       }
 
+      if (createdProducts.length > 0) {
+        setAllProducts(prev => [...prev, ...createdProducts]);
+      }
+
       setManualRows([{ code: '', unitPrice: 0, quantity: 0 }]);
       setManualFormOpen(false);
 
       alert(
         `עודכנו ${updatedCount} מוצרים בהצלחה.` +
-        (notFound.length > 0 ? `\n⚠️ לא נמצאו ${notFound.length} קודים: ${notFound.join(', ')}` : '')
+        (createdCodes.length > 0
+          ? `\n🆕 נוצרו ${createdCodes.length} מוצרים חדשים (מוסתרים, ללא שם/תמונה): ${createdCodes.join(', ')}\nיש להיכנס לעריכת מוצר ולמלא פרטים לפני שיוצגו בחנות.`
+          : '')
       );
     } finally {
       setApplyingManual(false);
@@ -425,6 +471,19 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
             className="whitespace-nowrap rounded-md border border-[#d1d5db] bg-[#f3f4f6] px-4 py-2 text-[13px] font-bold text-[#374151]"
           >
             ✍️ הזנה ידנית
+          </button>
+          <button
+            onClick={() => setShowPendingOnly(o => !o)}
+            disabled={pendingCount === 0 && !showPendingOnly}
+            className={`whitespace-nowrap rounded-md border px-4 py-2 text-[13px] font-bold ${
+              showPendingOnly
+                ? 'border-[#d97706] bg-[#fef3c7] text-[#92400e]'
+                : pendingCount > 0
+                  ? 'border-[#f59e0b] bg-[#fffbeb] text-[#92400e]'
+                  : 'border-[#d1d5db] bg-[#f3f4f6] text-[#9ca3af]'
+            }`}
+          >
+            ⏳ ממתינים להשלמה ({pendingCount})
           </button>
         </div>
 
@@ -582,12 +641,19 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
         </div>
       </div>
 
+      {showPendingOnly && inventoryProducts.length === 0 && (
+        <div style={{ textAlign: 'center', color: '#666', padding: 30, background: '#f0fdf4', borderRadius: 8, marginBottom: 15 }}>
+          🎉 אין מוצרים ממתינים להשלמה
+        </div>
+      )}
+
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #ddd' }}>
               <th style={{ padding: 10, textAlign: 'right' }}>מוצר</th>
               <th style={{ padding: 10, textAlign: 'right' }}>קוד</th>
+              <th style={{ padding: 10, textAlign: 'center' }}>ארגז במחסן</th>
               <th style={{ padding: 10, textAlign: 'center' }}>מחיר קנייה</th>
               <th style={{ padding: 10, textAlign: 'center' }}>קבלנו</th>
               <th style={{ padding: 10, textAlign: 'center' }}>נמכר</th>
@@ -604,10 +670,19 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
                 ? parseInt(e.receivedFromSupplier || '0') - sold
                 : p.computedInStock;
               const stockBg = displayStock < 0 ? '#fee2e2' : displayStock === 0 ? '#fee2e2' : displayStock < 5 ? '#fef3c7' : '#ecfdf5';
+              const pending = needsCompletion(p);
               return (
-                <tr key={p.id} style={{ borderBottom: '1px solid #eee', background: e ? '#fffbeb' : undefined }}>
-                  <td style={{ padding: 10 }}>{p.name?.slice(0, 40)}</td>
+                <tr key={p.id} style={{ borderBottom: '1px solid #eee', background: e ? '#fffbeb' : pending ? '#fffbeb' : undefined }}>
+                  <td style={{ padding: 10 }}>
+                    {p.name?.slice(0, 40)}
+                    {pending && (
+                      <span style={{ marginRight: 6, fontSize: 10, fontWeight: 700, color: '#92400e', background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 4, padding: '1px 5px' }}>
+                        ⏳ ממתין להשלמה
+                      </span>
+                    )}
+                  </td>
                   <td style={{ padding: 10, fontFamily: 'monospace', fontSize: 11 }}>{p.sku || '-'}</td>
+                  <td style={{ padding: 10, textAlign: 'center', fontFamily: 'monospace', fontSize: 11 }}>{p.warehouseBox || '-'}</td>
 
                   {/* מחיר קנייה */}
                   <td style={{ padding: 10, textAlign: 'center' }}>
@@ -663,12 +738,22 @@ export default function InventoryTab({ products, orders, onSave }: InventoryTabP
                         </button>
                       </span>
                     ) : (
-                      <button
-                        onClick={() => startEdit(p)}
-                        style={{ background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', borderRadius: 4, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}
-                      >
-                        ✏️
-                      </button>
+                      <span style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+                        {pending && onEditProduct && (
+                          <button
+                            onClick={() => onEditProduct(p)}
+                            style={{ background: '#d97706', color: '#fff', border: 'none', borderRadius: 4, padding: '3px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          >
+                            🛠 השלם פרטים
+                          </button>
+                        )}
+                        <button
+                          onClick={() => startEdit(p)}
+                          style={{ background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', borderRadius: 4, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}
+                        >
+                          ✏️
+                        </button>
+                      </span>
                     )}
                   </td>
                 </tr>

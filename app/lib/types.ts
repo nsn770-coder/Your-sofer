@@ -73,6 +73,7 @@ export interface Product {
   storageColumn?: string;           // A–G
   storageShelf?: string | number;   // 1–7
   storageNote?: string;
+  warehouseBox?: string;            // מספר ארגז במחסן
 
   // Metadata
   createdAt?: { seconds: number };

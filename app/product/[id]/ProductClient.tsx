@@ -13,6 +13,7 @@ import { formatPrice } from '@/app/lib/utils';
 import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import NextImage from 'next/image';
 import CertificatesSection, { type Certificate } from '@/app/components/CertificatesSection';
+import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES } from '@/app/components/ProductLabelPrint';
 import dynamic from 'next/dynamic';
 const MezuzahUpsellPopup = dynamic(() => import('@/components/MezuzahUpsellPopup'), { ssr: false });
 
@@ -61,6 +62,7 @@ interface Product {
   soferBasePrice?: number;
   receivedFromSupplier?: number;
   inStock?: number;
+  warehouseBox?: string;
 }
 
 interface KlafItem { id: string; name: string; imageUrl: string; status: string; }
@@ -660,6 +662,8 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [outOfStock, setOutOfStock]             = useState(product.outOfStock ?? false);
   const [sourceUrl, setSourceUrl]               = useState(product.sourceUrl || '');
   const [sku, setSku]                           = useState(product.sku || '');
+  const [warehouseBox, setWarehouseBox]         = useState(product.warehouseBox || '');
+  const { printLabels, printArea } = useProductLabelPrint();
   const [hasKlafSelection, setHasKlafSelection] = useState(product.hasKlafSelection ?? false);
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [isEventKippot, setIsEventKippot]             = useState(product.isEventKippot ?? false);
@@ -777,6 +781,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         priority: priority !== '' ? Number(priority) : 0,
         soferId: soferId || undefined,
         sku: sku.trim() || null,
+        warehouseBox: warehouseBox.trim(),
         ...(saveGlobal ? {} : textData),
       });
       setSaved(true);
@@ -792,6 +797,8 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
 
   const panelContent = (
     <div style={{ padding: '10px 12px 88px' }}>
+      <style>{PRODUCT_LABEL_PRINT_STYLES}</style>
+      {printArea}
       {saved && (
         <div style={{ position: 'sticky', top: 0, zIndex: 2, background: '#166534', color: '#dcfce7', padding: '7px 10px', borderRadius: 5, fontWeight: 700, fontSize: 12, textAlign: 'center', marginBottom: 10 }}>
           ✓ נשמר
@@ -836,6 +843,23 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
               style={{ ...iS, fontFamily: 'monospace' }}
             />
           </div>
+          <div>
+            <label style={lS}>מספר ארגז במחסן</label>
+            <input
+              value={warehouseBox}
+              onChange={e => setWarehouseBox(e.target.value)}
+              placeholder="למשל: 14"
+              dir="ltr"
+              style={{ ...iS, fontFamily: 'monospace' }}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => printLabels([{ id: product.id, name, sku, price: Number(price) || undefined, warehouseBox }])}
+            style={{ border: '1px solid rgba(184,151,42,0.4)', background: 'rgba(184,151,42,0.1)', color: '#C5A028', borderRadius: 6, padding: '6px 9px', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}
+          >
+            🏷️ הדפס מדבקה למוצר זה
+          </button>
 
           {/* Inventory — read-only */}
           <div style={{ background: '#1e1e1e', border: '1px solid #333', borderRadius: 8, padding: 14 }}>

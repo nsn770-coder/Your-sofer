@@ -19,6 +19,7 @@ import StickersTab from './components/StickersTab';
 import ProfitabilityTab from './components/ProfitabilityTab';
 import SiteSettingsTab from './components/SiteSettingsTab';
 import PromotionsTab from './components/PromotionsTab';
+import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES } from '@/app/components/ProductLabelPrint';
 
 interface OrderItem {
   id: string;
@@ -159,6 +160,7 @@ interface Product {
   storageColumn?: string;
   storageShelf?: string | number;
   storageNote?: string;
+  warehouseBox?: string;
   // Sale
   isOnSale?: boolean;
   salePrice?: number;
@@ -680,6 +682,11 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [storageColumn, setStorageColumn] = useState(product.storageColumn ?? '');
   const [storageShelf, setStorageShelf]   = useState(product.storageShelf != null ? String(product.storageShelf) : '');
   const [storageNote, setStorageNote]     = useState(product.storageNote ?? '');
+  const [warehouseBox, setWarehouseBox]   = useState(product.warehouseBox ?? '');
+  const { printLabels, printArea } = useProductLabelPrint();
+  // מוצר טיוטה שנוצר אוטומטית מהזנת מלאי (ראו InventoryTab.needsCompletion) — בשמירה ראשונה
+  // לאחר השלמת הפרטים נוציא אותו ממצב טיוטה (hidden:false, status:'active').
+  const isDraftCompletion = product.status === 'draft' || (product.name?.startsWith('מוצר חדש (') ?? false);
   const [saving, setSaving]         = useState(false);
   const [duplicating, setDuplicating] = useState(false);
   const [uploadingImg, setUploadingImg] = useState<string | null>(null);
@@ -764,6 +771,8 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         storageColumn: storageColumn || null,
         storageShelf: storageShelf || null,
         storageNote: storageNote || null,
+        warehouseBox: warehouseBox || null,
+        ...(isDraftCompletion ? { hidden: false, status: 'active' } : {}),
       });
       // Sync AI knowledge index (fire-and-forget)
       fetch('/api/ai/products/upsert', {
@@ -792,9 +801,18 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
       onClick={onClose}>
       <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
         onClick={e => e.stopPropagation()}>
+        <style>{PRODUCT_LABEL_PRINT_STYLES}</style>
+        {printArea}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A' }}>✏️ עריכת מוצר</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => printLabels([{ id: product.id, name, sku: product.sku, price: Number(price) || undefined, warehouseBox }])}
+              style={{ background: '#eef2ff', border: '1px solid #4338ca', color: '#4338ca', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+            >
+              🏷️ הדפס מדבקה
+            </button>
             <button
               type="button"
               onClick={handleDuplicate}
@@ -806,6 +824,11 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
           </div>
         </div>
+        {isDraftCompletion && (
+          <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#92400e' }}>
+            ⏳ מוצר זה נוצר אוטומטית מהזנת מלאי וממתין להשלמת פרטים. מלא שם אמיתי, קטגוריה ותמונה ולחץ &quot;שמור שינויים&quot; — המוצר יוצג בחנות ויירד מרשימת &quot;ממתינים להשלמה&quot;.
+          </div>
+        )}
         <div style={{ display: 'grid', gap: 14 }}>
           <div>
             <label style={labelStyle}>שם מוצר *</label>
@@ -1028,6 +1051,13 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             <input value={storageNote} onChange={e => setStorageNote(e.target.value)}
               placeholder='למשל: "שורה שלישית מלמעלה"'
               style={inputStyle} />
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <label style={labelStyle}>מספר ארגז במחסן</label>
+            <input value={warehouseBox} onChange={e => setWarehouseBox(e.target.value)}
+              placeholder="למשל: 14"
+              dir="ltr"
+              style={{ ...inputStyle, fontFamily: 'monospace' }} />
           </div>
         </div>
 
@@ -4414,7 +4444,7 @@ export default function AdminPage() {
 
       {activeTab === 'inventory' && <InventoryTab products={products} orders={orders} onSave={async (productId, data) => {
         await updateDoc(doc(db, 'products', productId), data as Record<string, unknown>);
-      }} />}
+      }} onEditProduct={(p) => setEditingProduct(p as unknown as Product)} />}
 
       {activeTab === 'prints' && <PrintsTab orders={orders} />}
 

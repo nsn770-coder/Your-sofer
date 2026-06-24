@@ -1,14 +1,22 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '@/app/firebase';
+import {
+  useProductLabelPrint,
+  PRODUCT_LABEL_PRINT_STYLES,
+  cloudImg,
+  type PrintableLabel,
+} from '@/app/components/ProductLabelPrint';
 
 interface StickerProduct {
   id: string;
   name: string;
   cat?: string;
   sku?: string;
+  price?: number;
+  warehouseBox?: string;
   imgUrl?: string;
   image_url?: string;
   receivedFromSupplier?: number;
@@ -52,15 +60,6 @@ interface OrderDoc {
   items?: OrderItem[];
 }
 
-// Insert Cloudinary transform after /upload/ if applicable
-function cloudImg(url: string | undefined): string {
-  if (!url) return '';
-  if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-    return url.replace('/upload/', '/upload/w_200,c_fill,q_auto,f_auto/');
-  }
-  return url;
-}
-
 function formatProcessedAt(pt: unknown): string {
   if (!pt || typeof pt !== 'object') return '';
   const obj = pt as Record<string, unknown>;
@@ -85,10 +84,7 @@ export default function StickersTab() {
   const [search, setSearch] = useState('');
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [modal, setModal] = useState<{ invoice: Invoice; rows: ModalRow[] } | null>(null);
-  // printSet drives the hidden print area — set by both table and invoice paths
-  const [printSet, setPrintSet] = useState<PrintItem[]>([]);
-  const [printing, setPrinting] = useState(false);
-  const printAreaRef = useRef<HTMLDivElement>(null);
+  const { printLabels, printArea, printing } = useProductLabelPrint();
 
   // Load products (no auth required — public collection)
   useEffect(() => {
@@ -185,45 +181,12 @@ export default function StickersTab() {
     if (n) productSkuMap[n] = p;
   });
 
-  // One sticker per product type (regardless of quantity in stock)
-  const stickerList: StickerProduct[] = printSet
-    .filter(({ qty }) => qty > 0)
-    .map(({ product }) => product);
-
-  // ── Print engine: wait for all images, then window.print() ──────────────
-  useEffect(() => {
-    if (!printing) return;
-    const el = printAreaRef.current;
-    if (!el) { setPrinting(false); return; }
-
-    let cancelled = false;
-
-    (async () => {
-      const imgs = Array.from(el.querySelectorAll<HTMLImageElement>('img'));
-      const loads = imgs
-        .filter(img => !img.complete || img.naturalHeight === 0)
-        .map(img => new Promise<void>(resolve => {
-          img.onload  = () => resolve();
-          img.onerror = () => resolve();
-        }));
-
-      await Promise.race([
-        Promise.all(loads),
-        new Promise<void>(r => setTimeout(r, 5000)),
-      ]);
-
-      if (!cancelled) window.print();
-    })();
-
-    const onAfterPrint = () => setPrinting(false);
-    window.addEventListener('afterprint', onAfterPrint, { once: true });
-    return () => {
-      cancelled = true;
-      window.removeEventListener('afterprint', onAfterPrint);
-    };
-  }, [printing]);
+  function toLabel(p: StickerProduct): PrintableLabel {
+    return { id: p.id, name: p.name, sku: p.sku, price: p.price, warehouseBox: p.warehouseBox, imgUrl: p.imgUrl, image_url: p.image_url };
+  }
 
   // ── Table path: print filtered products with manual quantities ───────────
+  // One label per product type (regardless of quantity in stock)
   function handlePrintAll() {
     const items: PrintItem[] = filtered
       .map(p => ({ product: p, qty: quantities[p.id] ?? getInStock(p) }))
@@ -232,8 +195,7 @@ export default function StickersTab() {
       alert('אין מדבקות להדפסה — הגדר כמות > 0 לפחות למוצר אחד');
       return;
     }
-    setPrintSet(items);
-    setPrinting(true);
+    printLabels(items.map(({ product }) => toLabel(product)));
   }
 
   // ── Invoice path: open modal ─────────────────────────────────────────────
@@ -263,8 +225,7 @@ export default function StickersTab() {
       return;
     }
     setModal(null);
-    setPrintSet(items);
-    setPrinting(true);
+    printLabels(items.map(({ product }) => toLabel(product)));
   }
 
   // ── Single-product QR (existing behaviour) ───────────────────────────────
@@ -290,78 +251,9 @@ export default function StickersTab() {
 
   return (
     <div>
-      {/* ── Print styles ─────────────────────────────────────────────────── */}
-      <style>{`
-        @page { margin: 8mm; size: A4 portrait; }
-        @media print {
-          body * { visibility: hidden; }
-          #sticker-print-area,
-          #sticker-print-area * { visibility: visible; }
-          #sticker-print-area {
-            position: absolute !important;
-            top: 0 !important; left: 0 !important;
-            display: grid !important;
-            grid-template-columns: repeat(3, 60mm) !important;
-            gap: 2mm !important;
-            padding: 0 !important;
-            direction: rtl !important;
-            background: #fff !important;
-          }
-        }
-        .sticker {
-          width: 60mm; height: 45mm;
-          border: 0.4pt solid #bbb; padding: 2mm;
-          box-sizing: border-box; direction: rtl;
-          display: flex; flex-direction: column;
-          overflow: hidden;
-          page-break-inside: avoid; break-inside: avoid;
-          background: #fff;
-        }
-        .sticker-top    { display: flex; gap: 1.5mm; height: 24mm; flex-shrink: 0; }
-        .sticker-img    { flex: 1; min-width: 0; height: 24mm; object-fit: cover; border-radius: 1mm; }
-        .sticker-qr     { flex: 1; min-width: 0; height: 24mm; object-fit: contain; }
-        .sticker-qr-full{ width: 100%; height: 24mm; object-fit: contain; flex: none; }
-        .sticker-name {
-          font-weight: bold; font-size: 7.5pt; line-height: 1.25;
-          overflow: hidden;
-          display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-          text-align: right; direction: rtl;
-          margin-top: 1.5mm; flex: 1;
-        }
-        .sticker-sku {
-          font-size: 6.5pt; font-family: monospace; color: #555;
-          text-align: left; direction: ltr;
-          margin-top: 1mm; flex-shrink: 0;
-        }
-      `}</style>
-
-      {/* ── Off-screen print area (images load here before window.print) ─── */}
-      {printing && (
-        <div
-          id="sticker-print-area"
-          ref={printAreaRef}
-          style={{
-            position: 'fixed', top: -9999, left: 0,
-            display: 'grid', gridTemplateColumns: 'repeat(3, 60mm)',
-            gap: '2mm', direction: 'rtl', background: '#fff', zIndex: -1,
-          }}
-        >
-          {stickerList.map((p, i) => {
-            const imgSrc = cloudImg(p.imgUrl || p.image_url);
-            const qrSrc  = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`https://your-sofer.com/product/${p.id}`)}`;
-            return (
-              <div key={i} className="sticker">
-                <div className="sticker-top">
-                  {imgSrc && <img className="sticker-img" src={imgSrc} alt="" />}
-                  <img className={imgSrc ? 'sticker-qr' : 'sticker-qr-full'} src={qrSrc} alt="QR" />
-                </div>
-                <div className="sticker-name">{p.name}</div>
-                {p.sku && <div className="sticker-sku">{p.sku}</div>}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {/* ── Print styles + off-screen print area (shared with product-edit label printing) ── */}
+      <style>{PRODUCT_LABEL_PRINT_STYLES}</style>
+      {printArea}
 
       {/* ── Invoice modal ─────────────────────────────────────────────────── */}
       {modal && (
