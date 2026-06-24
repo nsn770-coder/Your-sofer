@@ -985,7 +985,7 @@ export default function HomePageClient() {
             maxWidth: isMobile ? '88%' : '60%',
             lineHeight: 1.7,
           }}>
-            להתחבר לטוב ביותר — קלף אמיתי, סופר אמיתי, שקיפות מלאה
+            להתחבר לטוב ביותר
           </p>
 
           <Link href="/category/הכל" className="ys-hero-btn-primary" style={{ alignSelf: 'flex-start' }}>
@@ -1111,11 +1111,8 @@ export default function HomePageClient() {
         </div>
       </section>
 
-      {/* ── Live Activity Bar - isolated component, re-renders independently ── */}
-      <ActivityBar weeklyProducts={weeklyProducts} isMobile={isMobile} />
-
       {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '32px 16px' : '48px 32px', borderBottom: '1px solid #f0ece4' }}>
+      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '16px 16px 32px' : '24px 32px 48px', borderBottom: '1px solid #f0ece4' }}>
         <div style={{
           maxWidth: 900, margin: '0 auto',
           background: '#fff',
@@ -1189,14 +1186,14 @@ export default function HomePageClient() {
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px) scale(1.01)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; }}
               >
-                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', position: 'relative' }}>
+                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', position: 'relative' }}>
                   {cat.img ? (
                     <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4' }}>{cat.emoji}</div>
                   )}
                   {/* floating label over bottom of image */}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.94)', padding: '10px 14px', textAlign: 'center' }}>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.94)', padding: '4px 14px', textAlign: 'center' }}>
                     <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', letterSpacing: '0.01em' }}>{cat.name}</span>
                   </div>
                 </div>
@@ -1262,6 +1259,58 @@ export default function HomePageClient() {
         </div>
       </div>
 
+      {/* ── 5. Featured products horizontal scroll ── */}
+      <div style={{ minHeight: isMobile ? 290 : 330 }}>
+      {featuredProducts.length > 0 && (
+        <div ref={bsSectionRef} style={{ background: '#F8F6F1', padding: isMobile ? '56px 0' : '96px 0', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24 }}>
+            <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>המוצרים הנמכרים ביותר</h2>
+          </div>
+          <style>{`
+            .ys-bestseller-media > div { aspect-ratio: 4 / 5 !important; height: auto !important; }
+          `}</style>
+          <div style={{ display: 'flex', overflowX: 'auto', gap: 16, padding: '8px 20px 16px', scrollbarWidth: 'none' } as React.CSSProperties}>
+            {featuredProducts.map((p, idx) => {
+              const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
+              return (
+                <div key={p.id}
+                  style={{ width: 'clamp(220px, 60vw, 300px)', flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', transition: 'all 0.2s ease' }}
+                  onClick={() => router.push(`/product/${p.id}`)}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 26px rgba(0,0,0,0.13)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
+                >
+                  <div className="ys-bestseller-media">
+                    <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
+                      {p.isBestSeller && (
+                        <div style={{ position: 'absolute', top: 7, right: 7, zIndex: 1, background: '#fff3e0', border: '1px solid #e8920a', borderRadius: 20, fontSize: 10, fontWeight: 800, color: '#c45e00', padding: '2px 8px', letterSpacing: '0.01em' }}>
+                          הכי נמכר
+                        </div>
+                      )}
+                    </ProductCardVideo>
+                  </div>
+                  <div style={{ padding: '12px 14px 16px' }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
+                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C9A227', marginBottom: 10 }}>{formatPrice(p.price)}</p>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1, cat: p.cat || undefined });
+                      }}
+                      style={{ background: 'transparent', color: '#1a1a1a', border: '1.5px solid #1a1a1a', borderRadius: 8, fontSize: 11, fontWeight: 700, padding: '6px 10px', cursor: 'pointer', width: '100%', transition: 'all 0.2s ease' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1a1a1a'; }}
+                    >
+                      הוסף לסל
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      </div>
+
       {/* ── Embroidery & Print scroll ── */}
       <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 0 40px' : '80px 0 56px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: isMobile ? 24 : 36, textAlign: 'center' }}>
@@ -1324,53 +1373,6 @@ export default function HomePageClient() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* ── 5. Featured products horizontal scroll ── */}
-      <div style={{ minHeight: isMobile ? 290 : 330 }}>
-      {featuredProducts.length > 0 && (
-        <div ref={bsSectionRef} style={{ background: '#F8F6F1', padding: isMobile ? '56px 0' : '96px 0', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24 }}>
-            <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>המוצרים הנמכרים ביותר</h2>
-          </div>
-          <div style={{ display: 'flex', overflowX: 'auto', gap: 16, padding: '0 20px 12px', scrollbarWidth: 'none' } as React.CSSProperties}>
-            {featuredProducts.map((p, idx) => {
-              const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
-              return (
-                <div key={p.id}
-                  style={{ width: 172, flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', transition: 'all 0.2s ease' }}
-                  onClick={() => router.push(`/product/${p.id}`)}
-                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 26px rgba(0,0,0,0.13)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
-                >
-                  <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
-                    {p.isBestSeller && (
-                      <div style={{ position: 'absolute', top: 7, right: 7, zIndex: 1, background: '#fff3e0', border: '1px solid #e8920a', borderRadius: 20, fontSize: 10, fontWeight: 800, color: '#c45e00', padding: '2px 8px', letterSpacing: '0.01em' }}>
-                        הכי נמכר
-                      </div>
-                    )}
-                  </ProductCardVideo>
-                  <div style={{ padding: '12px 14px 16px' }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
-                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C9A227', marginBottom: 10 }}>{formatPrice(p.price)}</p>
-                    <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1, cat: p.cat || undefined });
-                      }}
-                      style={{ background: 'transparent', color: '#1a1a1a', border: '1.5px solid #1a1a1a', borderRadius: 8, fontSize: 11, fontWeight: 700, padding: '6px 10px', cursor: 'pointer', width: '100%', transition: 'all 0.2s ease' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1a1a1a'; }}
-                    >
-                      הוסף לסל
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
       </div>
 
       {/* ── Shop All CTA ── */}
@@ -1516,13 +1518,13 @@ export default function HomePageClient() {
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px) scale(1.01)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; }}
               >
-                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', position: 'relative' }}>
+                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', position: 'relative' }}>
                   {cat.img ? (
                     <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f4' }}>{cat.emoji}</div>
                   )}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.94)', padding: '10px 14px', textAlign: 'center' }}>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.94)', padding: '4px 14px', textAlign: 'center' }}>
                     <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', letterSpacing: '0.01em' }}>{cat.name}</span>
                   </div>
                 </div>
