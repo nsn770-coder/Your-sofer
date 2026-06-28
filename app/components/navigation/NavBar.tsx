@@ -229,12 +229,13 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
     <>
       <style>{`@keyframes navMegaIn{from{opacity:0;transform:translateX(50%) translateY(-8px) scale(0.98)}to{opacity:1;transform:translateX(50%) translateY(0) scale(1)}}`}</style>
       <div
+        dir="rtl"
         style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 520, maxWidth: 860, animation: "navMegaIn 0.2s ease-out" }}
         onMouseDown={e => e.preventDefault()}
       >
         <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "#1a1a1a", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
         <div style={{ background: "#1a1a1a", borderRadius: 0, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(184,151,42,0.12)", overflow: "hidden" }}>
-          <div style={{ display: "flex", flexDirection: "row-reverse", padding: "24px 24px 16px" }}>
+          <div style={{ display: "flex", flexDirection: "row", padding: "24px 24px 16px" }}>
             {item.columns.map((col, ci) => (
               <div key={ci} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.9)", textAlign: "right", marginBottom: 10, paddingBottom: 6, borderBottom: "1px solid rgba(197,160,40,0.5)" }}>{col.title}</div>
@@ -242,12 +243,12 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
                   {col.items.map((sub, si) => (
                     <li key={si}>
                       <button onClick={() => onSelect(sub.cat, sub.filter)}
-                        style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, width: "100%", padding: "7px 8px", borderRadius: 0, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "right", fontFamily: "inherit", transition: "all 0.15s" }}
+                        style={{ display: "flex", alignItems: "center", flexDirection: "row-reverse", justifyContent: "flex-end", gap: 8, width: "100%", padding: "7px 8px", borderRadius: 0, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "right", fontFamily: "inherit", transition: "all 0.15s" }}
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(184,151,42,0.12)"; e.currentTarget.style.color = "#fff"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}
                       >
-                        {sub.label}
                         <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#C5A028", flexShrink: 0, opacity: 0.6 }} />
+                        {sub.label}
                       </button>
                     </li>
                   ))}
