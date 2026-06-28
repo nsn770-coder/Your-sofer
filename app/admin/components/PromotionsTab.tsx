@@ -42,6 +42,9 @@ interface Product {
   sku?: string;
   imgUrl?: string;
   cat?: string;
+  source?: string;
+  createdAt?: { seconds: number } | null;
+  isOnSale?: boolean;
 }
 
 function isInStock(p: Product): boolean {
@@ -72,6 +75,11 @@ export default function PromotionsTab() {
   const [productsLoading, setProductsLoading] = useState(false);
   const [productSearch, setProductSearch] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [filterCat, setFilterCat]       = useState('');
+  const [filterSource, setFilterSource] = useState('');
+  const [hideOnSale, setHideOnSale]     = useState(false);
+  const [sortBy, setSortBy]             = useState<'oldest' | 'stock' | 'price' | 'name'>('oldest');
+  const [visibleCount, setVisibleCount] = useState(50);
 
   useEffect(() => {
     loadPromotions();
@@ -110,6 +118,8 @@ export default function PromotionsTab() {
   useEffect(() => {
     if (form.applyTo === 'manual') loadAllProducts();
   }, [form.applyTo]);
+
+  useEffect(() => { setVisibleCount(50); }, [filterCat, filterSource, hideOnSale, sortBy, productSearch]);
 
   async function handleCreate() {
     if (!form.name.trim()) { alert('נדרש שם למבצע'); return; }
@@ -264,11 +274,50 @@ export default function PromotionsTab() {
     }));
   }
 
-  const filteredProducts = allProducts.filter(p =>
-    productSearch === '' ||
-    p.name?.toLowerCase().includes(productSearch.toLowerCase()) ||
-    p.sku?.toLowerCase().includes(productSearch.toLowerCase())
-  );
+  function getDateMs(createdAt?: { seconds: number } | null): number {
+    return createdAt?.seconds ? createdAt.seconds * 1000 : 0;
+  }
+
+  function monthsInStock(createdAt?: { seconds: number } | null): number | null {
+    const ms = getDateMs(createdAt);
+    if (!ms) return null;
+    return Math.floor((Date.now() - ms) / (1000 * 60 * 60 * 24 * 30));
+  }
+
+  function selectAllFiltered() {
+    setForm(f => ({ ...f, productIds: [...new Set([...f.productIds, ...filteredProducts.map(p => p.id)])] }));
+  }
+
+  function deselectAllFiltered() {
+    const toRemove = new Set(filteredProducts.map(p => p.id));
+    setForm(f => ({ ...f, productIds: f.productIds.filter(id => !toRemove.has(id)) }));
+  }
+
+  const allCats    = [...new Set(allProducts.map(p => p.cat).filter(Boolean))].sort()    as string[];
+  const allSources = [...new Set(allProducts.map(p => p.source).filter(Boolean))].sort() as string[];
+
+  const filteredProducts = allProducts
+    .filter(p => {
+      const q = productSearch.toLowerCase();
+      if (q && !p.name?.toLowerCase().includes(q) && !p.sku?.toLowerCase().includes(q)) return false;
+      if (filterCat && p.cat !== filterCat) return false;
+      if (filterSource && p.source !== filterSource) return false;
+      if (hideOnSale && p.isOnSale === true) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'oldest') return getDateMs(a.createdAt) - getDateMs(b.createdAt);
+      if (sortBy === 'stock') {
+        const aS = typeof a.inStock === 'number' ? a.inStock : 0;
+        const bS = typeof b.inStock === 'number' ? b.inStock : 0;
+        return bS - aS;
+      }
+      if (sortBy === 'price') return (b.price ?? 0) - (a.price ?? 0);
+      if (sortBy === 'name')  return (a.name ?? '').localeCompare(b.name ?? '', 'he');
+      return 0;
+    });
+
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
 
   if (loading) return <div className="p-10 text-center text-gray-400">טוען מבצעים...</div>;
 
@@ -352,36 +401,116 @@ export default function PromotionsTab() {
 
             {/* manual product selection */}
             {form.applyTo === 'manual' && (
-              <div className="border border-gray-200 rounded-lg p-3">
-                <div className="text-xs font-bold text-gray-500 mb-2">
-                  בחר מוצרים ({form.productIds.length} נבחרו)
+              <div className="border border-gray-200 rounded-lg p-3 space-y-2">
+
+                {/* header: count + bulk actions */}
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-gray-500">
+                    {form.productIds.length} נבחרו · {filteredProducts.length} מסוננים · {allProducts.length} סה&quot;כ
+                  </span>
+                  <div className="flex gap-1">
+                    <button type="button" onClick={selectAllFiltered}
+                      className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 font-bold">
+                      ✓ בחר הכל ({filteredProducts.length})
+                    </button>
+                    <button type="button" onClick={deselectAllFiltered}
+                      className="text-xs px-2 py-1 rounded bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-200">
+                      הסר סימון
+                    </button>
+                  </div>
                 </div>
+
+                {/* search */}
                 <input
                   value={productSearch}
-                  onChange={e => setProductSearch(e.target.value)}
-                  placeholder="חפש מוצר..."
-                  className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs mb-2"
+                  onChange={e => { setProductSearch(e.target.value); setVisibleCount(50); }}
+                  placeholder="חפש לפי שם או SKU..."
+                  className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
                 />
+
+                {/* filters + sort */}
+                <div className="flex gap-2 flex-wrap">
+                  <select value={filterCat}
+                    onChange={e => { setFilterCat(e.target.value); setVisibleCount(50); }}
+                    className="border border-gray-200 rounded px-2 py-1 text-xs bg-white flex-1 min-w-[120px]">
+                    <option value="">כל הקטגוריות</option>
+                    {allCats.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <select value={filterSource}
+                    onChange={e => { setFilterSource(e.target.value); setVisibleCount(50); }}
+                    className="border border-gray-200 rounded px-2 py-1 text-xs bg-white flex-1 min-w-[110px]">
+                    <option value="">כל המקורות</option>
+                    {allSources.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  <select value={sortBy}
+                    onChange={e => { setSortBy(e.target.value as typeof sortBy); setVisibleCount(50); }}
+                    className="border border-gray-200 rounded px-2 py-1 text-xs bg-white flex-1 min-w-[130px]">
+                    <option value="oldest">ישן → חדש (מלאי תקוע)</option>
+                    <option value="stock">מלאי גבוה</option>
+                    <option value="price">מחיר גבוה</option>
+                    <option value="name">שם א-ת</option>
+                  </select>
+                  <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer whitespace-nowrap">
+                    <input type="checkbox" checked={hideOnSale}
+                      onChange={e => { setHideOnSale(e.target.checked); setVisibleCount(50); }}
+                      className="shrink-0" />
+                    הסתר כבר במבצע
+                  </label>
+                </div>
+
+                {/* product list */}
                 {productsLoading ? (
-                  <div className="text-xs text-gray-400 py-2">טוען...</div>
+                  <div className="text-xs text-gray-400 py-3 text-center">טוען מוצרים...</div>
                 ) : (
-                  <div className="max-h-48 overflow-y-auto space-y-1">
-                    {filteredProducts.slice(0, 50).map(p => (
-                      <label key={p.id} className="flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 px-1 py-0.5 rounded">
-                        <input
-                          type="checkbox"
-                          checked={form.productIds.includes(p.id)}
-                          onChange={() => toggleProduct(p.id)}
-                          className="shrink-0"
-                        />
-                        <span className="flex-1 truncate">{p.name}</span>
-                        <span className="text-gray-400 shrink-0">{formatPrice(p.price)}</span>
-                        {isInStock(p)
-                          ? <span className="text-green-600 shrink-0">●</span>
-                          : <span className="text-red-400 shrink-0">●</span>}
-                      </label>
-                    ))}
-                  </div>
+                  <>
+                    <div className="max-h-96 overflow-y-auto border border-gray-100 rounded divide-y divide-gray-50">
+                      {visibleProducts.map(p => {
+                        const months   = monthsInStock(p.createdAt);
+                        const stockNum = typeof p.inStock === 'number' ? p.inStock : null;
+                        const checked  = form.productIds.includes(p.id);
+                        return (
+                          <label key={p.id}
+                            className={`flex items-center gap-2 text-xs cursor-pointer px-2 py-1.5 transition-colors ${checked ? 'bg-blue-50 border-r-2 border-blue-400' : 'hover:bg-gray-50'}`}>
+                            <input type="checkbox" checked={checked}
+                              onChange={() => toggleProduct(p.id)} className="shrink-0" />
+                            {p.imgUrl
+                              ? <img src={p.imgUrl} alt="" className="w-8 h-8 rounded object-cover shrink-0 border border-gray-100" />
+                              : <div className="w-8 h-8 rounded bg-gray-100 shrink-0 flex items-center justify-center text-gray-300 font-bold text-base">{(p.name ?? '?')[0]}</div>
+                            }
+                            <div className="flex-1 min-w-0">
+                              <div className="truncate font-medium text-gray-800">{p.name}</div>
+                              <div className="flex items-center gap-1.5 mt-0.5 text-gray-400 flex-wrap">
+                                {p.cat && <span>{p.cat}</span>}
+                                {p.source && <span className="text-gray-300">·</span>}
+                                {p.source && <span>{p.source}</span>}
+                                {p.isOnSale && <span className="text-orange-500 font-bold">· במבצע</span>}
+                              </div>
+                            </div>
+                            <div className="shrink-0 text-right space-y-0.5">
+                              <div className="font-bold text-gray-700">{formatPrice(p.price)}</div>
+                              <div className={stockNum != null && stockNum > 0 ? 'text-green-600' : 'text-red-400'}>
+                                {stockNum != null ? `${stockNum} יח'` : isInStock(p) ? '● במלאי' : '● חסר'}
+                              </div>
+                              {months != null && (
+                                <div className={`text-gray-400 ${months >= 3 ? 'text-amber-600 font-bold' : ''}`}>
+                                  {months === 0 ? '< חודש' : `${months} חודשים`}
+                                </div>
+                              )}
+                            </div>
+                          </label>
+                        );
+                      })}
+                      {filteredProducts.length === 0 && (
+                        <div className="text-xs text-gray-400 py-4 text-center">לא נמצאו מוצרים</div>
+                      )}
+                    </div>
+                    {filteredProducts.length > visibleCount && (
+                      <button type="button" onClick={() => setVisibleCount(n => n + 50)}
+                        className="w-full text-xs text-blue-600 hover:text-blue-800 py-1.5 border border-blue-200 rounded hover:bg-blue-50">
+                        טען עוד 50 (מוצג {visibleCount} מתוך {filteredProducts.length})
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             )}
