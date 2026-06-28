@@ -9,7 +9,8 @@ const NAV_LINKS = [
   { href: '/account/orders',    label: 'הזמנות',      icon: '📦' },
   { href: '/account/profile',   label: 'הפרטים שלי', icon: '👤' },
   { href: '/account/addresses', label: 'כתובות',      icon: '📍' },
-  { href: '/account/loyalty',   label: 'נקודות',      icon: '⭐', soon: true },
+  { href: '/account/loyalty',   label: 'נקודות',      icon: '⭐' },
+  { href: '/account/club-deals',label: 'מבצעי מועדון',icon: '🏷️' },
   { href: '/account/messages',  label: 'הודעות',      icon: '🔔', soon: true },
 ];
 

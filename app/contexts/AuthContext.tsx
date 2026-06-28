@@ -34,6 +34,9 @@ export interface AuthUser {
   defaultBillingAddress?: Address | null;
   addresses?: Address[];
   newsletterSubscribed?: boolean;
+  // שדות מועדון — תצוגה בלבד; לוגיקת צבירה בשלב 3
+  totalSpent?: number;       // ₪ מצטבר — קובע דרגה (הדרגה לעולם לא יורדת)
+  loyaltyPoints?: number;    // נקודות לממש
 }
 
 interface AuthContextType {
@@ -117,6 +120,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   defaultBillingAddress: data.defaultBillingAddress ?? null,
                   addresses: data.addresses ?? [],
                   newsletterSubscribed: data.newsletterSubscribed ?? false,
+                  // שדות מועדון — 0 כברירת מחדל עד שיתמלאו בשלב 3
+                  totalSpent: data.totalSpent ?? 0,
+                  loyaltyPoints: data.loyaltyPoints ?? 0,
                 };
               } else {
                 // משתמש חדש - צור רשומה

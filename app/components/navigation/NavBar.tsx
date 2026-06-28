@@ -9,6 +9,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useShaliach } from "@/app/contexts/ShaliachContext";
+import { getTier, getNextTierInfo } from "@/app/lib/loyalty";
 import MobileDrawerMenu from "./MobileDrawerMenu";
 import lifeEvents from "@/data/lifeEvents";
 import AlgoliaSearch from "@/app/components/search/AlgoliaSearch";
@@ -473,12 +474,32 @@ function NavBarContent() {
                         <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", marginBottom: 8 }}>
                           שלום, {user.firstName || user.displayName?.split(" ")[0] || "אורח"} 👋
                         </div>
-                        {/* פס נקודות — placeholder עד שלב 3 */}
-                        <div style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>0 נקודות · דרגת ברונזה</div>
-                        <div style={{ height: 4, background: "#F0EDE8", borderRadius: 0, overflow: "hidden" }}>
-                          <div style={{ width: "0%", height: "100%", background: "#C5A028", transition: "width 0.4s" }} />
-                        </div>
-                        <div style={{ fontSize: 10, color: "#bbb", marginTop: 3, textAlign: "left" }}>0 / 500 נקודות לכסף</div>
+                        {/* פס דרגה — מחובר ל-totalSpent אמיתי */}
+                        {(() => {
+                          const spent = user.totalSpent ?? 0;
+                          const pts   = user.loyaltyPoints ?? 0;
+                          const tier  = getTier(spent);
+                          const next  = getNextTierInfo(spent);
+                          return (
+                            <>
+                              <div style={{ fontSize: 11, color: "#888", marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                                <span style={{ color: tier.color, fontWeight: 700 }}>{tier.icon} {tier.label}</span>
+                                <span>·</span>
+                                <span>{pts.toLocaleString("he-IL")} נקודות</span>
+                              </div>
+                              {next.nextTier ? (
+                                <>
+                                  <div style={{ height: 4, background: "#F0EDE8", overflow: "hidden" }}>
+                                    <div style={{ width: `${next.progressPercent}%`, height: "100%", background: tier.color, transition: "width 0.4s" }} />
+                                  </div>
+                                  <div style={{ fontSize: 10, color: "#bbb", marginTop: 3 }}>{next.progressLabel}</div>
+                                </>
+                              ) : (
+                                <div style={{ fontSize: 10, color: tier.color, marginTop: 3, fontWeight: 600 }}>הדרגה הגבוהה ביותר 🏆</div>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
 
                       {/* קישורי חשבון */}

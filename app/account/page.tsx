@@ -1,13 +1,14 @@
 'use client';
 import { useAuth } from '@/app/contexts/AuthContext';
 import Link from 'next/link';
+import { getTier, getNextTierInfo } from '@/app/lib/loyalty';
 
 const QUICK_LINKS = [
   { href: '/account/orders',    icon: '📦', title: 'ההזמנות שלי',        desc: 'עקוב אחרי הזמנות פעילות ועיין בהיסטוריה' },
   { href: '/account/profile',   icon: '👤', title: 'הפרטים שלי',         desc: 'ערוך שם, טלפון, תאריך לידה ופרטי חשבון' },
   { href: '/account/addresses', icon: '📍', title: 'הכתובות שלי',        desc: 'נהל כתובות משלוח וחיוב שמורות' },
-  { href: '/account/loyalty',   icon: '⭐', title: 'הנקודות שלי',        desc: 'צבור נקודות וקבל הטבות בלעדיות', soon: true },
-  { href: '/account/club-deals',icon: '🏷️', title: 'מבצעי מועדון',       desc: 'מבצעים בלעדיים לחברי מועדון', soon: true },
+  { href: '/account/loyalty',   icon: '⭐', title: 'הנקודות שלי',        desc: 'דרגת חברות, נקודות וההטבות שלך' },
+  { href: '/account/club-deals',icon: '🏷️', title: 'מבצעי מועדון',       desc: 'הטבות ומבצעים לפי דרגת חברות' },
   { href: '/account/messages',  icon: '🔔', title: 'ההודעות שלי',        desc: 'עדכונים ופניות שירות', soon: true },
 ];
 
@@ -31,24 +32,44 @@ export default function AccountPage() {
         </p>
       </div>
 
-      {/* כרטיס נקודות — placeholder עד שלב 3 */}
-      <div style={{ background: '#1a1a1a', color: '#fff', padding: '20px 24px', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
-        <div>
-          <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>מועדון YOUR SOFER</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>0</div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>נקודות · דרגת ברונזה</div>
-        </div>
-        <div style={{ flex: 1, minWidth: 180 }}>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 6 }}>התקדמות לדרגת כסף</div>
-          <div style={{ height: 6, background: 'rgba(255,255,255,0.15)', overflow: 'hidden' }}>
-            <div style={{ width: '0%', height: '100%', background: '#C5A028' }} />
-          </div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>0 / 500 נקודות</div>
-        </div>
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.2)', padding: '6px 12px' }}>
-          🔜 מערכת נקודות בקרוב
-        </div>
-      </div>
+      {/* כרטיס מועדון — מחובר ל-totalSpent ו-loyaltyPoints אמיתיים */}
+      {(() => {
+        const spent = user.totalSpent ?? 0;
+        const pts   = user.loyaltyPoints ?? 0;
+        const tier  = getTier(spent);
+        const next  = getNextTierInfo(spent);
+        return (
+          <Link href="/account/loyalty" style={{ textDecoration: 'none', display: 'block', marginBottom: 28 }}>
+            <div style={{ background: '#1a1a1a', color: '#fff', padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap', cursor: 'pointer' }}>
+              {/* שמאל — דרגה ונקודות */}
+              <div style={{ minWidth: 140 }}>
+                <div style={{ fontSize: 11, color: tier.color, fontWeight: 700, letterSpacing: 1, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span>{tier.icon}</span> מועדון YOUR SOFER · {tier.label}
+                </div>
+                <div style={{ fontSize: 32, fontWeight: 700, lineHeight: 1 }}>{pts.toLocaleString('he-IL')}</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>נקודות זמינות</div>
+              </div>
+              {/* ימין — פס התקדמות */}
+              <div style={{ flex: 1, minWidth: 180 }}>
+                {next.nextTier ? (
+                  <>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 6 }}>{next.progressLabel}</div>
+                    <div style={{ height: 6, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+                      <div style={{ width: `${next.progressPercent}%`, height: '100%', background: tier.color, transition: 'width 0.6s ease' }} />
+                    </div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 5 }}>
+                      ₪{spent.toLocaleString('he-IL')} מתוך ₪{next.nextTier.minSpent.toLocaleString('he-IL')}
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ fontSize: 13, color: tier.color, fontWeight: 700 }}>הדרגה הגבוהה ביותר 🏆</div>
+                )}
+              </div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>← לדשבורד המועדון</div>
+            </div>
+          </Link>
+        );
+      })()}
 
       {/* רשת קישורים מהירים */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
