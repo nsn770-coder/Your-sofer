@@ -5,6 +5,7 @@ import {
   collection, getDocs, query, orderBy, doc, updateDoc, getDoc, setDoc, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/app/firebase';
+import { getEligibleRecipients, type NewsletterRecipient } from '@/lib/getEligibleRecipients';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { getAuthLazy } from '@/lib/authLazy';
 
@@ -18,17 +19,7 @@ interface EmailTemplate {
   updatedAt?: { seconds: number } | Date;
 }
 
-interface ContactRow {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  source: string;
-  sourceLabel: string;
-  consent: boolean;
-  optOut: boolean;
-  createdAt?: { seconds: number };
-}
+type ContactRow = NewsletterRecipient;
 
 interface SentEmail {
   id: string;
@@ -49,16 +40,6 @@ const TEMPLATE_META: Record<string, { label: string }> = {
   custom_update:      { label: 'עדכון כללי ללקוח' },
 };
 
-const SOURCE_LABELS: Record<string, string> = {
-  club:             'מועדון',
-  mezuzah_funnel:   'פאנל מזוזות',
-  newsletter:       'ניוזלטר',
-  lead:             'ליד',
-};
-
-function sourceLabel(src: string): string {
-  return SOURCE_LABELS[src] ?? 'ליד';
-}
 
 const DEFAULT_TEMPLATES: Record<string, { subject: string; bodyHtml: string; isActive: boolean }> = {
   order_confirmation: {
@@ -313,31 +294,13 @@ export default function EmailsPage() {
     finally { setTemplatesLoading(false); }
   }, [seedTemplates]);
 
-  // ── Load contacts — leads with consent=true only ───────────────────────────
+  // ── Load contacts — delegates to getEligibleRecipients ───────────────────
 
   const loadContacts = useCallback(async () => {
     setContactsLoading(true);
     setContactsError(null);
     try {
-      const snap = await getDocs(query(collection(db, 'leads'), orderBy('createdAt', 'desc')));
-      const rows: ContactRow[] = [];
-      snap.forEach(d => {
-        const data = d.data();
-        // Only include leads that explicitly gave consent
-        if (data.consent !== true) return;
-        rows.push({
-          id: d.id,
-          name: data.name || '',
-          email: (data.email as string) || '',
-          phone: data.phone || '',
-          source: (data.source as string) || 'lead',
-          sourceLabel: sourceLabel((data.source as string) || 'lead'),
-          consent: true,
-          optOut: data.optOut === true,
-          createdAt: data.createdAt,
-        });
-      });
-      setContacts(rows);
+      setContacts(await getEligibleRecipients());
     } catch (e: any) {
       console.error('[loadContacts]', e);
       setContactsError('שגיאה בטעינת הרשימה — ' + (e?.message ?? 'נסה לרענן'));
@@ -384,8 +347,9 @@ export default function EmailsPage() {
   }
 
   // ── Contacts filter + selection ────────────────────────────────────────────
+  // All records from getEligibleRecipients() are already consent+!optOut+email,
+  // so every row in this list can be selected and sent to.
 
-  // Unique source labels found in the loaded data
   const uniqueSources = ['הכל', ...Array.from(new Set(contacts.map(c => c.sourceLabel)))];
 
   const filteredContacts = contacts.filter(c => {
@@ -395,25 +359,19 @@ export default function EmailsPage() {
     return matchQ && matchSrc;
   });
 
-  // Eligible = consent (already guaranteed) + has email + not opted out
-  const eligibleFiltered = filteredContacts.filter(isEligible);
-  const eligibleTotal   = contacts.filter(isEligible).length;
-
-  const allSelected = eligibleFiltered.length > 0 && eligibleFiltered.every(c => selected.has(c.id));
+  const allSelected = filteredContacts.length > 0 && filteredContacts.every(c => selected.has(c.id));
 
   function toggleAll() {
     const next = new Set(selected);
     if (allSelected) {
-      eligibleFiltered.forEach(c => next.delete(c.id));
+      filteredContacts.forEach(c => next.delete(c.id));
     } else {
-      eligibleFiltered.forEach(c => next.add(c.id));
+      filteredContacts.forEach(c => next.add(c.id));
     }
     setSelected(next);
   }
 
   function toggleOne(id: string) {
-    const contact = contacts.find(c => c.id === id);
-    if (!contact || !isEligible(contact)) return;
     const next = new Set(selected);
     if (next.has(id)) next.delete(id); else next.add(id);
     setSelected(next);
@@ -440,7 +398,7 @@ export default function EmailsPage() {
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
           {([
             { key: 'templates', label: '📋 תבניות מיילים' },
-            { key: 'leads',     label: `👥 רשימת תפוצה (${eligibleTotal} זכאים)` },
+            { key: 'leads',     label: `👥 רשימת תפוצה (${contacts.length})` },
             { key: 'history',   label: '📨 היסטוריית שליחות' },
           ] as { key: Section; label: string }[]).map(s => (
             <button key={s.key} onClick={() => setSection(s.key)}
@@ -539,9 +497,8 @@ export default function EmailsPage() {
             {/* Stats bar */}
             <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
               {[
-                { label: 'סה״כ ברשימה', value: contacts.length, color: '#1E3A8A' },
-                { label: 'זכאים לשליחה', value: eligibleTotal, color: '#15803d' },
-                { label: 'הסירו עצמם', value: contacts.filter(c => c.optOut).length, color: '#dc2626' },
+                { label: 'זכאים לשליחה', value: contacts.length, color: '#15803d' },
+                { label: 'נבחרו כעת',    value: selected.size,   color: '#1E3A8A' },
               ].map(s => (
                 <div key={s.label} style={{ background: '#fff', borderRadius: 10, padding: '10px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.07)', minWidth: 110 }}>
                   <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{s.value}</div>
@@ -611,67 +568,43 @@ export default function EmailsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredContacts.map((c, i) => {
-                        const eligible = isEligible(c);
-                        const rowBg = c.optOut
-                          ? '#fef2f2'
-                          : selected.has(c.id)
-                            ? '#EFF4FF'
-                            : i % 2 === 0 ? '#fff' : '#fafafa';
-                        return (
-                          <tr key={c.id} style={{ borderTop: '1px solid #f0f0f0', background: rowBg, opacity: c.optOut ? 0.6 : 1 }}>
-                            <td style={{ padding: '10px 14px' }}>
-                              <input
-                                type="checkbox"
-                                checked={selected.has(c.id)}
-                                disabled={!eligible}
-                                onChange={() => toggleOne(c.id)}
-                                style={{ cursor: eligible ? 'pointer' : 'not-allowed', accentColor: '#1E3A8A' }}
-                                title={!eligible ? (c.optOut ? 'הוסר מהרשימה' : 'אין כתובת מייל') : ''}
-                              />
-                            </td>
-                            <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: 12, color: c.email ? '#1E3A8A' : '#ccc' }}>
-                              {c.email || <span style={{ color: '#ccc', fontStyle: 'italic' }}>ללא מייל</span>}
-                            </td>
-                            <td style={{ padding: '10px 14px', fontWeight: 600, color: '#333' }}>{c.name || '—'}</td>
-                            <td style={{ padding: '10px 14px' }}>
-                              <span style={{
-                                display: 'inline-block', padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                                background: c.source === 'club' ? '#eff6ff' : c.source === 'mezuzah_funnel' ? '#fef9c3' : '#f3f4f6',
-                                color: c.source === 'club' ? '#1d4ed8' : c.source === 'mezuzah_funnel' ? '#854d0e' : '#555',
-                              }}>
-                                {c.sourceLabel}
-                              </span>
-                            </td>
-                            <td style={{ padding: '10px 14px' }}>
-                              {c.optOut ? (
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: '#fef2f2', color: '#dc2626' }}>
-                                  🚫 הוסר
-                                </span>
-                              ) : (
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: '#dcfce7', color: '#15803d' }}>
-                                  ✓ פעיל
-                                </span>
-                              )}
-                            </td>
-                            <td style={{ padding: '10px 14px', color: '#888', fontSize: 11 }}>{fmtDate(c.createdAt)}</td>
-                          </tr>
-                        );
-                      })}
+                      {filteredContacts.map((c, i) => (
+                        <tr key={c.id} style={{ borderTop: '1px solid #f0f0f0', background: selected.has(c.id) ? '#EFF4FF' : i % 2 === 0 ? '#fff' : '#fafafa' }}>
+                          <td style={{ padding: '10px 14px' }}>
+                            <input
+                              type="checkbox"
+                              checked={selected.has(c.id)}
+                              onChange={() => toggleOne(c.id)}
+                              style={{ cursor: 'pointer', accentColor: '#1E3A8A' }}
+                            />
+                          </td>
+                          <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: 12, color: '#1E3A8A' }}>
+                            {c.email}
+                          </td>
+                          <td style={{ padding: '10px 14px', fontWeight: 600, color: '#333' }}>{c.name || '—'}</td>
+                          <td style={{ padding: '10px 14px' }}>
+                            <span style={{
+                              display: 'inline-block', padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+                              background: c.source === 'club' ? '#eff6ff' : c.source === 'mezuzah_funnel' ? '#fef9c3' : '#f3f4f6',
+                              color: c.source === 'club' ? '#1d4ed8' : c.source === 'mezuzah_funnel' ? '#854d0e' : '#555',
+                            }}>
+                              {c.sourceLabel}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 14px' }}>
+                            <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: '#dcfce7', color: '#15803d' }}>
+                              ✓ consent
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 14px', color: '#888', fontSize: 11 }}>{fmtDate(c.createdAt)}</td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
               )}
             </div>
 
-            {/* Legend */}
-            {!contactsLoading && !contactsError && contacts.length > 0 && (
-              <div style={{ marginTop: 12, fontSize: 11, color: '#aaa', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                <span>✓ פעיל = ניתן לשליחה</span>
-                <span>🚫 הוסר = ביקש הסרה (optOut) — לא ניתן לבחירה</span>
-                <span>ללא מייל = לא ניתן לשלוח</span>
-              </div>
-            )}
           </div>
         )}
 
