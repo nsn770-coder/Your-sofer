@@ -10,9 +10,10 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const [signingIn, setSigningIn] = useState(false);
 
-  // אחרי כניסה מוצלחת — הפנה לחשבון (או לעמוד שרצו ללכת אליו)
+  // אחרי כניסה מוצלחת — אדמין לדשבורד, אחרים ל-?next או /account
   useEffect(() => {
     if (!loading && user) {
+      if (user.role === 'admin') { router.replace('/admin'); return; }
       const next = searchParams.get('next') || '/account';
       router.replace(next);
     }
