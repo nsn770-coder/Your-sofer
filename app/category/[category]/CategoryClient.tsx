@@ -1565,27 +1565,30 @@ export default function CategoryClient({ category }: { category: string }) {
               <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 10 }}>1. בחר סוג עיצוב</div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 {([
-                  { id: 'print-top', label: 'הדפסה למעלה', desc: 'הדפסה על חלק עליון', icon: '⬆️' },
-                  { id: 'print-bottom', label: 'הדפסה למטה', desc: 'הדפסה על שוליים', icon: '⬇️' },
-                  { id: 'embroidery', label: 'רקמה', desc: '+₪5 ליחידה', icon: '🧵' },
-                ] as { id: string; label: string; desc: string; icon: string }[]).map(opt => (
+                  { id: 'print-top', label: 'הדפסה למעלה', desc: 'הדפסה על חלק עליון', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638747/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_%D7%A2%D7%9D_%D7%94%D7%93%D7%A4%D7%A1_%D7%9C%D7%9E%D7%A2%D7%9C%D7%94_dh4nuv.png' },
+                  { id: 'print-bottom', label: 'הדפסה למטה', desc: 'הדפסה על שוליים', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638855/ChatGPT_Image_Jun_28_2026_12_27_20_PM_amqsji.png' },
+                  { id: 'embroidery', label: 'רקמה', desc: '+₪5 ליחידה', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638923/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%A0%D7%94_%D7%A2%D7%9D_%D7%A8%D7%A7%D7%9E%D7%94_%D7%95%D7%95%D7%A8%D7%95%D7%93_n9tjmk.png' },
+                ] as { id: string; label: string; desc: string; img: string }[]).map(opt => (
                   <button
                     key={opt.id}
                     onClick={() => setKippotPrintType(opt.id as typeof kippotPrintType)}
                     style={{
                       flex: '1 1 140px',
-                      padding: '14px 16px',
+                      padding: 0,
                       border: kippotPrintType === opt.id ? '2px solid #C5A028' : '2px solid #E5E0D5',
                       background: kippotPrintType === opt.id ? 'rgba(197,160,40,0.08)' : '#fff',
                       cursor: 'pointer',
                       textAlign: 'right',
                       fontFamily: 'inherit',
                       transition: 'all 0.15s',
+                      overflow: 'hidden',
                     }}
                   >
-                    <div style={{ fontSize: 20, marginBottom: 4 }}>{opt.icon}</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a' }}>{opt.label}</div>
-                    <div style={{ fontSize: 11, color: '#9C7B3F', marginTop: 2 }}>{opt.desc}</div>
+                    <img src={opt.img} alt={opt.label} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} />
+                    <div style={{ padding: '10px 12px' }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a' }}>{opt.label}</div>
+                      <div style={{ fontSize: 11, color: '#9C7B3F', marginTop: 2 }}>{opt.desc}</div>
+                    </div>
                   </button>
                 ))}
               </div>
