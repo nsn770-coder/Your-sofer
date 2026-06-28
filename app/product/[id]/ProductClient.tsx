@@ -63,6 +63,14 @@ interface Product {
   receivedFromSupplier?: number;
   inStock?: number;
   warehouseBox?: string;
+  clearanceDiscount?: boolean;
+  clearanceSalePrice?: number;
+  originalPrice?: number;
+  isOnSale?: boolean;
+  salePrice?: number;
+  salePercent?: number;
+  saleStartsAt?: string | null;
+  saleEndsAt?: string | null;
 }
 
 interface KlafItem { id: string; name: string; imageUrl: string; status: string; }
@@ -1672,7 +1680,26 @@ export default function ProductClient() {
   const allMediaOptimized = allMedia.map(u => optimizeCloudinaryUrl(u, 800));
   const allMediaThumb     = allMedia.map(u => optimizeCloudinaryUrl(u, 100));
   const hasVideo = !!product.videoUrl;
-  const discount = product.was ? Math.round((1 - product.price / product.was) * 100) : 0;
+  // ── Effective price: clearance > isOnSale (with date check) > base price ──
+  const _now = Date.now();
+  const _saleActive =
+    product.isOnSale === true &&
+    product.salePrice != null &&
+    (product.saleStartsAt == null || new Date(product.saleStartsAt).getTime() <= _now) &&
+    (product.saleEndsAt   == null || new Date(product.saleEndsAt).getTime()   >= _now);
+  const effectivePrice =
+    product.clearanceDiscount === true && product.clearanceSalePrice != null
+      ? product.clearanceSalePrice
+      : _saleActive
+        ? product.salePrice!
+        : product.price;
+  // % badge for isOnSale/clearance discount; separate from the was-based discount
+  const effectivePct = effectivePrice < product.price
+    ? (product.salePercent ?? Math.round((1 - effectivePrice / product.price) * 100))
+    : 0;
+  const discount = effectivePrice === product.price && product.was
+    ? Math.round((1 - product.price / product.was) * 100)
+    : 0;
 
   const EMBROIDERY_CATEGORIES = ['כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן', 'תיקי טלית ותפילין'];
 const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
@@ -1746,17 +1773,19 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
   function handleAddToCart() {
     if (product?.outOfStock) return;
+    const embSurcharge = embroideryText ? embroideryText.length * 5 : 0;
+    const cartPrice = effectivePrice + embSurcharge;
     if (selectedKlafIds.length > 0) {
       for (let i = 0; i < selectedKlafIds.length; i++) {
-        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     } else {
       for (let i = 0; i < qty; i++) {
-        addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     }
-    window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product!.price * qty, items: [{ item_id: product!.id, item_name: product!.name, price: product!.price, quantity: qty }] });
-    pixel.addToCart({ id: product!.id, name: product!.name, price: product!.price, quantity: qty });
+    window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: effectivePrice * qty, items: [{ item_id: product!.id, item_name: product!.name, price: effectivePrice, quantity: qty }] });
+    pixel.addToCart({ id: product!.id, name: product!.name, price: effectivePrice, quantity: qty });
     const initialQty = selectedKlafIds.length > 0 ? selectedKlafIds.length : qty;
     setCartQty(initialQty);
     if (fromWizardParam || fromWizardLS) setShowWizardModal(true);
@@ -1813,9 +1842,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {!compact && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-            <span style={{ fontSize: 28, fontWeight: 800, color: '#1a1a1a' }}>{formatPrice(product.price)}</span>
-            {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
-            {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
+            <span style={{ fontSize: 28, fontWeight: 800, color: effectivePrice < product.price ? '#c0392b' : '#1a1a1a' }}>{formatPrice(effectivePrice)}</span>
+            {effectivePrice < product.price && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.price)}</span>}
+            {effectivePrice >= product.price && product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
+            {effectivePct > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{effectivePct}%</span>}
+            {effectivePct === 0 && discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
           </div>
           {product.bundlePromo && (() => {
             const BUNDLE_LABELS: Record<string, string> = { '3for100': '3 ב-₪100', '4for100': '4 ב-₪100', '5for100': '5 ב-₪100', '12for100': '12 ב-₪100' };
@@ -1829,7 +1860,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           <div style={{ fontSize: 12, color: '#888', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
             <Icon.Truck /> כולל מע״מ · משלוח לכל הארץ
           </div>
-          <InstallmentBadge price={product.price} />
+          <InstallmentBadge price={effectivePrice} />
         </div>
       )}
 
@@ -2245,9 +2276,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             {isMobile && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f0f0f0' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-                  <span style={{ fontSize: 28, fontWeight: 800, color: '#1a1a1a' }}>{formatPrice(product.price)}</span>
-                  {product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
-                  {discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
+                  <span style={{ fontSize: 28, fontWeight: 800, color: effectivePrice < product.price ? '#c0392b' : '#1a1a1a' }}>{formatPrice(effectivePrice)}</span>
+                  {effectivePrice < product.price && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.price)}</span>}
+                  {effectivePrice >= product.price && product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
+                  {effectivePct > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{effectivePct}%</span>}
+                  {effectivePct === 0 && discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
                 </div>
                 {product.bundlePromo && (() => {
                   const BUNDLE_LABELS: Record<string, string> = { '3for100': '3 ב-₪100', '4for100': '4 ב-₪100', '5for100': '5 ב-₪100', '12for100': '12 ב-₪100' };
@@ -2259,7 +2292,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   ) : null;
                 })()}
                 <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Truck /> כולל מע״מ · משלוח לכל הארץ</div>
-                <InstallmentBadge price={product.price} />
+                <InstallmentBadge price={effectivePrice} />
               </div>
             )}
 
@@ -2644,8 +2677,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             paddingBottom: 'calc(10px + env(safe-area-inset-bottom))',
           }}
         >
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#1a1a1a', whiteSpace: 'nowrap' }}>
-            {formatPrice(product.price)}
+          <span style={{ fontSize: 18, fontWeight: 800, color: effectivePrice < product.price ? '#c0392b' : '#1a1a1a', whiteSpace: 'nowrap' }}>
+            {formatPrice(effectivePrice)}
           </span>
           <button
             onClick={handleAddToCart}
