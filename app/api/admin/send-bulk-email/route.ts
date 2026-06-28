@@ -1,8 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { verifyAdminToken } from '@/lib/verifyAdmin';
+import { buildUnsubscribeUrl } from '@/lib/unsubscribeToken';
 
 export const dynamic = 'force-dynamic';
+
+function injectUnsubscribeFooter(html: string, email: string): string {
+  const url = buildUnsubscribeUrl(email);
+  const footer = `
+<div dir="rtl" style="margin-top:32px;padding-top:16px;border-top:1px solid #e5e5e5;text-align:center;font-size:11px;color:#aaa;font-family:Arial,sans-serif;">
+  קיבלת מייל זה כי נרשמת לניוזלטר YourSofer.
+  <br/>
+  <a href="${url}" style="color:#aaa;text-decoration:underline;">להסרה מרשימת הדיוור — לחץ/י כאן</a>
+</div>`;
+  if (html.includes('</body>')) return html.replace('</body>', footer + '</body>');
+  return html + footer;
+}
+
+async function getOptedOutEmails(
+  db: ReturnType<typeof getAdminDb>,
+  emails: string[]
+): Promise<Set<string>> {
+  const optedOut = new Set<string>();
+  const normalized = emails.map(e => e.toLowerCase());
+  // Firestore 'in' supports up to 30 values per query
+  for (let i = 0; i < normalized.length; i += 30) {
+    const chunk = normalized.slice(i, i + 30);
+    const snap = await db.collection('leads').where('email', 'in', chunk).get();
+    snap.forEach(d => {
+      if (d.data().optOut === true) optedOut.add((d.data().email ?? '').toLowerCase());
+    });
+  }
+  return optedOut;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,11 +55,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
     }
 
+    // Filter opted-out recipients before sending
+    const validEmails = recipients.filter((e: unknown) => e && typeof e === 'string') as string[];
+    const optedOutEmails = await getOptedOutEmails(adminDb, validEmails);
+
     let sent = 0;
     let failed = 0;
+    let skipped = 0;
 
     for (const email of recipients) {
       if (!email || typeof email !== 'string') { failed++; continue; }
+      if (optedOutEmails.has(email.toLowerCase())) { skipped++; continue; }
+
+      const unsubUrl = buildUnsubscribeUrl(email);
       try {
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -41,7 +79,11 @@ export async function POST(req: NextRequest) {
             from: 'YourSofer <shop@your-sofer.com>',
             to: [email],
             subject,
-            html: bodyHtml,
+            html: injectUnsubscribeFooter(bodyHtml, email),
+            headers: {
+              'List-Unsubscribe': `<${unsubUrl}>`,
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            },
           }),
         });
         if (res.ok) sent++;
@@ -59,9 +101,10 @@ export async function POST(req: NextRequest) {
       sentAt: new Date(),
       status: failed === 0 ? 'sent' : sent === 0 ? 'failed' : 'partial',
       templateId: templateId ?? null,
+      skipped,
     });
 
-    return NextResponse.json({ success: true, sent, failed });
+    return NextResponse.json({ success: true, sent, failed, skipped });
   } catch (err: any) {
     console.error('[send-bulk-email]', err.message);
     return NextResponse.json({ error: err.message }, { status: 500 });

@@ -160,7 +160,7 @@ function SendModal({
       });
       const data = await res.json();
       if (data.success) {
-        setResult(`נשלח בהצלחה ל-${data.sent} נמענים${data.failed > 0 ? ` (${data.failed} נכשלו)` : ''}`);
+        setResult(`נשלח בהצלחה ל-${data.sent} נמענים${data.failed > 0 ? ` · ${data.failed} נכשלו` : ''}${(data.skipped ?? 0) > 0 ? ` · ${data.skipped} דילוגים (optOut)` : ''}`);
         setTimeout(() => { onSent(); onClose(); }, 2000);
       } else {
         setResult('שגיאה: ' + (data.error || 'unknown'));
