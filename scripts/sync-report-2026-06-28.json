@@ -1,0 +1,1582 @@
+{
+  "date": "2026-06-28T07:13:37.143Z",
+  "supplierSkuCount": 3833,
+  "firestoreCount": 3305,
+  "toDeleteCount": 294,
+  "toImportCount": 822,
+  "newCategories": [],
+  "toDelete": [
+    {
+      "id": "01NBQUWzJ8Z5FUXvCpaL",
+      "sku": "UK42386",
+      "name": "מגש זכוכית מהודר לחלה 45X30 ס\"מ"
+    },
+    {
+      "id": "0CbZL9ytXyMCFrfENj8Z",
+      "sku": "UK18260",
+      "name": "כיפה בד ארטמן כחול כהה 17 ס\"מ"
+    },
+    {
+      "id": "0EHNBP6y5GiOMixBcXvv",
+      "sku": "UK48513",
+      "name": "מעמד לנר זיכרון ממתכת וזכוכית זהב 18X22 ס\"מ"
+    },
+    {
+      "id": "0HQwhlsDh7n1Gi9SslRp",
+      "sku": "UK81047",
+      "name": "פמוטי קריסטל מהודר הדלקת נרות 21 ס\"מ"
+    },
+    {
+      "id": "0K9lTrjildtOfFcSr55f",
+      "sku": "UK82721",
+      "name": "נטלה \"במבוק עבה\" 14 ס\"מ - קוד מעורב"
+    },
+    {
+      "id": "0rn1o7TUbxEBvgHzAa6O",
+      "sku": "UK45565",
+      "name": "עץ ברכות ברכת העסק עברית 20 ס\"מ"
+    },
+    {
+      "id": "0vszBGXtexPpAiAIKoOq",
+      "sku": "UK40820",
+      "name": "כלי לנר הבדלה מקריסטל עם פלקטה \"ירושלים\" 13 ס\"מ"
+    },
+    {
+      "id": "1Dl3vgnBMmd31awvVOQE",
+      "sku": "UK80078",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "1PcihkiC515iiknJI4kb",
+      "sku": "UK57382",
+      "name": "עט שחור מהודר עם כיתוב זהב \"תפילת הדרך\" עם עיצוב י"
+    },
+    {
+      "id": "1v8QJK4ZuRU0cLS3d4A9",
+      "sku": "UK48639",
+      "name": "ספרון תהילים \"רבי\" 4 ס\"מ - באריזת PV בסלסלת קש"
+    },
+    {
+      "id": "2Fmp9FM3x1LCJnVgHGaf",
+      "sku": "UK18132",
+      "name": "כיפה פשתן עם רקמה 19 ס\"מ"
+    },
+    {
+      "id": "2gC5Iaasr6MUeSIPtUjI",
+      "sku": "UK40864",
+      "name": "סדר הבדלה עם ציפורן נוסח ע.מ 18X12 ס\"מ"
+    },
+    {
+      "id": "2kqhOlbcrP7arJJQfWm1",
+      "sku": "UK12721",
+      "name": "כיפה מהודרת משי פשתן תכלת בהיר 17 ס\"מ"
+    },
+    {
+      "id": "2u4IvWt6zAN0pBGLgDSy",
+      "sku": "UK51173",
+      "name": "ספרון תהילים צבע ורוד 4 ס\"מ - באריזת PV בסלסל"
+    },
+    {
+      "id": "2wOaC80pAeWY6KJ8Yihk",
+      "sku": "UK47815",
+      "name": "סט גביע קידוש + פמוטים + מלחייה מקריסטל עם אבנים ל"
+    },
+    {
+      "id": "32ivfuEz4vV8reYZ5hyj",
+      "sku": "UK35877",
+      "name": "מחזיק מפתחות עט 6.5 ס\"מ"
+    },
+    {
+      "id": "3hWCQSpjr82XShjKFtjx",
+      "sku": "UK81400",
+      "name": "חמסה ברכת הבית פולימר 24X19"
+    },
+    {
+      "id": "3ihJCqUc49m8MUsiLCcn",
+      "sku": "UK82893",
+      "name": "קופת צדקה אקריליק \"ירושלים\" 14.5 ס\"מ"
+    },
+    {
+      "id": "4VXfzm50SodUMiH0GvN0",
+      "sku": "UK41914",
+      "name": "זוג פמוטי קריסטל מהודרים 20.5 ס\"מ"
+    },
+    {
+      "id": "4d22cBmRr5pNPo1ddyTW",
+      "sku": "UK43756",
+      "name": "נר הבדלה \"דונג\" מהודר 30 ס\"מ"
+    },
+    {
+      "id": "4r3UQ1Ol2iW1VsYTdScn",
+      "sku": "UK81706",
+      "name": "נר הבדלה צבעוני ומהודר 16 ס\"מ"
+    },
+    {
+      "id": "5F75bUG1C57cz44plFor",
+      "sku": "UK48827",
+      "name": "תמונה לתלייה מפולימר \"ברכת הבית\" 26X19 ס\"מ"
+    },
+    {
+      "id": "5W3TAI7hVkYLlGIWnAZ2",
+      "sku": "UK80524",
+      "name": "נטלה מהודרת קלה מאלומיניום בגוון כסף 13 ס\"מ"
+    },
+    {
+      "id": "5ftEDd2R65nBoPrpfqia",
+      "sku": "UK19920",
+      "name": "כיפה בד מהודרת גודל 2 - 17.5 ס\"מ"
+    },
+    {
+      "id": "5zm2y6loHyLb6TysmQ4l",
+      "sku": "UK60490",
+      "name": "כיסוי חלה לבן רקמה כסף 51X41ס\"מ"
+    },
+    {
+      "id": "65NlcxU03S1RYvcHvrGR",
+      "sku": "UK51444",
+      "name": "מגש הבדלה אקריליק מרובע 25 ס\"מ"
+    },
+    {
+      "id": "6VXnhKn0bLvLXl0ym1nM",
+      "sku": "UK47444",
+      "name": "סדר הבדלה דמוי עור עם ציפורן נוסח ע.מ 18.5X13 ס\"מ"
+    },
+    {
+      "id": "6qUrKVW3KWScIXqUerGb",
+      "sku": "UK18549",
+      "name": "כיפה בד \"ארט-מן\" 16 ס\"מ לבן"
+    },
+    {
+      "id": "6rnM4JOHlWEv1TdeScav",
+      "sku": "UK60218",
+      "name": "כיסוי חלה מהודר דמוי עור זהב 45X55 ס\"מ"
+    },
+    {
+      "id": "70TVklwawynbUXhIT71N",
+      "sku": "UK41356",
+      "name": "שטיח \"ואנחנו כורעים\" מהודר 60X80 ס\"מ"
+    },
+    {
+      "id": "72i3bMY0WmjbXVxOVf5g",
+      "sku": "UK82887",
+      "name": "סט הבדלה מהודר מקריסטל 20 ס\"מ"
+    },
+    {
+      "id": "75VpSstMhmlLb3hkaQID",
+      "sku": "UK82734",
+      "name": "סט הבדלה מהודר קריסטל עם מגש 34x15 ס\"מ"
+    },
+    {
+      "id": "7DJg0iDJyCUhUhC4tnHS",
+      "sku": "UK11342",
+      "name": "כיפה סרוגה חוט עבה לבן סביב פס כסף 17ס\"מ"
+    },
+    {
+      "id": "7HoW0dnUnTejx4ffoSqm",
+      "sku": "UK49136",
+      "name": "נטלה אקריליק מהודרת שקופה עם אותיות בולטות 12 ס\"מ"
+    },
+    {
+      "id": "7OedNU6KoaigATAAiaTU",
+      "sku": "UK66740",
+      "name": "קיטל מהודר עם דנטל כסף מט מבריק גודל XL"
+    },
+    {
+      "id": "7nPz0FzHG35CicSFrUvS",
+      "sku": "UK42850",
+      "name": "סדר הבדלה מאקריליק נוסח אשכנזי 27X15 ס\"מ"
+    },
+    {
+      "id": "8G7DYSp4fBLrcfEatwIs",
+      "sku": "UK65585",
+      "name": "כיסוי קטיפה מהודר לשטנדר 55x66 ס\"מ - כחול כהה"
+    },
+    {
+      "id": "8GOSxuPT0KAQDTFCnYQZ",
+      "sku": "UK80062",
+      "name": "סט הבדלה מהודר מקריסטל 20 ס\"מ"
+    },
+    {
+      "id": "8ZMX0ONAwfPAQiQVPt2v",
+      "sku": "UK40288",
+      "name": "מעמד לבקבוק יין מאקריליק עם אותיות בולטות נצנץ כסף 20 ס\"מ"
+    },
+    {
+      "id": "8gi4vZwuND1rDvlW1Jse",
+      "sku": "UK67798",
+      "name": "כיסוי חלה מהודר דמוי עור זהב 45X54 ס\"מ"
+    },
+    {
+      "id": "8vbdENt5cQkrr0hp0fN6",
+      "sku": "UK82239",
+      "name": "סט הבדלה מגש מסתובב קריסטל שחור"
+    },
+    {
+      "id": "93lWaLICHEI1y8TlK89G",
+      "sku": "UK42792",
+      "name": "נר הבדלה צבעוני ומהודר 16 ס\"מ"
+    },
+    {
+      "id": "99S3jjp8aS6s2dNiqSgK",
+      "sku": "UK12722",
+      "name": "כיפה מהודרת משי פשתן תכלת בהיר 19 ס\"מ"
+    },
+    {
+      "id": "9HcamNhtcj7BIwMUjd3w",
+      "sku": "UK82462",
+      "name": "סט הבדלה קריסטל זהב עם מגש 25X12.5"
+    },
+    {
+      "id": "9OqFHPqXPEgCGZmnzzm0",
+      "sku": "UK41791",
+      "name": "מחזיק נר הבדלה \"ירושלים\" 13 ס\"מ"
+    },
+    {
+      "id": "9OrQ8ebYsdnpSNAOywaJ",
+      "sku": "UK59495",
+      "name": "תפילה לכלה אקריליק מהודרת 21x16 ס\"מ - כסף"
+    },
+    {
+      "id": "9eKFzhy8fjElCOgnY8tZ",
+      "sku": "UK81340",
+      "name": "מגש אקריליק להבדלה 25 ס\"מ"
+    },
+    {
+      "id": "9u6ircgAww2qZ3gejo9I",
+      "sku": "UK42708",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "A39Q0HeRNK67YeZeVHtz",
+      "sku": "UK55063",
+      "name": "נר הבדלה כחול לבן מהודר 30 ס\"מ"
+    },
+    {
+      "id": "A3W8UnA2xs4mxV5nYZWb",
+      "sku": "UK60478",
+      "name": "כיסוי חלה לבן מסטן עם ריקמה מהודרת 42x52 ס\"מ"
+    },
+    {
+      "id": "A8ACHiZjKsakSG8gMZYd",
+      "sku": "UK67799",
+      "name": "כיסוי חלה מהודר דמוי עור זהב 45X54 ס\"מ"
+    },
+    {
+      "id": "AAVbluBgEwoL486PD3U2",
+      "sku": "UK46893",
+      "name": "זוג פמוטי קריסטל מהודרים עם אבנים 12 ס\"מ"
+    },
+    {
+      "id": "AHhWPgWbpOWKd2i8igX7",
+      "sku": "UK49700",
+      "name": "זוג פמוטי קריסטל מהודרים עם יהלומים לבנים וקנים כסף 22.5 ס\"מ"
+    },
+    {
+      "id": "AIETtgz7jUt7yvkeN86o",
+      "sku": "UK42828",
+      "name": "חנוכיית חוטים חבד לשמן - מוכספת 33X50 ס\"מ"
+    },
+    {
+      "id": "AT1SQlkp91Ah3ZIBVrQe",
+      "sku": "UK42628",
+      "name": "כלי לנר הבדלה ובשמים להבדלה 13 ס\"מ"
+    },
+    {
+      "id": "AYp9wDlftiA5qlH50ktP",
+      "sku": "UK49941",
+      "name": "פמוטי אלומיניום מהודרים 5 קנים - כסף ורוז גולד 35 ס\"מ"
+    },
+    {
+      "id": "AaquePlVamb3wE0ish9r",
+      "sku": "UK83001",
+      "name": "סגולה מוזהבת 8x5 ס\"מ \"לשמירה בדרכים\""
+    },
+    {
+      "id": "ApKkeyowFyNjOYT8uHY4",
+      "sku": "UK10264",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה האש שלי גודל 3 - ורוד"
+    },
+    {
+      "id": "BIA1ZXqpeqIakf19dF3d",
+      "sku": "UK16423",
+      "name": "כיפה קטיפה פלוש שחורה 6 חלקים גודל 7 23 ס\"מ ללא סרט"
+    },
+    {
+      "id": "BNjXbiOSjcfLhtyM3gdq",
+      "sku": "UK35822",
+      "name": "מחזיק מפתחות דמוי עור 4.5 ס\"מ \"האש שלי\" וסגולת"
+    },
+    {
+      "id": "BTl5uxLFdvinHMkiopB0",
+      "sku": "UK82240",
+      "name": "סט הבדלה מגש מסתובב קריסטל רוז גולד"
+    },
+    {
+      "id": "BagDDrQOq0e0DErKWvzA",
+      "sku": "UK40769",
+      "name": "סט הבדלה מהודר 4 חלקים בגימור ניקל בעיטור ירושל"
+    },
+    {
+      "id": "Bi6yZ8sxUsXsvYcecqy4",
+      "sku": "UK81884",
+      "name": "ברכון מהודר דמוי עור - ספר הקידוש נוסח ע.מ. 12X17.5 ס\"מ"
+    },
+    {
+      "id": "COQQFFQPZyBXEH0WgIsP",
+      "sku": "UK18170",
+      "name": "צצ כיפה ד.מ.צ. שחור עם פס אפור 18 ס\"מ"
+    },
+    {
+      "id": "CdRJ45YMoeUYzDWZ00Ly",
+      "sku": "UK35978",
+      "name": "מחזיק מפתחות חמסה ניקל - 5 ס\"מ"
+    },
+    {
+      "id": "CsqxfUpSshxXDsX7hvn3",
+      "sku": "UK41256",
+      "name": "נר הבדלה צבעוני ומהודר 8 ס\"מ"
+    },
+    {
+      "id": "CsuSD1W6i2y9d6R3ylrA",
+      "sku": "UK82171",
+      "name": "מחלק יין מאקריליק מהודר \"כסף\" עם 8 כוסות 21 ס\"מ"
+    },
+    {
+      "id": "D6GZj8mSn5btlBBObnSC",
+      "sku": "UK80627",
+      "name": "ברכת העסק מתכת חיתוך לייזר - 35X48 ס\"מ"
+    },
+    {
+      "id": "DDvMFAoP05oWiMRJWynY",
+      "sku": "UK18319",
+      "name": "כיפה בד ארטמן שחור 20 ס\"מ"
+    },
+    {
+      "id": "DEFo7byJ7T6qyCKaNgLt",
+      "sku": "UK14536",
+      "name": "כיפה מהודרת משי פשתן תכלת בהיר 17 ס\"מ"
+    },
+    {
+      "id": "DdYOPgIrrmqeY191rtnl",
+      "sku": "UK82427",
+      "name": "קופת צדקה קריסטל"
+    },
+    {
+      "id": "EjKhZlJuKXpQZ2wbdb8u",
+      "sku": "UK40005",
+      "name": "סט הבדלה מהודר 4 חלקים בגימור ניקל בעיטור מתומן 22"
+    },
+    {
+      "id": "Eji3DXrGaX0mHujPiJjZ",
+      "sku": "UK82862",
+      "name": "מסגרת זכוכית מהודרת ברכת העסק 20X25 ס\"מ"
+    },
+    {
+      "id": "EnjMWHVEUelnzXewml5c",
+      "sku": "UK18559",
+      "name": "כיפה בד \"ארט-מן\" 18 ס\"מ לבן"
+    },
+    {
+      "id": "Err8Iso3VnAwwbq5HnU8",
+      "sku": "UK43082",
+      "name": "נר הבדלה \"דונג\" מהודר 30 ס\"מ"
+    },
+    {
+      "id": "Et5HpzRdKNjmXrfe4hpx",
+      "sku": "UK40146",
+      "name": "מגש חלה עץ מנגו טבעי + סכין 41X27 ס\"מ"
+    },
+    {
+      "id": "Ey9sJs0eBFmieoHPDaWI",
+      "sku": "UK51176",
+      "name": "ספרון תהילים צבע כסף 6 ס\"מ - באריזת PV בסלסלת"
+    },
+    {
+      "id": "EzbZ6vHdIMDaBCTrTU4O",
+      "sku": "UK15987",
+      "name": "כיפה בד מהודרת - כחול - גודל 2 - 17.5 ס\"מ"
+    },
+    {
+      "id": "F88jf49fPEBbUDjoyfyJ",
+      "sku": "UK47821",
+      "name": "פמוטי קריסטל חמשייה מהודרים 32 ס\"מ"
+    },
+    {
+      "id": "FI7f1PXVAB69Gt7BlySD",
+      "sku": "UK82606",
+      "name": "זוג פמוטים ציפוי זהב\"פולימר\" מהודרים 19 ס\"מ"
+    },
+    {
+      "id": "FXHfUuMecYFLNyG9dEuF",
+      "sku": "UK67019",
+      "name": "כיסוי פלטה מהודר מעכב בערה 70X80 ס\"מ"
+    },
+    {
+      "id": "FZxExRT74cvVERzKE3ce",
+      "sku": "UK81576",
+      "name": "נר הבדלה צבעוני ומהודר 16 ס\"מ"
+    },
+    {
+      "id": "Fnx5Vk6WCKFbqPkYzCXb",
+      "sku": "UK35774",
+      "name": "מחזיק מפתחות ניקל עם לולאה מזל ברכה והצלחה ושיבוץ אבנים"
+    },
+    {
+      "id": "GQPydtKImHv9WeR62kwO",
+      "sku": "UK41125",
+      "name": "סט הבדלה \"מגן דוד\" 3 חלקים"
+    },
+    {
+      "id": "GRMJgdmgJFa7iXvF8alK",
+      "sku": "uk49558",
+      "name": "נטלה \"במבוק עבה\" עם הדפסה צבעונית \"נטילת ידים\""
+    },
+    {
+      "id": "GWJ9XtATTWMzBi1AGLyu",
+      "sku": "UK80977",
+      "name": "צמיד כסף טהור 925 \"מגן דוד\""
+    },
+    {
+      "id": "GYKO9uKHXrEOv97QH4ev",
+      "sku": "UK66739",
+      "name": "קיטל מהודר עם דנטל כסף מט מבריק גודל L"
+    },
+    {
+      "id": "Gyp9qhOANkJ1XZUeTno1",
+      "sku": "UK82437",
+      "name": "קופת צדקה מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "H4mmJIU6bohB1V4VrBQm",
+      "sku": "UK81358",
+      "name": "קופת צדקה \"האש שלי\" מפולימר 13 ס\"מ"
+    },
+    {
+      "id": "H8WcjveHklsVjXof5p1D",
+      "sku": "UK81337",
+      "name": "מים אחרונים פולימר מהודר 12 ס\"מ"
+    },
+    {
+      "id": "HEzBxH9Mk1p5mJJgsi7v",
+      "sku": "UK80538",
+      "name": "נטלה מהודרת קלה מאלומיניום בגוון כסף 13 ס\"מ"
+    },
+    {
+      "id": "HWQzcfuGcDwcqY68633Z",
+      "sku": "UK34301",
+      "name": "מחזיק מפתחות חמסה \"חי\" רקע אדום 4 סמ"
+    },
+    {
+      "id": "HdVzMg44AMf8neNhNVc9",
+      "sku": "UK82783",
+      "name": "כלי לבשמים מקריסטל 9 ס\"מ עם ציפורן"
+    },
+    {
+      "id": "HxfVwFrCe7nWtKCchLfb",
+      "sku": "UK48186",
+      "name": "ספרון תהילים \"רזיאל המלאך\" 5X6 ס\"מ"
+    },
+    {
+      "id": "I6yDEMSJP9UNfXaWuAwq",
+      "sku": "UK80063",
+      "name": "סט הבדלה מהודר מקריסטל 20 ס\"מ"
+    },
+    {
+      "id": "I94T6xyBBvVs067HURGF",
+      "sku": "UK42715",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "IBsZSVlWsPF10AOBb3rX",
+      "sku": "UK82708",
+      "name": "גביע קידוש מהודר מקרמיקה בלי רגל עם תחתית 9 ס\"מ"
+    },
+    {
+      "id": "IIP0trnnhKvj402Jakm3",
+      "sku": "UK41257",
+      "name": "נר הבדלה צבעוני ומהודר 13 ס\"מ"
+    },
+    {
+      "id": "IK6gdQ6OflSDETlXxw1V",
+      "sku": "UK82140",
+      "name": "מלחייה קריסטל עם פלקטה \"פרחים\" ומכסה 6 ס\"מ"
+    },
+    {
+      "id": "IKbicFzWGjIW9fkKXekn",
+      "sku": "UK35951",
+      "name": "קופת צדקה עץ עם אפוקסי לבן 14 ס\"מ"
+    },
+    {
+      "id": "IiQtW6n1JmvM6Hz1Id0K",
+      "sku": "UK18759",
+      "name": "כיפה קורדרוי \"ארט-מן\" 19 ס\"מ שחור"
+    },
+    {
+      "id": "IylFgLUJJmWvUtfrhWtw",
+      "sku": "UK82817",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "JV4k9NxA8rGijNqZQIv0",
+      "sku": "UK40609",
+      "name": "קופת צדקה פח מהודרת \"ירושלים\" 10 ס\"מ"
+    },
+    {
+      "id": "JZyO4cdb2n4w9Ruo7Apu",
+      "sku": "UK19505",
+      "name": "כיפה סטן דלוקס אופוויט 20 ס\"מ עם מקום לסי"
+    },
+    {
+      "id": "Jji5KfLlNxwAdPesRlFl",
+      "sku": "UK35964",
+      "name": "כלי לבשמים מתומן אקריל"
+    },
+    {
+      "id": "JnLrqBhwlbXFKeIMOou4",
+      "sku": "UK10327",
+      "name": "כיפה בד מהודרת 17 ס\"מ - אופוויט"
+    },
+    {
+      "id": "L6WRLh1GFTol5ki1wYX7",
+      "sku": "UK81084",
+      "name": "סט הבדלה מהודר מקריסטל עם מגש 25 ס\"מ"
+    },
+    {
+      "id": "LGO5adX8NCGBk6lRMOIm",
+      "sku": "UK40126",
+      "name": "פמוטי נסיעה מקריסטל \"מעויינים\" כסף 10x5 ס\"מ"
+    },
+    {
+      "id": "LL1Y1tyJPYtKtURyF94n",
+      "sku": "UK52913",
+      "name": "רימון מהודר מאלומיניום אמייל בורדו 87 ס\"מ"
+    },
+    {
+      "id": "LtATZikWA117hGsa4Wka",
+      "sku": "UK50088",
+      "name": "מחזיק גפרורים אקריליק זהב שוכב"
+    },
+    {
+      "id": "M2kK5Et2KIJbHnEP4M8m",
+      "sku": "UK83599",
+      "name": "אגרטל קריסטל זר פרחים זהב 11סמ"
+    },
+    {
+      "id": "MdYJI7xwr1zlfmx0OXzC",
+      "sku": "UK41949",
+      "name": "זוג פמוטי קריסטל מהודרים 22.5 סמ"
+    },
+    {
+      "id": "Mkz0ip8fai84yM7AG0bc",
+      "sku": "UK81298",
+      "name": "מסגרת זכוכית מהודרת אשר יצר נוסח ספרדי 22X17 ס\"מ"
+    },
+    {
+      "id": "NVnYleQXTUV9YeyYA6GQ",
+      "sku": "UK81341",
+      "name": "מגש אקריליק להבדלה 25X25 ס\"מ"
+    },
+    {
+      "id": "Ni1WzKpQAhnCJ8MOySl4",
+      "sku": "UK16385",
+      "name": "כיפה \"מופת\" קטיפה שחורה גודל 8 24 ס\"מ - 4 חלקים ללא סרט"
+    },
+    {
+      "id": "O8atlxzJKCM8AW054DTe",
+      "sku": "UK80306",
+      "name": "כלי לבשמים מקריסטל 8X5 ס\"מ"
+    },
+    {
+      "id": "OEyPuPmjjcGBmsOUAVmI",
+      "sku": "UK40396",
+      "name": "סט הבדלה מהודר מקרמיקה 20 ס\"מ"
+    },
+    {
+      "id": "OHNncQoa4UGnIPiL5HIF",
+      "sku": "UK82073",
+      "name": "כלי לבשמים מקריסטל עם פלקטה 9 ס\"מ עם ציפורן"
+    },
+    {
+      "id": "OWr5lbZopI54ZbJlYGND",
+      "sku": "UK81987",
+      "name": "מסגרת זכוכית מהודרת אשר יצר נוסח ספרדי 20X25 ס\"מ"
+    },
+    {
+      "id": "Okq6hOSKIYE86oPBQNas",
+      "sku": "UK42481",
+      "name": "סט הבדלה מהודר מאלומיניום גווני אפור 14X23 ס\"מ"
+    },
+    {
+      "id": "P3b2jJEKVDYuhfuZS2Tr",
+      "sku": "UK40081",
+      "name": "נר הבדלה עם בשמים צבעים שונים 25 ס\"מ"
+    },
+    {
+      "id": "PI4qgfd5pMrgg71LorVf",
+      "sku": "UK46285",
+      "name": "מצת חשמלי עם טעינה USB עם פלקטה עיטורים"
+    },
+    {
+      "id": "PQYOWrvpot6DKtiTttWK",
+      "sku": "UK81575",
+      "name": "נר הבדלה צבעוני ומהודר 16 ס\"מ"
+    },
+    {
+      "id": "PaIeFKpgqEbR78daopDs",
+      "sku": "UK35859",
+      "name": "מחזיק מפתחות חמסה \"ירושלים\" משובץ 5.5 ס\"מ"
+    },
+    {
+      "id": "PiEIphwn2WuYdAZXzbzw",
+      "sku": "UK40742",
+      "name": "ברכה לתלייה זכוכית אשת חיל 13x21 ס\"מ"
+    },
+    {
+      "id": "PqAf1kE1CqrBhL5pWsmD",
+      "sku": "UK80047",
+      "name": "גביע קידוש קריסטל זהב מהודר \"האש שלי\" 16 ס\"מ"
+    },
+    {
+      "id": "Ps66rnYsqgm03p0h64ZI",
+      "sku": "UK47192",
+      "name": "פמוט זכוכית עם פלקטה 8 פמוטי קריסטל 25 ס\"מ"
+    },
+    {
+      "id": "QUWkfJ4UoD1G5sRKNPjj",
+      "sku": "UK43848",
+      "name": "סדר הבדלה עם ציפורן ספרדי 18.5X13 ס\"מ"
+    },
+    {
+      "id": "Qq8Pxps0YTPXea0xmdZu",
+      "sku": "UK82242",
+      "name": "נטלה פולימר 14סמ"
+    },
+    {
+      "id": "QqD3EMDHLD5t7f0Jul0d",
+      "sku": "UK41660",
+      "name": "כלי לטבק עם מראה פנימית \"ירושלים\" 6 ס\"מ"
+    },
+    {
+      "id": "R0GxpgzbuDJOBU6gOrHJ",
+      "sku": "UK43925",
+      "name": "פמוטי קריסטל מהודר הדלקת נרות 21 סמ"
+    },
+    {
+      "id": "R21rD3mu6uBoWQBZcX7h",
+      "sku": "UK67020",
+      "name": "כיסוי פלטה מהודר מעכב בערה 70X80 ס\"מ"
+    },
+    {
+      "id": "RH0tWNtMRwWvvI6RC5Mt",
+      "sku": "UK82459",
+      "name": "סט הבדלה קריסטל שקוף עם מגש 25X12.5"
+    },
+    {
+      "id": "RMYKSrmKMMJtqWZXm8mF",
+      "sku": "UK35377",
+      "name": "מגנט מפת ישראל ממתכת צבעוני 3X7 ס\"מ"
+    },
+    {
+      "id": "RTwG5K8XJJrY34jNc0PB",
+      "sku": "UK82815",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "Roetd4xXMMFRHvoVPds9",
+      "sku": "UK49201",
+      "name": "פמוטי קריסטל 5 קנים מהודרים עם פלקטה הדלקת נרות"
+    },
+    {
+      "id": "RteFvIRTDWlipuFSff8O",
+      "sku": "UK18267",
+      "name": "כיפה בד ארטמן אופוויט 18 ס\"מ"
+    },
+    {
+      "id": "RvhUMQvUpcfCNrmB8JMZ",
+      "sku": "UK80059",
+      "name": "סט הבדלה מהודר מקריסטל 22x11 ס\"מ"
+    },
+    {
+      "id": "S6i7UW3P1LQonvqDYh3R",
+      "sku": "UK35716",
+      "name": "מחזיק מפתחות דמוי עור 4.5 ס\"מ האש שלי וסגולת \"ש"
+    },
+    {
+      "id": "SRWZGzuPpl1WBiMwDqNz",
+      "sku": "UK83449",
+      "name": "סכין מהודרת ומתקפלת \"שבת ויום טוב\" 35 ס\"מ"
+    },
+    {
+      "id": "StqgvqqwjNwaqDglzbaO",
+      "sku": "UK42627",
+      "name": "כלי לנר הבדלה ובשמים להבדלה 13 ס\"מ"
+    },
+    {
+      "id": "T7JQKsRuQ9hnyAB3MTve",
+      "sku": "UK41258",
+      "name": "נר הבדלה צבעוני ומהודר 13.5 ס\"מ"
+    },
+    {
+      "id": "TBGYDpEKWrqIDbGpHTd0",
+      "sku": "UK19225",
+      "name": "כיפה \"פריק\" 21 ס\"מ פסים צבעוני"
+    },
+    {
+      "id": "TEus8sSVcA6mT4HaJy8R",
+      "sku": "UK10305",
+      "name": "כיפה ארטמן קטיפה ירוק בהיר רקמה סידנא בבא סאלי גודל 3"
+    },
+    {
+      "id": "Td9TsMahOlQM5cxEU66B",
+      "sku": "UK41434",
+      "name": "פמוט קריסטל \"זהב\" שבעייה מהודר 42 ס\"מ"
+    },
+    {
+      "id": "TgsMnUUNDFAlLLC4OpAA",
+      "sku": "UK19189",
+      "name": "קוד מעורב \"ארט-מן\" 120 יח כיפות שונות"
+    },
+    {
+      "id": "TppxgsxnvlxZUaJejjq9",
+      "sku": "UK47822",
+      "name": "פמוטי קריסטל שבעייה מהודרים 47 ס\"מ"
+    },
+    {
+      "id": "Tu56wWQ6EsZv2DataGlM",
+      "sku": "UK42249",
+      "name": "חמסה חיתוך לייזר - ברכת הבית אנגלית מהודרת 20 ס\"מ"
+    },
+    {
+      "id": "UBma44g7EZshFKt8EwDX",
+      "sku": "UK42584",
+      "name": "זוג פמוטי קריסטל מהודרים 16.5 סמ"
+    },
+    {
+      "id": "UNiITTNSJaeAcXz7Urb5",
+      "sku": "UK42120",
+      "name": "סט הבדלה מהודר קריסטל"
+    },
+    {
+      "id": "Uz6bvVjLrxYqOPMLWlWL",
+      "sku": "UK49838",
+      "name": "פמוטי קריסטל עם פלקטה הדלקת נרות \"עיטורים\" 25 ס\"מ"
+    },
+    {
+      "id": "V8ZRqPiZG2orhTVoCDxA",
+      "sku": "UK18133",
+      "name": "כיפה פשתן עם רקמה 19 ס\"מ"
+    },
+    {
+      "id": "VATtTSpytZdqvtxbKmI0",
+      "sku": "UK60488",
+      "name": "כיסוי חלה לבן רקמה כסף 51X41 ס\"מ"
+    },
+    {
+      "id": "VIwP8VoTigeWrOvZWFZp",
+      "sku": "UK45583",
+      "name": "חסיד יושב מפולירייזן מוכסף עם רגלי בד כסף מנגן"
+    },
+    {
+      "id": "VeWpDWVFfNfYJif5bwEl",
+      "sku": "UK48139",
+      "name": "ברכון דמוי עור לבן \"סדר הבדלה נוסח ע.מ\" עם בשמי"
+    },
+    {
+      "id": "VioIDZc7rlOHNzuF2rQO",
+      "sku": "UK42221",
+      "name": "סט הבדלה מהודר מקריסטל עם פלקטה 20 ס\"מ"
+    },
+    {
+      "id": "VpcHv1M5EP7HQwKhlutf",
+      "sku": "UK49227",
+      "name": "מלחיה קריסטל עם פלקטה \"עיטור\" 8x4 ס\"מ"
+    },
+    {
+      "id": "VyBbVee3VcZX01vOCGYt",
+      "sku": "UK41261",
+      "name": "נר הבדלה צבעוני ומהודר 9 ס\"מ"
+    },
+    {
+      "id": "WElZ1iwhehxALeiAH7cu",
+      "sku": "UK14563",
+      "name": "כיפה בד מהודרת שחור 17 ס\"מ"
+    },
+    {
+      "id": "Wif5rBsc7250ki0ws72c",
+      "sku": "UK10499",
+      "name": "כיפה פריק 26 ס\"מ גוונים מהודרת"
+    },
+    {
+      "id": "Wqrr19u8so8HmKdSaChR",
+      "sku": "UK81338",
+      "name": "מגש אקריליק להבדלה 25 ס\"מ"
+    },
+    {
+      "id": "X0WzPwFLLT8DByDR2gIp",
+      "sku": "UK82000",
+      "name": "מגש פרספקס מהודר לשבת עם פלקטה דמוי עור 30X45 ס\"מ"
+    },
+    {
+      "id": "XEL8MOhudMzUP6E9dMNk",
+      "sku": "UK60483",
+      "name": "כיסוי חלה לבן רקמה כסף 5141 ס\"מ"
+    },
+    {
+      "id": "XVXdOn0MhuwRrlEa3I4H",
+      "sku": "UK35268",
+      "name": "מחזיק מפתחות תהילים עם מגנט כחול 4 ס\"מ"
+    },
+    {
+      "id": "XfpECAV4TrHYRWf49AOv",
+      "sku": "UK14538",
+      "name": "כיפה מהודרת משי פשתן כחול טורקיז 17 ס\"מ"
+    },
+    {
+      "id": "XqUzpLjVXfF3mMjcARlS",
+      "sku": "UK82237",
+      "name": "סט הבדלה מגש מסתובב קריסטל שקוף"
+    },
+    {
+      "id": "Xr0gxTpz7KGWBlIWWFJ2",
+      "sku": "UK14643",
+      "name": "כיפה בד מהודרת כחול מידה 4 גודל 19 ס\"מ"
+    },
+    {
+      "id": "YI7rxXwrwOQwChylhYCK",
+      "sku": "UK35927",
+      "name": "מחזיק מפתחות עם תהילים"
+    },
+    {
+      "id": "YJ7MH10t1jM8DVqqzOvi",
+      "sku": "UK16113",
+      "name": "כיפה כחול כהה משי פשתן מהודרת מידה 2 גודל 17.5 ס\"מ"
+    },
+    {
+      "id": "YOir45MsoURLKCvCLBED",
+      "sku": "UK81135",
+      "name": "כיסוי חלה בד קטיפה מהודר 44X54 ס\"מ"
+    },
+    {
+      "id": "YW3dsSK50Q1hNGABemSp",
+      "sku": "UK18259",
+      "name": "כיפה בד ארטמן כחול כהה 16 ס\"מ"
+    },
+    {
+      "id": "Ym6Rr4R0e5JjhzPn4IWD",
+      "sku": "UK42119",
+      "name": "סט הבדלה מהודר קריסטל עם מגש 24X12 ס\"מ"
+    },
+    {
+      "id": "YoU7svcMJaCnSSbkEk4E",
+      "sku": "UK55061",
+      "name": "נר הבדלה צבעוני ומהודר 23 ס\"מ"
+    },
+    {
+      "id": "Yolv3qeHBHidkJS62YLr",
+      "sku": "UK48853",
+      "name": "סדר הבדלה עם ציפורן נוסח ע.מ 17.5X13 ס\"מ"
+    },
+    {
+      "id": "YyEK1lE458lp7RRsbCbR",
+      "sku": "UK42846",
+      "name": "סדר הבדלה מאקריליק נוסח עדות המזרח 27X15 ס\"מ"
+    },
+    {
+      "id": "Z5ITGklLfYpOYqvc3kMB",
+      "sku": "UK42570",
+      "name": "גביע קידוש מהודר מקרמיקה בלי רגל עם תחתית 9 ס\"מ"
+    },
+    {
+      "id": "Z7RTL9jLnPwjK6F3odMv",
+      "sku": "UK67566",
+      "name": "כיסוי חלה דמוי עור עם אותיות בולטות"
+    },
+    {
+      "id": "ZIsoIsn6DpS1dmcv43XF",
+      "sku": "UK42149",
+      "name": "כלי לבשמים מקריסטל עם פלקטה \"עיטור\" 8.5X5 ס\"מ עם צ"
+    },
+    {
+      "id": "ZMjekTgCV8Q35FLbnm69",
+      "sku": "UK60216",
+      "name": "כיסוי חלה מהודר דמוי עור לבן 45X55 ס\"מ"
+    },
+    {
+      "id": "ZPMfypTJikq5t3Q9UB6C",
+      "sku": "UK40087",
+      "name": "נר הבדלה צבעים שונים 15 ס\"מ"
+    },
+    {
+      "id": "ZQiSzIPQbbHfKC1aK6PQ",
+      "sku": "UK83293",
+      "name": "כלי לבשמים מהודר מקריסטל 16 ס\"מ"
+    },
+    {
+      "id": "ZhSxSaWJcR5vYxWxG3GK",
+      "sku": "UK12788",
+      "name": "כיפה בד מהודרת כחול 19 ס\"מ"
+    },
+    {
+      "id": "aVD68veuKcktIF4GEzDL",
+      "sku": "UK81705",
+      "name": "נר הבדלה צבע זהב ומהודר 16 ס\"מ"
+    },
+    {
+      "id": "abnjq6L9zoaeRLhZfJO3",
+      "sku": "UK80061",
+      "name": "סט הבדלה מהודר מקריסטל 20 ס\"מ"
+    },
+    {
+      "id": "amalqbhOLP6uX495JxVb",
+      "sku": "UK49221",
+      "name": "כלי לבשמים מקריסטל עם פלקטה \"עיטור\" 8X6 ס\"מ"
+    },
+    {
+      "id": "at82LbeTWuzFqd6otT2r",
+      "sku": "UK41219",
+      "name": "סט הבדלה מהודר מקריסטל עם פלקטה 20 ס\"מ"
+    },
+    {
+      "id": "azi7ripFycvg0Y7RgB1s",
+      "sku": "UK42931",
+      "name": "נטלה אקריליק מהודרת שקופה עם אותיות בולטות 13 ס\"מ"
+    },
+    {
+      "id": "bF2ATKulsGZI5ODM1Q5q",
+      "sku": "UK82458",
+      "name": "סט הבדלה קריסטל שקוף עם פלקטה מגש מסתובב 20סמ"
+    },
+    {
+      "id": "bUFESAOxHyHHw8VLLvvr",
+      "sku": "UK13334",
+      "name": "כיפה מהודרת משי פשתן גווני כחול לבן 19 ס\"מ"
+    },
+    {
+      "id": "bkv7SldZh4o9dM7kEwDk",
+      "sku": "UK40936",
+      "name": "מגש חלה \"עץ אקסיה\" טבעי עם אפוקסי 41X28 ס\"מ"
+    },
+    {
+      "id": "cQorfoGF1ddQHwCb00BA",
+      "sku": "UK12977",
+      "name": "כיפה בד מהודרת שחור עם דוגמא 19 ס\"מ"
+    },
+    {
+      "id": "cks0BHTEjdevyGVM5sHO",
+      "sku": "UK40371",
+      "name": "שרשרת ניקל עין עם שיבוץ אבנים 1 ס\"מ"
+    },
+    {
+      "id": "ctvQHnvcAMEloESYutd5",
+      "sku": "UK65782",
+      "name": "תיק מהודר לשופר דמוי עור וקטיפה 21X41 ס\"מ"
+    },
+    {
+      "id": "d4kvHfvFSDzewYmA0S1d",
+      "sku": "UK42121",
+      "name": "סט הבדלה מהודר קריסטל"
+    },
+    {
+      "id": "d6gmPkF9iVdc6B8FeLKw",
+      "sku": "UK14559",
+      "name": "כיפה מהודרת משי פשתן כחול ספיר 17 ס\"מ"
+    },
+    {
+      "id": "d7KmBvhBBljdhLtgct3O",
+      "sku": "UK41947",
+      "name": "זוג פמוטי קריסטל מהודרים 18 ס\"מ"
+    },
+    {
+      "id": "dGTWnQiXyMpfownmi81h",
+      "sku": "UK55652",
+      "name": "יד לספר תורה מהודרת גימור כסף 23 ס\"מ"
+    },
+    {
+      "id": "dltfRKm91CnngDVADzSs",
+      "sku": "UK80899",
+      "name": "ברכת מזמור לתודה פולימר 19X26 ס\"מ"
+    },
+    {
+      "id": "eiHSHovDsWpiyAIe5OJL",
+      "sku": "UK16412",
+      "name": "כיפה קטיפה פלוש שחורה 6 חלקים גודל 3 19 ס\"מ עם סרט"
+    },
+    {
+      "id": "f0XyovuPn8DleTjd3gCr",
+      "sku": "UK19990",
+      "name": "כיפה בד מהודרת גודל 3 - 18 ס\"מ"
+    },
+    {
+      "id": "fC6oPkrWcIeCuSHjh4kX",
+      "sku": "UK18122",
+      "name": "כיפה פשתן עם רקמה 19 ס\"מ"
+    },
+    {
+      "id": "fMIFNndUweJvtvor4upR",
+      "sku": "UK42385",
+      "name": "קופת צדקה פח מהודרת \"צדקה\" 10 ס\"מ"
+    },
+    {
+      "id": "fOwyyBZxsZZFzXb6hUMF",
+      "sku": "UK10185",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה האש שלי גודל 4 - לבן"
+    },
+    {
+      "id": "fZWngVihJ4V0APP1AGvD",
+      "sku": "UK82460",
+      "name": "סט הבדלה קריסטל רוז גולד עם מגש שחור 24X12"
+    },
+    {
+      "id": "fq9VXyNof8Zisaqhh2om",
+      "sku": "UK18403",
+      "name": "כיפה בד \"ארט-מן\" 19 ס\"מ אפור"
+    },
+    {
+      "id": "gb9U5XWtTOFOG9maARiU",
+      "sku": "UK55515",
+      "name": "מגש חלה זכוכית מהודר \"אבנים\" עם רגליים בעיטור \"ג"
+    },
+    {
+      "id": "gfDlgA2PoLvye1TAzL1n",
+      "sku": "UK42999",
+      "name": "נר הבדלה \"דונג\" מהודר 30 ס\"מ"
+    },
+    {
+      "id": "gjQXGPI2IMw69thGEtMd",
+      "sku": "UK18761",
+      "name": "כיפה קורדרוי \"ארט-מן\" 18 ס\"מ כחול כהה"
+    },
+    {
+      "id": "hPybkojbOpwoD7qWNJ8a",
+      "sku": "UK47600",
+      "name": "ברכון דמוי עור חום \"סדר הבדלה נוסח ע.מ\" עם בשמי"
+    },
+    {
+      "id": "hUKtcrRQWWl3r32r2Oi9",
+      "sku": "UK17209",
+      "name": "כיפה סרוגה 16 ס\"מ לבן מסביב עיטור כחול כהה תכלת"
+    },
+    {
+      "id": "hWbPxqVjkaHrUTzjqM7a",
+      "sku": "UK83300",
+      "name": "זוג פמוטי קריסטל מרובע 8 ס\"מ"
+    },
+    {
+      "id": "hWt12mbZwaRX8aa66UBT",
+      "sku": "UK41214",
+      "name": "סט הבדלה מהודר מקריסטל עם פלקטה 21x10 ס\"מ"
+    },
+    {
+      "id": "hawNtu4rx02YpES4W6FT",
+      "sku": "UK42791",
+      "name": "נר הבדלה צבעוני ומהודר 16 ס\"מ"
+    },
+    {
+      "id": "htsNUrXwPanTj6RJEHx8",
+      "sku": "UK81294",
+      "name": "נר הבדלה צבעוני ומהודר"
+    },
+    {
+      "id": "i0khR6OFNMktIJAp0y6m",
+      "sku": "UK83930",
+      "name": "כלי מיני בשמים \"עם פרחים\" מקריסטל עם מכסה 4X6 ס\"מ"
+    },
+    {
+      "id": "iAO6JSzKjPBTzUJ6STBy",
+      "sku": "UK81293",
+      "name": "נר הבדלה צבעוני ומהודר 15 ס\"מ"
+    },
+    {
+      "id": "iIvJdvNHHQDybt6rC4id",
+      "sku": "UK65587",
+      "name": "כיסוי חלה בד מהודר מודפס דגם \"רימונים כחול\" 4"
+    },
+    {
+      "id": "iVuZyEYXeHEqDdQAHBZ2",
+      "sku": "UK86870",
+      "name": "פמוטי נסיעה ניקל בקופסא עם מכסה \"ירושלים\" 4X9 ס"
+    },
+    {
+      "id": "jA1NAfp5FXj9HzpHxPy9",
+      "sku": "UK49081",
+      "name": "כלי מהודר לדבש מקריסטל 7 ס\"מ"
+    },
+    {
+      "id": "jA5AfgmNJ8EU8vpB5ZOV",
+      "sku": "UK48455",
+      "name": "מסגרת זכוכית עם אבנים לבנות ופלקטה שיוויתי 24X33 ס\"מ"
+    },
+    {
+      "id": "jh5C5GWNxWSaRQ3znWdc",
+      "sku": "UK41856",
+      "name": "פמוטי נסיעה ניקל בקופסא עם מכסה \"פיליגרין\" משוב"
+    },
+    {
+      "id": "jpwQWxAHn8ab5UB4mUde",
+      "sku": "UK17941",
+      "name": "כיפה פשתן עם רקמה 19 ס\"מ"
+    },
+    {
+      "id": "kOmPg6CsWO88Z3LFENzA",
+      "sku": "UK18262",
+      "name": "כיפה בד ארטמן כחול כהה 19 ס\"מ"
+    },
+    {
+      "id": "kgr31aPDGHEtNZbQ56E7",
+      "sku": "UK81809",
+      "name": "מעמד אקריליק נוסח אשכנזי 22X26 ס\"מ עם 6 ברכונים זהב"
+    },
+    {
+      "id": "kt6UYK8Vyf3z9gQR2MIp",
+      "sku": "UK66625",
+      "name": "כיסוי מהודר לבקבוק יין דמוי עור עם אבנים 23X16 ס\"מ"
+    },
+    {
+      "id": "kwal9M1exqQPFrPtaLMl",
+      "sku": "UK82457",
+      "name": "סט הבדלה קריסטל שקוף עם פלקטה מגש מסתובב 20סמ"
+    },
+    {
+      "id": "l1tpn5nqJFpqAz8WP0Cw",
+      "sku": "UK42148",
+      "name": "כלי לבשמים מקריסטל עם פלקטה \"ירושלים\" 8.5X5 ס\"מ עם"
+    },
+    {
+      "id": "lGD3SynmI461sQ5mWFtP",
+      "sku": "UK81518",
+      "name": "מעמד קריסטל זהב מהודר עם מזמור לתודה 21 ס\"מ"
+    },
+    {
+      "id": "lhUdF6ikSCCM7qpM8uz1",
+      "sku": "UK81770",
+      "name": "סט הבדלה מהודר מקריסטל עם פלקטה 20 ס\"מ"
+    },
+    {
+      "id": "liuT6Z9uKkhK5qAslupr",
+      "sku": "UK50083",
+      "name": "מחלק יין מאקריליק מהודר \"זהב\" עם 8 כוסות 21 ס\"מ"
+    },
+    {
+      "id": "lxWTK1MWzgdp1Z0GmSSc",
+      "sku": "UK80648",
+      "name": "כלי לנר הבדלה מקריסטל עם פלקטה \"ירושלים\" 13 ס\"מ"
+    },
+    {
+      "id": "mKimBSqA3nQCLgoh0q46",
+      "sku": "UK81547",
+      "name": "כלי לבשמים מאקריליק נצנצים כסף 8 ס\"מ"
+    },
+    {
+      "id": "nMOi6C9kDbUYVHtbVbG9",
+      "sku": "UK19918",
+      "name": "כיפה בד מהודרת גודל 2 - 17.5 ס\"מ"
+    },
+    {
+      "id": "nSyRZGfYXgdTD2jyM7T2",
+      "sku": "UK82554",
+      "name": "סט הבדלה קריסטל 22X11 ס\"מ"
+    },
+    {
+      "id": "o1lnNwZKmxdSuowDjYtu",
+      "sku": "UK81999",
+      "name": "מגש פרספקס מהודר לשבת עם פלקטה דמוי עור 30X45 ס\"מ"
+    },
+    {
+      "id": "oZ0qPl5sPmHGp83FOYIR",
+      "sku": "UK80472",
+      "name": "כלי לבשמים מקריסטל עם פלקטה \"עיטור\" 8X6 ס\"מ"
+    },
+    {
+      "id": "oaMXnCcqMSuDABn2hXF5",
+      "sku": "UK82836",
+      "name": "נטלה מהודרת מפולימר ציפוי כסף 14 ס\"מ"
+    },
+    {
+      "id": "oi2syTrvKKJKFI6fHlUs",
+      "sku": "UK81082",
+      "name": "סט הבדלה מהודר קריסטל עם מגש 34x15 ס\"מ"
+    },
+    {
+      "id": "pFGKmqXy2O4nRVpIzOaO",
+      "sku": "UK81976",
+      "name": "מגש חלה זכוכית עם פלקטה \"פיליגרין\" 42X29 ס\"מ"
+    },
+    {
+      "id": "pQH89t2LP3K0Syr2xfsl",
+      "sku": "UK55810",
+      "name": "כלי עם מיני בשמים \"עם פרחים\" מקריסטל עם פלקטה 8X6 ס\"מ"
+    },
+    {
+      "id": "pc7AtNS83yyPdNhZVY2K",
+      "sku": "UK40660",
+      "name": "סט הבדלה 4 חלקים מהגוני + 3 רגליים"
+    },
+    {
+      "id": "pcXdKEL6EPtCmfxTY55v",
+      "sku": "UK35914",
+      "name": "מחזיק מפתחות חמסה \"מזל\" משובץ 5.5 ס\"מ - ניקל"
+    },
+    {
+      "id": "pmLWnv6vVS8Ei4EDVyQv",
+      "sku": "UK82438",
+      "name": "קופת צדקה מפולימר 10 ס\"מ"
+    },
+    {
+      "id": "puQEZeHwQwZaSPhYK7ZM",
+      "sku": "UK47194",
+      "name": "פמוט זכוכית עם פלקטה 12 פמוטי קריסטל 31 ס\"מ"
+    },
+    {
+      "id": "q0Ze6FPVnQEocj2SVnjF",
+      "sku": "UK46211",
+      "name": "צלחת זכוכית מהודרת לראש השנה 35 ס\"מ"
+    },
+    {
+      "id": "q3opWiRz7JAhPqpJc3E8",
+      "sku": "UK65293",
+      "name": "תיק ברוקט מהודר לשופר 20X40 ס\"מ"
+    },
+    {
+      "id": "qxiYXXjJE7OoXr9OYBx0",
+      "sku": "UK86197",
+      "name": "תפילה לכלה אקריליק מהודרת 21x16 ס\"מ - זהב"
+    },
+    {
+      "id": "r7jV81KlAujVxslYHVpU",
+      "sku": "UK16395",
+      "name": "כיפה \"מופת\" קטיפה שחורה גודל 4 20 ס\"מ - 6 חלקים ללא סרט"
+    },
+    {
+      "id": "rG8mrtydu0nHNfuIb878",
+      "sku": "UK15989",
+      "name": "כיפה בד מהודרת - כחול - גודל 4 - 19 ס\"מ"
+    },
+    {
+      "id": "rPMiu2J9mPnwU6JKMnGS",
+      "sku": "UK41146",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "rw4dEJPgMpPeT2WhuyeA",
+      "sku": "UK35908",
+      "name": "מחזיק מפתחות דמוי עור עם תהילים 6X5 ס\"מ"
+    },
+    {
+      "id": "s2u4PdkM0Z13GKTXt8a4",
+      "sku": "UK42278",
+      "name": "תחתית לסיר זכוכית בלתי שבירה 19 ס\"מ"
+    },
+    {
+      "id": "s7aLEIaKaTXrnjsuQYIR",
+      "sku": "UK80672",
+      "name": "כלי עם מיני בשמים \"עם פרחים\" מקריסטל עם מכסה 4X6 ס\"מ"
+    },
+    {
+      "id": "sXNz1yst3P3adjgfoeNC",
+      "sku": "UK82238",
+      "name": "סט הבדלה מגש מסתובב קריסטל זהב"
+    },
+    {
+      "id": "sjXnd20FadjFmfPJ65I5",
+      "sku": "UK55590",
+      "name": "כלי לבשמים מקריסטל עם פלקטה \"עיטור\" 8.55 ס\"מ עם פרחים"
+    },
+    {
+      "id": "tAiRUEdcOcYQDf2XspLK",
+      "sku": "UK51927",
+      "name": "סט מחזיקי מפתחות (96) תהילים עם מגנט 4 ס\"מ צבעי"
+    },
+    {
+      "id": "tArKyQnaj5Bv9r7z3C3v",
+      "sku": "UK81065",
+      "name": "מלחייה קריסטל עם מכסה 4x6 ס\"מ"
+    },
+    {
+      "id": "tIS5FEQZDWK6ppWTyX5a",
+      "sku": "UK81787",
+      "name": "זוג פמוטי קריסטל מהודרים 20.5 ס\"מ"
+    },
+    {
+      "id": "tKc9L673XPxFBR1vRsvv",
+      "sku": "UK14558",
+      "name": "כיפה בד מהודרת שחור 19 ס\"מ"
+    },
+    {
+      "id": "tcNpXxVqFtnVxiJtRtGk",
+      "sku": "UK80647",
+      "name": "כלי לבשמים מקריסטל עם פלקטה 8X6 ס\"מ"
+    },
+    {
+      "id": "tgdWIHNANL4rNqhJvSez",
+      "sku": "UK81704",
+      "name": "נר הבדלה צבע כסף ומהודר 16 ס\"מ"
+    },
+    {
+      "id": "tzC81sb0bK4ia5Jzy0ds",
+      "sku": "UK54320",
+      "name": "(15) פמוטי קריסטל חמשייה מהודרים 35 ס\"מ"
+    },
+    {
+      "id": "uKL4z1Pt9aWTlisBz7MX",
+      "sku": "UK14537",
+      "name": "כיפה מהודרת משי פשתן תכלת בהיר 19 ס\"מ"
+    },
+    {
+      "id": "uN2Yt3R92qinWTGjgvMf",
+      "sku": "UK40858",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "ugOGRtuKn95y2aVN0V3s",
+      "sku": "931661",
+      "name": "כיפה עור \"ארטמן\" 14 ס\"מ כחול"
+    },
+    {
+      "id": "uirOkxE6zYruL5nGxK1t",
+      "sku": "UK40819",
+      "name": ".כלי לבשמים מקריסטל עם פלקטה \"ירושלים\" 8X6 ס\"מ"
+    },
+    {
+      "id": "uqNRlqYA54rwHCVUca2x",
+      "sku": "UK40822",
+      "name": "כלי לנר הבדלה מקריסטל עם פלקטה \"אורנמנטים\" 13 ס\"מ"
+    },
+    {
+      "id": "vHpGykteiZjeYk3fBhbT",
+      "sku": "UK48637",
+      "name": "מסגרת זכוכית עם אבנים לבנות ופלקטה אשר יצר ספרדי 20X28 ס\"מ"
+    },
+    {
+      "id": "vKBLos2aBwHVXVnJDPxU",
+      "sku": "UK49220",
+      "name": "כלי לבשמים מקריסטל עם פלקטה \"ירושלים\" 8X6 ס\"מ"
+    },
+    {
+      "id": "vra6m9fibJ0qYQGtJ9QH",
+      "sku": "UK17715",
+      "name": "כיפה אולטרא סוויד שחור 19 ס\"מ \"מגן דויד\" כסף ומ"
+    },
+    {
+      "id": "wI1zdszYR2BaXjVL7Qdn",
+      "sku": "UK59956",
+      "name": "זוג פמוטי קריסטל מהודרים 10.5 ס\"מ"
+    },
+    {
+      "id": "wWiihmQzVrur1Um7aW09",
+      "sku": "UK81771",
+      "name": "כלי לבשמים מקריסטל פלקטה ירושלים עם תערובת פרחי"
+    },
+    {
+      "id": "whClK3y1HWAzIAspj5vN",
+      "sku": "UK18011",
+      "name": "כיפה פשתן עם רקמה 19 ס\"מ"
+    },
+    {
+      "id": "wxycJp4VH4Zzk5Fn9N4d",
+      "sku": "UK14959",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה מגן דוד גודל 4 - ירוק בהיר"
+    },
+    {
+      "id": "xKW0kAKuDitBQ5ThtF0T",
+      "sku": "UK81129",
+      "name": "מסגרת נצנצים מזכוכית עיצוב \"קווים\" ברכת העסק 22x17"
+    },
+    {
+      "id": "xKxkiXd6hTcC2nu2UGtY",
+      "sku": "UK82794",
+      "name": "אשר יצר אשכנזי מלבן אקריליק מסגרת זהב"
+    },
+    {
+      "id": "xRdn6BPkOF2H7g5mrHKi",
+      "sku": "UK48087",
+      "name": "עץ הברכות צבעוני לתליה ברכת הבית אנגלית 20X19 ס\"מ"
+    },
+    {
+      "id": "xe6PMXBYXvFhcQ3zhiMk",
+      "sku": "UK19997",
+      "name": "כיפה בד מהודרת גודל 2 שטוח - 15.5 ס\"מ"
+    },
+    {
+      "id": "xjjHpLgM7h7qRKaH1v2F",
+      "sku": "UK15522",
+      "name": "כיפה בד מהודרת כחול כהה מבריק גודל 4 19 ס\"מ"
+    },
+    {
+      "id": "xmNfPV0ZtcFpSDl4tXoM",
+      "sku": "UK83235",
+      "name": "ברכת העסק מלבן פרספקס מסגרת זהב 2025 ס\"מ"
+    },
+    {
+      "id": "xti5e9X2MXB2mvxjsoHe",
+      "sku": "UK82883",
+      "name": "גביע קידוש קריסטל מהודר 16 ס\"מ תכולה 100 מ\"ל"
+    },
+    {
+      "id": "xtvIhWSsAFFXdPrX3h2d",
+      "sku": "UK82705",
+      "name": "נטלה \"במבוק עבה\" עם הדפסה \"נטילת ידים\" 14 ס\"מ"
+    },
+    {
+      "id": "xuUdovRXj4TCnWqTkhUn",
+      "sku": "UK82236",
+      "name": "כוס קידוש קריסטל רוז גולד יום השישי תכולה 100 מ\"ל"
+    },
+    {
+      "id": "xvie8IIJ9nnf3zcbHxpI",
+      "sku": "UK82416",
+      "name": "גביע קידוש מהודר מפולימר עם תחתית 8 ס\"מ"
+    },
+    {
+      "id": "y65EcxGSYlQ7SxesHbkH",
+      "sku": "UK81812",
+      "name": "מגש אקריליק להבדלה 25 ס\"מ"
+    },
+    {
+      "id": "yCc0pEy9wjAnGGB2GNSd",
+      "sku": "UK40068",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "yP2UV57pN5KOKv32YXvz",
+      "sku": "UK80991",
+      "name": "שרשרת כסף טהור 925 \"חי\""
+    },
+    {
+      "id": "yQUXWkthaELnvuyeckhB",
+      "sku": "UK42710",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "yQXJjHtKgWEPZ0Cob4Yc",
+      "sku": "UK82409",
+      "name": "גביע קידוש מהודר מפולימר עם רגל ותחתית 15 ס\"מ"
+    },
+    {
+      "id": "yR7L78pwwUphpXzvqDBE",
+      "sku": "UK81813",
+      "name": "מגש אקריליק להבדלה 25 ס\"מ"
+    },
+    {
+      "id": "yxu2w63hLXLJzZ4PoHjY",
+      "sku": "UK67447",
+      "name": "כיסוי פלטה מהודר דמוי עור 70x80 ס\"מ"
+    },
+    {
+      "id": "z4wHrI6oEvPfJoMruT0X",
+      "sku": "UK82181",
+      "name": "גביע קידוש מהודר מקרמיקה בלי רגל עם תחתית 9 ס\"מ"
+    },
+    {
+      "id": "zF1L0X48CiicBWgYDvHr",
+      "sku": "UK35963",
+      "name": "בורא מאורי האש מאקריליק \"אותיות בולטות\""
+    },
+    {
+      "id": "zsclOdiJokkoChBt2W2c",
+      "sku": "UK83142",
+      "name": "סט פולימר מגש להדלקת נרות וזוג פמוטים מהודרים"
+    }
+  ],
+  "toImport": [
+    "UK83265",
+    "UK83607",
+    "UK83608",
+    "UK54153",
+    "UK56167",
+    "UK83244",
+    "UK46867",
+    "UK46868",
+    "UK46869",
+    "UK49253",
+    "UK82868",
+    "UK82871",
+    "UK82874",
+    "UK42363",
+    "UK83062",
+    "UK59651",
+    "UK44948",
+    "UK47646",
+    "UK82500",
+    "UK83240",
+    "UK83255",
+    "UK83061",
+    "UK83227",
+    "UK55220",
+    "UK42076",
+    "UK58621",
+    "UK87535",
+    "UK81830",
+    "UK46859",
+    "UK48863",
+    "UK49324",
+    "UK81061",
+    "UK82456",
+    "UK49548",
+    "UK45977",
+    "UK49356",
+    "UK46628",
+    "UK83298",
+    "UK83995",
+    "UK83297",
+    "UK47483",
+    "UK42821",
+    "UK82047",
+    "UK82048",
+    "UK82046",
+    "UK82056",
+    "UK81803",
+    "UK81699",
+    "UK82077",
+    "UK60612",
+    "UK66827",
+    "UK55775",
+    "UK55777",
+    "UK42003",
+    "UK40510",
+    "UK48102",
+    "UK44476",
+    "UK48644",
+    "UK43492",
+    "UK43950",
+    "UK40509",
+    "UK46372",
+    "UK46375",
+    "UK46377",
+    "UK47237",
+    "UK47238",
+    "UK47239",
+    "UK47240",
+    "UK47241",
+    "UK47242",
+    "UK66583",
+    "UK66584",
+    "UK53381",
+    "UK55351",
+    "UK60363",
+    "UK60364",
+    "UK60392",
+    "UK63246",
+    "UK87756",
+    "UK67438",
+    "UK67523",
+    "UK65677",
+    "UK66380",
+    "UK67156",
+    "UK67261",
+    "UK66589",
+    "UK67704",
+    "UK67905",
+    "UK61210",
+    "UK67791",
+    "UK44979",
+    "UK67790",
+    "UK66379",
+    "UK66569",
+    "UK67155",
+    "UK67260",
+    "UK66588",
+    "UK67521",
+    "UK67721",
+    "UK67722"
+  ]
+}

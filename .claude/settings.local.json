@@ -208,7 +208,11 @@
       "WebFetch(domain:help.sumit.co.il)",
       "WebFetch(domain:app.sumit.co.il)",
       "WebFetch(domain:plugins.trac.wordpress.org)",
-      "Bash(unzip -o -q officeguy.zip -d officeguy)"
+      "Bash(unzip -o -q officeguy.zip -d officeguy)",
+      "Bash(echo \"EXIT_CODE:$?\")",
+      "Bash(netstat -ano)",
+      "Skill(run)",
+      "Bash(echo \"exit=$?\")"
     ]
   }
 }
