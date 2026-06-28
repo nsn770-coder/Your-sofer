@@ -311,6 +311,12 @@ function NavBarContent() {
     return () => window.removeEventListener("keydown", h);
   }, []);
 
+  useEffect(() => {
+    const h = () => setMobileOpen(true);
+    window.addEventListener("openMobileMenu", h);
+    return () => window.removeEventListener("openMobileMenu", h);
+  }, []);
+
   const clearTimers = () => {
     if (openTimer.current) clearTimeout(openTimer.current);
     if (closeTimer.current) clearTimeout(closeTimer.current);

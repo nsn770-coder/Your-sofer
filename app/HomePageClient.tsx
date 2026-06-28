@@ -1201,12 +1201,12 @@ export default function HomePageClient() {
             ))}
           </div>
           <div style={{ textAlign: 'center', marginTop: 40 }}>
-            <a
-              href="/categories"
+            <button
+              onClick={() => window.dispatchEvent(new Event("openMobileMenu"))}
               className="ys-outline-btn"
             >
               לכל הקטגוריות ←
-            </a>
+            </button>
           </div>
         </div>
       </div>
