@@ -265,10 +265,12 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
 }
 
 function NavBarContent() {
-  const [activeId,    setActiveId]    = useState<string | null>(null);
-  const [mobileOpen,  setMobileOpen]  = useState(false);
-  const [isMobile,    setIsMobile]    = useState(false);
+  const [activeId,      setActiveId]      = useState<string | null>(null);
+  const [mobileOpen,    setMobileOpen]    = useState(false);
+  const [isMobile,      setIsMobile]      = useState(false);
+  const [userMenuOpen,  setUserMenuOpen]  = useState(false);
   const [kipotSubcats, setKipotSubcats] = useState<Array<{ slug: string; displayName: string; priority?: number }>>([]);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     getDocs(query(collection(db, 'categories'), where('parentCategory', '==', 'כיפות')))
@@ -313,10 +315,22 @@ function NavBarContent() {
   }, []);
 
   useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape") { setActiveId(null); setMobileOpen(false); } };
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") { setActiveId(null); setMobileOpen(false); setUserMenuOpen(false); } };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, []);
+
+  // סגור תפריט משתמש בלחיצה מחוץ לו
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    function handleOutside(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [userMenuOpen]);
 
   useEffect(() => {
     const h = () => setMobileOpen(true);
@@ -374,6 +388,11 @@ function NavBarContent() {
       <style>{`
         .ys-nav-logo { height: 32px; }
         @media (max-width: 1023px) { .ys-nav-logo { height: 26px; } }
+        @keyframes ysUserMenuIn { from { opacity:0; transform:translateY(-6px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .ys-user-menu-item { display:flex; align-items:center; gap:8px; width:100%; padding:9px 16px; background:none; border:none; cursor:pointer; font-size:14px; color:#1a1a1a; text-align:right; font-family:inherit; text-decoration:none; transition:background 0.12s; }
+        .ys-user-menu-item:hover { background:#F5F3EE; }
+        .ys-user-menu-item-coming { color:#aaa; }
+        .ys-user-menu-item-coming:hover { background:none; cursor:default; }
       `}</style>
 
       {shaliach && (
@@ -422,21 +441,129 @@ function NavBarContent() {
           )}
 
           <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexShrink: 0 }}>
-            {user ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                {user.photoURL && !isMobile && <img src={user.photoURL} alt="" style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid #C5A028" }} />}
-                {!isMobile && <div style={{ fontSize: 11 }}><div style={{ color: "#888", fontSize: 10 }}>שלום,</div><div style={{ fontWeight: 700, color: "#1a1a1a" }}>{user.displayName?.split(" ")[0]}</div></div>}
-                {user.role === "admin" && <button onClick={() => router.push("/admin")} style={{ background: "#1a1a1a", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>ניהול</button>}
-                {user.role === "sofer" && <button onClick={() => router.push("/sofer-dashboard")} style={{ background: "#1a3a2a", color: "#fff", border: "none", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>סופר</button>}
-                {user.role === "shaliach" && <button onClick={() => router.push("/shaliach-dashboard")} style={{ background: "none", color: "#1a1a1a", border: "1px solid #1a1a1a", borderRadius: 0, padding: "4px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>שלוחה</button>}
-                {!isMobile && <button onClick={logout} style={{ background: "none", border: "none", color: "#888", fontSize: 11, cursor: "pointer" }}>יציאה</button>}
-              </div>
-            ) : (
-              <button onClick={signInWithGoogle} style={{ background: "none", border: "1px solid #1a1a1a", borderRadius: 0, padding: isMobile ? "4px 7px" : "5px 8px", color: "#1a1a1a", fontSize: isMobile ? 10 : 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
-                <svg width="11" height="11" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
-                {isMobile ? "כניסה" : "התחבר"}
+
+            {/* ── אייקון משתמש + תפריט נפתח ── */}
+            <div ref={userMenuRef} style={{ position: "relative" }}>
+              <button
+                onClick={() => isMobile
+                  ? router.push(user ? "/account" : "/account/login")
+                  : setUserMenuOpen(v => !v)
+                }
+                aria-label="חשבון משתמש"
+                style={{ background: "none", border: userMenuOpen ? "1px solid #C5A028" : "1px solid transparent", borderRadius: 0, padding: "5px 7px", color: "#1a1a1a", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "border-color 0.15s" }}
+              >
+                {/* אייקון דמות */}
+                <svg width={isMobile ? 22 : 22} height={isMobile ? 22 : 22} viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                {!isMobile && <span style={{ fontSize: 11, fontWeight: user ? 600 : 400, color: "#1a1a1a" }}>
+                  {user ? (user.firstName || user.displayName?.split(" ")[0] || "חשבון") : "כניסה"}
+                </span>}
               </button>
-            )}
+
+              {/* ── דרופדאון (דסקטופ בלבד) ── */}
+              {!isMobile && userMenuOpen && (
+                <div dir="rtl" style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 240, background: "#fff", border: "1px solid #E7E2D8", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 300, animation: "ysUserMenuIn 0.18s ease-out" }}>
+
+                  {user ? (
+                    <>
+                      {/* כותרת — שלום + נקודות */}
+                      <div style={{ padding: "14px 16px 10px", borderBottom: "1px solid #F0EDE8" }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", marginBottom: 8 }}>
+                          שלום, {user.firstName || user.displayName?.split(" ")[0] || "אורח"} 👋
+                        </div>
+                        {/* פס נקודות — placeholder עד שלב 3 */}
+                        <div style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>0 נקודות · דרגת ברונזה</div>
+                        <div style={{ height: 4, background: "#F0EDE8", borderRadius: 0, overflow: "hidden" }}>
+                          <div style={{ width: "0%", height: "100%", background: "#C5A028", transition: "width 0.4s" }} />
+                        </div>
+                        <div style={{ fontSize: 10, color: "#bbb", marginTop: 3, textAlign: "left" }}>0 / 500 נקודות לכסף</div>
+                      </div>
+
+                      {/* קישורי חשבון */}
+                      <div style={{ padding: "6px 0" }}>
+                        <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/orders"); }}>
+                          <span style={{ fontSize: 15 }}>📦</span> ההזמנות שלי
+                        </button>
+                        <button className="ys-user-menu-item ys-user-menu-item-coming" disabled>
+                          <span style={{ fontSize: 15 }}>⭐</span> הנקודות שלי
+                          <span style={{ marginRight: "auto", fontSize: 10, color: "#C5A028", border: "1px solid #C5A028", padding: "1px 5px" }}>בקרוב</span>
+                        </button>
+                        <button className="ys-user-menu-item ys-user-menu-item-coming" disabled>
+                          <span style={{ fontSize: 15 }}>🏷️</span> מבצעי מועדון
+                          <span style={{ marginRight: "auto", fontSize: 10, color: "#C5A028", border: "1px solid #C5A028", padding: "1px 5px" }}>בקרוב</span>
+                        </button>
+                        <button className="ys-user-menu-item ys-user-menu-item-coming" disabled>
+                          <span style={{ fontSize: 15 }}>🔔</span> ההודעות שלי
+                          <span style={{ marginRight: "auto", fontSize: 10, color: "#C5A028", border: "1px solid #C5A028", padding: "1px 5px" }}>בקרוב</span>
+                        </button>
+                      </div>
+
+                      <div style={{ height: 1, background: "#F0EDE8" }} />
+
+                      <div style={{ padding: "6px 0" }}>
+                        <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/profile"); }}>
+                          <span style={{ fontSize: 15 }}>👤</span> הפרטים שלי
+                        </button>
+                        <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/addresses"); }}>
+                          <span style={{ fontSize: 15 }}>📍</span> הכתובות שלי
+                        </button>
+                      </div>
+
+                      {/* קישורי תפקיד — admin/sofer/shaliach */}
+                      {(user.role === "admin" || user.role === "sofer" || user.role === "shaliach") && (
+                        <>
+                          <div style={{ height: 1, background: "#F0EDE8" }} />
+                          <div style={{ padding: "6px 0" }}>
+                            {user.role === "admin" && (
+                              <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/admin"); }}>
+                                <span style={{ fontSize: 15 }}>⚙️</span> פאנל ניהול
+                              </button>
+                            )}
+                            {user.role === "sofer" && (
+                              <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/sofer-dashboard"); }}>
+                                <span style={{ fontSize: 15 }}>✍️</span> פאנל סופר
+                              </button>
+                            )}
+                            {user.role === "shaliach" && (
+                              <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/shaliach-dashboard"); }}>
+                                <span style={{ fontSize: 15 }}>🏠</span> פאנל שלוחה
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      <div style={{ height: 1, background: "#F0EDE8" }} />
+                      <div style={{ padding: "6px 0" }}>
+                        <button className="ys-user-menu-item" style={{ color: "#888" }} onClick={() => { setUserMenuOpen(false); logout(); }}>
+                          <span style={{ fontSize: 15 }}>🚪</span> התנתקות
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    /* לא מחובר */
+                    <div style={{ padding: "20px 16px" }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a", marginBottom: 4, textAlign: "center" }}>כניסה לחשבון</div>
+                      <div style={{ fontSize: 12, color: "#888", marginBottom: 16, textAlign: "center" }}>עקוב אחרי הזמנות, צבור נקודות</div>
+                      <button
+                        onClick={() => { setUserMenuOpen(false); signInWithGoogle(); }}
+                        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 16px", background: "#1a1a1a", color: "#fff", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+                        המשך עם Google
+                      </button>
+                      <div style={{ marginTop: 10, textAlign: "center" }}>
+                        <button onClick={() => { setUserMenuOpen(false); router.push("/account/login"); }} style={{ background: "none", border: "none", color: "#888", fontSize: 11, cursor: "pointer", textDecoration: "underline", fontFamily: "inherit" }}>
+                          לעמוד הכניסה
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             <div onClick={() => router.push("/cart")} style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
               <div style={{ position: "relative" }}>
                 <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>

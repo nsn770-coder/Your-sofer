@@ -4,7 +4,20 @@ import { getAuthLazy } from '@/lib/authLazy';
 
 export type UserRole = 'customer' | 'shaliach' | 'sofer' | 'admin';
 
-interface AuthUser {
+// כתובת — נשמרת ב-addresses[] ב-Firestore
+export interface Address {
+  id: string;
+  label: string;       // "בית", "עבודה", "אחר"
+  firstName: string;
+  lastName: string;
+  street: string;
+  city: string;
+  zip?: string;
+  country: string;
+  phone?: string;
+}
+
+export interface AuthUser {
   uid: string;
   email: string | null;
   displayName: string | null;
@@ -12,6 +25,15 @@ interface AuthUser {
   role: UserRole;
   soferId?: string;
   shaliachId?: string;
+  // שדות פרופיל לקוח (מתמלאים מ-Firestore)
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  dateOfBirth?: string | null;           // ISO date string "YYYY-MM-DD"
+  defaultShippingAddress?: Address | null;
+  defaultBillingAddress?: Address | null;
+  addresses?: Address[];
+  newsletterSubscribed?: boolean;
 }
 
 interface AuthContextType {
@@ -19,6 +41,7 @@ interface AuthContextType {
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  updateLocalUser: (updates: Partial<AuthUser>) => void;  // עדכון מקומי אחרי שמירה ב-Firestore
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -26,6 +49,10 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+
+  function updateLocalUser(updates: Partial<AuthUser>) {
+    setUser(prev => prev ? { ...prev, ...updates } : null);
+  }
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -64,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             let role: UserRole = 'customer';
             let soferId: string | undefined;
             let shaliachId: string | undefined;
+            let extraProfile: Partial<AuthUser> = {};
 
             // בדוק admins
             const adminSnap = await getDoc(doc(db, 'admins', firebaseUser.uid));
@@ -79,6 +107,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 role = data.role || 'customer';
                 soferId = data.soferId;
                 shaliachId = data.shaliachId;
+                // שדות פרופיל לקוח — נטענים אם קיימים
+                extraProfile = {
+                  firstName: data.firstName,
+                  lastName: data.lastName,
+                  phone: data.phone,
+                  dateOfBirth: data.dateOfBirth ?? null,
+                  defaultShippingAddress: data.defaultShippingAddress ?? null,
+                  defaultBillingAddress: data.defaultBillingAddress ?? null,
+                  addresses: data.addresses ?? [],
+                  newsletterSubscribed: data.newsletterSubscribed ?? false,
+                };
               } else {
                 // משתמש חדש - צור רשומה
                 const referredByShaliach = typeof window !== 'undefined'
@@ -170,6 +209,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 role,
                 soferId,
                 shaliachId,
+                ...extraProfile,
               });
             }
           } else {
@@ -242,7 +282,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, logout, updateLocalUser }}>
       {children}
     </AuthContext.Provider>
   );
