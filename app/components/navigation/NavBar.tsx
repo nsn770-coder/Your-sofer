@@ -148,12 +148,11 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
       {
         title: "חגים",
         items: [
-          { label: "פסח",      cat: "יודאיקה", filter: "פסח" },
-          { label: "חנוכה",    cat: "יודאיקה", filter: "חנוכה" },
-          { label: "חנוכיות",  cat: "יודאיקה", filter: "חנוכיות" },
-          { label: "ראש השנה", cat: "יודאיקה", filter: "ראש השנה" },
-          { label: "פורים",    cat: "יודאיקה", filter: "פורים" },
-          { label: "סוכות",    cat: "יודאיקה", filter: "סוכות" },
+          { label: "פסח",      cat: "חגים", filter: "פסח" },
+          { label: "חנוכה",    cat: "חגים", filter: "חנוכה" },
+          { label: "ראש השנה", cat: "חגים", filter: "ראש השנה" },
+          { label: "פורים",    cat: "חגים", filter: "פורים" },
+          { label: "סוכות",    cat: "חגים", filter: "סוכות" },
         ],
       },
       {
