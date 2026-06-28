@@ -178,6 +178,22 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
     ],
   },
   {
+    id: "hagim", label: "חגים", cat: "חגים",
+    columns: [
+      {
+        title: "חגים ומועדים",
+        items: [
+          { label: "כל החגים",  cat: "חגים" },
+          { label: "חנוכה",     cat: "חגים", filter: "חנוכה" },
+          { label: "פסח",       cat: "חגים", filter: "פסח" },
+          { label: "סוכות",     cat: "חגים", filter: "סוכות" },
+          { label: "פורים",     cat: "חגים", filter: "פורים" },
+          { label: "ראש השנה",  cat: "חגים", filter: "ראש השנה" },
+        ],
+      },
+    ],
+  },
+  {
     id: "synagogue", label: "מוצרי בית כנסת", cat: "מוצרי בית כנסת",
     columns: [
       {
@@ -203,8 +219,6 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
 ];
 
 const SIMPLE_NAV = [
-  { label: "ביקורות", action: "reviews" },
-  { label: "קולקציות", action: "collections" },
   { label: "הסיפור שלנו", action: "about" },
   { label: "שאלות ותשובות", action: "faq" },
   { label: "צור קשר", action: "contact" },
