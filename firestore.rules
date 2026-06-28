@@ -141,8 +141,11 @@ service cloud.firestore {
                     || request.resource.data.guestId is string;
       // Guest orders (guestId present) are readable/updatable by anyone with the orderId.
       // The 20-char random Firestore ID acts as an unguessable access token.
+      // Logged-in customers can read their own orders by uid (new orders) or email (legacy).
       allow read:   if isAdmin()
                     || resource.data.guestId is string
+                    || (isSignedIn() && resource.data.uid == request.auth.uid)
+                    || (isSignedIn() && resource.data.email == request.auth.token.email)
                     || (isShaliach()
                         && resource.data.shaliachId ==
                            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shaliachId)

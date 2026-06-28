@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { collection, query, where, orderBy, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, Timestamp, QueryConstraint } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
 
@@ -95,35 +95,42 @@ export default function OrdersPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user) return;
     setLoading(true);
 
-    // שאילתה לפי אימייל — מחזירה את כל הזמנות המשתמש
-    getDocs(
-      query(
-        collection(db, 'orders'),
-        where('email', '==', user.email),
-        orderBy('createdAt', 'desc')
-      )
-    )
-      .then(snap => {
-        setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() } as Order)));
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('[orders]', err);
-        // Firestore דורש index ל-where+orderBy — אם נכשל ננסה בלי orderBy
-        getDocs(query(collection(db, 'orders'), where('email', '==', user.email)))
-          .then(snap => {
-            const sorted = snap.docs
-              .map(d => ({ id: d.id, ...d.data() } as Order))
-              .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
-            setOrders(sorted);
-            setLoading(false);
-          })
-          .catch(e => { setError('שגיאה בטעינת הזמנות'); console.error(e); setLoading(false); });
-      });
-  }, [user?.email]);
+    async function fetchOrders() {
+      const seen = new Set<string>();
+      const all: Order[] = [];
+
+      async function runQuery(constraints: QueryConstraint[]) {
+        try {
+          const snap = await getDocs(query(collection(db, 'orders'), ...constraints, orderBy('createdAt', 'desc')));
+          for (const d of snap.docs) {
+            if (!seen.has(d.id)) { seen.add(d.id); all.push({ id: d.id, ...d.data() } as Order); }
+          }
+        } catch {
+          // missing composite index — retry without orderBy
+          try {
+            const snap = await getDocs(query(collection(db, 'orders'), ...constraints));
+            for (const d of snap.docs) {
+              if (!seen.has(d.id)) { seen.add(d.id); all.push({ id: d.id, ...d.data() } as Order); }
+            }
+          } catch (e) { console.error('[orders] query failed', e); }
+        }
+      }
+
+      // Primary: uid-based (logged-in orders after uid fix)
+      if (user.uid) await runQuery([where('uid', '==', user.uid)]);
+      // Fallback: email-based (legacy orders without uid)
+      if (user.email) await runQuery([where('email', '==', user.email)]);
+
+      all.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+      setOrders(all);
+      setLoading(false);
+    }
+
+    fetchOrders().catch(e => { console.error('[orders]', e); setError('שגיאה בטעינת הזמנות'); setLoading(false); });
+  }, [user?.uid, user?.email]);
 
   return (
     <div>
