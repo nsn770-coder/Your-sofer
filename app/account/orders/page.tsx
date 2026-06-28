@@ -97,6 +97,9 @@ export default function OrdersPage() {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
+    // Capture synchronously so the async closure always sees non-null values
+    const userUid   = user.uid;
+    const userEmail = user.email;
 
     async function fetchOrders() {
       const seen = new Set<string>();
@@ -120,9 +123,9 @@ export default function OrdersPage() {
       }
 
       // Primary: uid-based (logged-in orders after uid fix)
-      if (user.uid) await runQuery([where('uid', '==', user.uid)]);
+      if (userUid)   await runQuery([where('uid',   '==', userUid)]);
       // Fallback: email-based (legacy orders without uid)
-      if (user.email) await runQuery([where('email', '==', user.email)]);
+      if (userEmail) await runQuery([where('email', '==', userEmail)]);
 
       all.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
       setOrders(all);

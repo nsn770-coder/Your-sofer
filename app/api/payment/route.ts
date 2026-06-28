@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { CartItem } from '@/app/contexts/CartContext';
+import { getTier } from '@/app/lib/loyalty';
 
 const SUMIT_API_URL        = 'https://api.sumit.co.il/billing/payments/charge/';
 const SUMIT_COMPANY_ID     = process.env.SUMIT_COMPANY_ID!;
@@ -44,6 +45,96 @@ function parseBundle(key: string): { n: number; bundlePrice: number } | null {
   const m = key.match(/^(\d+)for(\d+)$/);
   if (!m) return null;
   return { n: parseInt(m[1]), bundlePrice: parseInt(m[2]) };
+}
+
+// ── Loyalty accrual helper ────────────────────────────────────────────────────
+// Non-fatal: called inside its own try/catch so it never blocks payment response.
+async function accruePoints(
+  adminDb: ReturnType<typeof getAdminDb>,
+  orderId: string,
+  uid: string | null,
+  email: string,
+  total: number,
+  shippingCost: number,
+  cartItems: CartItem[],
+): Promise<void> {
+  // Resolve user document — prefer uid, fallback to email query for legacy orders
+  const uidSnap = uid ? await adminDb.collection('users').doc(uid).get() : null;
+  let userRef   = uidSnap?.exists ? uidSnap.ref : null;
+  if (!userRef && email) {
+    const q = await adminDb.collection('users').where('email', '==', email).limit(1).get();
+    if (!q.empty) userRef = q.docs[0].ref;
+  }
+  if (!userRef) return; // guest without account — skip silently
+
+  const orderDocRef = adminDb.collection('orders').doc(orderId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [userSnap, orderSnap] = await Promise.all([tx.get(userRef!), tx.get(orderDocRef)]);
+    if (orderSnap.data()?.loyaltyProcessed === true) return; // idempotency guard
+
+    const data        = userSnap.data() ?? {};
+    const prevSpent   = Number(data.totalSpent   ?? 0);
+    const prevPoints  = Number(data.loyaltyPoints ?? 0);
+    const currentTier = getTier(prevSpent);
+
+    // Accrue on (total − shipping) only; kippot earn a capped 5% regardless of tier
+    const baseAmount  = Math.max(0, total - (shippingCost || 0));
+    const kippotBase  = cartItems
+      .filter(i => i.cat === 'כיפות')
+      .reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const regularBase = Math.max(0, baseAmount - kippotBase);
+
+    const pointsEarned =
+      Math.floor(kippotBase  * 0.05) +
+      Math.floor(regularBase * currentTier.accrualRate / 100);
+
+    const newTotalSpent = prevSpent + baseAmount;
+    const newTier       = getTier(newTotalSpent);
+
+    // One-time tier-upgrade bonuses (flags prevent double-granting)
+    const bonuses: Array<{ amount: number; reason: string }> = [];
+    if (newTier.id !== 'bronze' && !data.silverBonusGranted) bonuses.push({ amount: 200, reason: 'silver_bonus' });
+    if (newTier.id === 'gold'   && !data.goldBonusGranted)   bonuses.push({ amount: 400, reason: 'gold_bonus'   });
+    const bonusTotal = bonuses.reduce((s, b) => s + b.amount, 0);
+
+    const userUpdate: Record<string, unknown> = {
+      totalSpent:    newTotalSpent,
+      loyaltyPoints: prevPoints + pointsEarned + bonusTotal,
+      tier:          newTier.id,
+    };
+    if (bonuses.some(b => b.reason === 'silver_bonus')) userUpdate.silverBonusGranted = true;
+    if (bonuses.some(b => b.reason === 'gold_bonus'))   userUpdate.goldBonusGranted   = true;
+
+    tx.update(userRef!, userUpdate);
+    tx.update(orderDocRef, { loyaltyProcessed: true });
+
+    // Points history — one Firestore sub-doc per credit reason
+    const historyCol = userRef!.collection('pointsHistory');
+    const expiresAt  = new Date();
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+    const expiresAtISO = expiresAt.toISOString();
+    let runningBalance = prevPoints;
+
+    if (pointsEarned > 0) {
+      runningBalance += pointsEarned;
+      tx.set(historyCol.doc(), {
+        amount: pointsEarned, reason: 'purchase', orderId,
+        balanceAfter: runningBalance,
+        createdAt: FieldValue.serverTimestamp(), expiresAt: expiresAtISO,
+      });
+    }
+    for (const bonus of bonuses) {
+      runningBalance += bonus.amount;
+      tx.set(historyCol.doc(), {
+        amount: bonus.amount, reason: bonus.reason, orderId,
+        balanceAfter: runningBalance,
+        createdAt: FieldValue.serverTimestamp(), expiresAt: expiresAtISO,
+      });
+    }
+
+    console.log(`[loyalty] uid=${uid ?? email} +${pointsEarned}pts bonus=${bonusTotal}pts tier:${currentTier.id}→${newTier.id}`);
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -326,6 +417,7 @@ export async function POST(req: NextRequest) {
         shaliachRef: refCode || null, shaliachId: shaliachId || null, shaliachName: shaliachName || null,
         commissionPercent: commissionPercent || 0, commissionAmount,
         uid: uid || null, guestId: sessionId || null, sessionId: sessionId || null, isGuest: !uid,
+        loyaltyProcessed: false,
       });
 
       const sideEffects: Promise<unknown>[] = [];
@@ -341,6 +433,13 @@ export async function POST(req: NextRequest) {
       results.forEach((r, i) => {
         if (r.status === 'rejected') console.error(`[payment] side-effect[${i}] failed:`, r.reason);
       });
+
+      // ── Loyalty accrual (non-fatal — never blocks payment response) ──────────
+      try {
+        await accruePoints(adminDb, orderRef.id, uid || null, customer.email, total, shippingCost || 0, cartItems);
+      } catch (loyaltyErr) {
+        console.error('[payment] loyalty accrual failed (non-fatal):', loyaltyErr);
+      }
     } catch (adminErr) {
       console.error('[payment] order creation failed after successful charge:', adminErr);
       return NextResponse.json({ error: 'התשלום בוצע אך שמירת ההזמנה נכשלה, פנה אלינו בהקדם' }, { status: 500 });
