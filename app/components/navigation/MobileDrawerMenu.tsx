@@ -223,6 +223,14 @@ export default function MobileDrawerMenu({
             </div>
           </div>
 
+          {/* ── Sale row ── */}
+          <button
+            onClick={() => onAction('sale')}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: '100%', padding: '16px 20px', fontSize: 16, fontWeight: 700, color: '#c0392b', background: '#FFF5F5', border: 'none', borderBottom: '1px solid #F0EDE8', cursor: 'pointer', textAlign: 'right', fontFamily: 'inherit' }}
+          >
+            🏷️ מבצעים
+          </button>
+
           {/* ── Catalog accordion ── */}
           {menuData.map(item => (
             <MobileAccordion key={item.id} item={item} onSelect={onSelect} />

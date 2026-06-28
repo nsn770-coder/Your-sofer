@@ -360,6 +360,7 @@ function NavBarContent() {
     else if (action === "bar-mitzva") router.push("/bar-mitzva");
     else if (action === "collections") router.push("/collections");
     else if (action === "promo-2plus1") router.push("/promo/2plus1");
+    else if (action === "sale") router.push("/sale");
     else if (action === "bundles") router.push("/bundles");
     else if (action === "reviews") router.push("/reviews");
     else if (action === "about") router.push("/about");
@@ -470,6 +471,14 @@ function NavBarContent() {
         {!isMobile && (
           <div style={{ background: "#FAF8F3", borderTop: "1px solid #E7E2D8", position: "relative" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
+              <button
+                onClick={() => router.push('/sale')}
+                style={{ background: 'none', border: 'none', color: '#c0392b', padding: '9px 13px', fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', fontWeight: 700, borderBottom: '2px solid transparent', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 3 }}
+                onMouseEnter={e => { e.currentTarget.style.borderBottomColor = '#c0392b'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderBottomColor = 'transparent'; }}
+              >
+                🏷️ מבצעים
+              </button>
               {menuData.map(item => (
                 <div key={item.id} style={{ position: "relative" }}
                   onMouseEnter={() => handleEnter(item.id)}
