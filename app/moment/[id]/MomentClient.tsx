@@ -35,6 +35,9 @@ type ProductWithTab = Product & { _tabLabel?: string };
 
 const ATTR_KEYS = ['סוג חומר', 'חומר', 'צבע', 'סגנון'];
 
+// ── Module-level cache — survives re-renders & navigation back ────────────────
+const pageCache = new Map<string, ProductWithTab[]>();
+
 // ── Scroll-reveal wrapper ──────────────────────────────────────────────────────
 function RevealCard({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -47,7 +50,7 @@ function RevealCard({ children, delay = 0 }: { children: React.ReactNode; delay?
       ([entry]) => {
         if (entry.isIntersecting) { setVisible(true); obs.disconnect(); }
       },
-      { threshold: 0.05, rootMargin: '0px 0px -30px 0px' }
+      { threshold: 0.05 }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -58,8 +61,8 @@ function RevealCard({ children, delay = 0 }: { children: React.ReactNode; delay?
       ref={ref}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? 'none' : 'translateY(16px)',
-        transition: `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms`,
+        transform: visible ? 'none' : 'translateY(12px)',
+        transition: `opacity 0.35s ease ${delay}ms, transform 0.35s ease ${delay}ms`,
       }}
     >
       {children}
@@ -109,34 +112,48 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
 
 // ── Main client component ──────────────────────────────────────────────────────
 export default function MomentClient({ event }: { event: LifeEvent }) {
-  const [products, setProducts]   = useState<ProductWithTab[]>([]);
-  const [loading, setLoading]     = useState(true);
+  const [products, setProducts]   = useState<ProductWithTab[]>(() => pageCache.get(event.id) ?? []);
+  const [loading, setLoading]     = useState(!pageCache.has(event.id));
   const [catFilter, setCatFilter] = useState('הכל');
   const [attrFilters, setAttrFilters] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    // ── Cache hit — instant display, no fetch needed ──────────────────────────
+    if (pageCache.has(event.id)) {
+      setProducts(pageCache.get(event.id)!);
+      setLoading(false);
+      setCatFilter('הכל');
+      setAttrFilters({});
+      return;
+    }
+
     setLoading(true);
     setCatFilter('הכל');
     setAttrFilters({});
 
     (async () => {
       try {
-        // 1. Unique cats → one Firestore query per cat
         const uniqueCats = [...new Set(event.relatedCategories.map(cf => cf.category))];
 
-        const snapshots = await Promise.all(
-          uniqueCats.map(cat =>
-            getDocs(query(collection(db, 'products'), where('cat', '==', cat)))
-          )
+        // ── Single Firestore query instead of N parallel queries ──────────────
+        // Uses where('cat', 'in', [...]) to fetch all relevant products in one
+        // round-trip. Firestore supports up to 30 values in 'in'.
+        // Previously: N getDocs() calls (up to 8 for bar-mitzvah).
+        const snap = await getDocs(
+          query(collection(db, 'products'), where('cat', 'in', uniqueCats))
         );
 
-        // 2. Map cat → docs for lookup
-        const catDocs = new Map<string, typeof snapshots[0]['docs']>();
-        uniqueCats.forEach((cat, i) => catDocs.set(cat, snapshots[i].docs));
+        // Group docs by cat for O(1) lookup per CategoryFilter
+        const catDocs = new Map<string, typeof snap.docs>();
+        for (const doc of snap.docs) {
+          const cat = (doc.data().cat ?? '') as string;
+          if (!catDocs.has(cat)) catDocs.set(cat, []);
+          catDocs.get(cat)!.push(doc);
+        }
 
-        // 3. Process each CategoryFilter in order — earlier entries claim products first.
-        //    nameContains and tabLabel are applied per-entry, enabling multiple tabs
-        //    from the same category.
+        // Process each CategoryFilter in order — earlier entries claim products first.
+        // nameContains and tabLabel are applied per-entry, enabling multiple tabs
+        // from the same category.
         const seen = new Set<string>();
         const all: ProductWithTab[] = [];
 
@@ -163,6 +180,9 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
         }
 
         all.sort((a, b) => (b.priority ?? 50) - (a.priority ?? 50));
+
+        // ── Store in cache for instant re-visits ──────────────────────────────
+        pageCache.set(event.id, all);
         setProducts(all);
       } catch (err) {
         console.error('[moment] fetch error:', err);
@@ -294,7 +314,7 @@ export default function MomentClient({ event }: { event: LifeEvent }) {
         ) : (
           <div className="moment-grid">
             {filtered.map((p, i) => (
-              <RevealCard key={p.id} delay={Math.min((i % 12) * 50, 300)}>
+              <RevealCard key={p.id} delay={Math.min((i % 12) * 30, 150)}>
                 <ProductCard
                   id={p.id}
                   name={p.name}
