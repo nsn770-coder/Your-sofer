@@ -1159,6 +1159,8 @@ export default function CategoryClient({ category }: { category: string }) {
   const isStamCat = SOFER_FETCH_CATS.has(category);
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [kippotQty, setKippotQty] = useState(50);
+  const [kippotPrintType, setKippotPrintType] = useState<'print-top' | 'print-bottom' | 'embroidery'>('print-top');
+  const [kippotStyle, setKippotStyle] = useState<string | null>(null);
 
   useEffect(() => {
     document.body.classList.toggle('filter-drawer-open', drawerOpen);
@@ -1530,111 +1532,174 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       )}
 
-      {/* ── כיפות: עצבו כיפה + מחירון סליידר ── */}
-      {category === 'כיפות' && (
-        <div dir="rtl" style={{ padding: '24px 20px 8px' }}>
-          <style>{`
-            .ys-kip-range { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: #E5E0D5; outline: none; cursor: pointer; transform: scaleX(-1); }
-            .ys-kip-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; background: #C5A028; cursor: pointer; border-radius: 50%; box-shadow: 0 2px 8px rgba(197,160,40,0.4); }
-            .ys-kip-range::-moz-range-thumb { width: 26px; height: 26px; background: #C5A028; cursor: pointer; border-radius: 50%; border: none; box-shadow: 0 2px 8px rgba(197,160,40,0.4); }
-            .ys-kip-range::-webkit-slider-runnable-track { height: 6px; background: #E5E0D5; }
-          `}</style>
+      {/* ── כיפות: wizard הזמנה בכמות ── */}
+      {category === 'כיפות' && (() => {
+        const KIPPOT_STYLES = [
+          { id: 'lavan', label: 'לבן ורדרד', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636051/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%9F_%D7%95%D7%A8%D7%93%D7%A8%D7%93_nauwhq.png' },
+          { id: 'beige', label: "בז'", img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_fhrr09.png' },
+          { id: 'marva', label: 'ירוק מרווה', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%9E%D7%A8%D7%95%D7%95%D7%94_b5ov4n.png' },
+          { id: 'techelet', label: 'כחול רויאל', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%AA%D7%9B%D7%9C%D7%AA_iflyjn.png' },
+        ];
+        const basePrice = kippotQty <= 49 ? 19 : kippotQty <= 99 ? 17 : kippotQty <= 150 ? 10 : 9;
+        const typeExtra = kippotPrintType === 'embroidery' ? 5 : 0;
+        const unitPrice = basePrice + typeExtra;
+        const total = kippotQty * unitPrice;
 
-          {/* CTA — עצבו כיפה באתר */}
-          <a
-            href={`/print-order?qty=${kippotQty}`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 16,
-              background: 'linear-gradient(135deg, #111d3a 0%, #162a5c 100%)',
-              padding: 'clamp(18px, 2.5vw, 28px) clamp(20px, 3vw, 36px)',
-              textDecoration: 'none',
-              border: '2px solid #C5A028',
-              flexWrap: 'wrap',
-              marginBottom: 16,
-            }}
-          >
-            <div style={{ fontSize: 'clamp(32px, 4vw, 48px)', lineHeight: 1, flexShrink: 0 }}>🖨️</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 'clamp(17px, 2vw, 22px)', fontWeight: 900, color: '#fff', marginBottom: 6 }}>
-                עצבו כיפה באתר
+        return (
+          <div dir="rtl" style={{ padding: '24px 20px 16px' }}>
+            <style>{`
+              .ys-kip-range { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: #E5E0D5; outline: none; cursor: pointer; transform: scaleX(-1); }
+              .ys-kip-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; background: #C5A028; cursor: pointer; border-radius: 50%; box-shadow: 0 2px 8px rgba(197,160,40,0.4); }
+              .ys-kip-range::-moz-range-thumb { width: 26px; height: 26px; background: #C5A028; cursor: pointer; border-radius: 50%; border: none; box-shadow: 0 2px 8px rgba(197,160,40,0.4); }
+              .ys-kip-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+            `}</style>
+
+            {/* כותרת */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 'clamp(18px, 2vw, 24px)', fontWeight: 900, color: '#1a1a1a' }}>הזמינו כיפות עם הדפסה או רקמה</div>
+              <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>מינימום 50 יחידות · מחיר כולל הדפסה</div>
+            </div>
+
+            {/* שלב 1: סוג */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 10 }}>1. בחר סוג עיצוב</div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                {([
+                  { id: 'print-top', label: 'הדפסה למעלה', desc: 'הדפסה על חלק עליון', icon: '⬆️' },
+                  { id: 'print-bottom', label: 'הדפסה למטה', desc: 'הדפסה על שוליים', icon: '⬇️' },
+                  { id: 'embroidery', label: 'רקמה', desc: '+₪5 ליחידה', icon: '🧵' },
+                ] as { id: string; label: string; desc: string; icon: string }[]).map(opt => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setKippotPrintType(opt.id as typeof kippotPrintType)}
+                    style={{
+                      flex: '1 1 140px',
+                      padding: '14px 16px',
+                      border: kippotPrintType === opt.id ? '2px solid #C5A028' : '2px solid #E5E0D5',
+                      background: kippotPrintType === opt.id ? 'rgba(197,160,40,0.08)' : '#fff',
+                      cursor: 'pointer',
+                      textAlign: 'right',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <div style={{ fontSize: 20, marginBottom: 4 }}>{opt.icon}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a' }}>{opt.label}</div>
+                    <div style={{ fontSize: 11, color: '#9C7B3F', marginTop: 2 }}>{opt.desc}</div>
+                  </button>
+                ))}
               </div>
-              <div style={{ fontSize: 'clamp(12px, 1.3vw, 14px)', color: 'rgba(255,255,255,0.72)', lineHeight: 1.6 }}>
-                בואו תראו בסימולציה איך הכיפה תיראה — הדמיה ומחיר תוך 3 שניות
+            </div>
+
+            {/* שלב 2: כמות + מחיר */}
+            <div style={{ background: '#fff', border: '1px solid #E5E0D5', padding: 'clamp(16px, 2.5vw, 28px)', marginBottom: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 16 }}>2. בחר כמות</div>
+              <input
+                type="range"
+                className="ys-kip-range"
+                min={50}
+                max={300}
+                step={1}
+                value={kippotQty}
+                onChange={e => setKippotQty(Number(e.target.value))}
+                style={{ touchAction: 'pan-y' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 11, color: '#9C7B3F', fontWeight: 600 }}>
+                <span>300</span><span>50</span>
               </div>
-            </div>
-            <div style={{ flexShrink: 0, background: '#C5A028', color: '#111d3a', fontWeight: 900, fontSize: 14, padding: '10px 22px' }}>
-              לעיצוב ←
-            </div>
-          </a>
 
-          {/* מחירון סליידר */}
-          <div style={{ background: '#fff', border: '1px solid #E5E0D5', padding: 'clamp(20px, 3vw, 32px)' }}>
-            <div style={{ fontSize: 'clamp(14px, 1.5vw, 16px)', fontWeight: 700, color: '#3A2E1A', marginBottom: 20 }}>
-              כמות כיפות כולל הדפס
-            </div>
-
-            <input
-              type="range"
-              className="ys-kip-range"
-              min={1}
-              max={300}
-              step={1}
-              value={kippotQty}
-              onChange={e => setKippotQty(Number(e.target.value))}
-              style={{ touchAction: 'pan-y' }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 11, color: '#9C7B3F', fontWeight: 600 }}>
-              <span>300</span>
-              <span>1</span>
-            </div>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 20 }}>
-              <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 90 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>כמות</div>
-                <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: '#111d3a' }}>{kippotQty}</div>
-              </div>
-              <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 110 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>מחיר ליחידה</div>
-                <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: '#C5A028' }}>
-                  ₪{kippotQty <= 49 ? 19 : kippotQty <= 99 ? 17 : kippotQty <= 150 ? 10 : 9}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 20 }}>
+                <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 80 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>כמות</div>
+                  <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: '#111d3a' }}>{kippotQty}</div>
+                </div>
+                <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 110 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>מחיר ליחידה</div>
+                  <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: '#C5A028' }}>₪{unitPrice}</div>
+                  {typeExtra > 0 && <div style={{ fontSize: 10, color: '#9C7B3F' }}>כולל +₪{typeExtra} רקמה</div>}
+                </div>
+                <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 130 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>סה&quot;כ משוער</div>
+                  <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: '#111d3a' }}>
+                    ₪{total.toLocaleString('he-IL')}
+                  </div>
                 </div>
               </div>
-              <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 130 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>סה&quot;כ משוער</div>
-                <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: '#111d3a' }}>
-                  ₪{(kippotQty * (kippotQty <= 49 ? 19 : kippotQty <= 99 ? 17 : kippotQty <= 150 ? 10 : 9)).toLocaleString('he-IL')}
-                </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14, alignItems: 'center' }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F' }}>מדרגות:</span>
+                {([
+                  { range: '50–99', price: 17, active: kippotQty <= 99 },
+                  { range: '100–150', price: 10, active: kippotQty >= 100 && kippotQty <= 150 },
+                  { range: '151–300', price: 9, active: kippotQty >= 151 },
+                ] as { range: string; price: number; active: boolean }[]).map(({ range, price, active }) => (
+                  <span key={range} style={{ fontSize: 11, fontWeight: active ? 800 : 400, color: active ? '#C5A028' : '#9C7B3F', background: active ? 'rgba(197,160,40,0.10)' : 'transparent', padding: active ? '2px 8px' : '2px 0', transition: 'all 0.15s' }}>
+                    {range} = ₪{price}{kippotPrintType === 'embroidery' ? `+₪5` : ''}
+                  </span>
+                ))}
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 16, alignItems: 'center' }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F' }}>מדרגות:</span>
-              {([
-                { range: '1–49', price: 19, active: kippotQty <= 49 },
-                { range: '50–99', price: 17, active: kippotQty >= 50 && kippotQty <= 99 },
-                { range: '100–150', price: 10, active: kippotQty >= 100 && kippotQty <= 150 },
-                { range: '151–300', price: 9, active: kippotQty >= 151 },
-              ] as { range: string; price: number; active: boolean }[]).map(({ range, price, active }) => (
-                <span
-                  key={range}
-                  style={{
-                    fontSize: 11,
-                    fontWeight: active ? 800 : 400,
-                    color: active ? '#C5A028' : '#9C7B3F',
-                    background: active ? 'rgba(197,160,40,0.10)' : 'transparent',
-                    padding: active ? '2px 8px' : '2px 0',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {range} = ₪{price}
-                </span>
-              ))}
+            {/* שלב 3: בחר סוג כיפה */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 12 }}>3. בחר סוג כיפה</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
+                {KIPPOT_STYLES.map(s => (
+                  <button
+                    key={s.id}
+                    className="ys-kip-card"
+                    onClick={() => setKippotStyle(kippotStyle === s.id ? null : s.id)}
+                    style={{
+                      border: kippotStyle === s.id ? '2px solid #C5A028' : '2px solid #E5E0D5',
+                      background: '#fff',
+                      padding: 0,
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.2s',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {kippotStyle === s.id && (
+                      <div style={{ position: 'absolute', top: 6, left: 6, background: '#C5A028', color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>✓</div>
+                    )}
+                    <img src={s.img} alt={s.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+                    <div style={{ padding: '8px 10px', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{s.label}</div>
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {/* כפתור המשך */}
+            {kippotStyle && (
+              <a
+                href={`/kippot-order?qty=${kippotQty}&type=${kippotPrintType}&style=${kippotStyle}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                  background: '#C5A028',
+                  color: '#1a1a1a',
+                  fontWeight: 900,
+                  fontSize: 16,
+                  padding: '16px 32px',
+                  textDecoration: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'opacity 0.15s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
+                onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+              >
+                המשך לעיצוב ←
+              </a>
+            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
 
       {/* ── סט טלית תפילין tab bar ── */}
