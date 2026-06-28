@@ -6,12 +6,6 @@ import { db } from '../firebase';
 import * as pixel from '@/lib/metaPixel';
 import { useAuth } from '../contexts/AuthContext';
 
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-  }
-}
-
 // ── Gematria blessing system ───────────────────────────────────────────────────
 
 /**
@@ -195,7 +189,9 @@ function ThankYouContent() {
           })),
         });
 
-        // Google Ads conversion event — guarded against double-fire on page refresh
+        // ── Google Ads Conversion — קוד מהקמפיינר (Ben Amsalem) ──
+        // מזהה המרה: AW-18095875961/f0NoCLGexLIcEPnO5LRD
+        // נורה רק בעמוד הצלחת תשלום, מוגן מירי כפול דרך localStorage. אין לשנות.
         const adsConversionKey = `gads_conversion_fired_${orderId}`;
         let adsAlreadyFired = false;
         try {
