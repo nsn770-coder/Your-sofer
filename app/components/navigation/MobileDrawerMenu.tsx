@@ -33,27 +33,8 @@ function MobileAccordion({ item, onSelect }: { item: NavMenuItem; onSelect: (cat
     <div style={{ borderBottom: '1px solid #F0EDE8' }} dir="rtl">
 
       {/* ── Main row ── */}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        {/* Label — navigates to category page */}
-        <button
-          onClick={() => onSelect(item.cat)}
-          style={{
-            flex: 1,
-            textAlign: 'right',
-            padding: '16px 20px',
-            fontSize: 16,
-            fontWeight: 600,
-            color: '#1a1a1a',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-          }}
-        >
-          {item.label}
-        </button>
-
-        {/* Chevron — toggles sub-items only */}
+      <div style={{ display: 'flex', alignItems: 'center', direction: 'rtl' }}>
+        {/* Chevron — toggles sub-items only (first in RTL = right side) */}
         <button
           onClick={() => setOpen(o => !o)}
           aria-label={open ? 'סגור' : 'פתח תת-קטגוריות'}
@@ -74,6 +55,25 @@ function MobileAccordion({ item, onSelect }: { item: NavMenuItem; onSelect: (cat
               transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
             }}
           />
+        </button>
+
+        {/* Label — navigates to category page */}
+        <button
+          onClick={() => onSelect(item.cat)}
+          style={{
+            flex: 1,
+            textAlign: 'right',
+            padding: '16px 20px',
+            fontSize: 16,
+            fontWeight: 600,
+            color: '#1a1a1a',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          {item.label}
         </button>
       </div>
 
