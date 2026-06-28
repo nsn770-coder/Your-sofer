@@ -6,6 +6,12 @@ import { db } from '../firebase';
 import * as pixel from '@/lib/metaPixel';
 import { useAuth } from '../contexts/AuthContext';
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
 // ── Gematria blessing system ───────────────────────────────────────────────────
 
 /**
@@ -188,6 +194,26 @@ function ThankYouContent() {
             quantity: i.quantity,
           })),
         });
+
+        // Google Ads conversion event — guarded against double-fire on page refresh
+        const adsConversionKey = `gads_conversion_fired_${orderId}`;
+        let adsAlreadyFired = false;
+        try {
+          if (typeof window !== 'undefined') {
+            adsAlreadyFired = !!localStorage.getItem(adsConversionKey);
+          }
+        } catch {}
+        if (!adsAlreadyFired && typeof window !== 'undefined' && typeof window.gtag === 'function') {
+          window.gtag('event', 'conversion', {
+            send_to: 'AW-18095875961/f0NoCLGexLIcEPnO5LRD',
+            value: order.total,
+            currency: 'ILS',
+            transaction_id: order.orderNumber,
+          });
+          try {
+            localStorage.setItem(adsConversionKey, '1');
+          } catch {}
+        }
 
         // Meta Pixel purchase event — guarded against double-fire on page refresh
         const pixelKey = `purchase_fired_${orderId}`;
