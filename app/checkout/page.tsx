@@ -429,6 +429,7 @@ export default function CheckoutPage() {
           sessionId,
           refCode: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
           commissionPercent,
+          uid: user?.uid || null,
         }),
       });
 

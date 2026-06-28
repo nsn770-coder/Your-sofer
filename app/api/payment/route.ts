@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
       cartItems, address, notes, selectedGift, giftLine,
       shippingCost, shippingType,
       sessionId, refCode, shaliachId, shaliachName, commissionPercent,
+      uid,
     } = await req.json() as {
       items:          PaymentItem[];
       total:          number;
@@ -92,6 +93,7 @@ export async function POST(req: NextRequest) {
       shaliachId?:    string | null;
       shaliachName?:  string | null;
       commissionPercent?: number;
+      uid?: string | null;
     };
 
     if (!singleUseToken) {
@@ -323,7 +325,7 @@ export async function POST(req: NextRequest) {
         status: 'paid', createdAt: FieldValue.serverTimestamp(), paidAt: FieldValue.serverTimestamp(),
         shaliachRef: refCode || null, shaliachId: shaliachId || null, shaliachName: shaliachName || null,
         commissionPercent: commissionPercent || 0, commissionAmount,
-        guestId: sessionId || null, sessionId: sessionId || null, isGuest: true,
+        uid: uid || null, guestId: sessionId || null, sessionId: sessionId || null, isGuest: !uid,
       });
 
       const sideEffects: Promise<unknown>[] = [];
