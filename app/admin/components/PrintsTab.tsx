@@ -17,6 +17,11 @@ interface PC {
   imageRotation?: number;
   logoWidthPct?: number;
   mockupUrl?: string;
+  designText?: string;
+  addSide?: boolean;
+  addSideText?: string;
+  kippahLabel?: string;
+  printType?: string;
 }
 
 interface PrintRow {
@@ -157,10 +162,11 @@ export default function PrintsTab({ orders }: PrintsTabProps) {
                 {/* ── Spec chips ── */}
                 <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
                   {([
-                    row.pc.productType,
+                    row.pc.kippahLabel || row.pc.productType,
                     `צד: ${row.pc.side}`,
                     row.pc.color ? `צבע: ${row.pc.color}` : null,
                     row.pc.bgRemoved ? 'ללא רקע ✓' : null,
+                    row.pc.addSide ? 'צד נוסף ✓' : null,
                   ] as (string | null)[]).filter(Boolean).map((tag, i) => (
                     <span key={i} style={{
                       fontSize: 11, fontWeight: 600,
@@ -172,6 +178,14 @@ export default function PrintsTab({ orders }: PrintsTabProps) {
                     </span>
                   ))}
                 </div>
+
+                {/* ── Design text ── */}
+                {(row.pc.designText || row.pc.addSideText) && (
+                  <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 6, padding: '8px 12px', marginBottom: 12, fontSize: 13 }}>
+                    {row.pc.designText && <div>✏️ <strong>טקסט:</strong> {row.pc.designText}</div>}
+                    {row.pc.addSideText && <div>↕️ <strong>צד נוסף:</strong> {row.pc.addSideText}</div>}
+                  </div>
+                )}
 
                 {/* ── Images + position data ── */}
                 <div style={{ display: 'flex', gap: 14, marginBottom: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>

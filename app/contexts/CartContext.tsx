@@ -57,6 +57,13 @@ export interface CartItem {
     imageRotation?: number;
     logoWidthPct?: number;
     mockupUrl?: string;
+    // kippot bulk order extras
+    designText?: string;
+    addSide?: boolean;
+    addSideText?: string;
+    kippahStyle?: string;
+    kippahLabel?: string;
+    printType?: string;
   };
 }
 
