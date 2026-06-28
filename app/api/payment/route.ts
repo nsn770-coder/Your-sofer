@@ -92,48 +92,27 @@ async function accruePoints(
     const newTotalSpent = prevSpent + baseAmount;
     const newTier       = getTier(newTotalSpent);
 
-    // One-time tier-upgrade bonuses (flags prevent double-granting)
-    const bonuses: Array<{ amount: number; reason: string }> = [];
-    if (newTier.id !== 'bronze' && !data.silverBonusGranted) bonuses.push({ amount: 200, reason: 'silver_bonus' });
-    if (newTier.id === 'gold'   && !data.goldBonusGranted)   bonuses.push({ amount: 400, reason: 'gold_bonus'   });
-    const bonusTotal = bonuses.reduce((s, b) => s + b.amount, 0);
-
-    const userUpdate: Record<string, unknown> = {
+    tx.update(userRef!, {
       totalSpent:    newTotalSpent,
-      loyaltyPoints: prevPoints + pointsEarned + bonusTotal,
+      loyaltyPoints: prevPoints + pointsEarned,
       tier:          newTier.id,
-    };
-    if (bonuses.some(b => b.reason === 'silver_bonus')) userUpdate.silverBonusGranted = true;
-    if (bonuses.some(b => b.reason === 'gold_bonus'))   userUpdate.goldBonusGranted   = true;
-
-    tx.update(userRef!, userUpdate);
+    });
     tx.update(orderDocRef, { loyaltyProcessed: true });
 
-    // Points history — one Firestore sub-doc per credit reason
+    // Points history — one sub-doc per purchase
     const historyCol = userRef!.collection('pointsHistory');
     const expiresAt  = new Date();
     expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-    const expiresAtISO = expiresAt.toISOString();
-    let runningBalance = prevPoints;
 
     if (pointsEarned > 0) {
-      runningBalance += pointsEarned;
       tx.set(historyCol.doc(), {
         amount: pointsEarned, reason: 'purchase', orderId,
-        balanceAfter: runningBalance,
-        createdAt: FieldValue.serverTimestamp(), expiresAt: expiresAtISO,
-      });
-    }
-    for (const bonus of bonuses) {
-      runningBalance += bonus.amount;
-      tx.set(historyCol.doc(), {
-        amount: bonus.amount, reason: bonus.reason, orderId,
-        balanceAfter: runningBalance,
-        createdAt: FieldValue.serverTimestamp(), expiresAt: expiresAtISO,
+        balanceAfter: prevPoints + pointsEarned,
+        createdAt: FieldValue.serverTimestamp(), expiresAt: expiresAt.toISOString(),
       });
     }
 
-    console.log(`[loyalty] uid=${uid ?? email} +${pointsEarned}pts bonus=${bonusTotal}pts tier:${currentTier.id}→${newTier.id}`);
+    console.log(`[loyalty] uid=${uid ?? email} +${pointsEarned}pts tier:${currentTier.id}→${newTier.id}`);
   });
 }
 
