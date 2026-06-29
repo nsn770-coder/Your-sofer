@@ -219,6 +219,7 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
 ];
 
 const SIMPLE_NAV = [
+  { label: "כיפות לאירועים", action: "event-kippot" },
   { label: "הסיפור שלנו", action: "about" },
   { label: "שאלות ותשובות", action: "faq" },
   { label: "צור קשר", action: "contact" },
@@ -292,12 +293,15 @@ function NavBarContent() {
     const mid = Math.ceil(allItems.length / 2);
     const kipotEntry: NavMenuItem = {
       id: 'kipot', label: 'כיפות', cat: 'כיפות',
-      columns: allItems.length <= 6
-        ? [{ title: 'כיפות', items: allItems }]
-        : [
-            { title: 'כיפות', items: allItems.slice(0, mid) },
-            { title: 'עוד',   items: allItems.slice(mid) },
-          ],
+      columns: [
+        ...(allItems.length <= 6
+          ? [{ title: 'כיפות', items: allItems }]
+          : [
+              { title: 'כיפות', items: allItems.slice(0, mid) },
+              { title: 'עוד',   items: allItems.slice(mid) },
+            ]),
+        { title: 'הדפסה', items: [{ label: 'כיפות לאירועים', cat: '__event-kippot' }] },
+      ],
     };
     return MEGA_MENU_DATA.map(item => (item.id === 'kipot' ? kipotEntry : item));
   }, [kipotSubcats]);
@@ -366,6 +370,7 @@ function NavBarContent() {
   function handleSelect(cat: string, filter?: string) {
     setActiveId(null);
     setMobileOpen(false);
+    if (cat === '__event-kippot') { router.push('/event-kippot'); return; }
     let url = `/category/${encodeURIComponent(cat)}`;
     if (filter) url += `?filter=${encodeURIComponent(filter)}`;
     router.push(url);
@@ -391,6 +396,7 @@ function NavBarContent() {
     else if (action === "faq") router.push("/faq");
     else if (action === "contact") router.push("/contact");
     else if (action === "print-order") router.push("/print-order");
+    else if (action === "event-kippot") router.push("/event-kippot");
   }
 
   return (

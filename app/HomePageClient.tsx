@@ -1215,7 +1215,7 @@ export default function HomePageClient() {
       <div style={{ background: '#F8F6F1', padding: isMobile ? '0 20px 48px' : '0 32px 64px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <a
-            href="/category/כיפות"
+            href="/event-kippot"
             style={{
               display: 'block',
               position: 'relative',
