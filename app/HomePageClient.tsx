@@ -1247,11 +1247,11 @@ export default function HomePageClient() {
                 <div style={{ fontSize: 'clamp(15px, 2.6vw, 26px)', fontWeight: 900, color: '#fff', textShadow: '0 2px 12px rgba(0,0,0,0.8)', lineHeight: 1.2, marginBottom: 4 }}>
                   כיפות בסיטונאות
                 </div>
-                <div style={{ fontSize: 'clamp(20px, 3.4vw, 36px)', fontWeight: 900, color: '#FACC15', textShadow: '0 2px 14px rgba(0,0,0,0.8)', lineHeight: 1.1 }}>
-                  30% הנחה
+                <div style={{ fontSize: 'clamp(16px, 2.8vw, 28px)', fontWeight: 900, color: '#FACC15', textShadow: '0 2px 14px rgba(0,0,0,0.8)', lineHeight: 1.1 }}>
+                  מחירים מיוחדים
                 </div>
                 <div style={{ fontSize: 'clamp(11px, 1.1vw, 13px)', color: 'rgba(255,255,255,0.85)', marginTop: 6, fontWeight: 600 }}>
-                  ב-100 כיפות ומעלה
+                  לאירועים וכמויות
                 </div>
               </div>
             </div>

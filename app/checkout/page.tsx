@@ -72,8 +72,6 @@ interface OrderSummaryProps {
   isSticky: boolean;
   items: CartItem[];
   total: number;
-  kippotDiscountAmount: number;
-  kippotDiscountActive: boolean;
   bundleDiscountAmount: number;
   appliedCoupon: { code: string; discount: number; type: 'percent' | 'fixed' } | null;
   setAppliedCoupon: (c: { code: string; discount: number; type: 'percent' | 'fixed' } | null) => void;
@@ -95,7 +93,7 @@ interface OrderSummaryProps {
 }
 
 function OrderSummary({
-  isSticky, items, total, kippotDiscountAmount, kippotDiscountActive,
+  isSticky, items, total,
   bundleDiscountAmount, appliedCoupon, setAppliedCoupon, discountAmount,
   finalTotal, selectedGift, giftOptions, giftEnabled, giftEligible,
   giftThreshold, amountToGift, setSelectedGift,
@@ -124,14 +122,8 @@ function OrderSummary({
       <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#777' }}>
           <span style={{ minWidth: 0 }}>סכום ביניים</span>
-          <span style={{ paddingLeft: 4 }}>{formatPrice(total + kippotDiscountAmount + bundleDiscountAmount)}</span>
+          <span style={{ paddingLeft: 4 }}>{formatPrice(total + bundleDiscountAmount)}</span>
         </div>
-        {kippotDiscountAmount > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎉 הנחת כיפות בר מצווה (30%)</span>
-            <span style={{ paddingLeft: 4 }}>-{formatPrice(kippotDiscountAmount)}</span>
-          </div>
-        )}
         {bundleDiscountAmount > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מבצע כיפות חבילות</span>
@@ -161,12 +153,6 @@ function OrderSummary({
       </div>
       <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#555" /> קוד קופון</div>
-        {kippotDiscountActive && (
-          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#15803d', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <IconCheck size={11} color="#15803d" />
-            קיבלת הנחת ענק של 30% — גדולה יותר מ-10% הקופון!
-          </div>
-        )}
         {appliedCoupon ? (
           <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflow: 'hidden' }}>
             <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} — {appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה</span>
@@ -239,7 +225,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
   const {
-    items, total, kippotDiscountActive, kippotDiscountAmount, bundleDiscountAmount,
+    items, total, bundleDiscountAmount,
     giftEnabled, giftThreshold, giftEligible, amountToGift, selectedGift, setSelectedGift,
     appliedCoupon, setAppliedCoupon, couponInput, setCouponInput, applyCoupon, couponLoading, couponError,
     discountAmount,
@@ -412,7 +398,6 @@ export default function CheckoutPage() {
           singleUseToken, paymentsCount,
           items: [
             ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '', bundlePromo: i.bundlePromo || undefined })),
-            ...(kippotDiscountAmount > 0 ? [{ name: 'הנחת כיפות בר מצווה — 30%', price: -kippotDiscountAmount, quantity: 1, cat: '' }] : []),
             ...(bundleDiscountAmount > 0 ? [{ name: 'מבצע כיפות — חבילות',        price: -bundleDiscountAmount, quantity: 1, cat: '' }] : []),
             ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
@@ -491,7 +476,7 @@ export default function CheckoutPage() {
 
         {/* Order summary first on mobile so user sees total before filling form */}
         <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}>
-          <OrderSummary isSticky={false} items={items} total={total} kippotDiscountAmount={kippotDiscountAmount} kippotDiscountActive={kippotDiscountActive} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} />
+          <OrderSummary isSticky={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} />
         </div>
 
         {/* Shipping form */}
@@ -593,7 +578,7 @@ export default function CheckoutPage() {
 
         {/* Order summary — desktop: sticky right column; mobile: hidden via CSS */}
         <div className="checkout-summary-desktop" style={{ display: isMobile ? 'none' : 'block' }}>
-          <OrderSummary isSticky={!isMobile} items={items} total={total} kippotDiscountAmount={kippotDiscountAmount} kippotDiscountActive={kippotDiscountActive} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} />
+          <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} />
         </div>
       </div>
       </div>{/* /centering wrapper */}

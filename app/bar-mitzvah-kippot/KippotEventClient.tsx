@@ -69,8 +69,8 @@ export interface EventKippotConfig {
 export const BAR_MITZVAH_CONFIG: EventKippotConfig = {
   heroTag:      '🎩 כיפות לאירועים',
   heroTitle:    'כיפות לבר מצווה\nואירועים במחירים מיוחדים',
-  heroSubtitle: 'הזמינו 100 כיפות ומעלה וקבלו 30% הנחה אוטומטית',
-  promoBanner:  '🎉 מבצע בר מצווה — 100 כיפות ומעלה = 30% הנחה אוטומטית — הדפסה החל מ־₪4.5 ליחידה',
+  heroSubtitle: 'כיפות לאירועים עם הדפסה אישית — שם, תאריך ולוגו — מגוון ענק של סגנונות וצבעים',
+  promoBanner:  '🎩 כיפות לבר מצווה ואירועים עם הדפסה אישית — הדמיה מיידית, אספקה בזמן לאירוע',
   gridTitle:    'כיפות לבר מצווה ואירועים',
   ctaPrintTitle:'הוסיפו הדפסה אישית לכיפות',
   ctaPrintBody: 'שם הבר מצווה, תאריך, לוגו — העלו תמונה, קבלו הדמיה, ומקבלים הדפסה מותאמת',
@@ -332,8 +332,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
           </h1>
 
           <p style={{ fontSize: isMobile ? 15 : 18, color: 'rgba(255,255,255,0.75)', marginBottom: 28, lineHeight: 1.7 }}>
-            הזמינו 100 כיפות ומעלה וקבלו{' '}
-            <strong style={{ color: GOLD }}>30% הנחה אוטומטית</strong>
+            {config.heroSubtitle}
           </p>
 
           <div style={{
@@ -676,7 +675,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             הזמנה בכמויות — יתרונות ומחירים
           </h2>
           <p>
-            הזמנה של כיפות בכמות גדולה מביאה ליתרונות כפולים: מחיר נמוך יותר ליחידה, וקבלת כמות מספקת לכל האורחים בלי דאגה. בהזמנת 100 כיפות ומעלה, תקבלו 30% הנחה אוטומטית — ללא צורך בקוד קופון.
+            הזמנה של כיפות בכמות גדולה מביאה ליתרונות כפולים: מחיר נמוך יותר ליחידה, וקבלת כמות מספקת לכל האורחים בלי דאגה. לאירועים גדולים — פנו אלינו לקבלת הצעת מחיר מיוחדת.
           </p>
 
           <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: '#1a1a1a', marginTop: 28, marginBottom: 12 }}>

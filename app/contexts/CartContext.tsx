@@ -3,10 +3,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
-// ── Discount constants — edit here to adjust promotions ───────────────────────
-export const KIPPOT_DISCOUNT_QTY  = 100;  // minimum kippot units for 30% off
-export const KIPPOT_DISCOUNT_RATE = 0.30; // 30% off regular kippot items
-
 // ── Shipping constant — single source of truth used in cart + checkout ────────
 export const SHIPPING_REGULAR = 35;
 
@@ -113,13 +109,12 @@ function parseBundle(key: string): { n: number; bundlePrice: number } | null {
 // ── Totals calculation ────────────────────────────────────────────────────────
 
 function calcTotals(items: CartItem[]) {
-  // Count ALL kippot (including bundlePromo) — if total >= 100, 30% wins over NforX
   // Print-service items (cat='הדפסה') are charged at face value — no kippot discount.
   const kippotQty = items
     .filter(i => i.cat === 'כיפות')
     .reduce((s, i) => s + i.quantity, 0);
-  const kippotDiscountActive = kippotQty >= KIPPOT_DISCOUNT_QTY;
-  const kippotDiscountRate   = kippotDiscountActive ? KIPPOT_DISCOUNT_RATE : 0;
+  const kippotDiscountActive = false;
+  const kippotDiscountRate   = 0;
 
   let total          = 0;
   let kippotSubtotal = 0;
@@ -133,7 +128,6 @@ function calcTotals(items: CartItem[]) {
     const isPrintService = item.cat === 'הדפסה';
 
     if (isKippot) {
-      // Kippot — eligible for 30% bulk discount at 100+ units; when kippotDiscountActive, bundlePromo kippot also processed here
       const orig = item.price * item.quantity;
       kippotSubtotal += orig;
       total += orig * (1 - kippotDiscountRate);
@@ -159,7 +153,7 @@ function calcTotals(items: CartItem[]) {
     }
   }
 
-  // ── Bundle promo (NforX) — only when 30% is NOT active for kippot ─────────
+  // ── Bundle promo (NforX) ─────────────────────────────────────────────────────
   const bundleGroups = new Map<string, CartItem[]>();
   for (const item of items) {
     if (!item.bundlePromo) continue;

@@ -22,10 +22,6 @@ function computeCommissionAmount(cartItems: CartItem[], commissionPercent: numbe
   return Math.round(amount * 100) / 100;
 }
 
-// ── Must match app/contexts/CartContext.tsx ───────────────────────────────────
-const KIPPOT_DISCOUNT_QTY  = 100;
-const KIPPOT_DISCOUNT_RATE = 0.30;
-
 // ── A1: event print tiered pricing ───────────────────────────────────────────
 function getEventPrintPricePerUnit(qty: number): number {
   if (qty >= 100) return 5;
@@ -183,24 +179,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── A1: kippot 30% bulk discount validation ───────────────────────────────
-    const kippotAllItems       = productItems.filter(i => i.cat === 'כיפות');
-    const kippotQty            = kippotAllItems.reduce((s, i) => s + i.quantity, 0);
-    const kippotDiscountActive = kippotQty >= KIPPOT_DISCOUNT_QTY;
-
-    let kippotDiscountAmount = 0;
-    if (kippotDiscountActive) {
-      const kippotOriginal   = kippotAllItems.reduce((s, i) => s + i.price * i.quantity, 0);
-      const expectedDiscount = Math.round(kippotOriginal * KIPPOT_DISCOUNT_RATE * 100) / 100;
-      const discountLine     = items.find(i => i.name.includes('הנחת כיפות'));
-      const submittedDiscount = discountLine ? -discountLine.price : 0;
-
-      if (Math.abs(submittedDiscount - expectedDiscount) > 0.02) {
-        console.error(`[payment] kippot discount mismatch`, { expectedDiscount, submittedDiscount });
-        return NextResponse.json({ error: 'שגיאה בחישוב הנחת הכיפות' }, { status: 400 });
-      }
-      kippotDiscountAmount = submittedDiscount;
-    }
+    // kippot bulk discount removed — no 30% validation needed
+    const kippotDiscountActive = false;
+    const kippotDiscountAmount = 0;
 
     // ── A1: event print tiered pricing validation ─────────────────────────────
     const printServiceItems = productItems.filter(i => i.cat === 'הדפסה');

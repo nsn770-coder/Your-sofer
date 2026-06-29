@@ -578,11 +578,6 @@ function EventKippotCalculator({
           <span>סה"כ</span>
           <span>₪{grandTotal.toLocaleString()}</span>
         </div>
-        {qty >= 100 && (
-          <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 600, marginTop: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
-            🎉 הנחת 30% על הכיפות תחול אוטומטית בעגלה!
-          </div>
-        )}
       </div>
 
       {/* Add to cart */}
@@ -1975,12 +1970,6 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </button>
       )}
 
-      {/* Kippot bulk discount notice */}
-      {product?.cat === 'כיפות' && (
-        <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', marginBottom: 8, fontSize: 12, color: '#15803d', fontWeight: 600 }}>
-          🎉 הזמינו 100 כיפות ומעלה וקבלו 30% הנחה אוטומטית
-        </div>
-      )}
 
       {/* SECONDARY: Add to Cart / Quantity control */}
       {!product.outOfStock && (cartQty === 0 ? (
