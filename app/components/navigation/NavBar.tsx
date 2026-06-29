@@ -461,12 +461,7 @@ function NavBarContent() {
             {/* ── אייקון משתמש + תפריט נפתח ── */}
             <div ref={userMenuRef} style={{ position: "relative" }}>
               <button
-                onClick={() => isMobile
-                  ? router.push(user
-                      ? (user.role === 'admin' ? '/admin' : '/account')
-                      : '/account/login')
-                  : setUserMenuOpen(v => !v)
-                }
+                onClick={() => setUserMenuOpen(v => !v)}
                 aria-label="חשבון משתמש"
                 style={{ background: "none", border: userMenuOpen ? "1px solid #C5A028" : "1px solid transparent", borderRadius: 0, padding: "5px 7px", color: "#1a1a1a", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "border-color 0.15s" }}
               >
@@ -480,9 +475,9 @@ function NavBarContent() {
                 </span>}
               </button>
 
-              {/* ── דרופדאון (דסקטופ בלבד) ── */}
-              {!isMobile && userMenuOpen && (
-                <div dir="rtl" style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, width: 240, background: "#fff", border: "1px solid #E7E2D8", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 300, animation: "ysUserMenuIn 0.18s ease-out" }}>
+              {/* ── דרופדאון ── */}
+              {userMenuOpen && (
+                <div dir="rtl" style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, width: 240, maxWidth: "calc(100vw - 24px)", background: "#fff", border: "1px solid #E7E2D8", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 300, animation: "ysUserMenuIn 0.18s ease-out" }}>
 
                   {user ? (
                     <>
