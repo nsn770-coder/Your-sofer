@@ -1467,6 +1467,22 @@ export default function CategoryClient({ category }: { category: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMore]);
 
+  // ── Fade-in: reveal cards as they scroll into view ──
+  useEffect(() => {
+    const cards = document.querySelectorAll<HTMLElement>('.ys-fade-card:not(.ys-visible)');
+    if (!cards.length) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          (entry.target as HTMLElement).classList.add('ys-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    cards.forEach(card => observer.observe(card));
+    return () => observer.disconnect();
+  }, [paginated]);
+
   const SORT_LABELS: Record<SortBy, string> = {
     popular: 'הכי נמכר', newest: 'חדש לישן', oldest: 'ישן לחדש',
     price_asc: 'מחיר: נמוך לגבוה', price_desc: 'מחיר: גבוה לנמוך',
@@ -2123,17 +2139,19 @@ export default function CategoryClient({ category }: { category: string }) {
                       aboveFold={idx < 4}
                     />
                   ) : (
-                    <ProductCard key={p.id} id={p.id} name={p.name} price={p.price}
-                      images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                      priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge} bundlePromo={p.bundlePromo}
-                      was={p.was} createdAt={p.createdAt} aboveFold={idx < 4}
-                      hasKlafSelection={p.hasKlafSelection} cat={p.cat}
-                      soferId={p.soferId}
-                      soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                      soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                      stars={p.stars || undefined}
-                      outOfStock={p.outOfStock}
-                      clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice} />
+                    <div key={p.id} className="ys-fade-card">
+                      <ProductCard id={p.id} name={p.name} price={p.price}
+                        images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                        priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge} bundlePromo={p.bundlePromo}
+                        was={p.was} createdAt={p.createdAt} aboveFold={idx < 4}
+                        hasKlafSelection={p.hasKlafSelection} cat={p.cat}
+                        soferId={p.soferId}
+                        soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                        soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                        stars={p.stars || undefined}
+                        outOfStock={p.outOfStock}
+                        clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice} />
+                    </div>
                   );
                   const LEVEL_GROUPS = [
                     {
@@ -2204,28 +2222,29 @@ export default function CategoryClient({ category }: { category: string }) {
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
                     {paginated.map((p, idx) => (
-                      <ProductCard
-                        key={p.id}
-                        id={p.id}
-                        name={p.name}
-                        price={p.price}
-                        images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                        priority={p.priority}
-                        isBestSeller={p.isBestSeller}
-                        badge={p.badge}
-                        bundlePromo={p.bundlePromo}
-                        was={p.was}
-                        createdAt={p.createdAt}
-                        aboveFold={idx < 4}
-                        hasKlafSelection={p.hasKlafSelection}
-                        cat={p.cat}
-                        soferId={p.soferId}
-                        soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                        soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                        stars={p.stars || undefined}
-                        outOfStock={p.outOfStock}
-                        clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
-                      />
+                      <div key={p.id} className="ys-fade-card">
+                        <ProductCard
+                          id={p.id}
+                          name={p.name}
+                          price={p.price}
+                          images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                          priority={p.priority}
+                          isBestSeller={p.isBestSeller}
+                          badge={p.badge}
+                          bundlePromo={p.bundlePromo}
+                          was={p.was}
+                          createdAt={p.createdAt}
+                          aboveFold={idx < 4}
+                          hasKlafSelection={p.hasKlafSelection}
+                          cat={p.cat}
+                          soferId={p.soferId}
+                          soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                          soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                          stars={p.stars || undefined}
+                          outOfStock={p.outOfStock}
+                          clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
+                        />
+                      </div>
                     ))}
                   </div>
                 )
@@ -2251,28 +2270,29 @@ export default function CategoryClient({ category }: { category: string }) {
                               aboveFold={start === 0 && idx < 4}
                             />
                           ) : (
-                            <ProductCard
-                              key={p.id}
-                              id={p.id}
-                              name={p.name}
-                              price={p.price}
-                              images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                              priority={p.priority}
-                              isBestSeller={p.isBestSeller}
-                              badge={p.badge}
-                              bundlePromo={p.bundlePromo}
-                              was={p.was}
-                              createdAt={p.createdAt}
-                              aboveFold={start === 0 && idx < 4}
-                              hasKlafSelection={p.hasKlafSelection}
-                              cat={p.cat}
-                              soferId={p.soferId}
-                              soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
-                              soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
-                              stars={p.stars || undefined}
-                              outOfStock={p.outOfStock}
-                              clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
-                            />
+                            <div key={p.id} className="ys-fade-card">
+                              <ProductCard
+                                id={p.id}
+                                name={p.name}
+                                price={p.price}
+                                images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                                priority={p.priority}
+                                isBestSeller={p.isBestSeller}
+                                badge={p.badge}
+                                bundlePromo={p.bundlePromo}
+                                was={p.was}
+                                createdAt={p.createdAt}
+                                aboveFold={start === 0 && idx < 4}
+                                hasKlafSelection={p.hasKlafSelection}
+                                cat={p.cat}
+                                soferId={p.soferId}
+                                soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
+                                soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
+                                stars={p.stars || undefined}
+                                outOfStock={p.outOfStock}
+                                clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
+                              />
+                            </div>
                           ))}
                         </div>
                       );

@@ -88,6 +88,13 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Product card scroll fade-in */
+.ys-fade-card { opacity: 0; transform: translateY(12px); transition: opacity 0.45s ease, transform 0.45s ease; }
+.ys-fade-card.ys-visible { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .ys-fade-card { opacity: 1; transform: none; transition: none; }
+}
+
 /* Checkout: force single-column on mobile — must live in <head> CSS so iOS Safari
    doesn't lock scroll width from the SSR 2-column paint before body <style> fires */
 @media (max-width: 767px) {

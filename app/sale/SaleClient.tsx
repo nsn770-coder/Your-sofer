@@ -117,7 +117,7 @@ export default function SaleClient() {
             <p style={{ fontSize: 13, color: '#888', marginBottom: 24, textAlign: 'right' }}>
               {products.length} מוצרים במבצע
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 20 }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
               {products.map((p, i) => {
                 const images = [p.imgUrl || p.image_url].filter(Boolean) as string[];
                 // Normalize isOnSale products to clearance fields so ProductCard renders the discount
