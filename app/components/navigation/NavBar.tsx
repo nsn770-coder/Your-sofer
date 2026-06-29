@@ -518,13 +518,11 @@ function NavBarContent() {
                         <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/orders"); }}>
                           <span style={{ fontSize: 15 }}>📦</span> ההזמנות שלי
                         </button>
-                        <button className="ys-user-menu-item ys-user-menu-item-coming" disabled>
+                        <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/loyalty"); }}>
                           <span style={{ fontSize: 15 }}>⭐</span> הנקודות שלי
-                          <span style={{ marginRight: "auto", fontSize: 10, color: "#C5A028", border: "1px solid #C5A028", padding: "1px 5px" }}>בקרוב</span>
                         </button>
-                        <button className="ys-user-menu-item ys-user-menu-item-coming" disabled>
+                        <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/club-deals"); }}>
                           <span style={{ fontSize: 15 }}>🏷️</span> מבצעי מועדון
-                          <span style={{ marginRight: "auto", fontSize: 10, color: "#C5A028", border: "1px solid #C5A028", padding: "1px 5px" }}>בקרוב</span>
                         </button>
                         <button className="ys-user-menu-item ys-user-menu-item-coming" disabled>
                           <span style={{ fontSize: 15 }}>🔔</span> ההודעות שלי
