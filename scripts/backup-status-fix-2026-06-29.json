@@ -1,0 +1,2824 @@
+{
+  "createdAt": "2026-06-29T21:48:48.772Z",
+  "description": "Backup before setting status:active for 352 drop-ship products (israel-judaica)",
+  "rollbackInstruction": "For each entry, set products/{id}.status = previousStatus (delete the field if undefined)",
+  "count": 352,
+  "records": [
+    {
+      "id": "04p0N9n9UjvtG2WFPwOz",
+      "name": "כיפה ד.מ.צ. שחור איכותי קשיח 17 ס\"מ",
+      "price": 52.3,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "0HcCdAlcsf8vo6FiLBtL",
+      "name": "כיפה ד.מ.צ. שחור איכותי קשיח 13 ס\"מ",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "0Qpls9MIy7nSGzRNtSn6",
+      "name": "כיפה סטן לבנה 19 ס\"מ הדפסה כסף \"מזל טוב\" חתן כל",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "0iAe9OtaUjaP4wrzJewe",
+      "name": "כיפה קטיפה פלוש שחורה 4 חלקים גודל 5 21 ס\"מ עם סרט",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "0kSoonbvo6rZ5aN0mfhl",
+      "name": "כיפה קטיפה ארטמן כחולה 4 חלקים עם סרט 17 ס\"מ",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "0kn6UFnrzG1ZM8PVcCFg",
+      "name": "(כמו 16419) כיפה קטיפה פלוש שחורה 6 חלקים גודל 3 19 ס\"מ ללא סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "18594RsskZhTLkDp4aOO",
+      "name": "כיפה עור ארטמן חום בהיר 15 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "1AqAtBG6Srj5BbnBDYr5",
+      "name": "כיפה קטיפה \"ארט-מן\" כחולה 6 חלקים עם סרט גודל 4",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "1Nj2PMkFu7Xud4jV4JD7",
+      "name": "כיפה DMC סריגה ישראלית חלק לבן 12-13 ס\"מ אין החזרת סחורה",
+      "price": 52.3,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "1Sjhrr5IPeyTmP9fudlr",
+      "name": "כיפה פריק 21 ס\"מ גוונים בורדו שחור לבן",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "1cCTU34dN6jTxQRerOQH",
+      "name": "כיפה קטיפה פלוש שחורה 6 חלקים גודל 2 18 ס\"מ",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "1lfLTBjmTffWaOMr6Cg2",
+      "name": "כיפה קטיפה \"ארט-מן\" עם אותיות בולטות זהב \"בבא סאלי\" גודל 4 - אופוויט",
+      "price": 43.58,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "1vjvWRc0tquBUeTy7HZ4",
+      "name": "כיפה דמוי עור ארטמן חום 17 ס\"מ",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "26D4rLl9FvVdoSRRmFZY",
+      "name": "מארז דבק דו צדדי לכיפה איכות מעולה",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "2CY1u67oAHQj7S2OasPz",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט 17 ס\"מ",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "2Mv1OOHiG7v0btNJ8mjk",
+      "name": "כיפה פריק 23 ס\"מ גוונים קרם ירוק זית וחום",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "2ZCmrOfd2GN4cHfGa48d",
+      "name": "כיפה סרוגה 17 ס\"מ לבן מחורר - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "2jUvTJmzSUUnvOdZzyNs",
+      "name": "כיפה קטיפה \"ארט מן\" עם ריקמה \"בבא סאלי\" גודל 4 - שחור",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "2vcCWawtjxwRpxhaIJtv",
+      "name": "כיפה DMC סריגה ישראלית דוגמת שטיח 18 ס\"מ אין החזרת סחורה",
+      "price": 80.64,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "2yTvLyJ87bwH3LgmnhI7",
+      "name": "כיפה טרלין גודל 22 סמ רקמה \"בית הרב\"",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "303mOFYag1YFVRwgpAKf",
+      "name": "כיפה קטיפה \"ארט-מן\" 17 ס\"מ - אפור",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "3GxWKOOMqJToPo3IFI2e",
+      "name": "כיפה סרוגה 17 ס\"מ אפור חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "3W24Oc88YpexLIRbSZJy",
+      "name": "כיפה פריק 24 ס\"מ פסים כחול לבן ותכלת",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "3X0G780VQDuVrVKWP6Ts",
+      "name": "(כמו 16415) כיפה קטיפה פלוש שחורה 6 חלקים גודל",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "4D6lbHSCej6DzO1jSyH2",
+      "name": "כיפה סרוגה 16 ס\"מ בצבע כחול כהה מסביב פסים בכחול",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "4P767V8ddjPkA4e8yHKR",
+      "name": "כיפה עור לבן 16 ס\"מ",
+      "price": 22.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "4RG22KUShWyX7lA9HzVf",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט 20 ס\"מ",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "4hJudzcyOMAQSSLLP0s4",
+      "name": "כיפה DMC סריגה ישראלית חלק שחור 17 ס\"מ אין החזרת סחורה",
+      "price": 76.28,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "4ioOgEsWEjfqtLbb0SsA",
+      "name": "כיפה סרוגה דגמים מעורבים - רקע כחול - 18 ס\"מ - 24 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "4olLtDbT4TlO4eCLM0qg",
+      "name": "כיפה קטיפה \"ארט-מן\" שחורה 6 חלקים עם סרט גודל 3",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "4rfEt8b71n8eotGLTpQc",
+      "name": "כיפה קטיפה \"ארט-מן\" 19 ס\"מ - אפור בהיר",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "4waLbPWoXxRhn9CDoNAA",
+      "name": "כיפה קטיפה ארטמן כחולה 4 חלקים עם סרט גודל 3",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "5CLvfEs9Kggo82lNIm3N",
+      "name": "כיפה סטן לבנה 20 ס\"מ מגן דוד וכסף מסביב",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "5FsQkEObRvzk0knlBgbi",
+      "name": "כיפה סרוגה 17 ס\"מ לבן מסביב פס כחול",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "5OWBM4fDGTUaKpUZLhy7",
+      "name": "כיפה סרוגה שטיח 20 ס\"מ שחור לבן בורדו",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "5oxwnDYLFFXPa7w8GADo",
+      "name": "כיפה קטיפה ארטמן כחולה 4 חלקים עם סרט גודל 4",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "5rPMfhm888LiOFeUfXuc",
+      "name": "כיפה סרוגה 16 ס\"מ לבנה עם ריקמה \"נחמן מאומן\" כסף",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "5te2HjXxyVxxmDzSAIHH",
+      "name": "כיפה קטיפה \"ארט-מן\" 17 ס\"מ - אפור בהיר",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "66Fq5oEN9XHTrTda8km3",
+      "name": "כיפה סרוגה שטיח 18 ס\"מ כחול כהה כחול בהיר ובז",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "68gBARVh7o18NUKKxMYR",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט גודל 5",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "6GZ6zfhWPD6iWHjOq3kF",
+      "name": "(כמו 16416) כיפה קטיפה פלוש שחורה 6 חלקים",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "6IBIGAXcd1zr1Eu91phz",
+      "name": "כיפה פריק 21 ס\"מ גוונים קרם אפור כחול כהה",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "6KG2JG2WfGfoWRJO3LL5",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט גודל 7",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "6LNaJyfkZi2nk6gswjX3",
+      "name": "כיפה עור ארטמן סגול 15 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "6MiC4E7HUHLCOlEvXJLC",
+      "name": "כיפה סרוגה 16 ס\"מ לבנה עם ריקמה \"האש שלי\" זהב",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "6SGzZcdofXYHDZSipdV5",
+      "name": "כיפה קטיפה פלוש שחורה 4 חלקים גודל 3 19 ס\"מ עם",
+      "price": 26.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "6dP0Lor0RiBmo1BO4R03",
+      "name": "כיפה ארטמן קטיפה נחמן כחולה עם רקמה כסף גודל 4",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "6nUqF3tbTjeWvYlDQPJT",
+      "name": "כיפה קטיפה \"ארט-מן\" שחורה 6 חלקים עם סרט גודל 4",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "8RKgfZj0HhX7nFkKiG9a",
+      "name": "כיפה סרוגה 16 ס\"מ שחורה עם ריקמה \"יחי אדוננו\" זהב",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "8bhUubkB0gKkIm160R6Z",
+      "name": "כיפה סטן לבנה לתינוק 9 ס\"מ עם עיטור כסף מסביב ע",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "8pzrFPTFsSkXeHoRgZgS",
+      "name": "כיפה פריק כחול וצהוב \"נחמן מאומן\" 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "8xR6CnpQ5uIYA1snMw9i",
+      "name": "כיפה קטיפה פלוש שחורה 6 חלקים גודל 4 20 ס\"מ עם סרט",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "8xwg1KqfVeS9lfkEWbwc",
+      "name": "כיפה פריק לבן 24 ס\"מ \"נחמן מאומן\"",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "9B5nsv55ZsA5q7U3iPS9",
+      "name": "כיפה פריק שחור עם חורים 22 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "9J8SV7XUo8t1uDUv2Kb9",
+      "name": "כיפה קטיפה פלוש שחורה 4 חלקים גודל 4 20 ס\"מ",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "9PtysZlA9IotaR4Z9Zv0",
+      "name": "כיפה סרוגה דגמים מעורבים - לבן עם כסף - 16 ס\"מ - 24 יח",
+      "price": 16.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "9QaJBqiyvWG6ypXmdqvB",
+      "name": "כיפה קטיפה ארטמן כחולה 4 חלקים עם סרט 20 ס\"מ",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "9WFP7kHB7uM0PHkvvthd",
+      "name": "כיפה סרוגה 17 ס\"מ שחור חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "A1ELsjRjiRf7Vk859a6G",
+      "name": "כיפה ארטמן קטיפה נחמן אפור כלשהו עם רקמה אפורה גודל 4",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "AB8eVWNEb1bOKFQa9RZQ",
+      "name": "כיפת קטיפה שחורה 1/4 נצנץ כסף גודל 4 - 20 ס\"מ",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "AgtkByuknUfyNCsJleqm",
+      "name": "כיפה סרוגה 16 ס\"מ לבנה עם ריקמה \"בבא סאלי\" כסף",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "AvklztSQKTqLr0LLzzGg",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט 22 ס\"מ",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "BBEaFqBhzG6BtqMno0bN",
+      "name": "כיפה פריק 21 ס\"מ פסים בגוון כחול כהה לבן ותכלת",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "BC99zPaC2aNOTvdk1Q1q",
+      "name": "כיפה קטיפה \"ארט-מן\" שחורה 6 חלקים עם סרט גודל 5",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "BT68B09sTcOor8vag1H7",
+      "name": "כיפה \"מופת\" קטיפה שחורה גודל 3 19 ס\"מ - 4 חלקים ללא סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "BT8IAF8ZyNA3jMLXc3fN",
+      "name": "כיפה קטיפה \"ארט מן\" עם ריקמה \"האש שלי\" גודל 4 - שחור",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "BW12WNaqsyHWUJEdqFPq",
+      "name": "כיפה קטיפה עם ריקמה האש שלי גודל 4 - אופוויט",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "BXRJZa01zzQjjVhCv79d",
+      "name": "כיפה סרוגה 16 ס\"מ לבנה מסביב שני פסים שחור ותכלת",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "BXyfPhKwnYxVZ0cvUyeU",
+      "name": "כיפה סרוגה 15 ס\"מ שחור חלק - 12 יח",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "BdhTNhPEF3I4gZViNdT1",
+      "name": "כיפה סרוגה 16 ס\"מ לבן עם רקמה זהב מגן דוד",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ButolVeNwnKASH01gCMw",
+      "name": "כיפה ד.מ.צ שחור 13 ס\"מ",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "C1QdGjUQvC728uGIk1Tg",
+      "name": "כיפה \"מנטש\" קטיפה שחורה גודל 4 20 ס\"מ - 4 חלקים ללא סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "CKjs0dPXKJviu7WJY6G9",
+      "name": "כיפה סרוגה 16 ס\"מ שחורה עם ריקמה \"נחמן מאומן\" זהב",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "CONi6E6YcLxdL28rx3uo",
+      "name": "כיפה עור אפור כהה 16 ס\"מ",
+      "price": 22.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "CUWNBiVuu1CvXyryijxD",
+      "name": "כיפה סרוגה 15 ס\"מ שחור מסביב פס כסף",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "CXpeS2cOtCpANsWrfYtm",
+      "name": "כיפה סרוגה 16 ס\"מ לבן 6 מגיני דוד זהב",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "D0oCsN0YGy0KYYz28KBA",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה האש שלי גודל 3 - אפור",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "D7VpCJZhmm8mvbHfQZqT",
+      "name": "כיפה סרוגה שטיח 20 ס\"מ כחול ירוק בהיר ולבן",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "DeEvq6wezz8ybk2h72rw",
+      "name": "כיפה סרוגה 15 ס\"מ לבן מסביב פס כחול",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Dsb9qTnwV6JUdKfxDzG1",
+      "name": "צצ כיפה ד.מ.צ. שחור עם פס כחול 18 ס\"מ",
+      "price": 61.02,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "E4yAdeaSnqXTQzuiwRzV",
+      "name": "כיפה סרוגה 17 ס\"מ כחול כהה חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "EFW6rLOW5gKGTm6CPun5",
+      "name": "כיפה ד.מ.צ. לבן עם פס שחור 14 ס\"מ",
+      "price": 41.4,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "EFWMpIerqHbi7DuYGBYr",
+      "name": "כיפת קטיפה שחורה 1/4 בד מהודר גודל 3 - 19 ס\"מ",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "EHD1KoVAAatMjKaEVztQ",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה בבא סאלי גודל 4 - לבן",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ETSsMpNNa46HKMmv8OeK",
+      "name": "כיפה \"מנטש\" קטיפה שחורה גודל 4 20 ס\"מ - 6 חלקים ללא סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "EZ9QCe9dRXBpwzJFffPm",
+      "name": "כיפה פריק אפור כהה עם חורים 22 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "EqKtjjCmyTke0PyJU6tK",
+      "name": "כיפה סרוגה 16 ס\"מ לבנה עם ריקמה \"בבא סאלי\" זהב",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "EqkUfVIzUaeJ4MqLPsS3",
+      "name": "כיפה סרוגה 19 ס\"מ כחול כהה חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "F0zQsat63Ube6O8eOpro",
+      "name": "כיפה DMC סריגה ישראלית דוגמת שטיח 12-13 ס\"מ אין החזרת סחורה",
+      "price": 52.3,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "F8lBs5mGDWeEAq9k6dZd",
+      "name": "כיפה \"פריק\" 21 ס\"מ גוונים מהודרת",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "F9VfGFJhpiHQuN8lc2YI",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט גודל 3",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "FC3RXqlAjk7pIYTcnvow",
+      "name": "כיפה פריק לבן עם חורים 22 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "FEmxHrqKtSV1JL2csNJ9",
+      "name": "כיפה DMC סריגה ישראלית חלק לבן 17 ס\"מ אין החזרת סחורה",
+      "price": 76.28,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Fldx7VQ3oaxLyAqZgAP2",
+      "name": "כיפה טרילין \"ארט מן\" שחור גודל 7 - 6 חלקים",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "GA6IaHppba8peGVGHGud",
+      "name": "כיפה סטן לבן פס כסף מהודר 20 ס\"מ",
+      "price": 5.07,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "GIG6Bsn4dYc49xYkpfva",
+      "name": "כיפה טרילין גודל 18 סמ רקמה \"יחי אדוננו..\"",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "GYx5BzFg03oag2LxABwp",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה בבא סאלי גודל 4 - כחו",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "H0r2WEXdtqGNoXnQOBrO",
+      "name": "כיפה סרוגה 15 ס\"מ שחור מסביב פס זהב",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "HF8UstYsxRYDwWjDn17J",
+      "name": "כיפה סרוגה 16 ס\"מ נטזים כסף עם רקמה מגן דוד",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "HTPliymShHjNQSyNPsZf",
+      "name": "כיפה עור אפור כהה 14 ס\"מ",
+      "price": 22.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Ht1hkN4Ce0kXEb3VPQzs",
+      "name": "כיפה סרוגה לבנה 17 חוט עבה פס כסף",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "IAI9FZ35un5Oh7S9ATkk",
+      "name": "כיפה סרוגה 15 ס\"מ שחור מחורר",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "IAhJQjWhqRRm0k7gY4Pq",
+      "name": "כיפה ד.מ.צ. לבן עם פס שחור איכותי קשיח 16 ס\"מ",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ICvhLoRpJbcKimjGFEsq",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה בבא סאלי גודל 4 - פ",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "IKFzBT0uMJaMm5pBgy5z",
+      "name": "כיפה סטן 19 ס\"מ מגן דוד זהב עם סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ITnVoHarcf2An38ggI3D",
+      "name": "כיפה סרוגה שטיח 20 ס\"מ שחור בז וירוק זית",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "IllSHbPm2uhRQYK5eAXA",
+      "name": "כיפה \"פריק\" לבן לבן 23 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "J7LYDy4UlSpjvxpem9tD",
+      "name": "כיפה \"מנטש\" קטיפה שחורה גודל 3 19 ס\"מ - 6 חלקים ללא סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "J7zfKJOh1wcw9E0dAEPR",
+      "name": "כיפה פריק 21 ס\"מ סריגה עבה גווני אפור ובז",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "JBo9DSSJEhee754gj6Jn",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה בבא סאלי גודל 4 - ירו",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "JUkaSiHrsBwLx2LutL0E",
+      "name": "כיפה ד.מ.צ. לבן איכותי קשיח 18 ס\"מ",
+      "price": 61.02,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "JYGS9K08UCFfVpi3pMwr",
+      "name": "כיפה DMC סריגה ישראלית חלק עם פס 12-13 ס\"מ אין החזרת סחורה",
+      "price": 52.3,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Jh9X2FHypKaS0MYLjZjC",
+      "name": "כיפה סטן 20 ס\"מ שחור",
+      "price": 4.17,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "JihexV4JV0CLuG2n5qZx",
+      "name": "כיפה סרוגה 15 ס\"מ לבן חלק - 12 יח",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "JuqKPy4hovlJkvjya5Nk",
+      "name": "כיפה סרוגה דגמים מעורבים - רקע שחור - 18 ס\"מ - 24 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "K0M8J4gagkgh9pDyJd0R",
+      "name": "(כמו 16410) כיפה קטיפה פלוש שחורה 4 חלקים גו",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "K0XT7PIZHZBRCwtbT2h0",
+      "name": "כיפה ירושלמית שחור חלק 24 ס\"מ",
+      "price": 26.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "K5ULZfOGBBb9TD9mCUmY",
+      "name": "כיפה סרוגה דגמים מעורבים - רקע כחול - 16 ס\"מ - 24 יח",
+      "price": 16.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "KCPKb6c7VdRgHlp4Br0P",
+      "name": "כיפה סרוגה 16 ס\"מ לבן רקמה תכלת מגן דוד",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "KEADapFzqqhS0hb3PWeM",
+      "name": "כיפה סטן כ. כהה 19",
+      "price": 4.17,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "KLgJUI6KPFOyxZNA7fS0",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה האש שלי גודל 4 - אפ",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "KkoHvLesF4eABGJg4nd8",
+      "name": "כיפה ארטמן קטיפה בבא סאלי שחור רקמה זהב גודל 4",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Kmto8u24uJ5jeynecjcv",
+      "name": "כיפה סרוגה 15 ס\"מ לבנה מחוררת עם פסי כסף",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "L6MuhOpxQngjBMfuahc1",
+      "name": "כיפה טרילין שחור 23 ס\"מ מס 8 - 6 חלקים",
+      "price": 16.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "LFydXcsgHadIerpbYQY7",
+      "name": "כיפה פריק 22 ס\"מ גוונים לבן ואדום",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "LKlWmaT6pB8KuIngoU3S",
+      "name": "כיפה סרוגה 16 ס\"מ לבן 6 מגיני דוד כחול",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "LSQhkUwN5W3DHxua9g4m",
+      "name": "כיפה סרוגה 19 ס\"מ אפור כהה חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "MAzuvxP1irW3Nyp6xXDt",
+      "name": "כיפה קטיפה ארטמן כחולה 4 חלקים עם סרט 16 ס\"מ",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "MJMpknFM95Em16aKZgnh",
+      "name": "כיפה עור ארטמן כחול בהיר 16 ס\"מ",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "MhSLvthDVk8HGti60ksk",
+      "name": "כיפה סטן 20 ס\"מ לבן",
+      "price": 4.17,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "MpPyZyzAdE1smm2uElfe",
+      "name": "כיפה ד.מ.צ. אפור 18 ס\"מ",
+      "price": 61.02,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "MqlR21OV3YeB53JIXD3x",
+      "name": "כיפה טרילין \"ארט מן\" שחור גודל 3 - 6 חלקים",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "MscKCQ06f54czjQr3EQH",
+      "name": "כיפה פריק לבן \"נחמן מאומן\" 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "MvExMlR885SF2BjR91ws",
+      "name": "כיפה טרלין גודל 20 סמ רקמה \"יחי אדוננו..\"",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Nc3GJuIZiY3Qx3unKkrs",
+      "name": "כיפה ד.מ.צ. שחור עם פס תכלת 20 ס\"מ",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "NuMDqrSxez9CyJLYzm62",
+      "name": "כיפה סטן דלוקס לבן 19 ס\"מ עם מקום לסיכה",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "OEVGFJ7xVB0C9lnzmJCc",
+      "name": "כיפה ד.מ.צ. שחור איכותי קשיח 18 ס\"מ",
+      "price": 61.02,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "OEe8ttNGGmekMWOy4T1M",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה בבא סאלי גודל 3 - חום כהה",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "OQ7AxQel6i5QOdIpItT0",
+      "name": "כיפה ד.מ.צ. אפור 20 ס\"מ",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "OUl6u2HnNF30U6EmeHDv",
+      "name": "כיפה עור \"ארטמן\" 16 ס\"מ כחול",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "OlufPw4l2inoCvsuPH5c",
+      "name": "כיפה סטן לבנה 15 ס\"מ",
+      "price": 5.37,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "P4rtJtBtWQMbIvcgFvB5",
+      "name": "כיפה קטיפה \"ארט-מן\" 17 ס\"מ - אופוויט",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "P59fewyP3xXBhyJD9R4A",
+      "name": "כיפה עור ארטמן שחור 14 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "P8uzEjRuTVi6g7HjSJMr",
+      "name": "כיפה פריק 23 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "PDc0dTK7NcEn3aS6iyVD",
+      "name": "כיפה קטיפה עם ריקמה בבא סאלי גודל 4 - אופוויט",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "PFdL7kX4b77CcEjbg8te",
+      "name": "כיפה עור ארטמן שחור 16 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "PLt4j4AELvnncN2HP3Sb",
+      "name": "כיפה טרילין \"ארט מן\" גודל 5 רקמה \"יחי אדוננו..\"",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "PMmTY1UsUDcGqWNABWB8",
+      "name": "כיפה סרוגה שטיח 18 ס\"מ שחור ולבן",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "PTqcBU6RD01Zw0JLzUSA",
+      "name": "כיפה עור ארטמן שחור 17 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "PtvVBEFlZ4VoRNacDlvT",
+      "name": "כיפה סטן שחור 19 ס\"מ",
+      "price": 3.57,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Q2q9pF8XoXk2cYEiz3p4",
+      "name": "כיפה סרוגה 16 ס\"מ 6 מגיני דוד כסף במרכז",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Q3pY9Zfj5WWOHNMERrR8",
+      "name": "כיפה סרוגה 19 ס\"מ אפור חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "QNro9lun7qvzdekqdxSY",
+      "name": "כיפה סטן לבן 20 ס\"מ עם עיטור ריקמה",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "QfP7pEDGJf1hafO4xKTp",
+      "name": "כיפה קטיפה \"ארט-מן\" 17 ס\"מ - כחול כהה",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Qih4xVAUgHcJmdVVFW3T",
+      "name": "כיפה קטיפה \"ארט מן\" עם ריקמה אותיות גודל 3 - אופוויט",
+      "price": 30.5,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Qrlnt0YR3SXPxINCeD9e",
+      "name": "כיפה סרוגה 20 ס\"מ שחור חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "R0QED3AZj0eionDDgURY",
+      "name": "כיפה טרילין \"ארט מן\" גודל 6 רקמה \"יחי אדוננו..\"",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "RFEAwc5yk9jWvFiQVSKd",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט גודל 4",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Rt45ig7T4JWYXb5VoWwF",
+      "name": "כיפה פריק אדום \"נחמן מאומן\" 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Sb9EA0kxDH21frdLY2hi",
+      "name": "כיפה טרילין \"ארט מן\" גודל 4 רקמה \"יחי אדוננו..\"",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Se2eDsvBs6q8F7jszfj3",
+      "name": "כיפה טרילין \"ארט מן\" שחור גודל 8 - 6 חלקים",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Shb9pBt8q5JhsHX2cUpQ",
+      "name": "כיפה סרוגה 17 ס\"מ לבן חלק - 12 יח",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "T4nKj28lu3FbsMQF3F3C",
+      "name": "כיפה סרוגה שטיח 18 ס\"מ כחול לבן ואפור",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "TIRkizFB1qBdoqhLaFgH",
+      "name": "כיפה פריק ירוק זית עם חורים 22 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "TRE8cauWaEGMHLG5LPgW",
+      "name": "כיפה פריק 26 ס\"מ פסים אפור וחום",
+      "price": 26.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "TqmjZc6GImTg16glostG",
+      "name": "כיפה קטיפה פלוש שחורה 6 חלקים גודל 5 21 ס\"מ עם סרט",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Ts9B4VnhLaAEHzrrYoE9",
+      "name": "כיפה בוכרית גודל 54 ס\"מ - צבעים שונים",
+      "price": 23.96,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "TzwwObibdDvxLLNH77Vc",
+      "name": "כיפה סטן לבנה 19 ס\"מ הדפסה כסף \"בר מצווה\"",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "U79Vk9oYiOhuWRu28jPB",
+      "name": "כיפה סרוגה לבנה רקמה מגן דוד ופס מסגרת בכחול כה",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "UOkzgrQ9UewyNarmuQxt",
+      "name": "כיפה טרלין גודל 21 סמ רקמה \"בית הרב\"",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "UREgeoI7Y0Oyxq0sk7QX",
+      "name": "כיפה ד.מ.צ. לבן 15 ס\"מ",
+      "price": 34.86,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "URRU5CmqJ6kebdtAqyqD",
+      "name": "כיפה DMC סריגה ישראלית חלק שחור 12-13 ס\"מ אין החזרת סחורה",
+      "price": 52.3,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "USY5646z5etgEa0p5bK9",
+      "name": "כיפה סרוגה 16 ס\"מ שחורה עם ריקמה \"יחי אדוננו\" כסף",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "UXiXq5AwWbtVnopCAsXY",
+      "name": "כיפה עור ארטמן חרדל 15 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "UYKGt7cHQWlUPM8v6jo4",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה האש שלי גודל 3 - כחול כהה",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "UZtwImqi78i5bZ9ejykX",
+      "name": "כיפה סרוגה 18 ס\"מ לבן חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "UhpbAPfCncdqoTnBMwJX",
+      "name": "כיפה ד.מ.צ. שחור איכותי קשיח 15 ס\"מ",
+      "price": 43.58,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "UngBB5PXY9mwNH51GnoN",
+      "name": "כיפה סרוגה 16 ס\"מ לבן מסביב פס כחול כהה ולבן",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "UoZD2TDWZVKixdl9NC7i",
+      "name": "כיפה פריק לבן \"נחמן מאומן\" 22 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "UypKKlsFNUtKxklKlToi",
+      "name": "כיפה ד.מ.צ. שחור איכותי קשיח 16 ס\"מ",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "V2Kq0Kuz3I9daTY7Dasf",
+      "name": "כיפה קטיפה \"ארט-מן\" עם אותיות בולטות זהב \"בבא סאלי\" גודל 4 - פנינה",
+      "price": 43.58,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "VR1zLFEjnnCUZs8Ve7Nl",
+      "name": "כיפה קטיפה ארטמן כחולה 4 חלקים עם סרט 19 ס\"מ",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "VYQXXdr2eHsdi13NvhGj",
+      "name": "כיפה \"פריק\" לבן חלק 22 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "VdLAAijXeyIjIbk6592e",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה האש שלי גודל 3 - כחול",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "W8HutSuWzOhFh9lDtdSI",
+      "name": "כיפת קטיפה שחורה 1/4 בד מהודר גודל 4 - 20 ס\"מ",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "WDpwDZrfBO2Ktr585Tfb",
+      "name": "כיפה סרוגה 17 ס\"מ אפור כהה חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Wi4dH7TGOnUNXlrTSq2n",
+      "name": "כיפה סרוגה 16 ס\"מ לבנה עם ריקמה \"נחמן מאומן\" זהב",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "WkmoP9cEzBIOrAF7lpLk",
+      "name": "כיפה סטן לבן פס כסף מהודר 17 ס\"מ",
+      "price": 5.07,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "WvhY8J93BiM8pMeOKERX",
+      "name": "כיפה קטיפה \"ארט-מן\" כחולה 6 חלקים עם סרט גודל 5",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "WxhxPwMnTjJp2i9i8K9r",
+      "name": "כיפה קטיפה פלוש שחורה 6 חלקים גודל 8 24 ס\"מ עם סרט",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "XF4dKfRUoNNSxYk9GRoG",
+      "name": "כיפה קטיפה ארטמן כחולה 4 חלקים עם סרט 18 ס\"מ",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "XNtGQw3eKlC4yEANRL6v",
+      "name": "כיפה קטיפה \"ארט-מן\" עם אותיות בולטות זהב \"האש שלי\" גודל 4 - פנינה",
+      "price": 43.58,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "XQ5wEjtRxF1Nqeuz2uQb",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה האש שלי גודל 4 - פנינ",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Xa5tMlO4eBRtDzzQcBrE",
+      "name": "סיכות לכיפה צבע זהב בליסטר 12 יח` חזקות מאוד",
+      "price": 5.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "XfusZEgURVoYFcdxav2U",
+      "name": "כיפה ד.מ.צ שחור 19 ס\"מ",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "XtIKpbPf379tCRG6RUuK",
+      "name": "כיפה סרוגה 16 ס\"מ שחורה עם ריקמה \"האש שלי\"",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "YmRL1Ua4y9L9yO1ukLN6",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט גודל 6",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "YpoTHCOvb4BbydpiFJ3p",
+      "name": "כיפה DMC סריגה ישראלית חלק עם פס 17 ס\"מ אין החז",
+      "price": 76.28,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ZYbXzUQkWFRPXCARE2oE",
+      "name": "כיפה קטיפה ארטמן שחורה 6 חלקים עם סרט גודל 2",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ZmRWl2ZJKbyNmJFis3ZC",
+      "name": "כיפה ארטמן קטיפה נחמן שחורה עם רקמה כסף גודל 4",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Zs1uHCwiDXJI4BZCe34b",
+      "name": "כיפה סרוגה שטיח 18 ס\"מ שחור לבן בורדו",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "Zzu7Be7lZleD6yCj8K7Q",
+      "name": "כיפה סרוגה 16 ס\"מ שחור עם ריקמה מגן דוד כסף",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "aGsVa7VjyGQRjs66ynna",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט 19 ס\"מ",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "aZ4aBWzNtgjpYEnDMwLf",
+      "name": "כיפה סרוגה דגמים מעורבים - רקע לבן - 16 ס\"מ - 24 יח",
+      "price": 16.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "aswHF41WQbUQsLwoowBH",
+      "name": "כיפה ארטמן קטיפה נחמן אפור עם רקמה חול בהיר גודל 4",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "b0ZLIck7i4S1pc5G3VkF",
+      "name": "כיפה ד.מ.צ. שחור עם פס לבן 20 ס\"מ",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "b7SurhUkrDjkeK1HfMNg",
+      "name": "כיפה פריק לבן 23 ס\"מ \"נחמן מאומן\"",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "bDP4cHlrbuzvwmwKwVuZ",
+      "name": "כיפה פריק כחול כהה עם חורים 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "bHprJkx3qFaV1MhaDIOB",
+      "name": "כיפה טרלין גודל 18 סמ רקמה \"נחמן מאומן\"",
+      "price": 26.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "byUVwYRysf02lJragFGQ",
+      "name": "כיפה DMC סריגה ישראלית חלק לבן 14-16 ס\"מ אין החזרת סחורה",
+      "price": 65.38,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "cDwtF9JUJ5gqbpISkCZB",
+      "name": "כיפה טרילין גודל 4 עם אותיות בולטות זהב \"יחי אדוננו..\"",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "cGFJOqUuBBNz00eU9Qj7",
+      "name": "כיפה קטיפה עם ריקמה האש שלי גודל 4 - ירוק בהיר",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "cJ6Xx1XjCqS6SvEsOvG4",
+      "name": "כיפה סטן דלוקס זהב 19 ס\"מ עם מקום לסיכה",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "cYey8odtnWnYtKM4xyYt",
+      "name": "כיפה סרוגה 16 ס\"מ שחורה עם ריקמה \"בבא סאלי\" זהב",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "caREwO8MpWPqdCLQd49B",
+      "name": "כיפת קטיפה שחורה 1/4 משובץ גודל 4 - 20 ס\"מ",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "coxKVLnzWTucVypEwE2Z",
+      "name": "כיפה קטיפה פלוש שחורה 6 חלקים גודל 8 24 ס\"מ ללא סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "d0EFxAeWnenjCqd1v0q2",
+      "name": "כיפה \"פריק\" לבן חלק 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "d36NPt7xh0VSj2Q7ExvG",
+      "name": "כיפה קטיפה \"ארט-מן\" 19 ס\"מ - אפור",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "dMdNKQhLul82OhQxOpbA",
+      "name": "כיפה סרוגה 17 ס\"מ שחור מסביב פס זהב",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "dMl2U5gVbrLt94Yqno9J",
+      "name": "כיפה ד.מ.צ. לבן עם פס תכלת איכותי קשיח 16 ס\"מ",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "dQe1PBltCCRXPdh1l60h",
+      "name": "כיפה קטיפה \"ארט מן\" עם ריקמה אותיות גודל 4 - אופוויט",
+      "price": 30.5,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "dU9GwWqKDdexFCkZOlY1",
+      "name": "כיפה פריק לבן עם חורים 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "dkKhd0Uy0Y4vitipZljX",
+      "name": "כיפה \"מנטש\" קטיפה שחורה גודל 3 19 ס\"מ - 4 חלקים ללא סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "dkZhlncNhXsHNGmO4ZgI",
+      "name": "כיפת קטיפה שחורה 1/4 נצנץ כסף גודל 3 - 19 ס\"מ",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "dpDJIUNgvW904Htd0zAj",
+      "name": "כיפה עור ארטמן שחור 15 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "dri5Ggw4Tl0O64beRKkE",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה האש שלי גודל 4 - יר",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "dwRAwp5qfNEuhjSD0be2",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט גודל 2",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "e8jMgu6FOvJZrMS46ISX",
+      "name": "כיפה סרוגה שטיח 18 ס\"מ כחול ירוק בהיר ולבן",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "eEzO8itoPRwwPWL6KKlA",
+      "name": "כיפה סרוגה 16 ס\"מ שחור מסביב שני פסים שחור וירוק",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "eFcRwN1UkNrkpjTqvb49",
+      "name": "כיפה בוכרית גודל 58 ס\"מ - צבעים שונים",
+      "price": 23.96,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "eHqZfB6XPdQ65g1WFhgK",
+      "name": "כיפה סרוגה 15 ס\"מ לבן מסביב פס זהב",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "eLPaJjFZZeqmprzUHt53",
+      "name": "כיפה סרוגה רקמה מגן דוד בכסף 16 ס\"מ",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "eRDjodm8gqkEMXKoAQmw",
+      "name": "כיפה לבנה סטן פס כסף 20 ס\"מ",
+      "price": 5.07,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "eiubNpl59OtzT38409gd",
+      "name": "כיפה ירושלמית לבן חלק 24 ס\"מ",
+      "price": 26.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ewtFMoU43d7KjQvSXQuQ",
+      "name": "כיפה DMC סריגה ישראלית חלק שחור 18 ס\"מ אין החזרת סחורה",
+      "price": 80.64,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "f1byMpbGHiPYqiGuTVks",
+      "name": "כיפה פריק כחול כהה עם חורים 22 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "f2fgMPT46WSlFtgjz95F",
+      "name": "כיפה פריק שחור עם חורים 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "f6iI71RfFvHdI0ecwvBX",
+      "name": "כיפה DMC סריגה ישראלית דוגמת שטיח 9-11 ס\"מ אין החזרת סחורה",
+      "price": 43.58,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "f8YidYHUbmwK4GG5xARr",
+      "name": "כיפה עור אפור בהיר 16 ס\"מ",
+      "price": 22.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "fEsy8jeWkYsdAG5euV9U",
+      "name": "כיפה סרוגה שטיח 18 ס\"מ שחור בז וירוק זית",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "fGccyzbdbN3yT28f0yKP",
+      "name": "כיפה DMC סריגה ישראלית חלק לבן 18 ס\"מ אין החזרת סחורה",
+      "price": 80.64,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "fIswhoQLR2awX6qAkmxt",
+      "name": "כיפה ד.מ.צ. שחור איכותי קשיח 14 ס\"מ",
+      "price": 41.4,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "fPis0aErPAo5n4sXBanb",
+      "name": "כיפה טרילין \"ארט מן\" שחור גודל 5 - 6 חלקים",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "fYE9BwoD61WC6l46YXjr",
+      "name": "כיפה ד.מ.צ. כחול כהה 20 ס\"מ",
+      "price": 63.2,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "fYTm5L5y07jUzyYNFWZG",
+      "name": "כיפה סרוגה דגמים מעורבים - לבן עם זהב - 16 ס\"מ - 24 יח",
+      "price": 16.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "g25GXB238R6XmEF3WdfL",
+      "name": "כיפה ארטמן קטיפה נחמן בז עם רקמה כסף גודל 4",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "gMJswNTcqETtcjrWnMfO",
+      "name": "כיפה פריק שחורה 22 ס\"מ \"נחמן מאומן\"",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "gQujUfQKIq3Jtb1wWjmd",
+      "name": "כיפה סרוגה 16 ס\"מ לבנה עם ריקמה \"יחי אדוננו\" זהב",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "geMialmabV28ytMV3lue",
+      "name": "זוג \"כיפהאייר\" בבליסטר סיכה לכיפה עם דבק דו",
+      "price": 16.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "gl2eOa9XOrUOSEi4O6Jl",
+      "name": "כיפה סטן לבן \"עיטורים\"16 ס\"מ",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "gywXnBVehKPVupGOu3GP",
+      "name": "כיפה סרוגה 18 ס\"מ שחור חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "hQIQDjzDkim0fpyAhr7w",
+      "name": "כיפה סרוגה 16 ס\"מ שחור עם ריקמה זהב מגן דוד",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "hgBWp8sR42IDnSCw0DYV",
+      "name": "כיפה פריק ירוק זית עם חורים 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "hgR6TBppWpOc3Vw4oujn",
+      "name": "כיפה סרוגה 16 ס\"מ שחורה עם ריקמה \"נחמן מאומן\" כסף",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "hi7Z3FnnFFN0r8tm496z",
+      "name": "כיפה סרוגה כחול רקמה מגן דוד כסף 16 ס\"מ",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "hosGU6zpjL7DLUGkmf9z",
+      "name": "כיפה DMC סריגה ישראלית חלק עם פס 14-16 ס\"מ אין",
+      "price": 65.38,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "i4tCNgblB160xLq3hazc",
+      "name": "כיפה סרוגה 16 ס\"מ לבן עם ריקמה \"שמע ישראל\" כסף",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "i99nHviMqXeissN6ut7a",
+      "name": "כיפה סרוגה 17 ס\"מ שחור מחורר",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "iDUBJY6rkyc8LDTnlez9",
+      "name": "כיפה סרוגה דגמים מעורבים - רקע לבן - 18 ס\"מ - 24 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "iGN8oJu5CsULUKbfhRFh",
+      "name": "(כמו 16412) כיפה קטיפה פלוש שחורה 6 חלקים גו",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "iGkOKWgaO0kk4BM831hv",
+      "name": "כיפה ד.מ.צ. לבן איכותי קשיח 16 ס\"מ",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "idcnM83yc7q9GRu7PWmr",
+      "name": "כיפה סרוגה 19 ס\"מ לבן מחורר - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "j0ycNiYFhnPnyNzSOywX",
+      "name": "כיפה טרילין גודל 4 עם אותיות בולטות כסף \"יחי אדוננו..\"",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "jD2KFpXlwyhQwSsmp4Mv",
+      "name": "כיפה פריק 21 ס\"מ לבן חלק",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "jPWrjLsJNEpLZHipHvr4",
+      "name": "כיפה פריק לבן \"נחמן מאומן\" 19.5 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "jqN57H0VTfn3a9tAzuCS",
+      "name": "כיפה לבנה סטן פס כסף 17 ס\"מ",
+      "price": 5.07,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "k33S227FJAQAm8uhsDEW",
+      "name": "כיפת קטיפה שחורה 1/4 בד מעוטר גודל 4 - 20 ס\"מ",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "k7NfNzJJGJiNzK3UJwHb",
+      "name": "כיפה סרוגה 16 ס\"מ כחול עם רקמה כסף מגן דוד",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "k806CoAj9Bt82WgDmWEi",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה בבא סאלי גודל 4 - א",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "kBaPBltsr6qIAr0BpCW9",
+      "name": "כיפת קטיפה שחורה 1/4 נצנץ ברונזה גודל 3 - 19 ס\"",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "kNFhlwtpeIDJY4pNkElj",
+      "name": "כיפה טרלין גודל 22 סמ רקמה \"יחי אדוננו..\"",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "kO9JSFyBxGRor2abJSX9",
+      "name": "כיפה קטיפה \"ארט-מן\" כחולה 6 חלקים עם סרט גודל 2",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "kWV4mWx1DWZIjS0SBQrC",
+      "name": "כיפה סרוגה 15 ס\"מ לבן מחורר",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ke4Nr6nHgmuTplmXwnMz",
+      "name": "כיפה פריק 23 ס\"מ גוונים",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "keAuBTGiqdnAaUmTrvIb",
+      "name": "כיפה קטיפה \"ארט-מן\" 17 ס\"מ - כחול",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ku1xrxJr3Sboz15rJYi9",
+      "name": "כיפה סרוגה שטיח 20 ס\"מ כחול לבן ואפור",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "lMeseeEIGWYW1CtQzg8X",
+      "name": "כיפה פריק 22 ס\"מ פסים חום תכלת ושחור",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "lVGPbNycs1TOkjlxwGU6",
+      "name": "כיפה בוכרית גודל 60 ס\"מ - צבעים שונים",
+      "price": 23.96,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "m1FIlJSvRJot7sNk1bN0",
+      "name": "כיפה DMC סריגה ישראלית חלק שחור 14-16 ס\"מ אין החזרת סחורה",
+      "price": 65.38,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "m7ZLJQANJLoJtj3MvM1I",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט 16 ס\"מ",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "m8mKGQ75e6no31rt8RXb",
+      "name": "כיפה קטיפה ארטמן כחולה 4 חלקים עם סרט גודל 5",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "mQOFZUBqWfuY8GeDdurM",
+      "name": "כיפה עור בד ארטמן אפור בהיר 15 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "mZtG1mvNrlo3QlvZVMeq",
+      "name": "סיכות לכיפה צבע כסף בליסטר 12 יח` חזקות מאוד",
+      "price": 5.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "maYD64OXyLuWHA1kaoAc",
+      "name": "כיפה פריק אפור כהה עם חורים 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "mqBQYxlPmJgLpewH8h61",
+      "name": "כיפה קטיפה פלוש שחורה 4 חלקים גודל 6 22 ס\"מ עם",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "mtiDt0wN19DZNlhI561F",
+      "name": "כיפה קטיפה \"ארט-מן\" 19 ס\"מ - ירוק",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "n1dHMkq7h9HmBIjopHRF",
+      "name": "כיפה פריק 24 ס\"מ שחור \"נחמן מאומן\"",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "nVFtniFbZh7JG39PYMF1",
+      "name": "כיפה סטן לבן \"עיטורים\" 17 ס\"מ",
+      "price": 6.87,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "nWAXxwY1QJak0X7p87yW",
+      "name": "כיפה קטיפה \"ארט-מן\" כחולה 6 חלקים עם סרט גודל 3",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "nbBwZ6kWz4fTnjhLDNjV",
+      "name": "כיפה פריק 21 ס\"מ לבן פסים תכלת",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ncBsPKPnIRf2kEXYLIHP",
+      "name": "כיפה ד.מ.צ. שחור עם פס אפור 20 ס\"מ",
+      "price": 63.2,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ncxUj4y8Cs1cA9QXZvJi",
+      "name": "כיפה פריק 26 ס\"מ גוונים",
+      "price": 26.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "nh7tIpdDUrelt3564Bop",
+      "name": "כיפה סרוגה 17 ס\"מ לבן מחורר",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "oAtmLXhrw8ZL3hsKhbi6",
+      "name": "כיפה ירושלמית לבן חלק 22 ס\"מ",
+      "price": 26.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "oI1yEGc1vMjsvWvrJLX3",
+      "name": "כיפה סטן לבן \"מעויינים\" 16 ס\"מ",
+      "price": 6.87,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "oJ9ci0JFsCVh0HJS6S8Z",
+      "name": "כיפה ארטמן קטיפה בבא סאלי כחול רקמה זהב גודל 4",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "oYCufJBf0SpSR8wgMpBm",
+      "name": "כיפת קטיפה שחורה 1/4 משובץ גודל 3 - 19 ס\"מ",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "oaQY00ANnN1bTNeTZ3nM",
+      "name": "כיפה סרוגה 16 ס\"מ לבן עם ריקמה כסף \"אין עוד מלבדו\"",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "of8aUwzWVuexfFMvtrGh",
+      "name": "כיפה סרוגה 17 ס\"מ שחור מסביב פס כסף",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ogzRLrj58SzIvcoIcTed",
+      "name": "כיפה טרילין שחור 21 ס\"מ מס 6 - 6 חלקים",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "oo2KR7U3UBGzpZ9e4a17",
+      "name": "כיפה קטיפה \"ארט-מן\" עם אותיות בולטות זהב \"בבא סאלי\" גודל 4 - שחור",
+      "price": 43.58,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "pEmy4D4CtCR6DDNb2jnP",
+      "name": "כיפה \"מופת\" קטיפה שחורה גודל 3 19 ס\"מ - 6 חלקים ללא סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "plCl2ogsLu8aZXJC3lOP",
+      "name": "כיפה קטיפה ארטמן כחולה 4 חלקים עם סרט גודל 2",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "plmYTewzmxR8lq2kCN3s",
+      "name": "כיפה ד.מ.צ. שחור עם פס כחול 20 ס\"מ",
+      "price": 63.2,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "qG7IikfFKNsoBNsTZv8i",
+      "name": "כיפה ד.מ.צ. לבן עם פס שחור איכותי קשיח 18 ס\"מ",
+      "price": 61.02,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "qacq7SgYdWo0AvGOhUJE",
+      "name": "כיפה סטן לבן 19 ס\"מ עם עיטור ריקמה",
+      "price": 9,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "qcGTjNpP2eoqyxM6Ns4L",
+      "name": "כיפה סטן לבן 18 ס\"מ",
+      "price": 3.57,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "qywoNMYACAVzFEuNZYQC",
+      "name": "כיפה דמוי עור ארטמן שחור 19 ס\"מ",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "qzXGSMCQewGwl3K50gIi",
+      "name": "כיפה לבנה סרוגה 17 ס\"מ חוט עבה פס כסף",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "r85Gl2xGEjH0YmxEoFuC",
+      "name": "כיפה טרילין \"ארט מן\" שחור גודל 4 - 6 חלקים",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "r89qO1W9BcRuRM7f4co1",
+      "name": "כיפה קטיפה פלוש שחורה 4 חלקים גודל 8 24 ס\"מ ללא סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "rSPi5nOo4FDlNkfuzubN",
+      "name": "כיפה סרוגה 15 ס\"מ שחור מסביב פס אפור",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "ra4rdiIhwCXai3RiFdwx",
+      "name": "כיפה סרוגה 16 ס\"מ עם רקמה כסף דגל ישראל",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "rbFtIYGGmQJx64PYTDhL",
+      "name": "כיפה עור \"ארטמן\" 15 ס\"מ כחול",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "rhSkA91F1aV2Ghe7qg5M",
+      "name": "כיפה פריק 22 ס\"מ גוונים מהודרת",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "rm9Bh5vGbWoEfGSACNXB",
+      "name": "כיפה סרוגה 15 ס\"מ שחור מסביב פס כחול",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "rsY9w7AAeVwxVkQeAVTA",
+      "name": "כיפה ארטמן קטיפה נחמן אפור עם רקמה כסף גודל 4",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "sGwiVrUxzpSpJbuVtScs",
+      "name": "כיפה ארטמן קטיפה נחמן כחולה כהה עם רקמה כסף גודל 4",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "sLo8id02MS1J9DSQHTMD",
+      "name": "כיפה DMC סריגה ישראלית חלק עם פס 18 ס\"מ אין החז",
+      "price": 80.64,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "sN4dH2axbXctK4hjK7Gd",
+      "name": "כיפה סטן בצבע כסף",
+      "price": 4.17,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "su4Kk26tuqy2EMz9gegj",
+      "name": "כיפה פריק 21 ס\"מ גוונים כחול כהה אפור תכלת",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "t2DXgFqXxl6eYlBOqFDB",
+      "name": "כיפה פריק 24 ס\"מ גוונים",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "tG40EjRKkSHb9KYQXwTx",
+      "name": "כיפה פריק כחול \"נחמן מאומן\" 24 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "tfodocFXDZQgff7cZZcd",
+      "name": "כיפה סרוגה 20 ס\"מ לבן חלק - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "trz8jgBnPh80frybZ6UL",
+      "name": "כיפה סרוגה 17 ס\"מ שחור מחורר - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "tsqRgjsf6zWzF01J7C4P",
+      "name": "כיפה DMC סריגה ישראלית דוגמת שטיח 14-16 ס\"מ אין החזרת סחורה",
+      "price": 65.38,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "u4LxC6L1jctbNyolmFX8",
+      "name": "כיפה קטיפה \"ארט-מן\" 17 ס\"מ - ירוק",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "uCAWGoVpQz6AXNSJWDFc",
+      "name": "כיפה עור ארטמן חום 15 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "v5nbPPJq9jzmA71p27BM",
+      "name": "כיפה סרוגה דגמים מעורבים - רקע שחור - 16 ס\"מ - 24 יח",
+      "price": 16.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "vGUWbuyEOaRS6qNRH3nW",
+      "name": "כיפה ד.מ.צ. לבן עם פס שחור 20 ס\"מ",
+      "price": 39.22,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "vNfsA3rbiZ9qawJFQZ3C",
+      "name": "כיפה סרוגה 19 ס\"מ שחור מחורר - 12 יח",
+      "price": 17.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "vS6CZGfwc6jno4CU1Do2",
+      "name": "כיפה טרילין \"ארט מן\" שחור גודל 6 - 6 חלקים",
+      "price": 29.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "vVJcWgrbshu8BVpnSOe5",
+      "name": "כיפה DMC סריגה ישראלית חלק עם פס 9-11 ס\"מ אין החזרת סחורה",
+      "price": 43.58,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "vd9ki6RIMy3iLNZwOn8o",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט 21 ס\"מ",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "vpjsawRHnXG5vzllTy6P",
+      "name": "כיפה ד.מ.צ. כחול כהה 18 ס\"מ",
+      "price": 61.02,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "w6BFFpSHJRvbVvfGJA8N",
+      "name": "סיכות לכיפה צבע שחור בליסטר 12 יח` חזקות מאוד",
+      "price": 5.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "wCD5FFJS8itQ9doJXdPs",
+      "name": "כיפה סרוגה 17 ס\"מ מחורר לבן פסי כסף",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "wP2LgsGXvaRw7Yh5nkcd",
+      "name": "כיפה בוכרית גודל 50 ס\"מ - צבעים שונים",
+      "price": 23.96,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "wUlqdPIUQRKB4Ihe5kUa",
+      "name": "כיפה ד.מ.צ. אפור 16 ס\"מ",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "woMrGfGnJOAhwZreTb9I",
+      "name": "כיפה קטיפה \"ארט-מן\" עם אותיות בולטות זהב \"האש שלי\" גודל 4 - אופוויט",
+      "price": 43.58,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "wvtI7DcilTjUszUY61SG",
+      "name": "צצ כיפה ד.מ.צ. כחול כהה 16 ס\"מ",
+      "price": 47.94,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "x8FZRK1EPVjhshFU6Ha7",
+      "name": "כיפה \"מנטש\" קטיפה שחורה גודל 3 19 ס\"מ - 4 חלקים עם סרט",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "xBQrFqkZZpV84gjm9jgH",
+      "name": "צצ כיפה ד.מ.צ. לבן עם פס כסף 18 ס\"מ",
+      "price": 61.02,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "xSJD91MjjBzS0P86fBXV",
+      "name": "כיפה \"פריק\" לבן חלק 21 ס\"מ",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "xTwnEcBgEnjGBM3TgkK2",
+      "name": "כיפה סרוגה 19 ס\"מ לבן חלק",
+      "price": 14.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "y47ZNDP4QxCAfqtSqFuE",
+      "name": "כיפה קטיפה \"ארט-מן\" עם ריקמה האש שלי גודל 4 - כחול",
+      "price": 43.58,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "yGu8VBEd5LJCDoN3pR3G",
+      "name": "כיפה \"פריק\" 21 ס\"מ פסים סגול ולבן",
+      "price": 23.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "yR5Q0uqivzjcviSTjcok",
+      "name": "כיפה קטיפה ארטמן שחורה 4 חלקים עם סרט 18 ס\"מ",
+      "price": 26.14,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "yW3rFN3JxK8p3AnaNg9j",
+      "name": "(כמו 16409) כיפה קטיפה פלוש שחורה 4 חלקים גו",
+      "price": 20.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "yl9M6H6Jrd8SyQho7ssX",
+      "name": "כיפה סרוגה 16 ס\"מ לבן 6 מגיני דוד כסף",
+      "price": 19.47,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "zDqO40uNR9xt94q8suoY",
+      "name": "כיפה סטן לבנה 19 ס\"מ הדפסה כסף \"מזל טוב\"",
+      "price": 11.97,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    },
+    {
+      "id": "zT4nsjOuxPWEilJvP3zV",
+      "name": "כיפה סטן לבן 17 ס\"מ",
+      "price": 3.57,
+      "source": "israel-judaica",
+      "cat": "כיפות",
+      "stockStatus": "in_stock"
+    }
+  ]
+}

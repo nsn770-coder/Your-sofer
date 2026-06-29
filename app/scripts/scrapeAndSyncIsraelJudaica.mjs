@@ -447,7 +447,7 @@ async function syncToFirestore(allProducts, existingMaps) {
     const existing = findMatch(p, existingMaps);
 
     if (existing) {
-      const updates = { source: 'israel-judaica', stockStatus: p.stockStatus };
+      const updates = { source: 'israel-judaica', stockStatus: p.stockStatus, outOfStock: p.stockStatus === 'out_of_stock' };
       if (p.sku)   updates.supplierCode = p.sku;
       if (p.price) updates.purchasePrice = p.price;
       if (p.imgUrl && !existing.imgUrl) updates.imgUrl = p.imgUrl;
