@@ -303,6 +303,8 @@ export default function MobileDrawerMenu({
                   { label: '📦 הזמנות', href: '/account/orders' },
                   { label: '👤 הפרטים שלי', href: '/account/profile' },
                   { label: '📍 כתובות', href: '/account/addresses' },
+                  { label: '⭐ הנקודות שלי', href: '/account/loyalty' },
+                  { label: '🏷️ מבצעי מועדון', href: '/account/club-deals' },
                 ].map(link => (
                   <a key={link.href} href={link.href} style={{ fontSize: 12, color: '#555', textDecoration: 'none', padding: '4px 8px 4px 0', marginLeft: 4 }}>
                     {link.label}

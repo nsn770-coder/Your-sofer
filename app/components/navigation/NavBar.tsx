@@ -482,7 +482,7 @@ function NavBarContent() {
 
               {/* ── דרופדאון (דסקטופ בלבד) ── */}
               {!isMobile && userMenuOpen && (
-                <div dir="rtl" style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 240, background: "#fff", border: "1px solid #E7E2D8", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 300, animation: "ysUserMenuIn 0.18s ease-out" }}>
+                <div dir="rtl" style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, width: 240, background: "#fff", border: "1px solid #E7E2D8", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 300, animation: "ysUserMenuIn 0.18s ease-out" }}>
 
                   {user ? (
                     <>
