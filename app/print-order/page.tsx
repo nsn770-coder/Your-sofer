@@ -946,12 +946,69 @@ export default function PrintOrderPage() {
                       </div>
                     </div>
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: NAVY, marginBottom: 12 }}>כמות כיפות</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <button onClick={() => setQty(q => Math.max(1, q - 1))} style={{ width: 36, height: 36, border: `1.5px solid ${NAVY}`, background: 'none', color: NAVY, fontSize: 20, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-                        <span style={{ fontSize: 20, fontWeight: 900, color: NAVY, minWidth: 32, textAlign: 'center' }}>{qty}</span>
-                        <button onClick={() => setQty(q => q + 1)} style={{ width: 36, height: 36, border: `1.5px solid ${NAVY}`, background: 'none', color: NAVY, fontSize: 20, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: NAVY, marginBottom: 10 }}>כמות כיפות</div>
+
+                      {/* Quick-jump buttons */}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                        {[30, 50, 100, 150, 200].map(n => (
+                          <button
+                            key={n}
+                            onClick={() => setQty(n)}
+                            style={{
+                              padding: '6px 16px',
+                              border: `1.5px solid ${qty === n ? GOLD : '#E7E2D8'}`,
+                              background: qty === n ? '#FEF9EC' : '#fff',
+                              color: qty === n ? '#6B5A1A' : NAVY,
+                              fontWeight: qty === n ? 900 : 600,
+                              fontSize: 13,
+                              cursor: 'pointer',
+                              fontFamily: 'inherit',
+                              transition: 'all 0.15s',
+                              boxShadow: qty === n ? `0 0 0 2px ${GOLD}44` : 'none',
+                            }}
+                          >
+                            {n}
+                          </button>
+                        ))}
                       </div>
+
+                      {/* +/- stepper + free-text input */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <button
+                          onClick={() => setQty(q => Math.max(1, q - 1))}
+                          style={{ width: 36, height: 36, border: `1.5px solid ${NAVY}`, background: 'none', color: NAVY, fontSize: 20, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >−</button>
+                        <input
+                          type="number"
+                          min={1}
+                          value={qty}
+                          onChange={e => {
+                            const n = parseInt(e.target.value, 10);
+                            if (n >= 1) setQty(n);
+                          }}
+                          onBlur={e => {
+                            const n = parseInt(e.target.value, 10);
+                            if (!(n >= 1)) setQty(1);
+                          }}
+                          style={{
+                            width: 68,
+                            height: 36,
+                            border: `1.5px solid ${NAVY}`,
+                            textAlign: 'center',
+                            fontSize: 17,
+                            fontWeight: 900,
+                            color: NAVY,
+                            background: '#fff',
+                            fontFamily: 'inherit',
+                          }}
+                        />
+                        <button
+                          onClick={() => setQty(q => q + 1)}
+                          style={{ width: 36, height: 36, border: `1.5px solid ${NAVY}`, background: 'none', color: NAVY, fontSize: 20, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >+</button>
+                      </div>
+
+                      {/* Price breakdown */}
                       <div style={{ marginTop: 12, padding: '12px 16px', background: '#FEF9EC', border: `1px solid ${GOLD}66` }}>
                         <div style={{ fontSize: 13, color: '#6B5A1A' }}>
                           <strong>₪{kipaUnitPrice} לכיפה</strong>
