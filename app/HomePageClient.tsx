@@ -944,7 +944,7 @@ export default function HomePageClient() {
           preload="metadata"
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '110%', objectFit: 'cover', objectPosition: 'top', zIndex: 0 }}
         >
-          <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/v1780438734/Video_sxnlwo.mp4" type="video/mp4" />
+          <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/v1782758809/%D7%A1%D7%A8%D7%98%D7%95%D7%9F_%D7%91%D7%90%D7%A0%D7%A8_hotlyr.mp4" type="video/mp4" />
         </video>
 
         {/* Overlay */}
