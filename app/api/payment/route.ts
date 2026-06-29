@@ -169,6 +169,7 @@ export async function POST(req: NextRequest) {
     // Product items (excludes discount lines and shipping)
     const productItems = items.filter(i =>
       !i.name.includes('הנחת') && !i.name.includes('משלוח') && !i.name.includes('מתנה:')
+      && !i.name.startsWith('מבצע כיפות')
     );
 
     // ── A3: minimum 5 units for items < ₪25 (excluding kippot and print service) ──
