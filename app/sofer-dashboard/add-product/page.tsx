@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { CATEGORY_OPTIONS, parseCatValue } from '@/app/constants/categories';
 
 const CLOUDINARY_CLOUD  = 'dyxzq3ucy';
 const CLOUDINARY_PRESET = 'yoursofer_upload';
@@ -16,15 +17,6 @@ async function uploadToCloudinary(file: File): Promise<string> {
   if (!res.ok) throw new Error('Upload failed');
   return (await res.json()).secure_url as string;
 }
-
-const CATEGORIES = [
-  'קלפי מזוזה',
-  'קלפי תפילין',
-  'ספרי תורה',
-  'מגילות',
-  'תפילין קומפלט',
-  'בתי מזוזה',
-];
 
 export default function AddProductPage() {
   const { user, loading } = useAuth();
@@ -90,14 +82,16 @@ export default function AddProductPage() {
     try {
       const soferBasePrice = Number(price);
       const finalPrice = Math.round(soferBasePrice * 1.15 * 1.18);
+      const { cat, subCategory } = parseCatValue(category);
       await addDoc(collection(db, 'products'), {
         name,
         desc,
         description: desc,
         price: finalPrice,
         soferBasePrice,
-        cat: category,
-        category,
+        cat,
+        category: cat,
+        subCategory: subCategory || '',
         nusach,
         level,
         size,
@@ -230,7 +224,17 @@ export default function AddProductPage() {
             <label style={labelStyle}>קטגוריה *</label>
             <select style={{ ...inputStyle, background: '#fff' }} value={category} onChange={e => setCategory(e.target.value)} required>
               <option value="">-- בחר קטגוריה --</option>
-              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              {CATEGORY_OPTIONS.map(opt =>
+                opt.type === 'standalone' ? (
+                  <option key={opt.cat} value={opt.cat}>{opt.cat}</option>
+                ) : (
+                  <optgroup key={opt.label} label={`── ${opt.label} ──`}>
+                    {opt.children.map(child => (
+                      <option key={child.value} value={child.value}>{child.label}</option>
+                    ))}
+                  </optgroup>
+                )
+              )}
             </select>
           </div>
 

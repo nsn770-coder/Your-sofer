@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { doc, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { CATEGORY_OPTIONS, parseCatValue, buildCatValue } from '@/app/constants/categories';
 
 interface ProductDoc {
   name: string;
@@ -11,6 +12,9 @@ interface ProductDoc {
   description?: string;
   price: number;
   soferBasePrice?: number;
+  cat?: string;
+  category?: string;
+  subCategory?: string;
   imgUrl?: string;
   imgUrl2?: string;
   imgUrl3?: string;
@@ -52,6 +56,7 @@ export default function EditProductPage() {
   const [name, setName]               = useState('');
   const [desc, setDesc]               = useState('');
   const [price, setPrice]             = useState('');
+  const [catValue, setCatValue]       = useState('');
   const [imgUrl, setImgUrl]           = useState('');
   const [imgUrl2, setImgUrl2]         = useState('');
   const [imgUrl3, setImgUrl3]         = useState('');
@@ -87,6 +92,7 @@ export default function EditProductPage() {
       setDesc(d.desc ?? d.description ?? '');
       // Show soferBasePrice if available, else fall back to stored price (legacy products saved base price directly)
       setPrice(String(d.soferBasePrice ?? d.price ?? ''));
+      setCatValue(buildCatValue(d.cat ?? d.category ?? '', d.subCategory));
       setImgUrl(d.imgUrl ?? '');
       setImgUrl2(d.imgUrl2 ?? '');
       setImgUrl3(d.imgUrl3 ?? '');
@@ -140,18 +146,22 @@ export default function EditProductPage() {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    if (!name || !price) { setError('שם ומחיר הם שדות חובה'); return; }
+    if (!name || !price || !catValue) { setError('שם, מחיר וקטגוריה הם שדות חובה'); return; }
     setSaving(true);
     setError('');
     try {
       const soferBasePrice = Number(price);
       const finalPrice = Math.round(soferBasePrice * 1.15 * 1.18);
+      const { cat, subCategory } = parseCatValue(catValue);
       await updateDoc(doc(db, 'products', productId), {
         name,
         desc,
         description: desc,
         price: finalPrice,
         soferBasePrice,
+        cat,
+        category: cat,
+        subCategory: subCategory || '',
         imgUrl: imgUrl || '',
         imgUrl2: imgUrl2 || '',
         imgUrl3: imgUrl3 || '',
@@ -269,6 +279,25 @@ export default function EditProductPage() {
                 </div>
               );
             })()}
+          </div>
+
+          {/* Category */}
+          <div>
+            <label style={labelStyle}>קטגוריה *</label>
+            <select style={{ ...inputStyle, background: '#fff' }} value={catValue} onChange={e => setCatValue(e.target.value)} required>
+              <option value="">-- בחר קטגוריה --</option>
+              {CATEGORY_OPTIONS.map(opt =>
+                opt.type === 'standalone' ? (
+                  <option key={opt.cat} value={opt.cat}>{opt.cat}</option>
+                ) : (
+                  <optgroup key={opt.label} label={`── ${opt.label} ──`}>
+                    {opt.children.map(child => (
+                      <option key={child.value} value={child.value}>{child.label}</option>
+                    ))}
+                  </optgroup>
+                )
+              )}
+            </select>
           </div>
 
           {/* Images */}
