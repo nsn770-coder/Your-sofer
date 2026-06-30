@@ -343,17 +343,18 @@ interface AbandonedCart {
 }
 
 interface Customer {
-  id: string;       // = Firebase Auth uid (doc ID in users collection)
+  id: string;
   name: string;
   email: string;
   phone: string;
   totalOrders: number;
   totalSpent: number;
   loyaltyPoints: number;
-  tier: string;     // 'bronze' | 'silver' | 'gold'
+  tier: string;
   tierLabel: string;
   tierIcon: string;
   createdAt?: string;
+  type: 'רשום' | 'אורח';
 }
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -2364,57 +2365,99 @@ export default function AdminPage() {
   }
 
   async function loadCustomers() {
+    const PAID_STATUSES = ['paid', 'completed', 'shipped', 'packing', 'magiah'];
     try {
-      // 1. Read all users, filter to those who actually bought (totalSpent > 0)
+      // 1. Registered buyers: users with totalSpent > 0
       const usersSnap = await getDocs(collection(db, 'users'));
-      const buyers: Array<{ uid: string; data: Record<string, unknown> }> = [];
+      const registeredByUid = new Map<string, Record<string, unknown>>();
+      const registeredEmails = new Set<string>();
       usersSnap.forEach(d => {
         const u = d.data();
         if ((u.totalSpent as number | undefined ?? 0) > 0) {
-          buyers.push({ uid: d.id, data: u });
+          registeredByUid.set(d.id, u);
+          const email = (u.email as string || '').toLowerCase().trim();
+          if (email) registeredEmails.add(email);
         }
       });
 
-      if (buyers.length === 0) {
-        setCustomers([]);
-        return;
-      }
-
-      // 2. Count orders per uid from orders collection (parallel queries)
-      const orderCounts = await Promise.all(
-        buyers.map(async ({ uid }) => {
-          const snap = await getCountFromServer(
-            query(collection(db, 'orders'), where('uid', '==', uid))
-          );
-          return { uid, count: snap.data().count };
-        })
+      // 2. Paid orders — single query for all statuses
+      const ordersSnap = await getDocs(
+        query(collection(db, 'orders'), where('status', 'in', PAID_STATUSES))
       );
-      const countMap = new Map(orderCounts.map(r => [r.uid, r.count]));
 
-      // 3. Build Customer objects
-      const data: Customer[] = buyers.map(({ uid, data: u }) => {
-        const spent  = (u.totalSpent as number) ?? 0;
+      // Count paid orders per uid (for registered users)
+      const uidOrderCount = new Map<string, number>();
+      // Aggregate guest orders by email
+      const guestMap = new Map<string, { totalSpent: number; orderCount: number; name: string; phone: string }>();
+
+      ordersSnap.forEach(d => {
+        const o = d.data();
+        const uid   = (o.uid as string | null | undefined) || null;
+        const email = (o.email as string || '').toLowerCase().trim();
+        const total = (o.total as number) || 0;
+
+        if (uid) {
+          uidOrderCount.set(uid, (uidOrderCount.get(uid) ?? 0) + 1);
+        } else if (email && !registeredEmails.has(email)) {
+          if (!guestMap.has(email)) {
+            guestMap.set(email, {
+              totalSpent: 0, orderCount: 0,
+              name:  (o.customerName as string) || '',
+              phone: (o.phone as string) || '',
+            });
+          }
+          const g = guestMap.get(email)!;
+          g.totalSpent += total;
+          g.orderCount++;
+        }
+      });
+
+      // 3. Build unified Customer array
+      const data: Customer[] = [];
+
+      // Registered
+      for (const [uid, u] of registeredByUid.entries()) {
+        const spent   = (u.totalSpent as number) ?? 0;
         const tierDef = getTier(spent);
         const createdTs = u.createdAt as { seconds: number } | string | undefined;
         const created = createdTs && typeof createdTs === 'object' && 'seconds' in createdTs
           ? new Date(createdTs.seconds * 1000).toLocaleDateString('he-IL')
           : typeof createdTs === 'string' ? createdTs.slice(0, 10) : undefined;
-        return {
+        data.push({
           id:            uid,
           name:          (u.displayName as string) || (u.name as string) || '',
           email:         (u.email as string) || '',
           phone:         (u.phone as string) || '',
-          totalOrders:   countMap.get(uid) ?? 0,
+          totalOrders:   uidOrderCount.get(uid) ?? 0,
           totalSpent:    spent,
           loyaltyPoints: (u.loyaltyPoints as number) ?? 0,
           tier:          tierDef.id,
           tierLabel:     tierDef.label,
           tierIcon:      tierDef.icon,
           createdAt:     created,
-        };
-      });
+          type:          'רשום',
+        });
+      }
 
-      // 4. Sort by totalSpent descending
+      // Guests (pure — email not linked to any user account)
+      for (const [email, g] of guestMap.entries()) {
+        if (g.totalSpent <= 0) continue;
+        data.push({
+          id:            `guest_${email}`,
+          name:          g.name,
+          email,
+          phone:         g.phone,
+          totalOrders:   g.orderCount,
+          totalSpent:    g.totalSpent,
+          loyaltyPoints: 0,
+          tier:          '',
+          tierLabel:     '',
+          tierIcon:      '',
+          createdAt:     undefined,
+          type:          'אורח',
+        });
+      }
+
       data.sort((a, b) => b.totalSpent - a.totalSpent);
       setCustomers(data);
     } catch (e) { console.error('[loadCustomers]', e); }
@@ -4237,9 +4280,11 @@ export default function AdminPage() {
           gold:   'bg-yellow-100 text-yellow-700',
         };
         const sortedCustomers = [...customers].sort((a, b) => b[customerSort] - a[customerSort]);
-        const totalRevenue    = customers.reduce((s, c) => s + c.totalSpent, 0);
-        const totalOrders     = customers.reduce((s, c) => s + c.totalOrders, 0);
-        const avgOrder        = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+        const totalRevenue  = customers.reduce((s, c) => s + c.totalSpent, 0);
+        const totalPaidOrds = customers.reduce((s, c) => s + c.totalOrders, 0);
+        const avgOrder      = totalPaidOrds > 0 ? totalRevenue / totalPaidOrds : 0;
+        const registeredCount = customers.filter(c => c.type === 'רשום').length;
+        const guestCount      = customers.filter(c => c.type === 'אורח').length;
 
         const SortBtn = ({ field, label }: { field: typeof customerSort; label: string }) => (
           <button
@@ -4256,7 +4301,14 @@ export default function AdminPage() {
           <div className="bg-white rounded-xl shadow overflow-hidden" dir="rtl">
             {/* Header */}
             <div className="p-4 border-b flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-lg font-bold">👤 לקוחות ששילמו ({customers.length})</h2>
+              <h2 className="text-lg font-bold">
+                👤 לקוחות ששילמו ({customers.length})
+                {!customersLoading && customers.length > 0 && (
+                  <span className="mr-2 text-sm font-normal text-gray-400">
+                    🟢 {registeredCount} רשומים · ⚪ {guestCount} אורחים
+                  </span>
+                )}
+              </h2>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-400">מיין לפי:</span>
                 <SortBtn field="totalSpent"    label="הוצאה" />
@@ -4297,6 +4349,7 @@ export default function AdminPage() {
                       <th className="p-3 text-right font-semibold">שם</th>
                       <th className="p-3 text-right font-semibold">אימייל</th>
                       <th className="p-3 text-right font-semibold">טלפון</th>
+                      <th className="p-3 text-center font-semibold">סוג</th>
                       <th className="p-3 text-center font-semibold">דרגה</th>
                       <th className="p-3 text-center font-semibold">נקודות</th>
                       <th className="p-3 text-center font-semibold">הזמנות</th>
@@ -4305,16 +4358,25 @@ export default function AdminPage() {
                   </thead>
                   <tbody>
                     {sortedCustomers.map(c => (
-                      <tr key={c.id} className="border-t hover:bg-cyan-50 transition-colors">
+                      <tr key={c.id} className={`border-t transition-colors ${c.type === 'אורח' ? 'hover:bg-gray-50' : 'hover:bg-cyan-50'}`}>
                         <td className="p-3 font-semibold">{c.name || '—'}</td>
                         <td className="p-3 text-gray-500 text-xs">{c.email || '—'}</td>
                         <td className="p-3 text-gray-500 text-xs">{c.phone || '—'}</td>
                         <td className="p-3 text-center">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tierColors[c.tier] ?? 'bg-gray-100 text-gray-500'}`}>
-                            {c.tierIcon} {c.tierLabel}
-                          </span>
+                          {c.type === 'רשום'
+                            ? <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-cyan-100 text-cyan-700">🟢 רשום</span>
+                            : <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">⚪ אורח</span>}
                         </td>
-                        <td className="p-3 text-center font-bold text-purple-700">{c.loyaltyPoints}</td>
+                        <td className="p-3 text-center">
+                          {c.type === 'רשום' && c.tier ? (
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tierColors[c.tier] ?? 'bg-gray-100 text-gray-500'}`}>
+                              {c.tierIcon} {c.tierLabel}
+                            </span>
+                          ) : <span className="text-gray-300">—</span>}
+                        </td>
+                        <td className="p-3 text-center font-bold text-purple-700">
+                          {c.type === 'רשום' ? c.loyaltyPoints : <span className="text-gray-300">—</span>}
+                        </td>
                         <td className="p-3 text-center font-bold text-blue-700">{c.totalOrders}</td>
                         <td className="p-3 text-left font-bold text-green-700">{formatPrice(c.totalSpent)}</td>
                       </tr>
