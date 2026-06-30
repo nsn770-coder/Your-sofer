@@ -1,7 +1,7 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, serverTimestamp, increment } from 'firebase/firestore';
 import { db } from '../firebase';
 import * as pixel from '@/lib/metaPixel';
 import { useAuth } from '../contexts/AuthContext';
@@ -145,32 +145,28 @@ function ThankYouContent() {
         const email: string = order.email || '';
         if (email) {
           try {
-            const customerRef = doc(db, 'customers', email.toLowerCase());
-            const customerSnap = await getDoc(customerRef);
             const now = new Date().toISOString();
-            if (customerSnap.exists()) {
-              const existing = customerSnap.data();
-              await updateDoc(customerRef, {
-                lastOrderAt: now,
-                totalOrders: (existing.totalOrders || 0) + 1,
-                totalSpent: Math.round(((existing.totalSpent || 0) + (order.total || 0)) * 100) / 100,
-              });
-              console.log('[thank-you] customer updated:', email);
-            } else {
-              await setDoc(customerRef, {
+            const customerRef = doc(db, 'customers', email.toLowerCase());
+            // כתיבה 1: כל השדות המתעדכנים (ללא firstOrderAt)
+            await setDoc(
+              customerRef,
+              {
                 name: order.customerName || '',
                 email: email.toLowerCase(),
                 phone: order.phone || '',
                 address: order.address || '',
-                firstOrderAt: now,
                 lastOrderAt: now,
-                totalOrders: 1,
-                totalSpent: order.total || 0,
+                totalOrders: increment(1),
+                totalSpent: increment(Math.round((order.total || 0) * 100) / 100),
                 isGuest: !order.uid,
                 uid: order.uid || null,
-              });
-              console.log('[thank-you] customer created:', email);
-            }
+              },
+              { merge: true },
+            );
+            // כתיבה 2: firstOrderAt רק אם עדיין לא קיים — ה-rule דוחה שינוי שקטה
+            try {
+              await setDoc(customerRef, { firstOrderAt: now }, { merge: true });
+            } catch {}
           } catch (e) {
             console.error('[thank-you] customer upsert failed:', e);
           }
@@ -200,9 +196,12 @@ function ThankYouContent() {
           }
         } catch {}
         if (!adsAlreadyFired && typeof window !== 'undefined' && typeof window.gtag === 'function') {
+          const conversionValue = Number(
+            String(order.total ?? 0).replace(/[^\d.]/g, '')
+          ) || 0;
           window.gtag('event', 'conversion', {
             send_to: 'AW-18095875961/f0NoCLGexLIcEPnO5LRD',
-            value: order.total,
+            value: conversionValue,
             currency: 'ILS',
             transaction_id: order.orderNumber,
           });

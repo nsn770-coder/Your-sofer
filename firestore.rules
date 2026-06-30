@@ -178,8 +178,11 @@ service cloud.firestore {
     // ── Customers (anyone can write post-payment, admin reads/deletes) ────────
 
     match /customers/{customerId} {
-      allow create, update: if true;
-      allow read, delete:   if isAdmin();
+      allow create: if true;
+      allow update: if true
+        && (!('firstOrderAt' in resource.data)
+            || request.resource.data.firstOrderAt == resource.data.firstOrderAt);
+      allow read, delete: if isAdmin();
     }
 
     // ── Sofer profile edit requests ─────────────────────────────────────────

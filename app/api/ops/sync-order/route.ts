@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/app/firebase';
+import { FieldValue } from 'firebase-admin/firestore';
+import { getAdminDb } from '@/lib/firebaseAdmin';
 
 function detectOrderType(items: any[]): 'judaica' | 'stam' | 'mixed' {
   const STAM_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'תפילין', 'מגילות', 'ספרי תורה', 'ספר תורה'];
@@ -30,10 +30,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'orderId required' }, { status: 400 });
     }
 
+    const adminDb = getAdminDb();
+
     // Check if already synced
-    const existing = await getDocs(
-      query(collection(db, 'internalOrders'), where('orderId', '==', orderId))
-    );
+    const existing = await adminDb.collection('internalOrders')
+      .where('orderId', '==', orderId)
+      .get();
     if (!existing.empty) {
       return NextResponse.json({ success: true, alreadySynced: true });
     }
@@ -81,19 +83,19 @@ export async function POST(req: NextRequest) {
       blockReason: '',
       internalNotes: [],
       customerCommunicationLog: [],
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     };
 
-    const docRef = await addDoc(collection(db, 'internalOrders'), internalOrder);
+    const docRef = await adminDb.collection('internalOrders').add(internalOrder);
 
-    await addDoc(collection(db, 'auditLog'), {
+    await adminDb.collection('auditLog').add({
       orderId: docRef.id,
       userId: 'system',
       userName: 'מערכת',
       action: 'הזמנה נוצרה',
       newValue: { status: 'new_order', orderId },
-      timestamp: serverTimestamp(),
+      timestamp: FieldValue.serverTimestamp(),
     });
 
     // Notify team (non-fatal)
