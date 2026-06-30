@@ -157,6 +157,7 @@ interface Product {
   createdAt?: { seconds: number };
   isExpertRecommended?: boolean;
   isBestSeller?: boolean;
+  isEventProduct?: boolean;
   // Warehouse location
   storageColumn?: string;
   storageShelf?: string | number;
@@ -690,7 +691,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [outOfStockDate] = useState(product.outOfStockDate ?? null);
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [isBestSeller, setIsBestSeller] = useState(product.isBestSeller ?? false);
-  const [isEventProduct, setIsEventProduct] = useState((product as Record<string, unknown>).isEventProduct === true);
+  const [isEventProduct, setIsEventProduct] = useState(product.isEventProduct ?? false);
   const [stockCountInput, setStockCountInput] = useState(
     product.stockCount != null ? String(product.stockCount) : ''
   );
