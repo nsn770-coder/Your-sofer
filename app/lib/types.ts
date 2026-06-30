@@ -43,6 +43,8 @@ export interface Product {
   // Product Features
   hasKlafSelection?: boolean;
   isExpertRecommended?: boolean;
+  isEventKippot?: boolean;
+  isEventProduct?: boolean;
   outOfStock?: boolean;
   coverStyle?: string;
   bundlePromo?: string | null;

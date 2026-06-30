@@ -44,6 +44,7 @@ export default function AdminNewProductPage() {
   const [hasKlafSelection, setHasKlafSelection]           = useState(false);
   const [isExpertRecommended, setIsExpertRecommended]     = useState(false);
   const [isEventKippot, setIsEventKippot]                 = useState(searchParams.get('isEventKippot') === 'true');
+  const [isEventProduct, setIsEventProduct]               = useState(searchParams.get('isEventProduct') === 'true');
   const [priority, setPriority]                           = useState('50');
   const [soferId, setSoferId]                             = useState('');
   const [soferOptions, setSoferOptions]                   = useState<{ id: string; name: string }[]>([]);
@@ -130,6 +131,7 @@ export default function AdminNewProductPage() {
         hasKlafSelection,
         isExpertRecommended,
         isEventKippot,
+        isEventProduct,
         priority: Number(priority) || 0,
         ...(soferId ? { soferId } : {}),
         sku: sku.trim() || null,
@@ -194,6 +196,7 @@ export default function AdminNewProductPage() {
               <label style={lS}>קטגוריה *</label>
               <select value={cat} onChange={e => { setCat(e.target.value); setSubCategory(''); }} style={{ ...iS, background: '#1a1a1a' }}>
                 <option value="">-- בחר קטגוריה --</option>
+                {cat && !CATS.includes(cat) && <option value={cat}>{cat} (legacy)</option>}
                 {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
@@ -329,6 +332,11 @@ export default function AdminNewProductPage() {
               <input type="checkbox" checked={isEventKippot} onChange={e => setIsEventKippot(e.target.checked)} />
               🎩 מחשבון כיפות אירועים
               <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>isEventKippot</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
+              <input type="checkbox" checked={isEventProduct} onChange={e => setIsEventProduct(e.target.checked)} />
+              🎪 מוצר לאירועים
+              <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>isEventProduct</span>
             </label>
             {showSofer && (
               <div>

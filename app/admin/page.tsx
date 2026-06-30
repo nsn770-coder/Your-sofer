@@ -522,6 +522,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
             <select value={cat} onChange={e => { setCat(e.target.value); setSubCategory(''); }}
               style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
               <option value="">-- בחר קטגוריה --</option>
+              {cat && !CATS.includes(cat) && <option value={cat}>{cat} (legacy)</option>}
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
@@ -689,6 +690,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [outOfStockDate] = useState(product.outOfStockDate ?? null);
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [isBestSeller, setIsBestSeller] = useState(product.isBestSeller ?? false);
+  const [isEventProduct, setIsEventProduct] = useState((product as Record<string, unknown>).isEventProduct === true);
   const [stockCountInput, setStockCountInput] = useState(
     product.stockCount != null ? String(product.stockCount) : ''
   );
@@ -784,6 +786,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         outOfStockDate: outOfStock ? (outOfStockDate ?? null) : null,
         isExpertRecommended: EXPERT_REC_CATS_ADMIN.includes(cat) ? isExpertRecommended : false,
         isBestSeller,
+        isEventProduct,
         storageColumn: storageColumn || null,
         storageShelf: storageShelf || null,
         storageNote: storageNote || null,
@@ -879,6 +882,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             <select value={cat} onChange={e => { setCat(e.target.value); setSubCategory(''); if (!LEVEL_CATS_EDIT.includes(e.target.value)) { setLevel(''); setNusach(''); } }}
               style={{ ...inputStyle, background: '#fff' }}>
               <option value="">-- בחר קטגוריה --</option>
+              {cat && !CATS.includes(cat) && <option value={cat}>{cat} (legacy)</option>}
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
@@ -1035,6 +1039,12 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
                 style={{ width: 16, height: 16, cursor: 'pointer' }}
               />
               הצג כמות במלאי
+            </label>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#333' }}>
+              <input type="checkbox" checked={isEventProduct} onChange={e => setIsEventProduct(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+              🎪 מוצר לאירועים
             </label>
           </div>
           {stockVisible && (

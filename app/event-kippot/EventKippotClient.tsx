@@ -1,8 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/app/firebase';
 import { getKipaUnitPrice } from '@/app/lib/kippot';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { Product } from '@/app/lib/types';
+import ProductCard from '@/components/ui/ProductCard';
 
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
@@ -27,6 +31,15 @@ export default function EventKippotClient() {
   const [printType, setPrintType] = useState<PrintType>('print-top');
   const [style, setStyle]         = useState<string | null>(null);
   const { user } = useAuth();
+  const [eventProducts, setEventProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getDocs(query(collection(db, 'products'), where('isEventProduct', '==', true)))
+      .then(snap => setEventProducts(
+        snap.docs.map(d => ({ id: d.id, ...d.data() } as Product))
+                 .filter(p => !p.hidden && !p.outOfStock && p.status !== 'inactive')
+      ));
+  }, []);
 
   const embroideryExtra = printType === 'embroidery' ? 5 : 0;
   const unitPrice = getKipaUnitPrice(qty) + embroideryExtra;
@@ -199,6 +212,36 @@ export default function EventKippotClient() {
         <div style={{ textAlign: 'center', fontSize: 13, color: '#9C7B3F', padding: '16px 0', border: '1px dashed #E5E0D5' }}>
           בחר סוג כיפה (שלב 3) כדי להמשיך ←
         </div>
+      )}
+      {eventProducts.length > 0 && (
+        <div style={{ marginTop: 48, borderTop: '1px solid #E5E0D5', paddingTop: 32 }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: NAVY, marginBottom: 16 }}>מוצרים נוספים לאירוע</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+            {eventProducts.map(p => (
+              <ProductCard
+                key={p.id} id={p.id} name={p.name} price={p.price}
+                images={[p.imgUrl, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                was={p.was} badge={p.badge} isBestSeller={p.isBestSeller}
+                outOfStock={p.outOfStock} cat={p.cat}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {user?.role === 'admin' && (
+        <a
+          href="/admin/new-product?isEventProduct=true"
+          style={{
+            position: 'fixed', bottom: 140, right: 20, zIndex: 9999,
+            background: '#374151', color: '#fff', fontWeight: 700, fontSize: 13,
+            padding: '10px 16px', textDecoration: 'none',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            fontFamily: 'Heebo, Arial, sans-serif',
+          }}
+        >
+          ➕ הוסף מוצר לאירוע
+        </a>
       )}
       {user?.role === 'admin' && (
         <a
