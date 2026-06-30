@@ -3243,7 +3243,7 @@ export default function AdminPage() {
       </div>
 
       <div className="flex justify-end mb-4">
-        <button onClick={() => router.push('/sofer-dashboard/add-product')} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר חדש</button>
+        <button onClick={() => setShowAddProduct(true)} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר חדש</button>
       </div>
 
       {/* ── טאבים ── */}
