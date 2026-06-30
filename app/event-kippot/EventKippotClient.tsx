@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { getKipaUnitPrice } from '@/app/lib/kippot';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
@@ -25,6 +26,7 @@ export default function EventKippotClient() {
   const [qty, setQty]             = useState(50);
   const [printType, setPrintType] = useState<PrintType>('print-top');
   const [style, setStyle]         = useState<string | null>(null);
+  const { user } = useAuth();
 
   const embroideryExtra = printType === 'embroidery' ? 5 : 0;
   const unitPrice = getKipaUnitPrice(qty) + embroideryExtra;
@@ -197,6 +199,20 @@ export default function EventKippotClient() {
         <div style={{ textAlign: 'center', fontSize: 13, color: '#9C7B3F', padding: '16px 0', border: '1px dashed #E5E0D5' }}>
           בחר סוג כיפה (שלב 3) כדי להמשיך ←
         </div>
+      )}
+      {user?.role === 'admin' && (
+        <a
+          href={`/admin/new-product?cat=${encodeURIComponent('כיפות')}&isEventKippot=true`}
+          style={{
+            position: 'fixed', bottom: 24, left: 20, zIndex: 200,
+            background: '#C5A028', color: '#fff', fontWeight: 700, fontSize: 13,
+            padding: '10px 16px', textDecoration: 'none',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            fontFamily: 'Heebo, Arial, sans-serif',
+          }}
+        >
+          + הוסף כיפה
+        </a>
       )}
     </div>
   );

@@ -12,6 +12,8 @@ import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import { useCart } from '@/app/contexts/CartContext';
 import { formatPrice } from '@/app/lib/utils';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { findParentCat } from '@/app/constants/categories';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -1156,6 +1158,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { setStamPage } = useChatPersona();
   const { addItem } = useCart();
+  const { user } = useAuth();
   const isStamCat = SOFER_FETCH_CATS.has(category);
   const [showAllProducts, setShowAllProducts] = useState(false);
 
@@ -1190,6 +1193,19 @@ export default function CategoryClient({ category }: { category: string }) {
   // When this is non-null, fetchAll does a direct subCategory query and re-runs if
   // urlFilter changes away from the override (so the full category reloads cleanly).
   const subcatOverrideForFetch = SUBCAT_QUERY_OVERRIDES[category]?.[urlFilter ?? ''] ?? null;
+
+  // Admin-only floating button: derive the correct cat/subCategory for this page context
+  const adminParams: { cat: string; subCategory: string } | null = (() => {
+    if (!user || user.role !== 'admin') return null;
+    if (['הכל', 'מבצעי-מלאי', 'מבצעי מלאי', 'שבתות וחגים', 'שבתות-וחגים'].includes(category)) return null;
+    if (SUBCATEGORY_PAGES.includes(category))
+      return { cat: findParentCat(category) ?? category, subCategory: category };
+    if (subcatOverrideForFetch)
+      return { cat: category, subCategory: subcatOverrideForFetch };
+    if (urlFilter)
+      return { cat: category, subCategory: urlFilter };
+    return { cat: category, subCategory: '' };
+  })();
 
   async function fetchAll() {
     // Case B: virtual category slug - no products have this as cat in Firestore
@@ -2151,6 +2167,21 @@ export default function CategoryClient({ category }: { category: string }) {
           )}
         </div>
       </div>
+
+      {adminParams && (
+        <a
+          href={`/admin/new-product?cat=${encodeURIComponent(adminParams.cat)}${adminParams.subCategory ? `&subCategory=${encodeURIComponent(adminParams.subCategory)}` : ''}`}
+          style={{
+            position: 'fixed', bottom: 24, left: 20, zIndex: 200,
+            background: '#C5A028', color: '#fff', fontWeight: 700, fontSize: 13,
+            padding: '10px 16px', textDecoration: 'none',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            fontFamily: 'Heebo, Arial, sans-serif',
+          }}
+        >
+          + הוסף מוצר
+        </a>
+      )}
     </div>
   );
 }

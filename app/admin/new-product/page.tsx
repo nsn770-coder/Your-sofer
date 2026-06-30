@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
@@ -15,12 +15,13 @@ const CLOUDINARY = 'https://api.cloudinary.com/v1_1/dyxzq3ucy';
 export default function AdminNewProductPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [name, setName]                                   = useState('');
   const [price, setPrice]                                 = useState('');
   const [was, setWas]                                     = useState('');
-  const [cat, setCat]                                      = useState('');
-  const [subCategory, setSubCategory]                      = useState('');
+  const [cat, setCat]                                      = useState(searchParams.get('cat') ?? '');
+  const [subCategory, setSubCategory]                      = useState(searchParams.get('subCategory') ?? '');
   const [days, setDays]                                   = useState('7-10');
   const [size, setSize]                                   = useState('');
   const [badge, setBadge]                                 = useState('');
@@ -42,7 +43,7 @@ export default function AdminNewProductPage() {
   const [warehouseBox, setWarehouseBox]                   = useState('');
   const [hasKlafSelection, setHasKlafSelection]           = useState(false);
   const [isExpertRecommended, setIsExpertRecommended]     = useState(false);
-  const [isEventKippot, setIsEventKippot]                 = useState(false);
+  const [isEventKippot, setIsEventKippot]                 = useState(searchParams.get('isEventKippot') === 'true');
   const [priority, setPriority]                           = useState('50');
   const [soferId, setSoferId]                             = useState('');
   const [soferOptions, setSoferOptions]                   = useState<{ id: string; name: string }[]>([]);
