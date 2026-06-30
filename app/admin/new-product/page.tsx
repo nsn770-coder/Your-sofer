@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { CATEGORY_OPTIONS, parseCatValue } from '@/app/constants/categories';
+import { CATS, getSubCats } from '@/app/constants/categories';
 
 const STAM_ADMIN_CATS = new Set([
   'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה',
@@ -19,7 +19,8 @@ export default function AdminNewProductPage() {
   const [name, setName]                                   = useState('');
   const [price, setPrice]                                 = useState('');
   const [was, setWas]                                     = useState('');
-  const [catValue, setCatValue]                           = useState('');
+  const [cat, setCat]                                      = useState('');
+  const [subCategory, setSubCategory]                      = useState('');
   const [days, setDays]                                   = useState('7-10');
   const [size, setSize]                                   = useState('');
   const [badge, setBadge]                                 = useState('');
@@ -69,7 +70,6 @@ export default function AdminNewProductPage() {
   );
   if (!user || user.role !== 'admin') { router.push('/'); return null; }
 
-  const { cat, subCategory } = parseCatValue(catValue);
   const isStam    = STAM_ADMIN_CATS.has(cat);
   const showSofer = SOFER_EDIT_CATS.includes(cat) || !!soferId;
   const showSize  = ['קלפי מזוזה', 'בתי מזוזה'].some(c => cat.includes(c));
@@ -98,7 +98,7 @@ export default function AdminNewProductPage() {
   }
 
   async function handleCreate() {
-    if (!name.trim() || !price || !catValue) { alert('שם, מחיר וקטגוריה הם שדות חובה'); return; }
+    if (!name.trim() || !price || !cat) { alert('שם, מחיר וקטגוריה הם שדות חובה'); return; }
     setSaving(true);
     try {
       const ref = await addDoc(collection(db, 'products'), {
@@ -191,21 +191,20 @@ export default function AdminNewProductPage() {
             <div><label style={lS}>priority</label><input type="number" value={priority} onChange={e => setPriority(e.target.value)} style={iS} /></div>
             <div>
               <label style={lS}>קטגוריה *</label>
-              <select value={catValue} onChange={e => setCatValue(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
+              <select value={cat} onChange={e => { setCat(e.target.value); setSubCategory(''); }} style={{ ...iS, background: '#1a1a1a' }}>
                 <option value="">-- בחר קטגוריה --</option>
-                {CATEGORY_OPTIONS.map(opt =>
-                  opt.type === 'standalone' ? (
-                    <option key={opt.cat} value={opt.cat}>{opt.cat}</option>
-                  ) : (
-                    <optgroup key={opt.label} label={`── ${opt.label} ──`}>
-                      {opt.children.map(child => (
-                        <option key={child.value} value={child.value}>{child.label}</option>
-                      ))}
-                    </optgroup>
-                  )
-                )}
+                {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
+            {getSubCats(cat).length > 0 && (
+              <div>
+                <label style={lS}>תת-קטגוריה <span style={{ fontWeight: 300, opacity: 0.7 }}>(אופציונלי)</span></label>
+                <select value={subCategory} onChange={e => setSubCategory(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
+                  <option value="">-- ללא תת-קטגוריה --</option>
+                  {getSubCats(cat).map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
               <div><label style={lS}>זמן אספקה</label><input value={days} onChange={e => setDays(e.target.value)} placeholder="7-10" style={iS} /></div>
               <div>

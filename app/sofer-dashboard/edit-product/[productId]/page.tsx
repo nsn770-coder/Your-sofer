@@ -4,7 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { doc, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { CATEGORY_OPTIONS, parseCatValue, buildCatValue } from '@/app/constants/categories';
+import { CATEGORY_OPTIONS, parseCatValue, buildCatValue, findParentCat } from '@/app/constants/categories';
 
 interface ProductDoc {
   name: string;
@@ -92,7 +92,12 @@ export default function EditProductPage() {
       setDesc(d.desc ?? d.description ?? '');
       // Show soferBasePrice if available, else fall back to stored price (legacy products saved base price directly)
       setPrice(String(d.soferBasePrice ?? d.price ?? ''));
-      setCatValue(buildCatValue(d.cat ?? d.category ?? '', d.subCategory));
+      const _rawCat = d.cat ?? d.category ?? '';
+      const _rawSub = d.subCategory ?? '';
+      const _parent = findParentCat(_rawCat);
+      const _normCat = _parent && _rawCat === _rawSub ? _parent : _rawCat;
+      const _normSub = _parent && _rawCat === _rawSub ? _rawCat : _rawSub;
+      setCatValue(buildCatValue(_normCat, _normSub));
       setImgUrl(d.imgUrl ?? '');
       setImgUrl2(d.imgUrl2 ?? '');
       setImgUrl3(d.imgUrl3 ?? '');

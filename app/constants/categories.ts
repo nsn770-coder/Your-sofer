@@ -21,7 +21,7 @@ export const CATS = [
   'קלפי מזוזה',
   'קלפי תפילין',
   'כיפות',
-  'ספרי קודש',
+  'ספרי קודש וסידורים',
 ];
 
 export const SUB_CATS: Record<string, string[]> = {
@@ -30,6 +30,7 @@ export const SUB_CATS: Record<string, string[]> = {
   'חגים':                 ['חנוכה', 'פסח', 'סוכות', 'פורים', 'ראש השנה'],
   'בר מצווה':             ['סטים לבר מצווה', 'תפילין קומפלט', 'טליתות', 'מתנות לבר מצווה'],
   'קלפים':                ['קלפי מזוזה', 'קלפי תפילין'],
+  'ספרי קודש וסידורים':  ['סידורים ותהילים'],
 };
 
 // ─── Admin product form: hierarchical category selector ───────────────────────
@@ -85,7 +86,10 @@ export const CATEGORY_OPTIONS: CategoryOption[] = [
     { label: 'מתנות לבר מצווה', value: 'בר מצווה|מתנות לבר מצווה' },
   ]},
   { type: 'standalone', cat: 'כיפות' },
-  { type: 'standalone', cat: 'ספרי קודש' },
+  { type: 'group', label: 'ספרי קודש וסידורים', children: [
+    { label: 'כל הספרים',       value: 'ספרי קודש וסידורים' },
+    { label: 'סידורים ותהילים', value: 'ספרי קודש וסידורים|סידורים ותהילים' },
+  ]},
 ];
 
 /**
@@ -106,6 +110,23 @@ export function parseCatValue(v: string): { cat: string; subCategory: string } {
 export function buildCatValue(cat: string, subCategory?: string): string {
   if (subCategory) return `${cat}|${subCategory}`;
   return cat;
+}
+
+/** Returns sub-categories for a primary cat, or [] if none. */
+export function getSubCats(cat: string): string[] {
+  return SUB_CATS[cat] ?? [];
+}
+
+/**
+ * Returns the first parent category that contains value as a sub-category.
+ * Used to normalize legacy products where cat === subCategory
+ * (saved by the old SUBCATEGORY_PAGES_FORM pattern).
+ */
+export function findParentCat(value: string): string | null {
+  for (const [parent, children] of Object.entries(SUB_CATS)) {
+    if (children.includes(value)) return parent;
+  }
+  return null;
 }
 
 export const NAV_ITEMS: { label: string; cat: string | null; action: string | null }[] = [

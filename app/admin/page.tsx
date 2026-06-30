@@ -10,7 +10,7 @@ import { formatPrice } from '@/app/lib/utils';
 import { getAuthLazy } from '@/lib/authLazy';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
-import { CATS } from '../constants/categories';
+import { CATS, getSubCats, findParentCat } from '../constants/categories';
 import HomepageConfigTab from './components/HomepageConfigTab';
 import BestSellersTab from './components/BestSellersTab';
 import InventoryTab from './components/InventoryTab';
@@ -382,8 +382,6 @@ function isSoferCat(cat: string): boolean {
   return SOFER_CATS_LIST.some(s => s.trim().normalize('NFC') === c);
 }
 
-// Categories whose /category/[slug] page filters by subCategory (not cat)
-const SUBCATEGORY_PAGES_FORM = ['חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
 
 // ─── Add Product Modal ────────────────────────────────────────────────────────
 
@@ -398,6 +396,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
   const [was, setWas] = useState('');
   const [desc, setDesc] = useState('');
   const [cat, setCat] = useState(CATS.filter(c => c !== 'הכל')[0] || '');
+  const [subCategory, setSubCategory] = useState('');
   const [level, setLevel] = useState('');
   const [nusach, setNusach] = useState('');
   const [badge, setBadge] = useState('');
@@ -459,7 +458,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
         supplierCost: supplierCost ? Number(supplierCost) : null,
         desc, cat,
         category: cat,
-        ...(SUBCATEGORY_PAGES_FORM.includes(cat) ? { subCategory: cat } : {}),
+        ...(subCategory ? { subCategory } : {}),
         level: LEVEL_CATS.includes(cat) ? level : '',
         nusach: LEVEL_CATS.includes(cat) ? nusach : '',
         badge: badge || null,
@@ -520,11 +519,22 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
           </div>
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>קטגוריה</label>
-            <select value={cat} onChange={e => setCat(e.target.value)}
+            <select value={cat} onChange={e => { setCat(e.target.value); setSubCategory(''); }}
               style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
+              <option value="">-- בחר קטגוריה --</option>
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
+          {getSubCats(cat).length > 0 && (
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>תת-קטגוריה <span style={{ fontWeight: 400, color: '#888' }}>(אופציונלי)</span></label>
+              <select value={subCategory} onChange={e => setSubCategory(e.target.value)}
+                style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
+                <option value="">-- ללא תת-קטגוריה --</option>
+                {getSubCats(cat).map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+          )}
           {(isSoferCat(cat) || !!soferId) && (
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>סופר</label>
@@ -657,7 +667,11 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [price, setPrice]     = useState(String(product.price ?? ''));
   const [was, setWas]         = useState(product.was != null ? String(product.was) : '');
   const [desc, setDesc]       = useState(product.desc || '');
-  const [cat, setCat]         = useState(product.cat || product.category || '');
+  const _rawCat = product.cat || product.category || '';
+  const _rawSub = product.subCategory || '';
+  const _parentCat = findParentCat(_rawCat);
+  const [cat, setCat]         = useState(_parentCat && _rawCat === _rawSub ? _parentCat : _rawCat);
+  const [subCategory, setSubCategory] = useState(_parentCat && _rawCat === _rawSub ? _rawCat : _rawSub);
   const [level, setLevel]     = useState(product.level || '');
   const [nusach, setNusach]   = useState(product.nusach || '');
   const [badge, setBadge]     = useState(product.badge || '');
@@ -754,7 +768,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         supplierCost: supplierCost ? Number(supplierCost) : null,
         desc, cat,
         category: cat,
-        ...(SUBCATEGORY_PAGES_FORM.includes(cat) ? { subCategory: cat } : {}),
+        ...(subCategory ? { subCategory } : {}),
         level: LEVEL_CATS_EDIT.includes(cat) ? level : '',
         nusach: LEVEL_CATS_EDIT.includes(cat) ? nusach : '',
         badge: badge || null,
@@ -862,11 +876,22 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
           </div>
           <div>
             <label style={labelStyle}>קטגוריה</label>
-            <select value={cat} onChange={e => { setCat(e.target.value); if (!LEVEL_CATS_EDIT.includes(e.target.value)) { setLevel(''); setNusach(''); } }}
+            <select value={cat} onChange={e => { setCat(e.target.value); setSubCategory(''); if (!LEVEL_CATS_EDIT.includes(e.target.value)) { setLevel(''); setNusach(''); } }}
               style={{ ...inputStyle, background: '#fff' }}>
+              <option value="">-- בחר קטגוריה --</option>
               {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
+          {getSubCats(cat).length > 0 && (
+            <div>
+              <label style={labelStyle}>תת-קטגוריה <span style={{ fontWeight: 400, color: '#888' }}>(אופציונלי)</span></label>
+              <select value={subCategory} onChange={e => setSubCategory(e.target.value)}
+                style={{ ...inputStyle, background: '#fff' }}>
+                <option value="">-- ללא תת-קטגוריה --</option>
+                {getSubCats(cat).map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+          )}
           {(isSoferCat(cat) || !!soferId) && (
             <div>
               <label style={labelStyle}>סופר</label>
