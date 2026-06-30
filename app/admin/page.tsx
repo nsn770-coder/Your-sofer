@@ -20,6 +20,7 @@ import ProfitabilityTab from './components/ProfitabilityTab';
 import SiteSettingsTab from './components/SiteSettingsTab';
 import PromotionsTab from './components/PromotionsTab';
 import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES } from '@/app/components/ProductLabelPrint';
+import { getTier } from '@/app/lib/loyalty';
 
 interface OrderItem {
   id: string;
@@ -342,17 +343,17 @@ interface AbandonedCart {
 }
 
 interface Customer {
-  id: string;
+  id: string;       // = Firebase Auth uid (doc ID in users collection)
   name: string;
   email: string;
   phone: string;
-  address: string;
-  firstOrderAt: string;
-  lastOrderAt: string;
   totalOrders: number;
   totalSpent: number;
-  isGuest: boolean;
-  uid: string | null;
+  loyaltyPoints: number;
+  tier: string;     // 'bronze' | 'silver' | 'gold'
+  tierLabel: string;
+  tierIcon: string;
+  createdAt?: string;
 }
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -2299,6 +2300,7 @@ export default function AdminPage() {
   const [abandonedCartsLoading, setAbandonedCartsLoading] = useState(true);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [customersLoading, setCustomersLoading] = useState(true);
+  const [customerSort, setCustomerSort] = useState<'totalSpent' | 'loyaltyPoints' | 'totalOrders'>('totalSpent');
   const [productDeleteConfirm, setProductDeleteConfirm] = useState<string | null>(null);
   const [priorityUpdating, setPriorityUpdating] = useState<string | null>(null);
   const priorityTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
@@ -2363,11 +2365,59 @@ export default function AdminPage() {
 
   async function loadCustomers() {
     try {
-      const snap = await getDocs(query(collection(db, 'customers'), orderBy('lastOrderAt', 'desc')));
-      const data: Customer[] = [];
-      snap.forEach(d => data.push({ id: d.id, ...d.data() } as Customer));
+      // 1. Read all users, filter to those who actually bought (totalSpent > 0)
+      const usersSnap = await getDocs(collection(db, 'users'));
+      const buyers: Array<{ uid: string; data: Record<string, unknown> }> = [];
+      usersSnap.forEach(d => {
+        const u = d.data();
+        if ((u.totalSpent as number | undefined ?? 0) > 0) {
+          buyers.push({ uid: d.id, data: u });
+        }
+      });
+
+      if (buyers.length === 0) {
+        setCustomers([]);
+        return;
+      }
+
+      // 2. Count orders per uid from orders collection (parallel queries)
+      const orderCounts = await Promise.all(
+        buyers.map(async ({ uid }) => {
+          const snap = await getCountFromServer(
+            query(collection(db, 'orders'), where('uid', '==', uid))
+          );
+          return { uid, count: snap.data().count };
+        })
+      );
+      const countMap = new Map(orderCounts.map(r => [r.uid, r.count]));
+
+      // 3. Build Customer objects
+      const data: Customer[] = buyers.map(({ uid, data: u }) => {
+        const spent  = (u.totalSpent as number) ?? 0;
+        const tierDef = getTier(spent);
+        const createdTs = u.createdAt as { seconds: number } | string | undefined;
+        const created = createdTs && typeof createdTs === 'object' && 'seconds' in createdTs
+          ? new Date(createdTs.seconds * 1000).toLocaleDateString('he-IL')
+          : typeof createdTs === 'string' ? createdTs.slice(0, 10) : undefined;
+        return {
+          id:            uid,
+          name:          (u.displayName as string) || (u.name as string) || '',
+          email:         (u.email as string) || '',
+          phone:         (u.phone as string) || '',
+          totalOrders:   countMap.get(uid) ?? 0,
+          totalSpent:    spent,
+          loyaltyPoints: (u.loyaltyPoints as number) ?? 0,
+          tier:          tierDef.id,
+          tierLabel:     tierDef.label,
+          tierIcon:      tierDef.icon,
+          createdAt:     created,
+        };
+      });
+
+      // 4. Sort by totalSpent descending
+      data.sort((a, b) => b.totalSpent - a.totalSpent);
       setCustomers(data);
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error('[loadCustomers]', e); }
     finally { setCustomersLoading(false); }
   }
 
@@ -4180,55 +4230,102 @@ export default function AdminPage() {
         </div>
       )}
 
-      {activeTab === 'customers' && (
-        <div className="bg-white rounded-xl shadow overflow-hidden">
-          <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="text-lg font-bold">👤 לקוחות ({customers.length})</h2>
-            <button onClick={loadCustomers} className="text-sm text-blue-600 hover:underline">רענן</button>
-          </div>
-          {customersLoading ? (
-            <div className="p-8 text-center text-gray-400">טוען...</div>
-          ) : customers.length === 0 ? (
-            <div className="p-8 text-center text-gray-400">אין לקוחות עדיין</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="p-3 text-right">שם</th>
-                    <th className="p-3 text-right">אימייל</th>
-                    <th className="p-3 text-right">טלפון</th>
-                    <th className="p-3 text-right">הזמנות</th>
-                    <th className="p-3 text-right">סה"כ הוצאה</th>
-                    <th className="p-3 text-right">הזמנה ראשונה</th>
-                    <th className="p-3 text-right">סוג</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {customers.map(c => {
-                    const firstDate = c.firstOrderAt ? new Date(c.firstOrderAt).toLocaleDateString('he-IL') : '-';
-                    return (
-                      <tr key={c.id} className="border-t hover:bg-cyan-50">
-                        <td className="p-3 font-semibold">{c.name || '-'}</td>
-                        <td className="p-3 text-gray-600 text-xs">{c.email || '-'}</td>
-                        <td className="p-3 text-gray-600">{c.phone || '-'}</td>
-                        <td className="p-3 text-center font-bold text-blue-700">{c.totalOrders ?? 0}</td>
-                        <td className="p-3 font-bold text-green-700">{formatPrice(c.totalSpent ?? 0)}</td>
-                        <td className="p-3 text-gray-400 text-xs whitespace-nowrap">{firstDate}</td>
-                        <td className="p-3">
-                          {c.isGuest
-                            ? <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs">אורח</span>
-                            : <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs">רשום</span>}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+      {activeTab === 'customers' && (() => {
+        const tierColors: Record<string, string> = {
+          bronze: 'bg-amber-100 text-amber-700',
+          silver: 'bg-gray-100 text-gray-600',
+          gold:   'bg-yellow-100 text-yellow-700',
+        };
+        const sortedCustomers = [...customers].sort((a, b) => b[customerSort] - a[customerSort]);
+        const totalRevenue    = customers.reduce((s, c) => s + c.totalSpent, 0);
+        const totalOrders     = customers.reduce((s, c) => s + c.totalOrders, 0);
+        const avgOrder        = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+        const SortBtn = ({ field, label }: { field: typeof customerSort; label: string }) => (
+          <button
+            onClick={() => setCustomerSort(field)}
+            className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+              customerSort === field ? 'bg-cyan-700 text-white border-cyan-700' : 'bg-white text-gray-600 border-gray-300 hover:border-cyan-500'
+            }`}
+          >
+            {label}
+          </button>
+        );
+
+        return (
+          <div className="bg-white rounded-xl shadow overflow-hidden" dir="rtl">
+            {/* Header */}
+            <div className="p-4 border-b flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-bold">👤 לקוחות ששילמו ({customers.length})</h2>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400">מיין לפי:</span>
+                <SortBtn field="totalSpent"    label="הוצאה" />
+                <SortBtn field="loyaltyPoints" label="נקודות" />
+                <SortBtn field="totalOrders"   label="הזמנות" />
+                <button onClick={() => { setCustomersLoading(true); loadCustomers(); }} className="mr-2 text-sm text-blue-600 hover:underline">רענן</button>
+              </div>
             </div>
-          )}
-        </div>
-      )}
+
+            {/* Summary bar */}
+            {!customersLoading && customers.length > 0 && (
+              <div className="grid grid-cols-3 divide-x divide-x-reverse border-b bg-cyan-50 text-center">
+                <div className="p-3">
+                  <div className="text-xs text-gray-500 mb-0.5">סה"כ לקוחות</div>
+                  <div className="text-xl font-black text-cyan-800">{customers.length}</div>
+                </div>
+                <div className="p-3">
+                  <div className="text-xs text-gray-500 mb-0.5">סה"כ הכנסות</div>
+                  <div className="text-xl font-black text-green-700">{formatPrice(totalRevenue)}</div>
+                </div>
+                <div className="p-3">
+                  <div className="text-xs text-gray-500 mb-0.5">ממוצע להזמנה</div>
+                  <div className="text-xl font-black text-gray-700">{formatPrice(Math.round(avgOrder))}</div>
+                </div>
+              </div>
+            )}
+
+            {/* Table */}
+            {customersLoading ? (
+              <div className="p-8 text-center text-gray-400">טוען...</div>
+            ) : customers.length === 0 ? (
+              <div className="p-8 text-center text-gray-400">אין לקוחות עם רכישות עדיין</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+                    <tr>
+                      <th className="p-3 text-right font-semibold">שם</th>
+                      <th className="p-3 text-right font-semibold">אימייל</th>
+                      <th className="p-3 text-right font-semibold">טלפון</th>
+                      <th className="p-3 text-center font-semibold">דרגה</th>
+                      <th className="p-3 text-center font-semibold">נקודות</th>
+                      <th className="p-3 text-center font-semibold">הזמנות</th>
+                      <th className="p-3 text-left font-semibold">סה"כ הוצאה</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedCustomers.map(c => (
+                      <tr key={c.id} className="border-t hover:bg-cyan-50 transition-colors">
+                        <td className="p-3 font-semibold">{c.name || '—'}</td>
+                        <td className="p-3 text-gray-500 text-xs">{c.email || '—'}</td>
+                        <td className="p-3 text-gray-500 text-xs">{c.phone || '—'}</td>
+                        <td className="p-3 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tierColors[c.tier] ?? 'bg-gray-100 text-gray-500'}`}>
+                            {c.tierIcon} {c.tierLabel}
+                          </span>
+                        </td>
+                        <td className="p-3 text-center font-bold text-purple-700">{c.loyaltyPoints}</td>
+                        <td className="p-3 text-center font-bold text-blue-700">{c.totalOrders}</td>
+                        <td className="p-3 text-left font-bold text-green-700">{formatPrice(c.totalSpent)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {activeTab === 'curations' && <CurationsTab />}
 
