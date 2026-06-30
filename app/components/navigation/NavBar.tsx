@@ -194,6 +194,17 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
     ],
   },
   {
+    id: "matanot", label: "מתנות", cat: "מתנות",
+    columns: [
+      {
+        title: "מתנות",
+        items: [
+          { label: "כל המתנות", cat: "מתנות" },
+        ],
+      },
+    ],
+  },
+  {
     id: "synagogue", label: "מוצרי בית כנסת", cat: "מוצרי בית כנסת",
     columns: [
       {
