@@ -1159,6 +1159,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const { setStamPage } = useChatPersona();
   const { addItem } = useCart();
   const { user } = useAuth();
+  console.log('ADMIN BTN DEBUG', { user, role: user?.role });
   const isStamCat = SOFER_FETCH_CATS.has(category);
   const [showAllProducts, setShowAllProducts] = useState(false);
 
