@@ -2173,7 +2173,7 @@ export default function CategoryClient({ category }: { category: string }) {
         <a
           href={`/admin/new-product?cat=${encodeURIComponent(adminParams.cat)}${adminParams.subCategory ? `&subCategory=${encodeURIComponent(adminParams.subCategory)}` : ''}`}
           style={{
-            position: 'fixed', bottom: 24, left: 20, zIndex: 200,
+            position: 'fixed', bottom: 90, right: 20, zIndex: 9999,
             background: '#C5A028', color: '#fff', fontWeight: 700, fontSize: 13,
             padding: '10px 16px', textDecoration: 'none',
             boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
