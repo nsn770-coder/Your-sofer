@@ -164,6 +164,15 @@ export default function RootLayout({
             gtag('config', 'AW-18095875961');
           `}
         </Script>
+
+        {/* ── Async chat widget ── */}
+        <Script
+          src="https://cdn.async.co.il/widget.js"
+          data-key="9fb328ec30b744058aeb1e2776270894"
+          data-api-base="https://api.async.co.il"
+          data-side="right"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
