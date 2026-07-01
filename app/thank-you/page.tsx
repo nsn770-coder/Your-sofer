@@ -1,6 +1,6 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { doc, getDoc, updateDoc, setDoc, serverTimestamp, increment } from 'firebase/firestore';
 import { db } from '../firebase';
 import * as pixel from '@/lib/metaPixel';
@@ -83,14 +83,66 @@ const GIFT_THRESHOLD = 250;
 function ThankYouContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, signInWithGoogle } = useAuth();
+  const { user, loading, signInWithGoogle } = useAuth();
   const [signingIn, setSigningIn] = useState(false);
+  const [orderShippingCost, setOrderShippingCost] = useState(0);
+  const [claimState, setClaimState] = useState<'idle' | 'claiming' | 'success' | 'already' | 'error'>('idle');
+  const [claimedPoints, setClaimedPoints] = useState(0);
+  // true once we know the user was definitively logged out on this page visit
+  const sawNullUserRef = useRef(false);
+  // prevents calling claim-order more than once per page load
+  const claimedRef = useRef(false);
   const orderNumber = searchParams.get('order');
   const orderId = searchParams.get('orderId');
   const [emailSent, setEmailSent] = useState(false);
   const [blessing, setBlessing] = useState<{ customerNumber: number; word: string; text: string } | null>(null);
   const [orderTotal, setOrderTotal] = useState<number>(0);
   const [checkoutEnabled, setCheckoutEnabled] = useState<boolean | null>(null);
+
+  // Record when user is definitively not logged in (loading done, user null).
+  // This distinguishes "user was a guest and just signed up" from "already logged in on arrival".
+  useEffect(() => {
+    if (!loading && !user) sawNullUserRef.current = true;
+  }, [loading, user]);
+
+  // After a fresh sign-in on this page: credit retroactive loyalty points exactly once.
+  useEffect(() => {
+    if (!user || !orderId || !sawNullUserRef.current || claimedRef.current) return;
+    claimedRef.current = true;
+
+    async function claimPoints() {
+      setClaimState('claiming');
+      try {
+        const { getAuthLazy } = await import('@/lib/authLazy');
+        const auth = await getAuthLazy();
+        if (!auth.currentUser) { setClaimState('error'); return; }
+        const idToken = await auth.currentUser.getIdToken();
+
+        const res = await fetch('/api/loyalty/claim-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({ orderId }),
+        });
+
+        if (!res.ok) { setClaimState('error'); return; }
+        const data = await res.json() as { pointsEarned?: number; alreadyProcessed?: boolean };
+
+        if (data.alreadyProcessed) {
+          setClaimState('already');
+        } else {
+          setClaimedPoints(data.pointsEarned ?? 0);
+          setClaimState('success');
+        }
+      } catch {
+        setClaimState('error');
+      }
+    }
+
+    claimPoints();
+  }, [user?.uid, orderId]);
 
   useEffect(() => {
     if (user?.role !== 'admin') return;
@@ -122,6 +174,7 @@ function ThankYouContent() {
         const blessingEntry = findClosestBlessing(customerNum);
         setBlessing({ customerNumber: customerNum, word: blessingEntry.word, text: blessingEntry.blessing });
         setOrderTotal(order.total ?? 0);
+        setOrderShippingCost(order.shippingCost ?? 0);
 
         // עדכן סטטוס הזמנה ל-paid
         await updateDoc(doc(db, 'orders', orderId!), {
@@ -274,7 +327,8 @@ function ThankYouContent() {
     sendEmail();
   }, [orderId]);
 
-  const hasGift = orderTotal >= GIFT_THRESHOLD;
+  const hasGift    = orderTotal >= GIFT_THRESHOLD;
+  const pointsHint = Math.floor(Math.max(0, orderTotal - orderShippingCost) * 0.10);
 
   return (
     <main style={{ maxWidth: 520, margin: '0 auto', padding: '0 16px 48px', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
@@ -323,53 +377,101 @@ function ThankYouContent() {
         </button>
       </div>
 
-      {/* ── Google sign-up offer — shown only to guests ── */}
-      {!user && (
+      {/* ── Google sign-up / loyalty card ────────────────────────────────────
+           Visible when: guest (idle) OR after sign-in (claiming/success/already).
+           Hidden when: already logged in on arrival (claimState stays 'idle', !user is false)
+           or when an error occurred (silently hide rather than break the page).       ── */}
+      {claimState !== 'error' && (!user || claimState !== 'idle') && (
         <div style={{
           background: '#fff', borderRadius: 20,
           boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
           padding: '28px 32px', marginTop: 20, textAlign: 'center',
         }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>⭐</div>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '0 0 8px' }}>
-            רוצה לעקוב אחרי ההזמנה ולצבור נקודות?
-          </h2>
-          <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: '0 0 22px' }}>
-            צור חשבון מהיר עם Google — מעקב הזמנות,<br />
-            נקודות לקנייה הבאה, והטבות מועדון.
-          </p>
-          <button
-            onClick={async () => {
-              setSigningIn(true);
-              try { await signInWithGoogle(); } finally { setSigningIn(false); }
-            }}
-            disabled={signingIn}
-            style={{
-              width: '100%', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', gap: 10,
-              padding: '13px 20px', background: signingIn ? '#555' : '#1a1a1a',
-              color: '#fff', border: 'none', borderRadius: 12,
-              fontSize: 15, fontWeight: 700, cursor: signingIn ? 'default' : 'pointer',
-              fontFamily: 'inherit', transition: 'background 0.2s',
-            }}
-          >
-            {signingIn ? (
-              <>
-                <div style={{ width: 18, height: 18, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                מתחבר...
-              </>
-            ) : (
-              <>
-                <svg width="18" height="18" viewBox="0 0 18 18">
-                  <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
-                  <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
-                  <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
-                  <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-                </svg>
-                המשך עם Google
-              </>
-            )}
-          </button>
+
+          {/* ── State: idle (before sign-in) — show offer + points hint ── */}
+          {claimState === 'idle' && !user && (
+            <>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>⭐</div>
+              <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '0 0 8px' }}>
+                רוצה לעקוב אחרי ההזמנה ולצבור נקודות?
+              </h2>
+              <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: '0 0 22px' }}>
+                {pointsHint > 0 ? (
+                  <>צור חשבון וקבל{' '}
+                    <strong style={{ color: '#1a1a1a' }}>~{pointsHint} נקודות</strong>
+                    {' '}(שוות ₪{pointsHint}) על הקנייה הזו!
+                  </>
+                ) : (
+                  <>צור חשבון מהיר עם Google — מעקב הזמנות,<br />נקודות לקנייה הבאה, והטבות מועדון.</>
+                )}
+              </p>
+              <button
+                onClick={async () => {
+                  setSigningIn(true);
+                  try { await signInWithGoogle(); } finally { setSigningIn(false); }
+                }}
+                disabled={signingIn}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', gap: 10,
+                  padding: '13px 20px', background: signingIn ? '#555' : '#1a1a1a',
+                  color: '#fff', border: 'none', borderRadius: 12,
+                  fontSize: 15, fontWeight: 700, cursor: signingIn ? 'default' : 'pointer',
+                  fontFamily: 'inherit', transition: 'background 0.2s',
+                }}
+              >
+                {signingIn ? (
+                  <>
+                    <div style={{ width: 18, height: 18, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                    מתחבר...
+                  </>
+                ) : (
+                  <>
+                    <svg width="18" height="18" viewBox="0 0 18 18">
+                      <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+                      <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                      <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
+                      <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                    </svg>
+                    המשך עם Google
+                  </>
+                )}
+              </button>
+            </>
+          )}
+
+          {/* ── State: claiming — spinner while endpoint runs ── */}
+          {claimState === 'claiming' && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '8px 0' }}>
+              <div style={{ width: 32, height: 32, border: '3px solid #E7E2D8', borderTopColor: '#C5A028', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+              <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>מזכה נקודות על הקנייה...</p>
+            </div>
+          )}
+
+          {/* ── State: success — points credited ── */}
+          {claimState === 'success' && (
+            <>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>🎉</div>
+              <h2 style={{ fontSize: 18, fontWeight: 900, color: '#166534', margin: '0 0 8px' }}>
+                זוכית ב-{claimedPoints} נקודות!
+              </h2>
+              <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: 0 }}>
+                שוות ₪{claimedPoints} בקנייה הבאה.<br />
+                תוכל לממש אותן באזור האישי.
+              </p>
+            </>
+          )}
+
+          {/* ── State: already — points were already credited ── */}
+          {claimState === 'already' && (
+            <>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>⭐</div>
+              <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>
+                הנקודות על הזמנה זו כבר זוכו.
+              </p>
+            </>
+          )}
+
         </div>
       )}
 
