@@ -26,11 +26,17 @@ export function isVisibleProduct(d: Doc): boolean {
   return true;
 }
 
-// Whether a visible product is currently purchasable.
+// Whether a visible product is currently purchasable. Mirrors the actual
+// add-to-cart gate on the live product page (app/product/[id]/ProductClient.tsx),
+// which only checks `outOfStock`. The numeric `inStock` field is a separate
+// internal warehouse count (often 0 for products that aren't unit-tracked) and is
+// NOT used to gate purchases on the site, so it must not be used here either —
+// otherwise most of the catalog would incorrectly show as unavailable.
 export function isInStock(d: Doc): boolean {
   if (d.outOfStock === true) return false;
+  if (d.available === false) return false;
   if (d.stockStatus === 'out_of_stock') return false;
-  if (typeof d.inStock === 'number' && d.inStock <= 0) return false;
+  if (d.availability === 'out_of_stock') return false;
   return true;
 }
 
