@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { requireChatApiKey } from '@/lib/chatApiAuth';
-import { serializeOrder } from '../../_lib/serialize';
+import { serializeOrder, resolveCustomerPhone } from '../../_lib/serialize';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,9 +22,15 @@ export async function GET(req: NextRequest) {
     const db = getAdminDb();
     const snap = await db.collection('orders').orderBy('createdAt', 'desc').limit(limit).get();
 
-    return NextResponse.json({
-      orders: snap.docs.map((d) => serializeOrder(d.data())),
-    });
+    const orders = await Promise.all(
+      snap.docs.map(async (doc) => {
+        const data = doc.data();
+        const resolvedPhone = await resolveCustomerPhone(db, data);
+        return serializeOrder(data, resolvedPhone);
+      }),
+    );
+
+    return NextResponse.json({ orders });
   } catch (err) {
     console.error('[chat-api/orders/recent]', err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });

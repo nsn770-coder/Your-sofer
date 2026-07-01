@@ -193,7 +193,89 @@ export interface ChatOrder {
   lines?: ChatOrderLine[];
 }
 
-export function serializeOrder(d: Doc): ChatOrder {
+// The checkout phone field (app/checkout/page.tsx) is a free-text <input type="tel">
+// with no format validation, so `phone` on an order can be "058-4877770", "0584877770",
+// "+972584877770", or (rare data-entry mistakes) a truncated fragment like "4877770".
+// The assistant needs a full, consistently-formatted number to match against the
+// number a WhatsApp customer is messaging from — so we normalize to local 0XXXXXXXX(X)
+// format here rather than passing the raw field through as-is.
+function normalizePhoneIL(raw: unknown): string {
+  if (!raw || typeof raw !== 'string') return '';
+  let digits = raw.replace(/[^\d+]/g, '');
+
+  if (digits.startsWith('+972')) digits = '0' + digits.slice(4);
+  else if (digits.startsWith('972') && digits.length >= 11) digits = '0' + digits.slice(3);
+  else digits = digits.replace(/\+/g, '');
+
+  // Missing leading 0 on an otherwise-complete 9-digit mobile number (e.g. "584877770").
+  if (digits.length === 9 && digits.startsWith('5')) digits = '0' + digits;
+
+  return digits;
+}
+
+// Israeli local numbers: mobile = 0 + 9 digits (10 total), landline = 0 + 8 digits (9 total).
+function isCompleteIsraeliPhone(phone: string): boolean {
+  return /^0\d{8,9}$/.test(phone);
+}
+
+// Orders store `phone` however the customer typed it at checkout (mostly local
+// "0XXXXXXXXX", occasionally "+972..."). A WhatsApp-based assistant will most likely
+// query us with the E.164 number WhatsApp gives it, which would never exact-match a
+// locally-stored number — so /orders?phone= must try every plausible stored variant
+// of whatever number it's given, not just look it up verbatim.
+export function phoneQueryVariants(raw: string): string[] {
+  const trimmed = raw.trim();
+  if (!trimmed) return [];
+
+  const local = normalizePhoneIL(trimmed);
+  const variants = new Set<string>([trimmed]);
+
+  if (local) {
+    variants.add(local);
+    if (local.startsWith('0')) {
+      variants.add(`+972${local.slice(1)}`);
+      variants.add(`972${local.slice(1)}`);
+    }
+  }
+
+  // Firestore `in` queries cap out at 10 values.
+  return Array.from(variants).slice(0, 10);
+}
+
+// Best-effort repair for orders whose stored phone is incomplete/malformed (see
+// normalizePhoneIL above): look for another order from the same customer (by uid,
+// then by email) that has a complete phone number, and use that instead. Falls back
+// to the normalized-but-possibly-incomplete value if no sibling order helps.
+export async function resolveCustomerPhone(
+  db: FirebaseFirestore.Firestore,
+  d: Doc,
+): Promise<string> {
+  const normalized = normalizePhoneIL(d.phone);
+  if (isCompleteIsraeliPhone(normalized)) return normalized;
+
+  const uid = typeof d.uid === 'string' ? d.uid : undefined;
+  const email = typeof d.email === 'string' ? d.email : undefined;
+
+  try {
+    const queries: Promise<FirebaseFirestore.QuerySnapshot>[] = [];
+    if (uid) queries.push(db.collection('orders').where('uid', '==', uid).limit(20).get());
+    if (email) queries.push(db.collection('orders').where('email', '==', email).limit(20).get());
+
+    const snaps = await Promise.all(queries);
+    for (const snap of snaps) {
+      for (const doc of snap.docs) {
+        const candidate = normalizePhoneIL(doc.data().phone);
+        if (isCompleteIsraeliPhone(candidate)) return candidate;
+      }
+    }
+  } catch (err) {
+    console.error('[chat-api] resolveCustomerPhone lookup failed (non-fatal):', err);
+  }
+
+  return normalized;
+}
+
+export function serializeOrder(d: Doc, phoneOverride?: string): ChatOrder {
   const status = d.status as string | undefined;
   const total = Number(d.total ?? 0);
   const items = Array.isArray(d.items) ? (d.items as Doc[]) : [];
@@ -204,7 +286,7 @@ export function serializeOrder(d: Doc): ChatOrder {
     financial_status: mapFinancialStatus(status),
     fulfillment_status: mapFulfillmentStatus(status),
     total: `${total.toFixed(2)} ILS`,
-    customer_phone: String(d.phone ?? ''),
+    customer_phone: phoneOverride ?? normalizePhoneIL(d.phone),
   };
 
   if (d.email) order.customer_email = String(d.email);
