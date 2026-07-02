@@ -10,6 +10,10 @@ import { useCart } from '@/app/contexts/CartContext';
 // Set to false to restore ShiraChat
 const SHOW_WHATSAPP_ONLY = true;
 
+// Floating WhatsApp button — removed in favor of the async chatbot widget
+// (loaded from layout.tsx). Set to true to bring the WhatsApp button back.
+const SHOW_WA_FLOAT = false;
+
 // Auto-opening chat window (the "נציג זמין כעת" bubble) — disabled for now.
 // Set to true to restore the 20s-idle / cart-add / cart-page auto-open triggers.
 const AUTO_OPEN_BUBBLE = false;
@@ -360,7 +364,7 @@ export default function ShiraChat() {
   if (pathname?.startsWith('/admin')) return null;
 
   if (SHOW_WHATSAPP_ONLY) {
-    return <WaFloatBubble />;
+    return SHOW_WA_FLOAT ? <WaFloatBubble /> : null;
   }
   const isHomepage = pathname === '/';
 
