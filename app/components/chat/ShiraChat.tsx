@@ -10,6 +10,10 @@ import { useCart } from '@/app/contexts/CartContext';
 // Set to false to restore ShiraChat
 const SHOW_WHATSAPP_ONLY = true;
 
+// Auto-opening chat window (the "נציג זמין כעת" bubble) — disabled for now.
+// Set to true to restore the 20s-idle / cart-add / cart-page auto-open triggers.
+const AUTO_OPEN_BUBBLE = false;
+
 const WA_NUMBER = '972587479933';
 const WA_DEFAULT_TEXT = 'שלום, אני מעוניין לברר על מוצר באתר';
 const BUBBLE_TEXT_IDLE = 'כתבו לנו כאן ונענה לכם מיידית';
@@ -30,6 +34,7 @@ function WaFloatBubble() {
 
   // 20-second idle trigger
   useEffect(() => {
+    if (!AUTO_OPEN_BUBBLE) return;
     const t = setTimeout(() => {
       if (!manuallyClosedRef.current) {
         setBubbleText(BUBBLE_TEXT_IDLE);
@@ -46,7 +51,7 @@ function WaFloatBubble() {
       hasMountedRef.current = true;
       return;
     }
-    if (count > (prevCountRef.current ?? 0) && !manuallyClosedRef.current) {
+    if (AUTO_OPEN_BUBBLE && count > (prevCountRef.current ?? 0) && !manuallyClosedRef.current) {
       setBubbleText(BUBBLE_TEXT_CART);
       setIsOpen(true);
     }
@@ -55,7 +60,7 @@ function WaFloatBubble() {
 
   // Cart-page trigger — open once when user navigates to /cart
   useEffect(() => {
-    if (pathname === '/cart' && !cartOpenedRef.current && !manuallyClosedRef.current) {
+    if (AUTO_OPEN_BUBBLE && pathname === '/cart' && !cartOpenedRef.current && !manuallyClosedRef.current) {
       cartOpenedRef.current = true;
       setBubbleText(BUBBLE_TEXT_CART);
       setIsOpen(true);
