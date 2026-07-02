@@ -252,14 +252,12 @@ export default function ClubPopup() {
               </h2>
 
               {/* Benefits */}
-              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.8, margin: '0 0 8px' }}>
-                חשבון אחד — וכל ההטבות איתכם:
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.88)', lineHeight: 1.85, margin: '0 0 20px' }}>
+                מועדון הלקוחות שלנו מעניק לכם{' '}
+                <span style={{ color: GOLD, fontWeight: 700 }}>10% חזרה מכל רכישה</span>{' '}
+                בנקודות. כל נקודה שווה <span style={{ color: GOLD, fontWeight: 700 }}>1 ₪</span>,
+                וניתן לממש את הנקודות החל מהרכישה השנייה.
               </p>
-              <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.88)', lineHeight: 2, margin: '0 0 20px' }}>
-                <div>🎁 <span style={{ color: GOLD, fontWeight: 700 }}>10% הנחה</span> על הרכישה הראשונה</div>
-                <div>⭐ <span style={{ color: GOLD, fontWeight: 700 }}>10% הנחה קבועה</span> וצבירת נקודות</div>
-                <div>📦 מעקב אחרי ההזמנות באזור האישי</div>
-              </div>
 
               {/* Error */}
               {joinError && (
