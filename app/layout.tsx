@@ -10,6 +10,7 @@ import NavBar from "@/app/components/navigation/NavBar";
 import TrustBar from "@/app/components/TrustBar";
 import Footer from "@/app/components/Footer";
 import ShiraChat from "@/app/components/chat/ShiraChat";
+import ChatCartBridge from "@/app/components/chat/ChatCartBridge";
 import { ChatPersonaProvider } from "@/app/components/chat/ChatPersonaContext";
 import GTMLoader from "@/app/components/GTMLoader";
 import MetaPixelPageView from "@/app/components/MetaPixelPageView";
@@ -116,6 +117,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <ShaliachProvider>
               <CartProvider>
+                <ChatCartBridge />
                 <NavBar />
                 <TrustBar />
                 {children}
