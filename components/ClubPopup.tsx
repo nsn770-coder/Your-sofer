@@ -35,6 +35,7 @@ export default function ClubPopup() {
   const [joining, setJoining]   = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [copied, setCopied]     = useState(false);
+  const [pointsCredited, setPointsCredited] = useState(0);
 
   // Guards: run the join exactly once, and don't re-run the "should we show?"
   // check after it already decided.
@@ -60,6 +61,9 @@ export default function ClubPopup() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) throw new Error(data.error || `club-join ${res.status}`);
+      if (typeof data.pointsCredited === 'number' && data.pointsCredited > 0) {
+        setPointsCredited(data.pointsCredited);
+      }
 
       // Welcome email (with the coupon) — best-effort, never blocks the user,
       // and only for NEW members so repeat sign-ins don't spam the inbox.
@@ -309,6 +313,23 @@ export default function ClubPopup() {
               <h2 style={{ fontSize: isMobile ? 21 : 25, fontWeight: 900, color: '#fff', margin: '0 0 10px' }}>
                 ברוכים הבאים למועדון!
               </h2>
+
+              {pointsCredited > 0 && (
+                <div style={{
+                  background: 'rgba(201,161,74,0.15)',
+                  border: `1px solid ${GOLD}`,
+                  borderRadius: 10,
+                  padding: '10px 14px',
+                  fontSize: 13.5,
+                  color: '#fff',
+                  marginBottom: 16,
+                  lineHeight: 1.7,
+                }}>
+                  ⭐ על הרכישות הקודמות שלכם זוכיתם ב-
+                  <span style={{ color: GOLD, fontWeight: 900 }}>{pointsCredited} נקודות</span>
+                  {' '}(שוות ₪{pointsCredited})!
+                </div>
+              )}
 
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.7, margin: '0 0 22px' }}>
                 הנה קוד ההנחה שלכם ל-10% על הרכישה הראשונה:
