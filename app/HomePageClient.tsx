@@ -1235,30 +1235,16 @@ export default function HomePageClient() {
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(0,0,0,0.14)'; }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)'; }}
           >
+            {/* Designed banner — text is baked into the image, no overlay needed */}
             <Image
-              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1780666296/ChatGPT_Image_Jun_5_2026_04_31_21_PM_xhjqhd.png"
-              alt="כיפות בסיטונאות"
+              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1783054967/%D7%91%D7%90%D7%A0%D7%A8_%D7%9B%D7%99%D7%A4%D7%95%D7%AA_%D7%95%D7%9E%D7%96%D7%9B%D7%A8%D7%95%D7%AA_%D7%9C%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D_%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D_rrjg06.png"
+              alt="כיפות ומזכרות לאירועים"
               fill
               unoptimized
               loading="lazy"
               style={{ objectFit: 'cover' }}
               sizes="(max-width: 768px) 100vw, 1280px"
             />
-            {/* gradient darkens the right (text) side in RTL */}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.72) 100%)' }} />
-            <div dir="rtl" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: isMobile ? '0 20px' : '0 52px' }}>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 'clamp(15px, 2.6vw, 26px)', fontWeight: 900, color: '#fff', textShadow: '0 2px 12px rgba(0,0,0,0.8)', lineHeight: 1.2, marginBottom: 4 }}>
-                  כיפות בסיטונאות
-                </div>
-                <div style={{ fontSize: 'clamp(16px, 2.8vw, 28px)', fontWeight: 900, color: '#FACC15', textShadow: '0 2px 14px rgba(0,0,0,0.8)', lineHeight: 1.1 }}>
-                  מחירים מיוחדים
-                </div>
-                <div style={{ fontSize: 'clamp(11px, 1.1vw, 13px)', color: 'rgba(255,255,255,0.85)', marginTop: 6, fontWeight: 600 }}>
-                  לאירועים וכמויות
-                </div>
-              </div>
-            </div>
           </a>
         </div>
       </div>
