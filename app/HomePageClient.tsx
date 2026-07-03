@@ -1229,8 +1229,8 @@ export default function HomePageClient() {
               textDecoration: 'none',
               boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
               transition: 'all 0.2s ease',
-              aspectRatio: isMobile ? '3 / 1' : '8 / 1.4',
-              minHeight: isMobile ? 90 : undefined,
+              aspectRatio: isMobile ? '5 / 2' : '8 / 1.8',
+              minHeight: isMobile ? 120 : undefined,
             }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(0,0,0,0.14)'; }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)'; }}
@@ -1245,6 +1245,22 @@ export default function HomePageClient() {
               style={{ objectFit: 'cover' }}
               sizes="(max-width: 768px) 100vw, 1280px"
             />
+            {/* CTA button — bottom-right (RTL start), whole banner is the link */}
+            <div style={{
+              position: 'absolute',
+              bottom: isMobile ? 10 : 18,
+              right: isMobile ? 12 : 28,
+              background: '#C9A227',
+              color: '#1a1a1a',
+              fontWeight: 900,
+              fontSize: isMobile ? 12.5 : 15,
+              padding: isMobile ? '8px 14px' : '12px 26px',
+              borderRadius: 999,
+              boxShadow: '0 3px 14px rgba(0,0,0,0.3)',
+              whiteSpace: 'nowrap',
+            }}>
+              כנסו לכיפות ומזכרות ←
+            </div>
           </a>
         </div>
       </div>
