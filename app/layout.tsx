@@ -12,7 +12,6 @@ import Footer from "@/app/components/Footer";
 import ShiraChat from "@/app/components/chat/ShiraChat";
 import ChatCartBridge from "@/app/components/chat/ChatCartBridge";
 import { ChatPersonaProvider } from "@/app/components/chat/ChatPersonaContext";
-import GTMLoader from "@/app/components/GTMLoader";
 import MetaPixelPageView from "@/app/components/MetaPixelPageView";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FacebookPixel } from "@/components/FacebookPixel";
@@ -85,6 +84,16 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100%' }} className={`overflow-x-hidden ${frankRuhl.variable} ${cormorant.variable}`}>
       <head>
+        {/* ── Google Tag Manager ── */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-PTHMKJ97');
+          window.gtag = window.gtag || function(){window.dataLayer.push(arguments);};
+        ` }} />
+        {/* ── End Google Tag Manager ── */}
         <meta name="facebook-domain-verification" content="xuwtu57l434nldfe7p4s8l2sr829jw" />
         <CanonicalTag />
         {/* ── Preconnects & DNS prefetches ── */}
@@ -109,6 +118,16 @@ export default function RootLayout({
         ` }} />
       </head>
       <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100%', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
+        {/* ── Google Tag Manager (noscript) ── */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-PTHMKJ97"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
+        {/* ── End Google Tag Manager (noscript) ── */}
         <AnnouncementTicker />
         <ChatPersonaProvider>
         <AuthProvider>
@@ -129,7 +148,6 @@ export default function RootLayout({
               </CartProvider>
             </ShaliachProvider>
           </Suspense>
-          <GTMLoader />
         </AuthProvider>
         </ChatPersonaProvider>
         <SpeedInsights />
@@ -146,26 +164,6 @@ export default function RootLayout({
 
         {/* ── Tidio live chat - deferred 5 seconds ── */}
         {process.env.NEXT_PUBLIC_TIDIO_KEY && <TidioChat />}
-
-        {/* ── GA4 ── */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-PM7GW4MWEJ"
-          strategy="afterInteractive"
-        />
-        {/* ── Google Ads ── */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-18095875961"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-PM7GW4MWEJ');
-            gtag('config', 'AW-18095875961');
-          `}
-        </Script>
 
         {/* ── Async chat widget ── */}
         <Script
