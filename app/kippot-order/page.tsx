@@ -61,6 +61,12 @@ function KippotOrderInner() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // ── AI mockup state ─────────────────────────────────────────────────────────
+  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+  const [aiLoading, setAiLoading]     = useState(false);
+  const [aiError, setAiError]         = useState<'service_disabled' | 'rate_limited' | 'general' | null>(null);
+  const [aiResult, setAiResult]       = useState<{ imageBase64: string; mimeType: string } | null>(null);
+
   // ── Drag / resize state ─────────────────────────────────────────────────────
   const [imgPos, setImgPos]           = useState({ x: 0, y: 0 });
   const [imgScale, setImgScale]       = useState(1);
@@ -143,6 +149,11 @@ function KippotOrderInner() {
     if (!file) return;
     setLocalUrl(URL.createObjectURL(file));
     setUploadedUrl(null); setUploadError(null); setUploading(true);
+    // Keep a base64 copy for the AI mockup + reset any previous mockup
+    setAiResult(null); setAiError(null); setLogoDataUrl(null);
+    const reader = new FileReader();
+    reader.onload = () => setLogoDataUrl(typeof reader.result === 'string' ? reader.result : null);
+    reader.readAsDataURL(file);
     resetTransform();
     try {
       const fd = new FormData();
@@ -154,6 +165,29 @@ function KippotOrderInner() {
     } catch { setUploadError('שגיאה בהעלאת התמונה — נסה שוב'); }
     finally { setUploading(false); }
   }, []);
+
+  // ── AI mockup generation ────────────────────────────────────────────────────
+  async function generateAiMockup() {
+    if (!logoDataUrl || aiLoading) return;
+    setAiLoading(true); setAiError(null); setAiResult(null);
+    try {
+      const res = await fetch('/api/kippah-mockup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logoBase64: logoDataUrl, productType: 'kippah', kippahColor: style }),
+      });
+      if (res.status === 503) { setAiError('service_disabled'); return; }
+      if (res.status === 429) { setAiError('rate_limited'); return; }
+      if (!res.ok) { setAiError('general'); return; }
+      const data = await res.json();
+      if (!data.imageBase64) { setAiError('general'); return; }
+      setAiResult({ imageBase64: data.imageBase64, mimeType: data.mimeType || 'image/png' });
+    } catch {
+      setAiError('general');
+    } finally {
+      setAiLoading(false);
+    }
+  }
 
   // ── Build Cloudinary mockup URL ─────────────────────────────────────────────
   function buildMockupUrl(): string {
@@ -306,6 +340,77 @@ function KippotOrderInner() {
               <button key={btn.label} onClick={btn.fn} style={{ padding: '6px 14px', border: '1px solid #E5E0D5', background: '#fff', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}>{btn.label}</button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ── הדמיית AI ── */}
+      {hasLogo && (
+        <div style={{ marginBottom: 24, border: '1px solid #E5D9B8', background: '#FDFAF2', padding: 18 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, marginBottom: 4 }}>✨ הדמיית AI</div>
+          <div style={{ fontSize: 12.5, color: '#6B7280', marginBottom: 12, lineHeight: 1.6 }}>
+            צרו תמונה פוטו-ריאליסטית של כיפת {kippah.label} עם הלוגו שלכם מודפס עליה.
+          </div>
+
+          {!aiResult && !aiLoading && (
+            <button
+              onClick={generateAiMockup}
+              disabled={!logoDataUrl}
+              style={{ background: '#C5A028', color: '#1a1a1a', fontWeight: 900, fontSize: 14, padding: '12px 24px', border: 'none', cursor: logoDataUrl ? 'pointer' : 'not-allowed', opacity: logoDataUrl ? 1 : 0.6, fontFamily: 'inherit', width: '100%' }}
+            >
+              ✨ צרו לי הדמיה
+            </button>
+          )}
+
+          {aiLoading && (
+            <div style={{ textAlign: 'center', padding: '18px 0', fontSize: 13.5, color: '#9C7B3F' }}>
+              <div style={{ display: 'inline-block', width: 22, height: 22, border: '3px solid #E5D9B8', borderTopColor: '#C5A028', borderRadius: '50%', animation: 'kip-ai-spin 0.8s linear infinite', verticalAlign: 'middle', marginLeft: 8 }} />
+              מייצרים הדמיה... זה לוקח בערך 15 שניות
+              <style>{`@keyframes kip-ai-spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+          )}
+
+          {aiError === 'service_disabled' && (
+            <div style={{ fontSize: 13, color: '#9C7B3F', lineHeight: 1.6 }}>
+              ⚠️ ההדמיה זמנית לא זמינה — אפשר להמשיך להזמין כרגיל, ונשמח לעזור עם עיצוב מותאם{' '}
+              <a href="https://wa.me/972587479933" target="_blank" rel="noopener noreferrer" style={{ color: '#C5A028', fontWeight: 700 }}>בוואטסאפ</a>.
+            </div>
+          )}
+          {aiError === 'rate_limited' && (
+            <div style={{ fontSize: 13, color: '#9C7B3F' }}>ניסיתם הרבה פעמים — נסו שוב בעוד כמה דקות.</div>
+          )}
+          {aiError === 'general' && (
+            <div style={{ fontSize: 13, color: '#dc2626' }}>
+              משהו השתבש — <button onClick={generateAiMockup} style={{ background: 'none', border: 'none', color: '#C5A028', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, padding: 0 }}>נסו שוב</button>
+            </div>
+          )}
+
+          {aiResult && (
+            <div>
+              <img
+                src={`data:${aiResult.mimeType};base64,${aiResult.imageBase64}`}
+                alt={`הדמיית AI — כיפת ${kippah.label} עם הלוגו שלכם`}
+                style={{ width: '100%', display: 'block', border: '1px solid #E5D9B8' }}
+              />
+              <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+                <a
+                  href={`data:${aiResult.mimeType};base64,${aiResult.imageBase64}`}
+                  download="hadmaya-yoursofer.png"
+                  style={{ flex: 1, textAlign: 'center', background: '#fff', border: '1px solid #C5A028', color: '#9C7B3F', fontWeight: 700, fontSize: 13, padding: '10px 16px', textDecoration: 'none' }}
+                >
+                  ⬇ הורדת ההדמיה
+                </a>
+                <button
+                  onClick={generateAiMockup}
+                  style={{ flex: 1, background: '#fff', border: '1px solid #E5E0D5', color: '#6B7280', fontWeight: 700, fontSize: 13, padding: '10px 16px', cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  🔄 הדמיה נוספת
+                </button>
+              </div>
+              <div style={{ fontSize: 11, color: '#9C7B3F', marginTop: 8, lineHeight: 1.5 }}>
+                ההדמיה להמחשה בלבד — ההדפסה בפועל תיעשה לפי המיקום והגודל שקבעתם למעלה.
+              </div>
+            </div>
+          )}
         </div>
       )}
 

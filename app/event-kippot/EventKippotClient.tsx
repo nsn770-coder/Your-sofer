@@ -213,6 +213,9 @@ export default function EventKippotClient() {
           בחר סוג כיפה (שלב 3) כדי להמשיך ←
         </div>
       )}
+      <div style={{ textAlign: 'center', fontSize: 13, color: '#9C7B3F', marginTop: 10, fontWeight: 600 }}>
+        ✨ בשלב הבא: מעלים לוגו ומקבלים הדמיית AI של הכיפה שלכם — חינם
+      </div>
       {eventProducts.length > 0 && (
         <div style={{ marginTop: 48, borderTop: '1px solid #E5E0D5', paddingTop: 32 }}>
           <div style={{ fontSize: 16, fontWeight: 700, color: NAVY, marginBottom: 16 }}>מוצרים נוספים לאירוע</div>

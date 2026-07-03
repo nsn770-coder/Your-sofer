@@ -10,7 +10,8 @@ const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 // ── Prompts ───────────────────────────────────────────────────────────────────
 
-const KIPPAH_PROMPT = `You are a product mockup photographer. The attached image is a CUSTOMER'S LOGO. Generate a single photorealistic product photo: a clean white satin kippah (Jewish skullcap), photographed from a slight top-down 3/4 angle on a soft neutral studio background.
+// {COLOR} is replaced per-request (defaults to white satin — the print-order flow).
+const KIPPAH_PROMPT = `You are a product mockup photographer. The attached image is a CUSTOMER'S LOGO. Generate a single photorealistic product photo: a clean {COLOR} kippah (Jewish skullcap), photographed from a slight top-down 3/4 angle on a soft neutral studio background.
 
 Place the provided logo CENTERED on the top of the kippah, printed as if embroidered/printed directly onto the fabric. The logo MUST curve naturally with the dome of the kippah — apply realistic perspective warp so it follows the rounded surface, not a flat sticker. Add subtle fabric texture and soft shadowing over the logo so it looks genuinely printed on cloth.
 
@@ -87,14 +88,27 @@ class ServiceDisabledError extends Error {
   constructor() { super('service_disabled'); this.name = 'ServiceDisabledError'; }
 }
 
+// Allowed kippah colors — keys match the style ids used on /kippot-order.
+// Locked to a whitelist so the client can never inject arbitrary prompt text.
+const KIPPAH_COLORS: Record<string, string> = {
+  lavan:    'white linen with a subtle pinkish weave',
+  beige:    'beige linen',
+  marva:    'sage-green linen',
+  techelet: 'royal-blue linen',
+};
+
 async function generateMockup(
   mimeType: string,
   base64: string,
   productType: 'kippah' | 'shirt',
   logoDescription: string,
+  kippahColor?: string,
 ): Promise<{ imageBase64: string; imageMimeType: string }> {
   const url = `${GEMINI_BASE}/gemini-2.5-flash-image:generateContent?key=${GEMINI_API_KEY}`;
-  const basePrompt = productType === 'kippah' ? KIPPAH_PROMPT : SHIRT_PROMPT;
+  const colorDesc = (kippahColor && KIPPAH_COLORS[kippahColor]) || 'white satin';
+  const basePrompt = productType === 'kippah'
+    ? KIPPAH_PROMPT.replace('{COLOR}', colorDesc)
+    : SHIRT_PROMPT;
   const prompt = logoDescription
     ? `${basePrompt}\n\nLogo description for reference: ${logoDescription}`
     : basePrompt;
@@ -144,7 +158,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => null);
     if (!body) return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
 
-    const { logoBase64, productType } = body as { logoBase64?: string; productType?: string };
+    const { logoBase64, productType, kippahColor } = body as {
+      logoBase64?: string; productType?: string; kippahColor?: string;
+    };
 
     if (!logoBase64 || typeof logoBase64 !== 'string') {
       return NextResponse.json({ error: 'logoBase64 is required' }, { status: 400 });
@@ -187,6 +203,7 @@ export async function POST(req: NextRequest) {
       base64Data,
       productType,
       logoDescription,
+      typeof kippahColor === 'string' ? kippahColor : undefined,
     );
 
     return NextResponse.json({ imageBase64, mimeType: imageMimeType });
