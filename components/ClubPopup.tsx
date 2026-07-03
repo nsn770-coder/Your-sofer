@@ -251,16 +251,18 @@ export default function ClubPopup() {
               </div>
 
               {/* Title */}
-              <h2 style={{ fontSize: isMobile ? 21 : 25, fontWeight: 900, color: '#fff', margin: '0 0 10px', lineHeight: 1.3 }}>
-                הצטרפו למועדון YourSofer עם Google
+              <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 900, color: '#fff', margin: '0 0 12px', lineHeight: 1.35 }}>
+                🎉 הצטרפו למועדון ותתחילו להרוויח כבר מהקנייה הראשונה!
               </h2>
 
               {/* Benefits */}
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.88)', lineHeight: 1.85, margin: '0 0 20px' }}>
-                מועדון הלקוחות שלנו מעניק לכם{' '}
-                <span style={{ color: GOLD, fontWeight: 700 }}>10% חזרה מכל רכישה</span>{' '}
-                בנקודות. כל נקודה שווה <span style={{ color: GOLD, fontWeight: 700 }}>1 ₪</span>,
-                וניתן לממש את הנקודות החל מהרכישה השנייה.
+              <p style={{ fontSize: isMobile ? 15 : 16, color: '#fff', fontWeight: 700, lineHeight: 1.75, margin: '0 0 8px' }}>
+                <span style={{ color: GOLD }}>10% הנחה</span> בקנייה הראשונה
+                {' + '}
+                <span style={{ color: GOLD }}>10% כסף</span> לקנייה הבאה.
+              </p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: '0 0 20px' }}>
+                לדוגמה: קנייה ב־500 ₪ = 50 ₪ לקנייה הבאה | קנייה ב־1,000 ₪ = 100 ₪ לקנייה הבאה.
               </p>
 
               {/* Error */}
