@@ -226,18 +226,44 @@ function ThankYouContent() {
           }
         }
 
-        // GA4 purchase event
-        window.gtag?.('event', 'purchase', {
-          transaction_id: order.orderNumber,
-          value: order.total,
-          currency: 'ILS',
-          items: (order.items || []).map((i: { id: string; name: string; price: number; quantity: number }) => ({
-            item_id: i.id,
-            item_name: i.name,
-            price: i.price,
-            quantity: i.quantity,
-          })),
+        // ── Enhanced Conversions — פרטי הלקוח מטופס הרכישה ──
+        const ecEmail = String(order.email || '').trim().toLowerCase();
+        const rawPhone = String(order.phone || '').replace(/\D/g, '');
+        const ecPhone = rawPhone
+          ? (rawPhone.startsWith('972') ? `+${rawPhone}` : `+972${rawPhone.replace(/^0/, '')}`)
+          : '';
+        const nameParts = String(order.customerName || '').trim().split(/\s+/);
+        const userData: Record<string, unknown> = {};
+        if (ecEmail) userData.email = ecEmail;
+        if (ecPhone) userData.phone_number = ecPhone;
+        if (nameParts[0]) {
+          userData.address = {
+            first_name: nameParts[0],
+            last_name: nameParts.slice(1).join(' ') || '',
+            country: 'IL',
+          };
+        }
+
+        // GA4 purchase — push יחיד ל-dataLayer הכולל user_data (אימייל) + ecommerce
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ ecommerce: null });
+        window.dataLayer.push({
+          event: 'purchase',
+          user_data: userData,
+          ecommerce: {
+            transaction_id: order.orderNumber,
+            value: order.total,
+            currency: 'ILS',
+            items: (order.items || []).map((i: { id: string; name: string; price: number; quantity: number }) => ({
+              item_id: i.id,
+              item_name: i.name,
+              price: i.price,
+              quantity: i.quantity,
+            })),
+          },
         });
+        // זמין גם ל-Google tag (gtag) עבור Enhanced Conversions
+        window.gtag?.('set', 'user_data', userData);
 
         // ── Google Ads Conversion — קוד מהקמפיינר (Ben Amsalem) ──
         // מזהה המרה: AW-18095875961/f0NoCLGexLIcEPnO5LRD
