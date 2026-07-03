@@ -56,6 +56,10 @@ const CATEGORY_META: Record<string, CategoryMetaEntry> = {
     title: 'ספרי תורה - כתיבה ידנית על ידי סופר סת"מ',
     description: 'ספרי תורה כתובים בידי סופרים מוסמכים. תהליך בדיקה מלא לפני מכירה. Your Sofer.',
   },
+  'תכשיטים': {
+    title: 'תכשיטים יהודיים - שרשראות, צמידים ותכשיטי יודאיקה',
+    description: 'תכשיטים בהשראה יהודית: שרשראות מגן דוד, חמסות, צמידים ועוד. מתנה מושלמת לכל אירוע. Your Sofer.',
+  },
 };
 
 function getCategoryMeta(category: string): CategoryMetaEntry {
