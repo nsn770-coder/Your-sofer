@@ -54,6 +54,7 @@ interface Product {
   priority?: number;
   isEventKippot?: boolean;
   isEventProduct?: boolean;
+  customDesign?: boolean;
   marketingIntro?: string;
   whoIsItFor?: { emoji: string; text: string }[];
   whyUs?: string[];
@@ -672,6 +673,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [isEventKippot, setIsEventKippot]             = useState(product.isEventKippot ?? false);
   const [isEventProduct, setIsEventProduct]           = useState(product.isEventProduct ?? false);
+  const [customDesign, setCustomDesign]               = useState(product.customDesign ?? false);
   const [priority, setPriority]               = useState(String(product.priority ?? 0));
   const [soferId, setSoferId]                 = useState(product.soferId || '');
   const [soferOptions, setSoferOptions]       = useState<{ id: string; name: string }[]>([]);
@@ -784,6 +786,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         isExpertRecommended: isExpertRecommended,
         isEventKippot: isEventKippot,
         isEventProduct: isEventProduct,
+        customDesign: customDesign,
         priority: priority !== '' ? Number(priority) : 0,
         soferId: soferId || undefined,
         sku: sku.trim() || null,
@@ -1027,6 +1030,11 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
             <input type="checkbox" checked={isEventProduct} onChange={e => setIsEventProduct(e.target.checked)} />
             🎪 מוצר לאירועים
             <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>isEventProduct</span>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
+            <input type="checkbox" checked={customDesign} onChange={e => setCustomDesign(e.target.checked)} />
+            🎨 אפשר עיצוב אישי למוצר זה
+            <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>customDesign</span>
           </label>
           {(SOFER_EDIT_CATS.includes(cat) || !!soferId) && (
             <div>
@@ -1814,6 +1822,15 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   const qtyStep        = 1; // step always 1; minQty=5 enforces the minimum
 
   const BuyBox = ({ compact = false }: { compact?: boolean }) => {
+    // customDesign: prominent CTA to the kippah design page (visible to all users)
+    const customDesignCTA = product.customDesign === true ? (
+      <button
+        onClick={() => router.push('/event-kippot')}
+        style={{ width: '100%', height: 52, background: '#1F3D8F', color: '#fff', border: 'none', borderRadius: 14, fontSize: compact ? 14 : 15, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em', boxShadow: '0 2px 10px rgba(31,61,143,0.25)' }}>
+        🎨 עצב כיפה אישית
+      </button>
+    ) : null;
+
     // isEventKippot: show calculator instead of standard buy box
     if (product.isEventKippot) {
       return (
@@ -1827,6 +1844,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             </div>
           )}
           <EventKippotCalculator product={product} onAddToCart={handleEventKippotAddToCart} />
+          {customDesignCTA}
           <a href={`https://wa.me/972587479933?text=${encodeURIComponent('שלום, אני מתעניין בהזמנת כיפות: ' + (product.name || ''))}`} target="_blank" rel="noopener noreferrer"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#25D366', fontSize: 13, fontWeight: 600, textDecoration: 'none', marginTop: 10 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
@@ -2009,6 +2027,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </button>
         </div>
       ))}
+
+      {customDesignCTA}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '4px 0 12px', padding: '12px 14px', background: '#FAFAF8', border: '1px solid #EDE9DF', borderRadius: 12, direction: 'rtl' }}>
         {[
@@ -2500,7 +2520,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <div style={{ padding: isMobile ? '8px' : '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0, overflow: 'hidden' }}>
                       <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: '#0f1111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, wordBreak: 'break-word', overflowWrap: 'break-word', maxWidth: '100%' }}>{r.name}</div>
                       <Stars n={r.stars || 4.5} size={11} />
-                      <div style={{ fontSize: 14, fontWeight: 900, color: '#1a1a1a', overflow: 'hidden', maxWidth: '100%' }}>{formatPrice(r.price)}</div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, overflow: 'hidden', maxWidth: '100%' }}>
+                        <span style={{ fontSize: 14, fontWeight: 900, color: '#1a1a1a' }}>{formatPrice(r.price)}</span>
+                        {typeof r.was === 'number' && r.was > r.price && (
+                          <span style={{ fontSize: 11, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(r.was)}</span>
+                        )}
+                      </div>
                       <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1, cat: r.cat || undefined }); }}
                         style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: '#C5A028', color: '#1a1a1a', border: 'none', fontWeight: 700, fontSize: 11, cursor: 'pointer', whiteSpace: 'nowrap', boxSizing: 'border-box' as const, overflow: 'hidden' }}>
                         הוסף לסל
