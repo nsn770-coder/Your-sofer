@@ -100,6 +100,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const adminSnap = await getDoc(doc(db, 'admins', firebaseUser.uid));
             if (adminSnap.exists()) {
               role = 'admin';
+              // אדמין הוא גם לקוח — טען את פרופיל המועדון שלו (נקודות, הוצאה, פרטים)
+              // בלי זה עמוד הנקודות והתפריט מציגים 0 לאדמינים למרות שיש להם צבירה.
+              try {
+                const adminUserSnap = await getDoc(doc(db, 'users', firebaseUser.uid));
+                if (adminUserSnap.exists()) {
+                  const data = adminUserSnap.data();
+                  extraProfile = {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    phone: data.phone,
+                    dateOfBirth: data.dateOfBirth ?? null,
+                    defaultShippingAddress: data.defaultShippingAddress ?? null,
+                    defaultBillingAddress: data.defaultBillingAddress ?? null,
+                    addresses: data.addresses ?? [],
+                    newsletterSubscribed: data.newsletterSubscribed ?? false,
+                    totalSpent: data.totalSpent ?? 0,
+                    loyaltyPoints: data.loyaltyPoints ?? 0,
+                  };
+                }
+              } catch (e) {
+                console.warn('[AuthContext] admin club profile load skipped:', e);
+              }
             } else {
               // בדוק users collection
               const userRef = doc(db, 'users', firebaseUser.uid);

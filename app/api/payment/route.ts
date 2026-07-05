@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb } from '@/lib/firebaseAdmin';
+import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
+
+// ── מימוש נקודות מועדון ──────────────────────────────────────────────────────
+// נקודה = ₪1 הנחה. ניתן לממש עד 50% מסכום המוצרים בעגלה (אחרי הנחות, לפני משלוח).
+const POINTS_REDEEM_LINE_NAME = 'הנחת נקודות מועדון';
+const POINTS_MAX_CART_PERCENT = 0.5;
 
 const SUMIT_API_URL        = 'https://api.sumit.co.il/billing/payments/charge/';
 const SUMIT_COMPANY_ID     = process.env.SUMIT_COMPANY_ID!;
@@ -112,6 +117,46 @@ async function accruePoints(
   });
 }
 
+// ── Loyalty redemption helper ─────────────────────────────────────────────────
+// Deducts redeemed points from the user AFTER a successful charge, and records a
+// negative pointsHistory entry. Non-fatal by design (charge already succeeded) —
+// but logged loudly so a failed deduction is never missed.
+async function redeemPoints(
+  adminDb: ReturnType<typeof getAdminDb>,
+  orderId: string,
+  uid: string,
+  pointsUsed: number,
+): Promise<void> {
+  const userRef  = adminDb.collection('users').doc(uid);
+  const orderRef = adminDb.collection('orders').doc(orderId);
+
+  await adminDb.runTransaction(async (tx) => {
+    const [userSnap, orderSnap] = await Promise.all([tx.get(userRef), tx.get(orderRef)]);
+    if (orderSnap.data()?.pointsRedeemed === true) return; // idempotency guard
+
+    const prevPoints = Number(userSnap.data()?.loyaltyPoints ?? 0);
+    // Never go negative even in a race — deduct what actually exists.
+    const deduct = Math.min(prevPoints, pointsUsed);
+    const balanceAfter = prevPoints - deduct;
+
+    tx.set(userRef, { loyaltyPoints: balanceAfter }, { merge: true });
+    tx.update(orderRef, { pointsRedeemed: true });
+
+    tx.set(userRef.collection('pointsHistory').doc(), {
+      amount:       -deduct,
+      reason:       'redemption',
+      orderId,
+      balanceAfter,
+      createdAt:    FieldValue.serverTimestamp(),
+    });
+
+    if (deduct < pointsUsed) {
+      console.error(`[loyalty-redeem] RACE: uid=${uid} order=${orderId} requested=${pointsUsed} had only ${prevPoints}`);
+    }
+    console.log(`[loyalty-redeem] uid=${uid} order=${orderId} -${deduct}pts balance:${prevPoints}→${balanceAfter}`);
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     // ── Feature 1: server-side checkout gate ─────────────────────────────────
@@ -139,7 +184,7 @@ export async function POST(req: NextRequest) {
       cartItems, address, notes, selectedGift, giftLine,
       shippingCost, shippingType,
       sessionId, refCode, shaliachId, shaliachName, commissionPercent,
-      uid,
+      uid, pointsUsed, idToken,
     } = await req.json() as {
       items:          PaymentItem[];
       total:          number;
@@ -160,6 +205,8 @@ export async function POST(req: NextRequest) {
       shaliachName?:  string | null;
       commissionPercent?: number;
       uid?: string | null;
+      pointsUsed?: number;
+      idToken?: string | null;
     };
 
     if (!singleUseToken) {
@@ -299,6 +346,54 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── A5: server-side points-redemption validation ──────────────────────────
+    // נקודה = ₪1. מותר לממש עד 50% מסכום המוצרים (אחרי הנחות חבילות/קופון, לפני משלוח).
+    // חובה טוקן Firebase מאומת — מונע ניכוי נקודות מחשבון של מישהו אחר.
+    const requestedPoints = Math.floor(Number(pointsUsed ?? 0));
+    let redeemUid: string | null = null;
+
+    if (requestedPoints > 0) {
+      if (!Number.isFinite(requestedPoints) || requestedPoints < 0) {
+        return NextResponse.json({ error: 'ערך נקודות לא תקין' }, { status: 400 });
+      }
+      if (!idToken) {
+        return NextResponse.json({ error: 'מימוש נקודות מחייב התחברות' }, { status: 401 });
+      }
+      try {
+        const decoded = await getAdminAuth().verifyIdToken(idToken);
+        redeemUid = decoded.uid;
+      } catch {
+        return NextResponse.json({ error: 'אימות המשתמש נכשל — התחבר מחדש ונסה שוב' }, { status: 401 });
+      }
+
+      // 1. יתרת נקודות אמיתית מ-Firestore
+      const adminDb = getAdminDb();
+      const redeemUserSnap = await adminDb.collection('users').doc(redeemUid).get();
+      const availablePoints = Number(redeemUserSnap.data()?.loyaltyPoints ?? 0);
+      if (requestedPoints > availablePoints) {
+        return NextResponse.json({ error: 'אין מספיק נקודות בחשבון' }, { status: 400 });
+      }
+
+      // 2. תקרה: 50% מסכום המוצרים נטו (אחרי הנחת חבילות וקופון, לפני משלוח)
+      const productsGross = productItems.reduce((s, i) => s + i.price * i.quantity, 0);
+      const bundleLine    = items.find(i => i.name.includes('מבצע כיפות — חבילות'));
+      const bundleDisc    = bundleLine ? -bundleLine.price : 0;
+      const netProducts   = Math.max(0, productsGross - bundleDisc - couponDiscountAmount);
+      const maxRedeemable = Math.floor(netProducts * POINTS_MAX_CART_PERCENT);
+      if (requestedPoints > maxRedeemable) {
+        console.error('[payment] points cap exceeded', { requestedPoints, maxRedeemable, netProducts });
+        return NextResponse.json({ error: `ניתן לממש עד ${maxRedeemable} נקודות בהזמנה זו (50% מסכום העגלה)` }, { status: 400 });
+      }
+
+      // 3. שורת ההנחה חייבת להתאים בדיוק לכמות הנקודות
+      const pointsLine = items.find(i => i.name === POINTS_REDEEM_LINE_NAME);
+      const submittedPointsDisc = pointsLine ? -pointsLine.price : 0;
+      if (Math.abs(submittedPointsDisc - requestedPoints) > 0.02) {
+        console.error('[payment] points discount mismatch', { submittedPointsDisc, requestedPoints });
+        return NextResponse.json({ error: 'שגיאה בחישוב הנחת הנקודות' }, { status: 400 });
+      }
+    }
+
     // ── Charge the card via the SingleUseToken (PCI: never touches our server) ──
     const chargeBody = {
       SingleUseToken: singleUseToken,
@@ -379,6 +474,9 @@ export async function POST(req: NextRequest) {
         commissionPercent: commissionPercent || 0, commissionAmount,
         uid: uid || null, guestId: sessionId || null, sessionId: sessionId || null, isGuest: !uid,
         loyaltyProcessed: false,
+        pointsUsed: requestedPoints > 0 ? requestedPoints : null,
+        pointsDiscount: requestedPoints > 0 ? requestedPoints : null,
+        pointsRedeemed: false,
       });
 
       const sideEffects: Promise<unknown>[] = [];
@@ -395,7 +493,18 @@ export async function POST(req: NextRequest) {
         if (r.status === 'rejected') console.error(`[payment] side-effect[${i}] failed:`, r.reason);
       });
 
+      // ── Loyalty redemption — deduct the points that paid for this order ──────
+      // (before accrual, so the new balance already reflects the deduction)
+      if (requestedPoints > 0 && redeemUid) {
+        try {
+          await redeemPoints(adminDb, orderRef.id, redeemUid, requestedPoints);
+        } catch (redeemErr) {
+          console.error('[payment] POINTS REDEMPTION FAILED — deduct manually!', { orderId: orderRef.id, uid: redeemUid, requestedPoints }, redeemErr);
+        }
+      }
+
       // ── Loyalty accrual (non-fatal — never blocks payment response) ──────────
+      // total כבר אחרי הנחת הנקודות — הצבירה היא רק על מה ששולם בפועל.
       try {
         await accruePoints(adminDb, orderRef.id, uid || null, customer.email, total, shippingCost || 0, cartItems);
       } catch (loyaltyErr) {

@@ -90,6 +90,10 @@ interface OrderSummaryProps {
   couponLoading: boolean;
   couponError: string;
   shaliach: { name: string; chabadName?: string; city?: string } | null;
+  pointsAvailable: number;
+  pointsToUse: number;
+  setPointsToUse: (n: number) => void;
+  maxRedeemablePoints: number;
 }
 
 function OrderSummary({
@@ -98,7 +102,9 @@ function OrderSummary({
   finalTotal, selectedGift, giftOptions, giftEnabled, giftEligible,
   giftThreshold, amountToGift, setSelectedGift,
   couponInput, setCouponInput, applyCoupon, couponLoading, couponError, shaliach,
+  pointsAvailable, pointsToUse, setPointsToUse, maxRedeemablePoints,
 }: OrderSummaryProps) {
+  const [pointsInput, setPointsInput] = useState('');
   return (
     <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: 16, position: isSticky ? 'sticky' : 'static', top: 20, width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
       <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -140,6 +146,12 @@ function OrderSummary({
             <span style={{ paddingLeft: 4 }}>-{formatPrice(discountAmount)}</span>
           </div>
         )}
+        {pointsToUse > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#7c3aed', fontWeight: 700 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>⭐ נקודות מועדון ({pointsToUse} נק')</span>
+            <span style={{ paddingLeft: 4 }}>-{formatPrice(pointsToUse)}</span>
+          </div>
+        )}
         {selectedGift && giftOptions.find(g => g.id === selectedGift) && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מתנה: {giftOptions.find(g => g.id === selectedGift)!.name}</span>
@@ -168,6 +180,47 @@ function OrderSummary({
         )}
         {couponError && <div style={{ fontSize: 11, color: '#dc2626', marginTop: 5 }}>{couponError}</div>}
       </div>
+      {/* ── מימוש נקודות מועדון — נקודה = ₪1, עד 50% מסכום העגלה ── */}
+      {pointsAvailable > 0 && (
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
+            ⭐ נקודות מועדון
+            <span style={{ fontWeight: 400, color: '#999' }}>· יש לך {pointsAvailable.toLocaleString('he-IL')} נק' (נקודה = ₪1)</span>
+          </div>
+          {pointsToUse > 0 ? (
+            <div style={{ background: '#f5f3ff', border: '1px solid #c4b5fd', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflow: 'hidden' }}>
+              <span style={{ fontSize: 12, color: '#6d28d9', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>
+                <IconCheck size={12} color="#6d28d9" /> מומשו {pointsToUse} נקודות — {formatPrice(pointsToUse)} הנחה
+              </span>
+              <button onClick={() => { setPointsToUse(0); setPointsInput(''); }} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', display: 'flex', flexShrink: 0 }}><IconX size={14} /></button>
+            </div>
+          ) : maxRedeemablePoints > 0 ? (
+            <>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input
+                  value={pointsInput}
+                  onChange={e => setPointsInput(e.target.value.replace(/\D/g, ''))}
+                  onKeyDown={e => { if (e.key === 'Enter') { const n = Math.min(parseInt(pointsInput) || 0, maxRedeemablePoints); if (n > 0) setPointsToUse(n); } }}
+                  placeholder={`עד ${maxRedeemablePoints} נק'`}
+                  inputMode="numeric"
+                  style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                />
+                <button
+                  onClick={() => { const n = Math.min(parseInt(pointsInput) || 0, maxRedeemablePoints); if (n > 0) setPointsToUse(n); }}
+                  style={{ background: '#FFFFFF', color: '#6d28d9', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >ממש</button>
+                <button
+                  onClick={() => { setPointsToUse(maxRedeemablePoints); setPointsInput(String(maxRedeemablePoints)); }}
+                  style={{ background: '#6d28d9', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >הכל ({maxRedeemablePoints})</button>
+              </div>
+              <div style={{ fontSize: 11, color: '#aaa', marginTop: 5 }}>ניתן לממש עד 50% מסכום העגלה בנקודות</div>
+            </>
+          ) : (
+            <div style={{ fontSize: 11, color: '#aaa' }}>לא ניתן לממש נקודות בהזמנה זו</div>
+          )}
+        </div>
+      )}
       {/* A4: Gift — progress bar (no giftOptions needed) and selection (requires options) */}
       {giftEnabled && (
         <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
@@ -234,6 +287,14 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ checkoutEnabled: true, checkoutDisabledMessage: '' });
+  // ── מימוש נקודות מועדון — נקודה = ₪1, עד 50% מסכום העגלה (אחרי הנחות, לפני משלוח)
+  const [pointsToUse, setPointsToUse] = useState(0);
+  const pointsAvailable = user?.loyaltyPoints ?? 0;
+  const maxRedeemablePoints = Math.max(0, Math.min(pointsAvailable, Math.floor((total - discountAmount) / 2)));
+  // אם העגלה/קופון השתנו והמימוש חורג מהתקרה — הצמד אוטומטית
+  useEffect(() => {
+    if (pointsToUse > maxRedeemablePoints) setPointsToUse(maxRedeemablePoints);
+  }, [pointsToUse, maxRedeemablePoints]);
   const [isMobile, setIsMobile] = useState(true);
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', notes: '' });
 
@@ -361,7 +422,7 @@ export default function CheckoutPage() {
   }
 
   const shippingCost = SHIPPING_REGULAR;
-  const finalTotal = total - discountAmount + shippingCost;
+  const finalTotal = total - discountAmount - pointsToUse + shippingCost;
 
   function saveAbandonedCartBeforePayment() {
     if (!sessionId || items.length === 0) return;
@@ -391,6 +452,23 @@ export default function CheckoutPage() {
       const commissionPercent = shaliach?.commissionPercent || 0;
       const gift = selectedGift ? giftOptions.find(g => g.id === selectedGift) : null;
 
+      // מימוש נקודות מחייב טוקן מאומת — השרת מנכה רק מהחשבון המאומת
+      let idToken: string | null = null;
+      if (pointsToUse > 0) {
+        try {
+          const { getAuthLazy } = await import('@/lib/authLazy');
+          const auth = await getAuthLazy();
+          idToken = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+        } catch (e) {
+          console.error('[checkout] failed to get idToken for points redemption:', e);
+        }
+        if (!idToken) {
+          setSubmitError('מימוש נקודות מחייב התחברות — התחבר מחדש ונסה שוב');
+          setLoading(false);
+          return;
+        }
+      }
+
       const paymentRes = await fetch('/api/payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -401,6 +479,7 @@ export default function CheckoutPage() {
             ...(bundleDiscountAmount > 0 ? [{ name: 'מבצע כיפות — חבילות',        price: -bundleDiscountAmount, quantity: 1, cat: '' }] : []),
             ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
+            ...(pointsToUse > 0 ? [{ name: 'הנחת נקודות מועדון', price: -pointsToUse, quantity: 1, cat: '' }] : []),
           ],
           total: finalTotal,
           customer: { name: form.name, email: form.email, phone: form.phone },
@@ -415,6 +494,8 @@ export default function CheckoutPage() {
           refCode: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
           commissionPercent,
           uid: user?.uid || null,
+          pointsUsed: pointsToUse > 0 ? pointsToUse : undefined,
+          idToken: pointsToUse > 0 ? idToken : undefined,
         }),
       });
 
@@ -476,7 +557,7 @@ export default function CheckoutPage() {
 
         {/* Order summary first on mobile so user sees total before filling form */}
         <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}>
-          <OrderSummary isSticky={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} />
+          <OrderSummary isSticky={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} />
         </div>
 
         {/* Shipping form */}
@@ -578,7 +659,7 @@ export default function CheckoutPage() {
 
         {/* Order summary — desktop: sticky right column; mobile: hidden via CSS */}
         <div className="checkout-summary-desktop" style={{ display: isMobile ? 'none' : 'block' }}>
-          <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} />
+          <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} />
         </div>
       </div>
       </div>{/* /centering wrapper */}
