@@ -21,6 +21,24 @@ const nextConfig: NextConfig = {
     // Keep console.error and console.warn in production for server-side log visibility
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
+  async rewrites() {
+    return [
+      // Firebase Auth handler proxy — serves /__/auth/* from our own domain so
+      // the Google sign-in popup/redirect is first-party (not blocked by
+      // third-party-cookie / storage-partitioning in Chrome & Safari).
+      // Requires: authDomain = 'your-sofer.com' in firebase-app.ts, and
+      // https://your-sofer.com/__/auth/handler added to the OAuth client's
+      // Authorized redirect URIs in Google Cloud Console.
+      {
+        source: '/__/auth/:path*',
+        destination: 'https://your-sofer.firebaseapp.com/__/auth/:path*',
+      },
+      {
+        source: '/__/firebase/:path*',
+        destination: 'https://your-sofer.firebaseapp.com/__/firebase/:path*',
+      },
+    ];
+  },
   async headers() {
     return [
       {

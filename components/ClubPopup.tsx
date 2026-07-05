@@ -94,8 +94,19 @@ export default function ClubPopup() {
   // Covers both the signInWithPopup path and the signInWithRedirect fallback
   // (where the page reloads and the modal would otherwise be lost).
   useEffect(() => {
-    if (authLoading || !user) return;
+    if (authLoading) return;
     if (!sessionStorage.getItem(PENDING_KEY)) return;
+    if (!user) {
+      // Auth settled with no user — the redirect came back without a sign-in
+      // (blocked/cancelled/failed). Don't dead-end silently: clear the flag
+      // and re-open the join screen with a visible error so the user can retry.
+      sessionStorage.removeItem(PENDING_KEY);
+      setIsMobile(window.innerWidth < 640);
+      setJoinError('ההתחברות לא הושלמה — נסו שוב');
+      setScreen('join');
+      setVisible(true);
+      return;
+    }
     setVisible(true);
     setIsMobile(window.innerWidth < 640);
     completeJoin();
