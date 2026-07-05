@@ -135,25 +135,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 let approvedShaliachId: string | undefined;
                 let approvedSoferId: string | undefined;
                 if (firebaseUser.email) {
-                  const appSnap = await getDocs(
-                    query(
-                      collection(db, 'shluchim_applications'),
-                      where('email', '==', firebaseUser.email.trim().toLowerCase()),
-                      where('status', '==', 'approved'),
-                    )
-                  );
-                  if (!appSnap.empty) {
-                    const appData = appSnap.docs[0].data();
-                    const approvedDocId: string = appData.approvedDocId || appSnap.docs[0].id;
-                    newRole = 'shaliach';
-                    approvedShaliachId = approvedDocId;
-                    // קשר את מסמך השליח ל-uid האמיתי
-                    await updateDoc(doc(db, 'shluchim', approvedDocId), { uid: firebaseUser.uid });
+                  // Never let a permission error here kill the whole sign-in —
+                  // this check only matters for pre-approved shluchim.
+                  try {
+                    const appSnap = await getDocs(
+                      query(
+                        collection(db, 'shluchim_applications'),
+                        where('email', '==', firebaseUser.email.trim().toLowerCase()),
+                        where('status', '==', 'approved'),
+                      )
+                    );
+                    if (!appSnap.empty) {
+                      const appData = appSnap.docs[0].data();
+                      const approvedDocId: string = appData.approvedDocId || appSnap.docs[0].id;
+                      newRole = 'shaliach';
+                      approvedShaliachId = approvedDocId;
+                      // קשר את מסמך השליח ל-uid האמיתי
+                      await updateDoc(doc(db, 'shluchim', approvedDocId), { uid: firebaseUser.uid });
+                    }
+                  } catch (e) {
+                    console.warn('[AuthContext] shluchim_applications check skipped:', e);
                   }
                 }
 
                 // בדוק אם האימייל אושר כסופר לפני ההרשמה
                 if (firebaseUser.email && newRole === 'customer') {
+                  try {
                   const soferAppSnap = await getDocs(
                     query(
                       collection(db, 'soferim_applications'),
@@ -182,6 +189,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         console.warn('[AuthContext] Could not link uid to soferim doc:', resolvedSoferId);
                       }
                     }
+                  }
+                  } catch (e) {
+                    console.warn('[AuthContext] soferim_applications check skipped:', e);
                   }
                 }
 
@@ -223,7 +233,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         } catch (e) {
           console.error('[AuthContext] Firestore error during auth:', e);
-          if (!cancelled) setUser(null);
+          // Firebase Auth succeeded — a Firestore hiccup must NOT log the user
+          // out of the UI. Fall back to a minimal customer identity.
+          if (!cancelled) {
+            setUser(firebaseUser ? {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName,
+              photoURL: firebaseUser.photoURL,
+              role: 'customer',
+            } : null);
+          }
         } finally {
           if (!cancelled) setLoading(false);
         }

@@ -204,14 +204,20 @@ service cloud.firestore {
 
     match /soferim_applications/{id} {
       allow create: if true;             // public application form
-      allow read, update, delete: if isAdmin();
+      // Signing-in user may look up their own application (AuthContext role bootstrap)
+      allow read: if isAdmin()
+                  || (isSignedIn() && resource.data.email == request.auth.token.email);
+      allow update, delete: if isAdmin();
     }
 
     // ── Shluchim applications ───────────────────────────────────────────────
 
     match /shluchim_applications/{id} {
       allow create: if true;             // public application form
-      allow read, update, delete: if isAdmin();
+      // Signing-in user may look up their own application (AuthContext role bootstrap)
+      allow read: if isAdmin()
+                  || (isSignedIn() && resource.data.email == request.auth.token.email);
+      allow update, delete: if isAdmin();
     }
 
     // ── Personal store requests (sofer → admin approval flow) ───────────────
