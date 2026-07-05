@@ -118,23 +118,50 @@ function ThankYouContent() {
         if (!auth.currentUser) { setClaimState('error'); return; }
         const idToken = await auth.currentUser.getIdToken();
 
-        const res = await fetch('/api/loyalty/claim-order', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({ orderId }),
-        });
+        let totalPoints = 0;
+        let anyOk = false;
+        let alreadyProcessed = false;
 
-        if (!res.ok) { setClaimState('error'); return; }
-        const data = await res.json() as { pointsEarned?: number; alreadyProcessed?: boolean };
+        // 1) Credit THIS order (by orderId — covers guest orders too)
+        try {
+          const res = await fetch('/api/loyalty/claim-order', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({ orderId }),
+          });
+          if (res.ok) {
+            const data = await res.json() as { pointsEarned?: number; alreadyProcessed?: boolean };
+            anyOk = true;
+            if (data.alreadyProcessed) alreadyProcessed = true;
+            else totalPoints += data.pointsEarned ?? 0;
+          }
+        } catch { /* club-join below may still succeed */ }
 
-        if (data.alreadyProcessed) {
-          setClaimState('already');
-        } else {
-          setClaimedPoints(data.pointsEarned ?? 0);
+        // 2) Join the premium club + backfill any other historical orders
+        //    (idempotent — orders already credited above are skipped)
+        try {
+          const res2 = await fetch('/api/club-join', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${idToken}` },
+          });
+          if (res2.ok) {
+            const d2 = await res2.json() as { ok?: boolean; pointsCredited?: number };
+            if (d2.ok) {
+              anyOk = true;
+              totalPoints += Number(d2.pointsCredited ?? 0);
+            }
+          }
+        } catch { /* non-fatal */ }
+
+        if (!anyOk) { setClaimState('error'); return; }
+        if (totalPoints > 0) {
+          setClaimedPoints(totalPoints);
           setClaimState('success');
+        } else {
+          setClaimState(alreadyProcessed ? 'already' : 'success');
         }
       } catch {
         setClaimState('error');
@@ -414,22 +441,39 @@ function ThankYouContent() {
           padding: '28px 32px', marginTop: 20, textAlign: 'center',
         }}>
 
-          {/* ── State: idle (before sign-in) — show offer + points hint ── */}
+          {/* ── State: idle (before sign-in) — premium club offer + points hint ── */}
           {claimState === 'idle' && !user && (
             <>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>⭐</div>
-              <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '0 0 8px' }}>
-                רוצה לעקוב אחרי ההזמנה ולצבור נקודות?
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
+                מועדון לקוחות פרימיום
+              </div>
+              <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '0 0 10px', lineHeight: 1.4 }}>
+                🎉 הצטרפו למועדון ותתחילו להרוויח כבר מהקנייה הזו!
               </h2>
-              <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: '0 0 22px' }}>
-                {pointsHint > 0 ? (
-                  <>צור חשבון וקבל{' '}
-                    <strong style={{ color: '#1a1a1a' }}>~{pointsHint} נקודות</strong>
-                    {' '}(שוות ₪{pointsHint}) על הקנייה הזו!
-                  </>
-                ) : (
-                  <>צור חשבון מהיר עם Google — מעקב הזמנות,<br />נקודות לקנייה הבאה, והטבות מועדון.</>
-                )}
+
+              {/* Purchase summary → points value */}
+              {pointsHint > 0 && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #fdf8ec, #faf3e0)',
+                  border: '1.5px solid #C5A028',
+                  borderRadius: 12,
+                  padding: '14px 18px',
+                  marginBottom: 14,
+                  fontSize: 14,
+                  color: '#1a1a1a',
+                  lineHeight: 1.8,
+                }}>
+                  סכום הרכישה שלך: <strong>₪{orderTotal.toLocaleString('he-IL')}</strong><br />
+                  מגיעות לך <strong style={{ color: '#92400e' }}>~{pointsHint} נקודות</strong>
+                  {' '}— שוות <strong style={{ color: '#92400e' }}>₪{pointsHint}</strong> למימוש בקנייה הבאה!
+                </div>
+              )}
+
+              <p style={{ fontSize: 13.5, color: '#4b5563', lineHeight: 1.75, margin: '0 0 6px' }}>
+                <span style={{ color: '#92400e', fontWeight: 700 }}>10% כסף</span> בחזרה בנקודות על כל קנייה במועדון.
+              </p>
+              <p style={{ fontSize: 12, color: '#9ca3af', lineHeight: 1.7, margin: '0 0 18px' }}>
+                לדוגמה: קנייה ב־500 ₪ = 50 ₪ לקנייה הבאה | קנייה ב־1,000 ₪ = 100 ₪ לקנייה הבאה.
               </p>
               <button
                 onClick={async () => {
@@ -459,10 +503,17 @@ function ThankYouContent() {
                       <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
                       <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
                     </svg>
-                    המשך עם Google
+                    הצטרפות למועדון עם Google
                   </>
                 )}
               </button>
+              <p style={{ fontSize: 11.5, color: '#9ca3af', lineHeight: 1.6, margin: '12px 0 0' }}>
+                בהצטרפות למועדון אתם מאשרים קבלת דיוור שיווקי ומסכימים{' '}
+                <a href="/legal/privacy" target="_blank" rel="noopener noreferrer"
+                   style={{ color: '#92400e', textDecoration: 'underline' }}>
+                  למדיניות הפרטיות
+                </a>
+              </p>
             </>
           )}
 
@@ -479,12 +530,19 @@ function ThankYouContent() {
             <>
               <div style={{ fontSize: 40, marginBottom: 12 }}>🎉</div>
               <h2 style={{ fontSize: 18, fontWeight: 900, color: '#166534', margin: '0 0 8px' }}>
-                זוכית ב-{claimedPoints} נקודות!
+                ברוכים הבאים למועדון!
               </h2>
-              <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: 0 }}>
-                שוות ₪{claimedPoints} בקנייה הבאה.<br />
-                תוכל לממש אותן באזור האישי.
-              </p>
+              {claimedPoints > 0 ? (
+                <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: 0 }}>
+                  זוכית ב-<strong style={{ color: '#166534' }}>{claimedPoints} נקודות</strong>
+                  {' '}— שוות ₪{claimedPoints} בקנייה הבאה.<br />
+                  תוכל לממש אותן באזור האישי.
+                </p>
+              ) : (
+                <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: 0 }}>
+                  מעכשיו תצברו 10% בנקודות על כל קנייה.
+                </p>
+              )}
             </>
           )}
 
@@ -493,7 +551,7 @@ function ThankYouContent() {
             <>
               <div style={{ fontSize: 40, marginBottom: 12 }}>⭐</div>
               <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>
-                הנקודות על הזמנה זו כבר זוכו.
+                ברוכים הבאים למועדון! הנקודות על הזמנה זו כבר זוכו.
               </p>
             </>
           )}

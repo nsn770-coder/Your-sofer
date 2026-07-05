@@ -1,24 +1,15 @@
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { useState, useEffect, useRef } from 'react';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
-import { getAuthLazy } from '@/lib/authLazy';
-import { useAuth } from '@/app/contexts/AuthContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
-// ── Club popup — Google sign-in only ─────────────────────────────────────────
-// The old email+phone form is gone: joining the club now means signing in with
-// Google, so every member becomes a real Firebase user (users/{uid} is the
-// identity). Server-side (/api/club-join) links/creates the matching `leads`
-// record so the mailing list keeps working, and recovers the phone number of
-// "old" members who joined via the previous popup (email match).
-//
-// sessionStorage → shows once per browser session, resets on each new visit.
-// 'ys_club_join_pending' survives the signInWithRedirect fallback: when Google
-// bounces the whole page, the popup re-opens on return and finishes the join.
+// ── Club popup — email+phone lead form (restored) ────────────────────────────
+// Google sign-in moved to the thank-you page (post-purchase premium club offer).
+// This popup collects email+phone into `leads` and hands out a 15% first-purchase
+// coupon. sessionStorage → shows once per browser session.
 const SESSION_KEY = 'ys_club_popup_seen';
-const PENDING_KEY = 'ys_club_join_pending';
-const COUPON_CODE = 'TAMUZ10';
+const COUPON_CODE = 'CLUB15';
 const DELAY_MS    = 8000;
 const IMAGE_URL   = optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780510230/%D7%A4%D7%95%D7%A4%D7%90%D7%A4_rnyoth.png', 800);
 
@@ -26,152 +17,104 @@ const GOLD   = '#C9A14A';
 const GOLD_D = '#a07c30';
 const DARK   = '#111111';
 
+function isValidEmail(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+}
+function isValidIsraeliPhone(v: string) {
+  const d = v.replace(/[-\s]/g, '');
+  return /^0(5\d{8}|[2-9]\d{7})$/.test(d);
+}
+
 export default function ClubPopup() {
-  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const [visible, setVisible]       = useState(false);
+  const [isMobile, setIsMobile]     = useState(false);
+  const [screen, setScreen]         = useState<'form' | 'thanks'>('form');
+  const [email, setEmail]           = useState('');
+  const [phone, setPhone]           = useState('');
+  const [consent, setConsent]       = useState(false);
+  const [loading, setLoading]       = useState(false);
+  const [errors, setErrors]         = useState<{ email?: string; phone?: string; consent?: string }>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [copied, setCopied]         = useState(false);
 
-  const [visible, setVisible]   = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [screen, setScreen]     = useState<'join' | 'thanks'>('join');
-  const [joining, setJoining]   = useState(false);
-  const [joinError, setJoinError] = useState<string | null>(null);
-  const [copied, setCopied]     = useState(false);
-  const [pointsCredited, setPointsCredited] = useState(0);
+  // Refs to read autofill values at submit time, in case autofill skips onChange
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
 
-  // Guards: run the join exactly once, and don't re-run the "should we show?"
-  // check after it already decided.
-  const joinRanRef = useRef(false);
-  const timerCheckedRef = useRef(false);
-
-  // ── Complete the join for the signed-in user (idempotent) ─────────────────
-  const completeJoin = useCallback(async () => {
-    if (joinRanRef.current) return;
-    joinRanRef.current = true;
-    setJoining(true);
-    setJoinError(null);
-
-    try {
-      const auth = await getAuthLazy();
-      const current = auth.currentUser;
-      if (!current) throw new Error('no-current-user');
-      const idToken = await current.getIdToken();
-
-      const res = await fetch('/api/club-join', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.ok) throw new Error(data.error || `club-join ${res.status}`);
-      if (typeof data.pointsCredited === 'number' && data.pointsCredited > 0) {
-        setPointsCredited(data.pointsCredited);
-      }
-
-      // Welcome email (with the coupon) — best-effort, never blocks the user,
-      // and only for NEW members so repeat sign-ins don't spam the inbox.
-      if (!data.alreadyMember && current.email) {
-        fetch('/api/send-club-welcome', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: current.email }),
-        }).catch(() => {});
-      }
-
-      sessionStorage.setItem(SESSION_KEY, '1');
-      sessionStorage.removeItem(PENDING_KEY);
-      setScreen('thanks');
-      setVisible(true);
-    } catch (e) {
-      console.error('[ClubPopup] completeJoin failed:', e);
-      joinRanRef.current = false; // allow retry
-      setJoinError('אירעה שגיאה בהצטרפות — נסו שוב בעוד רגע');
-    } finally {
-      setJoining(false);
-    }
-  }, []);
-
-  // ── Redirect-return / popup sign-in completion ─────────────────────────────
-  // Runs whenever auth state settles: if a join was started (pending flag) and
-  // we now have a signed-in user — finish the join and show the coupon screen.
-  // Covers both the signInWithPopup path and the signInWithRedirect fallback
-  // (where the page reloads and the modal would otherwise be lost).
   useEffect(() => {
-    if (authLoading) return;
-    if (!sessionStorage.getItem(PENDING_KEY)) return;
-    if (!user) {
-      // Auth settled with no user — the redirect came back without a sign-in
-      // (blocked/cancelled/failed). Don't dead-end silently: clear the flag
-      // and re-open the join screen with a visible error so the user can retry.
-      sessionStorage.removeItem(PENDING_KEY);
-      setIsMobile(window.innerWidth < 640);
-      setJoinError('ההתחברות לא הושלמה — נסו שוב');
-      setScreen('join');
-      setVisible(true);
-      return;
-    }
-    setVisible(true);
-    setIsMobile(window.innerWidth < 640);
-    completeJoin();
-  }, [authLoading, user, completeJoin]);
-
-  // ── 8-second timer (once per session) ─────────────────────────────────────
-  useEffect(() => {
-    if (authLoading) return;               // wait until we know who's here
-    if (timerCheckedRef.current) return;
     if (sessionStorage.getItem(SESSION_KEY)) return;
-    if (sessionStorage.getItem(PENDING_KEY)) return; // redirect flow owns the UI
-    timerCheckedRef.current = true;
-
-    let cancelled = false;
-    const t = setTimeout(async () => {
-      // Signed-in users who are already club members never see the popup.
-      if (user) {
-        try {
-          const snap = await getDoc(doc(db, 'users', user.uid));
-          if (snap.exists() && snap.data().clubMember === true) {
-            sessionStorage.setItem(SESSION_KEY, '1');
-            return;
-          }
-        } catch { /* if the check fails, fall through and show the popup */ }
-      }
-      if (cancelled) return;
-      setIsMobile(window.innerWidth < 640);
-      setVisible(true);
-    }, DELAY_MS);
-
-    return () => { cancelled = true; clearTimeout(t); };
-  }, [authLoading, user]);
+    setIsMobile(window.innerWidth < 640);
+    const t = setTimeout(() => setVisible(true), DELAY_MS);
+    return () => clearTimeout(t);
+  }, []);
 
   function close() {
     sessionStorage.setItem(SESSION_KEY, '1');
-    sessionStorage.removeItem(PENDING_KEY);
     setVisible(false);
   }
 
-  // ── CTA click ──────────────────────────────────────────────────────────────
-  async function handleJoinClick() {
-    setJoinError(null);
-    if (user) {
-      // Already signed in — no re-auth needed, just join.
-      completeJoin();
-      return;
-    }
-    // Mark the join as pending BEFORE starting sign-in: if signInWithGoogle
-    // falls back to a full-page redirect, this flag lets us resume on return.
-    sessionStorage.setItem(PENDING_KEY, '1');
-    setJoining(true);
-    try {
-      await signInWithGoogle();
-      // Popup path: auth state updates async — the pending-flag effect above
-      // completes the join once `user` lands. If the user closed the Google
-      // popup, auth state never changes and nothing happens (flag is cleared
-      // when the popup is dismissed).
-    } finally {
-      setJoining(false);
-    }
+  function validate(emailVal: string, phoneVal: string): boolean {
+    const e: typeof errors = {};
+    if (!isValidEmail(emailVal))        e.email   = 'נא להזין כתובת מייל תקינה';
+    if (!isValidIsraeliPhone(phoneVal)) e.phone   = 'נא להזין מספר טלפון ישראלי תקין (05X-XXXXXXX)';
+    if (!consent)                       e.consent = 'יש לאשר קבלת דיוור לפני ההצטרפות';
+    setErrors(e);
+    return Object.keys(e).length === 0;
   }
 
-  if (!visible) return null;
+  async function handleSubmit(ev: React.FormEvent) {
+    ev.preventDefault();
+    setSubmitError(null);
 
-  const pad = isMobile ? '28px 22px 32px' : '44px 40px 44px';
+    // Read from refs to catch autofill values that may not have triggered onChange
+    const emailVal = emailRef.current?.value ?? email;
+    const phoneVal = phoneRef.current?.value ?? phone;
+
+    // Sync state if autofill populated without onChange
+    if (emailVal !== email) setEmail(emailVal);
+    if (phoneVal !== phone) setPhone(phoneVal);
+
+    if (!validate(emailVal, phoneVal)) return;
+
+    setLoading(true);
+    const normalizedEmail = emailVal.trim().toLowerCase();
+    const normalizedPhone = phoneVal.trim();
+
+    // Step 1: save lead — critical
+    try {
+      await addDoc(collection(db, 'leads'), {
+        email:     normalizedEmail,
+        phone:     normalizedPhone,
+        source:    'club',
+        consent:   true,
+        createdAt: serverTimestamp(),
+      });
+    } catch (e) {
+      console.error('[ClubPopup] addDoc leads failed:', e);
+      setSubmitError('אירעה שגיאה בשליחה — נסו שוב בעוד רגע');
+      setLoading(false);
+      return;
+    }
+
+    // Step 2: send welcome email — best-effort, never blocks the user
+    try {
+      const res = await fetch('/api/send-club-welcome', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ email: normalizedEmail }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.error('[ClubPopup] send-club-welcome failed:', res.status, text);
+      }
+    } catch (e) {
+      console.error('[ClubPopup] send-club-welcome network error:', e);
+    }
+
+    sessionStorage.setItem(SESSION_KEY, '1');
+    setLoading(false);
+    setScreen('thanks');
+  }
 
   async function copyCode() {
     try {
@@ -181,6 +124,10 @@ export default function ClubPopup() {
     } catch { /* clipboard unavailable */ }
   }
 
+  if (!visible) return null;
+
+  const pad = isMobile ? '28px 22px 32px' : '44px 40px 44px';
+
   return (
     <>
       <style>{`
@@ -188,6 +135,17 @@ export default function ClubPopup() {
           from { opacity: 0; transform: translate(-50%,-46%) scale(0.96); }
           to   { opacity: 1; transform: translate(-50%,-50%) scale(1); }
         }
+        .ci {
+          width: 100%; box-sizing: border-box;
+          border: 1.5px solid rgba(201,161,74,0.55);
+          border-radius: 10px; padding: 11px 14px; font-size: 14px;
+          outline: none; background: rgba(255,255,255,0.08);
+          color: #fff; font-family: inherit; direction: rtl;
+          transition: border-color 0.2s;
+        }
+        .ci::placeholder { color: rgba(255,255,255,0.45); }
+        .ci:focus  { border-color: ${GOLD}; background: rgba(255,255,255,0.13); }
+        .ci.err    { border-color: #f87171; }
         .cgold {
           background: ${GOLD}; color: ${DARK};
           border: none; border-radius: 10px;
@@ -197,16 +155,6 @@ export default function ClubPopup() {
         }
         .cgold:hover:not(:disabled) { background: ${GOLD_D}; transform: scale(1.01); }
         .cgold:disabled { opacity: 0.55; cursor: not-allowed; }
-        .cgoogle {
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-          width: 100%; padding: 13px; margin-top: 4px;
-          background: #fff; color: #1f1f1f;
-          border: none; border-radius: 10px;
-          font-size: 15px; font-weight: 800; font-family: inherit;
-          cursor: pointer; transition: transform 0.12s, box-shadow 0.18s;
-        }
-        .cgoogle:hover:not(:disabled) { transform: scale(1.01); box-shadow: 0 4px 18px rgba(0,0,0,0.35); }
-        .cgoogle:disabled { opacity: 0.55; cursor: not-allowed; }
       `}</style>
 
       {/* Backdrop */}
@@ -254,7 +202,7 @@ export default function ClubPopup() {
             }}
           >✕</button>
 
-          {screen === 'join' ? (
+          {screen === 'form' ? (
             <>
               {/* Label */}
               <div style={{ fontSize: 11, fontWeight: 700, color: GOLD, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
@@ -262,61 +210,96 @@ export default function ClubPopup() {
               </div>
 
               {/* Title */}
-              <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 900, color: '#fff', margin: '0 0 12px', lineHeight: 1.35 }}>
-                🎉 הצטרפו למועדון ותתחילו להרוויח כבר מהקנייה הראשונה!
+              <h2 style={{ fontSize: isMobile ? 21 : 25, fontWeight: 900, color: '#fff', margin: '0 0 10px', lineHeight: 1.3 }}>
+                הצטרפו למועדון YourSofer
               </h2>
 
-              {/* Benefits */}
-              <p style={{ fontSize: isMobile ? 15 : 16, color: '#fff', fontWeight: 700, lineHeight: 1.75, margin: '0 0 8px' }}>
-                <span style={{ color: GOLD }}>10% הנחה</span> בקנייה הראשונה
-                {' + '}
-                <span style={{ color: GOLD }}>10% כסף</span> לקנייה הבאה.
-              </p>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: '0 0 20px' }}>
-                לדוגמה: קנייה ב־500 ₪ = 50 ₪ לקנייה הבאה | קנייה ב־1,000 ₪ = 100 ₪ לקנייה הבאה.
+              {/* Subtitle */}
+              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.75, margin: '0 0 22px' }}>
+                <span style={{ color: GOLD, fontWeight: 700 }}>15% הנחה</span> על הרכישה הראשונה<br />
+                <span style={{ color: GOLD, fontWeight: 700 }}>+ הטבות בלעדיות</span> לחברי המועדון
               </p>
 
-              {/* Error */}
-              {joinError && (
-                <div style={{
-                  background: 'rgba(248,113,113,0.15)',
-                  border: '1px solid rgba(248,113,113,0.5)',
-                  borderRadius: 8,
-                  padding: '9px 12px',
-                  fontSize: 12,
-                  color: '#fca5a5',
-                  textAlign: 'center',
-                  marginBottom: 10,
-                }}>
-                  {joinError}
+              {/* Form */}
+              <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {/* Email */}
+                <div>
+                  <input
+                    ref={emailRef}
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    value={email}
+                    onChange={e => { setEmail(e.target.value); setErrors(p => ({ ...p, email: undefined })); }}
+                    placeholder="כתובת מייל"
+                    className={`ci${errors.email ? ' err' : ''}`}
+                  />
+                  {errors.email && <div style={{ fontSize: 11, color: '#fca5a5', marginTop: 3 }}>{errors.email}</div>}
                 </div>
-              )}
 
-              {/* Google CTA */}
-              <button onClick={handleJoinClick} disabled={joining} className="cgoogle">
-                {joining ? (
-                  '⏳ מתחברים...'
-                ) : (
-                  <>
-                    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
-                      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                    </svg>
-                    {user ? 'צרפו אותי למועדון' : 'הצטרפות עם Google'}
-                  </>
+                {/* Phone */}
+                <div>
+                  <input
+                    ref={phoneRef}
+                    type="tel"
+                    name="phone"
+                    autoComplete="tel"
+                    inputMode="tel"
+                    value={phone}
+                    onChange={e => { setPhone(e.target.value); setErrors(p => ({ ...p, phone: undefined })); }}
+                    placeholder="מספר טלפון (05X-XXXXXXX)"
+                    className={`ci${errors.phone ? ' err' : ''}`}
+                    style={{ direction: 'ltr', textAlign: 'right' } as React.CSSProperties}
+                  />
+                  {errors.phone && <div style={{ fontSize: 11, color: '#fca5a5', marginTop: 3 }}>{errors.phone}</div>}
+                </div>
+
+                {/* Consent */}
+                <div>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={consent}
+                      onChange={e => { setConsent(e.target.checked); setErrors(p => ({ ...p, consent: undefined })); }}
+                      style={{ marginTop: 3, flexShrink: 0, accentColor: GOLD }}
+                    />
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6 }}>
+                      אני מאשר/ת קבלת דיוור שיווקי ומסכים/ה{' '}
+                      <a href="/legal/privacy" target="_blank" rel="noopener noreferrer"
+                         style={{ color: GOLD, textDecoration: 'underline' }}>
+                        למדיניות הפרטיות
+                      </a>
+                    </span>
+                  </label>
+                  {errors.consent && <div style={{ fontSize: 11, color: '#fca5a5', marginTop: 3 }}>{errors.consent}</div>}
+                </div>
+
+                {/* General submit error — shown only when Firestore write fails */}
+                {submitError && (
+                  <div style={{
+                    background: 'rgba(248,113,113,0.15)',
+                    border: '1px solid rgba(248,113,113,0.5)',
+                    borderRadius: 8,
+                    padding: '9px 12px',
+                    fontSize: 12,
+                    color: '#fca5a5',
+                    textAlign: 'center',
+                  }}>
+                    {submitError}
+                  </div>
                 )}
-              </button>
 
-              {/* Consent note */}
-              <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, margin: '12px 0 0', textAlign: 'center' }}>
-                בהצטרפות למועדון אתם מאשרים קבלת דיוור שיווקי ומסכימים{' '}
-                <a href="/legal/privacy" target="_blank" rel="noopener noreferrer"
-                   style={{ color: GOLD, textDecoration: 'underline' }}>
-                  למדיניות הפרטיות
-                </a>
-              </p>
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="cgold"
+                  style={{ padding: '13px', width: '100%', marginTop: 6 }}
+                >
+                  {loading ? '⏳ שומר...' : 'הצטרפו וקבלו 15% הנחה'}
+                </button>
+              </form>
             </>
           ) : (
             /* ── Screen 2: Thank you ── */
@@ -327,25 +310,8 @@ export default function ClubPopup() {
                 ברוכים הבאים למועדון!
               </h2>
 
-              {pointsCredited > 0 && (
-                <div style={{
-                  background: 'rgba(201,161,74,0.15)',
-                  border: `1px solid ${GOLD}`,
-                  borderRadius: 10,
-                  padding: '10px 14px',
-                  fontSize: 13.5,
-                  color: '#fff',
-                  marginBottom: 16,
-                  lineHeight: 1.7,
-                }}>
-                  ⭐ על הרכישות הקודמות שלכם זוכיתם ב-
-                  <span style={{ color: GOLD, fontWeight: 900 }}>{pointsCredited} נקודות</span>
-                  {' '}(שוות ₪{pointsCredited})!
-                </div>
-              )}
-
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.7, margin: '0 0 22px' }}>
-                הנה קוד ההנחה שלכם ל-10% על הרכישה הראשונה:
+                הנה קוד ההנחה שלכם ל-15% על הרכישה הראשונה:
               </p>
 
               {/* Coupon box + copy */}
