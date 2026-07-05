@@ -1,115 +1,48 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-
-const TICKER_ITEMS = [
-  "הדפסת כיפות לאירועים – מגוון ענק לבר מצווה, חתונות ואירועים",
-  "הצטרפו למועדון Your Sofer וקבלו 10% הנחה על ההזמנה הראשונה",
-  "נוספו 28 מוצרים חדשים להפרשת חלה – גלו את הקולקציה החדשה",
-];
+// פס הודעה סטטי — ללא תזוזה. רקע זהב (צבע האתר), כתב שחור.
+const MESSAGE = '15% הנחה על כל האתר עם קוד קופון: ברכה15';
 
 export default function AnnouncementTicker() {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
-
-  useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    let rafId: number;
-    let paused = false;
-    const speed = 0.6;
-
-    // מתחילים מאמצע (סוף העותק הראשון) כדי שיהיה מקום לגלול ימינה
-    const initScroll = () => {
-      el.scrollLeft = el.scrollWidth / 2;
-    };
-    initScroll();
-
-    const step = () => {
-      if (!paused && el) {
-        // מקטינים = תנועה ימינה (נוח לקריאת עברית)
-        el.scrollLeft -= speed;
-        const half = el.scrollWidth / 2;
-        // כשהגענו ל-0 או מתחת — מוסיפים חצי רוחב, הלולאה seamless
-        if (el.scrollLeft <= 0) {
-          el.scrollLeft += half;
-        }
-      }
-      rafId = requestAnimationFrame(step);
-    };
-
-    const onEnter = () => { paused = true; };
-    const onLeave = () => { paused = false; };
-    el.addEventListener('mouseenter', onEnter);
-    el.addEventListener('mouseleave', onLeave);
-
-    rafId = requestAnimationFrame(step);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      el.removeEventListener('mouseenter', onEnter);
-      el.removeEventListener('mouseleave', onLeave);
-    };
-  }, []);
-
   return (
-    <div className="ticker-bar" dir="rtl" role="marquee" aria-label="הודעות מבצעים">
-      <div className="ticker-scroller" ref={scrollerRef}>
-        <div className="ticker-track">
-          {items.map((text, i) => (
-            <span className="ticker-item" key={i}>
-              <span className="ticker-mark" aria-hidden="true">✦</span>
-              {text}
-            </span>
-          ))}
-        </div>
-      </div>
+    <div className="ticker-bar" dir="rtl" role="status" aria-label="הודעת מבצע">
+      <span className="ticker-item">
+        <span className="ticker-mark" aria-hidden="true">✦</span>
+        {MESSAGE}
+        <span className="ticker-mark" aria-hidden="true">✦</span>
+      </span>
 
       <style jsx>{`
         .ticker-bar {
           width: 100%;
           max-width: 100vw;
           height: 40px;
-          background-color: #000000;
-          color: #ffffff;
+          background-color: #C9A227;
+          color: #000000;
           position: relative;
           z-index: 101;
           display: flex;
           align-items: center;
+          justify-content: center;
           overflow: hidden;
-        }
-        .ticker-scroller {
-          width: 100%;
-          overflow-x: hidden;
-          overflow-y: hidden;
-          direction: ltr;
-        }
-        .ticker-track {
-          display: flex;
-          width: max-content;
-          align-items: center;
-          white-space: nowrap;
-          direction: rtl;
         }
         .ticker-item {
           display: inline-flex;
           align-items: center;
-          padding: 0 28px;
+          gap: 10px;
+          padding: 0 16px;
           font-size: 14px;
-          font-weight: 500;
+          font-weight: 700;
           letter-spacing: 0.2px;
-          color: #ffffff;
+          color: #000000;
+          white-space: nowrap;
         }
         .ticker-mark {
-          margin-left: 10px;
-          opacity: 0.9;
+          opacity: 0.85;
         }
         @media (max-width: 640px) {
           .ticker-bar { height: 36px; }
-          .ticker-item { padding: 0 18px; font-size: 13px; }
+          .ticker-item { font-size: 13px; padding: 0 10px; }
         }
       `}</style>
     </div>

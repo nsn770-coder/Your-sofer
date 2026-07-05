@@ -1296,7 +1296,12 @@ export default function HomePageClient() {
                   </div>
                   <div style={{ padding: '12px 14px 16px' }}>
                     <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
-                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C9A227', marginBottom: 10 }}>{formatPrice(p.price)}</p>
+                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C9A227', marginBottom: 10, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                      {formatPrice(p.price)}
+                      {typeof p.was === 'number' && p.was > p.price && (
+                        <span style={{ fontSize: 11, fontWeight: 400, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(p.was)}</span>
+                      )}
+                    </p>
                     <button
                       onClick={e => {
                         e.stopPropagation();

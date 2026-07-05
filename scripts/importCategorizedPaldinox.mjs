@@ -70,7 +70,10 @@ const USERNAME        = '20552';
 const BASE_URL        = 'https://paldinox.co.il';
 const CLOUDINARY_URL  = 'https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload';
 const UPLOAD_PRESET   = 'yoursofer_upload';
-const PRICE_FACTOR    = 2.18;
+// מחיר סופי (אחרי הנחה): ספק × 2.4416  (2.18 × 1.12)
+// מחיר מחוק (לפני הנחה): ספק × 3.052   (2.18 × 1.40)
+const FINAL_PRICE_FACTOR = 2.4416;
+const WAS_PRICE_FACTOR   = 3.052;
 const CONCURRENCY     = 3;
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -152,7 +155,10 @@ async function processProduct(page, product, idx, total) {
     process.stdout.write(`  ⚠️  scrape — fallback: ${e.message.slice(0, 60)}\n`);
   }
 
-  const finalPrice = Math.round(originalPrice * PRICE_FACTOR * 100) / 100;
+  // עיגול לשקל שלם, ללא אגורות
+  const finalPrice = Math.round(originalPrice * FINAL_PRICE_FACTOR);
+  let   wasPrice   = Math.round(originalPrice * WAS_PRICE_FACTOR);
+  if (wasPrice <= finalPrice) wasPrice = finalPrice + 1; // מחיר מחוק תמיד גבוה מהסופי
 
   // 2. Cloudinary
   let cloudinaryUrl = imageSrc;
@@ -168,8 +174,9 @@ async function processProduct(page, product, idx, total) {
   await db.collection('products').add({
     name:          product.name,
     desc:          '',
-    price:         finalPrice,
-    originalPrice: originalPrice,
+    price:         finalPrice,     // מחיר סופי לתשלום (ספק × 2.4416)
+    was:           wasPrice,       // מחיר מחוק לתצוגה (ספק × 3.052)
+    supplierCost:  originalPrice,  // מחיר ספק גולמי
     imgUrl:        cloudinaryUrl,
     images:        [cloudinaryUrl].filter(Boolean),
     sku:           product.sku || '',

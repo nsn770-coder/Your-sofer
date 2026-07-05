@@ -375,7 +375,10 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
     }
 
     const purchasePrice = rawProduct.price ? parseFloat(rawProduct.price) : null;
-    const salePrice     = purchasePrice ? Math.round(purchasePrice * 1.4 * 10) / 10 : null;
+    // מחיר סופי = ספק × 1.4 × 1.12 | מחיר מחוק = ספק × 1.4 × 1.40 (מעוגל לשקל שלם)
+    const salePrice     = purchasePrice ? Math.round(purchasePrice * 1.4 * 1.12) : null;
+    let   wasPrice      = purchasePrice ? Math.round(purchasePrice * 1.4 * 1.40) : null;
+    if (wasPrice != null && salePrice != null && wasPrice <= salePrice) wasPrice = salePrice + 1;
 
     const newDoc = {
       name:          heb.name,
@@ -387,6 +390,7 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
       imgUrl:        cloudinaryUrl || supplierImgUrl || null,
       purchasePrice: purchasePrice,
       price:         salePrice,
+      was:           wasPrice,
       stockStatus:   'in_stock',
       status:        'inactive', // צריך בדיקה לפני פרסום
       supplierCatCode: catEntry.code,

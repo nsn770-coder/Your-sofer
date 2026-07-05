@@ -40,7 +40,10 @@ const LANG           = 'he';
 const BATCH          = 100;
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload';
 const UPLOAD_PRESET  = 'yoursofer_upload';
-const PRICE_FACTOR   = 2.18; // reserved for when real prices are added
+// reserved for when real prices are added:
+// מחיר סופי = ספק × 2.4416 (2.18 × 1.12) | מחיר מחוק (was) = ספק × 3.052 (2.18 × 1.40)
+const FINAL_PRICE_FACTOR = 2.4416;
+const WAS_PRICE_FACTOR   = 3.052;
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
