@@ -37,16 +37,17 @@ export async function POST(req: NextRequest) {
       <div style="background:#EFF6FF;border-right:4px solid #2563EB;border-radius:10px;padding:18px 20px;margin-bottom:24px;">
         <div style="color:#1E3A8A;font-size:14px;font-weight:700;margin-bottom:8px;">ההטבות שלכם:</div>
         <div style="color:#333;font-size:13px;line-height:2;">
-          ✅ 15% הנחה על הרכישה הראשונה (קוד למטה)<br/>
+          ✅ 5% הנחה על הרכישה הראשונה (קוד למטה)<br/>
+          ✅ צבירת 10% מסכום הרכישה בנקודות — כל נקודה שווה 1 ₪ וניתן לממש מהקנייה הבאה<br/>
           ✅ הטבות בלעדיות לחברי המועדון<br/>
           ✅ עדכונים ראשונים על מוצרים ומבצעים חדשים
         </div>
       </div>
 
       <!-- Coupon -->
-      <p style="color:#444;font-size:14px;margin:0 0 12px;">הנה קוד ההנחה שלכם ל-15% על הרכישה הראשונה:</p>
+      <p style="color:#444;font-size:14px;margin:0 0 12px;">הנה קוד ההנחה שלכם ל-5% על הרכישה הראשונה:</p>
       <div style="border:2px dashed #2563EB;border-radius:10px;padding:16px;text-align:center;margin-bottom:24px;background:#F8FAFF;">
-        <div style="font-size:24px;font-weight:900;color:#1E3A8A;letter-spacing:3px;direction:ltr;">CLUB15</div>
+        <div style="font-size:24px;font-weight:900;color:#1E3A8A;letter-spacing:3px;">ברכה5</div>
         <div style="font-size:12px;color:#666;margin-top:6px;">הכניסו את הקוד בשדה ״קוד קופון״ בעמוד הקופה</div>
       </div>
 

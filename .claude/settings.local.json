@@ -217,7 +217,8 @@
       "PowerShell(npx tsc --noEmit 2>&1)",
       "PowerShell(Get-PSDrive C | Select-Object @{N='Free_GB';E={[math]::Round\\($_.Free/1GB,2\\)}}, @{N='Used_GB';E={[math]::Round\\($_.Used/1GB,2\\)}}, @{N='Total_GB';E={[math]::Round\\(\\($_.Free+$_.Used\\)/1GB,2\\)}})",
       "PowerShell(npm *)",
-      "PowerShell($nm = \"C:\\\\Users\\\\Nissan\\\\your-sofer\\\\node_modules\"; $nx = \"C:\\\\Users\\\\Nissan\\\\your-sofer\\\\.next\"; $nmSize = \\(Get-ChildItem $nm -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum\\).Sum; $nxSize = \\(Get-ChildItem $nx -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum\\).Sum; [PSCustomObject]@{ node_modules_GB=[math]::Round\\($nmSize/1GB,2\\); dot_next_GB=[math]::Round\\($nxSize/1GB,2\\) })"
+      "PowerShell($nm = \"C:\\\\Users\\\\Nissan\\\\your-sofer\\\\node_modules\"; $nx = \"C:\\\\Users\\\\Nissan\\\\your-sofer\\\\.next\"; $nmSize = \\(Get-ChildItem $nm -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum\\).Sum; $nxSize = \\(Get-ChildItem $nx -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum\\).Sum; [PSCustomObject]@{ node_modules_GB=[math]::Round\\($nmSize/1GB,2\\); dot_next_GB=[math]::Round\\($nxSize/1GB,2\\) })",
+      "Bash(env)"
     ]
   }
 }

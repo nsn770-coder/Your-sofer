@@ -6,10 +6,10 @@ import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 // ── Club popup — email+phone lead form (restored) ────────────────────────────
 // Google sign-in moved to the thank-you page (post-purchase premium club offer).
-// This popup collects email+phone into `leads` and hands out a 15% first-purchase
-// coupon. sessionStorage → shows once per browser session.
+// This popup collects email+phone into `leads` and hands out a 5% first-purchase
+// coupon (+10% back in points). sessionStorage → shows once per browser session.
 const SESSION_KEY = 'ys_club_popup_seen';
-const COUPON_CODE = 'CLUB15';
+const COUPON_CODE = 'ברכה5';
 const DELAY_MS    = 8000;
 const IMAGE_URL   = optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780510230/%D7%A4%D7%95%D7%A4%D7%90%D7%A4_rnyoth.png', 800);
 
@@ -219,9 +219,11 @@ export default function ClubPopup() {
               </h2>
 
               {/* Subtitle */}
-              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.75, margin: '0 0 22px' }}>
-                <span style={{ color: GOLD, fontWeight: 700 }}>15% הנחה</span> על הרכישה הראשונה<br />
-                <span style={{ color: GOLD, fontWeight: 700 }}>+ הטבות בלעדיות</span> לחברי המועדון
+              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.75, margin: '0 0 8px' }}>
+                מצטרפים למועדון ומקבלים <span style={{ color: GOLD, fontWeight: 700 }}>5% הנחה מיידית</span> + <span style={{ color: GOLD, fontWeight: 700 }}>10% בחזרה</span> לקנייה הבאה 🎁
+              </p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.62)', lineHeight: 1.65, margin: '0 0 22px' }}>
+                כל נקודה שווה 1 ₪. צוברים 10% מסכום הרכישה וניתן לממש מהקנייה הבאה.
               </p>
 
               {/* Form */}
@@ -301,7 +303,7 @@ export default function ClubPopup() {
                   className="cgold"
                   style={{ padding: '13px', width: '100%', marginTop: 6 }}
                 >
-                  {loading ? '⏳ שומר...' : 'הצטרפו וקבלו 15% הנחה'}
+                  {loading ? '⏳ שומר...' : 'קבלו את ההטבה'}
                 </button>
               </form>
             </>
@@ -315,7 +317,7 @@ export default function ClubPopup() {
               </h2>
 
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.82)', lineHeight: 1.7, margin: '0 0 22px' }}>
-                הנה קוד ההנחה שלכם ל-15% על הרכישה הראשונה:
+                הנה קוד ההנחה שלכם ל-5% על הרכישה הראשונה:
               </p>
 
               {/* Coupon box + copy */}

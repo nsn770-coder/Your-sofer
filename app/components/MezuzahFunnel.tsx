@@ -366,7 +366,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
           </div>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 10 }}>נוסף לסל! עכשיו בחר גם בית מזוזה</div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#C5A028', color: '#1a1a1a', borderRadius: 0, padding: '7px 20px', fontSize: 14, fontWeight: 900 }}>
-            <IconGift size={16} color="#1a1a1a" /> 15% הנחה על בתי מזוזה עכשיו
+            <IconGift size={16} color="#1a1a1a" /> 5% הנחה על בתי מזוזה עכשיו
           </div>
         </div>
         <div style={{ padding: '20px 20px 24px' }}>

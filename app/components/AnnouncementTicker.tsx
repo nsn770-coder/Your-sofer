@@ -1,7 +1,7 @@
 'use client';
 
 // פס הודעה סטטי — ללא תזוזה. רקע זהב (צבע האתר), כתב שחור.
-const MESSAGE = '15% הנחה על כל האתר עם קוד קופון: ברכה15';
+const MESSAGE = '5% הנחה על כל האתר עם קוד קופון: ברכה5';
 
 export default function AnnouncementTicker() {
   return (

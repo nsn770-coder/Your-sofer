@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const COUPON_CODE = 'ברכה15';
+const COUPON_CODE = 'ברכה5';
 
 export default function CouponStrip() {
   const [copied, setCopied] = useState(false);
@@ -36,7 +36,7 @@ export default function CouponStrip() {
         }}
       >
         <span className="coupon-label">
-          🎁 קוד קופון להנחה של 15%:
+          🎁 קוד קופון להנחה של 5%:
         </span>
         <span className="coupon-code">
           {COUPON_CODE}
