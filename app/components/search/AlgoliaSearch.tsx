@@ -140,7 +140,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
               onNavigate?.();
             }
           }}
-          style={{ background: '#C5A028', border: 'none', padding: '0 14px', cursor: 'pointer', flexShrink: 0 }}
+          style={{ background: '#373A5A', border: 'none', padding: '0 14px', cursor: 'pointer', flexShrink: 0 }}
           aria-label="חפש"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
@@ -235,7 +235,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
                         </div>
                         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 2 }}>
                           {p.cat    && <span style={{ fontSize: 11, color: '#888' }}>{p.cat}</span>}
-                          {p.price != null && <span style={{ fontSize: 12, fontWeight: 700, color: '#C5A028' }}>₪{p.price}</span>}
+                          {p.price != null && <span style={{ fontSize: 12, fontWeight: 700, color: '#373A5A' }}>₪{p.price}</span>}
                         </div>
                       </div>
                     </button>
@@ -247,7 +247,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
               <div style={{ padding: '8px 16px', borderTop: '1px solid #F0EDE8' }}>
                 <button
                   onClick={() => navigate(`/search?q=${encodeURIComponent(query)}`)}
-                  style={{ background: 'none', border: 'none', color: '#C5A028', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+                  style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
                 >
                   הצג את כל התוצאות ←
                 </button>

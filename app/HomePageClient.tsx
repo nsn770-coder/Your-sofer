@@ -68,17 +68,18 @@ function IconActivityShield() {
   );
 }
 
-// Counter icons
+// Counter icons — navy (brand primary)
+const NAVY = '#373A5A';
 function IconCounterPen({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
     </svg>
   );
 }
 function IconCounterBox({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
       <polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
     </svg>
@@ -86,14 +87,14 @@ function IconCounterBox({ isMobile }: { isMobile: boolean }) {
 }
 function IconCounterCheck({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
 function IconCounterStar({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="#C5A028" stroke="none">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill={NAVY} stroke="none">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </svg>
   );
@@ -241,7 +242,7 @@ function CategoryCard({
       <Link
         href={card.href}
         className="mt-4 block text-right hover:underline"
-        style={{ fontSize: 13, fontWeight: 700, color: '#C5A028' }}
+        style={{ fontSize: 13, fontWeight: 700, color: '#373A5A' }}
       >
         {card.ctaLabel}
       </Link>
@@ -764,24 +765,28 @@ export default function HomePageClient() {
       <style>{`
         .ys-hero-btn-primary {
           display: inline-flex; align-items: center; justify-content: center;
-          background: #C9A227; color: #1a1a1a;
-          border: 2px solid #C9A227;
+          background: #373A5A; color: #FFFFFF;
+          border: 2px solid #373A5A;
           height: 54px; padding: 0 40px; border-radius: 10px;
           font-weight: 800; font-size: 16px; text-decoration: none;
           white-space: nowrap; transition: all 0.2s ease; cursor: pointer;
           font-family: inherit; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
         }
-        .ys-hero-btn-primary:hover { background: transparent; color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.22); }
+        .ys-hero-btn-primary:hover { background: #2F324D; border-color: #2F324D; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.22); }
+        .ys-hero-btn-primary:active { background: #282B43; border-color: #282B43; }
+        .ys-hero-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(55,58,90,0.35); }
         .ys-hscroll::-webkit-scrollbar { display: none; }
         .ys-outline-btn {
           display: inline-flex; align-items: center; justify-content: center;
-          background: #FFFFFF; color: #1a1a1a;
-          border: 1.5px solid #1a1a1a; border-radius: 10px;
+          background: #FFFFFF; color: #373A5A;
+          border: 1.5px solid #373A5A; border-radius: 10px;
           height: 52px; padding: 0 36px;
           font-weight: 700; font-size: 14px; text-decoration: none;
           transition: all 0.2s ease; cursor: pointer; font-family: inherit;
         }
-        .ys-outline-btn:hover { background: #1a1a1a; color: #fff; transform: translateY(-1px); }
+        .ys-outline-btn:hover { background: #373A5A; color: #fff; transform: translateY(-1px); }
+        .ys-outline-btn:active { background: #282B43; border-color: #282B43; color: #fff; }
+        .ys-outline-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(55,58,90,0.35); }
       `}</style>
 
       {/* ── Newsletter popup ── */}
@@ -818,7 +823,7 @@ export default function HomePageClient() {
             </div>
             {wizardStep < 3 && (
               <div style={{ height: 3, background: '#f0f0f0' }}>
-                <div style={{ height: '100%', width: `${((wizardStep + 1) / 3) * 100}%`, background: '#C5A028', transition: 'width 0.4s ease' }} />
+                <div style={{ height: '100%', width: `${((wizardStep + 1) / 3) * 100}%`, background: '#373A5A', transition: 'width 0.4s ease' }} />
               </div>
             )}
             <div style={{ padding: 24 }}>
@@ -829,7 +834,7 @@ export default function HomePageClient() {
                     {[{ val: 'self' as const, label: '👤 לי עצמי' }, { val: 'gift' as const, label: '🎁 מתנה לאחר' }].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardFor(opt.val); setWizardStep(1); }}
                         style={{ padding: '18px 12px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         {opt.label}
                       </button>
@@ -848,7 +853,7 @@ export default function HomePageClient() {
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardBudget(opt.val); setWizardStep(2); }}
                         style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
                         <span style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>{opt.sub}</span>
@@ -868,7 +873,7 @@ export default function HomePageClient() {
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardKashrut(opt.val); setWizardStep(3); fetchWizardResults(wizardBudget, opt.val); }}
                         style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLButtonElement).style.background = '#fffbf0'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
                         <span style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>{opt.sub}</span>
@@ -885,7 +890,7 @@ export default function HomePageClient() {
                     <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
                     לא נמצאו מוצרים מתאימים לפי הסינון.
                     <br />
-                    <button onClick={() => router.push('/category/הכל')} style={{ marginTop: 16, background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
+                    <button onClick={() => router.push('/category/הכל')} style={{ marginTop: 16, background: '#373A5A', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
                   </div>
                 ) : (
                   <>
@@ -893,20 +898,20 @@ export default function HomePageClient() {
                       {wizardResults.map(p => (
                         <div key={p.id} onClick={() => { closeWizard(); router.push(`/product/${p.id}`); }}
                           style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 14px', borderRadius: 0, border: '1px solid #eee', cursor: 'pointer', background: '#fafafa', transition: 'all 0.15s' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#C5A028'; (e.currentTarget as HTMLDivElement).style.background = '#fffbf0'; }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLDivElement).style.background = '#F3F4F9'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#eee'; (e.currentTarget as HTMLDivElement).style.background = '#fafafa'; }}>
                           {(p.imgUrl || p.image_url) && (
                             <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 100)} alt={p.name} loading="lazy" style={{ width: 60, height: 60, borderRadius: 0, objectFit: 'cover', flexShrink: 0 }} />
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                            <div style={{ fontSize: 15, fontWeight: 900, color: '#C5A028' }}>{formatPrice(p.price)}</div>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: '#373A5A' }}>{formatPrice(p.price)}</div>
                           </div>
-                          <span style={{ color: '#C5A028', fontSize: 18, flexShrink: 0 }}>←</span>
+                          <span style={{ color: '#373A5A', fontSize: 18, flexShrink: 0 }}>←</span>
                         </div>
                       ))}
                     </div>
-                    <button onClick={closeWizard} style={{ width: '100%', background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                    <button onClick={closeWizard} style={{ width: '100%', background: '#373A5A', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                       המשך לגלישה
                     </button>
                   </>
@@ -1014,9 +1019,9 @@ export default function HomePageClient() {
                 <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A227', letterSpacing: '0.16em', textTransform: 'uppercase', margin: '0 0 6px' }}>מבצע מיוחד</p>
                 <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 300, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>🏷️ קנו 3, שלמו על 2</h2>
               </div>
-              <a href="/promo/2plus1" style={{ fontSize: 13, fontWeight: 700, color: '#C9A227', textDecoration: 'none', border: '1px solid #C9A227', borderRadius: 10, padding: '9px 20px', whiteSpace: 'nowrap', transition: 'all 0.2s ease' }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#C9A227'; e.currentTarget.style.color = '#1a1a1a'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#C9A227'; }}>
+              <a href="/promo/2plus1" style={{ fontSize: 13, fontWeight: 700, color: '#373A5A', textDecoration: 'none', border: '1px solid #373A5A', borderRadius: 10, padding: '9px 20px', whiteSpace: 'nowrap', transition: 'all 0.2s ease' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#373A5A'; e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#373A5A'; }}>
                 לכל המבצעים ←
               </a>
             </div>
@@ -1043,7 +1048,7 @@ export default function HomePageClient() {
                       </span>
                       <span style={{ fontSize: 11, color: '#9ca3af' }}>יחיד: {formatPrice(p.price)}</span>
                       {promoPrice && (
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#C9A227' }}>3 ב-{formatPrice(Math.round(p.price * 2 * 100) / 100)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#373A5A' }}>3 ב-{formatPrice(Math.round(p.price * 2 * 100) / 100)}</span>
                       )}
                     </div>
                   </a>
@@ -1132,26 +1137,26 @@ export default function HomePageClient() {
         }}>
           {/* לקוחות מרוצים */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
-            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterCheck isMobile={false} /></span>
-            <span ref={customersValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0+</span>
+            <span style={{ color: '#373A5A', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterCheck isMobile={false} /></span>
+            <span ref={customersValRef} style={{ fontSize: 22, fontWeight: 800, color: '#373A5A', lineHeight: 1 }}>0+</span>
             <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>משפחות כבר בחרו בנו</span>
           </div>
           {/* סופרים מוסמכים */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
-            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterPen isMobile={false} /></span>
-            <span ref={soferimValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0</span>
+            <span style={{ color: '#373A5A', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterPen isMobile={false} /></span>
+            <span ref={soferimValRef} style={{ fontSize: 22, fontWeight: 800, color: '#373A5A', lineHeight: 1 }}>0</span>
             <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>סופרים מוסמכים</span>
           </div>
           {/* מוצרים באתר */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
-            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterBox isMobile={false} /></span>
-            <span ref={productsValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0+</span>
+            <span style={{ color: '#373A5A', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterBox isMobile={false} /></span>
+            <span ref={productsValRef} style={{ fontSize: 22, fontWeight: 800, color: '#373A5A', lineHeight: 1 }}>0+</span>
             <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>מוצרים באתר</span>
           </div>
           {/* דירוג ממוצע */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', flex: 1 }}>
-            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterStar isMobile={false} /></span>
-            <span style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>4.8</span>
+            <span style={{ color: '#373A5A', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterStar isMobile={false} /></span>
+            <span style={{ fontSize: 22, fontWeight: 800, color: '#373A5A', lineHeight: 1 }}>4.8</span>
             <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>דירוג ממוצע</span>
           </div>
         </div>
@@ -1225,7 +1230,7 @@ export default function HomePageClient() {
               position: 'relative',
               overflow: 'hidden',
               borderRadius: 20,
-              border: '2px solid #C9A227',
+              border: '2px solid #373A5A',
               textDecoration: 'none',
               boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
               transition: 'all 0.2s ease',
@@ -1250,8 +1255,8 @@ export default function HomePageClient() {
               position: 'absolute',
               bottom: isMobile ? 10 : 18,
               right: isMobile ? 12 : 28,
-              background: '#C9A227',
-              color: '#1a1a1a',
+              background: '#373A5A',
+              color: '#FFFFFF',
               fontWeight: 900,
               fontSize: isMobile ? 12.5 : 15,
               padding: isMobile ? '8px 14px' : '12px 26px',
@@ -1296,7 +1301,7 @@ export default function HomePageClient() {
                   </div>
                   <div style={{ padding: '12px 14px 16px' }}>
                     <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
-                    <p style={{ fontSize: 14, fontWeight: 800, color: '#C9A227', marginBottom: 10, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                    <p style={{ fontSize: 14, fontWeight: 800, color: '#373A5A', marginBottom: 10, display: 'flex', alignItems: 'baseline', gap: 6 }}>
                       {formatPrice(p.price)}
                       {typeof p.was === 'number' && p.was > p.price && (
                         <span style={{ fontSize: 11, fontWeight: 400, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(p.was)}</span>
@@ -1307,9 +1312,9 @@ export default function HomePageClient() {
                         e.stopPropagation();
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1, cat: p.cat || undefined });
                       }}
-                      style={{ background: 'transparent', color: '#1a1a1a', border: '1.5px solid #1a1a1a', borderRadius: 8, fontSize: 11, fontWeight: 700, padding: '6px 10px', cursor: 'pointer', width: '100%', transition: 'all 0.2s ease' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1a1a1a'; }}
+                      style={{ background: 'transparent', color: '#373A5A', border: '1.5px solid #373A5A', borderRadius: 8, fontSize: 11, fontWeight: 700, padding: '6px 10px', cursor: 'pointer', width: '100%', transition: 'all 0.2s ease' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
                     >
                       הוסף לסל
                     </button>

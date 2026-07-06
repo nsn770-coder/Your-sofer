@@ -403,22 +403,22 @@ export default function ProductCard({
               onClick={handleAdd}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: 'transparent', color: '#1a1a1a',
-                height: 44, borderRadius: 8, border: '1.5px solid #1a1a1a',
+                background: 'transparent', color: '#373A5A',
+                height: 44, borderRadius: 8, border: '1.5px solid #373A5A',
                 fontWeight: 700, fontSize: 14, cursor: 'pointer',
                 transition: 'background 0.2s, color 0.2s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#1a1a1a'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
             >
               <IconCart size={13} />
               הוסף לסל
             </button>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FDF8EC', borderRadius: 8, overflow: 'hidden', width: '100%', height: 44, border: '1.5px solid #E8D48A' }}>
-              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
-              <span style={{ color: '#C9A227', fontWeight: 700, fontSize: 15 }}>{qty}</span>
-              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#F3F4F9', borderRadius: 8, overflow: 'hidden', width: '100%', height: 44, border: '1.5px solid #373A5A' }}>
+              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
+              <span style={{ color: '#373A5A', fontWeight: 700, fontSize: 15 }}>{qty}</span>
+              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
             </div>
           )}
         </div>
