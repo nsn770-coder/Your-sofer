@@ -20,9 +20,13 @@ const DARK   = '#111111';
 function isValidEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
-function isValidIsraeliPhone(v: string) {
-  const d = v.replace(/[-\s]/g, '');
-  return /^0(5\d{8}|[2-9]\d{7})$/.test(d);
+// Normalizes an Israeli phone to local format (05X.../0X...): accepts
+// 05X-XXXXXXX, +9725X-XXXXXXX, 9725X-XXXXXXX (also landlines). Returns null if invalid.
+function normalizeIsraeliPhone(v: string): string | null {
+  let d = v.replace(/[-\s()]/g, '');
+  if (d.startsWith('+972')) d = '0' + d.slice(4);
+  else if (d.startsWith('972')) d = '0' + d.slice(3);
+  return /^0(5\d{8}|[2-9]\d{7})$/.test(d) ? d : null;
 }
 
 export default function ClubPopup() {
@@ -55,9 +59,9 @@ export default function ClubPopup() {
 
   function validate(emailVal: string, phoneVal: string): boolean {
     const e: typeof errors = {};
-    if (!isValidEmail(emailVal))        e.email   = 'נא להזין כתובת מייל תקינה';
-    if (!isValidIsraeliPhone(phoneVal)) e.phone   = 'נא להזין מספר טלפון ישראלי תקין (05X-XXXXXXX)';
-    if (!consent)                       e.consent = 'יש לאשר קבלת דיוור לפני ההצטרפות';
+    if (!isValidEmail(emailVal))                 e.email   = 'נא להזין כתובת מייל תקינה';
+    if (normalizeIsraeliPhone(phoneVal) === null) e.phone   = 'נא להזין מספר טלפון ישראלי תקין (05X או +972)';
+    if (!consent)                                e.consent = 'יש לאשר קבלת דיוור לפני ההצטרפות';
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -78,7 +82,7 @@ export default function ClubPopup() {
 
     setLoading(true);
     const normalizedEmail = emailVal.trim().toLowerCase();
-    const normalizedPhone = phoneVal.trim();
+    const normalizedPhone = normalizeIsraeliPhone(phoneVal) ?? phoneVal.trim();
 
     // Step 1: save lead — critical
     try {
@@ -248,7 +252,7 @@ export default function ClubPopup() {
                     inputMode="tel"
                     value={phone}
                     onChange={e => { setPhone(e.target.value); setErrors(p => ({ ...p, phone: undefined })); }}
-                    placeholder="מספר טלפון (05X-XXXXXXX)"
+                    placeholder="מספר טלפון (05X או +972)"
                     className={`ci${errors.phone ? ' err' : ''}`}
                     style={{ direction: 'ltr', textAlign: 'right' } as React.CSSProperties}
                   />
