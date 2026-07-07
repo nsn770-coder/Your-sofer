@@ -32,6 +32,7 @@ interface Product {
   image_url?: string;
   img1?: string; img2?: string; img3?: string;
   imgUrl2?: string; imgUrl3?: string; imgUrl4?: string; imgUrl5?: string;
+  aiLifestyleImage?: string;
   cat?: string;
   badge?: string;
   sofer?: string;
@@ -1698,8 +1699,11 @@ export default function ProductClient() {
 
   const allMediaRaw = [product.imgUrl || product.image_url, product.imgUrl2 || product.img1, product.imgUrl3 || product.img2, product.imgUrl4 || product.img3, product.imgUrl5].filter(Boolean) as string[];
   const allMediaDeduped = [...new Set(allMediaRaw)];
-  // Show AI-generated image (index 1) as primary when available
-  const allMedia = allMediaDeduped.length >= 2 ? [allMediaDeduped[1], allMediaDeduped[0], ...allMediaDeduped.slice(2)] : allMediaDeduped;
+  // תמונת ה-AI lifestyle (שדה ייעודי) מקבלת קדימות כתמונה ראשית.
+  // fallback להתנהגות הישנה: קידום תמונה #2 (אינדקס 1) כתמונת AI כשאין שדה ייעודי.
+  const allMedia = product.aiLifestyleImage
+    ? [product.aiLifestyleImage, ...allMediaDeduped.filter(u => u !== product.aiLifestyleImage)]
+    : (allMediaDeduped.length >= 2 ? [allMediaDeduped[1], allMediaDeduped[0], ...allMediaDeduped.slice(2)] : allMediaDeduped);
   const allMediaOptimized = allMedia.map(u => optimizeCloudinaryUrl(u, 800));
   const allMediaThumb     = allMedia.map(u => optimizeCloudinaryUrl(u, 100));
   const hasVideo = !!product.videoUrl;
