@@ -68,18 +68,17 @@ function IconActivityShield() {
   );
 }
 
-// Counter icons — navy (brand primary)
-const NAVY = '#373A5A';
+// Counter icons — gold
 function IconCounterPen({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
     </svg>
   );
 }
 function IconCounterBox({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
       <polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
     </svg>
@@ -87,14 +86,14 @@ function IconCounterBox({ isMobile }: { isMobile: boolean }) {
 }
 function IconCounterCheck({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
 function IconCounterStar({ isMobile }: { isMobile: boolean }) {
   return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill={NAVY} stroke="none">
+    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="#C5A028" stroke="none">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </svg>
   );
@@ -242,7 +241,7 @@ function CategoryCard({
       <Link
         href={card.href}
         className="mt-4 block text-right hover:underline"
-        style={{ fontSize: 13, fontWeight: 700, color: '#373A5A' }}
+        style={{ fontSize: 13, fontWeight: 700, color: '#C5A028' }}
       >
         {card.ctaLabel}
       </Link>
@@ -997,9 +996,6 @@ export default function HomePageClient() {
             להתחבר לטוב ביותר
           </p>
 
-          <Link href="/category/הכל" className="ys-hero-btn-primary" style={{ alignSelf: 'flex-start' }}>
-            לכל המוצרים ←
-          </Link>
         </div>
       </div>
 
@@ -1137,26 +1133,26 @@ export default function HomePageClient() {
         }}>
           {/* לקוחות מרוצים */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
-            <span style={{ color: '#373A5A', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterCheck isMobile={false} /></span>
-            <span ref={customersValRef} style={{ fontSize: 22, fontWeight: 800, color: '#373A5A', lineHeight: 1 }}>0+</span>
+            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterCheck isMobile={false} /></span>
+            <span ref={customersValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0+</span>
             <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>משפחות כבר בחרו בנו</span>
           </div>
           {/* סופרים מוסמכים */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
-            <span style={{ color: '#373A5A', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterPen isMobile={false} /></span>
-            <span ref={soferimValRef} style={{ fontSize: 22, fontWeight: 800, color: '#373A5A', lineHeight: 1 }}>0</span>
+            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterPen isMobile={false} /></span>
+            <span ref={soferimValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0</span>
             <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>סופרים מוסמכים</span>
           </div>
           {/* מוצרים באתר */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
-            <span style={{ color: '#373A5A', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterBox isMobile={false} /></span>
-            <span ref={productsValRef} style={{ fontSize: 22, fontWeight: 800, color: '#373A5A', lineHeight: 1 }}>0+</span>
+            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterBox isMobile={false} /></span>
+            <span ref={productsValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0+</span>
             <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>מוצרים באתר</span>
           </div>
           {/* דירוג ממוצע */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', flex: 1 }}>
-            <span style={{ color: '#373A5A', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterStar isMobile={false} /></span>
-            <span style={{ fontSize: 22, fontWeight: 800, color: '#373A5A', lineHeight: 1 }}>4.8</span>
+            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterStar isMobile={false} /></span>
+            <span style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>4.8</span>
             <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>דירוג ממוצע</span>
           </div>
         </div>
