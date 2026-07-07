@@ -213,6 +213,11 @@ export default function CartPage() {
                           {item.embroideryText && (
                             <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ ריקמה: {item.embroideryText}</div>
                           )}
+                          {item.embroideryOptions && item.embroideryOptions.length > 0 && (
+                            <div style={{ fontSize: 11, color: '#92400e', fontWeight: 600, marginBottom: 4 }}>
+                              תוספת רקמה ({item.embroideryOptions.join(' + ')}): +₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50}
+                            </div>
+                          )}
                           {item.selectedCover && (
                             <div style={{ fontSize: 11, color: '#5B4B12', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
                               כיסוי נבחר:
@@ -281,6 +286,11 @@ export default function CartPage() {
                           <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText || item.selectedCover ? 4 : 10 }}>✓ במלאי</div>
                           {item.embroideryText && (
                             <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6 }}>✍️ ריקמה: {item.embroideryText}</div>
+                          )}
+                          {item.embroideryOptions && item.embroideryOptions.length > 0 && (
+                            <div style={{ fontSize: 12, color: '#92400e', fontWeight: 600, marginBottom: 6 }}>
+                              תוספת רקמה ({item.embroideryOptions.join(' + ')}): +₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50}
+                            </div>
                           )}
                           {item.selectedCover && (
                             <div style={{ fontSize: 11, color: '#5B4B12', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 4 }}>

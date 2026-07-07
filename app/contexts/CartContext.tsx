@@ -27,6 +27,11 @@ export interface CartItem {
   selectedKlafId?: string;
   selectedKlafName?: string;
   embroideryText?: string;
+  embroideryOptions?: string[];    // 'כיסוי טלית' | 'כיסוי תפילין' — ₪50 לאופציה
+  embroiderySurcharge?: number;    // תוספת רקמה כלולה במחיר הפריט
+  embossingText?: string;          // אותיות ההטבעה על סידור/ספר
+  embossingColor?: 'gold' | 'silver'; // צבע ההטבעה — זהב / כסף
+  embossingSurcharge?: number;     // תוספת הטבעה (₪15) כלולה במחיר הפריט
   selectedCover?: { id: string; name: string; imgUrl: string };
   promoPlan?: string;              // '2+1' for buy-2-get-1-free
   promoPrice?: number;

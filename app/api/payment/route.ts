@@ -460,7 +460,9 @@ export async function POST(req: NextRequest) {
           ...cartItems.map(i => ({
             id: i.id, productId: i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity,
             selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null,
-            embroideryText: i.embroideryText || null, selectedCover: i.selectedCover || null,
+            embroideryText: i.embroideryText || null,
+            embroideryOptions: i.embroideryOptions || null, embroiderySurcharge: i.embroiderySurcharge || null,
+            selectedCover: i.selectedCover || null,
             printCustomization: i.printCustomization || null,
           })),
           ...(giftLine ? [{ id: giftLine.productId || giftLine.id, name: `מתנה: ${giftLine.name}`, price: 0, quantity: 1, isGift: true, giftSourceId: giftLine.id }] : []),

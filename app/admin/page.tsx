@@ -31,6 +31,8 @@ interface OrderItem {
   productName?: string;  // alias used by InventoryTab / ProfitabilityTab
   finalPrice?: number;
   embroideryText?: string | null;
+  embroideryOptions?: string[] | null;
+  embroiderySurcharge?: number | null;
   selectedKlafName?: string | null;
   selectedCover?: { id: string; name: string; imgUrl: string } | null;
   printCustomization?: {
@@ -1751,6 +1753,8 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         productId: it.productId ?? it.id,
         productName: it.productName ?? it.name,
         ...(it.embroideryText != null && { embroideryText: it.embroideryText }),
+        ...(it.embroideryOptions != null && { embroideryOptions: it.embroideryOptions }),
+        ...(it.embroiderySurcharge != null && { embroiderySurcharge: it.embroiderySurcharge }),
         ...(it.selectedKlafName != null && { selectedKlafName: it.selectedKlafName }),
         ...(it.selectedCover != null && { selectedCover: it.selectedCover }),
         ...(it.printCustomization != null && { printCustomization: it.printCustomization }),
@@ -2174,6 +2178,11 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                                           {item.embroideryText && (
                                             <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
                                               ✍️ ריקמה: <strong>{item.embroideryText}</strong>
+                                            </span>
+                                          )}
+                                          {item.embroideryOptions && item.embroideryOptions.length > 0 && (
+                                            <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
+                                              🧵 רקמה על: <strong>{item.embroideryOptions.join(' + ')}</strong> (+₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50})
                                             </span>
                                           )}
                                           {item.selectedKlafName && (

@@ -17,6 +17,8 @@ interface SharedItem {
   selectedKlafId?: string;
   selectedKlafName?: string;
   embroideryText?: string;
+  embroideryOptions?: string[];
+  embroiderySurcharge?: number;
   selectedCover?: { id: string; name: string; imgUrl: string };
 }
 
@@ -79,6 +81,7 @@ export default function SharedCartPage() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: 13, color: '#222', marginBottom: 2 }}>{item.name}</div>
                 {item.embroideryText && <div style={{ fontSize: 11, color: '#666' }}>ריקמה: {item.embroideryText}</div>}
+                {item.embroideryOptions && item.embroideryOptions.length > 0 && <div style={{ fontSize: 11, color: '#666' }}>תוספת רקמה ({item.embroideryOptions.join(' + ')}): +₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50}</div>}
                 {item.selectedKlafName && <div style={{ fontSize: 11, color: '#666' }}>קלף: {item.selectedKlafName}</div>}
               </div>
               <div style={{ textAlign: 'left', flexShrink: 0 }}>

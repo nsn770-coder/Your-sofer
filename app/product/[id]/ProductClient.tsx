@@ -1487,6 +1487,11 @@ export default function ProductClient() {
   const [sizeMatchProducts, setSizeMatchProducts]   = useState<Product[]>([]);
   const [pageDefaults, setPageDefaults]             = useState<PageDefaults | null>(null);
   const [embroideryText, setEmbroideryText] = useState('');
+  const [embTalitCover, setEmbTalitCover]       = useState(false); // רקמה על כיסוי טלית — ₪50
+  const [embTefillinCover, setEmbTefillinCover] = useState(false); // רקמה על כיסוי תפילין — ₪50
+  const [embossingEnabled, setEmbossingEnabled] = useState(false); // הטבעה על סידור/ספר — ₪15
+  const [embossingText, setEmbossingText]       = useState('');
+  const [embossingColor, setEmbossingColor]     = useState<'gold' | 'silver'>('gold');
   const [loading, setLoading]           = useState(true);
   const [activeImg, setActiveImg]       = useState(0);
   const [cartQty, setCartQty]           = useState(0);
@@ -1714,6 +1719,22 @@ export default function ProductClient() {
     : 0;
 
   const EMBROIDERY_CATEGORIES = ['כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן', 'תיקי טלית ותפילין'];
+  // ── רקמה: ₪50 לכל אופציה (כיסוי טלית / כיסוי תפילין) — במקום ₪5 לאות ──────
+  const EMB_OPTION_PRICE = 50;
+  const embroideryOptions: string[] = [
+    ...(embTalitCover ? ['כיסוי טלית'] : []),
+    ...(embTefillinCover ? ['כיסוי תפילין'] : []),
+  ];
+  const embroiderySurcharge = embroideryText.trim() ? embroideryOptions.length * EMB_OPTION_PRICE : 0;
+
+  // ── הטבעה: קטגוריות סידורים/ספרים — ₪15 קבוע ──────────────────────────────
+  const EMBOSSING_CATEGORIES = ['סידורים', 'ספרים'];
+  const EMBOSSING_PRICE = 15;
+  const showEmbossing = !!product?.cat && EMBOSSING_CATEGORIES.includes(product.cat);
+  const embossingSurcharge = showEmbossing && embossingEnabled && embossingText.trim() ? EMBOSSING_PRICE : 0;
+  const embossingFields = embossingSurcharge > 0
+    ? { embossingText: embossingText.trim(), embossingColor, embossingSurcharge }
+    : {};
 const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
 
   const MEZUZAH_CERTS: Certificate[] = [
@@ -1785,15 +1806,21 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
   function handleAddToCart() {
     if (product?.outOfStock) return;
-    const embSurcharge = embroideryText ? embroideryText.length * 5 : 0;
-    const cartPrice = effectivePrice + embSurcharge;
+    if (showEmbossing && embossingEnabled && !embossingText.trim()) {
+      alert('נא להזין את האותיות להטבעה');
+      return;
+    }
+    const cartPrice = effectivePrice + embroiderySurcharge + embossingSurcharge;
+    const embFields = embroiderySurcharge > 0
+      ? { embroideryText: embroideryText.trim(), embroideryOptions, embroiderySurcharge }
+      : {};
     if (selectedKlafIds.length > 0) {
       for (let i = 0; i < selectedKlafIds.length; i++) {
-        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], ...embFields, ...embossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     } else {
       for (let i = 0; i < qty; i++) {
-        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...embFields, ...embossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: effectivePrice * qty, items: [{ item_id: product!.id, item_name: product!.name, price: effectivePrice, quantity: qty }] });
@@ -1926,17 +1953,34 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {product.cat && EMBROIDERY_CATEGORIES.includes(product.cat) && (
         <div style={{ marginBottom: 12 }}>
           <label style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
-            <Icon.Pen /> טקסט לריקמה אישית
+            <Icon.Pen /> ריקמה אישית
           </label>
-          <p style={{ fontSize: 11, color: '#888', marginTop: 2, marginBottom: 6 }}>* כל אות עולה 5 ש״ח</p>
-          <input type="text" defaultValue={embroideryText} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
-            style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
-            onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { setEmbroideryText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
-          <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>הטקסט יירקם על המוצר - עד 30 תווים</p>
-          {embroideryText.length > 0 && (
-            <div style={{ fontSize: 12, color: '#C9A227', fontWeight: 700, marginTop: 4 }}>
-              תוספת ריקמה: {embroideryText.length} אותיות × ₪5 = ₪{embroideryText.length * 5}
-            </div>
+          <p style={{ fontSize: 11, color: '#888', marginTop: 2, marginBottom: 6 }}>* כל אופציה עולה ₪{EMB_OPTION_PRICE} — ניתן לבחור אחת או שתיהן</p>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            <button type="button" onClick={() => setEmbTalitCover(v => !v)}
+              style={{ flex: 1, padding: '9px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif', border: embTalitCover ? '1.5px solid #C9A227' : '1.5px solid #e0e0e0', background: embTalitCover ? '#FDF8EC' : '#fff', color: embTalitCover ? '#8a6d0f' : '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+              {embTalitCover ? '✓ ' : ''}רקמה על כיסוי טלית · ₪{EMB_OPTION_PRICE}
+            </button>
+            <button type="button" onClick={() => setEmbTefillinCover(v => !v)}
+              style={{ flex: 1, padding: '9px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif', border: embTefillinCover ? '1.5px solid #C9A227' : '1.5px solid #e0e0e0', background: embTefillinCover ? '#FDF8EC' : '#fff', color: embTefillinCover ? '#8a6d0f' : '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+              {embTefillinCover ? '✓ ' : ''}רקמה על כיסוי תפילין · ₪{EMB_OPTION_PRICE}
+            </button>
+          </div>
+          {(embTalitCover || embTefillinCover) && (
+            <>
+              <input type="text" defaultValue={embroideryText} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
+                style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
+                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { setEmbroideryText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
+              <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>הטקסט יירקם על המוצר - עד 30 תווים</p>
+              {!embroideryText.trim() && (
+                <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginTop: 3 }}>יש להזין את הטקסט לרקמה</div>
+              )}
+              {embroiderySurcharge > 0 && (
+                <div style={{ fontSize: 12, color: '#C9A227', fontWeight: 700, marginTop: 4 }}>
+                  תוספת ריקמה: {embroideryOptions.length} × ₪{EMB_OPTION_PRICE} = ₪{embroiderySurcharge}
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -2019,7 +2063,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </span>
           <button
             onClick={() => {
-              addItem({ id: product!.id, name: product!.name, price: product!.price + (embroideryText ? embroideryText.length * 5 : 0), imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, embroideryText: embroideryText || undefined, bundlePromo: product!.bundlePromo || undefined });
+              addItem({ id: product!.id, name: product!.name, price: product!.price + embroiderySurcharge + embossingSurcharge, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...(embroiderySurcharge > 0 ? { embroideryText: embroideryText.trim(), embroideryOptions, embroiderySurcharge } : {}), ...embossingFields, bundlePromo: product!.bundlePromo || undefined });
               setCartQty(c => c + 1);
             }}
             style={{ flex: '0 0 48px', background: 'transparent', border: 'none', color: '#C9A227', fontSize: 22, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
