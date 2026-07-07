@@ -1519,6 +1519,8 @@ export default function ProductClient() {
   const [descExpanded, setDescExpanded] = useState(false);
   const buyBoxRef = useRef<HTMLDivElement>(null);
   const mobileBuyBoxRef = useRef<HTMLDivElement>(null);
+  const embroideryTextRef = useRef<HTMLInputElement>(null); // קריאת טקסט רקמה עדכני בזמן הוספה לסל
+  const embossingTextRef = useRef<HTMLInputElement>(null);   // קריאת טקסט הטבעה עדכני בזמן הוספה לסל
   const [stickyBarVisible, setStickyBarVisible] = useState(false);
   const { setStamPage } = useChatPersona();
 
@@ -1815,26 +1817,41 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
   function handleAddToCart() {
     if (product?.outOfStock) return;
-    if (showEmbossing && embossingEnabled && !embossingText.trim()) {
+    // קריאת ערכים עדכניים מהשדות (uncontrolled) כדי שלחיצה אחת תספיק
+    const liveEmbText = (embroideryTextRef.current?.value ?? embroideryText).trim();
+    const liveEmbSurcharge = liveEmbText ? embroideryOptions.length * EMB_OPTION_PRICE : 0;
+    const liveEmbossText = (embossingTextRef.current?.value ?? embossingText).trim();
+    const liveEmbossSurcharge = showEmbossing && embossingEnabled && liveEmbossText ? EMBOSSING_PRICE : 0;
+    // סנכרון ל-state לתצוגה עקבית (תוספת מחיר / כרטיס פריט)
+    if (liveEmbText !== embroideryText) setEmbroideryText(liveEmbText);
+    if (liveEmbossText !== embossingText) setEmbossingText(liveEmbossText);
+
+    if (showEmbossing && embossingEnabled && !liveEmbossText) {
       alert('נא להזין את האותיות להטבעה');
       return;
     }
     // חסימת הוספה לסל אם נבחרה רקמה אך לא נבחר צבע חוט
-    if (embroiderySurcharge > 0 && !threadColor) {
+    if (liveEmbSurcharge > 0 && !threadColor) {
       setThreadColorError('בחר צבע חוט לרקמה לפני הוספה לסל');
       return;
     }
-    const cartPrice = effectivePrice + embroiderySurcharge + embossingSurcharge;
-    const embFields = embroiderySurcharge > 0
-      ? { embroideryText: embroideryText.trim(), embroideryOptions, embroiderySurcharge }
+    const cartPrice = effectivePrice + liveEmbSurcharge + liveEmbossSurcharge;
+    const embFields = liveEmbSurcharge > 0
+      ? { embroideryText: liveEmbText, embroideryOptions, embroiderySurcharge: liveEmbSurcharge }
+      : {};
+    const liveThreadFields = liveEmbSurcharge > 0 && threadColor
+      ? { threadColor: { id: threadColor.id, name: threadColor.name, hex: threadColor.hex } }
+      : {};
+    const liveEmbossingFields = liveEmbossSurcharge > 0
+      ? { embossingText: liveEmbossText, embossingColor, embossingSurcharge: liveEmbossSurcharge }
       : {};
     if (selectedKlafIds.length > 0) {
       for (let i = 0; i < selectedKlafIds.length; i++) {
-        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], ...embFields, ...embThreadFields, ...embossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], ...embFields, ...liveThreadFields, ...liveEmbossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     } else {
       for (let i = 0; i < qty; i++) {
-        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...embFields, ...embThreadFields, ...embossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...embFields, ...liveThreadFields, ...liveEmbossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: effectivePrice * qty, items: [{ item_id: product!.id, item_name: product!.name, price: effectivePrice, quantity: qty }] });
@@ -1982,9 +1999,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </div>
           {(embTalitCover || embTefillinCover) && (
             <>
-              <input type="text" value={embroideryText} onChange={e => setEmbroideryText(e.target.value)} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
+              <input type="text" ref={embroideryTextRef} defaultValue={embroideryText} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
                 style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
-                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { e.target.style.borderColor = '#e0e0e0'; }} />
+                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { setEmbroideryText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
               <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>הטקסט יירקם על המוצר - עד 30 תווים</p>
               {!embroideryText.trim() && (
                 <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginTop: 3 }}>יש להזין את הטקסט לרקמה</div>
@@ -2025,9 +2042,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           {embossingEnabled && (
             <div style={{ marginTop: 12 }}>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#444', display: 'block', marginBottom: 4 }}>האותיות שיופיעו בהטבעה:</label>
-              <input type="text" value={embossingText} onChange={e => setEmbossingText(e.target.value)} placeholder="לדוגמה: משפחת כהן" maxLength={30}
+              <input type="text" ref={embossingTextRef} defaultValue={embossingText} placeholder="לדוגמה: משפחת כהן" maxLength={30}
                 style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
-                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { e.target.style.borderColor = '#e0e0e0'; }} />
+                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { setEmbossingText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
               <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>עד 30 תווים</p>
 
               <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginTop: 10, marginBottom: 6 }}>צבע ההטבעה:</div>

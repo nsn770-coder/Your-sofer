@@ -108,18 +108,33 @@ const imageModel = genAI.getGenerativeModel({
   model: 'gemini-2.5-flash-image',
 });
 
+// שדות התמונה בסכימה של YourSofer: imgUrl (string) ו-images (array). לא imageUrl/image.
+function resolveSourceImage(product) {
+  return (
+    product.imgUrl ||
+    (Array.isArray(product.images) ? product.images[0] : product.images) ||
+    product.imageUrl ||
+    product.image ||
+    null
+  );
+}
+
 // ─── יצירת תמונה אחת + העלאה ל-Cloudinary ──────────────────
 async function generateAndUpload(product, prompt) {
-  // שולחים את תמונת המוצר הקיימת כרפרנס כדי לשמר זהות מדויקת
-  const parts = [{ text: prompt }];
-  if (product.imageUrl || product.image) {
-    const srcUrl = product.imageUrl || product.image;
-    const imgResp = await fetch(srcUrl);
-    const buf = Buffer.from(await imgResp.arrayBuffer());
-    parts.unshift({
-      inlineData: { mimeType: 'image/jpeg', data: buf.toString('base64') },
-    });
-  }
+  // חובה לשלוח את תמונת המוצר המקורית כרפרנס (image-to-image) כדי לשמר זהות מדויקת.
+  // בלי רפרנס — Gemini ממציא מוצר ומצייר טקסט מהכותרת. לכן מדלגים במקום להמציא.
+  const srcUrl = resolveSourceImage(product);
+  if (!srcUrl) throw new Error('אין תמונת מקור (imgUrl/images) — דילוג כדי לא להמציא מוצר');
+
+  const imgResp = await fetch(srcUrl);
+  if (!imgResp.ok) throw new Error(`טעינת תמונת מקור נכשלה: HTTP ${imgResp.status}`);
+  const mimeType = imgResp.headers.get('content-type')?.split(';')[0] || 'image/jpeg';
+  const buf = Buffer.from(await imgResp.arrayBuffer());
+
+  const parts = [
+    { inlineData: { mimeType, data: buf.toString('base64') } },
+    { text: prompt },
+  ];
 
   const result = await imageModel.generateContent(parts);
   const imgPart = result.response.candidates?.[0]?.content?.parts?.find(

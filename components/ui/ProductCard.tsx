@@ -14,6 +14,7 @@ interface Props {
   name: string;
   price: number;
   images: string[];
+  aiLifestyleImage?: string;
   priority?: number;
   isBestSeller?: boolean;
   badge?: string | null;
@@ -115,7 +116,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProductCard({
-  id, name, price, images, priority, isBestSeller, badge, bundlePromo, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
+  id, name, price, images, aiLifestyleImage, priority, isBestSeller, badge, bundlePromo, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
   soferId, soferName, soferPhoto, horizontal, stars, outOfStock, clearanceDiscount, clearanceSalePrice, originalPrice,
 }: Props) {
   const router = useRouter();
@@ -157,7 +158,8 @@ export default function ProductCard({
     setTimeout(() => setRemoved(true), 300);
   }
 
-  const thumbRaw     = (images?.length ?? 0) >= 2 ? images[1] : (images?.[0] ?? '');
+  // תמונת ה-AI lifestyle מקבלת עדיפות כתמונה שמוצגת בגלילה; אחרת התנהגות קודמת (images[1])
+  const thumbRaw     = aiLifestyleImage || ((images?.length ?? 0) >= 2 ? images[1] : (images?.[0] ?? ''));
   const imgSrc       = optimizeCloudinaryUrl(thumbRaw, 400) || null;
   const itemInCart   = items.find(i => i.id === id);
   const qty          = itemInCart?.quantity ?? 0;

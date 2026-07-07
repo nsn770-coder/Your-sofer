@@ -27,6 +27,7 @@ interface Product {
   image_url?: string;
   imgUrl2?: string;
   imgUrl3?: string;
+  aiLifestyleImage?: string;
   priority?: number;
   isBestSeller?: boolean;
   badge?: string | null;
@@ -1725,7 +1726,7 @@ export default function CategoryClient({ category }: { category: string }) {
                             ) : (
                               <ProductCard
                                 id={p.id} name={p.name} price={p.price}
-                                images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                                images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]} aiLifestyleImage={p.aiLifestyleImage}
                                 priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge} bundlePromo={p.bundlePromo}
                                 was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
                                 hasKlafSelection={p.hasKlafSelection} cat={p.cat}
@@ -1982,7 +1983,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   ) : (
                     <div key={p.id} className="ys-fade-card">
                       <ProductCard id={p.id} name={p.name} price={p.price}
-                        images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                        images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]} aiLifestyleImage={p.aiLifestyleImage}
                         priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge} bundlePromo={p.bundlePromo}
                         was={p.was} createdAt={p.createdAt} aboveFold={idx < 4}
                         hasKlafSelection={p.hasKlafSelection} cat={p.cat}
@@ -2068,7 +2069,7 @@ export default function CategoryClient({ category }: { category: string }) {
                           id={p.id}
                           name={p.name}
                           price={p.price}
-                          images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                          images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]} aiLifestyleImage={p.aiLifestyleImage}
                           priority={p.priority}
                           isBestSeller={p.isBestSeller}
                           badge={p.badge}
@@ -2116,7 +2117,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 id={p.id}
                                 name={p.name}
                                 price={p.price}
-                                images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+                                images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]} aiLifestyleImage={p.aiLifestyleImage}
                                 priority={p.priority}
                                 isBestSeller={p.isBestSeller}
                                 badge={p.badge}
