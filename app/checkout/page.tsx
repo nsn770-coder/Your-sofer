@@ -120,6 +120,7 @@ function OrderSummary({
               <div style={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', lineHeight: 1.4, overflowWrap: 'break-word' }}>{item.name}</div>
               <div style={{ fontSize: 11, color: '#999' }}>כמות: {item.quantity}</div>
               {item.selectedKlafName && <div style={{ fontSize: 10, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 3 }}><IconCheck size={9} color="#1a6b3c" /> {item.selectedKlafName}</div>}
+              {item.threadColor && <div style={{ fontSize: 10, color: '#92400e', display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 11, height: 11, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} /> צבע חוט: {item.threadColor.id} - {item.threadColor.name}</div>}
             </div>
             <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', flexShrink: 1, minWidth: 0 }}>{formatPrice(item.price * item.quantity)}</div>
           </div>

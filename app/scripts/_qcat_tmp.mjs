@@ -1,0 +1,14 @@
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+const __d = dirname(fileURLToPath(import.meta.url));
+const SA = resolve(__d,'serviceAccount.json');
+if(getApps().length===0) initializeApp({credential:cert(SA)});
+const db=getFirestore();
+const snap=await db.collection('products').select('category').get();
+const c={};
+snap.forEach(d=>{const v=Object.prototype.hasOwnProperty.call(d.data(),'category')?d.data().category:'∅MISSING'; c[v]=(c[v]||0)+1;});
+const rows=Object.entries(c).sort((a,b)=>b[1]-a[1]);
+console.log('TOTAL_DOCS',snap.size,'DISTINCT',rows.length);
+for(const [k,v] of rows) console.log(v+'\t'+JSON.stringify(k));

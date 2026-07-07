@@ -33,6 +33,7 @@ interface OrderItem {
   embroideryText?: string | null;
   embroideryOptions?: string[] | null;
   embroiderySurcharge?: number | null;
+  threadColor?: { id: string; name: string; hex: string } | null;
   selectedKlafName?: string | null;
   selectedCover?: { id: string; name: string; imgUrl: string } | null;
   printCustomization?: {
@@ -1755,6 +1756,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         ...(it.embroideryText != null && { embroideryText: it.embroideryText }),
         ...(it.embroideryOptions != null && { embroideryOptions: it.embroideryOptions }),
         ...(it.embroiderySurcharge != null && { embroiderySurcharge: it.embroiderySurcharge }),
+        ...(it.threadColor != null && { threadColor: it.threadColor }),
         ...(it.selectedKlafName != null && { selectedKlafName: it.selectedKlafName }),
         ...(it.selectedCover != null && { selectedCover: it.selectedCover }),
         ...(it.printCustomization != null && { printCustomization: it.printCustomization }),
@@ -2183,6 +2185,12 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                                           {item.embroideryOptions && item.embroideryOptions.length > 0 && (
                                             <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
                                               🧵 רקמה על: <strong>{item.embroideryOptions.join(' + ')}</strong> (+₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50})
+                                            </span>
+                                          )}
+                                          {item.threadColor && (
+                                            <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
+                                              <span style={{ width: 12, height: 12, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} />
+                                              חוט: <strong>{item.threadColor.id} · {item.threadColor.name}</strong>
                                             </span>
                                           )}
                                           {item.selectedKlafName && (
