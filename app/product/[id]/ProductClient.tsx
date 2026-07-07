@@ -1731,10 +1731,10 @@ export default function ProductClient() {
   ];
   const embroiderySurcharge = embroideryText.trim() ? embroideryOptions.length * EMB_OPTION_PRICE : 0;
 
-  // ── הטבעה: קטגוריות סידורים/ספרים — ₪15 קבוע ──────────────────────────────
-  const EMBOSSING_CATEGORIES = ['סידורים', 'ספרים'];
+  // ── הטבעה: קטגוריית ספרי קודש וסידורים — ₪15 קבוע ─────────────────────────
+  const EMBOSSING_CATEGORIES = ['ספרי קודש וסידורים'];
   const EMBOSSING_PRICE = 15;
-  const showEmbossing = !!product?.cat && EMBOSSING_CATEGORIES.includes(product.cat);
+  const showEmbossing = !!product?.cat && EMBOSSING_CATEGORIES.some(c => product.cat!.includes(c));
   const embossingSurcharge = showEmbossing && embossingEnabled && embossingText.trim() ? EMBOSSING_PRICE : 0;
   const embossingFields = embossingSurcharge > 0
     ? { embossingText: embossingText.trim(), embossingColor, embossingSurcharge }
