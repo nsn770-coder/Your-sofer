@@ -105,6 +105,7 @@ export interface CartItem extends Product {
   embroideryText?: string;
   embroideryOptions?: string[];    // 'כיסוי טלית' | 'כיסוי תפילין' — ₪50 לאופציה
   embroiderySurcharge?: number;    // תוספת רקמה כלולה במחיר הפריט
+  threadColor?: { id: string; name: string; hex: string }; // צבע חוט הרקמה שנבחר
   embossingText?: string;          // אותיות ההטבעה על סידור/ספר
   embossingColor?: 'gold' | 'silver'; // צבע ההטבעה — זהב / כסף
   embossingSurcharge?: number;     // תוספת הטבעה (₪15) כלולה במחיר הפריט

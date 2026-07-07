@@ -462,6 +462,8 @@ export async function POST(req: NextRequest) {
             selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null,
             embroideryText: i.embroideryText || null,
             embroideryOptions: i.embroideryOptions || null, embroiderySurcharge: i.embroiderySurcharge || null,
+            threadColor: i.threadColor || null,
+            embossingText: i.embossingText || null, embossingColor: i.embossingColor || null, embossingSurcharge: i.embossingSurcharge || null,
             selectedCover: i.selectedCover || null,
             printCustomization: i.printCustomization || null,
           })),

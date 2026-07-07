@@ -14,6 +14,8 @@ import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import NextImage from 'next/image';
 import CertificatesSection, { type Certificate } from '@/app/components/CertificatesSection';
 import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES } from '@/app/components/ProductLabelPrint';
+import EmbroideryThreadColorPicker from '@/app/components/EmbroideryThreadColorPicker';
+import type { ThreadColor } from '@/app/data/threadColors';
 import dynamic from 'next/dynamic';
 const MezuzahUpsellPopup = dynamic(() => import('@/components/MezuzahUpsellPopup'), { ssr: false });
 
@@ -1492,6 +1494,8 @@ export default function ProductClient() {
   const [embossingEnabled, setEmbossingEnabled] = useState(false); // הטבעה על סידור/ספר — ₪15
   const [embossingText, setEmbossingText]       = useState('');
   const [embossingColor, setEmbossingColor]     = useState<'gold' | 'silver'>('gold');
+  const [threadColor, setThreadColor]           = useState<ThreadColor | null>(null); // צבע חוט הרקמה
+  const [threadColorError, setThreadColorError] = useState('');
   const [loading, setLoading]           = useState(true);
   const [activeImg, setActiveImg]       = useState(0);
   const [cartQty, setCartQty]           = useState(0);
@@ -1735,6 +1739,11 @@ export default function ProductClient() {
   const embossingFields = embossingSurcharge > 0
     ? { embossingText: embossingText.trim(), embossingColor, embossingSurcharge }
     : {};
+
+  // ── צבע חוט לרקמה — נדרש כאשר הרקמה פעילה (טקסט + אופציה נבחרה) ──────────────
+  const embThreadFields = embroiderySurcharge > 0 && threadColor
+    ? { threadColor: { id: threadColor.id, name: threadColor.name, hex: threadColor.hex } }
+    : {};
 const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
 
   const MEZUZAH_CERTS: Certificate[] = [
@@ -1810,17 +1819,22 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       alert('נא להזין את האותיות להטבעה');
       return;
     }
+    // חסימת הוספה לסל אם נבחרה רקמה אך לא נבחר צבע חוט
+    if (embroiderySurcharge > 0 && !threadColor) {
+      setThreadColorError('בחר צבע חוט לרקמה לפני הוספה לסל');
+      return;
+    }
     const cartPrice = effectivePrice + embroiderySurcharge + embossingSurcharge;
     const embFields = embroiderySurcharge > 0
       ? { embroideryText: embroideryText.trim(), embroideryOptions, embroiderySurcharge }
       : {};
     if (selectedKlafIds.length > 0) {
       for (let i = 0; i < selectedKlafIds.length; i++) {
-        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], ...embFields, ...embossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], ...embFields, ...embThreadFields, ...embossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     } else {
       for (let i = 0; i < qty; i++) {
-        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...embFields, ...embossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...embFields, ...embThreadFields, ...embossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: effectivePrice * qty, items: [{ item_id: product!.id, item_name: product!.name, price: effectivePrice, quantity: qty }] });
@@ -1980,7 +1994,63 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   תוספת ריקמה: {embroideryOptions.length} × ₪{EMB_OPTION_PRICE} = ₪{embroiderySurcharge}
                 </div>
               )}
+              {/* בורר צבע חוט לרקמה */}
+              <div style={{ marginTop: 12 }}>
+                <EmbroideryThreadColorPicker
+                  value={threadColor}
+                  onChange={(c) => { setThreadColor(c); setThreadColorError(''); }}
+                  required
+                  error={threadColorError || undefined}
+                />
+              </div>
             </>
+          )}
+        </div>
+      )}
+
+      {/* Embossing — siddurim & books */}
+      {showEmbossing && (
+        <div style={{ marginBottom: 12, padding: '12px 14px', background: '#fff', border: '1px solid #e5d9c3', borderRadius: 12 }}>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, cursor: 'pointer' }}>
+            <span style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: 13, fontWeight: 800, color: '#1a1a1a', display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Icon.Pen /> הוספת הטבעה אישית
+              </span>
+              <span style={{ fontSize: 11, color: '#888', marginTop: 2 }}>הטבעת אותיות / שם על הכריכה · תוספת ₪{EMBOSSING_PRICE}</span>
+            </span>
+            <input type="checkbox" checked={embossingEnabled} onChange={e => setEmbossingEnabled(e.target.checked)}
+              style={{ width: 18, height: 18, accentColor: '#C9A227', flexShrink: 0, cursor: 'pointer' }} />
+          </label>
+
+          {embossingEnabled && (
+            <div style={{ marginTop: 12 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#444', display: 'block', marginBottom: 4 }}>האותיות שיופיעו בהטבעה:</label>
+              <input type="text" defaultValue={embossingText} placeholder="לדוגמה: משפחת כהן" maxLength={30}
+                style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
+                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { setEmbossingText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
+              <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>עד 30 תווים</p>
+
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginTop: 10, marginBottom: 6 }}>צבע ההטבעה:</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type="button" onClick={() => setEmbossingColor('gold')}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif', border: embossingColor === 'gold' ? '1.5px solid #C9A227' : '1.5px solid #e0e0e0', background: embossingColor === 'gold' ? '#FDF8EC' : '#fff', color: embossingColor === 'gold' ? '#8a6d0f' : '#555' }}>
+                  <span style={{ width: 16, height: 16, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', background: 'linear-gradient(135deg,#f7e08a,#c9a227)' }} />
+                  {embossingColor === 'gold' ? '✓ ' : ''}זהב
+                </button>
+                <button type="button" onClick={() => setEmbossingColor('silver')}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif', border: embossingColor === 'silver' ? '1.5px solid #9ca3af' : '1.5px solid #e0e0e0', background: embossingColor === 'silver' ? '#f5f5f5' : '#fff', color: embossingColor === 'silver' ? '#444' : '#555' }}>
+                  <span style={{ width: 16, height: 16, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', background: 'linear-gradient(135deg,#eaeaea,#a8a8a8)' }} />
+                  {embossingColor === 'silver' ? '✓ ' : ''}כסף
+                </button>
+              </div>
+
+              {!embossingText.trim() && (
+                <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginTop: 6 }}>יש להזין את האותיות להטבעה</div>
+              )}
+              {embossingSurcharge > 0 && (
+                <div style={{ fontSize: 12, color: '#C9A227', fontWeight: 700, marginTop: 6 }}>תוספת הטבעה: +₪{EMBOSSING_PRICE}</div>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -2063,7 +2133,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </span>
           <button
             onClick={() => {
-              addItem({ id: product!.id, name: product!.name, price: product!.price + embroiderySurcharge + embossingSurcharge, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...(embroiderySurcharge > 0 ? { embroideryText: embroideryText.trim(), embroideryOptions, embroiderySurcharge } : {}), ...embossingFields, bundlePromo: product!.bundlePromo || undefined });
+              addItem({ id: product!.id, name: product!.name, price: product!.price + embroiderySurcharge + embossingSurcharge, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...(embroiderySurcharge > 0 ? { embroideryText: embroideryText.trim(), embroideryOptions, embroiderySurcharge } : {}), ...embThreadFields, ...embossingFields, bundlePromo: product!.bundlePromo || undefined });
               setCartQty(c => c + 1);
             }}
             style={{ flex: '0 0 48px', background: 'transparent', border: 'none', color: '#C9A227', fontSize: 22, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -213,9 +213,20 @@ export default function CartPage() {
                           {item.embroideryText && (
                             <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ ריקמה: {item.embroideryText}</div>
                           )}
+                          {item.threadColor && (
+                            <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ width: 12, height: 12, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} />
+                              צבע חוט: {item.threadColor.id} - {item.threadColor.name}
+                            </div>
+                          )}
                           {item.embroideryOptions && item.embroideryOptions.length > 0 && (
                             <div style={{ fontSize: 11, color: '#92400e', fontWeight: 600, marginBottom: 4 }}>
                               תוספת רקמה ({item.embroideryOptions.join(' + ')}): +₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50}
+                            </div>
+                          )}
+                          {item.embossingText && (
+                            <div style={{ fontSize: 11, color: '#92400e', fontWeight: 600, marginBottom: 4 }}>
+                              🔖 הטבעה: {item.embossingText} ({item.embossingColor === 'silver' ? 'כסף' : 'זהב'}) +₪{item.embossingSurcharge ?? 15}
                             </div>
                           )}
                           {item.selectedCover && (
@@ -283,13 +294,24 @@ export default function CartPage() {
                             onMouseLeave={e => (e.currentTarget.style.color = '#0f1111')}>
                             {item.name}
                           </div>
-                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText || item.selectedCover ? 4 : 10 }}>✓ במלאי</div>
+                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText || item.embossingText || item.selectedCover ? 4 : 10 }}>✓ במלאי</div>
                           {item.embroideryText && (
                             <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6 }}>✍️ ריקמה: {item.embroideryText}</div>
+                          )}
+                          {item.threadColor && (
+                            <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 5 }}>
+                              <span style={{ width: 14, height: 14, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} />
+                              צבע חוט: {item.threadColor.id} - {item.threadColor.name}
+                            </div>
                           )}
                           {item.embroideryOptions && item.embroideryOptions.length > 0 && (
                             <div style={{ fontSize: 12, color: '#92400e', fontWeight: 600, marginBottom: 6 }}>
                               תוספת רקמה ({item.embroideryOptions.join(' + ')}): +₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50}
+                            </div>
+                          )}
+                          {item.embossingText && (
+                            <div style={{ fontSize: 12, color: '#92400e', fontWeight: 600, marginBottom: 6 }}>
+                              🔖 הטבעה: {item.embossingText} ({item.embossingColor === 'silver' ? 'כסף' : 'זהב'}) +₪{item.embossingSurcharge ?? 15}
                             </div>
                           )}
                           {item.selectedCover && (
