@@ -1982,9 +1982,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </div>
           {(embTalitCover || embTefillinCover) && (
             <>
-              <input type="text" defaultValue={embroideryText} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
+              <input type="text" value={embroideryText} onChange={e => setEmbroideryText(e.target.value)} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
                 style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
-                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { setEmbroideryText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
+                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { e.target.style.borderColor = '#e0e0e0'; }} />
               <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>הטקסט יירקם על המוצר - עד 30 תווים</p>
               {!embroideryText.trim() && (
                 <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginTop: 3 }}>יש להזין את הטקסט לרקמה</div>
@@ -2025,9 +2025,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           {embossingEnabled && (
             <div style={{ marginTop: 12 }}>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#444', display: 'block', marginBottom: 4 }}>האותיות שיופיעו בהטבעה:</label>
-              <input type="text" defaultValue={embossingText} placeholder="לדוגמה: משפחת כהן" maxLength={30}
+              <input type="text" value={embossingText} onChange={e => setEmbossingText(e.target.value)} placeholder="לדוגמה: משפחת כהן" maxLength={30}
                 style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
-                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { setEmbossingText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
+                onFocus={e => (e.target.style.borderColor = '#C5A028')} onBlur={e => { e.target.style.borderColor = '#e0e0e0'; }} />
               <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>עד 30 תווים</p>
 
               <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginTop: 10, marginBottom: 6 }}>צבע ההטבעה:</div>
