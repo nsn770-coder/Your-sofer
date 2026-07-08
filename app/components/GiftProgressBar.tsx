@@ -37,15 +37,16 @@ export default function GiftProgressBar() {
           position:     'fixed',
           bottom:       'calc(14px + env(safe-area-inset-bottom, 0px))',
           left:         16,
-          right:        16,
+          right:        84, /* leaves room for the floating WhatsApp button (bottom-right) */
+          maxWidth:     560,
           zIndex:       9990,
           borderRadius: 9999,
           background:   '#1a1a1a',
           boxShadow:    '0 6px 28px rgba(0,0,0,0.38)',
           display:      'flex',
           alignItems:   'center',
-          padding:      '8px 8px 8px 10px',
-          gap:          10,
+          padding:      '6px 6px 6px 8px',
+          gap:          8,
           fontFamily:   'var(--font-heebo), Arial, sans-serif',
         }}
       >
@@ -54,10 +55,10 @@ export default function GiftProgressBar() {
           <div
             className={giftEligible ? 'gift-icon-pulse' : ''}
             style={{
-              width: 42, height: 42, borderRadius: '50%',
+              width: 36, height: 36, borderRadius: '50%',
               background: 'linear-gradient(135deg, #C9A227, #E6C25A)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 20,
+              fontSize: 17,
             }}
           >
             🎁
@@ -81,12 +82,12 @@ export default function GiftProgressBar() {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
             color:      '#fff',
-            fontSize:   'clamp(11px, 3.2vw, 13px)',
+            fontSize:   'clamp(10px, 3vw, 12px)',
             fontWeight: 600,
             whiteSpace: 'nowrap',
             overflow:   'hidden',
             textOverflow: 'ellipsis',
-            marginBottom: 5,
+            marginBottom: 4,
           }}>
             {giftEligible
               ? 'זכית במתנה חינם! 🎉'
@@ -117,7 +118,7 @@ export default function GiftProgressBar() {
             color:          '#1a1a1a',
             border:         'none',
             borderRadius:   9999,
-            padding:        '6px 14px',
+            padding:        '5px 11px',
             cursor:         'pointer',
             display:        'flex',
             flexDirection:  'column',

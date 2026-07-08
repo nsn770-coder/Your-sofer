@@ -2390,6 +2390,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                 </video>
               ) : (
                 <img src={allMediaOptimized[activeImg] || '/placeholder.png'} alt={product.name} onClick={() => setZoomVisible(true)}
+                  /* LCP: main product image — eager + high priority (preloaded in page.tsx) */
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                   style={{ width: '100%', aspectRatio: isMobile ? '4/3' : '1', objectFit: 'contain', padding: isMobile ? 8 : 20, display: 'block' }}
                   onError={e => (e.currentTarget.style.display = 'none')} />
               )}

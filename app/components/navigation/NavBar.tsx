@@ -463,13 +463,13 @@ function NavBarContent() {
           </div>
 
           {/* ── Search area (desktop only) ───────────────────────────── */}
-          {isMobile ? (
-            <div style={{ flex: 1 }} />
-          ) : (
-            <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
-              <AlgoliaSearch onNavigate={() => setActiveId(null)} />
-            </div>
-          )}
+          {/* CLS FIX: shown/hidden via CSS media query instead of isMobile state,
+              which rendered the desktop search on phones for the first paint and
+              then removed it after hydration (header height jump on every page). */}
+          <div className="hidden lg:block" style={{ flex: 1, minWidth: 0, position: "relative" }}>
+            <AlgoliaSearch onNavigate={() => setActiveId(null)} />
+          </div>
+          <div className="lg:hidden" style={{ flex: 1 }} />
 
           <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexShrink: 0 }}>
 

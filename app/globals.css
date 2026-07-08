@@ -112,22 +112,15 @@ body {
 }
 
 /* Lift WA float bubble above gift progress bar when bar is active.
-   Specificity (0,2,0) beats ShiraChat's .wa-float-wrap (0,1,0).
-   --sticky-bar-clearance is measured dynamically by StickyBarLift
-   (bar height + bottom offset + 16px gap); old values kept as fallbacks. */
-.wa-float-wrap,
-#tidio-chat-iframe,
-#tidio-chat {
-  transition: bottom 0.28s ease;
-}
+   Specificity (0,2,0) beats ShiraChat's .wa-float-wrap (0,1,0). */
 body.gift-bar-active .wa-float-wrap {
-  bottom: var(--sticky-bar-clearance, 90px) !important;
+  bottom: 90px !important;
 }
 
 /* Also push Tidio up when gift bar is active */
 body.gift-bar-active #tidio-chat-iframe,
 body.gift-bar-active #tidio-chat {
-  bottom: calc(var(--sticky-bar-clearance, 90px) + 46px) !important;
+  bottom: 136px !important;
 }
 
 /* Hide gift progress bar while mobile filter drawer is open */

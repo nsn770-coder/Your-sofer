@@ -41,9 +41,17 @@ const organizationSchema = {
   areaServed: 'IL',
 };
 
+// Hero video poster — the real mobile LCP element. Must be byte-identical to the
+// poster URL in HomePageClient.tsx so the preload is actually used.
+// w_1080 covers phones up to DPR2 (and is fine on desktop, where the video takes over).
+const HERO_POSTER =
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1080/v1782769100/WhatsApp_Image_2026-06-29_at_21.52.31_1_m59ykm.jpg';
+
 export default function HomePage() {
   return (
     <>
+      {/* React hoists this into <head> of the prerendered HTML */}
+      <link rel="preload" as="image" href={HERO_POSTER} fetchPriority="high" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

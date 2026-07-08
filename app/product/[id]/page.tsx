@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from 'next';
 import ProductClient from './ProductClient';
 import { formatPrice } from '@/app/lib/utils';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 const BASE_URL = 'https://your-sofer.com';
 const FIREBASE_PROJECT = 'your-sofer';
@@ -200,11 +201,35 @@ async function ProductJsonLd({ id }: { id: string }) {
     },
   };
 
+  // LCP: preload the exact image ProductClient shows first, so the browser
+  // downloads it in parallel with the client-side Firestore fetch instead of
+  // discovering it only after hydration. Mirrors ProductClient's allMedia logic
+  // (aiLifestyleImage first; else image #2 promoted; width 800 — keep in sync).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = product as any;
+  const mediaRaw = [
+    p.imgUrl || p.image_url,
+    p.imgUrl2 || p.img1,
+    p.imgUrl3 || p.img2,
+    p.imgUrl4 || p.img3,
+    p.imgUrl5,
+  ].filter(Boolean) as string[];
+  const mediaDeduped = [...new Set(mediaRaw)];
+  const mainImage = p.aiLifestyleImage
+    ? (p.aiLifestyleImage as string)
+    : (mediaDeduped.length >= 2 ? mediaDeduped[1] : mediaDeduped[0]);
+  const mainImageOptimized = mainImage ? optimizeCloudinaryUrl(mainImage, 800) : null;
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
+    <>
+      {mainImageOptimized && (
+        <link rel="preload" as="image" href={mainImageOptimized} fetchPriority="high" />
+      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+    </>
   );
 }
 

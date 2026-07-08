@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Heebo, Frank_Ruhl_Libre, Cormorant_Garamond } from "next/font/google";
+import { Geist, Heebo, Cormorant_Garamond } from "next/font/google";
 import { Suspense } from "react";
 import Script from "next/script";
 import "./globals.css";
@@ -19,16 +19,12 @@ import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 import ClubPopupWrapper from "@/components/ClubPopupWrapper";
 import GiftProgressBar from "./components/GiftProgressBar";
-import StickyBarLift from "./components/StickyBarLift";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
-const frankRuhl = Frank_Ruhl_Libre({
-  subsets: ['hebrew', 'latin'],
-  weight: ['300', '400', '500', '700', '900'],
-  display: 'swap',
-  variable: '--font-frank',
-});
+// PERF: Frank Ruhl Libre removed — next/font preloaded 5 weights × 2 subsets on
+// every page, but the only selector using it (.brand-story) appears in no component.
+// globals.css still maps --font-frank to a serif fallback if it's ever reused.
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
@@ -81,7 +77,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100%' }} className={`overflow-x-hidden ${frankRuhl.variable} ${cormorant.variable}`}>
+    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100%' }} className={`overflow-x-hidden ${cormorant.variable}`}>
       <head>
         {/* ── Google Tag Manager ── */}
         <script dangerouslySetInnerHTML={{ __html: `
@@ -134,7 +130,6 @@ export default function RootLayout({
                 <ShavuotPopupWrapper />
                 <ClubPopupWrapper />
                 <GiftProgressBar />
-                <StickyBarLift />
               </CartProvider>
             </ShaliachProvider>
           </Suspense>

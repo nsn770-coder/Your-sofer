@@ -10,7 +10,8 @@ import {
   doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import HeroSwiper from './components/HeroSwiper';
+// PERF: HeroSwiper import removed — it was imported but never rendered,
+// yet still pulled its module graph into the homepage bundle.
 import ProductCard from '@/components/ui/ProductCard';
 const RabbinicalSupervision = dynamic(() => import('./components/RabbinicalSupervision'), { ssr: false, loading: () => <div style={{ height: 420 }} /> });
 
@@ -369,6 +370,9 @@ export default function HomePageClient() {
   const [soferimList, setSoferimList]           = useState<Sofer[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [promoProducts, setPromoProducts]       = useState<Product[]>([]);
+  // CLS: promo/featured section space is reserved until the fetch settles (see wrappers below)
+  const [promoLoaded, setPromoLoaded]           = useState(false);
+  const [featuredLoaded, setFeaturedLoaded]     = useState(false);
   const [testimonials, setTestimonials]         = useState<Testimonial[]>([]);
   const [liveReviews, setLiveReviews]           = useState<LiveReview[]>([]);
   const [newsletterEmail, setNewsletterEmail]   = useState('');
@@ -520,6 +524,7 @@ export default function HomePageClient() {
           .filter(p => isShowable(p) && !pinnedIdSet.has(p.id));
         setFeaturedProducts([...pinnedProducts, ...all]);
       } catch { /* non-fatal */ }
+      finally { setFeaturedLoaded(true); }
     }
 
     async function fetchPromoProducts() {
@@ -529,6 +534,7 @@ export default function HomePageClient() {
         );
         setPromoProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => !p.hidden && (p.imgUrl || p.image_url)));
       } catch { /* non-fatal */ }
+      finally { setPromoLoaded(true); }
     }
 
     // Defer all Firebase reads so the hero (LCP element) paints first
@@ -786,6 +792,18 @@ export default function HomePageClient() {
         .ys-outline-btn:hover { background: #373A5A; color: #fff; }
         .ys-outline-btn:active { background: #282B43; border-color: #282B43; color: #fff; }
         .ys-outline-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(55,58,90,0.35); }
+        /* CLS FIX: layout-critical responsive values live in CSS media queries, NOT in
+           the isMobile JS state. isMobile is false during SSR/prerender, so any
+           isMobile-driven width/height/grid painted desktop-first on phones and then
+           jumped after hydration. CSS is correct on the very first paint. */
+        .ys-hero-box { padding-top: 40%; }
+        .ys-cta-banner { aspect-ratio: 8 / 1.8; }
+        .ys-promo-reserve { min-height: 560px; }
+        @media (max-width: 767px) {
+          .ys-hero-box { padding-top: 56.25%; }
+          .ys-cta-banner { aspect-ratio: 5 / 2; min-height: 120px; }
+          .ys-promo-reserve { min-height: 600px; }
+        }
       `}</style>
 
       {/* ── Newsletter popup ── */}
@@ -927,11 +945,13 @@ export default function HomePageClient() {
       )}
 
       {/* ── 1. Hero ── */}
+      {/* CLS FIX: height comes from the .ys-hero-box media query (correct at first
+          paint) instead of isMobile, which flipped 40%→56.25% after hydration. */}
       <div
         dir="rtl"
+        className="ys-hero-box"
         style={{
           position: 'relative',
-          paddingTop: isMobile ? '56.25%' : '40%',
           overflow: 'hidden',
           borderRadius: 0,
           width: '100%',
@@ -940,13 +960,15 @@ export default function HomePageClient() {
         }}
       >
         {/* Background video — height 140% + objectFit:cover + objectPosition:top → fills width, crops from bottom only */}
+        {/* LCP: poster is w_1080 (was w_1600) — covers phone DPR2 and MUST stay
+            byte-identical to HERO_POSTER preloaded in app/page.tsx */}
         <video
           autoPlay
           muted
           loop
           playsInline
           preload="metadata"
-          poster="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1600/v1782769100/WhatsApp_Image_2026-06-29_at_21.52.31_1_m59ykm.jpg"
+          poster="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1080/v1782769100/WhatsApp_Image_2026-06-29_at_21.52.31_1_m59ykm.jpg"
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '110%', objectFit: 'cover', objectPosition: 'top', zIndex: 0 }}
         >
           {/* vc_h264 + q_auto: transcode the raw WhatsApp upload to guaranteed-compatible
@@ -1000,20 +1022,17 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Mobile search band ── */}
-      {isMobile && (
-        <div style={{ background: '#FFFFFF', padding: '20px 16px', borderBottom: '1px solid #E7E2D8' }}>
-          <AlgoliaSearch />
-        </div>
-      )}
+      {/* CLS FIX: always rendered, hidden on desktop via CSS (md:hidden) instead of
+          {isMobile && …} which inserted the band after hydration and pushed the
+          whole page down on phones. minHeight reserves the input's space. */}
+      <div className="md:hidden" style={{ background: '#FFFFFF', padding: '20px 16px', borderBottom: '1px solid #E7E2D8', minHeight: 84 }}>
+        <AlgoliaSearch />
+      </div>
 
       {/* ── Trust row ── */}
-      <div dir="rtl" style={{ background: '#FFFFFF', borderBottom: '1px solid #F0F0F2', padding: isMobile ? '14px 16px' : '18px 32px' }}>
-        <div style={{
-          maxWidth: 1280, margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-          gap: isMobile ? 10 : 16,
-        }}>
+      {/* CLS FIX: responsive grid via Tailwind classes — stable on first paint */}
+      <div dir="rtl" className="px-4 py-3.5 md:px-8 md:py-[18px]" style={{ background: '#FFFFFF', borderBottom: '1px solid #F0F0F2' }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-4" style={{ maxWidth: 1280, margin: '0 auto' }}>
           {[
             'משלוחים לכל הארץ',
             'מבחר ענק של מוצרי יודאיקה',
@@ -1029,6 +1048,9 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Promo 2+1 section ── */}
+      {/* CLS FIX: space is reserved while Firestore loads so content below doesn't
+          jump when the dark section appears; collapses only if there are no promos. */}
+      <div className={promoLoaded && promoProducts.length === 0 ? undefined : 'ys-promo-reserve'} style={{ background: promoProducts.length === 0 ? '#FFFFFF' : undefined }}>
       {promoProducts.length > 0 && (
         <section style={{ background: '#1a1a1a', padding: isMobile ? '40px 16px' : '64px 32px', direction: 'rtl' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -1076,17 +1098,19 @@ export default function HomePageClient() {
           </div>
         </section>
       )}
+      </div>
 
       {/* ── Life events horizontal scroll ── */}
       <section
         id="life-events"
-        style={{ background: '#FFFFFF', padding: isMobile ? '40px 0 36px' : '64px 0 48px', direction: 'rtl' }}
+        className="pt-10 pb-9 md:pt-16 md:pb-12"
+        style={{ background: '#FFFFFF', direction: 'rtl' }}
       >
-        <div style={{ textAlign: 'center', padding: '0 20px', marginBottom: isMobile ? 20 : 28 }}>
+        <div className="mb-5 md:mb-7" style={{ textAlign: 'center', padding: '0 20px' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, marginTop: 0 }}>
             רגעי חיים
           </p>
-          <p style={{ fontSize: isMobile ? 24 : 30, fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
+          <p className="text-2xl md:text-[30px]" style={{ fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
             מה מביא אתכם אלינו?
           </p>
         </div>
@@ -1099,12 +1123,12 @@ export default function HomePageClient() {
             <a
               key={ev.id}
               href={`/moment/${ev.id}`}
+              className="w-[200px] md:w-[240px]"
               style={{
                 textDecoration: 'none',
                 display: 'flex',
                 flexDirection: 'column',
                 flexShrink: 0,
-                width: isMobile ? 200 : 240,
                 background: '#FFFFFF',
                 border: '1px solid #EDEDEF',
                 borderRadius: 0,
@@ -1138,11 +1162,10 @@ export default function HomePageClient() {
       </section>
 
       {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#FFFFFF', padding: isMobile ? '16px 16px 32px' : '24px 32px 48px', borderBottom: '1px solid #f0ece4' }}>
-        <div style={{
+      <div ref={countersRef} className="px-4 pt-4 pb-8 md:px-8 md:pt-6 md:pb-12" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4' }}>
+        <div className="px-4 py-6 md:px-10 md:py-8" style={{
           maxWidth: 900, margin: '0 auto',
           background: '#fff',
-          padding: isMobile ? '24px 16px' : '32px 40px',
           borderRadius: 0,
           border: '1px solid #EDEDEF',
           display: 'flex',
@@ -1179,15 +1202,12 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 4. Category grid ── */}
-      <div id="categories" style={{ background: '#FFFFFF', padding: isMobile ? '40px 20px' : '64px 32px', direction: 'rtl' }}>
+      {/* CLS FIX: grid/padding/heading via responsive classes — no 2↔3-column jump */}
+      <div id="categories" className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
+          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-            gap: isMobile ? 16 : 28,
-          }}>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-7">
             {([
               { name: 'חנוכה',        emoji: '🕎', img: catImages['חנוכה']        || '', href: '/category/%D7%97%D7%A0%D7%95%D7%9B%D7%94' },
               { name: 'סט בר מצווה', emoji: '✡️', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777989198/fqm7twz1berprum03u7u.png', 400), href: '/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94' },
@@ -1229,10 +1249,11 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Bar-Mitzvah Kippot CTA ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '0 20px 48px' : '0 32px 64px', direction: 'rtl' }}>
+      <div className="px-5 pb-12 md:px-8 md:pb-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <a
             href="/event-kippot"
+            className="ys-cta-banner"
             style={{
               display: 'block',
               position: 'relative',
@@ -1241,8 +1262,6 @@ export default function HomePageClient() {
               border: '1px solid #EDEDEF',
               textDecoration: 'none',
               transition: 'border-color 0.2s ease',
-              aspectRatio: isMobile ? '5 / 2' : '8 / 1.8',
-              minHeight: isMobile ? 120 : undefined,
             }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = '#373A5A'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
@@ -1276,12 +1295,15 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── 5. Featured products horizontal scroll ── */}
-      <div style={{ minHeight: isMobile ? 290 : 330 }}>
-      {featuredProducts.length > 0 && (
-        <div ref={bsSectionRef} style={{ background: '#FFFFFF', padding: isMobile ? '40px 0' : '64px 0', direction: 'rtl' }}>
+      {/* ── 5. Featured products ── */}
+      {/* CLS FIX: while Firestore loads, a skeleton grid with the exact card layout
+          holds the space (image square + title + price rows), so the 10 real cards
+          swap in without shifting anything below. Collapses only if truly empty. */}
+      <div>
+      {(featuredProducts.length > 0 || !featuredLoaded) && (
+        <div ref={bsSectionRef} className="py-10 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-            <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הכי נמכרים השבוע</h2>
+            <h2 className="text-[22px] md:text-[28px]" style={{ fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הכי נמכרים השבוע</h2>
             <Link href="/category/%D7%94%D7%9B%D7%9C" className="underline underline-offset-4" style={{ fontSize: 13, color: '#111111', textDecoration: 'underline', whiteSpace: 'nowrap' }}>
               לכל המוצרים
             </Link>
@@ -1290,6 +1312,16 @@ export default function HomePageClient() {
             .ys-bestseller-media > div { aspect-ratio: 1 / 1 !important; height: auto !important; }
           `}</style>
           <div className="grid grid-cols-2 gap-x-3 gap-y-7 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
+            {featuredProducts.length === 0 && Array.from({ length: 10 }).map((_, i) => (
+              <div key={`sk-${i}`}>
+                <div className="aspect-square bg-gray-100 animate-pulse" />
+                <div style={{ padding: '10px 2px 4px' }}>
+                  <div className="h-4 bg-gray-100 rounded animate-pulse mb-1.5 w-11/12" />
+                  <div className="h-4 bg-gray-100 rounded animate-pulse mb-2 w-2/3" />
+                  <div className="h-4 bg-gray-100 rounded animate-pulse w-1/3" />
+                </div>
+              </div>
+            ))}
             {featuredProducts.slice(0, 10).map((p, idx) => {
               const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
               return (
@@ -1335,9 +1367,9 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 6. More categories horizontal scroll ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 0' : '64px 0', direction: 'rtl' }}>
+      <div className="py-10 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
-          <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 300, color: '#111111', marginBottom: 20, letterSpacing: '-0.01em' }}>עוד קטגוריות</h2>
+          <h2 className="text-[22px] md:text-[26px]" style={{ fontWeight: 300, color: '#111111', marginBottom: 20, letterSpacing: '-0.01em' }}>עוד קטגוריות</h2>
         </div>
         <div
           className="no-scrollbar"
@@ -1356,7 +1388,8 @@ export default function HomePageClient() {
             return (
               <div key={cat.slug}
                 onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
-                style={{ cursor: 'pointer', flexShrink: 0, width: isMobile ? 160 : 200, scrollSnapAlign: 'start', transition: 'transform 0.2s ease' } as React.CSSProperties}
+                className="w-40 md:w-[200px]"
+                style={{ cursor: 'pointer', flexShrink: 0, scrollSnapAlign: 'start', transition: 'transform 0.2s ease' } as React.CSSProperties}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}
               >
@@ -1375,12 +1408,12 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Cloudinary video ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 16px' : '64px 32px' }}>
-        <div style={{ maxWidth: 896, margin: '0 auto', textAlign: 'center', direction: 'rtl', marginBottom: isMobile ? 20 : 28 }}>
-          <p style={{ fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#373A5A', margin: 0, lineHeight: 1.25, letterSpacing: '-0.01em' }}>
+      <div className="px-4 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF' }}>
+        <div className="mb-5 md:mb-7" style={{ maxWidth: 896, margin: '0 auto', textAlign: 'center', direction: 'rtl' }}>
+          <p className="text-[28px] md:text-4xl" style={{ fontWeight: 300, color: '#373A5A', margin: 0, lineHeight: 1.25, letterSpacing: '-0.01em' }}>
             רק אצלנו ב&nbsp;<span dir="ltr" style={{ unicodeBidi: 'embed' }}>Your Sofer</span>
           </p>
-          <p style={{ fontSize: isMobile ? 16 : 18, color: '#4B5563', marginTop: 10, marginBottom: 0 }}>
+          <p className="text-base md:text-lg" style={{ color: '#4B5563', marginTop: 10, marginBottom: 0 }}>
             תפגשו ישירות עם סופרי סת&quot;ם ובפערי תיווך נמוכים
           </p>
         </div>
@@ -1436,15 +1469,11 @@ export default function HomePageClient() {
       )}
 
       {/* ── Sofer STaM categories grid ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 20px' : '64px 32px', direction: 'rtl' }}>
+      <div className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות סת״מ</h2>
+          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות סת״מ</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>כל מוצרי הסופר סת״מ</p>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-            gap: isMobile ? 16 : 28,
-          }}>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-7">
             {([
               { name: 'ספרי תורה',     emoji: '📜', img: catImages['ספרי תורה']     || '', href: '/category/%D7%A1%D7%A4%D7%A8%D7%99%20%D7%AA%D7%95%D7%A8%D7%94' },
               { name: 'קלפי תפילין',   emoji: '📄', img: catImages['קלפי תפילין']   || '', href: '/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F' },
@@ -1477,7 +1506,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Soferim CTA ── */}
-      <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 16px' : '56px 16px', direction: 'rtl', textAlign: 'center' }}>
+      <div className="py-10 md:py-14" style={{ background: '#FFFFFF', paddingLeft: 16, paddingRight: 16, direction: 'rtl', textAlign: 'center' }}>
         <button onClick={() => router.push('/soferim')} className="ys-hero-btn-primary">
           לצפייה במאגר הסופרים שלנו ←
         </button>
