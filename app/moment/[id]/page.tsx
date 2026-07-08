@@ -2,6 +2,12 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import lifeEvents from '@/data/lifeEvents';
 import MomentClient from './MomentClient';
+import { fetchMomentProducts } from './fetchMomentProducts';
+
+// Server-render the product list and cache it for MOMENT_REVALIDATE seconds.
+// Products become a fixed cached copy shared across visitors, instead of a fresh
+// client-side Firestore query on every visit.
+export const revalidate = 600; // keep in sync with MOMENT_REVALIDATE
 
 export async function generateMetadata(
   { params }: { params: Promise<{ id: string }> }
@@ -19,6 +25,10 @@ export default async function MomentPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const event = lifeEvents.find(e => e.id === id);
   if (!event) notFound();
+
+  // Fetch products server-side (cached). Passed to the client as initial data so
+  // the grid renders immediately with no client-side Firestore round-trip.
+  const initialProducts = await fetchMomentProducts(event);
 
   return (
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#FBF8F3', minHeight: '100vh' }}>
@@ -80,7 +90,7 @@ export default async function MomentPage({ params }: { params: Promise<{ id: str
       </section>
 
       {/* ── Products (client) ─────────────────────────────────────────────────── */}
-      <MomentClient event={event} />
+      <MomentClient event={event} initialProducts={initialProducts} />
     </div>
   );
 }

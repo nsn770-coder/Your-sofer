@@ -111,14 +111,27 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
 }
 
 // ── Main client component ──────────────────────────────────────────────────────
-export default function MomentClient({ event }: { event: LifeEvent }) {
-  const [products, setProducts]   = useState<ProductWithTab[]>(() => pageCache.get(event.id) ?? []);
-  const [loading, setLoading]     = useState(!pageCache.has(event.id));
+export default function MomentClient({
+  event,
+  initialProducts,
+}: {
+  event: LifeEvent;
+  initialProducts?: ProductWithTab[];
+}) {
+  // Server-provided products win: seed the module cache so back-navigation is instant too.
+  if (initialProducts && initialProducts.length && !pageCache.has(event.id)) {
+    pageCache.set(event.id, initialProducts);
+  }
+
+  const seeded = initialProducts && initialProducts.length ? initialProducts : pageCache.get(event.id);
+
+  const [products, setProducts]   = useState<ProductWithTab[]>(() => seeded ?? []);
+  const [loading, setLoading]     = useState(!seeded);
   const [catFilter, setCatFilter] = useState('הכל');
   const [attrFilters, setAttrFilters] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    // ── Cache hit — instant display, no fetch needed ──────────────────────────
+    // ── Server data or module cache present — instant display, no fetch needed ──
     if (pageCache.has(event.id)) {
       setProducts(pageCache.get(event.id)!);
       setLoading(false);
