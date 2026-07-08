@@ -19,6 +19,13 @@ import type { ThreadColor } from '@/app/data/threadColors';
 import dynamic from 'next/dynamic';
 const MezuzahUpsellPopup = dynamic(() => import('@/components/MezuzahUpsellPopup'), { ssr: false });
 
+/** 'YYYY-MM-DD' → 'DD/MM/YYYY' — תאריך צפי הגעה ("מגיע בקרוב") */
+function formatArrivalDate(iso?: string | null): string {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return d && m && y ? `${d}/${m}/${y}` : '';
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Product {
@@ -51,6 +58,8 @@ interface Product {
   stockCount?: number;
   stockVisible?: boolean;
   outOfStock?: boolean;
+  comingSoon?: boolean;
+  expectedArrivalDate?: string | null; // 'YYYY-MM-DD'
   sourceUrl?: string;
   hasKlafSelection?: boolean;
   isExpertRecommended?: boolean;
@@ -1918,7 +1927,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
     return (
     <div style={{ background: '#fff', borderRadius: compact ? 0 : 12, padding: compact ? '12px 16px' : '20px 18px' }}>
-      {product.outOfStock && (
+      {product.comingSoon ? (
+        <div style={{ background: '#fffbeb', border: '2px solid #b45309', color: '#92400e', padding: '10px 16px', borderRadius: 8, fontWeight: 700, textAlign: 'center', marginBottom: 14, fontSize: 15 }}>
+          🕒 מגיע בקרוב{product.expectedArrivalDate ? ` ${formatArrivalDate(product.expectedArrivalDate)}` : ''}
+        </div>
+      ) : product.outOfStock && (
         <div style={{ background: '#fef2f2', border: '2px solid #ef4444', color: '#b91c1c', padding: '10px 16px', borderRadius: 8, fontWeight: 700, textAlign: 'center', marginBottom: 14, fontSize: 15 }}>
           🔴 אזל המלאי
         </div>
@@ -1950,7 +1963,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
       {/* Urgency - directly above CTA */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-        {product.outOfStock ? (
+        {product.comingSoon ? (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#92400e', fontWeight: 700 }}>
+            🕒 מגיע בקרוב{product.expectedArrivalDate ? ` ${formatArrivalDate(product.expectedArrivalDate)}` : ''}
+          </span>
+        ) : product.outOfStock ? (
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#f5f5f5', border: '1px solid #d1d5db', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#6b7280', fontWeight: 700 }}>
             אזל מהמלאי
           </span>
@@ -2108,10 +2125,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       )}
 
       {/* PRIMARY: Buy Now */}
-      {product.outOfStock ? (
+      {(product.outOfStock || product.comingSoon) ? (
         <>
           <button disabled style={{ width: '100%', height: 52, background: '#e5e7eb', color: '#9ca3af', border: 'none', borderRadius: 14, fontSize: compact ? 14 : 16, fontWeight: 900, cursor: 'not-allowed', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em' }}>
-            אזל מהמלאי
+            {product.comingSoon ? `🕒 מגיע בקרוב${product.expectedArrivalDate ? ` ${formatArrivalDate(product.expectedArrivalDate)}` : ''}` : 'אזל מהמלאי'}
           </button>
           <a
             href={`https://wa.me/972587479933?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + (product.name || ''))}`}
@@ -2381,6 +2398,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               )}
               {product.badge && !showVideo && (
                 <div style={{ position: 'absolute', top: discount > 0 ? 46 : 12, right: 12, background: product.badge === 'מבצע' ? '#c0392b' : product.badge === 'חדש' ? '#2980b9' : '#27ae60', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>{product.badge}</div>
+              )}
+              {product.comingSoon && !showVideo && (
+                <div style={{ position: 'absolute', top: 12, left: 12, background: '#b45309', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>
+                  🕒 מגיע בקרוב{product.expectedArrivalDate ? ` ${formatArrivalDate(product.expectedArrivalDate)}` : ''}
+                </div>
               )}
             </div>
             <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', scrollbarWidth: 'none', borderTop: '1px solid #f0f0f0' }}>

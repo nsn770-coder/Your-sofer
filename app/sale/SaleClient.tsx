@@ -67,15 +67,15 @@ export default function SaleClient() {
   }, []);
 
   return (
-    <main dir="rtl" style={{ background: '#F8F6F1', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
+    <main dir="rtl" style={{ background: '#FFFFFF', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
       {/* Hero */}
       <div style={{ background: '#1a1a1a', color: '#fff', padding: '48px 24px 40px', textAlign: 'center' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: '#c0392b', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 10 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A227', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 10 }}>
           מחירים מוזלים לזמן מוגבל
         </p>
         <h1 style={{ fontSize: 38, fontWeight: 300, margin: '0 0 12px', letterSpacing: '-0.01em' }}>
-          מבצעים 🏷️
+          מבצעים
         </h1>
         <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.65)', maxWidth: 520, margin: '0 auto' }}>
           כל המוצרים שבהנחה — יודאיקה, כיפות, מזוזות ועוד.
@@ -84,8 +84,8 @@ export default function SaleClient() {
       </div>
 
       {/* Badge strip */}
-      <div style={{ background: '#c0392b', padding: '10px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#fff' }}>
-        🏷️ המחירים המוזלים מוצגים ישירות על המוצר &nbsp;·&nbsp; ההנחה מחושבת אוטומטית בעגלה
+      <div style={{ background: '#373A5A', padding: '10px 24px', textAlign: 'center', fontSize: 13, fontWeight: 500, color: '#fff' }}>
+        המחירים המוזלים מוצגים ישירות על המוצר &nbsp;·&nbsp; ההנחה מחושבת אוטומטית בעגלה
       </div>
 
       {/* Grid */}
@@ -115,9 +115,9 @@ export default function SaleClient() {
         {!loading && products.length > 0 && (
           <>
             <p style={{ fontSize: 13, color: '#888', marginBottom: 24, textAlign: 'right' }}>
-              {products.length} מוצרים במבצע
+              נמצאו {products.length} מוצרים במבצע
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7">
               {products.map((p, i) => {
                 const images = [p.imgUrl || p.image_url].filter(Boolean) as string[];
                 // Normalize isOnSale products to clearance fields so ProductCard renders the discount

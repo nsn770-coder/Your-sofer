@@ -120,7 +120,7 @@ export default function ShabbatHolidaysClient() {
   }
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', background: '#F5F2EC', fontFamily: "'Heebo', Arial, sans-serif" }}>
+    <div dir="rtl" style={{ minHeight: '100vh', background: '#FFFFFF', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
       {/* Page header */}
       <div style={{ background: '#1a1a1a', padding: isMobile ? '32px 20px 28px' : '48px 24px 40px', textAlign: 'center' }}>
@@ -132,7 +132,7 @@ export default function ShabbatHolidaysClient() {
         </p>
         {products.length > 0 && (
           <p style={{ fontSize: 13, color: '#C5A028', marginTop: 12, fontWeight: 600 }}>
-            {products.length} מוצרים
+            נמצאו {products.length} מוצרים
           </p>
         )}
       </div>
@@ -147,7 +147,8 @@ export default function ShabbatHolidaysClient() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(220px, 1fr))',
-            gap: isMobile ? 12 : 20,
+            columnGap: isMobile ? 12 : 16,
+            rowGap: isMobile ? 24 : 28,
           }}>
             {products.map(p => (
               <ProductCard

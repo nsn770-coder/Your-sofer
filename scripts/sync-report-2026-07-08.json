@@ -1,0 +1,3157 @@
+{
+  "date": "2026-07-08T06:12:17.218Z",
+  "supplierSkuCount": 4393,
+  "firestoreCount": 5605,
+  "toDeleteCount": 609,
+  "toImportCount": 630,
+  "newCategories": [],
+  "toDelete": [
+    {
+      "id": "03glzol2ldqtymRVcP5J",
+      "sku": "UK29420",
+      "name": "מזוזה אלומניום 10 ס\"מ בגוון כסף מבריק \"ש\" מודפסת פרופיל מיוחד"
+    },
+    {
+      "id": "05tVKXL5HIFnRM1CSQrZ",
+      "sku": "X389A",
+      "name": "מעמד בשמים להבדלה בגימור מוכסף"
+    },
+    {
+      "id": "06O5CWaGix6DkH2qMaSQ",
+      "sku": "UK61150",
+      "name": "כיסוי חלה לבן מסטן עם ריקמה אובלית \"שבת ויום טו"
+    },
+    {
+      "id": "0DLttvloPRvNHRBpeU8Q",
+      "sku": "UK24440",
+      "name": "מזוזה \"פולימר בטון\" ברכת הבית 15 ס\"מ"
+    },
+    {
+      "id": "0NSG5p6azkiavNUyRHA4",
+      "sku": "X5009",
+      "name": "חנוכיית אלומיניום זהב 'מן המשכן'"
+    },
+    {
+      "id": "0cJcGUB6OEjzPsvt74GI",
+      "sku": "UK41620",
+      "name": "זוג פמוטי קריסטל מהודרים 18 ס\"מ"
+    },
+    {
+      "id": "0hGmZCDLqLF6Mo4KvCMZ",
+      "sku": "UK21166",
+      "name": "מזוזה \"וכתבתם על...\" פולימר 20סמ"
+    },
+    {
+      "id": "1DG0e74hEUeXOnHJ94Bw",
+      "sku": "X5106A",
+      "name": "נטלה כסף מהודרת עם עיטור אבנים"
+    },
+    {
+      "id": "1EIx3JN27C3lE7OzpzYp",
+      "sku": "UK24570",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן \"ש\" להבה זהב 12"
+    },
+    {
+      "id": "1Gza5W4xAT527sLo2nOG",
+      "sku": "X4977KZ",
+      "name": "מזוזה אבן ירושלים מוזהבת עם כיתוב כסף"
+    },
+    {
+      "id": "1QaNYLNhuWC2UIqXB5gQ",
+      "sku": "UK24253",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן 12 ס\"מ"
+    },
+    {
+      "id": "1sYB6oBxKdk19N6wS2Fa",
+      "sku": "UK46771",
+      "name": "גביע קידוש ניקל גפן משובצת 13 ס\"מ תכולה 100 מ\"ל"
+    },
+    {
+      "id": "1vTk16kxFIFFDmpoMXDU",
+      "sku": "UK24768",
+      "name": "מזוזה \"פולימר בטון\" \"כותל\" 12 ס\"מ"
+    },
+    {
+      "id": "1vpfTv1CA8yu1TG6Mnd7",
+      "sku": "X3125",
+      "name": "חנוכיית קריסטל בשילוב כסף – עיצוב שופר"
+    },
+    {
+      "id": "28cE7adfrfmPSgxDkPtt",
+      "sku": "X5038BZ",
+      "name": "סכין חלה נירוסטה עם ציפוי זהב וכיתוב \"שבת קודש\""
+    },
+    {
+      "id": "2BsqJ3y97xu0wB0JJTVf",
+      "sku": "X2197",
+      "name": "דיבשית להבה"
+    },
+    {
+      "id": "2C5c70vMujvjLIts5X2e",
+      "sku": "UK24816",
+      "name": "מזוזה \"פולימר בטון\" גוון שחור - \"ש\" להבה 25 ס\"מ"
+    },
+    {
+      "id": "2CCznTA65qXTrixtiCns",
+      "sku": "X5038EZ",
+      "name": "סכין חלה נירוסטה עם ציפוי זהב לשבת והחגים"
+    },
+    {
+      "id": "2MxGLVBlNybBMvZGkkoD",
+      "sku": "X4979S",
+      "name": "מזוזה מעויינים מוכספת 15 ס\"מ"
+    },
+    {
+      "id": "2WF1akSs8JShtPk6C1ZJ",
+      "sku": "P296K",
+      "name": "חנוכיית פרחים מוכספת – רוחב 20 ס\"מ"
+    },
+    {
+      "id": "2hFj7gCEPXH94jERI0OA",
+      "sku": "P914M",
+      "name": "חנוכיית כסף \"טוהר\" עם בסיס מתומן"
+    },
+    {
+      "id": "2nh0AZPWvg2yVYsqJnXq",
+      "sku": "UK20341",
+      "name": "מזוזה פולימר ש שקועה \"שמע ישראל\" 20סמ לבן"
+    },
+    {
+      "id": "396JY4Vrs6tDlnrU4Sdg",
+      "sku": "UK24182",
+      "name": "20569 מזוזה זכוכית 15 ס\"מ \"בועות\" עם פקק סיליקון"
+    },
+    {
+      "id": "3PGYY3DBdgJO2SrTpXJs",
+      "sku": "X4979KS",
+      "name": "מזוזה מעויינים מוכסף – 12 ס\"מ"
+    },
+    {
+      "id": "3SoWBT9oS1hpORxRf9bL",
+      "sku": "P067J",
+      "name": "סט קידוש ללא רגל בעיצוב ירושלים – כסוף"
+    },
+    {
+      "id": "3WO8Q1y33l6kPuQOczv5",
+      "sku": "UK21424",
+      "name": "מזוזה פולימר ש שקועה חמסה 12 ס\"מ"
+    },
+    {
+      "id": "3YvKIOp6TN3VJkcXN2Hk",
+      "sku": "UK20923",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה זהב 30 ס\"מ"
+    },
+    {
+      "id": "3bj4VuvO5TUnEzmSVHIe",
+      "sku": "UK24835",
+      "name": "מזוזה \"פולימר בטון\" \"ש\" 15 ס\"מ"
+    },
+    {
+      "id": "3gJkCnKuPREpJS7t2o69",
+      "sku": "X5038AZ",
+      "name": "סכין חלה נירוסטה בציפוי זהב לשבת"
+    },
+    {
+      "id": "3mrmGAKFDeMlgyyWqYKo",
+      "sku": "X5897K",
+      "name": "חנוכיה כסף בעיצוב כריות מרובע"
+    },
+    {
+      "id": "3tmJbuR1LrwHMWhBTuMN",
+      "sku": "UK80789",
+      "name": "פאזל 48 חלקים לילדים \"שבת\" 38X28 ס\"מ"
+    },
+    {
+      "id": "3uGR5FmsldDlH5uMLE1j",
+      "sku": "UK24530",
+      "name": "מזוזה פלסטיק גוון עץ 10 ס\"מ \"ש\" כסף עם פקק גומי"
+    },
+    {
+      "id": "4Fye4luDJxV54tCNVSsY",
+      "sku": "X2209Z",
+      "name": "זוג מלחיות קריסטל בתכשיט זהב – \"שבת קודש\""
+    },
+    {
+      "id": "4M1hoiXUG8j756fHDzcA",
+      "sku": "UK21785",
+      "name": "מזוזה \"פולימר בטון\" כותל ש בולטת ציפוי זהב 20 סמ"
+    },
+    {
+      "id": "4P767V8ddjPkA4e8yHKR",
+      "sku": "UK19087",
+      "name": "כיפה עור לבן 16 ס\"מ"
+    },
+    {
+      "id": "4fKckmkBQfQAjxcByg9h",
+      "sku": "X5604",
+      "name": "נטלה אמייל שנהב וזהב לנטילת ידיים"
+    },
+    {
+      "id": "4q9ba6dcdOpRoQjifsD9",
+      "sku": "X5922",
+      "name": "נטלה פולירזין בגוון לבן לשטיפת ידיים"
+    },
+    {
+      "id": "4sosBBjJWJ6d5MxIr6LP",
+      "sku": "UK14644",
+      "name": "כיפה בד מהודרת כחול מידה 5 גודל 20 ס\"מ"
+    },
+    {
+      "id": "58pMHroWzBDutH1F8XJ0",
+      "sku": "X5848K",
+      "name": "חנוכיית כסף \"המכבים\" – עיצוב קלאסי"
+    },
+    {
+      "id": "5AonHZ0PzDSsA6fXvA9n",
+      "sku": "X5902A",
+      "name": "חנוכיית קריסטל בעיצוב קוביות – שילוב ענבר"
+    },
+    {
+      "id": "5BzuB18bPnVqO4clXNaM",
+      "sku": "UK48975",
+      "name": "קופת צדקה פולימר \"כותל\" 13x9 ס\"מ"
+    },
+    {
+      "id": "5JU6IS1R7LNtY1dzHEhN",
+      "sku": "X4882B",
+      "name": "נטלת מים אחרונים נירוסטה עם עיצוב גיאומטרי שחור וזהב"
+    },
+    {
+      "id": "5OJJijJBSuNz6O7Le5P5",
+      "sku": "UK67362",
+      "name": "תיק מפואר לטלית דמוי עור עם ריקמה 31X38 ס\"מ"
+    },
+    {
+      "id": "5Srh1ZnC6ToFgJT4umEp",
+      "sku": "X5301A",
+      "name": "נטלה אקרילית כחול-סגול הדרגתי עם ידיות שקופות"
+    },
+    {
+      "id": "5aP8IrJPHIIcrOL6bzJX",
+      "sku": "UK80803",
+      "name": "פאזל עץ בית המקדש 30x22 ס\"מ"
+    },
+    {
+      "id": "5nmr1TywrCRZksLV6odr",
+      "sku": "UK24668",
+      "name": "מזוזה פולימר כותל \"ברוך אתה\" 15 ס\"מ - גוון אפ"
+    },
+    {
+      "id": "5ufj9rkzHkTUjOr2qsun",
+      "sku": "UK24448",
+      "name": "מזוזה \"פולימר בטון\" ברוך אתה 15 ס\"מ"
+    },
+    {
+      "id": "5yC6oeNU3vdX8g5WyhlH",
+      "sku": "P730J",
+      "name": "סט הבדלה 4 חלקים בעיצוב ירושלים כסף"
+    },
+    {
+      "id": "61QHa78gVr5JcwNQmIs8",
+      "sku": "UK60377",
+      "name": "סט טלית תפילין דמוי עור מהודר 36X30 ס\"מ"
+    },
+    {
+      "id": "66DcfXsEFJNlFCeGcfoa",
+      "sku": "X2209",
+      "name": "זוג מלחיות קריסטל לשבת"
+    },
+    {
+      "id": "67cfK6vZXSMnkwTDjTAO",
+      "sku": "UK48161",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "6FfsXsRwAkc0MydZ0hb1",
+      "sku": "X4990W",
+      "name": "קופת צדקה נירוסטה בסגנון ארט דקו לבן וזהב"
+    },
+    {
+      "id": "6nWjQvWiQN8XSWXlc8uN",
+      "sku": "UK67921",
+      "name": "סט טלית תפילין דמוי עור יברכך 36X29 ס\"מ"
+    },
+    {
+      "id": "6sIhGhbOW1rBGyxdaHYX",
+      "sku": "X875",
+      "name": "נטלה מים אחרונים כסף מבריק"
+    },
+    {
+      "id": "70UUl1doThFkOqhTdQ99",
+      "sku": "X4715ZB",
+      "name": "נטלה נירוסטה שחורה עם קווים זהב"
+    },
+    {
+      "id": "7AohkwB4F8yRGUmucksD",
+      "sku": "X4983S",
+      "name": "מזוזה מוכסף עם כיתוב זהב – 15 ס\"מ"
+    },
+    {
+      "id": "7BtfLwEiV68yEkIdDT80",
+      "sku": "UK22255",
+      "name": "מזוזה פולימר בטון 15 ס\"מ ירושלים"
+    },
+    {
+      "id": "7SnhwcGmewkoN5n3DYHY",
+      "sku": "X5740",
+      "name": "נטלה נירוסטה לבן עם עיצוב מעויינים וזהב"
+    },
+    {
+      "id": "7TyDgeWex9Hh1m3hpuoa",
+      "sku": "UK20204",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור \"ש\" להבה זהב 15 ס\"מ"
+    },
+    {
+      "id": "7U6Jal5Df3kiVPVJeCTh",
+      "sku": "P914A",
+      "name": "חנוכיית טוהר בציפוי כסף עם בסיס מתומן"
+    },
+    {
+      "id": "7cGlW4pz3hUzmCnwD2t5",
+      "sku": "X3597",
+      "name": "כלי לחרוסת ודבש בשילוב כסף ושנהב"
+    },
+    {
+      "id": "7e8Sre7qHs9FNgRDG1ax",
+      "sku": "UK50060",
+      "name": "כלי לנר הבדלה אקריליק זהב 14 ס\"מ"
+    },
+    {
+      "id": "7eKY1WzOglTHDeIpJE2D",
+      "sku": "X1772B",
+      "name": "חנוכיה \"אור הנס\" כסף עם ציפוי לכה"
+    },
+    {
+      "id": "7h8rSXeStNauqZUTcbbq",
+      "sku": "UK66383",
+      "name": "טלית קטן אקרילן 105x30 ס\"מ פסים לבן וכסף"
+    },
+    {
+      "id": "7osVWGJAD0LDbwAbrY37",
+      "sku": "UK66116",
+      "name": "ספר תורה אשכנזי מבד רקמת \"שער וילנה\" 40 ס\"מ"
+    },
+    {
+      "id": "83zhl5zqY1edasO32NFS",
+      "sku": "X5383C",
+      "name": "נטלה זהב עם חריטה וחלקים בכסף"
+    },
+    {
+      "id": "8Bkr0SR9SmS236qouvT0",
+      "sku": "UK67645",
+      "name": "סט חלאקה"
+    },
+    {
+      "id": "8CbwP3X3Q16jjQofCg9m",
+      "sku": "X5266L",
+      "name": "חנוכיית \"המכבים\" ציפוי כסף – גודל ג'מבו"
+    },
+    {
+      "id": "8DbY7nQtSyKuQ6mOBVFO",
+      "sku": "X4726B",
+      "name": "קופסת מצה שמורה עגולה בגוון marble לבן"
+    },
+    {
+      "id": "8KMrbeQYHus5oeiSGBG8",
+      "sku": "UK20213",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור \"ש\" להבה זהב 30 ס\"מ"
+    },
+    {
+      "id": "8NQkMeFyh7hd2oBWs2eb",
+      "sku": "UK83408",
+      "name": "גביע קידוש מהודר מפולימר \"האש שלי\" עם רגל ותחתית 15 ס\"מ"
+    },
+    {
+      "id": "8PGVTeJKUVPACrYzwZmM",
+      "sku": "UK21418",
+      "name": "מזוזה פולימר ש שקועה כסף מבריק 15 סמ לבן"
+    },
+    {
+      "id": "8PNoslh8a9yj31czlBLg",
+      "sku": "UK67355",
+      "name": "זוג מגבות לבנות \"נטילת ידיים\" 72x34 ס\"מ"
+    },
+    {
+      "id": "8Raadgj4vRQdtc4ALaVp",
+      "sku": "X389",
+      "name": "מעמד לבשמים להבדלה מוכסף"
+    },
+    {
+      "id": "8RwuJgFxLkRkPbHdJ4tl",
+      "sku": "X348KA",
+      "name": "חנוכיית קריסטל זהב על 4 רגליים – 35 ס\"מ"
+    },
+    {
+      "id": "8TBbblTdQ1KMNmKYCZEU",
+      "sku": "UK24855",
+      "name": "מזוזה \"פולימר בטון\" \"כותל\" 30 ס\"מ"
+    },
+    {
+      "id": "8YMpzLLpmtf0IU7UnRIf",
+      "sku": "UK24558",
+      "name": "מזוזה \"סמנט בטון\" גוון בטון \"שמע\"- ש כסף 12 ס"
+    },
+    {
+      "id": "8aIo4Aan5r8kOyE5XOvc",
+      "sku": "X5380",
+      "name": "נטלה לשטיפת ידיים לבנה עם עיטור זהב"
+    },
+    {
+      "id": "8ygAqlytKkNa21McFz5R",
+      "sku": "UK67614",
+      "name": "תיק מפואר לטלית דמוי עור עם בולט 31X38 ס\"מ"
+    },
+    {
+      "id": "95YRFs9x2l8uUhHYgGIw",
+      "sku": "UK24665",
+      "name": "מזוזה פולימר בטון כותל ברכת הבית 20 ס\"מ - גוון"
+    },
+    {
+      "id": "96yQWIFuhsZJMuspMZEd",
+      "sku": "P108Z",
+      "name": "חנוכיה קלאסיק בשילוב כסף וזהב – רוחב 31 ס\"מ"
+    },
+    {
+      "id": "9NZ5sWfgVGCj36MTGIKj",
+      "sku": "UK81880",
+      "name": "ברכון מהודר \"הדלקת נרות\" 12X17.5 ס\"מ"
+    },
+    {
+      "id": "9RrIVXME8rUQ0GKgijNe",
+      "sku": "X5602",
+      "name": "חנוכיית קריסטל דגם BASIC"
+    },
+    {
+      "id": "9a9r2p21ZAzSzfAQ7Kk3",
+      "sku": "UK24239",
+      "name": "מזוזה סמנט בטון מהודרת אפור\"כותל\" 12 ס\"מ"
+    },
+    {
+      "id": "9ii6p8ydwW2JuhOSwrOb",
+      "sku": "UK87527",
+      "name": "פאזל עץ תלת מימד \"בית מקדש\" 26x15x10 ס\"מ"
+    },
+    {
+      "id": "9sgckz5k0MIMrBkFLeIi",
+      "sku": "X5739B",
+      "name": "נטלה נירוסטה בגוון שיש שחור וזהב"
+    },
+    {
+      "id": "9xrknpmW1ChbCHOAzuvR",
+      "sku": "UK20202",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור \"ש\" להבה זהב 12 ס\"מ"
+    },
+    {
+      "id": "9ygS44jYu89koJyytL7f",
+      "sku": "UK21464",
+      "name": "מזוזה פולימר ש שקועה חמסה 20 ס\"מ"
+    },
+    {
+      "id": "ALH2O1z7AJh3hgJvwB2B",
+      "sku": "UK47928",
+      "name": "חנוכיית \"אור הזהב\" מתכת \"נבל\" עם ראשי קריסטל"
+    },
+    {
+      "id": "AZmSKGMqg5d1oFpo8xUU",
+      "sku": "X1935A",
+      "name": "זוג מלחיות קריסטל בעיצוב כוכב"
+    },
+    {
+      "id": "Afg5x0miN6sQ2ciEhSxr",
+      "sku": "X4702A",
+      "name": "h13.5 נטלה נירו’ אמייל שנהב “נטילת ידיים”"
+    },
+    {
+      "id": "AgDWNWqoMk7H5RpRjfwD",
+      "sku": "UK49796",
+      "name": "מנורה אלומיניום 7 קנים גימור זהב 30 ס\"מ"
+    },
+    {
+      "id": "AgaubkEZTDy8J82ca2hX",
+      "sku": "UK21201",
+      "name": "מזוזה פולימר ש שקועה שמע ישראל 20 ס\"מ חול"
+    },
+    {
+      "id": "AlHDIxeQ3bbAWA1xyvzY",
+      "sku": "UK67906",
+      "name": "נרתיק קלאצ' האש שלי פיו לבן 26.5X20.5סמ"
+    },
+    {
+      "id": "At4CPRCDERETs07CG6uI",
+      "sku": "P108",
+      "name": "חנוכיה מוכספת בעיצוב רגל בארוק"
+    },
+    {
+      "id": "B3Y0wZ4XqIsG4yyaWEfk",
+      "sku": "X5296B",
+      "name": "נטלה אקרילית כחול הדרגתי עם ידיות שקופות"
+    },
+    {
+      "id": "BOUFt0Pb52twkYvGUDJ9",
+      "sku": "X1802",
+      "name": "חנוכיית קריסטל אלאדין"
+    },
+    {
+      "id": "BZ2ReAMrLXEXI5f9a686",
+      "sku": "X5848LZ",
+      "name": "חנוכיית המכבים ג'מבו בציפוי כסף וזהב"
+    },
+    {
+      "id": "BfVDG7xSISxBZpQGSjb2",
+      "sku": "UK21260",
+      "name": "מזוזה פולימר ש שקועה שמע ישראל 20 ס\"מ"
+    },
+    {
+      "id": "BhFaEOBLl8ACrXceXkEi",
+      "sku": "UK22182",
+      "name": "מזוזה \"פולימר בטון\" \"ש\" 25 ס\"מ"
+    },
+    {
+      "id": "Bnjg1a0zrvVTHDMc0vCW",
+      "sku": "UK24849",
+      "name": "מזוזה \"סמנט בטון\" \"האש שלי\" רחבה גוון אפור 15 ס\"מ"
+    },
+    {
+      "id": "BsFAr7SJVCS8HeupjQHR",
+      "sku": "UK20769",
+      "name": "מזוזה פלסטיק 15 ס\"מ - גימור שיש אפור"
+    },
+    {
+      "id": "BselZ4rlHKd6zDwJ9kiJ",
+      "sku": "UK82412",
+      "name": "גביע קידוש מהודר מפולימר עם רגל ותחתית 15 ס\"מ"
+    },
+    {
+      "id": "C5nCJsxpGjuYJA9lMeYd",
+      "sku": "UK20690",
+      "name": "מזוזה \"וכתבתם על...\" פולימר לבן 12סמ"
+    },
+    {
+      "id": "C7MEgSLNPwtqDbVALcEX",
+      "sku": "UK24650",
+      "name": "מזוזה \"סמנט בטון\" גוון לבן - ש כסף 12 ס\"מ"
+    },
+    {
+      "id": "CBnkUHpollzJa42r73le",
+      "sku": "UK24841",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור 12 ס\"מ"
+    },
+    {
+      "id": "CDKThGQLcdLeV0EaLhsK",
+      "sku": "UK24085",
+      "name": "מזוזה \"פולימר בטון\" \"ש\" 20 ס\"מ"
+    },
+    {
+      "id": "CFEPn0XmQKhCzapDxJQk",
+      "sku": "UK29754",
+      "name": "מזוזה אלומיניום 12 ס\"מ לבן \"ש\" מתכת"
+    },
+    {
+      "id": "COahsId01FkQnof6pGuD",
+      "sku": "UK41204",
+      "name": "סטנד צמידים זהב עם אורנומנטים מעורב - 24 יח"
+    },
+    {
+      "id": "CbmiIqUEqDab4zNIgrsc",
+      "sku": "UK24738",
+      "name": "מזוזה \"פולימר בטון\" גוון שחור - \"ש\" כסף 15 ס\"מ"
+    },
+    {
+      "id": "CeK744QThJiLo6hThVSD",
+      "sku": "UK83607",
+      "name": "ואזה קריסטל עם פרחים גוון זהב 26 ס\"מ"
+    },
+    {
+      "id": "ChbUBI58RQlHfdj1QTFI",
+      "sku": "X4861A",
+      "name": "מעמד בשמים להבדלה בצבע כסף"
+    },
+    {
+      "id": "DFrhmO1WLpTrr07EkCL1",
+      "sku": "X5295",
+      "name": "נטלה אקרילית שקופה בצבע אדום"
+    },
+    {
+      "id": "DLm555RgMh6RGNnQdue4",
+      "sku": "P002X",
+      "name": "כריות למים אחרונים"
+    },
+    {
+      "id": "DQGaOHCnzRmK7UNTU0Qd",
+      "sku": "UK41273",
+      "name": "נטלה מהודרת קלה \"עץ מנגו עבודת יד\" 14 ס\"מ"
+    },
+    {
+      "id": "DRezYIIh9AbzBMLGXhm2",
+      "sku": "UK21353",
+      "name": "מזוזה פולימר ש שקועה זהב מבריק 12 סמ לבן"
+    },
+    {
+      "id": "DZtYGtzidvzfJDfI2k0r",
+      "sku": "X4990B",
+      "name": "קופת צדקה נירוסטה בסגנון ארט דקו שחור וזהב"
+    },
+    {
+      "id": "DcKolnVendDoB7lmHbgd",
+      "sku": "UK53025",
+      "name": "שמלה לבנה מהודרת לברית מסטן עם רקמה וסרטים בצבע"
+    },
+    {
+      "id": "DhoVjyKz2KuhZ9OfmPE0",
+      "sku": "X3048",
+      "name": "H26 חנוכיה ציפוי כסף “בארוק” רוחב 23 ס”מ"
+    },
+    {
+      "id": "Drr4OZj0RV4A6P3DMwc6",
+      "sku": "UK22292",
+      "name": "מזוזה פולימר בטון 20 ס\"מ ירושלים"
+    },
+    {
+      "id": "E7XUpUiy8h9mXyZ3wxDB",
+      "sku": "X5861GB",
+      "name": "חנוכיית פז שחורה מאלומיניום – 27 ס\"מ"
+    },
+    {
+      "id": "EAgjECjmp83DKNLfKefZ",
+      "sku": "X4446C",
+      "name": "סכין לחלה שבת קודש עם ידית ניקל"
+    },
+    {
+      "id": "EB2zoVcvlSNyeXU1hCfz",
+      "sku": "UK44476",
+      "name": "סטנד 18 יח מראה דמוי עור \"רבות בנות\" 10.5X8.5 ס\"מ"
+    },
+    {
+      "id": "EJ2rvB86ivQVNxG8F54a",
+      "sku": "X5786",
+      "name": "סכין יודאיקה נירוסטה עם ציפוי כסף וידית זכוכית"
+    },
+    {
+      "id": "EVy0kG7TrCG9Fy41xKBo",
+      "sku": "UK54996",
+      "name": "תיק לטלית גדול מהודר עם בידוד טרמי 41x31 ס\"מ"
+    },
+    {
+      "id": "EhOX9u4pSvecCAnwqvUs",
+      "sku": "6608",
+      "name": "זמירות שבת דגם עיגול"
+    },
+    {
+      "id": "EyHtbKMwNNz7fdj8TgTM",
+      "sku": "UK24651",
+      "name": "מזוזה \"סמנט בטון\" גוון לבן - ש כסף 15 ס\"מ"
+    },
+    {
+      "id": "FBlaRd4IgE7cuBUZB8Mo",
+      "sku": "X874",
+      "name": "מלחיה בודדת וכפית מוכספת סגנון פילגרים"
+    },
+    {
+      "id": "FHXmKNpEcux5jJDIBwrm",
+      "sku": "UK24850",
+      "name": "מזוזה \"סמנט בטון\" \"האש שלי\" רחבה גוון אפור 20 ס\"מ"
+    },
+    {
+      "id": "FIi20uqJy31oyB9snGJg",
+      "sku": "UK24670",
+      "name": "מזוזה פולימר כותל \"ברוך אתה\" 15 ס\"מ - שחור"
+    },
+    {
+      "id": "FOLPBilCPJ6NVxkaVe0r",
+      "sku": "X3955A",
+      "name": "נטלה אלומיניום בציפוי כסף – עיצוב מעוין"
+    },
+    {
+      "id": "Fc95JcykbO7ZxNri6I8J",
+      "sku": "UK66679",
+      "name": "תיק תפ טרמי דמוי עור גוון חום איכותי לאחסון תפילין"
+    },
+    {
+      "id": "Fgv9dvsxeimeHJaRTARX",
+      "sku": "X5904",
+      "name": "חנוכיית קריסטל נטיפים בקנים זהב"
+    },
+    {
+      "id": "FjBadGuZUi8RJbEfylyx",
+      "sku": "X5899A",
+      "name": "חנוכיית קריסטל בעיצוב מנורה – שקוף בשילוב ענבר"
+    },
+    {
+      "id": "FmAuSrF58kQSKRxVrh83",
+      "sku": "UK24741",
+      "name": "מזוזה \"פולימר בטון\" גוון בטון - \"ש\" כסף 12 ס\"מ"
+    },
+    {
+      "id": "G4nfta22I3cMUTBJommH",
+      "sku": "UK24819",
+      "name": "מזוזה \"פולימר בטון\" גוון בטון - \"ש\" להבה 30 ס\"מ"
+    },
+    {
+      "id": "GGJbhwNSdL3pV3fMPAMr",
+      "sku": "X5082W",
+      "name": "סט נטילת ידיים אמייל לבן וזהב נירוסטה"
+    },
+    {
+      "id": "GVsnlLvrfgcvVk65NoUU",
+      "sku": "UK24386",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון בטון 20 ס\"מ"
+    },
+    {
+      "id": "GVuvVJiMKlUNrGUmAdfY",
+      "sku": "X4726",
+      "name": "קופסת מצה עגולה חלוקי נחל כסופים"
+    },
+    {
+      "id": "GYKXmOKLH99VKwzSMve6",
+      "sku": "UK24852",
+      "name": "מזוזה \"פולימר בטון\" \"כותל\" 15 ס\"מ"
+    },
+    {
+      "id": "GYnnEF6Yqojp22mU77Bz",
+      "sku": "UK65838",
+      "name": "כרית מהודרת לברית מסטן עם דנטל מסביב, \"כיסא אלי"
+    },
+    {
+      "id": "Gif6FxVayUvpysl7Zskn",
+      "sku": "UK44122",
+      "name": "פמוטי זכוכית עם ברכת הדלקת נרות מעוטרת פסיפס"
+    },
+    {
+      "id": "GuhYez7G6hv7tFnXcxLn",
+      "sku": "UK82413",
+      "name": "גביע קידוש מהודר מפולימר עם רגל ותחתית 15 ס\"מ"
+    },
+    {
+      "id": "Gv8jUj7lZdgYDL5rd6IE",
+      "sku": "UK20913",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה כסף 30 ס\"מ"
+    },
+    {
+      "id": "HX3PvGLyEB2pY4oEGUVu",
+      "sku": "UK24830",
+      "name": "מזוזה \"פולימר בטון\" \"ש\" 20 ס\"מ"
+    },
+    {
+      "id": "HXodWsKGNw9ROCeVTiza",
+      "sku": "X5863",
+      "name": "חנוכיית כנסת מתכת כסף"
+    },
+    {
+      "id": "HaPZRNquuJaW9VvgwLZn",
+      "sku": "X5861GZ",
+      "name": "חנוכיית פז מאלומיניום זהב – 27 ס\"מ"
+    },
+    {
+      "id": "HdQUewSteZbcw2Nyy6Uq",
+      "sku": "X4978WK",
+      "name": "מזוזה שיש לבן ושחור – 12 ס\"מ"
+    },
+    {
+      "id": "HeZQp2cvDXDqkiLeCCKs",
+      "sku": "UK24411",
+      "name": "מזוזה זכוכית מהודרת עם מראה ואבנים 12 ס\"מ"
+    },
+    {
+      "id": "HfhcdLa3ijeI8VU0FECV",
+      "sku": "X5600",
+      "name": "נטלה כסף טהור עם עיטור גלים"
+    },
+    {
+      "id": "HiB32euZ1jeEeLiI1Bv7",
+      "sku": "X4976KS",
+      "name": "מזוזה אמייל מוכסף עם כיתוב זהב – 12 ס\"מ"
+    },
+    {
+      "id": "Hk7n17wv9cBWqf5oejOp",
+      "sku": "UK41239",
+      "name": "נטלה מהודרת קלה \"עץ מנגו עבודת יד\" 14 ס\"מ"
+    },
+    {
+      "id": "HpG72O03IwKxzLls1Tga",
+      "sku": "X5743",
+      "name": "נטלה נירוסטה שחורה עם עיטור זהב – \"נטילת ידיים\""
+    },
+    {
+      "id": "Hy8IjdmnGmmo0bd38BfK",
+      "sku": "UK24671",
+      "name": "מזוזה פולימר בטון כותל \"ברוך אתה\" 20 ס\"מ - שחור"
+    },
+    {
+      "id": "I6Id8nqrTvinuGQQOhIW",
+      "sku": "UK21128",
+      "name": "מזוזה \"וכתבתם על...\" פולימר לבן 12סמ"
+    },
+    {
+      "id": "IHoQjPgcDGp1UMqtg4oc",
+      "sku": "X1882K",
+      "name": "קופסת אחסון למצה שמורה עם מכסה"
+    },
+    {
+      "id": "INnJOwzGUu2ETvbAnYJB",
+      "sku": "UK62291",
+      "name": "כרית מהודרת לברית מסאטן עם דנטל מסביב, ריקמה"
+    },
+    {
+      "id": "IRq4HONsAbKfFkJ46cUv",
+      "sku": "X4985K",
+      "name": "מזוזה מוכסף עם כיתוב שחור – 12 ס\"מ"
+    },
+    {
+      "id": "IYWQPKTCM8AFADdyFwwr",
+      "sku": "UK24383",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור 20 ס\"מ"
+    },
+    {
+      "id": "IckwydebaKOhno549Mlv",
+      "sku": "X526G",
+      "name": "מעמד לקיסמים קריסטל ענבר"
+    },
+    {
+      "id": "IdLfhEPfGbITGkXInDsa",
+      "sku": "UK24748",
+      "name": "מזוזה מהודרת מפולימר בטון שחור ש זהב 12 ס\"מ"
+    },
+    {
+      "id": "IjzgTQexuuXHh5qKAvZ4",
+      "sku": "UK82038",
+      "name": "סטנד כלי בשמים זכוכית עם תערובת פרחים מעורב 24 יח"
+    },
+    {
+      "id": "IqXp7uE6hxrTDL5TjPx1",
+      "sku": "UK24843",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור 20 ס\"מ"
+    },
+    {
+      "id": "IsTLATFS0XioN59bSQMC",
+      "sku": "P447X",
+      "name": "מעמד לספר תורה עץ/כריות 30/36סמ"
+    },
+    {
+      "id": "Itbo53I9PZMvDwmCiHBv",
+      "sku": "X4983KS",
+      "name": "מזוזה מוכסף עם כיתוב זהב – 12 ס״מ"
+    },
+    {
+      "id": "IzGnwl2RUmGp8DHzszHC",
+      "sku": "UK65368",
+      "name": "כיסוי חלה סטן מהודר 52x42 ס\"מ + pv"
+    },
+    {
+      "id": "J1GdKFfz32mmpSjtWu4i",
+      "sku": "UK24449",
+      "name": "מזוזה \"פולימר בטון\" ברוך אתה 12 ס\"מ"
+    },
+    {
+      "id": "JDQYoG5GvNLHFxWeSYdL",
+      "sku": "UK47820",
+      "name": "זוג פמוטי קריסטל מהודרים עם אבנים לבנות 25.5 ס\""
+    },
+    {
+      "id": "JP5BMz0QC4yrFLkRr321",
+      "sku": "P707C",
+      "name": "חנוכיה אקווריום “כריות חדש” כסף גובה 38 ס”מ"
+    },
+    {
+      "id": "JWZgRZLx5rOHoGxRq68s",
+      "sku": "X5296",
+      "name": "נטלה אקרילית כתום הדרגתי וידיות שקופות"
+    },
+    {
+      "id": "JYtyfwpsxNEGsNckcQZL",
+      "sku": "X4703BZ",
+      "name": "נטלה נירוסטה אמייל שחור וזהב"
+    },
+    {
+      "id": "JcT1M17Vp6jrPvp0kQ6i",
+      "sku": "X4971",
+      "name": "חנוכיית קריסטל סביבון בעיטור זהב – סדרת סטייל"
+    },
+    {
+      "id": "Jquy8ycNzgB9My7VQtmA",
+      "sku": "UK24774",
+      "name": "מזוזה \"פולימר בטון\" ברוך אתה 15 ס\"מ"
+    },
+    {
+      "id": "Js189rGoZE4d1rUlbzaQ",
+      "sku": "X4703SZ",
+      "name": "נטלה נירוסטה אמייל אפור/ זהב “נטילת ידיים”"
+    },
+    {
+      "id": "Juiur6CyZV4fu7IGgsrc",
+      "sku": "UK20068",
+      "name": "מזוזה פלסטיק לבנה 15 ס\"מ \"ש\" כסף עם פקק גומי וחורים"
+    },
+    {
+      "id": "K5Qhz0Q8YbFZJkqwuYpz",
+      "sku": "UK83144",
+      "name": "סט פולימר מגש להדלקת נרות וזוג פמוטים מהודרים"
+    },
+    {
+      "id": "KECBmKn0ohzRFTTLf154",
+      "sku": "UK21412",
+      "name": "מזוזה פולימר ש שקועה זהב מבריק 15 סמ שחור"
+    },
+    {
+      "id": "KGFhKD4O7MbuTpf97zCA",
+      "sku": "UK80884",
+      "name": "נטלה מהודרת קלה \"עץ מנגו עבודת יד\" 14 ס\"מ"
+    },
+    {
+      "id": "KVFtBY4YiBw5yijwIBGF",
+      "sku": "UK21420",
+      "name": "מזוזה פולימר ש שקועה כסף מבריק 20 סמ לבן"
+    },
+    {
+      "id": "KkWbSKRRQ64Y1RzUvG4v",
+      "sku": "UK20693",
+      "name": "מזוזה \"וכתבתם על...\" פולימר לבן 15סמ"
+    },
+    {
+      "id": "KrLw4tjOsaU7tzbFAiKy",
+      "sku": "X4981BK",
+      "name": "מזוזה art deco שחור/זהב כיתוב כסף 12סמ"
+    },
+    {
+      "id": "L0AMwkb2JUgcNXJe2CJN",
+      "sku": "X5234Z",
+      "name": "כלי דבש זכוכית עם כפית מתכת ציפוי זהב"
+    },
+    {
+      "id": "LCh3eZEY2ogTnHkfNpXX",
+      "sku": "UK20400",
+      "name": "מזוזה ש + מגן דוד חרוטים פולימר לבן 20סמ"
+    },
+    {
+      "id": "LFrHnUXPfa8NFbb0PoiT",
+      "sku": "X5902",
+      "name": "חנוכיה קריסטל “קוביות” רוחב 37 ס”מ H20"
+    },
+    {
+      "id": "LN6H5urXxHciZafXsTf2",
+      "sku": "X5383D",
+      "name": "נטלה ניקל עם חריטה מוזהבת"
+    },
+    {
+      "id": "LaxRqJbEQ4TR9RJvKTPk",
+      "sku": "UK67362",
+      "name": "תיק מפואר לטלית דמוי עור עם ריקמה 31X38 ס\"מ"
+    },
+    {
+      "id": "LmEyhO9fyc9DLMk1Fe6h",
+      "sku": "X5380AB",
+      "name": "נטלה נירוסטה שחורה עם זהב ועיטור רקוע"
+    },
+    {
+      "id": "Ltgbb0sw31ca5sPBKaBM",
+      "sku": "UK18315",
+      "name": "כיפה בד ארטמן שחור 16 ס\"מ"
+    },
+    {
+      "id": "M0SZZes1sAKN6cwEzqI6",
+      "sku": "X3589",
+      "name": "נטלה שיש אפור ידית חרדל"
+    },
+    {
+      "id": "M1BxiLc8RsdN6iS2L3vA",
+      "sku": "X5209B",
+      "name": "מים אחרונים ענני שחור/אפור נירוסטה"
+    },
+    {
+      "id": "M5kQI6wshjFQAl7XPJcR",
+      "sku": "UK60964",
+      "name": "טלית קטן אקרילן 105x30 ס\"מ פסים כסף"
+    },
+    {
+      "id": "MOKFCtCT5sN0QAUz3Nvm",
+      "sku": "UK24385",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון בטון 15 ס\"מ"
+    },
+    {
+      "id": "MV09jD48UbrVbiqiGOh9",
+      "sku": "UK24254",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן 15 ס\"מ"
+    },
+    {
+      "id": "MVDRL0H92qH0Fh5pjTlS",
+      "sku": "UK20891",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה כסף 12 ס\"מ"
+    },
+    {
+      "id": "Ma9KU1WXnYG3Ix6cZfpm",
+      "sku": "P719C",
+      "name": "מעמד למצה בעיטורי תחרה"
+    },
+    {
+      "id": "MbcUomyeaVsM8gqNkTUe",
+      "sku": "UK62554",
+      "name": "כרית מהודרת לברית מסאטן עם דנטל מסביב, ריקמה"
+    },
+    {
+      "id": "MgxF0aasPwVBEDqNlWIe",
+      "sku": "P114C",
+      "name": "סט 6 תחתית לקידוש/ענבים 12.5 ס”מ"
+    },
+    {
+      "id": "NES5jRDLPMvVOubyh2PD",
+      "sku": "X5380B",
+      "name": "נטלה נירוסטה שחור עם עיטור זהב לנטילת ידיים"
+    },
+    {
+      "id": "NWTf8RX368LRsvwh0BzD",
+      "sku": "UK20208",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור \"ש\" להבה זהב 25 ס\"מ"
+    },
+    {
+      "id": "NZSTMoTZ28PxbFUovTsU",
+      "sku": "P578",
+      "name": "מתקן ברכון מעץ וכסף"
+    },
+    {
+      "id": "Nb6a6FehjPDrhuDgBdhv",
+      "sku": "UK67922",
+      "name": "סט טלית תפילין דמוי עור יברכך 36X29 ס\"מ"
+    },
+    {
+      "id": "Ng5d8YvT0kYNA6DWngQk",
+      "sku": "UK24751",
+      "name": "מזוזה מהודרת \"פולימר בטון\" דגם שיש ש כסף 12 ס\"מ"
+    },
+    {
+      "id": "NsW6Utv4NVRVBWxZagMh",
+      "sku": "X4598G",
+      "name": "חנוכיה כסף עם ציפוי ולכה"
+    },
+    {
+      "id": "ODSVbJSrhrVqwIm7mS4U",
+      "sku": "UK46403",
+      "name": "ספר \"ראשית מצוות הסידור הראשון שלי\" - בת 15x15 ס\"מ"
+    },
+    {
+      "id": "OELgyIEak5b7kYndm3W3",
+      "sku": "UK21348",
+      "name": "מזוזה פולימר ש שקועה 7 ברכות 20 ס\"מ"
+    },
+    {
+      "id": "OEoqnRiqFbIORDtTtUKA",
+      "sku": "X3080A",
+      "name": "סט 6 תחתיות משושה כסף טהור"
+    },
+    {
+      "id": "OOHqfsIUdYMrrpKKjpPQ",
+      "sku": "UK66903",
+      "name": "תיק מפואר לטלית דמוי עור אותיות בולטות \"יברכך\""
+    },
+    {
+      "id": "OXxhQJ2TGRLs7ldlxUOd",
+      "sku": "UK24853",
+      "name": "מזוזה \"פולימר\" \"כותל\" 20 ס\"מ"
+    },
+    {
+      "id": "OsmtOiHK35l5S48Bw2tv",
+      "sku": "UK24411",
+      "name": "מזוזה זכוכית מהודרת עם מראה ואבנים 12 ס\"מ"
+    },
+    {
+      "id": "P0cpvIlDwDDLOdf4G1fD",
+      "sku": "X5848G",
+      "name": "חנוכיית המכבים בציפוי כסף"
+    },
+    {
+      "id": "P2a97c5h3r1JR3gzBgxh",
+      "sku": "X3446D",
+      "name": "מלחיה קריסטל שקופה עם מכסה"
+    },
+    {
+      "id": "PAvONEzaMqbH2oy2lcfX",
+      "sku": "UK54319",
+      "name": "פמוטי קריסטל חמשייה מהודרים 22 ס\"מ"
+    },
+    {
+      "id": "PBv2KGKmbENYFHNgRa4I",
+      "sku": "X5604B",
+      "name": "נטלה לשטיפת ידיים בעיצוב אפור כהה וזהב"
+    },
+    {
+      "id": "PCj4mrqOyEvIzJRMCVhl",
+      "sku": "UK60198",
+      "name": "כיסוי חלה מהודר דמוי עור לבן פרחים אפורים 45X55 ס\"מ"
+    },
+    {
+      "id": "PCxXP0DkQ4dpqLYN2f8Z",
+      "sku": "UK24811",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן 20 ס\"מ"
+    },
+    {
+      "id": "PKFBi60nNTgKtPzc8IZy",
+      "sku": "X5922C",
+      "name": "נטלה פולירזין בגוון ענבר – 14 ס\"מ"
+    },
+    {
+      "id": "PSW3qmPfnrWv5TGWFEO5",
+      "sku": "X1291A",
+      "name": "מעמד לבשמים מוכסף בעיצוב פילגרים"
+    },
+    {
+      "id": "PdHjel3ZvPqoAPnc00KL",
+      "sku": "X4978K",
+      "name": "מזוזה Marble אפור/לבן 12סמ"
+    },
+    {
+      "id": "PkdJWpNAEwg2eBEGYH6M",
+      "sku": "X2209A",
+      "name": "זוג מלחיות קריסטל ענבר"
+    },
+    {
+      "id": "PlUzD77jk8XWx9h8P7ar",
+      "sku": "UK24677",
+      "name": "מזוזה פלסטיק שחורה 15 ס\"מ \"ש\" זהב ופס זהב עם פקק גומי"
+    },
+    {
+      "id": "Pq8IowpQ5H6SifJiCAFc",
+      "sku": "UK21792",
+      "name": "מזוזה פולי כותל ש בולטת אלקטרופורמינג זהב 30סמ"
+    },
+    {
+      "id": "Q53Mh9HAvbylJFkEyOPj",
+      "sku": "UK20149",
+      "name": "מזוזה \"פולימר בטון \"ש\" 30 ס\"מ"
+    },
+    {
+      "id": "QAnLOO5uCxIa2ZoJZLGI",
+      "sku": "UK67000",
+      "name": "סט הפרשת חלה דמוי עור לבן \"אותיות בולטות\" 4"
+    },
+    {
+      "id": "QNYeg811n4KhgCeF1Icu",
+      "sku": "UK53348",
+      "name": "סטנד אקריליק לקופסאות טבק 46x25 ס\"מ בקניית 90 יחידות"
+    },
+    {
+      "id": "QTIUA7OyWyt089yp8jIL",
+      "sku": "UK48572",
+      "name": "סט החלאקה שלי - מכיל נרתיק לתלתל ומספריים"
+    },
+    {
+      "id": "QbWwootl1WkIfXb9QTSx",
+      "sku": "X5848KZ",
+      "name": "חנוכיית זהב \"המכבים\" – 19 ס\"מ"
+    },
+    {
+      "id": "QhCtwC38lgsWL2ndMt7b",
+      "sku": "UK21413",
+      "name": "מזוזה פולימר ש שקועה זהב מבריק 20 סמ שחור"
+    },
+    {
+      "id": "QiDM5Zj9gZmiUGzosAGz",
+      "sku": "UK24842",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור 15 ס\"מ"
+    },
+    {
+      "id": "QmD37uA6J4het1cL2QD7",
+      "sku": "UK20333",
+      "name": "מזוזה פולימר ש שקועה חמסה 20 ס\"מ"
+    },
+    {
+      "id": "QmtFF1gWqwscHThvezzx",
+      "sku": "UK67613",
+      "name": "סט טלית תפילין בד קטיפה \"האש שלי\" 36X29 ס\"מ"
+    },
+    {
+      "id": "R7az6M0DnQJtkPlT66vC",
+      "sku": "UK40393",
+      "name": "סט החלאקה שלי - מכיל נרתיק לתלתל ומספריים גוון בטו"
+    },
+    {
+      "id": "R8NEp2s4JwanhYdA9p6s",
+      "sku": "X5295B",
+      "name": "נטלה אקרילית שקופה בגוון סגול"
+    },
+    {
+      "id": "RA2kJnTH8zXoXtdXsqgI",
+      "sku": "UK21417",
+      "name": "מזוזה פולימר ש שקועה כסף מבריק 12 סמ לבן"
+    },
+    {
+      "id": "RBtZxLByVG7r65Sc1LGR",
+      "sku": "X1039ZA",
+      "name": "מילחיות פתוחות קריסטל/ פנינים/זהב"
+    },
+    {
+      "id": "RKvZOTJAaqEW4Oaw4W3l",
+      "sku": "UK21790",
+      "name": "מזוזה פולי כותל ש בולטת אלקטרופורמינג זהב 25סמ"
+    },
+    {
+      "id": "RRzgjEZPi6HvzumwGWCp",
+      "sku": "UK24384",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון בטון 12 ס\"מ"
+    },
+    {
+      "id": "Rk1HWG0tTk3AfJKlwY2G",
+      "sku": "UK67780",
+      "name": "עטרה מהודרת לטלית דמוי עור 100X10 ס\"מ"
+    },
+    {
+      "id": "RkEHBTQyh6piGQQmgIJD",
+      "sku": "UK20008",
+      "name": "מזוזה פולימר עץ עם אפוקסי צבע כחול שמיים גודל 20"
+    },
+    {
+      "id": "RlWmW9eGxB2K8rPD4uz1",
+      "sku": "UK80802",
+      "name": "פאזל עץ אותיות א\"ב צבעוניות 30x22 ס\"מ"
+    },
+    {
+      "id": "RoNsc2GR3gbAqUaSpvE0",
+      "sku": "X1935AZ",
+      "name": "זוג מלחיות קריסטל עם עיצוב כוכב וזהב"
+    },
+    {
+      "id": "Rp2W0TJaL7PHnFNr6OYo",
+      "sku": "UK80793",
+      "name": "פאזל 24 חלקים לילדים \"א\"ב\" 38X28 ס\"מ"
+    },
+    {
+      "id": "RrabxjafmB7c7iWoNtiv",
+      "sku": "UK20034",
+      "name": "מזוזה פולימר עץ עם אפוקסי צבע שחור אפור גודל 20"
+    },
+    {
+      "id": "RxGlwzjhcQWDb469uuYG",
+      "sku": "UK45792",
+      "name": "כרית מהודרת לברית דמוי עור \"האש שלי\" עם אותיות בולטות 74X50 ס\"מ"
+    },
+    {
+      "id": "RyMVy1UcvB8D7NZzChcn",
+      "sku": "UK24666",
+      "name": "מזוזה \"פולימר בטון\" כותל ברכת הבית 15 ס\"מ - שחור"
+    },
+    {
+      "id": "S5y2F09b0ya4ZQ5QSq97",
+      "sku": "X1039C",
+      "name": "מילחיות פתוחות קריסטל ענבר/ כסוף גובה 8 ס”מ"
+    },
+    {
+      "id": "S6eePUPHGKFTWwnWaeIK",
+      "sku": "X4976KW",
+      "name": "מזוזה אמייל לבן כיתוב זהב 12סמ"
+    },
+    {
+      "id": "SAgaUb3WfVJaKMnxEyTX",
+      "sku": "P353K",
+      "name": "מפצח אגוזים קטן"
+    },
+    {
+      "id": "SE2eoHlDj45BAs5ck7LX",
+      "sku": "X880Z",
+      "name": "סט הבדלה כסף עיטור זהב"
+    },
+    {
+      "id": "SEHH9tT6OU0EPWRvCbSi",
+      "sku": "UK80801",
+      "name": "פאזל עץ אותיות א\"ב צבעוניות 30x22 ס\"מ"
+    },
+    {
+      "id": "SO40KEoiRzRBoqRr5AHO",
+      "sku": "UK67921",
+      "name": "סט טלית תפילין דמוי עור יברכך 36X29 ס\"מ"
+    },
+    {
+      "id": "SQz2MMZcQK8c2P88OW5q",
+      "sku": "UK66858",
+      "name": "כרית מהודרת לברית דמוי עור עם אותיות בולטות 74X50 ס\"מ"
+    },
+    {
+      "id": "Sff38yJKxlJR8RnzY7NK",
+      "sku": "UK24457",
+      "name": "מזוזה \"פולימר בטון\" שיש ברכת הבית 25 ס\"מ"
+    },
+    {
+      "id": "Sq2NfLM5P6uoEBuFWsb3",
+      "sku": "X5038",
+      "name": "סכין חלה נירוסטה מעוטרת ציפוי ניקל"
+    },
+    {
+      "id": "SvwykqxrAGGpYhhpv9Xh",
+      "sku": "X5038B",
+      "name": "סכין לחלה נירוסטה עם ציפוי כסף ועיטורים"
+    },
+    {
+      "id": "T0v3nRsuC20rqltiSLFA",
+      "sku": "X4976W",
+      "name": "מזוזה אמייל לבן עם כיתוב זהב – 15 ס\"מ"
+    },
+    {
+      "id": "T2Gw1ANCKTglzeTPnz7X",
+      "sku": "UK20924",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה זהב 12 ס\"מ"
+    },
+    {
+      "id": "T2HBFDPbagFv5mta8wNT",
+      "sku": "Uk67617",
+      "name": "תיק טלית פשתן ודמוי עור עם ריקמה"
+    },
+    {
+      "id": "T3DsZkCkPHFTWjtQB5mh",
+      "sku": "P221G",
+      "name": "מלחיות זכוכית עם סטנד כריות"
+    },
+    {
+      "id": "T9ITZAk1szCSmMwWk8L4",
+      "sku": "UK80334",
+      "name": "סט פולימר מגש להדלקת נרות וזוג פמוטים מהודרים"
+    },
+    {
+      "id": "TBtscfALaFy6zLsS3pLH",
+      "sku": "X5234",
+      "name": "סוכרון דבש זכוכית עם כפית מתכת ניקל"
+    },
+    {
+      "id": "TCJEycnxju6F1MeAZebv",
+      "sku": "UK60306",
+      "name": "סט חלאקה פשתן אפור יברכך + עטרה"
+    },
+    {
+      "id": "TGdPpWTSIbe5v6cdOict",
+      "sku": "X5848Z",
+      "name": "חנוכיה משולב כסף וזהב \"המכבים\""
+    },
+    {
+      "id": "TValCxbaY7yBr1GapdUv",
+      "sku": "X5106CZ",
+      "name": "אגנת נטילת ידיים נירוסטה בגימור זהב"
+    },
+    {
+      "id": "TfVdlmQp1qZCrqXaoo6W",
+      "sku": "X3587",
+      "name": "דיבשית נירו’ מוכספת מעוינים"
+    },
+    {
+      "id": "ThWlk7xqeHbAS8FGgxfl",
+      "sku": "UK24596",
+      "name": "מזוזה \"סמנט בטון\" גוון לבן - ש זהב 15 ס\"מ"
+    },
+    {
+      "id": "TjzNGBPCNsBdwC1YEpu8",
+      "sku": "UK66452",
+      "name": "כרית מהודרת לברית דמוי עור עם אותיות בולטות 74X50 ס\"מ"
+    },
+    {
+      "id": "Top8OIIMUaEk6AM0Fx0I",
+      "sku": "X4980B",
+      "name": "מזוזה Marble שחור/לבן כיתוב כסף 15סמ"
+    },
+    {
+      "id": "TovWAOYPeURxlPayufn3",
+      "sku": "X5922B",
+      "name": "נטלה פולירזין חום גובה 14 ס”מ"
+    },
+    {
+      "id": "Ts9B4VnhLaAEHzrrYoE9",
+      "sku": "UK10104",
+      "name": "כיפה בוכרית גודל 54 ס\"מ - צבעים שונים"
+    },
+    {
+      "id": "TxBax2Iwencymq3JxshF",
+      "sku": "UK21370",
+      "name": "מזוזה פולימר ש שקועה זהב מבריק 20 סמ לבן"
+    },
+    {
+      "id": "U11h5OxtZM5YlNdNN3l1",
+      "sku": "X5038A",
+      "name": "סכין חלה נירוסטה עם ציפוי כסף לשבת ויום טוב"
+    },
+    {
+      "id": "U2z2DXgXNQoqq4Ytq5bE",
+      "sku": "X4980K",
+      "name": "מזוזה Marble שחור לבן עם כיתוב כסף"
+    },
+    {
+      "id": "UAvkJGY27Tz9pz3xZVZe",
+      "sku": "UK20206",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור \"ש\" להבה זהב 20 ס\"מ"
+    },
+    {
+      "id": "UBFkAF8A0Xr6XhpoUdRL",
+      "sku": "X4984KB",
+      "name": "מזוזה עיטור גלים שחור ולבן עם כיתוב שחור"
+    },
+    {
+      "id": "UFS4LMWOQjImochni33L",
+      "sku": "UK23093",
+      "name": "מזוזה פלסטיק שקופה 10 ס\"מ \"ש\" עם כסף פקק גומי"
+    },
+    {
+      "id": "UKsOwV7NHsHe7llLMKQ3",
+      "sku": "X3397A",
+      "name": "נטלה נירוסטה עם ציפוי כסף"
+    },
+    {
+      "id": "ULGMMrsWkwcizQt8eqEP",
+      "sku": "UK66753",
+      "name": "סט החלאקה שלי - מכיל נרתיק לתלתל ומספריים"
+    },
+    {
+      "id": "UNiMch1WSKat4JyW0bLF",
+      "sku": "UK81204",
+      "name": "קופת צדקה פולימר \"הבית של הרבי\" 14x8 ס\"מ"
+    },
+    {
+      "id": "UiTlWkvcqZRI8Sjcn6kB",
+      "sku": "UK48985",
+      "name": "נטלה מהודרת מפולימר 14 ס\"מ"
+    },
+    {
+      "id": "UkK6xc2QGwEc4gReIsgF",
+      "sku": "X3955",
+      "name": "נטלה אלומיניום ציפוי כסף לנטילת ידיים"
+    },
+    {
+      "id": "UkZsOWG1e6HkalOeY3Ei",
+      "sku": "UK21423",
+      "name": "מזוזה פולימר ש שקועה חמסה 20 ס\"מ חול"
+    },
+    {
+      "id": "UmJ0yKf1c0ht76SZW0hi",
+      "sku": "UK24669",
+      "name": "מזוזה פולימר בטון כותל \"ברוך אתה\" 20 ס\"מ - גוון"
+    },
+    {
+      "id": "UwsPSUwU3InL3HckH5u1",
+      "sku": "UK60433",
+      "name": "תיק טלית תפילין פיו רצועה תפורה 38X29.5 ס\"מ לבן"
+    },
+    {
+      "id": "UyZTa7uR1HBoHoer2Bu8",
+      "sku": "UK41272",
+      "name": "נטלה מהודרת קלה \"עץ מנגו עבודת יד\" 12 ס\"מ"
+    },
+    {
+      "id": "V9Zr0RYMPzc6MBXH4g83",
+      "sku": "X5897",
+      "name": "חנוכיית כסף בעיצוב כריות עם גימור מרובע"
+    },
+    {
+      "id": "VB0eDqmYKPB8n3AwUWim",
+      "sku": "UK60199",
+      "name": "כיסוי חלה מהודר דמוי עור לבן פרחים ורודים 45X55 ס\"מ"
+    },
+    {
+      "id": "VH9o4oruErY5RSDxhUcc",
+      "sku": "X5038E",
+      "name": "סכין לחלה ממתכת נירוסטה עם ציפוי כסף"
+    },
+    {
+      "id": "VJ3WaWeljhzOWbroKVQA",
+      "sku": "X362P",
+      "name": "נטלה לשטיפת ידיים מפיוטר"
+    },
+    {
+      "id": "VKt7Hhh4tCfglOHU6RpD",
+      "sku": "UK21821",
+      "name": "מזוזה \"פולימר בטון\" שיש גס לבן ש ציפוי זהב 20סמ"
+    },
+    {
+      "id": "VMEfO9CpK7SgpkRIuts8",
+      "sku": "UK20827",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן \"ש\" להבה זהב 25 ס\"מ"
+    },
+    {
+      "id": "VNUFWwvBWiu55rhtEonc",
+      "sku": "UK82706",
+      "name": "נטלה \"במבוק עבה\" עם הדפסה \"נטילת ידים\" 14 ס\"מ"
+    },
+    {
+      "id": "VTnxuztNL3pBDCsZjqvD",
+      "sku": "UK44476",
+      "name": "סטנד 18 יח מראה דמוי עור \"רבות בנות\" 10.5X8.5 ס\"מ"
+    },
+    {
+      "id": "VUs6yjccXUO69poKYhmW",
+      "sku": "UK66685",
+      "name": "ספר בד 20 ס\"מ \"ראשית מצוות הסידור הראשון שלי\" - בת"
+    },
+    {
+      "id": "VVHOXOocANnlAgsp670j",
+      "sku": "UK24456",
+      "name": "מזוזה \"פולימר בטון\" שיש ברכת הבית 20 ס\"מ"
+    },
+    {
+      "id": "VXzxCZHIyIN6CtzqaXK0",
+      "sku": "X5037",
+      "name": "סט הבדלה 3 חלקים בציפוי כסף"
+    },
+    {
+      "id": "Vdfw7gpWpw6BaI9tsNDQ",
+      "sku": "UK24844",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון אפור 12 ס\"מ"
+    },
+    {
+      "id": "Vv0R6yIKTowjbPhgmLab",
+      "sku": "UK35678",
+      "name": "מחזיק מפתחות \"מגן דוד\" עם תהילים 3 ס\"מ"
+    },
+    {
+      "id": "VzuriZ3ZnpInvE3yjXor",
+      "sku": "UK24641",
+      "name": "מזוזה \"פולימר בטון\" כותל \"ברוך אתה\" 20 ס\"מ - לבן"
+    },
+    {
+      "id": "W1BX4jCuWSoxC6qjTzgR",
+      "sku": "UK24818",
+      "name": "מזוזה \"פולימר בטון\" גוון בטון - \"ש\" להבה 25 ס\"מ"
+    },
+    {
+      "id": "WB879rig12n79ojPOE2X",
+      "sku": "X4252W",
+      "name": "נטלה נירוסטה שיש לבן וזהב"
+    },
+    {
+      "id": "WClZLyKkovZOwgYUKeQG",
+      "sku": "X4976S",
+      "name": "מזוזה אמייל מוכסף עם כיתוב זהב – 15 ס״מ"
+    },
+    {
+      "id": "WHH0jjSxQAgJ7hymJIry",
+      "sku": "X5905",
+      "name": "חנוכיית קריסטל \"ירושלים\" בשילוב זהב"
+    },
+    {
+      "id": "WP3oN6ulSnnJuLWWrgXo",
+      "sku": "X4979Z",
+      "name": "מזוזה מעויינים מוזהבת"
+    },
+    {
+      "id": "WRnV4OKkiJzuPggMTXqk",
+      "sku": "X5009K",
+      "name": "חנוכיה “מן המשכן” אלומיניום זהב רוחב 29 ס”מ H53"
+    },
+    {
+      "id": "WcoBDuvERdXcsN2oUr7R",
+      "sku": "P588KX",
+      "name": "מחלק יין לשמונה כוסות כסוף"
+    },
+    {
+      "id": "WggOqqoA28WBlrbCXdiH",
+      "sku": "UK21817",
+      "name": "מזוזה \"פולימר בטון\" שיש גס לבן ש ציפוי זהב 12סמ"
+    },
+    {
+      "id": "WtLUHyksFCAlQcGh8DJW",
+      "sku": "UK24817",
+      "name": "מזוזה \"פולימר בטון\" גוון שחור - \"ש\" להבה 30 ס\"מ"
+    },
+    {
+      "id": "WuVmh4Xl1LIe4oLkUAYj",
+      "sku": "UK24433",
+      "name": "מזוזה סמנט בטון מהודרת שחור \"כותל\" 12 ס\"מ"
+    },
+    {
+      "id": "Wvou5OqNRieUxEu1DVnO",
+      "sku": "UK24115",
+      "name": "מזוזה \"סמנט בטון\" 12 ס\"מ מהודרת - שחור מנוקד"
+    },
+    {
+      "id": "X63jRLhQHSrMUiBPvj7p",
+      "sku": "X5037A",
+      "name": "סט הבדלה 3 חלקים ציפוי כסף"
+    },
+    {
+      "id": "XA7rul3JyLEm2ECyHI0R",
+      "sku": "UK26439",
+      "name": "מזוזה \"פולימר בטון\" כותל 30 ס\"מ - שיש לבן"
+    },
+    {
+      "id": "XJqvQmwovoAPg5RxoyfN",
+      "sku": "X4977K",
+      "name": "מזוזה אבן ירושלים שנהב כיתוב שחור 12סמ"
+    },
+    {
+      "id": "XMeSlAi3wOcMWl0STZnn",
+      "sku": "UK66115",
+      "name": "ספר תורה אשכנזי מבד רקמת \"שער וילנה\" 55 ס\"מ"
+    },
+    {
+      "id": "XPKIYsc8gSSrVyIBytws",
+      "sku": "X5899",
+      "name": "חנוכיית קריסטל שקופה – עיצוב מנורה"
+    },
+    {
+      "id": "XbRBY7r4jgThIshpwNGS",
+      "sku": "X4982S",
+      "name": "מזוזה עיטור מסולסל מוכסף כיתוב זהב 12סמ"
+    },
+    {
+      "id": "XkPwXk2VNeMuimkcppSG",
+      "sku": "UK24455",
+      "name": "מזוזה \"פולימר בטון\" \"ש\" 25 ס\"מ"
+    },
+    {
+      "id": "XmbWkmbi4uEKgZ0hAezt",
+      "sku": "P563J",
+      "name": "סט הבדלה /ירושלים*12*"
+    },
+    {
+      "id": "Xw7YQ9lxyI94qpybufqB",
+      "sku": "X5107A",
+      "name": "שרביט הדלקה מכסף מט"
+    },
+    {
+      "id": "XxBImApo6HIS9h0BUOqj",
+      "sku": "X5598",
+      "name": "נטלה נירוסטה אמייל שחור עם עיטור זהב"
+    },
+    {
+      "id": "Xxnrqnumv8prfUZrDAyG",
+      "sku": "UK24116",
+      "name": "מזוזה \"סמנט בטון\" 15 ס\"מ מהודרת - שחור מנוקד"
+    },
+    {
+      "id": "XzXPTyqYaXdUk1mIdfLt",
+      "sku": "UK24854",
+      "name": "מזוזה \"פולימר בטון\" \"כותל\" 25 ס\"מ"
+    },
+    {
+      "id": "YAP3fFbRQ5yxUn7Rgfku",
+      "sku": "101150",
+      "name": "זמירות שבת דמוי עור לבן"
+    },
+    {
+      "id": "YGevsyj2b2Hoih7LeSFF",
+      "sku": "X3136A",
+      "name": "סט 3 סביבוני קריסטל צבעוניים – כחול ירוק וורוד"
+    },
+    {
+      "id": "YV8aZShZYAN51Q8YF6zD",
+      "sku": "X4982Z",
+      "name": "מזוזה עיטור מסולסל מוזהב כיתוב שחור 12סמ"
+    },
+    {
+      "id": "YWTmv7TZ9zIloWXtrfTJ",
+      "sku": "X3781",
+      "name": "חנוכיה קריסטל ROYAL רוחב 35 ס”מ H15"
+    },
+    {
+      "id": "YWXLC4JoE4xqAINcoUyi",
+      "sku": "P447A",
+      "name": "מעמד לספר תורה מפואר עץ/כסף 30/36 ס”מ"
+    },
+    {
+      "id": "Yq1b9wfaTAaaGxshIi7j",
+      "sku": "X5848GZ",
+      "name": "חנוכיית המכבים בציפוי כסף וזהב משולב – 48 ס\"מ"
+    },
+    {
+      "id": "YxgpqR2zi144f7f2NiV8",
+      "sku": "X5106AZ",
+      "name": "נטלה נירו’ אבנים בזהב"
+    },
+    {
+      "id": "YxhaFsIMAxndtmgP9CKI",
+      "sku": "X5898K",
+      "name": "חנוכיה ילדים פילגרים כסף ולכה רוחב 18 ס”מ H21"
+    },
+    {
+      "id": "Yxz2j1G8CduXqIfpuxER",
+      "sku": "P588A",
+      "name": "מחלק יין 8 כוסות/פסים כסף ציפוי לכה גובה 28 ס”מ"
+    },
+    {
+      "id": "YyoPkb8mc0sZBh60rcPG",
+      "sku": "UK20822",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן \"ש\" להבה זהב 15 ס\"מ"
+    },
+    {
+      "id": "ZGNdMmt0I3ITu8CaU8R7",
+      "sku": "UK82922",
+      "name": "סטנד בייבי חמסה לילד -דגמים שונים"
+    },
+    {
+      "id": "ZOoi7VJ77UvNO26ing0b",
+      "sku": "UK21784",
+      "name": "מזוזה פולי כותל ש בולטת אלקטרופורמינג זהב 15סמ"
+    },
+    {
+      "id": "ZStzosfpEHdaz04DhPx8",
+      "sku": "UK24822",
+      "name": "מזוזה \"סמנט בטון\" \"האש שלי\" רחבה גוון לבן 20 ס\"מ"
+    },
+    {
+      "id": "ZTqhRrs2Ka8UcNbYQoew",
+      "sku": "X5600B",
+      "name": "נטלה לשטיפת ידיים בעיצוב מעויינים – כסף ושחור"
+    },
+    {
+      "id": "ZdzXfBUXFjci0Zsqn6I4",
+      "sku": "X3397",
+      "name": "נטלה נירוסטה לבנה"
+    },
+    {
+      "id": "ZmVu6QKWCQzgIxeZ8E4r",
+      "sku": "X5922D",
+      "name": "נטלה פולירזין בגוון ירוק זית"
+    },
+    {
+      "id": "ZnWxGOgKWIgN8Ry7zseV",
+      "sku": "UK46914",
+      "name": "זוג פמוטי קריסטל מהודרים 34 ס\"מ"
+    },
+    {
+      "id": "ZxAJUITEO27DrwI2QMvB",
+      "sku": "UK24834",
+      "name": "מזוזה \"פולימר בטון\" \"ש\" 12 ס\"מ"
+    },
+    {
+      "id": "a85DO4dosiiyn2TLVBDJ",
+      "sku": "UK20850",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן \"ש\" להבה זהב 30 ס\"מ"
+    },
+    {
+      "id": "a9IRlLWsPkeMO1NxeWB3",
+      "sku": "X5784",
+      "name": "מלחייה מתכת עם זכוכית שקופה וציפוי כסף"
+    },
+    {
+      "id": "aNHsUwEUI7t1Ze6bNeaH",
+      "sku": "UK21230",
+      "name": "מזוזה פולימר ש שקועה שמע ישראל 12 ס\"מ"
+    },
+    {
+      "id": "aQBijxoKM0Lel2R9JXNl",
+      "sku": "UK80879",
+      "name": "נטלה מהודרת קלה \"עץ מנגו עבודת יד\" 12 ס\"מ"
+    },
+    {
+      "id": "adtq3xx7BWwNN4aDLGwT",
+      "sku": "UK20928",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה זהב 30 ס\"מ"
+    },
+    {
+      "id": "ai5z35oqWWnp2LlDR5G7",
+      "sku": "UK47376",
+      "name": "חמסה \"פולימר\" \"ברכת הבית\" עברית 19 ס\"מ"
+    },
+    {
+      "id": "apygfi1mSznWrQGVePIR",
+      "sku": "X2091",
+      "name": "מפצח אגוזים סנאי מוכסף"
+    },
+    {
+      "id": "aq7z4pmvlvvMv3Ls0CDw",
+      "sku": "X5643",
+      "name": "מים אחרונים בכלי קריסטל על סטנד זהב"
+    },
+    {
+      "id": "arksuPocOxQBd2qaOovt",
+      "sku": "101154",
+      "name": "ברכון זמירות שבת דמוי עור לבן"
+    },
+    {
+      "id": "b1tDeNrsogJFXrlxXHEC",
+      "sku": "X5605",
+      "name": "חנוכיה “אור מלכות” ציפוי כסף H47"
+    },
+    {
+      "id": "bDGTBWAkN2nBI64M7ZxE",
+      "sku": "UK22956",
+      "name": "מזוזה פלסטיק שקופה 10 ס\"מ \"ש\" זהב עם פקק ג"
+    },
+    {
+      "id": "bGGL1fVQqHhcsofCyq3h",
+      "sku": "UK29749",
+      "name": "מזוזה אלומיניום 10 ס\"מ בגוון כסף מט \"ש\" מת"
+    },
+    {
+      "id": "bJakMRblsJEVwmiihrJG",
+      "sku": "X3518",
+      "name": "מחלק יין ירושלים 6 כוסות ציפוי כסף גובה 22 ס”מ"
+    },
+    {
+      "id": "bQRRTTRBUYlypgLsivIJ",
+      "sku": "UK83442",
+      "name": "גביע קידוש מהודר מפולימר \"בורא\" עם רגל ותחתית 15"
+    },
+    {
+      "id": "bXlOZ6iyhpkHEaXNuS8Z",
+      "sku": "X5107",
+      "name": "שרביט הדלקה כסף לנרות שבת"
+    },
+    {
+      "id": "bgIlTwEFB5rPtpPDaYsZ",
+      "sku": "UK20766",
+      "name": "מזוזה פלסטיק 12 ס\"מ - גימור שיש אפור"
+    },
+    {
+      "id": "bgjnvqfSmyJECYFBr7Li",
+      "sku": "UK60433",
+      "name": "תיק טלית תפילין פיו רצועה תפורה 38X29.5 ס\"מ לבן"
+    },
+    {
+      "id": "bjPB8HIc5hwI1beeD0mM",
+      "sku": "UK83634",
+      "name": "נטלה אקריליק עם הדפסה ירושלים 13 ס\"מ"
+    },
+    {
+      "id": "bmO8FQ99AfIU2y5TL7Xz",
+      "sku": "UK80800",
+      "name": "פאזל עץ חגים צבעוני 30x22 ס\"מ"
+    },
+    {
+      "id": "bsYmSCMpuEa64dMnOwnD",
+      "sku": "P730X",
+      "name": "סט הבדלה 4 חלקים כסף בעיצוב כריות"
+    },
+    {
+      "id": "bx3xV8Ih59ACIuyLjG7h",
+      "sku": "X4978ZK",
+      "name": "מזוזה Marble מוזהבת 12 ס\"מ"
+    },
+    {
+      "id": "bxiABYHuexM2UhefPebr",
+      "sku": "X1802BA",
+      "name": "חנוכיית קריסטל אלדין בגוון ענבר"
+    },
+    {
+      "id": "c5r7m2WI0kHU0s0DBcNR",
+      "sku": "X5209C",
+      "name": "נטלה מים אחרונים נחושת ושחור"
+    },
+    {
+      "id": "c6Bv2c1ex3SJsborOuJr",
+      "sku": "UK26437",
+      "name": "מזוזה \"פולימר בטון\" כותל 20 ס\"מ - שיש לבן"
+    },
+    {
+      "id": "cN0GTJwF65o9fqpJ8iLQ",
+      "sku": "UK20906",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה כסף 15 ס\"מ"
+    },
+    {
+      "id": "cUlOdUEGxth1RVCVVzKY",
+      "sku": "UK24831",
+      "name": "מזוזה \"פולימר בטון\" \"ש\" 12 ס\"מ"
+    },
+    {
+      "id": "cXL9uhde6Aa6U8kMbWiA",
+      "sku": "X3781A",
+      "name": "חנוכיית קריסטל בגוון ענבר – קולקציית ROYAL"
+    },
+    {
+      "id": "cZcTb1aSDMoemM2F2Pv3",
+      "sku": "UK20048",
+      "name": "מזוזה פולימר עץ עם אפוקסי צבע שחור אפור גודל 25"
+    },
+    {
+      "id": "cbWpeN7JAf8kcPOV9hxI",
+      "sku": "X3079",
+      "name": "סט 6 תחתיות ירושלים כסף עם לכה"
+    },
+    {
+      "id": "clEkd4MhJWmJ7JBlyYXU",
+      "sku": "UK84652",
+      "name": "צלחת עגולה מהודרת לראש השנה מזכוכית וקריסטל 40 ס\"מ"
+    },
+    {
+      "id": "cmnVbMalWXHou1hQPQf2",
+      "sku": "X4978BK",
+      "name": "מזוזה Marble שחורה – 12 ס\"מ"
+    },
+    {
+      "id": "d2LAPWQJI1TLbpxd9PM6",
+      "sku": "X4978AK",
+      "name": "מזוזה שיש אפור ענבר – 12 ס\"מ"
+    },
+    {
+      "id": "d6N1rjvA0aHkTZwzkzKg",
+      "sku": "X5007",
+      "name": "חנוכיית אלומיניום זהב \"אורים\" – 53 ס\"מ"
+    },
+    {
+      "id": "dFZoyn6bx4ix6ItgL6BT",
+      "sku": "UK40489",
+      "name": "ספר תמונות רבנים לילדים - ספרדי"
+    },
+    {
+      "id": "dUNXGNIaC1KdhvfEpBDw",
+      "sku": "UK21121",
+      "name": "מזוזה \"וכתבתם על...\" פולימר לבן 20סמ"
+    },
+    {
+      "id": "dWcUWWpUMfOVbxXX7gSA",
+      "sku": "UK20925",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה זהב 15 ס\"מ"
+    },
+    {
+      "id": "dapbSodif1v5JJIYmMlM",
+      "sku": "X4870",
+      "name": "חנוכיית כסף טהור עם ציפוי לכה"
+    },
+    {
+      "id": "djtxxRWVwHWkq4RCU5gF",
+      "sku": "UK83406",
+      "name": "גביע קידוש מהודר מפולימר \"בורא\" עם רגל ותחתית 15 ס\"מ"
+    },
+    {
+      "id": "dlwOWckM5aHaQF69mXH1",
+      "sku": "UK24821",
+      "name": "מזוזה \"סמנט בטון\" \"האש שלי\" רחבה גוון לבן 15 ס\"מ"
+    },
+    {
+      "id": "dzptANKpVgobPtkSYREb",
+      "sku": "X3397B",
+      "name": "H14 נטלה נירו’ שנהב"
+    },
+    {
+      "id": "eGUArYgTcKuw6JVSOqrX",
+      "sku": "X4983Z",
+      "name": "מזוזה מוזהב עם כיתוב כסף – 15 ס\"מ"
+    },
+    {
+      "id": "eOImW3XakpBlle0lT0oW",
+      "sku": "UK40488",
+      "name": "ספר תמונות רבנים לילדים - אשכנזי"
+    },
+    {
+      "id": "eZLel6cr4EroDSEmMeI2",
+      "sku": "X1963",
+      "name": "לבשמים פסים מוכסף"
+    },
+    {
+      "id": "eZiPzaQePgw8mSz3Ax8O",
+      "sku": "X2748",
+      "name": "מעמד למצה עיטור שושנים יH19"
+    },
+    {
+      "id": "eecCywALhVQgo8kwBNrx",
+      "sku": "UK66451",
+      "name": "כרית מהודרת לברית דמוי עור עם אותיות בולטות 74X50 ס\"מ"
+    },
+    {
+      "id": "etnh3LnXpL6s4K9MLVjo",
+      "sku": "UK49005",
+      "name": "חמסה \"פולימר\" \"ברכת הבית\" אנגלית 19 ס\"מ"
+    },
+    {
+      "id": "evoh4I6lfz6oSlpucdj2",
+      "sku": "X5006B",
+      "name": "חנוכיית \"ניסים\" אלומיניום שחורה – 27 ס\"מ"
+    },
+    {
+      "id": "f1u1krdsdWwTANEh6QXx",
+      "sku": "X4976K",
+      "name": "מזוזה אמייל שנהב כיתוב זהב 12סמ"
+    },
+    {
+      "id": "fAN4cWcplOwOTaAm9gSk",
+      "sku": "P914MZ",
+      "name": "חנוכיית טוהר מוזהבת בסיס מתומן"
+    },
+    {
+      "id": "fJrDlL59JJFgyS3N1WQ3",
+      "sku": "X5300A",
+      "name": "נטלה אקרילית שחור ואפור לשטיפת ידיים"
+    },
+    {
+      "id": "fL335c0VgmFQDRKqkVfj",
+      "sku": "UK24437",
+      "name": "מזוזה \"פולימר בטון\" ברכת הבית 12 ס\"מ"
+    },
+    {
+      "id": "fhYcQVSvdM4MwlzndBXq",
+      "sku": "X5784GZ",
+      "name": "זוג מלחיות מתכת בציפוי זהב עם ידית נשיאה"
+    },
+    {
+      "id": "fjhvcs5UBe9g8DPqMvih",
+      "sku": "UK24833",
+      "name": "מזוזה \"פולימר בטון\" \"ש\" 20 ס\"מ"
+    },
+    {
+      "id": "foqxkZCB2Hsog6s7jHZ8",
+      "sku": "UK41238",
+      "name": "נטלה מהודרת קלה \"עץ מנגו עבודת יד\" 14 ס\"מ"
+    },
+    {
+      "id": "g2wWE6eMWvTgtd62iEk1",
+      "sku": "UK24642",
+      "name": "מזוזה \"פולימר בטון\" כותל ברכת הבית 15 ס\"מ - לבן"
+    },
+    {
+      "id": "gXn6vVuBWdkpMEU6m9ry",
+      "sku": "UK66857",
+      "name": "כרית מהודרת לברית דמוי עור עם אותיות בולטות 74X50 ס\"מ"
+    },
+    {
+      "id": "goD9JjziHQNaAMIYjthx",
+      "sku": "UK47228",
+      "name": "פאזל עץ תלת מימד \"בית הרב\" 26x15x10 ס\"מ"
+    },
+    {
+      "id": "gzjgzA8sXBwTSvngG50z",
+      "sku": "X5903A",
+      "name": "חנוכיית קריסטל ענבר בשילוב אלגנטי"
+    },
+    {
+      "id": "h20Z5JnT6Ljo2Orqynxc",
+      "sku": "X5900",
+      "name": "חנוכיית קריסטל שקוף בשילוב ענבר"
+    },
+    {
+      "id": "h5lZxXk12fMOB9FQDd3X",
+      "sku": "UK22293",
+      "name": "מזוזה פולימר בטון 12 ס\"מ ירושלים"
+    },
+    {
+      "id": "h9TUo8Sbt0LywTSAzoAU",
+      "sku": "X5082",
+      "name": "סט נטילת ידיים כסף עם פס ריקוע"
+    },
+    {
+      "id": "hIHi1MCkCqS1xLTPxMdp",
+      "sku": "UK80795",
+      "name": "פאזל 24 חלקים לילדים \"א\"ב\" 38X28 ס\"מ"
+    },
+    {
+      "id": "hIOPV3ckQPSbNxEuH71F",
+      "sku": "UK24667",
+      "name": "מזוזה פולימר בטון כותל ברכת הבית 20 ס\"מ - שחור"
+    },
+    {
+      "id": "hMask72M57hTNrtVyf4V",
+      "sku": "UK24229",
+      "name": "מזוזה פולימר בטון ש זהב 15 ס\"מ"
+    },
+    {
+      "id": "hOk2nyBjLRpujPt7kQ4S",
+      "sku": "UK20810",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן \"ש\" להבה זהב 12 ס\"מ"
+    },
+    {
+      "id": "hSUUvyPXiSTQ5O1TeQZN",
+      "sku": "X4977Z",
+      "name": "מזוזה אבן ירושלים מוזהבת עם כיתוב כסף – 15 ס\"מ"
+    },
+    {
+      "id": "hSgQvXsGwqe0kDNS0zAY",
+      "sku": "UK65417",
+      "name": "כרית מהודרת לברית מסטן עם רקמה 73x50 ס\"מ"
+    },
+    {
+      "id": "ha7ipDthm6eFWCaN9lCh",
+      "sku": "UK67780",
+      "name": "עטרה מהודרת לטלית דמוי עור 100X10 ס\"מ"
+    },
+    {
+      "id": "he1yv40mA2tflnmEmG0u",
+      "sku": "UK20907",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה כסף 20 ס\"מ"
+    },
+    {
+      "id": "hoohmjnCmrCkz5HNoiRt",
+      "sku": "X2630A",
+      "name": "מחלק יין 6 כוסות בציפוי כסף"
+    },
+    {
+      "id": "huNvQxtXLTBy7C9dqRmT",
+      "sku": "UK21410",
+      "name": "מזוזה פולימר ש שקועה זהב מבריק 20 סמ לבן"
+    },
+    {
+      "id": "hy49yrojsIPUzfwWlXex",
+      "sku": "UK41276",
+      "name": "נטלה מהודרת קלה \"עץ מנגו עבודת יד\" 12 ס\"מ"
+    },
+    {
+      "id": "hz1btmNrt8hLHN34lqmf",
+      "sku": "UK67146",
+      "name": "כרית מהודרת לברית דמוי עור עם אותיות בולטות 70x45 ס\"מ"
+    },
+    {
+      "id": "i1QwI68ShXoDtjsNxraz",
+      "sku": "UK24643",
+      "name": "מזוזה פולימר בטון כותל ברכת הבית 20 ס\"מ - לבן"
+    },
+    {
+      "id": "iCUFVnkxKnTJEA1HhIHk",
+      "sku": "UK40553",
+      "name": "שעון ברכת הבית מסגרת שחורה 30 ס\"מ"
+    },
+    {
+      "id": "iHjMZRPLlNneobiJQtUt",
+      "sku": "UK66734",
+      "name": "תיק מפואר לטלית תפילין דמוי עור גוון כחול 36X33 ס\"מ"
+    },
+    {
+      "id": "iJppKO7IopKD1wmJpLsI",
+      "sku": "X1291AZ",
+      "name": "מעמד בשמים הבדלה בשילוב כסף וזהב"
+    },
+    {
+      "id": "iP1tyvegLZcyNABKAtc4",
+      "sku": "UK24002",
+      "name": "מזוזה סמנט בטון מהודרת - אפור כהה עם ש כסף 15 ס\"מ"
+    },
+    {
+      "id": "iu92CB3lx3soYUqTRKlq",
+      "sku": "UK24653",
+      "name": "מזוזה \"סמנט בטון\" גוון שחור - ש זהב 12 ס\"מ"
+    },
+    {
+      "id": "j3n8lZElunQCKn28RaLp",
+      "sku": "P221",
+      "name": "מלחיה פתוחה בודדת על בסיס זכוכית עם כפית"
+    },
+    {
+      "id": "jAY1iSBjPTK5hFWlu4lM",
+      "sku": "UK24445",
+      "name": "מזוזה \"פולימר בטון\" ברכת הבית 12 ס\"מ"
+    },
+    {
+      "id": "jB5xPJZef0I75FKHUfWB",
+      "sku": "X5600A",
+      "name": "נטלה נירוסטה עם עיטור מעוינים בזהב וכסף"
+    },
+    {
+      "id": "jByO3GIr6y4sADbAIA7B",
+      "sku": "UK24763",
+      "name": "מזוזה פולימר בטון כותל 30 ס\"מ"
+    },
+    {
+      "id": "jCIinRvecT9XZ2EFYVSq",
+      "sku": "P072L",
+      "name": "ברכון מניפה מעץ לבן וכסף"
+    },
+    {
+      "id": "jJf8uHvkGA8el2qWpas6",
+      "sku": "X4981WK",
+      "name": "מזוזה ארט דקו לבן וזהב עם כיתוב זהב"
+    },
+    {
+      "id": "jJxFA74y4im1x60exubQ",
+      "sku": "X4981B",
+      "name": "מזוזה ארט דקו שחור וזהב עם כיתוב כסף"
+    },
+    {
+      "id": "jShOiw2ajbTV5H5unpJx",
+      "sku": "X871Z",
+      "name": "סט מלח ופלפל קריסטל מרובע זהב"
+    },
+    {
+      "id": "jVwsmStXlqfJh7oY0MEU",
+      "sku": "UK24664",
+      "name": "מזוזה \"פולימר בטון\" כותל ברכת הבית 15 ס\"מ - גוון"
+    },
+    {
+      "id": "jg80VhuNABZoCslCwQW7",
+      "sku": "X4976",
+      "name": "מזוזה אמייל שנהב כיתוב זהב 15סמ"
+    },
+    {
+      "id": "jr6DTk21zMNdlGVOYgBl",
+      "sku": "UK20054",
+      "name": "מזוזה פולימר עץ עם אפוקסי צבע לבן פנינה גודל 25"
+    },
+    {
+      "id": "jtwJu4dAKTRfANrV82fD",
+      "sku": "UK81360",
+      "name": "סידור \"כתר התפילה\" כריכה קשה 17.5X12 ס\"מ"
+    },
+    {
+      "id": "k2mxmN9JgPl01uZyUr0s",
+      "sku": "UK41344",
+      "name": "סטנד צמידים עם אורנומנטים מעורב - 24 יח"
+    },
+    {
+      "id": "k3wxSy1OllumsaoC6f8U",
+      "sku": "UK42568",
+      "name": "גביע קידוש מהודר מקרמיקה בלי רגל עם תחתית 9 ס\"מ"
+    },
+    {
+      "id": "kHiwGNLJxqFIK4Xv4K60",
+      "sku": "P165AG",
+      "name": "מילחיות קריסטל פתוחות בעיטור זהב"
+    },
+    {
+      "id": "kIfFtF8buLdQtoJ7T8gE",
+      "sku": "X4259A",
+      "name": "נטלה לשטיפת ידיים לבן וזהב"
+    },
+    {
+      "id": "kLpCeBN0UbVSIUW0X81o",
+      "sku": "X5082A",
+      "name": "סט נטילת ידיים אמייל גלים שנהב / זהב נירוסטה"
+    },
+    {
+      "id": "kb9jTT12uqMh2gaU2DEg",
+      "sku": "3568",
+      "name": "זמירות דגם מעין עולם הבא"
+    },
+    {
+      "id": "kl5epJoFeFFHZs3IsePT",
+      "sku": "UK24444",
+      "name": "מזוזה \"פולימר בטון\" ברכת הבית 15 ס\"מ"
+    },
+    {
+      "id": "klUQHVc8Xzl3HKePKmGW",
+      "sku": "UK24737",
+      "name": "מזוזה \"פולימר בטון\" גוון שחור - \"ש\" כסף 12 ס\"מ"
+    },
+    {
+      "id": "kmAfhUnHwXqs2RcH8W5N",
+      "sku": "X5106C",
+      "name": "מי אחרונים עם אבנים בנירוסטה כסף"
+    },
+    {
+      "id": "kohFreWhsDKsx7ieALyc",
+      "sku": "X4698",
+      "name": "מי אחרונים כסף מבריק"
+    },
+    {
+      "id": "kpYFfVtt3d7Sd2bEaQZW",
+      "sku": "UK81503",
+      "name": "סט להגשת תפוח בדבש זכוכית בלתי שבירה 19 ס\"מ"
+    },
+    {
+      "id": "kxcEn1Vm0TFXSJWR1quA",
+      "sku": "X5740A",
+      "name": "נטלה נירוסטה אמייל לבן עיטור ו”נטילת ידיים” בזהב"
+    },
+    {
+      "id": "ky9b2DFZvbcabfk3YWbW",
+      "sku": "UK41271",
+      "name": "נטלה מהודרת קלה \"עץ מנגו עבודת יד\" 14 ס\"מ"
+    },
+    {
+      "id": "l0yTnw91pvxMb1uGikRw",
+      "sku": "UK80799",
+      "name": "פאזל עץ שבת צבעוני 30x22 ס\"מ"
+    },
+    {
+      "id": "l8aEubiKEIcUeZq9huWv",
+      "sku": "X5028B",
+      "name": "מים אחרונים אמייל שחור גלים כסף"
+    },
+    {
+      "id": "lAAD9lIXXyhb2fYmuBOt",
+      "sku": "UK21425",
+      "name": "מזוזה פולימר ש שקועה חמסה 15 ס\"מ"
+    },
+    {
+      "id": "lH8CE7MASlVlgIbxkM44",
+      "sku": "UK24381",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור 12 ס\"מ"
+    },
+    {
+      "id": "lO4NCSeHqYyASJhUzmoF",
+      "sku": "UK58623",
+      "name": "פאזל עץ תלת מימד \"בית מקדש\" זהב 26x15x10 ס\"מ"
+    },
+    {
+      "id": "lQ0D7zfcLQdrlzSzePnR",
+      "sku": "X4703WZ",
+      "name": "נטלה נירו’ אמייל לבן / זהב “נטילת ידיים”"
+    },
+    {
+      "id": "lTwL571xDaLKaz2bAP6C",
+      "sku": "UK24379",
+      "name": "מזוזה \"סמנט בטון\" גוון בטון - ש כסף 12 ס\"מ"
+    },
+    {
+      "id": "laoGaLDzjapyVV9MsKcI",
+      "sku": "UK83143",
+      "name": "סט פולימר מגש להדלקת נרות וזוג פמוטים מהודרים"
+    },
+    {
+      "id": "lek0PXptuW5nE10T9M0E",
+      "sku": "UK24656",
+      "name": "מזוזה \"סמנט בטון\" גוון בטון - ש כסף 12 ס\"מ"
+    },
+    {
+      "id": "lk00nqFJZCDK5lXlsLGl",
+      "sku": "UK81758",
+      "name": "סכין מהודרת זהב עם ידית מתכת 35 ס\"מ"
+    },
+    {
+      "id": "lkhIGZRqNQEkdzzGsP0Z",
+      "sku": "X5301",
+      "name": "נטלה אקרילית אדום כתום הדרגתי “שקיעה” וידיות שקופות"
+    },
+    {
+      "id": "lqYGxifxPPtAKQflLlfS",
+      "sku": "UK20927",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה זהב 25 ס\"מ"
+    },
+    {
+      "id": "lz5nFWKyWpvriE3Wzaac",
+      "sku": "UK82389",
+      "name": "ברכת העסק בלוק פולימר בטון 22X16 ס\"מ לבן"
+    },
+    {
+      "id": "m19D7YIWTHLyHXMezs0B",
+      "sku": "UK65458",
+      "name": "סט טלית תפילין קטיפה כחול בהיר עם ריקמה 36X29 ס\"מ"
+    },
+    {
+      "id": "m7akH6D50J2S4zBhwJ2p",
+      "sku": "X5898",
+      "name": "חנוכיה פילגרים כסף רוחב 23 ס”מ H30"
+    },
+    {
+      "id": "mLC7iOYvsM83PKRDpKTB",
+      "sku": "UK20334",
+      "name": "מזוזה פולימר ש שקועה \"שמע ישראל\" 12סמ לבן"
+    },
+    {
+      "id": "mLMrSonDb1Q2VzXiQsNj",
+      "sku": "X4248B",
+      "name": "נטלה נירו' Golden Pine לשטיפת ידיים"
+    },
+    {
+      "id": "mNCe4YENbKwGqHWFcK2L",
+      "sku": "X3182",
+      "name": "H13.5 נטלה ציפוי כסף “נטילת ידיים”"
+    },
+    {
+      "id": "mWrPfHr1Sa0e30NwECcG",
+      "sku": "X5896",
+      "name": "חנוכיה כסף מבריק עם גימור לכה"
+    },
+    {
+      "id": "mbP1S39x4c05cwNDIHzq",
+      "sku": "X1772C",
+      "name": "חנוכיית כסף \"אור הנס\" עם גימור לכה"
+    },
+    {
+      "id": "mfCPqbarLCPHmtcUVpSX",
+      "sku": "UK66734",
+      "name": "תיק מפואר לטלית תפילין דמוי עור גוון כחול 36X33 ס\"מ"
+    },
+    {
+      "id": "n5kxymgzFBT3pwk2E9mQ",
+      "sku": "UK24450",
+      "name": "מזוזה \"פולימר בטון\" בברוך אתה 15 ס\"מ"
+    },
+    {
+      "id": "n6oc2HdmFPIti6gCdiCe",
+      "sku": "UK24447",
+      "name": "מזוזה \"פולימר בטון\" ברוך אתה 12 ס\"מ"
+    },
+    {
+      "id": "n8RZ8tTICr6D1FWIBKxb",
+      "sku": "UK24677",
+      "name": "מזוזה פלסטיק שחורה 15 ס\"מ \"ש\" זהב ופס זהב עם פקק גומי"
+    },
+    {
+      "id": "n8S74415WFs1kdWqi5UX",
+      "sku": "X5599",
+      "name": "נטלה נירוסטה מעושנת ומוזהבת"
+    },
+    {
+      "id": "nLqUBOOtEDSyxReAZkBO",
+      "sku": "X3786A",
+      "name": "חנוכיה אקווריום קריסטל/זהב “ירושלים” 36 ס”מ H32"
+    },
+    {
+      "id": "nMwclzzZsQQRdiUb3yOa",
+      "sku": "UK24595",
+      "name": "מזוזה \"סמנט בטון\" גוון לבן - ש זהב 12 ס\"מ"
+    },
+    {
+      "id": "nUYQEkrjyTiWmqCQy55m",
+      "sku": "UK24417",
+      "name": "מזוזה זכוכית מהודרת עם פלקטה \"עיטורים\" 12 ס\"מ"
+    },
+    {
+      "id": "nZhYvJijuzBF93rwXMp8",
+      "sku": "UK58173",
+      "name": "סטנד בייבי חמסה לילד -דגמים שונים (10 יח)"
+    },
+    {
+      "id": "nhqSuhgtj6xp73sA5bmk",
+      "sku": "UK24761",
+      "name": "מזוזה פולימר בטון כותל 20 ס\"מ"
+    },
+    {
+      "id": "nm1Ygi0rSebgSyqb30Uv",
+      "sku": "X4727BM",
+      "name": "h19/7 קופסא למצה קריסטל marble שחור"
+    },
+    {
+      "id": "nosgXdlQneCkRtgJ5C3E",
+      "sku": "UK20586",
+      "name": "מזוזה עץ 12 ס\"מ לבנה 2 שרשראות עם גב"
+    },
+    {
+      "id": "numPAhx0hGiQqJ2I4Mf1",
+      "sku": "X4979KZ",
+      "name": "מזוזה מעויינים מוזהב 12סמ"
+    },
+    {
+      "id": "nvYuEsf16NvxfBsbm5zc",
+      "sku": "UK24810",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן 15 ס\"מ"
+    },
+    {
+      "id": "nwaLeShl9cISpUpi2HUR",
+      "sku": "UK60307",
+      "name": "סט חלאקה פשתן בז יברכך + עטרה"
+    },
+    {
+      "id": "nxpZwyxGs6mSXX85IgpJ",
+      "sku": "UK21818",
+      "name": "מזוזה \"פולימר בטון\" שיש גס לבן ש ציפוי כסף 12סמ"
+    },
+    {
+      "id": "o0V0okI72aOl6fhDQYOg",
+      "sku": "X4989Z",
+      "name": "קופת צדקה נירוסטה מעוייני זהב"
+    },
+    {
+      "id": "o2GWoJv3IEVWJ77XhQ5m",
+      "sku": "UK60336",
+      "name": "כרית מהודרת לברית דמוי עור עם אותיות בולטות 74X50 ס\"מ"
+    },
+    {
+      "id": "o2gFUNFJ1oKqley5yoWI",
+      "sku": "P221X",
+      "name": "מלחיה זכוכית עם כריות"
+    },
+    {
+      "id": "o7ZB3nQ89rmwlYyXsXb4",
+      "sku": "X5038C",
+      "name": "סכין נירוסטה לחלה מעוטרת ציפוי ניקל 33.9סמ"
+    },
+    {
+      "id": "o98rvIjHHezqVNNkAI5f",
+      "sku": "UK21416",
+      "name": "מזוזה פולימר ש שקועה כסף מבריק 20 סמ לבן"
+    },
+    {
+      "id": "oDP8aP8rMQo2LdioBRZ3",
+      "sku": "UK21200",
+      "name": "מזוזה פולימר ש שקועה שמע ישראל 15 ס\"מ חול"
+    },
+    {
+      "id": "oFyBhbNj3SMTv0ZpTMwr",
+      "sku": "UK20340",
+      "name": "מזוזה פולימר ש שקועה \"שמע ישראל\" 15סמ לבן"
+    },
+    {
+      "id": "oJSvej5lZTfgCNT1gFDS",
+      "sku": "UK24759",
+      "name": "מזוזה פולימר בטון כותל 12 ס\"מ"
+    },
+    {
+      "id": "oLTJs18tXUG13ZC24k5P",
+      "sku": "99254",
+      "name": "זמירות דגם נצנצים"
+    },
+    {
+      "id": "oTa0qFVx7zQFyZsjf73B",
+      "sku": "UK24780",
+      "name": "מזוזה \"פולימר בטון\" גוון לבן - \"ש\" להבה 30 ס\"מ"
+    },
+    {
+      "id": "oWal5PAAKfM9aqzoLIKM",
+      "sku": "X5400M",
+      "name": "קופסת מצה שמורה עם מכסה שקוף וזהב"
+    },
+    {
+      "id": "odWQmvAlFJ7vgw9ifum7",
+      "sku": "UK69647",
+      "name": "שמלה לבנה מהודרת לתינוק לברית עם דנטלים, ריקמה"
+    },
+    {
+      "id": "oldMllxhIr0UDBY6NSPF",
+      "sku": "X4446",
+      "name": "סכין לחלה ירושלים ידית ניקל"
+    },
+    {
+      "id": "osyqLSpD5Ly0DaJEjMtL",
+      "sku": "UK24382",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון שחור 15 ס\"מ"
+    },
+    {
+      "id": "p2ZTFKKIBCgE9q9iO6fP",
+      "sku": "X3180C",
+      "name": "נטלה בציפוי כסף עם עיצוב גלים"
+    },
+    {
+      "id": "p8eihp7r9ZXtFCa7nW4F",
+      "sku": "X5265",
+      "name": "חנוכיית המכבים כסף – רוחב 32.5 ס\"מ"
+    },
+    {
+      "id": "p9narTXDPy37BqdFKqbX",
+      "sku": "X525",
+      "name": "סט מלחיות קריסטל לשבת וחג"
+    },
+    {
+      "id": "p9uEUvCYXhND2soH7nDj",
+      "sku": "X3120",
+      "name": "חנוכיית קריסטל עם עיצוב ציפור על עלים"
+    },
+    {
+      "id": "pAZZNiNytOnC4xcYeP5I",
+      "sku": "UK21422",
+      "name": "מזוזה פולימר ש שקועה חמסה 15 ס\"מ חול"
+    },
+    {
+      "id": "pAquOjAoIaUxLRVxAKTy",
+      "sku": "X5923C",
+      "name": "נטלה פולירזין בגוון חום טייגר"
+    },
+    {
+      "id": "pBc97I7ZaujbNw1004K5",
+      "sku": "X6019",
+      "name": "זוג מילחיות קריסטל ענבר עם מכסה ויד אפור"
+    },
+    {
+      "id": "pDf1JKoJXfQSVPNXcZpb",
+      "sku": "X4995Z",
+      "name": "נטלה נירוסטה בעיצוב גלים עם ציפוי זהב"
+    },
+    {
+      "id": "pEJiKwLseFk8FAcJlX4n",
+      "sku": "X4703AZ",
+      "name": "נטלה לשטיפת ידיים מנירוסטה בגוון שנהב וזהב"
+    },
+    {
+      "id": "pd3dQPyvi4szJyHXxdI7",
+      "sku": "UK22627",
+      "name": "מזוזה אלומיניום 12 ס\"מ אפור כהה ללא חורים \"ש"
+    },
+    {
+      "id": "pjfvS4QHi43YtluJ1Er6",
+      "sku": "UK83439",
+      "name": "גביע קידוש מהודר מפולימר \"ירושלים\" עם תחתית 8 ס\"מ"
+    },
+    {
+      "id": "pkSphfbzuBU6OBAb049G",
+      "sku": "P707CZ",
+      "name": "חנוכיה אקווריום “כריות חדש” משולב כסף זהב גובה 38 ס”מ"
+    },
+    {
+      "id": "pp3UB1bvt0wmXzwfZGPR",
+      "sku": "X5602B",
+      "name": "חנוכיית קריסטל צבעונית – סדרת BASIC"
+    },
+    {
+      "id": "pq6zUU4yBaktPQsa4MSU",
+      "sku": "UK21411",
+      "name": "מזוזה פולימר ש שקועה זהב מבריק 12 סמ שחור"
+    },
+    {
+      "id": "q0i3juvbL4TswkcZrbrb",
+      "sku": "UK21414",
+      "name": "מזוזה פולימר ש שקועה כסף מבריק 12 סמ לבן"
+    },
+    {
+      "id": "q5YcoPFuE0dUMB0vsx4V",
+      "sku": "X5006",
+      "name": "חנוכיית אלומיניום ניסים בציפוי זהב"
+    },
+    {
+      "id": "q93lsZtmXVEjcu0z5oSa",
+      "sku": "UK24839",
+      "name": "מזוזה \"פולימר בטון\" \"כותל\" 12 ס\"מ"
+    },
+    {
+      "id": "qQagFQwxih63DEb9z9g3",
+      "sku": "UK20032",
+      "name": "מזוזה פולימר עץ עם אפוקסי צבע כחול שמיים גודל 25"
+    },
+    {
+      "id": "qVEepUpNFt275APTTpKs",
+      "sku": "X2027Z",
+      "name": "כלי חרוסת ודיבשית בעיצוב זהב"
+    },
+    {
+      "id": "qVrP3uzsU6w0MhGkhoCD",
+      "sku": "UK24752",
+      "name": "מזוזה מהודרת \"פולימר בטון\" דגם שיש ש כסף 15 ס\"מ"
+    },
+    {
+      "id": "qbNUEY5RzJRKAerYmz1r",
+      "sku": "UK24848",
+      "name": "מזוזה \"סמנט בטון\" \"האש שלי\" רחבה גוון אפור 12 ס\"מ"
+    },
+    {
+      "id": "qfqwqtRWiyctSGemanUa",
+      "sku": "1151",
+      "name": "מטפחת עדינה דגם פרחים"
+    },
+    {
+      "id": "qlrZtukyPjG3K3KsHrie",
+      "sku": "UK67501",
+      "name": "סט טלית תפילין פשתן 36X29 ס\"מ"
+    },
+    {
+      "id": "qt70waoMdStL8En3UC15",
+      "sku": "UK67442",
+      "name": "כרית מהודרת לברית דמוי עור עם אותיות בולטות 70x45 ס\"מ"
+    },
+    {
+      "id": "qzvVJs2gMaUqd6jIPWZP",
+      "sku": "X3446C",
+      "name": "מלחיה קריסטל עם מכסה ענבר"
+    },
+    {
+      "id": "rC2s9xePRPWaJxy0dylU",
+      "sku": "X348KS",
+      "name": "חנוכיה קריסטל בשילוב ענבר"
+    },
+    {
+      "id": "rFNe2iBJceQjSRpjWDKY",
+      "sku": "X4252",
+      "name": "נטלה לשטיפת ידיים בעיצוב שיש אפור וזהב"
+    },
+    {
+      "id": "rFT9QTezmVApoceGTqDS",
+      "sku": "UK87618",
+      "name": "ספר 20 ס\"מ \"ראשית מצוות הסידור הראשון שלי\" -"
+    },
+    {
+      "id": "rHxpVoSSsm4EQ8OK9vrY",
+      "sku": "UK45791",
+      "name": "כרית מהודרת לברית דמוי עור \"בבא סאליי\" עם אותיות ב"
+    },
+    {
+      "id": "rPNk34NB5O0HWcVffb7G",
+      "sku": "X4977KS",
+      "name": "מזוזה אבן ירושלים מוכסף עם כיתוב זהב"
+    },
+    {
+      "id": "rdivF6JdnmYarUzDbC5z",
+      "sku": "UK21231",
+      "name": "מזוזה פולימר ש שקועה שמע ישראל 15 ס\"מ"
+    },
+    {
+      "id": "rj5ioRIDmA4FReqHTTUs",
+      "sku": "X5923A",
+      "name": "נטלה פולירזין אפור לשטיפת ידיים"
+    },
+    {
+      "id": "rlTfYXu0MMhIEvjaMCyS",
+      "sku": "UK24776",
+      "name": "מזוזה \"פולימר בטון\" ברכת הבית 15 ס\"מ"
+    },
+    {
+      "id": "rnV9hGOxv6oaV6dd0KIR",
+      "sku": "UK24377",
+      "name": "מזוזה \"סמנט בטון\" גוון שחור - ש זהב 12 ס\"מ"
+    },
+    {
+      "id": "rofwLOMmrTXeZKJERKku",
+      "sku": "X5849K",
+      "name": "חנוכיה ילדים בציפוי כסף"
+    },
+    {
+      "id": "rq5OG0ppfPDkimHNQPfl",
+      "sku": "P702J",
+      "name": "סט ליקר 8 כוסות עם מגש ירושלים"
+    },
+    {
+      "id": "rxCAT9zLtmO0lkuB1oDp",
+      "sku": "X5296A",
+      "name": "נטלה אקרילית סגול הדרגתי עם ידיות שקופות"
+    },
+    {
+      "id": "rykBG1LpkTze3eygixxD",
+      "sku": "UK21344",
+      "name": "מזוזה פולימר ש שקועה 7 ברכות 12 ס\"מ"
+    },
+    {
+      "id": "s3I6EcBpCs4CR6qVt9b6",
+      "sku": "UK21131",
+      "name": "מזוזה \"וכתבתם על...\" פולימר לבן 20סמ"
+    },
+    {
+      "id": "s98KppkEgfFvxZc8SZ0h",
+      "sku": "UK12779",
+      "name": "כיפה מהודרת משי פשתן כחול כהה 17 ס\"מ"
+    },
+    {
+      "id": "sE2btD80X3glld0ov3HI",
+      "sku": "UK62553",
+      "name": "כרית מהודרת לברית מסאטן עם דנטל מסביב, ריקמה"
+    },
+    {
+      "id": "sHRfeBTAsFSPqoaH97Cd",
+      "sku": "UK87619",
+      "name": "ספר 20 ס\"מ \"ראשית מצוות הסידור הראשון שלי\" - ב"
+    },
+    {
+      "id": "sV6xW3Y8K5NUV3uUB82C",
+      "sku": "P966A",
+      "name": "כלי בשמים לבדלה בהשראת ירושלים"
+    },
+    {
+      "id": "skmlX928bgDGlUzjWTQj",
+      "sku": "X397",
+      "name": "סט 6 תחתיות ניקל לכוסות"
+    },
+    {
+      "id": "soz9TzrNiVMim5K8GDTi",
+      "sku": "UK40619",
+      "name": "קופת צדקה פח מהודרת \"צדקה\" 10 ס\"מ"
+    },
+    {
+      "id": "srBRSQluhalP06X3P89f",
+      "sku": "UK35776",
+      "name": "מחזיק מפתחות ניקל עם לולאה מזל ברכה והצלחה ושיבוץ אבנים"
+    },
+    {
+      "id": "sxHh5wXPOhSBCdtJZsVA",
+      "sku": "UK24443",
+      "name": "מזוזה \"פולימר בטון\" ברכת הבית 12 ס\"מ"
+    },
+    {
+      "id": "syQYpDbbGbomcmHjlBtt",
+      "sku": "X5922A",
+      "name": "נטלה לשטיפת ידיים בגוון אפור"
+    },
+    {
+      "id": "t60EAqthjIAnDsyutNjD",
+      "sku": "P588KJ",
+      "name": "מחלק יין כסוף עם עיצוב ירושלמי"
+    },
+    {
+      "id": "tJ2MKZk8JmBM09aIIKVB",
+      "sku": "X4981W",
+      "name": "מזוזה art deco לבן/זהב כיתוב זהב 15סמ"
+    },
+    {
+      "id": "tSaZcqi53Yo52lwso70Y",
+      "sku": "101154",
+      "name": "ברכון זמירות שבת דמוי עור לבן לאירועים"
+    },
+    {
+      "id": "tWbYL18k2dXLNEJHFeKm",
+      "sku": "UK80791",
+      "name": "פאזל 48 חלקים לילדים \"חגי ישראל\" 38X28 ס\"מ"
+    },
+    {
+      "id": "to7nfjk10weFsDEgIcfa",
+      "sku": "UK40797",
+      "name": "חסיד פוליריזן עומד על במה ומחזיק ספר תורה 11 ס\"מ"
+    },
+    {
+      "id": "u1FnoyHfaXUuHPtcwDGH",
+      "sku": "UK19983",
+      "name": "כיפה בד מהודרת גודל 2 - 17.5 ס\"מ"
+    },
+    {
+      "id": "u74SKUpCQ0F9v8EtFFiq",
+      "sku": "UK21151",
+      "name": "מזוזה \"וכתבתם על...\" פולימר 12סמ"
+    },
+    {
+      "id": "u8wODWFgRJrAACmW9aFk",
+      "sku": "X5743W",
+      "name": "נטלה נירוסטה אמייל לבן עם עיטור זהב"
+    },
+    {
+      "id": "uAxToaCa211RzvEJ6InB",
+      "sku": "X5811",
+      "name": "סט הבדלה 3 חלקים בקריסטל ענבר על מגש מראה"
+    },
+    {
+      "id": "uEtBTzeRW2ej6AOYv9Uq",
+      "sku": "UK20330",
+      "name": "מזוזה פולימר ש שקועה חמסה 12 ס\"מ"
+    },
+    {
+      "id": "uP1ogCzS25h6h0MELila",
+      "sku": "X5334",
+      "name": "זוג מלחיות מחוברות זהב עם אמייל שקוף"
+    },
+    {
+      "id": "uQHOKUv93MrsVHc8HBZk",
+      "sku": "UK80197",
+      "name": "מזמור לתודה בלוק אקריליק רקע ורוד"
+    },
+    {
+      "id": "uXEMnX5wlp8CfDcfl9BS",
+      "sku": "X4983KZ",
+      "name": "מזוזה מוזהב עם כיתוב כסף – 12 ס״מ"
+    },
+    {
+      "id": "ubXAOkWeGvLDExlKQ5TU",
+      "sku": "X5744",
+      "name": "נטלה נירוסטה בשילוב זהב וכסף"
+    },
+    {
+      "id": "ueMx9ZIqjTwZKWxfdQ8e",
+      "sku": "UK20354",
+      "name": "מזוזה ש + מגן דוד חרוטים פולימר לבן 15סמ"
+    },
+    {
+      "id": "uijbkUHKpsmSS3MUyo4j",
+      "sku": "UK24851",
+      "name": "מזוזה \"פולימר בטון\" \"כותל\" 12 ס\"מ"
+    },
+    {
+      "id": "uohnK5C2OEhQcrBqdCfe",
+      "sku": "UK47667",
+      "name": "עטרה לטלית עם אבנים 92X9 ס\"מ"
+    },
+    {
+      "id": "usoFLekkruxCephzSpGW",
+      "sku": "UK20911",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה כסף 25 ס\"מ"
+    },
+    {
+      "id": "uyYEq9CgMr71cbW7sWGB",
+      "sku": "UK49315",
+      "name": "עץ הברכות פולימר \"ברכת הבית\" עברית 20 ס\"מ"
+    },
+    {
+      "id": "v5uPyvptibVpMgDf7HHg",
+      "sku": "UK21421",
+      "name": "מזוזה פולימר ש שקועה חמסה 12 ס\"מ חול"
+    },
+    {
+      "id": "v6dEuWOlO4XimojLGDct",
+      "sku": "UK24777",
+      "name": "מזוזה \"פולימר בטון\" שמע ישראל 12 ס\"מ"
+    },
+    {
+      "id": "vAfje72eI8ifPzGWsAeS",
+      "sku": "UK60231",
+      "name": "כיסוי חלה מהודר דמוי עור ורוד 45X55 ס\"מ"
+    },
+    {
+      "id": "vDh622LF9Lo7s4wSfiBj",
+      "sku": "UK20926",
+      "name": "מזוזה \"סמנט בטון\" רחבה \"ש\" להבה זהב 20 ס\"מ"
+    },
+    {
+      "id": "vGo5I8DQG0OJugBgofyt",
+      "sku": "X5889",
+      "name": "חנוכיה מתכת מרובעת זהב עיצוב מנורה"
+    },
+    {
+      "id": "vH3bLEWAZTscd9aTLcKP",
+      "sku": "UK42730",
+      "name": "ספר \"ראשית מצוות הסידור הראשון שלי\" - בת 10"
+    },
+    {
+      "id": "vPb8fgc3lwXluTmq2eQM",
+      "sku": "P116",
+      "name": "ברכון עץ כסף לשאת תפילות"
+    },
+    {
+      "id": "w4sFHy7wKzb6hURK8PLQ",
+      "sku": "X3136AG",
+      "name": "סט 3 סביבוני קריסטל צבעוניים – סדרה פרימיום"
+    },
+    {
+      "id": "w8T1rNCedsqkiUOr3HGH",
+      "sku": "UK24773",
+      "name": "מזוזה \"פולימר בטון\" ברוך אתה 12 ס\"מ"
+    },
+    {
+      "id": "w8r25TpPRoVWUO94sG3L",
+      "sku": "UK65841",
+      "name": "כרית מהודרת לברית מסטן עם דנטל מסביב, \"כיסא אלי"
+    },
+    {
+      "id": "wFflEIXJoYOiqN6MEPlo",
+      "sku": "UK24775",
+      "name": "מזוזה \"פולימר בטון\" ברכת הבית 12 ס\"מ"
+    },
+    {
+      "id": "wJoRrp0JK7CUboI1UJY6",
+      "sku": "X5739",
+      "name": "נטלה לשטיפת ידיים – שיש לבן וזהב עם ידיות כסף"
+    },
+    {
+      "id": "wNMPXCcPFPpBn4fnbhRN",
+      "sku": "X5923B",
+      "name": "נטלה פולירזין בגוון חום"
+    },
+    {
+      "id": "wYIMfzedvXoUIipUNMyN",
+      "sku": "P003S",
+      "name": "סט הבדלה 4 חלקים בעיצוב ענבים"
+    },
+    {
+      "id": "wYRecL18ex2JPuEc2bjo",
+      "sku": "UK21383",
+      "name": "מזוזה פולימר ש שקועה זהב מבריק 15 סמ לבן"
+    },
+    {
+      "id": "xAdfMlqRVsyQt4PSTDRE",
+      "sku": "X2587",
+      "name": "מגש מראה אובלי כסוף לשבת קודש"
+    },
+    {
+      "id": "xP949gQsYESckxqh7GYj",
+      "sku": "X2413Z",
+      "name": "מעמד מצה מזכוכית שקופה עם כתיב זהב"
+    },
+    {
+      "id": "xPacvA1Quu4eEp4PNjh3",
+      "sku": "UK81504",
+      "name": "סט להגשת תפוח בדבש זכוכית בלתי שבירה 19 ס\"מ"
+    },
+    {
+      "id": "xV1m5eSdUFSM5irCztVC",
+      "sku": "UK82760",
+      "name": "נטלה \"במבוק עבה\" עם הדפסה \"נטילת ידים\" 14 ס\"מ"
+    },
+    {
+      "id": "xWHBx9rD3NXXMulcwXmg",
+      "sku": "X2413",
+      "name": "קופסת מצה קריסטל עם עיטור אבנים"
+    },
+    {
+      "id": "xXMKOnInCwTigaofLXq8",
+      "sku": "UK41246",
+      "name": "נטלה מהודרת קלה \"עץ מנגו עבודת יד\" 14 ס\"מ"
+    },
+    {
+      "id": "xaVeY64dEDIqXtgjHMA5",
+      "sku": "UK24762",
+      "name": "מזוזה פולימר בטון כותל 25 ס\"מ"
+    },
+    {
+      "id": "xjgY0wfjvfO5x3uGdQ02",
+      "sku": "UK82754",
+      "name": "פמוטי קריסטל מהודרים 10 סמ"
+    },
+    {
+      "id": "xovHCTo7HQ7uKSe4aWOV",
+      "sku": "UK24809",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן 12 ס\"מ"
+    },
+    {
+      "id": "xspznIbMfRkIpgedW78h",
+      "sku": "X1802A",
+      "name": "חנוכיית קריסטל אלדין צבעונית"
+    },
+    {
+      "id": "xyeaWHKHH3gskcllfAEG",
+      "sku": "UK24256",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן 20 ס\"מ"
+    },
+    {
+      "id": "y1puvOXfhAS0haOv98w7",
+      "sku": "UK83607",
+      "name": "ואזה קריסטל עם פרחים גוון זהב 26 ס\"מ"
+    },
+    {
+      "id": "yBvoyyeTHfJRDOQBr2g9",
+      "sku": "UK41344",
+      "name": "סטנד צמידים עם אורנומנטים מעורב - 24 יח"
+    },
+    {
+      "id": "ySvA9EzPuW0gKBLkRsRT",
+      "sku": "UK81650",
+      "name": "מלחיה קריסטל זהב"
+    },
+    {
+      "id": "yVrLw5qaXGJzxe7Ni2kX",
+      "sku": "UK20825",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון לבן \"ש\" להבה זהב 20 ס\"מ"
+    },
+    {
+      "id": "ycQG8Ejhevr7WPpIOSZN",
+      "sku": "X4977",
+      "name": "מזוזה אבן ירושלים שנהב עם כיתוב שחור"
+    },
+    {
+      "id": "yndhAN7byJn9Hjqi4mHR",
+      "sku": "X1551Z",
+      "name": "מים אחרונים בשילוב כסף וזהב"
+    },
+    {
+      "id": "yu6lIpe7QGmGrUHeBZ9x",
+      "sku": "UK20343",
+      "name": "מזוזה ש + מגן דוד חרוטים פולימר לבן 12סמ"
+    },
+    {
+      "id": "z1lFFMeA4iXNRAk7UbBp",
+      "sku": "X2630GG",
+      "name": "מחלק יין מכסף לשנים עשר כוסות בעיצוב ענבים"
+    },
+    {
+      "id": "z3hkJghuPPuPLkK7teE2",
+      "sku": "X4249Z",
+      "name": "נטלה נירוסטה עם פס שיש מוזהב"
+    },
+    {
+      "id": "z6A2dx9i41Ffl01DAGln",
+      "sku": "UK67087",
+      "name": "סט החלאקה שלי - מכיל נרתיק לתלתל ומספריים"
+    },
+    {
+      "id": "z7mIYxkIRYoIGh4Ur3q8",
+      "sku": "X5784Z",
+      "name": "מלחיית מתכת וזכוכית בציפוי זהב עם פסים"
+    },
+    {
+      "id": "zCF55oLwoBRjTwFBGnpR",
+      "sku": "X5234K",
+      "name": "סוכרון דבש זכוכית עם כפית מתכת ניקל"
+    },
+    {
+      "id": "zF4h91LrqQilH15VVt0x",
+      "sku": "X1935G",
+      "name": "זוג מלחיות קריסטל כוכב בגוון ענבר עם כיתוב שבת קודש בזהב"
+    },
+    {
+      "id": "zHKT2areCXUhVxWGEE4M",
+      "sku": "X389B",
+      "name": "מעמד בשמים להבדלה בעיצוב גפן מוכסף"
+    },
+    {
+      "id": "zJFlVs1D9VzBywmE8jbp",
+      "sku": "UK24779",
+      "name": "מזוזה \"פולימר בטון\" גוון לבן - \"ש\" להבה 25 ס\"מ"
+    },
+    {
+      "id": "zN2PNKRlG6lAWJmbXKy7",
+      "sku": "X2630",
+      "name": "h24D19 מחלק יין פילגרים 6 כוסות"
+    },
+    {
+      "id": "zmdmzaFstMgWpdbXHc9K",
+      "sku": "X5889K",
+      "name": "חנוכיה מרובעת זהב מתכת – עיצוב מנורה"
+    },
+    {
+      "id": "zmqJfnh27s2rqg4oFH0Y",
+      "sku": "UK24846",
+      "name": "מזוזה \"סמנט בטון\" רחבה גוון אפור 20 ס\"מ"
+    },
+    {
+      "id": "zoZn6rDdbgKmwGDoDbQL",
+      "sku": "UK20332",
+      "name": "מזוזה פולימר ש שקועה חמסה 15 ס\"מ"
+    },
+    {
+      "id": "zufFQkpWpwZqvCgw4EZ3",
+      "sku": "UK60215",
+      "name": "כיסוי חלה מהודר דמוי עור לבן פרחים כחולים 45X55 ס\"מ"
+    },
+    {
+      "id": "zvPuMjq3xfNCyQhQGRZu",
+      "sku": "UK20068",
+      "name": "מזוזה פלסטיק לבנה 15 ס\"מ \"ש\" כסף עם פקק גומי וחורים"
+    },
+    {
+      "id": "zvi1BYuW1vY7tlw0Qr6C",
+      "sku": "UK20769",
+      "name": "מזוזה פלסטיק 15 ס\"מ - גימור שיש אפור"
+    },
+    {
+      "id": "zykVtn1JPnEKKhBzOx29",
+      "sku": "UK24836",
+      "name": "מזוזה \"פולימר בטון\" \"ש\" 20 ס\"מ"
+    }
+  ],
+  "toImport": [
+    "UK41267",
+    "UK41390",
+    "UK41391",
+    "UK83542",
+    "UK83543",
+    "UK83538",
+    "UK83541",
+    "UK83544",
+    "UK83943",
+    "UK83944",
+    "UK59565",
+    "UK59566",
+    "UK59567",
+    "UK83443",
+    "UK83444",
+    "UK50056",
+    "UK83429",
+    "UK83445",
+    "UK83446",
+    "UK58052",
+    "UK59834",
+    "UK59835",
+    "UK88755",
+    "UK53136",
+    "UK53176",
+    "UK53200",
+    "UK53201",
+    "UK53203",
+    "UK53204",
+    "UK57688",
+    "UK83288",
+    "UK83289",
+    "UK83290",
+    "UK57905",
+    "UK58001",
+    "UK83046",
+    "UK55746",
+    "UK83295",
+    "UK58002",
+    "UK83045",
+    "UK81563",
+    "UK81564",
+    "UK81565",
+    "UK81566",
+    "UK41370",
+    "UK82763",
+    "UK82764",
+    "UK81534",
+    "UK41350",
+    "UK81793",
+    "UK83547",
+    "UK83528",
+    "UK83529",
+    "UK83510",
+    "UK83537",
+    "UK83531",
+    "UK83533",
+    "UK83532",
+    "UK81500",
+    "UK81792",
+    "UK55799",
+    "UK55801",
+    "UK80957",
+    "UK83042",
+    "UK80999",
+    "UK83733",
+    "UK83741",
+    "UK83742",
+    "UK81350",
+    "UK59202",
+    "UK59213",
+    "UK59254",
+    "UK86041",
+    "UK86359",
+    "UK59217",
+    "UK59236",
+    "UK59255",
+    "UK59256",
+    "UK59272",
+    "UK59149",
+    "UK59165",
+    "UK59166",
+    "UK85733",
+    "UK86296",
+    "UK59167",
+    "UK59168",
+    "UK59170",
+    "UK59198",
+    "UK59201",
+    "UK59172",
+    "UK59180",
+    "UK59181",
+    "UK55763",
+    "UK81121",
+    "UK82788",
+    "UK82789",
+    "UK49327",
+    "UK47447",
+    "UK83449",
+    "UK67951"
+  ]
+}

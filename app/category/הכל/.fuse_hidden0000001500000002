@@ -50,8 +50,6 @@ interface Product {
   subCategory?: string;
   stars?: number;
   outOfStock?: boolean;
-  comingSoon?: boolean;
-  expectedArrivalDate?: string | null;
   hasKlafSelection?: boolean;
   soferId?: string;
   soferName?: string;
@@ -83,12 +81,12 @@ function applySort(products: Product[], sort: SortBy): Product[] {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-none overflow-hidden animate-pulse">
-      <div className="aspect-[4/5] bg-gray-100" />
-      <div className="py-3 space-y-2">
-        <div className="h-3 bg-gray-100 w-3/4" />
-        <div className="h-3 bg-gray-100 w-1/2" />
-        <div className="h-9 bg-gray-100 mt-3" />
+    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
+      <div className="aspect-square bg-gray-100" />
+      <div className="p-3 space-y-2">
+        <div className="h-3 bg-gray-100 rounded-full w-3/4" />
+        <div className="h-3 bg-gray-100 rounded-full w-1/2" />
+        <div className="h-8 bg-gray-100 rounded-full mt-3" />
       </div>
     </div>
   );
@@ -281,11 +279,11 @@ export default function AllProductsClient() {
 
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div dir="rtl" style={{ background: '#FFFFFF', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
+    <div dir="rtl" style={{ background: '#FAF8F3', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
       <style>{`@keyframes spin{from{transform-origin:center;transform:rotate(0)}to{transform-origin:center;transform:rotate(360deg)}}`}</style>
 
       {/* ── Page header ─────────────────────────────────────────────────────── */}
-      <div style={{ background: '#FFFFFF', padding: '32px 20px 16px' }}>
+      <div style={{ background: '#FAF8F3', padding: '32px 20px 16px' }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
           <h1 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 400, color: '#1F2937', margin: '0 0 4px', letterSpacing: '-0.01em' }}>
             כל המוצרים
@@ -293,7 +291,7 @@ export default function AllProductsClient() {
           <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>
             {loading
               ? 'טוען מוצרים...'
-              : `נמצאו ${filtered.length.toLocaleString('he-IL')}${!fullyLoaded ? '+' : ''} מוצרים`}
+              : `${filtered.length.toLocaleString('he-IL')}${!fullyLoaded ? '+' : ''} מוצרים`}
           </p>
         </div>
       </div>
@@ -301,7 +299,7 @@ export default function AllProductsClient() {
       {/* ── Sticky toolbar (search + sort + mobile filter button) ───────────── */}
       <div
         className="sticky top-0 z-20"
-        style={{ background: '#FFFFFF', borderBottom: '1px solid #EDEDEF', padding: '8px 20px' }}
+        style={{ background: '#FAF8F3', borderBottom: '1px solid #E7E2D8', padding: '8px 20px' }}
       >
         <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', gap: 8, alignItems: 'center' }}>
 
@@ -440,7 +438,7 @@ export default function AllProductsClient() {
 
             {/* Loading skeletons — first batch in-flight */}
             {loading && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7">
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
                 {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
               </div>
             )}
@@ -478,7 +476,7 @@ export default function AllProductsClient() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
                   {paginated.map((p, idx) => (
                     <ProductCard
                       key={p.id}

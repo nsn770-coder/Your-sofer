@@ -97,6 +97,7 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
         title: "תיקי טלית ותפילין",
         items: [
           { label: "כל התיקים", cat: "תיקי טלית ותפילין" },
+          { label: "סטים לטלית מעור אמיתי", cat: "תיקי טלית ותפילין", filter: "סטים לטלית מעור אמיתי" },
         ],
       },
     ],
@@ -152,6 +153,9 @@ const MEGA_MENU_DATA: NavMenuItem[] = [
           { label: "פסח",      cat: "חגים", filter: "פסח" },
           { label: "חנוכה",    cat: "חגים", filter: "חנוכה" },
           { label: "ראש השנה", cat: "חגים", filter: "ראש השנה" },
+          { label: "דבשיות לראש השנה",     cat: "חגים", filter: "דבשיות לראש השנה" },
+          { label: "צלחות סימני ראש השנה", cat: "חגים", filter: "צלחות סימני ראש השנה" },
+          { label: "סכיני חלה לראש השנה",  cat: "חגים", filter: "סכיני חלה לראש השנה" },
           { label: "פורים",    cat: "חגים", filter: "פורים" },
           { label: "סוכות",    cat: "חגים", filter: "סוכות" },
         ],

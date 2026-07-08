@@ -755,7 +755,7 @@ export default function HomePageClient() {
     <div
       dir="rtl"
       style={{
-        background: '#F8F6F1',
+        background: '#FFFFFF',
         fontFamily: "var(--font-heebo), 'Heebo', Arial, sans-serif",
         overflowX: 'hidden',
         maxWidth: '100vw',
@@ -765,25 +765,25 @@ export default function HomePageClient() {
         .ys-hero-btn-primary {
           display: inline-flex; align-items: center; justify-content: center;
           background: #373A5A; color: #FFFFFF;
-          border: 2px solid #373A5A;
-          height: 54px; padding: 0 40px; border-radius: 10px;
-          font-weight: 800; font-size: 16px; text-decoration: none;
+          border: 1px solid #373A5A;
+          height: 54px; padding: 0 40px; border-radius: 0;
+          font-weight: 600; font-size: 16px; text-decoration: none;
           white-space: nowrap; transition: all 0.2s ease; cursor: pointer;
-          font-family: inherit; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+          font-family: inherit;
         }
-        .ys-hero-btn-primary:hover { background: #2F324D; border-color: #2F324D; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.22); }
+        .ys-hero-btn-primary:hover { background: #2F324D; border-color: #2F324D; }
         .ys-hero-btn-primary:active { background: #282B43; border-color: #282B43; }
         .ys-hero-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(55,58,90,0.35); }
         .ys-hscroll::-webkit-scrollbar { display: none; }
         .ys-outline-btn {
           display: inline-flex; align-items: center; justify-content: center;
           background: #FFFFFF; color: #373A5A;
-          border: 1.5px solid #373A5A; border-radius: 10px;
-          height: 52px; padding: 0 36px;
-          font-weight: 700; font-size: 14px; text-decoration: none;
+          border: 1px solid #373A5A; border-radius: 0;
+          height: 50px; padding: 0 36px;
+          font-weight: 500; font-size: 14px; text-decoration: none;
           transition: all 0.2s ease; cursor: pointer; font-family: inherit;
         }
-        .ys-outline-btn:hover { background: #373A5A; color: #fff; transform: translateY(-1px); }
+        .ys-outline-btn:hover { background: #373A5A; color: #fff; }
         .ys-outline-btn:active { background: #282B43; border-color: #282B43; color: #fff; }
         .ys-outline-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(55,58,90,0.35); }
       `}</style>
@@ -976,7 +976,7 @@ export default function HomePageClient() {
             margin: '0 0 16px',
             letterSpacing: '-0.01em',
           }}>
-            הבית היהודי שתמיד דמיינתם
+            כל עולם היודאיקה במקום אחד
           </p>
 
           {/* h1 — preserved for SEO, visually hidden */}
@@ -989,11 +989,11 @@ export default function HomePageClient() {
             fontWeight: 400,
             color: 'rgba(255,255,255,0.88)',
             marginTop: 0,
-            marginBottom: isMobile ? 28 : 36,
+            marginBottom: isMobile ? 24 : 32,
             maxWidth: isMobile ? '88%' : '60%',
             lineHeight: 1.7,
           }}>
-            להתחבר לטוב ביותר
+            המבחר הגדול בישראל למוצרי יודאיקה — לבית, לבית הכנסת, לאירועים ולמתנות
           </p>
 
         </div>
@@ -1006,6 +1006,28 @@ export default function HomePageClient() {
         </div>
       )}
 
+      {/* ── Trust row ── */}
+      <div dir="rtl" style={{ background: '#FFFFFF', borderBottom: '1px solid #F0F0F2', padding: isMobile ? '14px 16px' : '18px 32px' }}>
+        <div style={{
+          maxWidth: 1280, margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+          gap: isMobile ? 10 : 16,
+        }}>
+          {[
+            'משלוחים לכל הארץ',
+            'מבחר ענק של מוצרי יודאיקה',
+            'קנייה מאובטחת',
+            'שירות אישי בוואטסאפ',
+          ].map(item => (
+            <div key={item} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+              <span aria-hidden="true" style={{ color: '#C5A028', fontSize: 12, lineHeight: 1 }}>✓</span>
+              <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 500, color: '#222222', whiteSpace: 'nowrap' }}>{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* ── Promo 2+1 section ── */}
       {promoProducts.length > 0 && (
         <section style={{ background: '#1a1a1a', padding: isMobile ? '48px 16px' : '80px 32px', direction: 'rtl' }}>
@@ -1013,11 +1035,11 @@ export default function HomePageClient() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 24 : 32, flexWrap: 'wrap', gap: 10 }}>
               <div>
                 <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A227', letterSpacing: '0.16em', textTransform: 'uppercase', margin: '0 0 6px' }}>מבצע מיוחד</p>
-                <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 300, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>🏷️ קנו 3, שלמו על 2</h2>
+                <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 300, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>קנו 3, שלמו על 2</h2>
               </div>
-              <a href="/promo/2plus1" style={{ fontSize: 13, fontWeight: 700, color: '#373A5A', textDecoration: 'none', border: '1px solid #373A5A', borderRadius: 10, padding: '9px 20px', whiteSpace: 'nowrap', transition: 'all 0.2s ease' }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#373A5A'; e.currentTarget.style.color = '#fff'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#373A5A'; }}>
+              <a href="/promo/2plus1" style={{ fontSize: 13, fontWeight: 500, color: '#FFFFFF', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.5)', borderRadius: 0, padding: '9px 20px', whiteSpace: 'nowrap', transition: 'all 0.2s ease' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#1a1a1a'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#fff'; }}>
                 לכל המבצעים ←
               </a>
             </div>
@@ -1026,10 +1048,10 @@ export default function HomePageClient() {
                 const img = p.imgUrl || p.image_url || '';
                 const promoPrice = (p as any).promoPrice as number | undefined;
                 return (
-                  <a key={p.id} href={`/product/${p.id}`} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', background: '#2a2a2a', overflow: 'hidden', position: 'relative', borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', transition: 'all 0.2s ease' }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(0,0,0,0.35)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
-                    <div style={{ position: 'absolute', top: 10, right: 10, background: '#C9A227', color: '#1a1a1a', fontSize: 10, fontWeight: 900, padding: '3px 8px', borderRadius: 999, zIndex: 1, letterSpacing: '0.06em' }}>2+1</div>
+                  <a key={p.id} href={`/product/${p.id}`} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', background: '#2a2a2a', overflow: 'hidden', position: 'relative', borderRadius: 0, border: '1px solid rgba(255,255,255,0.08)', transition: 'border-color 0.2s ease' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}>
+                    <div style={{ position: 'absolute', top: 10, right: 10, background: '#C9A227', color: '#1a1a1a', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 0, zIndex: 1, letterSpacing: '0.06em' }}>2+1</div>
                     <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', background: '#333' }}>
                       {img ? (
                         <img src={optimizeCloudinaryUrl(img, 400)} alt={p.name} loading="lazy"
@@ -1044,7 +1066,7 @@ export default function HomePageClient() {
                       </span>
                       <span style={{ fontSize: 11, color: '#9ca3af' }}>יחיד: {formatPrice(p.price)}</span>
                       {promoPrice && (
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#373A5A' }}>3 ב-{formatPrice(Math.round(p.price * 2 * 100) / 100)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#C9A227' }}>3 ב-{formatPrice(Math.round(p.price * 2 * 100) / 100)}</span>
                       )}
                     </div>
                   </a>
@@ -1058,7 +1080,7 @@ export default function HomePageClient() {
       {/* ── Life events horizontal scroll ── */}
       <section
         id="life-events"
-        style={{ background: '#F8F6F1', padding: isMobile ? '48px 0 40px' : '80px 0 56px', direction: 'rtl' }}
+        style={{ background: '#FFFFFF', padding: isMobile ? '48px 0 40px' : '80px 0 56px', direction: 'rtl' }}
       >
         <div style={{ textAlign: 'center', padding: '0 20px', marginBottom: isMobile ? 24 : 36 }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, marginTop: 0 }}>
@@ -1084,15 +1106,14 @@ export default function HomePageClient() {
                 flexShrink: 0,
                 width: isMobile ? 200 : 240,
                 background: '#FFFFFF',
-                border: '1px solid #EDE8DC',
-                borderRadius: 16,
+                border: '1px solid #EDEDEF',
+                borderRadius: 0,
                 overflow: 'hidden',
-                boxShadow: '0 2px 10px rgba(58,46,26,0.06)',
-                transition: 'all 0.2s ease',
+                transition: 'border-color 0.2s ease',
                 cursor: 'pointer',
               }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 28px rgba(58,46,26,0.14)'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 10px rgba(58,46,26,0.06)'; e.currentTarget.style.transform = 'none'; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#373A5A'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
             >
               {ev.image && (
                 <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', flexShrink: 0 }}>
@@ -1117,14 +1138,13 @@ export default function HomePageClient() {
       </section>
 
       {/* ── Live Counters ── */}
-      <div ref={countersRef} style={{ background: '#F8F6F1', padding: isMobile ? '16px 16px 32px' : '24px 32px 48px', borderBottom: '1px solid #f0ece4' }}>
+      <div ref={countersRef} style={{ background: '#FFFFFF', padding: isMobile ? '16px 16px 32px' : '24px 32px 48px', borderBottom: '1px solid #f0ece4' }}>
         <div style={{
           maxWidth: 900, margin: '0 auto',
           background: '#fff',
           padding: isMobile ? '24px 16px' : '32px 40px',
-          borderRadius: 20,
-          boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-          border: '1px solid #EEEBE4',
+          borderRadius: 0,
+          border: '1px solid #EDEDEF',
           display: 'flex',
           justifyContent: 'space-around',
           alignItems: 'center',
@@ -1159,7 +1179,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 4. Category grid ── */}
-      <div id="categories" style={{ background: '#F8F6F1', padding: isMobile ? '56px 20px' : '96px 32px', direction: 'rtl' }}>
+      <div id="categories" style={{ background: '#FFFFFF', padding: isMobile ? '56px 20px' : '96px 32px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 44, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
@@ -1180,27 +1200,19 @@ export default function HomePageClient() {
             ].filter(Boolean) as { name: string; emoji: string; img: string; href: string; fallback?: string }[]).map(cat => (
               <div key={cat.name}
                 onClick={() => router.push(cat.href)}
-                style={{
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  background: '#FFFFFF',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
-                  transition: 'all 0.2s ease',
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px) scale(1.01)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; }}
+                className="group"
+                style={{ cursor: 'pointer', background: '#FFFFFF' }}
               >
-                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', position: 'relative' }}>
+                <div style={{ width: '100%', aspectRatio: '4 / 5', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
                   {cat.img ? (
-                    <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 33vw" />
+                    <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} className="object-cover transition-transform duration-300 group-hover:scale-[1.015]" sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4' }}>{cat.emoji}</div>
                   )}
-                  {/* floating label over bottom of image */}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.94)', padding: '4px 14px', textAlign: 'center' }}>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', letterSpacing: '0.01em' }}>{cat.name}</span>
-                  </div>
+                </div>
+                <div style={{ marginTop: 12, textAlign: 'center' }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 500, color: '#373A5A', margin: 0 }}>{cat.name}</h3>
+                  <span className="underline underline-offset-4" style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: '#111111' }}>לצפייה</span>
                 </div>
               </div>
             ))}
@@ -1217,7 +1229,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Bar-Mitzvah Kippot CTA ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '0 20px 48px' : '0 32px 64px', direction: 'rtl' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '0 20px 48px' : '0 32px 64px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <a
             href="/event-kippot"
@@ -1225,16 +1237,15 @@ export default function HomePageClient() {
               display: 'block',
               position: 'relative',
               overflow: 'hidden',
-              borderRadius: 20,
-              border: '2px solid #373A5A',
+              borderRadius: 0,
+              border: '1px solid #EDEDEF',
               textDecoration: 'none',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-              transition: 'all 0.2s ease',
+              transition: 'border-color 0.2s ease',
               aspectRatio: isMobile ? '5 / 2' : '8 / 1.8',
               minHeight: isMobile ? 120 : undefined,
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(0,0,0,0.14)'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#373A5A'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
           >
             {/* Designed banner — text is baked into the image, no overlay needed */}
             <Image
@@ -1253,11 +1264,10 @@ export default function HomePageClient() {
               right: isMobile ? 12 : 28,
               background: '#373A5A',
               color: '#FFFFFF',
-              fontWeight: 900,
+              fontWeight: 600,
               fontSize: isMobile ? 12.5 : 15,
               padding: isMobile ? '8px 14px' : '12px 26px',
-              borderRadius: 999,
-              boxShadow: '0 3px 14px rgba(0,0,0,0.3)',
+              borderRadius: 0,
               whiteSpace: 'nowrap',
             }}>
               כנסו לכיפות ומזכרות ←
@@ -1269,9 +1279,12 @@ export default function HomePageClient() {
       {/* ── 5. Featured products horizontal scroll ── */}
       <div style={{ minHeight: isMobile ? 290 : 330 }}>
       {featuredProducts.length > 0 && (
-        <div ref={bsSectionRef} style={{ background: '#F8F6F1', padding: isMobile ? '56px 0' : '96px 0', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24 }}>
-            <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>המוצרים הנמכרים ביותר</h2>
+        <div ref={bsSectionRef} style={{ background: '#FFFFFF', padding: isMobile ? '56px 0' : '96px 0', direction: 'rtl' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+            <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הכי נמכרים השבוע</h2>
+            <Link href="/category/%D7%94%D7%9B%D7%9C" className="underline underline-offset-4" style={{ fontSize: 13, color: '#111111', textDecoration: 'underline', whiteSpace: 'nowrap' }}>
+              לכל המוצרים
+            </Link>
           </div>
           <style>{`
             .ys-bestseller-media > div { aspect-ratio: 4 / 5 !important; height: auto !important; }
@@ -1281,26 +1294,24 @@ export default function HomePageClient() {
               const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
               return (
                 <div key={p.id}
-                  style={{ width: 'clamp(220px, 60vw, 300px)', flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', transition: 'all 0.2s ease' }}
+                  style={{ width: 'clamp(220px, 60vw, 300px)', flexShrink: 0, cursor: 'pointer', background: '#fff', borderRadius: 0, overflow: 'hidden' }}
                   onClick={() => router.push(`/product/${p.id}`)}
-                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 26px rgba(0,0,0,0.13)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
                 >
                   <div className="ys-bestseller-media">
                     <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
                       {p.isBestSeller && (
-                        <div style={{ position: 'absolute', top: 7, right: 7, zIndex: 1, background: '#fff3e0', border: '1px solid #e8920a', borderRadius: 20, fontSize: 10, fontWeight: 800, color: '#c45e00', padding: '2px 8px', letterSpacing: '0.01em' }}>
+                        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 1, background: '#373A5A', borderRadius: 0, fontSize: 11, fontWeight: 600, color: '#FFFFFF', padding: '3px 8px', letterSpacing: '0.01em' }}>
                           הכי נמכר
                         </div>
                       )}
                     </ProductCardVideo>
                   </div>
-                  <div style={{ padding: '12px 14px 16px' }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5 }}>{p.name}</p>
-                    <p style={{ fontSize: 14, fontWeight: 800, color: '#373A5A', marginBottom: 10, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                  <div style={{ padding: '10px 2px 4px' }}>
+                    <p style={{ fontSize: 14, fontWeight: 500, color: '#373A5A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 5, textAlign: 'right' }}>{p.name}</p>
+                    <p style={{ fontSize: 15, fontWeight: 700, color: '#111111', marginBottom: 10, display: 'flex', alignItems: 'baseline', gap: 6 }}>
                       {formatPrice(p.price)}
                       {typeof p.was === 'number' && p.was > p.price && (
-                        <span style={{ fontSize: 11, fontWeight: 400, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(p.was)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 400, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(p.was)}</span>
                       )}
                     </p>
                     <button
@@ -1308,11 +1319,11 @@ export default function HomePageClient() {
                         e.stopPropagation();
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1, cat: p.cat || undefined });
                       }}
-                      style={{ background: 'transparent', color: '#373A5A', border: '1.5px solid #373A5A', borderRadius: 8, fontSize: 11, fontWeight: 700, padding: '6px 10px', cursor: 'pointer', width: '100%', transition: 'all 0.2s ease' }}
+                      style={{ background: '#FFFFFF', color: '#373A5A', border: '1px solid #373A5A', borderRadius: 0, fontSize: 13, fontWeight: 500, height: 36, cursor: 'pointer', width: '100%', transition: 'all 0.2s ease' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF'; (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
                     >
-                      הוסף לסל
+                      הוספה לסל
                     </button>
                   </div>
                 </div>
@@ -1324,7 +1335,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── 6. More categories horizontal scroll ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 0' : '80px 0', direction: 'rtl' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '48px 0' : '80px 0', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
           <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 300, color: '#111111', marginBottom: 28, letterSpacing: '-0.01em' }}>עוד קטגוריות</h2>
         </div>
@@ -1349,7 +1360,7 @@ export default function HomePageClient() {
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}
               >
-                <div style={{ width: '100%', aspectRatio: '4 / 3', borderRadius: 16, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative', boxShadow: '0 3px 14px rgba(0,0,0,0.07)' }}>
+                <div style={{ width: '100%', aspectRatio: '4 / 3', borderRadius: 0, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
                   {img ? (
                     <Image fill unoptimized loading="lazy" src={img} alt={cat.slug} style={{ objectFit: 'cover' }} sizes="200px" />
                   ) : (
@@ -1364,9 +1375,9 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Cloudinary video ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '48px 16px' : '80px 32px' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '48px 16px' : '80px 32px' }}>
         <div style={{ maxWidth: 896, margin: '0 auto', textAlign: 'center', direction: 'rtl', marginBottom: isMobile ? 24 : 32 }}>
-          <p style={{ fontSize: isMobile ? 28 : 36, fontWeight: 700, color: '#1E3A8A', margin: 0, lineHeight: 1.25 }}>
+          <p style={{ fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#373A5A', margin: 0, lineHeight: 1.25, letterSpacing: '-0.01em' }}>
             רק אצלנו ב&nbsp;<span dir="ltr" style={{ unicodeBidi: 'embed' }}>Your Sofer</span>
           </p>
           <p style={{ fontSize: isMobile ? 16 : 18, color: '#4B5563', marginTop: 10, marginBottom: 0 }}>
@@ -1375,7 +1386,7 @@ export default function HomePageClient() {
         </div>
         <div
           ref={videoWrapperRef}
-          style={{ maxWidth: 896, margin: '0 auto', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.13)', position: 'relative', aspectRatio: '16 / 9' }}
+          style={{ maxWidth: 896, margin: '0 auto', borderRadius: 0, overflow: 'hidden', border: '1px solid #EDEDEF', position: 'relative', aspectRatio: '16 / 9' }}
         >
           <iframe
             src={`https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=${videoStarted ? 'true' : 'false'}&muted=true`}
@@ -1388,7 +1399,7 @@ export default function HomePageClient() {
 
       {/* ── Soferim horizontal row ── */}
       {soferimList.length > 0 && (
-        <div style={{ background: '#F8F6F1', padding: isMobile ? '40px 0 24px' : '56px 0 32px', direction: 'rtl' }}>
+        <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 0 24px' : '56px 0 32px', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 20 }}>
             <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הסופרים שלנו</h2>
           </div>
@@ -1425,7 +1436,7 @@ export default function HomePageClient() {
       )}
 
       {/* ── Sofer STaM categories grid ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 20px' : '96px 32px', direction: 'rtl' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '56px 20px' : '96px 32px', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות סת״מ</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 44, fontWeight: 400 }}>כל מוצרי הסופר סת״מ</p>
@@ -1445,26 +1456,19 @@ export default function HomePageClient() {
               <div
                 key={cat.name}
                 onClick={() => router.push(cat.href)}
-                style={{
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  background: '#FFFFFF',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
-                  transition: 'all 0.2s ease',
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px) scale(1.01)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'none'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; }}
+                className="group"
+                style={{ cursor: 'pointer', background: '#FFFFFF' }}
               >
-                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', position: 'relative' }}>
+                <div style={{ width: '100%', aspectRatio: '4 / 5', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
                   {cat.img ? (
-                    <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 50vw, 33vw" />
+                    <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} className="object-cover transition-transform duration-300 group-hover:scale-[1.015]" sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f4' }}>{cat.emoji}</div>
                   )}
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,255,255,0.94)', padding: '4px 14px', textAlign: 'center' }}>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', letterSpacing: '0.01em' }}>{cat.name}</span>
-                  </div>
+                </div>
+                <div style={{ marginTop: 12, textAlign: 'center' }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 500, color: '#373A5A', margin: 0 }}>{cat.name}</h3>
+                  <span className="underline underline-offset-4" style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: '#111111' }}>לצפייה</span>
                 </div>
               </div>
             ))}
@@ -1473,7 +1477,7 @@ export default function HomePageClient() {
       </div>
 
       {/* ── Soferim CTA ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 16px' : '80px 16px', direction: 'rtl', textAlign: 'center' }}>
+      <div style={{ background: '#FFFFFF', padding: isMobile ? '56px 16px' : '80px 16px', direction: 'rtl', textAlign: 'center' }}>
         <button onClick={() => router.push('/soferim')} className="ys-hero-btn-primary">
           לצפייה במאגר הסופרים שלנו ←
         </button>
@@ -1481,7 +1485,7 @@ export default function HomePageClient() {
 
       {/* ── Live Reviews Carousel ── */}
       {liveReviews.length > 0 && (
-        <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 0 48px' : '96px 0 80px', direction: 'rtl' }}>
+        <div style={{ background: '#FFFFFF', padding: isMobile ? '56px 0 48px' : '96px 0 80px', direction: 'rtl' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
             <h2 style={{ textAlign: 'center', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>
               מה הלקוחות אומרים
@@ -1501,14 +1505,13 @@ export default function HomePageClient() {
                   flexShrink: 0,
                   width: isMobile ? 260 : 300,
                   background: '#FFFFFF',
-                  borderRadius: 16,
-                  border: '1px solid #EDE8DC',
+                  borderRadius: 0,
+                  border: '1px solid #EDEDEF',
                   overflow: 'hidden',
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                  transition: 'all 0.2s ease',
+                  transition: 'border-color 0.2s ease',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 26px rgba(0,0,0,0.12)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#373A5A'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
               >
                 <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden' }}>
                   <img

@@ -407,7 +407,7 @@ export default function SearchPage() {
 
           {/* Product grid + pagination */}
           <div className="flex-1 min-w-0">
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7">
               {hits.map(hit => (
                 <ProductCard
                   key={hit.objectID}

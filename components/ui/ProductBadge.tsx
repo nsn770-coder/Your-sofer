@@ -21,37 +21,37 @@ function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundleProm
   if (isBestSeller) {
     return {
       label: 'הכי נמכר',
-      className: 'bg-orange-100 text-orange-700 border-orange-300',
+      className: 'bg-[#111111] text-[#C5A028] border-[#111111]',
     };
   }
   if (typeof priority === 'number' && priority >= 80) {
     return {
       label: 'מומלץ',
-      className: 'bg-blue-100 text-blue-700 border-blue-300',
+      className: 'bg-[#373A5A] text-white border-[#373A5A]',
     };
   }
   if (badge === 'מהודר') {
     return {
       label: 'מהודר',
-      className: 'bg-amber-100 text-amber-700 border-amber-400',
+      className: 'bg-[#111111] text-[#C5A028] border-[#111111]',
     };
   }
   if (badge === 'מתנה') {
     return {
       label: 'מתאים כמתנה',
-      className: 'bg-green-100 text-green-700 border-green-300',
+      className: 'bg-white text-[#373A5A] border-[#373A5A]',
     };
   }
   if (badge === 'בטוח') {
     return {
       label: 'בחירה בטוחה',
-      className: 'bg-gray-100 text-gray-600 border-gray-300',
+      className: 'bg-white text-gray-500 border-gray-300',
     };
   }
   if (badge === 'מהדרין') {
     return {
       label: 'מהדרין',
-      className: 'bg-purple-100 text-purple-700 border-purple-300',
+      className: 'bg-[#373A5A] text-white border-[#373A5A]',
     };
   }
   return null;
@@ -66,14 +66,14 @@ export default function ProductBadge({ isBestSeller, priority, badge, bundleProm
   return (
     <span dir="rtl" className="inline-flex flex-col items-end gap-1">
       {config && (
-        <span className={`inline-flex items-center border rounded-full px-2 py-0.5 text-xs font-bold whitespace-nowrap ${config.className}`}>
+        <span className={`inline-flex items-center border rounded-none px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap ${config.className}`}>
           {config.label}
         </span>
       )}
       {bundleLabel && (
         <span
           className="inline-flex items-center whitespace-nowrap"
-          style={{ background: '#1a1a1a', color: '#C5A028', fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, letterSpacing: '0.01em' }}
+          style={{ background: '#1a1a1a', color: '#C5A028', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 0, letterSpacing: '0.01em' }}
         >
           ✦ {bundleLabel}
         </span>

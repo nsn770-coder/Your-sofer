@@ -12,6 +12,19 @@
  *   node app/scripts/fullSyncIsraelJudaica.mjs --execute      ← ביצוע
  *   node app/scripts/fullSyncIsraelJudaica.mjs --execute --skip-delete  ← ייבוא בלי מחיקה
  *   node app/scripts/fullSyncIsraelJudaica.mjs --execute --skip-import  ← מחיקה בלי ייבוא
+ *
+ * מצב ייבוא-חדשים-בלבד (07/2026):
+ *   node app/scripts/fullSyncIsraelJudaica.mjs --import-only            ← DRY-RUN: מפיק CSV מועמדים
+ *   node app/scripts/fullSyncIsraelJudaica.mjs --import-only --execute  ← ייבוא חדשים בלבד כ-draft
+ *
+ *   ב---import-only:
+ *     • אין מחיקה ואין עדכון מוצרים קיימים — הוספת חדשים בלבד
+ *     • חדשים נוצרים עם status:'draft'
+ *     • rawProduct.arrive_date → comingSoon + expectedArrivalDate ("מגיע בקרוב")
+ *     • העשרה עם לוגין ספק (Playwright): מחיר סוחר + "נמכר באריזה של X יחידות"
+ *       (SUPPLIER_EMAIL / SUPPLIER_PASSWORD ב-.env.local; --no-enrich לדילוג)
+ *     • DRY-RUN כותב scripts/new-products-candidates-<תאריך>.csv
+ *     • EXECUTE כותב לוג scripts/import-log-<תאריך>.json
  */
 
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
@@ -27,9 +40,13 @@ const ROOT      = resolve(__dirname, '../..');
 // ── CLI ───────────────────────────────────────────────────────────────────────
 const args        = process.argv.slice(2);
 const EXECUTE     = args.includes('--execute');
-const SKIP_DELETE = args.includes('--skip-delete');
+const IMPORT_ONLY = args.includes('--import-only');
+const NO_ENRICH   = args.includes('--no-enrich');
+const SKIP_DELETE = args.includes('--skip-delete') || IMPORT_ONLY; // import-only: לעולם לא מוחקים
 const SKIP_IMPORT = args.includes('--skip-import');
 const DRY_RUN     = !EXECUTE;
+
+if (IMPORT_ONLY) console.log('🛡️  IMPORT-ONLY — ללא מחיקות וללא עדכון מוצרים קיימים. חדשים בלבד (draft).\n');
 
 if (DRY_RUN) console.log('🧪  DRY-RUN — Firestore/Cloudinary לא יעודכנו. הוסף --execute להרצה.\n');
 
@@ -66,6 +83,13 @@ const db = getFirestore();
 
 // ── Known category map ────────────────────────────────────────────────────────
 const CATEGORY_MAP = [
+  // קטגוריות קולקציה חדשות (07/2026) — בראש המפה בכוונה: מוצר שנמצא גם
+  // בקטגוריית-אם וגם בקולקציה יקבל את שיוך הקולקציה (first-occurrence wins)
+  { code: '1194', label: 'קולקציית דבשיות לראש השנה',      cat: 'חגים',                subCategory: 'דבשיות לראש השנה' },
+  { code: '1195', label: 'קולקציית צלחות סימני ראש השנה',  cat: 'חגים',                subCategory: 'צלחות סימני ראש השנה' },
+  { code: '1197', label: 'קולקציית סכיני חלה לראש השנה',   cat: 'חגים',                subCategory: 'סכיני חלה לראש השנה' },
+  { code: '1196', label: 'קולקציית סוכות',                  cat: 'חגים',                subCategory: 'סוכות' },
+  { code: '1198', label: 'סטים לטלית מעור אמיתי',           cat: 'תיקי טלית ותפילין',  subCategory: 'סטים לטלית מעור אמיתי' },
   { code: '1116', label: 'הפרשת חלה',          cat: 'שבת',                subCategory: 'הפרשת חלה' },
   { code: '1118', label: 'ברכות',               cat: 'יודאיקה',            subCategory: 'ברכונים' },
   { code: '1119', label: 'חמסות וסגולות',        cat: 'יודאיקה',            subCategory: 'חמסות וסגולות' },
@@ -131,7 +155,7 @@ async function fetchBatch(categoryCode, offset) {
     limit: String(BATCH), offset: String(offset),
     sortValue: '', sortDirection: '', note: '', search_term: '',
   });
-  const res = await fetch(`${BASE_URL}/index.php?option=com_art&task=category.getProducts`, {
+  const res = await fetch(`${BASE_URL}/index.php?option=com_art&task=category.getProducts&lang=${LANG}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
@@ -175,6 +199,25 @@ function buildImgUrl(filename) {
   return `${BASE_URL}/${ext === 'webp' ? 'webp' : 'big'}/${filename}`;
 }
 
+/**
+ * rawProduct.arrive_date → תאריך צפי הגעה ("מגיע בקרוב").
+ * "0000-00-00" = אין. מחזיר 'YYYY-MM-DD' רק אם התאריך עתידי (עבר = כבר הגיע).
+ */
+function parseArriveDate(raw) {
+  if (!raw || typeof raw !== 'string') return null;
+  const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m || m[1] === '0000') return null;
+  const today = new Date().toISOString().slice(0, 10);
+  return raw > today ? raw : null;
+}
+
+/** 'YYYY-MM-DD' → 'DD/MM/YYYY' לתצוגה */
+function formatArriveDate(iso) {
+  if (!iso) return '';
+  const [y, mo, d] = iso.split('-');
+  return `${d}/${mo}/${y}`;
+}
+
 // ── Cloudinary helpers ────────────────────────────────────────────────────────
 function extractPublicId(cloudinaryUrl) {
   if (!cloudinaryUrl || !cloudinaryUrl.includes('cloudinary.com')) return null;
@@ -211,13 +254,153 @@ async function deleteFromCloudinary(publicId) {
   return json.result === 'ok';
 }
 
+// ── Enrichment: dealer login → prices + pack sizes (Playwright) ───────────────
+// מבוסס על scripts/scrapePackSizes.mjs (לוגין #btl + regex "נמכר באריזה של X יחידות")
+const ENRICH_CACHE_PATH = resolve(__dirname, '../../scripts/ij-new-enrichment-cache.json');
+
+function loadEnrichCache() {
+  try { return JSON.parse(readFileSync(ENRICH_CACHE_PATH, 'utf8')); } catch { return {}; }
+}
+
+async function enrichNewProducts(newSkus) {
+  // newSkus: Array<[sku, { catEntry, rawProduct }]>
+  const cache = loadEnrichCache();
+  const result = new Map(Object.entries(cache).map(([k, v]) => [k, v]));
+  const pending = newSkus.filter(([sku]) => !cache[sku]);
+
+  if (NO_ENRICH) {
+    console.log('  ⏭  --no-enrich — דילוג העשרה (מחיר סוחר/כמות באריזה)');
+    return result;
+  }
+  if (pending.length === 0) {
+    console.log(`  ✅ העשרה: הכל ב-cache (${result.size} מוצרים)`);
+    return result;
+  }
+
+  const EMAIL    = process.env.SUPPLIER_EMAIL;
+  const PASSWORD = process.env.SUPPLIER_PASSWORD;
+  if (!EMAIL || !PASSWORD) {
+    console.log('  ⚠️  חסרים SUPPLIER_EMAIL/SUPPLIER_PASSWORD ב-.env.local — ממשיך ללא העשרה');
+    return result;
+  }
+
+  let chromium;
+  try { ({ chromium } = await import('playwright')); }
+  catch { console.log('  ⚠️  playwright לא מותקן — ממשיך ללא העשרה'); return result; }
+
+  console.log(`\n══ העשרה: מחיר סוחר + כמות באריזה (${pending.length} מוצרים חדשים) ══\n`);
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage();
+
+  try {
+    // login (same flow as scrapePackSizes.mjs)
+    await page.goto(`${BASE_URL}/index.php?lang=he`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.fill('#btl-input-username', EMAIL);
+    await page.fill('#btl-input-password', PASSWORD);
+    await Promise.all([
+      page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }),
+      page.$eval('.btl-formlogin input[type=submit]', el => el.click()),
+    ]);
+    const loggedIn = await page.$eval('body', b => /שלום|התנתק|חשבון שלי|יציאה/i.test(b.innerText));
+    if (!loggedIn) throw new Error('אימות התחברות נכשל');
+    console.log('  ✅ התחברות ספק הצליחה');
+
+    // 1) מחירי סוחר בבת אחת: קריאת ה-API מתוך הדפדפן (עם session) לכל קטגוריה רלוונטית
+    const neededCodes = [...new Set(pending.map(([, { catEntry }]) => catEntry.code))];
+    const dealerPrices = {};
+    console.log(`  💰 שולף מחירי סוחר מ-${neededCodes.length} קטגוריות...`);
+    for (const code of neededCodes) {
+      let offset = 0;
+      while (true) {
+        const products = await page.evaluate(async ({ code, offset, limit }) => {
+          const body = new URLSearchParams({
+            category: code, filterChoices: '[]', limit: String(limit), offset: String(offset),
+            sortValue: '', sortDirection: '', note: '', search_term: '',
+          });
+          const r = await fetch('/index.php?option=com_art&task=category.getProducts&lang=he', {
+            method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString(),
+          });
+          const j = await r.json();
+          return j.status ? (j.products || {}) : {};
+        }, { code, offset, limit: BATCH });
+        const keys = Object.keys(products);
+        if (!keys.length) break;
+        for (const [sku, p] of Object.entries(products)) {
+          const n = parseFloat(p.price);
+          if (!isNaN(n) && n > 0) dealerPrices[sku] = n;
+        }
+        if (keys.length < BATCH) break;
+        offset += BATCH;
+        await sleep(250);
+      }
+      await sleep(300);
+    }
+    console.log(`  💰 נמצאו מחירים ל-${Object.keys(dealerPrices).length} SKUs`);
+
+    // 2) כמות באריזה — דף מוצר לכל מוצר חדש (resumable cache)
+    let sinceFlush = 0;
+    for (let i = 0; i < pending.length; i++) {
+      const [sku] = pending[i];
+      let entry = { price: dealerPrices[sku] ?? null, packSize: 1 };
+      try {
+        await page.goto(`${BASE_URL}/index.php?option=com_art&view=product&sku=${sku}&lang=he`,
+          { waitUntil: 'domcontentloaded', timeout: 45000 });
+        await page.waitForTimeout(1200);
+        const bodyText = await page.evaluate(() => document.body.innerText);
+        const m = bodyText.match(/נמכר באריזה של\s*(\d+)\s*יחידות/);
+        if (m) entry.packSize = Number(m[1]);
+      } catch (e) {
+        process.stdout.write(`  ⚠️  ${sku}: ${e.message}\n`);
+      }
+      result.set(sku, entry);
+      cache[sku] = entry;
+      sinceFlush++;
+      if (sinceFlush >= 25) {
+        writeFileSync(ENRICH_CACHE_PATH, JSON.stringify(cache, null, 2));
+        sinceFlush = 0;
+      }
+      process.stdout.write(`  [${i + 1}/${pending.length}] ${sku} — ₪${entry.price ?? '?'} | אריזה: ${entry.packSize}\r`);
+      await sleep(600);
+    }
+    writeFileSync(ENRICH_CACHE_PATH, JSON.stringify(cache, null, 2));
+    console.log(`\n  💾 cache: ${ENRICH_CACHE_PATH}`);
+  } catch (e) {
+    console.log(`\n  ⚠️  העשרה נכשלה (${e.message}) — ממשיך עם מה שנאסף`);
+    writeFileSync(ENRICH_CACHE_PATH, JSON.stringify(cache, null, 2));
+  } finally {
+    await browser.close();
+  }
+  return result;
+}
+
+// ── CSV of new-product candidates (dry-run deliverable) ──────────────────────
+function csvEscape(v) {
+  const s = v == null ? '' : String(v);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function writeCandidatesCsv(rows) {
+  const header = ['קוד UK', 'שם', 'מחיר ספק', 'מחיר אצלנו', 'מחיר מחוק', 'מגיע בקרוב', 'תאריך צפי', 'כמות באריזה', 'קטגוריה', 'תת-קטגוריה', 'תמונה'];
+  const lines = [header.join(',')];
+  for (const r of rows) {
+    lines.push([
+      r.sku, r.name, r.purchasePrice ?? '', r.price ?? '', r.was ?? '',
+      r.comingSoon ? 'כן' : '', r.comingSoon ? formatArriveDate(r.expectedArrivalDate) : '',
+      r.packSize ?? 1, r.category, r.subCategory, r.imgUrl ?? '',
+    ].map(csvEscape).join(','));
+  }
+  const path = resolve(__dirname, `../../scripts/new-products-candidates-${new Date().toISOString().slice(0, 10)}.csv`);
+  writeFileSync(path, '﻿' + lines.join('\n')); // BOM לעברית באקסל
+  return path;
+}
+
 // ── Phase 1: Discover new categories ─────────────────────────────────────────
 async function discoverNewCategories() {
-  console.log('\n══ שלב 1: חיפוש קטגוריות חדשות (קודים 1194–1250) ══\n');
+  console.log('\n══ שלב 1: חיפוש קטגוריות חדשות (קודים 1199–1250) ══\n');
   const knownCodes = new Set(CATEGORY_MAP.map(c => c.code));
   const newCats = [];
 
-  for (let code = 1194; code <= 1250; code++) {
+  for (let code = 1199; code <= 1250; code++) {
     try {
       const batch = await fetchBatch(String(code), 0);
       if (Object.keys(batch).length > 0) {
@@ -267,6 +450,20 @@ async function fetchAllSupplierSkus() {
 
 // ── Phase 3: Load Firestore products ──────────────────────────────────────────
 async function loadFirestoreProducts() {
+  if (IMPORT_ONLY) {
+    // השוואה לפי קוד UK מול *כל* הקטלוג שלנו (לא רק source=israel-judaica) —
+    // מונע ייבוא כפול של מוצר שקיים אצלנו עם source אחר/חסר.
+    console.log('\n══ שלב 3: טעינת כל המוצרים מ-Firestore (השוואת קוד UK מול כל הקטלוג) ══\n');
+    const snap = await db.collection('products').get();
+    const products = [];
+    snap.forEach(d => {
+      const data = d.data();
+      products.push({ id: d.id, sku: data.supplierCode || data.sku || null, ...data });
+    });
+    const withUk = products.filter(p => typeof p.sku === 'string' && /^UK\d+/i.test(p.sku)).length;
+    console.log(`  📥 נטענו ${products.length} מוצרים (מתוכם עם קוד UK: ${withUk})`);
+    return products;
+  }
   console.log('\n══ שלב 3: טעינת מוצרי israel-judaica מ-Firestore ══\n');
   const snap = await db.collection('products').where('source', '==', 'israel-judaica').get();
   const products = [];
@@ -334,77 +531,121 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
   if (SKIP_IMPORT) { console.log('\n══ שלב 5: דילוג ייבוא (--skip-import) ══'); return; }
   console.log('\n══ שלב 5: ייבוא מוצרים חדשים ══\n');
 
-  const existingSkus = new Set(firestoreProducts.map(p => p.sku).filter(Boolean));
-  const newSkus = [...supplierSkus.entries()].filter(([sku]) => !existingSkus.has(sku));
+  const existingSkus = new Set(firestoreProducts.map(p => p.sku && String(p.sku).toUpperCase()).filter(Boolean));
+  const newSkus = [...supplierSkus.entries()].filter(([sku]) => !existingSkus.has(String(sku).toUpperCase()));
   console.log(`  🆕 ${newSkus.length} מוצרים חדשים שאין אצלנו`);
 
   if (newSkus.length === 0) { console.log('  ✅ אין מוצרים חדשים לייבא.'); return; }
 
+  // העשרה: מחיר סוחר + כמות באריזה (עם cache; --no-enrich לדילוג)
+  const enrichment = await enrichNewProducts(newSkus);
+
+  // בניית שורות המועמדים (משמש גם ל-CSV וגם לייבוא)
+  const candidates = [];
+  for (const [sku, { catEntry, rawProduct }] of newSkus) {
+    const enriched      = enrichment.get(sku) || {};
+    const purchasePrice = enriched.price ?? (rawProduct.price ? parseFloat(rawProduct.price) : null);
+    // מחיר סופי = ספק × 1.4 × 1.12 | מחיר מחוק = ספק × 1.4 × 1.40 (מעוגל לשקל שלם)
+    const salePrice     = purchasePrice ? Math.round(purchasePrice * 1.4 * 1.12) : null;
+    let   wasPrice      = purchasePrice ? Math.round(purchasePrice * 1.4 * 1.40) : null;
+    if (wasPrice != null && salePrice != null && wasPrice <= salePrice) wasPrice = salePrice + 1;
+
+    const expectedArrivalDate = parseArriveDate(rawProduct.arrive_date);
+
+    candidates.push({
+      sku,
+      catEntry,
+      rawProduct,
+      name:          rawProduct.name_he || null, // fallback ל-fetchHebName בזמן ייבוא
+      purchasePrice,
+      price:         salePrice,
+      was:           wasPrice,
+      comingSoon:    !!expectedArrivalDate,
+      expectedArrivalDate,
+      packSize:      enriched.packSize ?? 1,
+      category:      catEntry.cat,
+      subCategory:   catEntry.subCategory,
+      imgUrl:        buildImgUrl(rawProduct.image),
+    });
+  }
+
+  const comingSoonCount = candidates.filter(c => c.comingSoon).length;
+  console.log(`  🔜 מתוכם "מגיע בקרוב": ${comingSoonCount}`);
+
   if (DRY_RUN) {
-    console.log('  🧪 DRY-RUN — לא ייובא כלום. דגום ראשון:');
-    newSkus.slice(0, 10).forEach(([sku, { catEntry }]) =>
-      console.log(`    • ${sku} → ${catEntry.cat} / ${catEntry.subCategory}`)
+    const csvPath = writeCandidatesCsv(candidates);
+    console.log(`\n  🧪 DRY-RUN — לא ייובא כלום.`);
+    console.log(`  📄 CSV מועמדים: ${csvPath}`);
+    candidates.slice(0, 10).forEach(c =>
+      console.log(`    • ${c.sku} → ${c.category} / ${c.subCategory}${c.comingSoon ? ` | 🔜 ${formatArriveDate(c.expectedArrivalDate)}` : ''} | אריזה: ${c.packSize}`)
     );
     return;
   }
 
   let imported = 0, failed = 0;
-  for (let i = 0; i < newSkus.length; i++) {
-    const [sku, { catEntry, rawProduct }] = newSkus[i];
-    process.stdout.write(`  [${i+1}/${newSkus.length}] ${sku}... `);
+  const importLog = [];
+  for (let i = 0; i < candidates.length; i++) {
+    const c = candidates[i];
+    process.stdout.write(`  [${i+1}/${candidates.length}] ${c.sku}... `);
 
-    // Fetch Hebrew name
-    const heb = await fetchHebName(sku);
-    await sleep(300);
-
-    if (!heb?.name) {
+    // שם עברי: מה-API (name_he) או fallback לחיפוש
+    let name = c.name;
+    if (!name) {
+      const heb = await fetchHebName(c.sku);
+      await sleep(300);
+      name = heb?.name || null;
+    }
+    if (!name) {
       process.stdout.write('⚠️  ללא שם עברי — דולג\n');
       failed++;
       continue;
     }
 
     // Upload image to Cloudinary
-    const supplierImgUrl = rawProduct.image ? `${BASE_URL}/${rawProduct.image.split('.').pop() === 'webp' ? 'webp' : 'big'}/${rawProduct.image}` : null;
     let cloudinaryUrl = null;
-    if (supplierImgUrl) {
+    if (c.imgUrl) {
       try {
-        cloudinaryUrl = await uploadToCloudinary(supplierImgUrl);
+        cloudinaryUrl = await uploadToCloudinary(c.imgUrl);
         process.stdout.write('☁️✓ ');
       } catch { process.stdout.write('☁️✗ '); }
       await sleep(400);
     }
 
-    const purchasePrice = rawProduct.price ? parseFloat(rawProduct.price) : null;
-    // מחיר סופי = ספק × 1.4 × 1.12 | מחיר מחוק = ספק × 1.4 × 1.40 (מעוגל לשקל שלם)
-    const salePrice     = purchasePrice ? Math.round(purchasePrice * 1.4 * 1.12) : null;
-    let   wasPrice      = purchasePrice ? Math.round(purchasePrice * 1.4 * 1.40) : null;
-    if (wasPrice != null && salePrice != null && wasPrice <= salePrice) wasPrice = salePrice + 1;
-
     const newDoc = {
-      name:          heb.name,
-      sku:           sku,
-      supplierCode:  sku,
+      name,
+      sku:           c.sku,
+      supplierCode:  c.sku,
       source:        'israel-judaica',
-      category:      catEntry.cat,
-      subCategory:   catEntry.subCategory,
-      imgUrl:        cloudinaryUrl || supplierImgUrl || null,
-      purchasePrice: purchasePrice,
-      price:         salePrice,
-      was:           wasPrice,
-      stockStatus:   'in_stock',
-      status:        'inactive', // צריך בדיקה לפני פרסום
-      supplierCatCode: catEntry.code,
+      cat:           c.category, // דפי הקטגוריה באתר שולפים לפי 'cat'
+      category:      c.category,
+      subCategory:   c.subCategory,
+      hidden:        true, // טיוטה — לא מוצג באתר עד פרסום ידני (הדפים מסננים לפי hidden)
+      imgUrl:        cloudinaryUrl || c.imgUrl || null,
+      purchasePrice: c.purchasePrice,
+      price:         c.price,
+      was:           c.was,
+      packSize:      c.packSize,
+      comingSoon:    c.comingSoon,
+      expectedArrivalDate: c.expectedArrivalDate, // 'YYYY-MM-DD' או null
+      stockStatus:   c.comingSoon ? 'coming_soon' : 'in_stock',
+      outOfStock:    c.comingSoon, // טרם במלאי — צפייה כן, רכישה לא
+      status:        'draft', // טיוטה — פרסום ידני בלבד
+      supplierCatCode: c.catEntry.code,
       createdAt:     FieldValue.serverTimestamp(),
     };
 
-    await db.collection('products').add(newDoc);
+    const ref = await db.collection('products').add(newDoc);
     imported++;
-    process.stdout.write(`✓ ${heb.name.slice(0, 30)}\n`);
+    importLog.push({ docId: ref.id, sku: c.sku, name, price: c.price, purchasePrice: c.purchasePrice, comingSoon: c.comingSoon, expectedArrivalDate: c.expectedArrivalDate, packSize: c.packSize, category: c.category, subCategory: c.subCategory });
+    process.stdout.write(`✓ ${name.slice(0, 30)}${c.comingSoon ? ' 🔜' : ''}\n`);
     await sleep(200);
   }
 
+  const logPath = resolve(__dirname, `../../scripts/import-log-${new Date().toISOString().slice(0, 10)}.json`);
+  writeFileSync(logPath, JSON.stringify({ date: new Date().toISOString(), imported, failed, items: importLog }, null, 2));
   console.log(`\n  ✅ יובאו ${imported} מוצרים חדשים | נכשלו: ${failed}`);
-  console.log('  ℹ️  כל המוצרים החדשים מוגדרים status=inactive — בדוק וכנן לפרסום.');
+  console.log(`  📄 לוג ייבוא: ${logPath}`);
+  console.log('  ℹ️  כל המוצרים החדשים מוגדרים status=draft — בדוק ופרסם ידנית.');
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -428,9 +669,9 @@ async function main() {
   const firestoreProducts = await loadFirestoreProducts();
 
   // Summary before acting
-  const existingSkus = new Set(firestoreProducts.map(p => p.sku).filter(Boolean));
+  const existingSkus = new Set(firestoreProducts.map(p => p.sku && String(p.sku).toUpperCase()).filter(Boolean));
   const toDelete = firestoreProducts.filter(p => p.sku && !supplierSkus.has(p.sku));
-  const toImport = [...supplierSkus.keys()].filter(sku => !existingSkus.has(sku));
+  const toImport = [...supplierSkus.keys()].filter(sku => !existingSkus.has(String(sku).toUpperCase()));
 
   console.log('\n══ סיכום ══\n');
   console.log(`  📦 אצל הספק:     ${supplierSkus.size} SKUs`);
@@ -457,7 +698,7 @@ async function main() {
   await deleteDiscontinued(firestoreProducts, supplierSkus);
   await importNewProducts(firestoreProducts, supplierSkus);
 
-  console.log('\n═'.repeat(60));
+  console.log('\n' + '═'.repeat(60));
   console.log('✅ Sync הסתיים');
   console.log('═'.repeat(60));
 }

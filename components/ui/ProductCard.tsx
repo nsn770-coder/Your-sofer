@@ -34,6 +34,15 @@ interface Props {
   clearanceDiscount?: boolean;
   clearanceSalePrice?: number;
   originalPrice?: number;
+  comingSoon?: boolean;
+  expectedArrivalDate?: string | null; // 'YYYY-MM-DD'
+}
+
+/** 'YYYY-MM-DD' → 'DD/MM/YYYY' */
+export function formatArrivalDate(iso?: string | null): string {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return d && m && y ? `${d}/${m}/${y}` : '';
 }
 
 const SOFER_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'סט בר מצווה', 'מגילות']);
@@ -80,22 +89,6 @@ function IconTrash() {
   );
 }
 
-function IconFlame() {
-  return (
-    <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-      <path d="M12 23c-4.97 0-9-3.58-9-8 0-2.67 1.19-4.81 2.38-6.29.57-.71 1.14-1.28 1.56-1.67.21-.19.38-.34.5-.44.06-.05.1-.09.13-.11l.04-.03c.12-.09.27-.09.38 0 .14.11.14.32 0 .43-.02.01-.05.04-.09.07-.1.09-.25.22-.43.39-.36.34-.87.86-1.38 1.49C4.99 10.23 4 12.09 4 14.5c0 3.59 3.13 6.5 7 6.5 1.04 0 2.03-.22 2.9-.62C11.64 19.8 10 17.77 10 15.5c0-1.5.61-2.86 1.59-3.84.49-.49 1.04-.85 1.58-1.09.27-.12.54-.21.79-.27.13-.03.25-.05.35-.06h.03c.15-.01.28.08.32.22.04.15-.04.3-.18.35-.02.01-.04.01-.07.02-.08.02-.17.05-.27.1-.22.08-.47.21-.71.39C12.7 11.8 12 13.07 12 14.5c0 2.49 2.01 4.5 4.5 4.5.49 0 .96-.08 1.4-.22C16.84 21.22 14.58 23 12 23z"/>
-    </svg>
-  );
-}
-
-function IconSparkle() {
-  return (
-    <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
-    </svg>
-  );
-}
-
 function IconCart({ size = 14 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -117,7 +110,8 @@ function IconCheck({ size = 10 }: { size?: number }) {
 
 export default function ProductCard({
   id, name, price, images, aiLifestyleImage, priority, isBestSeller, badge, bundlePromo, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
-  soferId, soferName, soferPhoto, horizontal, stars, outOfStock, clearanceDiscount, clearanceSalePrice, originalPrice,
+  soferId, soferName, soferPhoto, horizontal, outOfStock, clearanceDiscount, clearanceSalePrice, originalPrice,
+  comingSoon, expectedArrivalDate,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -172,9 +166,11 @@ export default function ProductCard({
     return createdAt.seconds > Date.now() / 1000 - 7 * 24 * 60 * 60;
   })();
 
+  const notPurchasable = outOfStock || comingSoon;
+
   function handleAdd(e: React.MouseEvent) {
     e.stopPropagation();
-    if (outOfStock) return;
+    if (notPurchasable) return;
     addItem({ id, name, price, imgUrl: imgSrc ?? undefined, quantity: 1, cat, bundlePromo: bundlePromo ?? undefined });
     try { localStorage.removeItem('bmWizard_step'); } catch {}
   }
@@ -190,22 +186,8 @@ export default function ProductCard({
     <div
       dir="rtl"
       onClick={() => router.push(`/product/${id}`)}
-      className={`group relative flex flex-col cursor-pointer ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''} ${horizontal ? 'pc-horizontal' : ''}`}
-      style={{
-        background: '#FFFFFF',
-        borderRadius: 12,
-        overflow: 'hidden',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
-        transition: 'all 0.25s ease',
-      }}
-      onMouseEnter={e => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 10px 32px rgba(0,0,0,0.11)';
-        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
-      }}
-      onMouseLeave={e => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.07)';
-        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-      }}
+      className={`group relative flex flex-col cursor-pointer rounded-none ${removing ? 'opacity-0 scale-95 pointer-events-none' : ''} ${horizontal ? 'pc-horizontal' : ''}`}
+      style={{ background: '#FFFFFF', transition: 'opacity 0.25s ease' }}
     >
       {/* ── Admin toolbar ── */}
       {isAdmin && (
@@ -252,15 +234,15 @@ export default function ProductCard({
       )}
 
       {/* ── Image ── */}
-      <div className={`relative w-full overflow-hidden${horizontal ? ' pc-img' : ''}`} style={{ aspectRatio: '1 / 1', background: '#F8F6F1' }}>
+      <div className={`relative w-full overflow-hidden rounded-none${horizontal ? ' pc-img' : ''}`} style={{ aspectRatio: '4 / 5', background: '#FFFFFF' }}>
         {imgSrc ? (
           <img
             src={imgSrc} alt={name}
-            width={400} height={400}
+            width={400} height={500}
             loading={aboveFold ? 'eager' : 'lazy'}
             fetchPriority={aboveFold ? 'high' : 'auto'}
             decoding="async"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.015]"
             onError={e => { e.currentTarget.style.display = 'none'; }}
           />
         ) : (
@@ -276,112 +258,74 @@ export default function ProductCard({
 
         {/* Top-left: clearance / sale / new / klaf-selection badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {comingSoon && (
+            <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#111111' }}>
+              מגיע בקרוב{expectedArrivalDate ? ` ${formatArrivalDate(expectedArrivalDate)}` : ''}
+            </span>
+          )}
           {hasClearance && (
-            <span className="flex items-center gap-1 text-white text-[10px] font-bold px-2 py-0.5 rounded-full leading-tight" style={{ background: '#0c6e4f' }}>
-              🏷️ 10% הנחת מלאי
+            <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#111111' }}>
+              10% הנחת מלאי
             </span>
           )}
           {hasSale && (
-            <span className="flex items-center gap-1 text-white text-[10px] font-bold px-2 py-0.5 rounded-full leading-tight" style={{ background: '#e53e3e' }}>
-              <IconFlame /> מבצע
+            <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#373A5A' }}>
+              {savePct}% הנחה
             </span>
           )}
           {isNew && (
-            <span className="flex items-center gap-1 text-white text-[10px] font-bold px-2 py-0.5 rounded-full leading-tight" style={{ background: '#3182ce' }}>
-              <IconSparkle /> חדש
+            <span className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#FFFFFF', color: '#373A5A', border: '1px solid #373A5A' }}>
+              חדש
             </span>
           )}
           {hasKlafSelection && (
-            <span style={{ background: 'linear-gradient(90deg, #b8972a, #d4a832)', color: '#1a1a1a', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+            <span style={{ background: '#111111', color: '#C5A028', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
               ✦ בחר את הקלף שלך
             </span>
           )}
         </div>
       </div>
 
-      {/* ── Sofer strip ── */}
-      {soferName && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', background: '#f8f6f1', borderTop: '1px solid #ede9df' }}>
-          <div style={{ width: 24, height: 24, borderRadius: 3, background: '#e5e0d5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
-            ✍️
-          </div>
-          <span style={{ fontSize: 10, color: '#666', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-            {soferName}
-          </span>
-        </div>
-      )}
-
       {/* ── Content ── */}
-      <div className={horizontal ? 'pc-content' : ''} style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '12px 14px 16px', gap: 4 }}>
-        {cat && (
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#C9A227', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
-            {cat}
-          </span>
-        )}
-
-        <p style={{
-          fontSize: 15, fontWeight: 500, color: '#1F2937', lineHeight: 1.4,
+      <div className={horizontal ? 'pc-content' : ''} style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '8px 2px 2px', gap: 2 }}>
+        <h3 className="mt-1 text-right text-[14px] font-medium leading-snug text-[#373A5A]" style={{
           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-          overflow: 'hidden', marginBottom: 6,
-          minHeight: '42px',
+          overflow: 'hidden', minHeight: '40px',
         } as React.CSSProperties}>
           {name}
-        </p>
-
-        {(stars && stars > 0) && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} style={{ color: i < Math.round(stars) ? '#C9A227' : '#E5E7EB', fontSize: 11 }}>★</span>
-            ))}
-            <span style={{ fontSize: 10, color: '#9CA3AF', marginRight: 2 }}>{stars.toFixed(1)}</span>
-          </div>
-        )}
+        </h3>
 
         {(soferId || soferName || (cat && SOFER_CATS.has(cat))) && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
             {soferPhoto ? (
               <img
                 src={soferPhoto}
                 alt={soferName ?? 'סופר'}
-                style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #E7E2D8', flexShrink: 0 }}
+                style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover', border: '1px solid #E5E7EB', flexShrink: 0 }}
               />
-            ) : (
-              <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, flexShrink: 0, border: '1.5px solid #E7E2D8' }}>
-                ✍
-              </div>
-            )}
-            <span style={{ fontSize: 12, color: '#6B7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            ) : null}
+            <span style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               נכתב ע״י {soferName ?? 'סופר מוסמך'}
             </span>
           </div>
         )}
 
         {/* Price */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ fontSize: 22, fontWeight: 600, color: hasClearance ? '#0c6e4f' : '#1a1a1a', lineHeight: 1 }}>
+        <div className="mt-1 flex items-center justify-start gap-2" dir="rtl">
+          <span style={{ fontSize: 17, fontWeight: 700, color: '#111111', lineHeight: 1 }}>
             {formatPrice(displayPrice)}
           </span>
           {hasClearance && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 13, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(originalPrice ?? price)}</span>
-              <span style={{ background: '#d1fae5', color: '#065f46', fontSize: 11, fontWeight: 700, borderRadius: 0, padding: '2px 6px' }}>
-                חסכת 10%
-              </span>
-            </div>
+            <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(originalPrice ?? price)}</span>
           )}
           {hasSale && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 13, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(was!)}</span>
-              <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 11, fontWeight: 700, borderRadius: 0, padding: '2px 6px' }}>
-                חסכת {savePct}%
-              </span>
-            </div>
+            <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(was!)}</span>
           )}
         </div>
 
         {/* Cart button */}
         <div className={qty === 0 ? 'lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200' : ''} style={{ marginTop: 'auto', paddingTop: 10 }} onClick={e => e.stopPropagation()}>
-          {outOfStock ? (
+          {notPurchasable ? (
             <a
               href={`https://wa.me/972587479933?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + name)}`}
               target="_blank"
@@ -389,9 +333,9 @@ export default function ProductCard({
               onClick={e => e.stopPropagation()}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: '#e5e7eb', color: '#6b7280',
-                height: 44, borderRadius: 8, border: '1.5px solid #d1d5db',
-                fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                background: '#FFFFFF', color: '#6b7280',
+                height: 38, borderRadius: 0, border: '1px solid #d1d5db',
+                fontWeight: 600, fontSize: 13, cursor: 'pointer',
                 textDecoration: 'none',
               }}
             >
@@ -405,19 +349,19 @@ export default function ProductCard({
               onClick={handleAdd}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: 'transparent', color: '#373A5A',
-                height: 44, borderRadius: 8, border: '1.5px solid #373A5A',
-                fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                background: '#FFFFFF', color: '#373A5A',
+                height: 38, borderRadius: 0, border: '1px solid #373A5A',
+                fontWeight: 500, fontSize: 14, cursor: 'pointer',
                 transition: 'background 0.2s, color 0.2s',
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF'; (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
             >
               <IconCart size={13} />
               הוסף לסל
             </button>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#F3F4F9', borderRadius: 8, overflow: 'hidden', width: '100%', height: 44, border: '1.5px solid #373A5A' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FFFFFF', borderRadius: 0, overflow: 'hidden', width: '100%', height: 38, border: '1px solid #373A5A' }}>
               <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
               <span style={{ color: '#373A5A', fontWeight: 700, fontSize: 15 }}>{qty}</span>
               <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>

@@ -92,9 +92,13 @@ const CATEGORY_QUOTAS = [
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry');
 const FORCE = args.includes('--force'); // בלי דילוג — מרנדר גם מוצרים שכבר יש להם תמונת AI
+const ALL = args.includes('--all');     // כל האתר — מתעלם מ-CATEGORY_QUOTAS
 const catArg = args.find((a) => a.startsWith('--cat='))?.split('=')[1];
 const fieldArg = args.find((a) => a.startsWith('--field='))?.split('=')[1] || 'category';
 const limitArg = args.find((a) => a.startsWith('--limit='))?.split('=')[1];
+
+// סת"ם כתוב-יד ומגילות — תמונות AI לא רלוונטיות. מדולג במצב --all (בכל שדה: cat/category/subcategory).
+const SKIP_VALUES = new Set(['קלפי מזוזה', 'קלפי תפילין', 'קלף מזוזה', 'קלף תפילין', 'מגילות']);
 
 cloudinary.config({
   cloud_name: 'dyxzq3ucy',
@@ -189,29 +193,14 @@ async function processProduct(db, product, i, total) {
 async function main() {
   const db = getAdminDb();
 
-  // אם הועבר --cat, מריצים רק עליו (עם --field אופציונלי, ברירת מחדל 'category')
-  const quotas = catArg
-    ? [{ field: fieldArg, value: catArg, limit: Number(limitArg) || 50 }]
-    : CATEGORY_QUOTAS;
-
   console.log(DRY_RUN ? '🌵 DRY RUN — רק פרומטים\n' : '🎨 מצב מלא — פרומט + תמונה + Cloudinary\n');
   console.log('Visual DNA:', VISUAL_DNA.brand, '|', VISUAL_DNA.palette, '\n');
 
   let done = 0, failed = 0, skipped = 0, processed = 0;
-  const seen = new Set(); // dedup — מוצר שנתפס בכמה שורות יעובד פעם אחת בלבד
 
-  for (const { field = 'category', value, limit } of quotas) {
-    const snap = await db.collection('products')
-      .where(field, '==', value)
-      .limit(limit)
-      .get();
-
-    const products = snap.docs
-      .map((d) => ({ id: d.id, ...d.data() }))
-      .filter((p) => !seen.has(p.id));
-    products.forEach((p) => seen.add(p.id));
-    console.log(`\n════ ${field}="${value}" — ${products.length} מוצרים (חדשים) ════`);
-
+  // עיבוד רשימת מוצרים עם דיווח התקדמות ו-throttle
+  async function runList(products, header) {
+    console.log(`\n════ ${header} — ${products.length} מוצרים ════`);
     for (let i = 0; i < products.length; i++) {
       const r = await processProduct(db, products[i], i, products.length);
       if (r.skipped) skipped++;
@@ -226,6 +215,35 @@ async function main() {
 
       // throttle קל כדי לא לחטוף rate-limit מ-Gemini (לא לאחר דילוג)
       if (!DRY_RUN && !r.skipped) await new Promise((res) => setTimeout(res, 1500));
+    }
+  }
+
+  if (ALL) {
+    // כל האתר — מתעלם ממכסות. מדלג על קלף/מגילות ועל מוצרים בלי תמונת מקור.
+    console.log('📦 מצב --all: טוען את כל המוצרים מ-Firestore...');
+    const snap = await db.collection('products').get();
+    const products = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }))
+      .filter((p) => !SKIP_VALUES.has(p.cat) && !SKIP_VALUES.has(p.category) && !SKIP_VALUES.has(p.subcategory))
+      .filter((p) => resolveSourceImage(p)); // חייב תמונת מקור, אחרת אין מה לשמר
+    console.log(`נמצאו ${products.length} מוצרים רלוונטיים (אחרי דילוג קלף/מגילות/בלי-תמונה).`);
+    await runList(products, 'כל האתר');
+  } else {
+    // אם הועבר --cat, מריצים רק עליו (עם --field אופציונלי, ברירת מחדל 'category')
+    const quotas = catArg
+      ? [{ field: fieldArg, value: catArg, limit: Number(limitArg) || 50 }]
+      : CATEGORY_QUOTAS;
+    const seen = new Set(); // dedup — מוצר שנתפס בכמה שורות יעובד פעם אחת בלבד
+    for (const { field = 'category', value, limit } of quotas) {
+      const snap = await db.collection('products')
+        .where(field, '==', value)
+        .limit(limit)
+        .get();
+      const products = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((p) => !seen.has(p.id));
+      products.forEach((p) => seen.add(p.id));
+      await runList(products, `${field}="${value}" (חדשים)`);
     }
   }
 

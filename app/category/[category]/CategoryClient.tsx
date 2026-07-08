@@ -52,6 +52,8 @@ interface Product {
   hasKlafSelection?: boolean;
   isExpertRecommended?: boolean;
   outOfStock?: boolean;
+  comingSoon?: boolean;
+  expectedArrivalDate?: string | null;
   coverStyle?: string;
   bundlePromo?: string | null;
   clearanceDiscount?: boolean;
@@ -406,12 +408,12 @@ function applySort(products: Product[], sort: SortBy): Product[] {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
-      <div className="aspect-square bg-gray-100" />
-      <div className="p-3 space-y-2">
-        <div className="h-3 bg-gray-100 rounded-full w-3/4" />
-        <div className="h-3 bg-gray-100 rounded-full w-1/2" />
-        <div className="h-8 bg-gray-100 rounded-full mt-3" />
+    <div className="bg-white rounded-none overflow-hidden animate-pulse">
+      <div className="aspect-[4/5] bg-gray-100" />
+      <div className="py-3 space-y-2">
+        <div className="h-3 bg-gray-100 w-3/4" />
+        <div className="h-3 bg-gray-100 w-1/2" />
+        <div className="h-9 bg-gray-100 mt-3" />
       </div>
     </div>
   );
@@ -665,10 +667,10 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
               <button
                 key={opt}
                 onClick={() => onSubCategoryFilter(opt === 'הכל' ? '' : opt)}
-                className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
+                className={`text-xs px-2.5 py-1 rounded-none font-medium transition-all border ${
                   (subCategoryFilter || '') === (opt === 'הכל' ? '' : opt)
-                    ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
+                    ? 'bg-[#373A5A] text-white border-[#373A5A]'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-[#373A5A] hover:text-[#373A5A]'
                 }`}
               >
                 {opt}
@@ -1504,7 +1506,7 @@ export default function CategoryClient({ category }: { category: string }) {
   };
 
   return (
-    <div dir="rtl" className="min-h-screen" style={{ background: '#F5F2EC' }}>
+    <div dir="rtl" className="min-h-screen" style={{ background: '#FFFFFF' }}>
 
       {/* ── Breadcrumb ── */}
       <div className="bg-white border-b border-gray-100 px-4 py-2.5" dir="rtl">
@@ -1519,14 +1521,14 @@ export default function CategoryClient({ category }: { category: string }) {
       </div>
 
       {/* ── Header ── */}
-      <div style={{ background: '#FAF8F3', padding: '40px 20px 24px' }}>
-        <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
-          <h1 style={{ fontSize: 26, fontWeight: 400, color: '#1F2937', margin: 0, letterSpacing: '-0.01em' }}>
+      <div style={{ background: '#FFFFFF', padding: '40px 20px 24px' }}>
+        <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'baseline', gap: 8 }} dir="rtl">
+          <h1 style={{ fontSize: 26, fontWeight: 400, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>
             {category === 'מתנות' ? 'מתנות ומוצרי בית' : category}
           </h1>
           {!loading && (
             <span style={{ fontSize: 13, color: '#6B7280', marginRight: 8 }}>
-              {filtered.length.toLocaleString('he-IL')} מוצרים
+              נמצאו {filtered.length.toLocaleString('he-IL')} מוצרים
             </span>
           )}
         </div>
@@ -1594,12 +1596,12 @@ export default function CategoryClient({ category }: { category: string }) {
       )}
 
       {/* ── Mobile toolbar ── */}
-      <div className="lg:hidden sticky top-0 z-20" style={{ background: '#FAF8F3', borderBottom: '1px solid #E7E2D8', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
+      <div className="lg:hidden sticky top-0 z-20" style={{ background: '#FFFFFF', borderBottom: '1px solid #EDEDEF', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
         {!loading && (
           <span style={{ fontSize: 13, color: '#6B7280', flex: 1 }}>{filtered.length} מוצרים</span>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 8, padding: '8px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 0, padding: '8px 14px' }}>
           <IconSort size={13} />
           <select
             value={sortBy}
@@ -1612,7 +1614,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
         <button
           onClick={() => setDrawerOpen(true)}
-          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 8, padding: '8px 14px', fontSize: 13, color: '#1F2937', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
+          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 0, padding: '8px 14px', fontSize: 13, color: '#1F2937', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
         >
           <IconFilter size={14} />
           סינון
@@ -1627,7 +1629,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <div className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 pb-8 shadow-2xl">
             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
             <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} availableCollections={availableCollections} />
-            <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#1a1a1a] text-white rounded-2xl font-bold text-sm hover:bg-[#1a1a1a] transition-colors">
+            <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#373A5A] text-white rounded-none font-medium text-sm hover:bg-[#2F324D] transition-colors">
               הצג {filtered.length} תוצאות
             </button>
           </div>
@@ -1653,7 +1655,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                     <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a', margin: 0 }}>⭐ מומלץ לרמת {lvl}</h2>
                   </div>
-                  <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
+                  <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7'}>
                     {recs.map((p, idx) => (
                       <div key={p.id}
                         style={{ border: '2px solid #1a1a1a', borderRadius: 12, overflow: 'hidden', background: (category.includes('מצווה') || category.includes('מצוה')) ? '#fff' : '#EFF4FF', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
@@ -1734,7 +1736,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                                 soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                                 stars={p.stars || undefined}
-                                outOfStock={p.outOfStock}
+                                outOfStock={p.outOfStock} comingSoon={p.comingSoon} expectedArrivalDate={p.expectedArrivalDate}
                                 clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
                               />
                             )}
@@ -1948,7 +1950,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
           {/* Products grid / loading / empty */}
           {loading ? (
-            <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
+            <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7'}>
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : hasExpertRec && !showAllProducts ? null
@@ -1971,7 +1973,7 @@ export default function CategoryClient({ category }: { category: string }) {
             <>
               {(['בתי מזוזה', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
                 (() => {
-                  const gridCls = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4';
+                  const gridCls = 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7';
                   const renderCard = (p: Product, idx: number) => isStamCat ? (
                     <StamCard
                       key={p.id}
@@ -1991,7 +1993,7 @@ export default function CategoryClient({ category }: { category: string }) {
                         soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                         soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                         stars={p.stars || undefined}
-                        outOfStock={p.outOfStock}
+                        outOfStock={p.outOfStock} comingSoon={p.comingSoon} expectedArrivalDate={p.expectedArrivalDate}
                         clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice} />
                     </div>
                   );
@@ -2062,7 +2064,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     ))}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7">
                     {paginated.map((p, idx) => (
                       <div key={p.id} className="ys-fade-card">
                         <ProductCard
@@ -2083,7 +2085,7 @@ export default function CategoryClient({ category }: { category: string }) {
                           soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                           soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                           stars={p.stars || undefined}
-                          outOfStock={p.outOfStock}
+                          outOfStock={p.outOfStock} comingSoon={p.comingSoon} expectedArrivalDate={p.expectedArrivalDate}
                           clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
                         />
                       </div>
@@ -2102,7 +2104,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     for (let start = 0; start < paginated.length; start += BANNER_EVERY) {
                       const chunk = paginated.slice(start, start + BANNER_EVERY);
                       result.push(
-                        <div key={`chunk-${start}`} className={isStamCat ? '' : 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'}>
+                        <div key={`chunk-${start}`} className={isStamCat ? '' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7'}>
                           {chunk.map((p, idx) => isStamCat ? (
                             <StamCard
                               key={p.id}
@@ -2131,7 +2133,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                                 soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                                 stars={p.stars || undefined}
-                                outOfStock={p.outOfStock}
+                                outOfStock={p.outOfStock} comingSoon={p.comingSoon} expectedArrivalDate={p.expectedArrivalDate}
                                 clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
                               />
                             </div>
