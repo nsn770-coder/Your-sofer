@@ -1223,7 +1223,7 @@ export default function HomePageClient() {
                 className="group"
                 style={{ cursor: 'pointer', background: '#FFFFFF' }}
               >
-                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
+                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
                   {cat.img ? (
                     <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} className="object-cover transition-transform duration-300 group-hover:scale-[1.015]" sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
@@ -1308,11 +1308,21 @@ export default function HomePageClient() {
               לכל המוצרים
             </Link>
           </div>
-          {/* Same grid + card sizing as category pages (source of truth):
-              2 cols on mobile, identical gaps and breakpoints */}
-          <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
+          {/* Horizontal scroll strip (RTL) — same card design as category pages */}
+          <div
+            className="no-scrollbar"
+            style={{
+              display: 'flex',
+              overflowX: 'auto',
+              gap: 12,
+              padding: '0 20px 8px',
+              scrollbarWidth: 'none',
+              direction: 'rtl',
+              scrollSnapType: 'x mandatory',
+            } as React.CSSProperties}
+          >
             {featuredProducts.length === 0 && Array.from({ length: 10 }).map((_, i) => (
-              <div key={`sk-${i}`}>
+              <div key={`sk-${i}`} className="w-[calc((100vw_-_56px)*3/8)] md:w-[calc((100vw_-_120px)/4)] xl:w-[290px]" style={{ flexShrink: 0, scrollSnapAlign: 'start' }}>
                 <div className="aspect-square bg-gray-100 animate-pulse" />
                 <div style={{ padding: '8px 2px 2px' }}>
                   <div className="h-4 bg-gray-100 rounded animate-pulse mb-1.5 w-11/12" />
@@ -1322,12 +1332,17 @@ export default function HomePageClient() {
               </div>
             ))}
             {featuredProducts.slice(0, 10).map((p, idx) => {
-              const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 400);
+              const rawImg = p.imgUrl || p.image_url || '';
+              // Square 1:1 crop (3:3) — width identical to the current height
+              const imgSrc = rawImg.includes('/upload/')
+                ? rawImg.replace('/upload/', '/upload/f_auto,q_auto,c_fill,g_auto,w_400,h_400/')
+                : optimizeCloudinaryUrl(rawImg, 400);
               const hasSale = typeof p.was === 'number' && p.was > p.price;
               const savePct = hasSale ? Math.round((1 - p.price / (p.was as number)) * 100) : 0;
               return (
                 <div key={p.id}
-                  style={{ cursor: 'pointer', background: '#fff', borderRadius: 0, overflow: 'hidden' }}
+                  className="w-[calc((100vw_-_56px)*3/8)] md:w-[calc((100vw_-_120px)/4)] xl:w-[290px]"
+                  style={{ cursor: 'pointer', background: '#fff', borderRadius: 0, overflow: 'hidden', flexShrink: 0, scrollSnapAlign: 'start' }}
                   onClick={() => router.push(`/product/${p.id}`)}
                 >
                   <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
@@ -1492,7 +1507,7 @@ export default function HomePageClient() {
                 className="group"
                 style={{ cursor: 'pointer', background: '#FFFFFF' }}
               >
-                <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
+                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
                   {cat.img ? (
                     <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} className="object-cover transition-transform duration-300 group-hover:scale-[1.015]" sizes="(max-width: 640px) 50vw, 33vw" />
                   ) : (
