@@ -188,7 +188,7 @@ function LookBreakBanner({ col, onSelect }: { col: string; onSelect: (c: string)
   const img  = COLLECTION_IMG[col];
   const desc = COLLECTION_DESC[col] ?? '';
   return (
-    <div style={{ margin: '24px 0', position: 'relative', borderRadius: 12, overflow: 'hidden', height: 250 }}>
+    <div style={{ margin: '24px 0', position: 'relative', borderRadius: 0, overflow: 'hidden', height: 250 }}>
       {img && (
         <img
           src={img}
@@ -200,7 +200,7 @@ function LookBreakBanner({ col, onSelect }: { col: string; onSelect: (c: string)
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 100%)' }} />
       <div dir="rtl" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', padding: '0 36px' }}>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 6, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>
+          <div style={{ fontSize: 24, fontWeight: 500, color: '#fff', marginBottom: 6, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>
             {col}
           </div>
           <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.82)', marginBottom: 18 }}>
@@ -209,13 +209,13 @@ function LookBreakBanner({ col, onSelect }: { col: string; onSelect: (c: string)
           <button
             onClick={() => { onSelect(col); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             style={{
-              background: '#C5A028', color: '#1a1a1a',
-              border: 'none', borderRadius: 8,
-              padding: '10px 22px', fontSize: 14, fontWeight: 900,
+              background: '#FFFFFF', color: '#111111',
+              border: 'none', borderRadius: 0,
+              padding: '10px 22px', fontSize: 14, fontWeight: 500,
               cursor: 'pointer',
             }}
           >
-            ✨ צפה בעוד סגנונות
+            צפה בעוד סגנונות
           </button>
         </div>
       </div>
@@ -409,7 +409,7 @@ function applySort(products: Product[], sort: SortBy): Product[] {
 function SkeletonCard() {
   return (
     <div className="bg-white rounded-none overflow-hidden animate-pulse">
-      <div className="aspect-[4/5] bg-gray-100" />
+      <div className="aspect-square bg-gray-100" />
       <div className="py-3 space-y-2">
         <div className="h-3 bg-gray-100 w-3/4" />
         <div className="h-3 bg-gray-100 w-1/2" />
@@ -540,7 +540,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
               flexShrink: 0, width: 88, height: 114, borderRadius: 0, overflow: 'hidden',
               position: 'relative', display: 'block', textDecoration: 'none',
               background: img ? '#000' : 'linear-gradient(135deg, #1a1a1a, #1a1a1a)',
-              boxShadow: isActive ? '0 0 0 2.5px #C5A028, 0 4px 12px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.12)',
+              boxShadow: isActive ? '0 0 0 2px #C5A028' : 'none',
               transition: 'transform 0.18s ease, box-shadow 0.18s ease',
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; }}
@@ -627,17 +627,17 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
   const active = hasActiveFilters(filters);
 
   return (
-    <div dir="rtl" className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-sm">
+    <div dir="rtl" className="bg-white rounded-none border border-gray-100 p-4 text-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#1a1a1a] flex items-center justify-center">
+          <div className="w-7 h-7 rounded-none bg-[#1a1a1a] flex items-center justify-center">
             <IconFilter size={14} />
           </div>
           <span className="font-bold text-gray-800 text-sm">סינון</span>
         </div>
         {active && (
-          <button onClick={() => onChange(EMPTY_FILTERS)} className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-semibold transition-colors bg-red-50 hover:bg-red-100 px-2 py-1 rounded-lg">
+          <button onClick={() => onChange(EMPTY_FILTERS)} className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-semibold transition-colors bg-red-50 hover:bg-red-100 px-2 py-1 rounded-none">
             <IconX size={10} />
             נקה הכל
           </button>
@@ -693,9 +693,9 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                   onClick={() => onCollectionFilter(opt === 'הכל' ? '' : opt)}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 0,
-                    border: isActive ? '2px solid #C5A028' : '1.5px solid #d1d5db',
-                    borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
-                    background: isActive ? '#fffbf0' : '#fff',
+                    border: isActive ? '1px solid #373A5A' : '1px solid #d1d5db',
+                    borderRadius: 0, overflow: 'hidden', cursor: 'pointer',
+                    background: '#fff',
                     transition: 'border-color 0.15s, background 0.15s',
                     padding: img ? 0 : '4px 10px',
                     fontFamily: 'inherit',
@@ -734,7 +734,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
               <button
                 key={opt}
                 onClick={() => set({ nusachFilter: opt === 'הכל' ? '' : opt })}
-                className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
+                className={`text-xs px-2.5 py-1 rounded-none font-semibold transition-all border ${
                   (filters.nusachFilter || '') === (opt === 'הכל' ? '' : opt)
                     ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
@@ -755,7 +755,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
               <button
                 key={opt}
                 onClick={() => set({ level: opt === 'הכל' ? '' : opt })}
-                className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
+                className={`text-xs px-2.5 py-1 rounded-none font-semibold transition-all border ${
                   (filters.level || '') === (opt === 'הכל' ? '' : opt)
                     ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
@@ -779,10 +779,10 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
       <Section title="טווח מחיר">
         <div className="flex items-center gap-2">
           <input type="number" min={0} placeholder="מינ׳" value={filters.minPrice} onChange={e => set({ minPrice: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all" />
+            className="w-full border border-gray-200 rounded-none px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all" />
           <span className="text-gray-300">-</span>
           <input type="number" min={0} placeholder="מקס׳" value={filters.maxPrice} onChange={e => set({ maxPrice: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all" />
+            className="w-full border border-gray-200 rounded-none px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all" />
         </div>
       </Section>
 
@@ -828,7 +828,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                 <button
                   key={opt}
                   onClick={() => setNameFilter(spec.key, opt)}
-                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
+                  className={`text-xs px-2.5 py-1 rounded-none font-semibold transition-all border ${
                     current === opt
                       ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
@@ -854,7 +854,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                 <button
                   key={opt}
                   onClick={() => setAttr(key, opt)}
-                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-all border ${
+                  className={`text-xs px-2.5 py-1 rounded-none font-semibold transition-all border ${
                     current === opt
                       ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]'
                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
@@ -927,7 +927,7 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
         פעיל:
       </span>
       {pills.map((pill, i) => (
-        <span key={i} className="inline-flex items-center gap-1.5 bg-[#1a1a1a]/8 text-[#1a1a1a] text-xs font-semibold px-3 py-1 rounded-lg border border-[#1a1a1a]/20">
+        <span key={i} className="inline-flex items-center gap-1.5 bg-[#1a1a1a]/8 text-[#1a1a1a] text-xs font-semibold px-3 py-1 rounded-none border border-[#1a1a1a]/20">
           {pill.label}
           <button onClick={pill.onRemove} className="hover:text-red-500 transition-colors">
             <IconX size={10} />
@@ -962,7 +962,7 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
       {active ? (
         <button
           onClick={onClear}
-          className="px-6 py-2.5 bg-[#1a1a1a] text-white rounded-lg font-bold text-sm hover:bg-[#1a1a1a] transition-colors"
+          className="px-6 py-2.5 bg-[#1a1a1a] text-white rounded-none font-bold text-sm hover:bg-[#1a1a1a] transition-colors"
         >
           נקה סינון
         </button>
@@ -972,7 +972,7 @@ function EmptyState({ active, onClear, relatedCats = [], message }: { active: bo
             <Link
               key={cat}
               href={`/category/${encodeURIComponent(cat)}`}
-              className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-bold hover:bg-[#1a1a1a] transition-colors"
+              className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-none text-sm font-bold hover:bg-[#1a1a1a] transition-colors"
             >
               {cat}
             </Link>
@@ -1021,14 +1021,14 @@ function StamCard({
       onClick={() => router.push(`/product/${product.id}`)}
       style={{
         display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 14,
-        padding: 16, background: '#FFFFFF', border: '1px solid #E7E2D8',
-        borderRadius: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+        padding: 16, background: '#FFFFFF', border: '1px solid #EDEDEF',
+        borderRadius: 0,
         marginBottom: 12, cursor: 'pointer',
       }}
     >
       {/* Klaf image */}
       <div style={{ width: 110, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ width: 110, height: 110, borderRadius: 12, overflow: 'hidden', background: '#F8F6F1' }}>
+        <div style={{ width: 110, height: 110, borderRadius: 0, overflow: 'hidden', background: '#F8F6F1' }}>
           {imgSrc ? (
             <img src={imgSrc} alt={product.name} loading={aboveFold ? 'eager' : 'lazy'}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -1059,7 +1059,7 @@ function StamCard({
             </span>
           )}
           {hasSale && (
-            <span style={{ background: '#e53e3e', color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '2px 8px' }}>מבצע</span>
+            <span style={{ background: '#373A5A', color: '#fff', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 8px' }}>מבצע</span>
           )}
         </div>
 
@@ -1070,16 +1070,6 @@ function StamCard({
         } as React.CSSProperties}>
           {product.name}
         </p>
-
-        {((product as any).stars || (product as any).rating) > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
-            {Array.from({ length: 5 }).map((_, i) => {
-              const s = (product as any).stars || (product as any).rating || 0;
-              return <span key={i} style={{ color: i < Math.round(s) ? '#C9A227' : '#E5E7EB', fontSize: 11 }}>★</span>;
-            })}
-            <span style={{ fontSize: 10, color: '#9CA3AF', marginRight: 2 }}>{((product as any).stars || (product as any).rating || 0).toFixed(1)}</span>
-          </div>
-        )}
 
         {/* Sofer row */}
         {(soferName || soferPhoto || product.soferId) && (
@@ -1104,7 +1094,7 @@ function StamCard({
           {hasSale && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
               <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(product.was!)}</span>
-              <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 11, fontWeight: 700, borderRadius: 6, padding: '2px 6px' }}>חסכת {savePct}%</span>
+              <span style={{ background: '#111111', color: '#FFFFFF', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 6px' }}>{savePct}% הנחה</span>
             </div>
           )}
         </div>
@@ -1115,18 +1105,21 @@ function StamCard({
             <button
               onClick={handleAdd}
               style={{
-                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: '#EEF3FF', color: '#1F3D8F', height: 40, borderRadius: 10,
-                border: '1.5px solid #C5D5F0', fontWeight: 700, fontSize: 14, cursor: 'pointer', marginTop: 8,
+                background: 'none', border: 'none', padding: 0, marginTop: 8,
+                color: '#111111', fontSize: 13, fontWeight: 500,
+                textDecoration: 'underline', textUnderlineOffset: 4,
+                cursor: 'pointer', fontFamily: 'inherit', transition: 'color 0.2s',
               }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}
             >
-              הוסף לסל
+              הוספה לסל
             </button>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FDF8EC', borderRadius: 10, width: '100%', height: 40, border: '1.5px solid #E8D48A', marginTop: 8 }}>
-              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
-              <span style={{ color: '#C9A227', fontWeight: 700, fontSize: 15 }}>{qty}</span>
-              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#C9A227', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 0, height: 30, marginTop: 8 }}>
+              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>−</button>
+              <span style={{ color: '#373A5A', fontWeight: 600, fontSize: 13, minWidth: 16, textAlign: 'center' }}>{qty}</span>
+              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>+</button>
             </div>
           )}
         </div>
@@ -1538,13 +1531,7 @@ export default function CategoryClient({ category }: { category: string }) {
       {curation && (
         <div
           dir="rtl"
-          style={{
-            position: 'relative',
-            width: '100%',
-            height: 220,
-            overflow: 'hidden',
-            background: 'linear-gradient(135deg, #1a1a1a 0%, #1a1a1a 100%)',
-          }}
+          className="relative w-full aspect-[16/9] md:aspect-[16/6] overflow-hidden rounded-none bg-white"
         >
           {curation.bannerImageUrl && (
             <img
@@ -1553,9 +1540,9 @@ export default function CategoryClient({ category }: { category: string }) {
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
             />
           )}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.05) 45%, transparent 100%)' }} />
           <div style={{ position: 'absolute', bottom: 16, right: 20, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-            <h2 style={{ color: '#fff', fontWeight: 900, fontSize: 22, margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
+            <h2 style={{ color: '#fff', fontWeight: 500, fontSize: 22, margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
               {curation.bannerTitle}
             </h2>
           </div>
@@ -1572,23 +1559,23 @@ export default function CategoryClient({ category }: { category: string }) {
       {/* ── Rabbinical trust banner - STaM categories only ── */}
       {['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה'].includes(category) && (
         <div dir="rtl" style={{
-          background: '#EEF3FF',
-          border: '1px solid #C5D5F0',
-          borderRadius: 8,
+          background: '#FFFFFF',
+          border: '1px solid #EDEDEF',
+          borderRadius: 0,
           margin: '12px 20px',
           padding: '10px 16px',
           display: 'flex', alignItems: 'center', gap: 10,
           flexWrap: 'wrap',
         }}>
-          <span style={{ fontSize: 14, color: '#1a1a1a', fontWeight: 700, flexShrink: 0 }}>✓</span>
-          <span style={{ fontSize: 13, color: '#1a1a1a', fontWeight: 600 }}>
+          <span style={{ fontSize: 14, color: '#C5A028', fontWeight: 700, flexShrink: 0 }}>✓</span>
+          <span style={{ fontSize: 13, color: '#111111', fontWeight: 500 }}>
             כל המוצרים בקטגוריה זו עברו בדיקת מגיה רבנית
           </span>
           <span style={{
-            fontSize: 11, color: '#1a1a1a', fontWeight: 700,
+            fontSize: 11, color: '#373A5A', fontWeight: 600,
             background: '#fff',
-            border: '1px solid #C5D5F0',
-            borderRadius: 4, padding: '3px 10px',
+            border: '1px solid #E5E7EB',
+            borderRadius: 0, padding: '3px 10px',
           }}>
             הרב שמחה בונים ברג'יקובסקי · מגיה מוסמך
           </span>
@@ -1653,12 +1640,12 @@ export default function CategoryClient({ category }: { category: string }) {
               {recommendedByLevel.map(({ level: lvl, products: recs }) => (
                 <div key={lvl} style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a', margin: 0 }}>⭐ מומלץ לרמת {lvl}</h2>
+                    <h2 style={{ fontSize: 16, fontWeight: 600, color: '#373A5A', margin: 0 }}>מומלץ לרמת {lvl}</h2>
                   </div>
                   <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7'}>
                     {recs.map((p, idx) => (
                       <div key={p.id}
-                        style={{ border: '2px solid #1a1a1a', borderRadius: 12, overflow: 'hidden', background: (category.includes('מצווה') || category.includes('מצוה')) ? '#fff' : '#EFF4FF', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
+                        style={{ border: '1px solid #373A5A', borderRadius: 0, overflow: 'hidden', background: '#fff', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
                         onClick={() => { if (category.includes('מצווה') || category.includes('מצוה')) window.location.href = `/product/${p.id}`; }}>
 
                         {(category.includes('מצווה') || category.includes('מצוה')) ? (
@@ -1672,20 +1659,12 @@ export default function CategoryClient({ category }: { category: string }) {
                                 loading={idx < 2 ? 'eager' : 'lazy'}
                               />
                             </div>
-                            {/* Blue banner */}
-                            <div style={{ background: '#1a1a1a', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
-                              ⭐ מומלץ לרמת {lvl}
+                            {/* Recommended banner */}
+                            <div style={{ background: '#373A5A', color: '#fff', fontSize: 12, fontWeight: 600, padding: '6px 14px', textAlign: 'right' }}>
+                              מומלץ לרמת {lvl}
                             </div>
                             {/* Content */}
                             <div style={{ padding: '14px 16px', direction: 'rtl' }}>
-                              {p.stars && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 8 }}>
-                                  {Array.from({ length: 5 }).map((_, i) => (
-                                    <span key={i} style={{ fontSize: 20, color: i < Math.round(p.stars!) ? '#F59E0B' : '#ddd' }}>★</span>
-                                  ))}
-                                  <span style={{ fontSize: 13, color: '#666', marginRight: 4 }}>({p.stars})</span>
-                                </div>
-                              )}
                               <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a', margin: '0 0 10px', lineHeight: 1.4, textAlign: 'right' }}>
                                 {p.name}
                               </h3>
@@ -1694,29 +1673,31 @@ export default function CategoryClient({ category }: { category: string }) {
                                 {p.was && p.was > p.price && (
                                   <>
                                     <span style={{ fontSize: 13, color: '#999', textDecoration: 'line-through' }}>₪{p.was?.toLocaleString()}</span>
-                                    <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>
+                                    <span style={{ background: '#111111', color: '#FFFFFF', fontSize: 12, fontWeight: 600, padding: '2px 8px', borderRadius: 0 }}>
                                       {Math.round((1 - p.price / p.was) * 100)}% הנחה
                                     </span>
                                   </>
                                 )}
                               </div>
-                              <div style={{ fontSize: 12, color: '#1a1a1a', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, padding: '6px 10px', marginBottom: 10, textAlign: 'right' }}>
-                                🎒 ניתן לבחור כיסוי תפילין בדף המוצר
+                              <div style={{ fontSize: 12, color: '#1a1a1a', background: '#FFFFFF', border: '1px solid #EDEDEF', borderRadius: 0, padding: '6px 10px', marginBottom: 10, textAlign: 'right' }}>
+                                ניתן לבחור כיסוי תפילין בדף המוצר
                               </div>
                               <button
                                 onClick={e => {
                                   e.stopPropagation();
                                   addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl || p.image_url, quantity: 1, cat: p.cat || undefined });
                                 }}
-                                style={{ width: '100%', padding: '11px', background: '#C5A028', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                הוסף לסל 🛒
+                                style={{ background: 'none', border: 'none', padding: 0, color: '#111111', fontSize: 13, fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: 4, cursor: 'pointer', fontFamily: 'inherit', transition: 'color 0.2s' }}
+                                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
+                                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}>
+                                הוספה לסל
                               </button>
                             </div>
                           </>
                         ) : (
                           <>
-                            <div style={{ background: '#1a1a1a', color: '#fff', fontSize: 12, fontWeight: 700, padding: '6px 14px', textAlign: 'right' }}>
-                              ⭐ מומלץ לרמת {lvl}
+                            <div style={{ background: '#373A5A', color: '#fff', fontSize: 12, fontWeight: 600, padding: '6px 14px', textAlign: 'right' }}>
+                              מומלץ לרמת {lvl}
                             </div>
                             {isStamCat ? (
                               <StamCard
@@ -1751,11 +1732,11 @@ export default function CategoryClient({ category }: { category: string }) {
                 <button
                   onClick={() => setShowAllProducts(v => !v)}
                   style={{
-                    background: showAllProducts ? '#1a1a1a' : '#fff',
-                    color: showAllProducts ? '#fff' : '#1a1a1a',
-                    border: '2px solid #1a1a1a',
-                    borderRadius: 8, padding: '10px 28px',
-                    fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                    background: showAllProducts ? '#373A5A' : '#fff',
+                    color: showAllProducts ? '#fff' : '#373A5A',
+                    border: '1px solid #373A5A',
+                    borderRadius: 0, padding: '10px 28px',
+                    fontSize: 14, fontWeight: 500, cursor: 'pointer',
                     fontFamily: 'inherit', direction: 'rtl', transition: 'all 0.2s',
                   }}
                 >
@@ -1766,7 +1747,7 @@ export default function CategoryClient({ category }: { category: string }) {
           )}
 
           {/* Desktop sort + filter bar */}
-          <div className="hidden lg:flex items-center gap-2 mb-5 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3" style={{ direction: 'rtl' }}>
+          <div className="hidden lg:flex items-center gap-2 mb-5 bg-white rounded-none border border-gray-100 px-4 py-3" style={{ direction: 'rtl' }}>
             <span className="text-sm text-gray-400 font-medium flex-shrink-0">
               {loading ? 'טוען...' : `${filtered.length} מוצרים`}
             </span>
@@ -1784,7 +1765,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     <select
                       value={current}
                       onChange={e => setFilters(prev => ({ ...prev, nameFilters: { ...prev.nameFilters, [spec.key]: e.target.value } }))}
-                      className="appearance-none border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all pr-7"
+                      className="appearance-none border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all pr-7"
                       style={{ direction: 'rtl', borderColor: isActive ? '#1a1a1a' : '#e5e7eb', color: isActive ? '#1a1a1a' : '#6b7280', background: isActive ? '#f0f4ff' : '#fff' }}
                     >
                       <option value="הכל">{spec.label}: הכל</option>
@@ -1799,7 +1780,7 @@ export default function CategoryClient({ category }: { category: string }) {
                 <select
                   value={filters.nusachFilter || 'הכל'}
                   onChange={e => setFilters(prev => ({ ...prev, nusachFilter: e.target.value === 'הכל' ? '' : e.target.value }))}
-                  className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
+                  className="flex-shrink-0 border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
                   style={{ direction: 'rtl', borderColor: filters.nusachFilter ? '#1a1a1a' : '#e5e7eb', color: filters.nusachFilter ? '#1a1a1a' : '#6b7280', background: filters.nusachFilter ? '#f0f4ff' : '#fff' }}
                 >
                   <option value="הכל">נוסח: הכל</option>
@@ -1812,7 +1793,7 @@ export default function CategoryClient({ category }: { category: string }) {
                 <select
                   value={filters.level || 'הכל'}
                   onChange={e => setFilters(prev => ({ ...prev, level: e.target.value === 'הכל' ? '' : e.target.value }))}
-                  className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
+                  className="flex-shrink-0 border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
                   style={{ direction: 'rtl', borderColor: filters.level ? '#1a1a1a' : '#e5e7eb', color: filters.level ? '#1a1a1a' : '#6b7280', background: filters.level ? '#f0f4ff' : '#fff' }}
                 >
                   <option value="הכל">רמת כשרות: הכל</option>
@@ -1824,7 +1805,7 @@ export default function CategoryClient({ category }: { category: string }) {
               <select
                 value={filters.minRating}
                 onChange={e => setFilters(prev => ({ ...prev, minRating: Number(e.target.value) }))}
-                className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
+                className="flex-shrink-0 border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
                 style={{ direction: 'rtl', borderColor: filters.minRating > 0 ? '#1a1a1a' : '#e5e7eb', color: filters.minRating > 0 ? '#1a1a1a' : '#6b7280', background: filters.minRating > 0 ? '#f0f4ff' : '#fff' }}
               >
                 <option value={0}>דירוג: הכל</option>
@@ -1843,7 +1824,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     key={`tb-attr-${key}`}
                     value={current}
                     onChange={e => setFilters(prev => ({ ...prev, attrFilters: { ...prev.attrFilters, [key]: e.target.value } }))}
-                    className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
+                    className="flex-shrink-0 border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
                     style={{ direction: 'rtl', borderColor: isActive ? '#1a1a1a' : '#e5e7eb', color: isActive ? '#1a1a1a' : '#6b7280', background: isActive ? '#f0f4ff' : '#fff' }}
                   >
                     <option value="הכל">{key}: הכל</option>
@@ -1853,7 +1834,7 @@ export default function CategoryClient({ category }: { category: string }) {
               })}
 
               {active && (
-                <button onClick={() => setFilters(EMPTY_FILTERS)} className="flex-shrink-0 flex items-center gap-1 text-xs text-red-400 hover:text-red-600 font-semibold transition-colors bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-xl">
+                <button onClick={() => setFilters(EMPTY_FILTERS)} className="flex-shrink-0 flex items-center gap-1 text-xs text-red-400 hover:text-red-600 font-semibold transition-colors bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-none">
                   <IconX size={10} />
                   נקה
                 </button>
@@ -1865,7 +1846,7 @@ export default function CategoryClient({ category }: { category: string }) {
               <select
                 value={collectionFilter || 'הכל'}
                 onChange={e => setCollectionFilter(e.target.value === 'הכל' ? '' : e.target.value)}
-                className="flex-shrink-0 border rounded-xl px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
+                className="flex-shrink-0 border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
                 style={{ direction: 'rtl', borderColor: collectionFilter ? '#1a1a1a' : '#e5e7eb', color: collectionFilter ? '#1a1a1a' : '#6b7280', background: collectionFilter ? '#f0f4ff' : '#fff' }}
               >
                 <option value="הכל">קולקציה: הכל</option>
@@ -1913,9 +1894,9 @@ export default function CategoryClient({ category }: { category: string }) {
                     onClick={() => setCollectionFilter(isActive ? '' : col)}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 0,
-                      border: isActive ? '2px solid #C5A028' : '1.5px solid #e5e7eb',
-                      borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
-                      background: isActive ? '#fffbf0' : '#fff',
+                      border: isActive ? '1px solid #373A5A' : '1px solid #e5e7eb',
+                      borderRadius: 0, overflow: 'hidden', cursor: 'pointer',
+                      background: '#fff',
                       transition: 'border-color 0.15s, background 0.15s',
                       padding: img ? 0 : '7px 14px',
                       flexShrink: 0, fontFamily: 'inherit',
@@ -2026,9 +2007,9 @@ export default function CategoryClient({ category }: { category: string }) {
                         if (prods.length === 0) return null;
                         return (
                           <div key={g.key} style={{ marginBottom: 40 }}>
-                            <div style={{ background: '#EEF3FF', border: '1px solid #C5D5F0', borderRadius: 14, padding: '16px 20px', marginBottom: 16 }}>
-                              <span style={{ background: '#C9A227', color: '#1F3D8F', borderRadius: 20, fontSize: 12, fontWeight: 700, padding: '4px 12px', display: 'inline-block', marginBottom: 8 }}>{g.key}</span>
-                              <h2 style={{ fontSize: 17, fontWeight: 700, color: '#1F2937', margin: '0 0 6px', lineHeight: 1.3 }}>{g.title}</h2>
+                            <div style={{ background: '#FFFFFF', border: '1px solid #EDEDEF', borderRadius: 0, padding: '16px 20px', marginBottom: 16 }}>
+                              <span style={{ background: '#373A5A', color: '#FFFFFF', borderRadius: 0, fontSize: 12, fontWeight: 600, padding: '4px 12px', display: 'inline-block', marginBottom: 8 }}>{g.key}</span>
+                              <h2 style={{ fontSize: 17, fontWeight: 600, color: '#1F2937', margin: '0 0 6px', lineHeight: 1.3 }}>{g.title}</h2>
                               <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>{g.desc}</p>
                             </div>
                             <div className={isStamCat ? '' : gridCls}>

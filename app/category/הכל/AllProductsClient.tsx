@@ -84,7 +84,7 @@ function applySort(products: Product[], sort: SortBy): Product[] {
 function SkeletonCard() {
   return (
     <div className="bg-white rounded-none overflow-hidden animate-pulse">
-      <div className="aspect-[4/5] bg-gray-100" />
+      <div className="aspect-square bg-gray-100" />
       <div className="py-3 space-y-2">
         <div className="h-3 bg-gray-100 w-3/4" />
         <div className="h-3 bg-gray-100 w-1/2" />

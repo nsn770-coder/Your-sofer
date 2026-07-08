@@ -89,15 +89,6 @@ function IconTrash() {
   );
 }
 
-function IconCart({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-      <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
-    </svg>
-  );
-}
-
 function IconCheck({ size = 10 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -234,11 +225,11 @@ export default function ProductCard({
       )}
 
       {/* ── Image ── */}
-      <div className={`relative w-full overflow-hidden rounded-none${horizontal ? ' pc-img' : ''}`} style={{ aspectRatio: '4 / 5', background: '#FFFFFF' }}>
+      <div className={`relative w-full overflow-hidden rounded-none${horizontal ? ' pc-img' : ''}`} style={{ aspectRatio: '1 / 1', background: '#FFFFFF' }}>
         {imgSrc ? (
           <img
             src={imgSrc} alt={name}
-            width={400} height={500}
+            width={400} height={400}
             loading={aboveFold ? 'eager' : 'lazy'}
             fetchPriority={aboveFold ? 'high' : 'auto'}
             decoding="async"
@@ -323,8 +314,8 @@ export default function ProductCard({
           )}
         </div>
 
-        {/* Cart button */}
-        <div className={qty === 0 ? 'lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200' : ''} style={{ marginTop: 'auto', paddingTop: 10 }} onClick={e => e.stopPropagation()}>
+        {/* Cart button — minimal underlined text link */}
+        <div style={{ marginTop: 'auto', paddingTop: 6, textAlign: 'right' }} onClick={e => e.stopPropagation()}>
           {notPurchasable ? (
             <a
               href={`https://wa.me/972587479933?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + name)}`}
@@ -332,39 +323,34 @@ export default function ProductCard({
               rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
               style={{
-                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: '#FFFFFF', color: '#6b7280',
-                height: 38, borderRadius: 0, border: '1px solid #d1d5db',
-                fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                textDecoration: 'none',
+                display: 'inline-block',
+                color: '#6b7280', fontSize: 13, fontWeight: 500,
+                textDecoration: 'underline', textUnderlineOffset: 4,
+                cursor: 'pointer',
               }}
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="#25D366">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-              </svg>
               עדכנו אותי
             </a>
           ) : qty === 0 ? (
             <button
               onClick={handleAdd}
               style={{
-                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: '#FFFFFF', color: '#373A5A',
-                height: 38, borderRadius: 0, border: '1px solid #373A5A',
-                fontWeight: 500, fontSize: 14, cursor: 'pointer',
-                transition: 'background 0.2s, color 0.2s',
+                background: 'none', border: 'none', padding: 0,
+                color: '#111111', fontSize: 13, fontWeight: 500,
+                textDecoration: 'underline', textUnderlineOffset: 4,
+                cursor: 'pointer', fontFamily: 'inherit',
+                transition: 'color 0.2s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF'; (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}
             >
-              <IconCart size={13} />
-              הוסף לסל
+              הוספה לסל
             </button>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FFFFFF', borderRadius: 0, overflow: 'hidden', width: '100%', height: 38, border: '1px solid #373A5A' }}>
-              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>−</button>
-              <span style={{ color: '#373A5A', fontWeight: 700, fontSize: 15 }}>{qty}</span>
-              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 20, fontWeight: 800, cursor: 'pointer', padding: '0 14px', height: '100%', lineHeight: 1 }}>+</button>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 0, height: 30 }}>
+              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>−</button>
+              <span style={{ color: '#373A5A', fontWeight: 600, fontSize: 13, minWidth: 16, textAlign: 'center' }}>{qty}</span>
+              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>+</button>
             </div>
           )}
         </div>
