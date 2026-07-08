@@ -9,6 +9,8 @@ interface Props {
   index?: number;
   preloadTrigger?: boolean; // for index 0,1 — fires when section IO triggers
   children?: React.ReactNode;
+  /** Responsive sizes hint for the image layer (matches category-grid card widths by default) */
+  sizes?: string;
 }
 
 function injectCloudinaryParams(url: string): string {
@@ -18,6 +20,7 @@ function injectCloudinaryParams(url: string): string {
 
 export default function ProductCardVideo({
   imgSrc, alt, videoUrl, index = 0, preloadTrigger = false, children,
+  sizes = '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 240px',
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef     = useRef<HTMLVideoElement>(null);
@@ -90,7 +93,9 @@ export default function ProductCardVideo({
   }, [isEager, optimizedUrl]);
 
   return (
-    <div ref={containerRef} style={{ height: 155, overflow: 'hidden', position: 'relative' }}>
+    // Square media area — same aspect ratio as category ProductCard (1:1);
+    // explicit aspect-ratio reserves space up-front so there is no CLS.
+    <div ref={containerRef} style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
 
       {/* Image layer — visible by default, fades out when video starts playing */}
       <div ref={imgLayerRef} style={{ position: 'absolute', inset: 0, transition: 'opacity 0.35s' }}>
@@ -99,7 +104,7 @@ export default function ProductCardVideo({
             fill unoptimized loading="lazy"
             src={imgSrc} alt={alt}
             style={{ objectFit: 'cover' }}
-            sizes="160px"
+            sizes={sizes}
           />
         ) : (
           <div style={{ width: '100%', height: '100%', background: '#e8e8e8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
