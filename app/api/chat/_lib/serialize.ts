@@ -56,6 +56,9 @@ export interface ChatProduct {
   in_stock: boolean;
   price: string;
   currency: string;
+  /** Total units sold (all-time), from updateBestSellers.mjs. Higher = more
+   *  popular; omitted for products with no sales signal (per assistant spec). */
+  popularity?: number;
   details?: ChatProductDetail[];
 }
 
@@ -95,6 +98,13 @@ export function serializeProduct(
     price: price.toFixed(2),
     currency: 'ILS',
   };
+
+  // popularity = raw units sold (salesCount, maintained by app/scripts/updateBestSellers.mjs).
+  // One consistent signal across the whole catalog; omitted when there's no sales data.
+  const salesCount = Number(d.salesCount);
+  if (Number.isFinite(salesCount) && salesCount > 0) {
+    product.popularity = salesCount;
+  }
 
   if (opts.withDetails) {
     const details: ChatProductDetail[] = [];
