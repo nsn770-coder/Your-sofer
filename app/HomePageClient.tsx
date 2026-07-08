@@ -1482,36 +1482,6 @@ export default function HomePageClient() {
       {/* ── Rabbinical Supervision ── */}
       <RabbinicalSupervision isMobile={isMobile} />
 
-      {/* ── Why Your Sofer trust block ── */}
-      <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 16px' : '96px 32px', direction: 'rtl' }}>
-        <div style={{
-          maxWidth: 640, margin: '0 auto',
-          background: '#FFFFFF',
-          borderRadius: 20,
-          padding: isMobile ? '40px 24px' : '56px 48px',
-          textAlign: 'center',
-          boxShadow: '0 4px 32px rgba(0,0,0,0.06)',
-        }}>
-          <p style={{ fontSize: isMobile ? 24 : 28, fontWeight: 300, color: '#1F2937', marginBottom: 32, lineHeight: 1.5, letterSpacing: '-0.01em' }}>
-            רוב האנשים לא יודעים מי כתב את המזוזה שלהם — אבל אצלנו:
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'right' }}>
-            {[
-              'כל קלף מצולם ומאומת לפני מכירה',
-              'בדיקת מגיה מוסמך לכל מוצר',
-              'ניתן לתקשר ישירות עם הסופר סת"מ',
-              'ניתן לבחור קלף ספציפי',
-              'כל סופר עובר אצלנו אבחון',
-            ].map(row => (
-              <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#F8F6F1', borderRadius: 12, padding: '14px 18px' }}>
-                <span style={{ color: '#C9A227', fontSize: 15, flexShrink: 0, fontWeight: 900, lineHeight: 1 }}>✓</span>
-                <span style={{ fontSize: 15, fontWeight: 500, color: '#1F2937', lineHeight: 1.5 }}>{row}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* ── Live Reviews Carousel ── */}
       {liveReviews.length > 0 && (
         <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 0 48px' : '96px 0 80px', direction: 'rtl' }}>
