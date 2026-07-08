@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "algolia:sync": "node scripts/syncAlgolia.mjs"
+    "algolia:sync": "node scripts/syncAlgolia.mjs",
+    "perf:check": "node scripts/perf-check.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.0",

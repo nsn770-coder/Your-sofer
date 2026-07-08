@@ -1301,21 +1301,20 @@ export default function HomePageClient() {
           swap in without shifting anything below. Collapses only if truly empty. */}
       <div>
       {(featuredProducts.length > 0 || !featuredLoaded) && (
-        <div ref={bsSectionRef} className="py-10 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+        <div ref={bsSectionRef} className="py-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
+          <div className="mb-4 md:mb-6" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
             <h2 className="text-[22px] md:text-[28px]" style={{ fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הכי נמכרים השבוע</h2>
             <Link href="/category/%D7%94%D7%9B%D7%9C" className="underline underline-offset-4" style={{ fontSize: 13, color: '#111111', textDecoration: 'underline', whiteSpace: 'nowrap' }}>
               לכל המוצרים
             </Link>
           </div>
-          <style>{`
-            .ys-bestseller-media > div { aspect-ratio: 1 / 1 !important; height: auto !important; }
-          `}</style>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-7 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
+          {/* Same grid + card sizing as category pages (source of truth):
+              2 cols on mobile, identical gaps and breakpoints */}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
             {featuredProducts.length === 0 && Array.from({ length: 10 }).map((_, i) => (
               <div key={`sk-${i}`}>
                 <div className="aspect-square bg-gray-100 animate-pulse" />
-                <div style={{ padding: '10px 2px 4px' }}>
+                <div style={{ padding: '8px 2px 2px' }}>
                   <div className="h-4 bg-gray-100 rounded animate-pulse mb-1.5 w-11/12" />
                   <div className="h-4 bg-gray-100 rounded animate-pulse mb-2 w-2/3" />
                   <div className="h-4 bg-gray-100 rounded animate-pulse w-1/3" />
@@ -1323,27 +1322,32 @@ export default function HomePageClient() {
               </div>
             ))}
             {featuredProducts.slice(0, 10).map((p, idx) => {
-              const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
+              const imgSrc = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 400);
+              const hasSale = typeof p.was === 'number' && p.was > p.price;
+              const savePct = hasSale ? Math.round((1 - p.price / (p.was as number)) * 100) : 0;
               return (
                 <div key={p.id}
                   style={{ cursor: 'pointer', background: '#fff', borderRadius: 0, overflow: 'hidden' }}
                   onClick={() => router.push(`/product/${p.id}`)}
                 >
-                  <div className="ys-bestseller-media">
-                    <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
-                      {p.isBestSeller && (
-                        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 1, background: '#373A5A', borderRadius: 0, fontSize: 11, fontWeight: 600, color: '#FFFFFF', padding: '3px 8px', letterSpacing: '0.01em' }}>
-                          הכי נמכר
-                        </div>
-                      )}
-                    </ProductCardVideo>
-                  </div>
-                  <div style={{ padding: '10px 2px 4px' }}>
+                  <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
+                    {p.isBestSeller && (
+                      <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 1, background: '#373A5A', borderRadius: 0, fontSize: 11, fontWeight: 600, color: '#FFFFFF', padding: '3px 8px', letterSpacing: '0.01em' }}>
+                        הכי נמכר
+                      </div>
+                    )}
+                    {hasSale && (
+                      <span style={{ position: 'absolute', top: 8, left: 8, zIndex: 1, background: '#373A5A', color: '#FFFFFF', fontSize: 11, fontWeight: 600, padding: '4px 8px', lineHeight: 1.2, borderRadius: 0 }}>
+                        {savePct}% הנחה
+                      </span>
+                    )}
+                  </ProductCardVideo>
+                  <div style={{ padding: '8px 2px 2px' }}>
                     <p style={{ fontSize: 14, fontWeight: 500, color: '#373A5A', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 40, marginBottom: 5, textAlign: 'right' } as React.CSSProperties}>{p.name}</p>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: '#111111', marginBottom: 10, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                    <p style={{ fontSize: 17, fontWeight: 700, color: '#111111', marginBottom: 8, display: 'flex', alignItems: 'baseline', gap: 6 }}>
                       {formatPrice(p.price)}
-                      {typeof p.was === 'number' && p.was > p.price && (
-                        <span style={{ fontSize: 12, fontWeight: 400, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(p.was)}</span>
+                      {hasSale && (
+                        <span style={{ fontSize: 12, fontWeight: 400, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(p.was as number)}</span>
                       )}
                     </p>
                     <button
@@ -1514,25 +1518,29 @@ export default function HomePageClient() {
 
       {/* ── Live Reviews Carousel ── */}
       {liveReviews.length > 0 && (
-        <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 0 40px' : '64px 0 56px', direction: 'rtl' }}>
+        <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 0 32px' : '64px 0 56px', direction: 'rtl' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
-            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 28 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>
+            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 8, letterSpacing: '-0.01em' }}>
               מה הלקוחות אומרים
             </h2>
-            <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>
+            <p style={{ textAlign: 'center', fontSize: isMobile ? 13 : 15, color: '#9CA3AF', marginBottom: isMobile ? 20 : 28, fontWeight: 400 }}>
               אלפי לקוחות מרוצים ברחבי הארץ
             </p>
           </div>
+          {/* Mobile: card width matches the category-grid rhythm (2 cards per viewport,
+              same width as a category product card). Desktop unchanged. */}
           <div
             className="ys-hscroll"
-            style={{ display: 'flex', overflowX: 'auto', gap: 16, padding: '4px 20px 16px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
+            style={{ display: 'flex', overflowX: 'auto', gap: isMobile ? 12 : 16, padding: isMobile ? '4px 20px 12px' : '4px 20px 16px', scrollbarWidth: 'none', direction: 'rtl', scrollSnapType: 'x mandatory' } as React.CSSProperties}
           >
             {liveReviews.map(r => (
               <div
                 key={r.id}
                 style={{
                   flexShrink: 0,
-                  width: isMobile ? 260 : 300,
+                  width: isMobile ? 'calc(50vw - 26px)' : 300,
+                  maxWidth: isMobile ? 220 : undefined,
+                  scrollSnapAlign: 'start',
                   background: '#FFFFFF',
                   borderRadius: 0,
                   border: '1px solid #EDEDEF',
@@ -1546,21 +1554,27 @@ export default function HomePageClient() {
                   <img
                     src={squareCropUrl(r.mediaUrl)}
                     alt={r.reviewerName}
+                    width={400}
+                    height={400}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                     loading="lazy"
+                    decoding="async"
                   />
                 </div>
-                <div style={{ padding: '16px 16px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ padding: isMobile ? '10px 10px 12px' : '16px 16px 20px', display: 'flex', flexDirection: 'column', gap: isMobile ? 5 : 8 }}>
                   <div style={{ display: 'flex', gap: 2 }}>
                     {Array.from({ length: r.stars }).map((_, i) => (
-                      <span key={i} style={{ color: '#C9A227', fontSize: 13 }}>★</span>
+                      <span key={i} style={{ color: '#C9A227', fontSize: isMobile ? 12 : 13 }}>★</span>
                     ))}
                   </div>
-                  <p style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.65, margin: 0, fontStyle: 'italic' }}>
+                  <p style={{
+                    fontSize: isMobile ? 12.5 : 13, color: '#4B5563', lineHeight: 1.6, margin: 0, fontStyle: 'italic',
+                    ...(isMobile ? { display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 60 } : {}),
+                  } as React.CSSProperties}>
                     &ldquo;{r.text}&rdquo;
                   </p>
-                  <div style={{ marginTop: 4 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{formatReviewerName(r.reviewerName)}</div>
+                  <div style={{ marginTop: isMobile ? 2 : 4 }}>
+                    <div style={{ fontSize: isMobile ? 12 : 13, fontWeight: 600, color: '#1F2937' }}>{formatReviewerName(r.reviewerName)}</div>
                     {r.createdAt && (
                       <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{formatHeDate(r.createdAt.seconds)}</div>
                     )}
@@ -1569,7 +1583,7 @@ export default function HomePageClient() {
               </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginTop: 32, padding: '0 20px' }}>
+          <div style={{ textAlign: 'center', marginTop: isMobile ? 20 : 32, padding: '0 20px' }}>
             <a href="/reviews" className="ys-outline-btn">לכל הביקורות ←</a>
           </div>
         </div>
