@@ -19,6 +19,7 @@ import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 import ClubPopupWrapper from "@/components/ClubPopupWrapper";
 import GiftProgressBar from "./components/GiftProgressBar";
+import StickyBarLift from "./components/StickyBarLift";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
@@ -101,19 +102,9 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://apis.google.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <link rel="dns-prefetch" href="https://firebaseapp.com" />
-        <link
-          rel="preload"
-          as="image"
-          href="https://res.cloudinary.com/dyxzq3ucy/image/upload/w_1200,q_auto:good,f_auto/v1777365682/%D7%91%D7%90%D7%A0%D7%A8_2_wovsve.png"
-          fetchPriority="high"
-        />
-        <script async dangerouslySetInnerHTML={{ __html: `
-          (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window,document,"clarity","script","wiozsdfcgm");
-        ` }} />
+        {/* PERF: removed stale hero preload (old banner PNG no longer rendered anywhere) —
+            it fetched a high-priority image on EVERY page and competed with the real LCP.
+            The homepage hero poster is now preloaded from app/page.tsx instead. */}
       </head>
       <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100%', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
         {/* ── Google Tag Manager (noscript) ── */}
@@ -128,8 +119,10 @@ export default function RootLayout({
         {/* ── End Google Tag Manager (noscript) ── */}
         <ChatPersonaProvider>
         <AuthProvider>
-          {/* Suspense is required by Next.js when useSearchParams() is used
-              inside a component rendered from the root layout */}
+          {/* NOTE: nothing inside this boundary may call useSearchParams() —
+              it would suspend static prerendering and ship this entire tree as
+              EMPTY HTML (fallback=null) on every page, destroying LCP & CLS.
+              Read window.location.search in a useEffect instead (see ShaliachContext). */}
           <Suspense fallback={null}>
             <ShaliachProvider>
               <CartProvider>
@@ -141,6 +134,7 @@ export default function RootLayout({
                 <ShavuotPopupWrapper />
                 <ClubPopupWrapper />
                 <GiftProgressBar />
+                <StickyBarLift />
               </CartProvider>
             </ShaliachProvider>
           </Suspense>
@@ -160,6 +154,16 @@ export default function RootLayout({
 
         {/* ── Tidio live chat - deferred 5 seconds ── */}
         {process.env.NEXT_PUBLIC_TIDIO_KEY && <TidioChat />}
+
+        {/* ── Microsoft Clarity — moved out of raw <head> script so it can never
+               compete with first paint; afterInteractive keeps full session data ── */}
+        <Script id="ms-clarity" strategy="afterInteractive">{`
+          (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          })(window,document,"clarity","script","wiozsdfcgm");
+        `}</Script>
 
         {/* ── Async chat widget ── */}
         <Script
