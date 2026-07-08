@@ -1479,9 +1479,6 @@ export default function HomePageClient() {
         </button>
       </div>
 
-      {/* ── Rabbinical Supervision ── */}
-      <RabbinicalSupervision isMobile={isMobile} />
-
       {/* ── Live Reviews Carousel ── */}
       {liveReviews.length > 0 && (
         <div style={{ background: '#F8F6F1', padding: isMobile ? '56px 0 48px' : '96px 0 80px', direction: 'rtl' }}>
@@ -1545,6 +1542,9 @@ export default function HomePageClient() {
           </div>
         </div>
       )}
+
+      {/* ── Rabbinical Supervision ── */}
+      <RabbinicalSupervision isMobile={isMobile} />
 
 
     </div>
