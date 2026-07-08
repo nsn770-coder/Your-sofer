@@ -54,3 +54,5 @@ scripts/categories_backup.json
 
 # local backups (Firestore pre-write snapshots)
 backups/
+
+.fuse_hidden*
