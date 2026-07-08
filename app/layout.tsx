@@ -18,7 +18,6 @@ import { TidioChat } from "@/components/TidioChat";
 import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 import ClubPopupWrapper from "@/components/ClubPopupWrapper";
-import AnnouncementTicker from "./components/AnnouncementTicker";
 import GiftProgressBar from "./components/GiftProgressBar";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
@@ -127,7 +126,6 @@ export default function RootLayout({
           />
         </noscript>
         {/* ── End Google Tag Manager (noscript) ── */}
-        <AnnouncementTicker />
         <ChatPersonaProvider>
         <AuthProvider>
           {/* Suspense is required by Next.js when useSearchParams() is used
