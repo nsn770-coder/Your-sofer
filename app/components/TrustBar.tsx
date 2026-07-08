@@ -24,6 +24,7 @@ export default function TrustBar() {
     return () => clearInterval(interval);
   }, []);
 
+  if (pathname === '/') return null;
   if (pathname?.startsWith('/bar-mitzvah')) return null;
 
   return (

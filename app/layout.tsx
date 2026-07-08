@@ -7,7 +7,6 @@ import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ShaliachProvider } from "./contexts/ShaliachContext";
 import NavBar from "@/app/components/navigation/NavBar";
-import TrustBar from "@/app/components/TrustBar";
 import Footer from "@/app/components/Footer";
 import ShiraChat from "@/app/components/chat/ShiraChat";
 import ChatCartBridge from "@/app/components/chat/ChatCartBridge";
@@ -138,7 +137,6 @@ export default function RootLayout({
               <CartProvider>
                 <ChatCartBridge />
                 <NavBar />
-                <TrustBar />
                 {children}
                 <Footer />
                 <ShiraChat />
