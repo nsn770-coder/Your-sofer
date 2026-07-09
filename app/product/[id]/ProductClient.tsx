@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import { doc, getDoc, updateDoc, setDoc, addDoc, collection, getDocs, query, where, limit, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -1483,7 +1483,7 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export default function ProductClient() {
+export default function ProductClient({ initialProduct = null }: { initialProduct?: Partial<Product> | null }) {
   const { id } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1492,7 +1492,16 @@ export default function ProductClient() {
   const { addItem, removeItem, updateQty } = useCart();
   const { user } = useAuth();
 
-  const [product, setProduct]           = useState<Product | null>(null);
+  // PERF: initialProduct is the server-fetched product (same data as the SSR
+  // shell in page.tsx). It lets the full page render at hydration instead of
+  // after a client-side Firestore roundtrip. The Firestore fetch below still
+  // runs and replaces it with the authoritative document.
+  const [product, setProduct]           = useState<Product | null>((initialProduct as Product) ?? null);
+  // Render nothing until mounted: the server-rendered shell (#pdp-shell) is
+  // visible instead, and is removed (pre-paint) the moment we take over.
+  // This also guarantees isMobile is settled before the first real render,
+  // so the SSR HTML never flashes a desktop layout on mobile.
+  const [mounted, setMounted]           = useState(false);
   const [related, setRelated]                       = useState<Product[]>([]);
   const [lookProducts, setLookProducts]             = useState<Product[]>([]);
   const [collectionProducts, setCollectionProducts] = useState<Product[]>([]);
@@ -1506,7 +1515,7 @@ export default function ProductClient() {
   const [embossingColor, setEmbossingColor]     = useState<'gold' | 'silver'>('gold');
   const [threadColor, setThreadColor]           = useState<ThreadColor | null>(null); // צבע חוט הרקמה
   const [threadColorError, setThreadColorError] = useState('');
-  const [loading, setLoading]           = useState(true);
+  const [loading, setLoading]           = useState(!initialProduct);
   const [activeImg, setActiveImg]       = useState(0);
   const [cartQty, setCartQty]           = useState(0);
   const [qty, setQty]                   = useState(1); // updated to minQty after product loads
@@ -1543,6 +1552,17 @@ export default function ProductClient() {
     check(); window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // PERF: flip to the interactive render only after mount (isMobile is set in
+  // the same effect flush above, so the first real render already uses the
+  // correct layout — no desktop→mobile flash).
+  useEffect(() => { setMounted(true); }, []);
+
+  // PERF: remove the server-rendered shell before the interactive version
+  // paints (useLayoutEffect = pre-paint, so there is never a duplicate frame).
+  useLayoutEffect(() => {
+    if (mounted) document.getElementById('pdp-shell')?.remove();
+  }, [mounted]);
 
   useEffect(() => {
     if (!isMobile) return;
@@ -1687,6 +1707,22 @@ export default function ProductClient() {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) { console.error(err); alert('שגיאה בשמירה'); }
+  }
+
+  // Before mount: the SSR shell (#pdp-shell) is what the user sees. Render
+  // nothing here so server HTML and first client render match. When there is
+  // no server data (shell absent), keep the old spinner so behavior is
+  // unchanged for that edge case.
+  if (!mounted) {
+    if (initialProduct) return null;
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', fontFamily: 'Heebo, Arial, sans-serif' }}>
+        <div style={{ textAlign: 'center' }}>
+          <Icon.Loader />
+          <div style={{ fontSize: 15, color: '#888', marginTop: 12 }}>טוען מוצר...</div>
+        </div>
+      </div>
+    );
   }
 
   if (loading) return (

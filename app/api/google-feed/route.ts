@@ -52,28 +52,40 @@ function getGender(_cat: string): string {
   return 'male';
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const db = getAdminDb();
     const snap = await db.collection('products').get();
 
     const items: string[] = [];
+    // Diagnostics: skip counts by reason (exposed via ?diag=1)
+    const skipped: Record<string, number> = {};
+    const seenIds = new Set<string>();
+    let duplicateIds = 0;
+    const skip = (reason: string) => { skipped[reason] = (skipped[reason] ?? 0) + 1; };
 
     snap.forEach(doc => {
       const d = doc.data();
       const id: string = doc.id;
       const name: string = d.name ?? '';
-      const price: number = d.price ?? 0;
+      const price: number = typeof d.price === 'number' ? d.price : Number(d.price) || 0;
       const cat: string = d.cat ?? d.category ?? '';
       const desc: string = d.desc ?? d.description ?? name;
       const badge: string = d.badge ?? '';
 
-      // Skip hidden or inactive/draft products
-      if (d.hidden === true) return;
-      if (d.status === 'inactive' || d.status === 'draft') return;
+      // Skip hidden products
+      if (d.hidden === true) return skip('hidden');
+      // Whitelist statuses: only 'active' or legacy products with no status
+      // (previously a blacklist — 'rejected'/'pending' products leaked into the feed)
+      if (d.status && d.status !== 'active') return skip(`status_${d.status}`);
 
       // Skip products with no name or price
-      if (!name || !price) return;
+      if (!name) return skip('missing_name');
+      if (!price) return skip('missing_or_zero_price');
+
+      // Guard against duplicate ids (should not happen with doc.id, but track it)
+      if (seenIds.has(id)) { duplicateIds++; return skip('duplicate_id'); }
+      seenIds.add(id);
 
       const availability: string = d.availability ?? 'in_stock';
       const condition: string = d.condition ?? 'new';
@@ -99,7 +111,7 @@ export async function GET() {
       ].filter((u): u is string => u !== null);
 
       // Skip products with no image
-      if (allImages.length === 0) return;
+      if (allImages.length === 0) return skip('missing_image');
 
       const imageLink = allImages[0];
       const additionalImages: string[] = allImages.slice(1);
@@ -145,6 +157,19 @@ export async function GET() {
       </g:shipping>
     </item>`);
     });
+
+    // Diagnostics mode: /api/google-feed?diag=1 returns counts instead of XML.
+    // Exposes aggregate counts only (no product data beyond what's already public).
+    if (new URL(req.url).searchParams.get('diag') === '1') {
+      return NextResponse.json({
+        totalDocs: snap.size,
+        includedInFeed: items.length,
+        skipped,
+        skippedTotal: Object.values(skipped).reduce((a, b) => a + b, 0),
+        duplicateIds,
+        generatedAt: new Date().toISOString(),
+      });
+    }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">

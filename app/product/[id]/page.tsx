@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from 'next';
 import ProductClient from './ProductClient';
+import ProductShell, { type ShellProduct } from './ProductShell';
 import { formatPrice } from '@/app/lib/utils';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
@@ -16,6 +17,7 @@ function parseField(field: any): any {
   if ('integerValue' in field) return Number(field.integerValue);
   if ('doubleValue' in field) return Number(field.doubleValue);
   if ('booleanValue' in field) return field.booleanValue as boolean;
+  if ('timestampValue' in field) return field.timestampValue as string; // ISO string — matches client-side date handling
   if ('nullValue' in field) return null;
   if ('arrayValue' in field)
     return ((field.arrayValue.values as unknown[]) ?? []).map(parseField);
@@ -147,6 +149,7 @@ async function ProductJsonLd({ id }: { id: string }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
+    sku: id,
     name: product.name,
     description: product.desc || product.description || undefined,
     image: images.length ? images : undefined,
@@ -239,10 +242,23 @@ export default async function ProductPage(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  // PERF: same fetch as generateMetadata/ProductJsonLd — deduped by Next's
+  // fetch cache, so this costs nothing extra. The parsed product is:
+  //  1. rendered as a server-side above-the-fold shell (real LCP image +
+  //     title + price in the initial HTML, removed by ProductClient on mount)
+  //  2. passed to ProductClient as initialProduct so it renders full content
+  //     at hydration instead of waiting for a client-side Firestore roundtrip.
+  const product = await fetchProduct(id);
+  // Only pass data through when the essential render fields exist — otherwise
+  // fall back to the original client-side flow (spinner → Firestore fetch).
+  const shellProduct = product && product.name && product.price != null
+    ? ({ ...(product as Record<string, unknown>), id } as ShellProduct)
+    : null;
   return (
     <>
       <ProductJsonLd id={id} />
-      <ProductClient />
+      {shellProduct && <ProductShell product={shellProduct} />}
+      <ProductClient initialProduct={shellProduct} />
     </>
   );
 }

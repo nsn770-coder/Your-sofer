@@ -8,7 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ShaliachProvider } from "./contexts/ShaliachContext";
 import NavBar from "@/app/components/navigation/NavBar";
 import Footer from "@/app/components/Footer";
-import ShiraChat from "@/app/components/chat/ShiraChat";
+import ShiraChatLoader from "@/app/components/chat/ShiraChatLoader";
 import ChatCartBridge from "@/app/components/chat/ChatCartBridge";
 import { ChatPersonaProvider } from "@/app/components/chat/ChatPersonaContext";
 import MetaPixelPageView from "@/app/components/MetaPixelPageView";
@@ -18,6 +18,7 @@ import { TidioChat } from "@/components/TidioChat";
 import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 import ClubPopupWrapper from "@/components/ClubPopupWrapper";
+import AsyncChatWidget from "@/components/AsyncChatWidget";
 import GiftProgressBar from "./components/GiftProgressBar";
 
 const geist = Geist({ subsets: ["latin"], display: "swap" });
@@ -126,7 +127,7 @@ export default function RootLayout({
                 <NavBar />
                 {children}
                 <Footer />
-                <ShiraChat />
+                <ShiraChatLoader />
                 <ShavuotPopupWrapper />
                 <ClubPopupWrapper />
                 <GiftProgressBar />
@@ -160,14 +161,10 @@ export default function RootLayout({
           })(window,document,"clarity","script","wiozsdfcgm");
         `}</Script>
 
-        {/* ── Async chat widget ── */}
-        <Script
-          src="https://cdn.async.co.il/widget.js"
-          data-key="9fb328ec30b744058aeb1e2776270894"
-          data-api-base="https://api.async.co.il"
-          data-side="right"
-          strategy="afterInteractive"
-        />
+        {/* ── Async chat widget — injected after first interaction / 8s idle
+               (see components/AsyncChatWidget.tsx) so its script + heavy avatar
+               never compete with LCP/hydration ── */}
+        <AsyncChatWidget />
       </body>
     </html>
   );

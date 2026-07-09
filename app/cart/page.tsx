@@ -56,6 +56,12 @@ export default function CartPage() {
   } = useCart();
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
+  // PERF (CLS ~4.3 on /cart): on a hard load the SSR HTML painted the
+  // "empty cart" state in a desktop 2-column grid, then flipped to the real
+  // items + mobile 1-column layout after hydration. Gate the cart body behind
+  // `hydrated` (set in the same effect flush that reads localStorage items and
+  // window width), so the first painted state is already the correct one.
+  const [hydrated, setHydrated] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [shareLoading, setShareLoading] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
@@ -92,6 +98,8 @@ export default function CartPage() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  useEffect(() => { setHydrated(true); }, []);
 
   // Fetch gift options from Firestore
   useEffect(() => {
@@ -144,7 +152,12 @@ export default function CartPage() {
         width: '100%',
       }}>
 
-        {items.length === 0 ? (
+        {!hydrated ? (
+          /* Neutral placeholder — spans both grid columns, so the desktop→mobile
+             column flip and the localStorage items appearing never paint a wrong
+             intermediate state. Replaced in the very next frame after hydration. */
+          <div style={{ gridColumn: '1 / -1', minHeight: '55vh' }} />
+        ) : items.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', background: '#fff', borderRadius: 8, border: '1px solid #ddd', padding: isMobile ? 32 : 60, textAlign: 'center' }}>
             <div style={{ fontSize: 64, marginBottom: 16 }}>🛒</div>
             <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>הסל שלך ריק</div>
