@@ -379,6 +379,13 @@ export default function HomePageClient() {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
+  // PERF (homepage lab LCP ~14.6s): the hero <video autoPlay> started downloading
+  // several MB immediately, hogging bandwidth during the LCP window — and its
+  // first rendered frame registered as the LCP element. Until armed, we show the
+  // exact same poster as a plain <img> (identical geometry, already preloaded in
+  // page.tsx), and mount the <video> only after first interaction or 8s idle.
+  // The video element carries the same poster, so the takeover is seamless.
+  const [heroVideoOn, setHeroVideoOn] = useState(false);
   const [bsVisible, setBsVisible] = useState(false);
   const videoWrapperRef = useRef<HTMLDivElement>(null);
   const bsSectionRef = useRef<HTMLDivElement>(null);
@@ -390,6 +397,18 @@ export default function HomePageClient() {
   // Read isMobile synchronously before the browser paints to prevent CLS on mobile
   // (avoids the false→true flip that shifts the entire layout after hydration)
   useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
+
+  // Arm the hero video after first interaction or 8s idle (see heroVideoOn above)
+  useEffect(() => {
+    const arm = () => setHeroVideoOn(true);
+    const events: (keyof WindowEventMap)[] = ['scroll', 'pointerdown', 'keydown', 'touchstart'];
+    events.forEach(e => window.addEventListener(e, arm, { once: true, passive: true }));
+    const t = setTimeout(arm, 8_000);
+    return () => {
+      events.forEach(e => window.removeEventListener(e, arm));
+      clearTimeout(t);
+    };
+  }, []);
 
   // Resize — debounced 150 ms so mobile touch events don't saturate the thread
   useEffect(() => {
@@ -799,10 +818,22 @@ export default function HomePageClient() {
         .ys-hero-box { padding-top: 40%; }
         .ys-cta-banner { aspect-ratio: 8 / 1.8; }
         .ys-promo-reserve { min-height: 560px; }
+        /* CLS FIX 2: the hero overlay text + trust row previously used isMobile
+           inline styles — SSR painted the desktop values (padding 0 72px, font
+           48px) on phones, then everything reflowed after hydration. Same exact
+           values, now correct on the very first paint. */
+        .ys-hero-content { padding: 0 72px; }
+        .ys-hero-title { font-size: 48px; max-width: 70%; }
+        .ys-hero-sub { font-size: 18px; margin-bottom: 32px; max-width: 60%; }
+        .ys-trust-txt { font-size: 13px; }
         @media (max-width: 767px) {
           .ys-hero-box { padding-top: 56.25%; }
           .ys-cta-banner { aspect-ratio: 5 / 2; min-height: 120px; }
           .ys-promo-reserve { min-height: 600px; }
+          .ys-hero-content { padding: 40px 24px 36px; }
+          .ys-hero-title { font-size: 28px; max-width: 92%; }
+          .ys-hero-sub { font-size: 15px; margin-bottom: 24px; max-width: 88%; }
+          .ys-trust-txt { font-size: 12px; }
         }
       `}</style>
 
@@ -961,7 +992,22 @@ export default function HomePageClient() {
       >
         {/* Background video — height 140% + objectFit:cover + objectPosition:top → fills width, crops from bottom only */}
         {/* LCP: poster is w_1080 (was w_1600) — covers phone DPR2 and MUST stay
-            byte-identical to HERO_POSTER preloaded in app/page.tsx */}
+            byte-identical to HERO_POSTER preloaded in app/page.tsx.
+            PERF: until heroVideoOn (first interaction / 8s), the poster renders as a
+            plain <img> with IDENTICAL geometry — so the multi-MB video download never
+            competes with the LCP window, and the img (not a video frame) is the LCP.
+            The <video> then mounts with the same poster → seamless, pixel-identical
+            takeover, and plays exactly like before. */}
+        {!heroVideoOn ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1080/v1782769100/WhatsApp_Image_2026-06-29_at_21.52.31_1_m59ykm.jpg"
+            alt=""
+            fetchPriority="high"
+            decoding="async"
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '110%', objectFit: 'cover', objectPosition: 'top', zIndex: 0 }}
+          />
+        ) : (
         <video
           autoPlay
           muted
@@ -976,24 +1022,23 @@ export default function HomePageClient() {
               that could serve webm and contradict the type="video/mp4" hint below. */}
           <source src="https://res.cloudinary.com/dyxzq3ucy/video/upload/vc_h264,q_auto/v1782758809/%D7%A1%D7%A8%D7%98%D7%95%D7%9F_%D7%91%D7%90%D7%A0%D7%A8_hotlyr.mp4" type="video/mp4" />
         </video>
+        )}
 
         {/* Overlay */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)', zIndex: 1 }} />
 
-        {/* Content — absolute so it doesn't push container height */}
-        <div style={{
+        {/* Content — absolute so it doesn't push container height.
+            CLS FIX 2: responsive values moved to .ys-hero-* media queries. */}
+        <div className="ys-hero-content" style={{
           position: 'absolute', inset: 0, zIndex: 2,
-          padding: isMobile ? '40px 24px 36px' : '0 72px',
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }}>
           {/* Emotional title — visual prominence, NOT the h1 */}
-          <p style={{
-            fontSize: isMobile ? 28 : 48,
+          <p className="ys-hero-title" style={{
             fontWeight: 300,
             fontFamily: 'var(--font-cormorant), serif',
             color: '#FFFFFF',
             lineHeight: 1.2,
-            maxWidth: isMobile ? '92%' : '70%',
             textShadow: '0 2px 16px rgba(0,0,0,0.4)',
             margin: '0 0 16px',
             letterSpacing: '-0.01em',
@@ -1006,13 +1051,10 @@ export default function HomePageClient() {
             לקנות ישירות מסופרי סת"ם
           </h1>
 
-          <p style={{
-            fontSize: isMobile ? 15 : 18,
+          <p className="ys-hero-sub" style={{
             fontWeight: 400,
             color: 'rgba(255,255,255,0.88)',
             marginTop: 0,
-            marginBottom: isMobile ? 24 : 32,
-            maxWidth: isMobile ? '88%' : '60%',
             lineHeight: 1.7,
           }}>
             המבחר הגדול בישראל למוצרי יודאיקה — לבית, לבית הכנסת, לאירועים ולמתנות
@@ -1041,7 +1083,7 @@ export default function HomePageClient() {
           ].map(item => (
             <div key={item} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
               <span aria-hidden="true" style={{ color: '#C5A028', fontSize: 12, lineHeight: 1 }}>✓</span>
-              <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 500, color: '#222222', whiteSpace: 'nowrap' }}>{item}</span>
+              <span className="ys-trust-txt" style={{ fontWeight: 500, color: '#222222', whiteSpace: 'nowrap' }}>{item}</span>
             </div>
           ))}
         </div>
