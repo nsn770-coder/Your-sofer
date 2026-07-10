@@ -2526,6 +2526,43 @@ export default function AdminPage() {
     } catch (e) { console.error(e); }
   }
 
+  // ── ייצוא לידים לקובץ אקסל (xlsx נטען דינמית — לא מכביד על שאר האדמין) ──
+  async function exportLeadsToExcel() {
+    if (leads.length === 0) { alert('אין לידים לייצוא'); return; }
+    try {
+      const XLSX = await import('xlsx');
+      const rows = leads.map(l => ({
+        'שם':        l.name  || '',
+        'טלפון':     l.phone || '',
+        'אימייל':    l.email || '',
+        'מקור':      l.source === 'club' ? 'מועדון' : (l.source || ''),
+        'נוסח':      l.nusach || '',
+        'מיקום':     l.location === 'room' ? 'חדר' : l.location === 'entrance' ? 'כניסה ראשית' : (l.location || ''),
+        'כמות קלפים': l.klafimCount ?? '',
+        'תאריך':     l.createdAt ? new Date(l.createdAt.seconds * 1000).toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '',
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws['!cols'] = [
+        { wch: 20 }, // שם
+        { wch: 14 }, // טלפון
+        { wch: 28 }, // אימייל
+        { wch: 10 }, // מקור
+        { wch: 10 }, // נוסח
+        { wch: 12 }, // מיקום
+        { wch: 10 }, // כמות קלפים
+        { wch: 18 }, // תאריך
+      ];
+      const wb = XLSX.utils.book_new();
+      wb.Workbook = { Views: [{ RTL: true }] };
+      XLSX.utils.book_append_sheet(wb, ws, 'לידים');
+      const today = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `yoursofer-leads-${today}.xlsx`);
+    } catch (e) {
+      console.error('[exportLeadsToExcel]', e);
+      alert('שגיאה בייצוא הקובץ');
+    }
+  }
+
   async function loadApplications() {
     try {
       const snap = await getDocs(query(collection(db, 'soferim_applications'), orderBy('createdAt', 'desc')));
@@ -4446,9 +4483,17 @@ export default function AdminPage() {
 
       {activeTab === 'leads' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
-          <div className="p-4 border-b flex items-center justify-between">
+          <div className="p-4 border-b flex items-center justify-between flex-wrap gap-2">
             <h2 className="text-xl font-black text-gray-800">📋 לידים מהאתר ({leads.length})</h2>
-            <button onClick={loadLeads} className="text-sm text-blue-600 underline">רענן</button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={exportLeadsToExcel}
+                className="inline-flex items-center gap-1.5 bg-green-600 text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-green-700 transition"
+              >
+                📥 ייצוא לאקסל
+              </button>
+              <button onClick={loadLeads} className="text-sm text-blue-600 underline">רענן</button>
+            </div>
           </div>
           {leads.length === 0 ? (
             <div className="p-10 text-center text-gray-400">אין לידים עדיין</div>
