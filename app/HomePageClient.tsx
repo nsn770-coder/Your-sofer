@@ -398,15 +398,17 @@ export default function HomePageClient() {
   // (avoids the false→true flip that shifts the entire layout after hydration)
   useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
 
-  // Arm the hero video after first interaction or 8s idle (see heroVideoOn above)
+  // Arm the hero video ONLY after first interaction (see heroVideoOn above).
+  // PERF: the old 8s idle fallback meant Lighthouse (which never interacts)
+  // still downloaded the multi-MB video mid-trace — inflating total payload,
+  // Speed Index and TBT. The poster <img> is pixel-identical, so a visitor who
+  // hasn't touched the page loses nothing.
   useEffect(() => {
     const arm = () => setHeroVideoOn(true);
     const events: (keyof WindowEventMap)[] = ['scroll', 'pointerdown', 'keydown', 'touchstart'];
     events.forEach(e => window.addEventListener(e, arm, { once: true, passive: true }));
-    const t = setTimeout(arm, 8_000);
     return () => {
       events.forEach(e => window.removeEventListener(e, arm));
-      clearTimeout(t);
     };
   }, []);
 
@@ -1482,10 +1484,15 @@ export default function HomePageClient() {
           ref={videoWrapperRef}
           style={{ maxWidth: 896, margin: '0 auto', borderRadius: 0, overflow: 'hidden', border: '1px solid #EDEDEF', position: 'relative', aspectRatio: '16 / 9' }}
         >
+          {/* PERF: loading="lazy" — the embed pulls ~170KB of player JS/CSS from
+              jsDelivr; below the fold it now loads only when scrolled near.
+              title fixes the Lighthouse a11y "frame without title" flag. */}
           <iframe
             src={`https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=${videoStarted ? 'true' : 'false'}&muted=true`}
             allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
             allowFullScreen
+            loading="lazy"
+            title="סרטון על Your Sofer — קנייה ישירה מסופרי סת״ם"
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
           />
         </div>

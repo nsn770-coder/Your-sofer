@@ -98,6 +98,9 @@ function ThankYouContent() {
   const [blessing, setBlessing] = useState<{ customerNumber: number; word: string; text: string } | null>(null);
   const [orderTotal, setOrderTotal] = useState<number>(0);
   const [checkoutEnabled, setCheckoutEnabled] = useState<boolean | null>(null);
+  // ── Member points display (user already logged in on arrival) ──
+  const [memberBalance, setMemberBalance] = useState<number | null>(null);
+  const [orderPointsEarned, setOrderPointsEarned] = useState<number | null>(null);
 
   // Record when user is definitively not logged in (loading done, user null).
   // This distinguishes "user was a guest and just signed up" from "already logged in on arrival".
@@ -171,6 +174,17 @@ function ThankYouContent() {
     claimPoints();
   }, [user?.uid, orderId]);
 
+  // Already logged in on arrival: fetch a FRESH points balance from Firestore
+  // (user.loyaltyPoints from AuthContext was loaded before this purchase's accrual).
+  useEffect(() => {
+    if (loading || !user?.uid || sawNullUserRef.current) return;
+    getDoc(doc(db, 'users', user.uid))
+      .then(snap => {
+        if (snap.exists()) setMemberBalance(Number(snap.data().loyaltyPoints ?? 0));
+      })
+      .catch(() => {});
+  }, [loading, user?.uid]);
+
   useEffect(() => {
     if (user?.role !== 'admin') return;
     getDoc(doc(db, 'siteSettings', 'global'))
@@ -202,6 +216,7 @@ function ThankYouContent() {
         setBlessing({ customerNumber: customerNum, word: blessingEntry.word, text: blessingEntry.blessing });
         setOrderTotal(order.total ?? 0);
         setOrderShippingCost(order.shippingCost ?? 0);
+        if (typeof order.pointsEarned === 'number') setOrderPointsEarned(order.pointsEarned);
 
         // עדכן סטטוס הזמנה ל-paid
         await updateDoc(doc(db, 'orders', orderId!), {
@@ -556,6 +571,54 @@ function ThankYouContent() {
             </>
           )}
 
+        </div>
+      )}
+
+      {/* ── Member points card — user was already logged in on arrival ──────────
+           Shows points earned on THIS order + fresh balance from Firestore.       ── */}
+      {user && claimState === 'idle' && !sawNullUserRef.current && memberBalance !== null && (
+        <div style={{
+          background: '#fff', borderRadius: 20,
+          boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
+          padding: '28px 32px', marginTop: 20, textAlign: 'center',
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
+            מועדון לקוחות פרימיום
+          </div>
+          <div style={{ fontSize: 36, marginBottom: 10 }}>⭐</div>
+          {(orderPointsEarned ?? pointsHint) > 0 && (
+            <p style={{ fontSize: 15, color: '#1a1a1a', lineHeight: 1.7, margin: '0 0 12px' }}>
+              זוכו לך{' '}
+              <strong style={{ color: '#166534' }}>
+                {orderPointsEarned !== null ? orderPointsEarned : `~${pointsHint}`} נקודות
+              </strong>
+              {' '}על הזמנה זו 🎉
+            </p>
+          )}
+          <div style={{
+            background: 'linear-gradient(135deg, #fdf8ec, #faf3e0)',
+            border: '1.5px solid #C5A028',
+            borderRadius: 12,
+            padding: '14px 18px',
+            marginBottom: 14,
+            fontSize: 14,
+            color: '#1a1a1a',
+            lineHeight: 1.8,
+          }}>
+            יתרת הנקודות שלך:{' '}
+            <strong style={{ color: '#92400e' }}>{memberBalance.toLocaleString('he-IL')} נקודות</strong>
+            <br />
+            שוות <strong style={{ color: '#92400e' }}>₪{memberBalance.toLocaleString('he-IL')}</strong> למימוש בקנייה הבאה
+          </div>
+          <a
+            href="/account/loyalty"
+            style={{
+              display: 'inline-block', fontSize: 13.5, fontWeight: 700,
+              color: '#166534', textDecoration: 'underline',
+            }}
+          >
+            לצפייה בנקודות ובהטבות באזור האישי ←
+          </a>
         </div>
       )}
 

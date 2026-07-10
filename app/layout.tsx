@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Heebo, Cormorant_Garamond } from "next/font/google";
+import { Heebo, Cormorant_Garamond } from "next/font/google";
 import { Suspense } from "react";
 import Script from "next/script";
 import "./globals.css";
@@ -21,14 +21,21 @@ import ClubPopupWrapper from "@/components/ClubPopupWrapper";
 import AsyncChatWidget from "@/components/AsyncChatWidget";
 import GiftProgressBar from "./components/GiftProgressBar";
 
-const geist = Geist({ subsets: ["latin"], display: "swap" });
+// PERF: Geist removed — its className was on <body> but the inline style
+// (fontFamily: var(--font-heebo)…) overrode it everywhere, so the font file was
+// preloaded with display:swap on every page and never actually rendered.
+// One less woff2 in the critical chain + one less potential font-swap CLS source.
 const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
 // PERF: Frank Ruhl Libre removed — next/font preloaded 5 weights × 2 subsets on
 // every page, but the only selector using it (.brand-story) appears in no component.
 // globals.css still maps --font-frank to a serif fallback if it's ever reused.
+// PERF: Cormorant trimmed 5 weights → the 3 actually used (300 = hero title +
+// homepage h2s, 600 = h1/h2/h3 default in globals.css, 700 = bold headings).
+// 2 fewer preloaded woff2 files on every page — the font chain was the longest
+// item in the critical request path (2.6s on slow 4G).
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['300', '600', '700'],
   display: 'swap',
   variable: '--font-cormorant',
 });
@@ -103,7 +110,7 @@ export default function RootLayout({
             it fetched a high-priority image on EVERY page and competed with the real LCP.
             The homepage hero poster is now preloaded from app/page.tsx instead. */}
       </head>
-      <body className={`${geist.className} ${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100%', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
+      <body className={`${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100%', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
         {/* ── Google Tag Manager (noscript) ── */}
         <noscript>
           <iframe
@@ -151,9 +158,10 @@ export default function RootLayout({
         {/* ── Tidio live chat - deferred 5 seconds ── */}
         {process.env.NEXT_PUBLIC_TIDIO_KEY && <TidioChat />}
 
-        {/* ── Microsoft Clarity — moved out of raw <head> script so it can never
-               compete with first paint; afterInteractive keeps full session data ── */}
-        <Script id="ms-clarity" strategy="afterInteractive">{`
+        {/* ── Microsoft Clarity — lazyOnload: session replay doesn't need to boot
+               during the load window (~150ms CPU + 25KB saved from the TBT window);
+               it still records the full session once loaded ── */}
+        <Script id="ms-clarity" strategy="lazyOnload">{`
           (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;

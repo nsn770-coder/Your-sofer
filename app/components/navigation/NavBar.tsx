@@ -458,7 +458,7 @@ function NavBarContent() {
           </button>
 
           <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
-            <Image src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778746370/%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_L_ecatchila_1_hrlkhj.png" alt="logo" width={200} height={48} className="ys-nav-logo" style={{ height: 48, width: "auto", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
+            <Image src="https://res.cloudinary.com/dyxzq3ucy/image/upload/v1778746370/%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_L_ecatchila_1_hrlkhj.png" alt="logo" width={200} height={48} className="ys-nav-logo" style={{ height: 48, width: "auto", aspectRatio: "200 / 48", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
             <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "#1a1a1a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 

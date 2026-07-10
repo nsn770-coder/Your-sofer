@@ -98,7 +98,7 @@ async function accruePoints(
       loyaltyPoints: prevPoints + pointsEarned,
       tier:          newTier.id,
     });
-    tx.update(orderDocRef, { loyaltyProcessed: true });
+    tx.update(orderDocRef, { loyaltyProcessed: true, pointsEarned });
 
     // Points history — one sub-doc per purchase
     const historyCol = userRef!.collection('pointsHistory');

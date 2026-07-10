@@ -5,7 +5,11 @@ const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 export function FacebookPixel() {
   if (!PIXEL_ID) return null;
   return (
-    <Script id="meta-pixel" strategy="afterInteractive">{`
+    // PERF: lazyOnload (was afterInteractive) — fbevents.js + its config total
+    // ~228KB and ~233ms of main-thread CPU; loading them after `load` keeps the
+    // pixel out of the LCP/TBT window. PageView still fires on every visit and
+    // fbclid attribution is unaffected (it reads the URL whenever it loads).
+    <Script id="meta-pixel" strategy="lazyOnload">{`
       !function(f,b,e,v,n,t,s){
       if(f.fbq)return;n=f.fbq=function(){
       n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
