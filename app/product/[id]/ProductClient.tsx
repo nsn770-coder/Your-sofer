@@ -1498,7 +1498,7 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   // runs and replaces it with the authoritative document.
   const [product, setProduct]           = useState<Product | null>((initialProduct as Product) ?? null);
   // Render nothing until mounted: the server-rendered shell (#pdp-shell) is
-  // visible instead, and is removed (pre-paint) the moment we take over.
+  // visible instead, and is hidden (pre-paint) the moment we take over.
   // This also guarantees isMobile is settled before the first real render,
   // so the SSR HTML never flashes a desktop layout on mobile.
   const [mounted, setMounted]           = useState(false);
@@ -1558,10 +1558,20 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   // correct layout — no desktop→mobile flash).
   useEffect(() => { setMounted(true); }, []);
 
-  // PERF: remove the server-rendered shell before the interactive version
+  // PERF: hide the server-rendered shell before the interactive version
   // paints (useLayoutEffect = pre-paint, so there is never a duplicate frame).
+  // BUGFIX: must be display:none, NOT .remove() — the shell is a React-rendered
+  // node (page.tsx renders <ProductShell/>), so removing it from the DOM
+  // imperatively desyncs React's tree. On the next client-side navigation
+  // (e.g. "קנה עכשיו" → /cart) React unmounts the product route, calls
+  // removeChild on the already-removed shell, throws NotFoundError, and the
+  // whole app crashes to global-error ("שגיאה בטעינת האתר"). display:none has
+  // the identical visual/layout effect and lets React unmount cleanly.
   useLayoutEffect(() => {
-    if (mounted) document.getElementById('pdp-shell')?.remove();
+    if (mounted) {
+      const shell = document.getElementById('pdp-shell');
+      if (shell) shell.style.display = 'none';
+    }
   }, [mounted]);
 
   useEffect(() => {
