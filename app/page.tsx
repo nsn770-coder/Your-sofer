@@ -24,9 +24,9 @@ const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Store',
   name: 'Your Sofer',
-  legalName: 'סודות התורה ע״ר',
+  legalName: 'בואהרון ניסן נסים',
   url: BASE_URL,
-  description: 'חנות אונליין לרכישת מוצרי סת״מ ויודאיקה, המופעלת על ידי סודות התורה ע״ר',
+  description: 'חנות אונליין לרכישת מוצרי סת״מ ויודאיקה',
   telephone: '058-4877-770',
   email: 'support@your-sofer.com',
   address: {

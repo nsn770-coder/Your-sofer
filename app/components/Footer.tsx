@@ -199,7 +199,7 @@ export default function Footer() {
           color: 'rgba(255,255,255,0.4)',
         }}>
           <div style={{ marginBottom: 6, fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
-            Your Sofer מופעל על ידי סודות התורה ע״ר
+            Your Sofer — בבעלות ובניהול בואהרון ניסן נסים, עוסק מורשה 304803810
           </div>
           <div style={{ marginBottom: 10, fontSize: 12, color: 'rgba(255,255,255,0.45)', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px' }}>
             <span>📍 רחוב האורן 18, דימונה</span>

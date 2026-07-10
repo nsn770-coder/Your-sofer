@@ -124,7 +124,7 @@ export default function AboutClient() {
         <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
           <h2 style={{ color: '#1a1a1a', fontSize: 20, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 15, color: '#444' }}>
-            <div><strong>שם העסק:</strong> Your Sofer — חנות אונליין לרכישת מוצרי סת״מ ויודאיקה, המופעלת על ידי <strong>סודות התורה ע״ר</strong></div>
+            <div><strong>שם העסק:</strong> Your Sofer — חנות אונליין לרכישת מוצרי סת״מ ויודאיקה, בבעלות ובניהול <strong>בואהרון ניסן נסים</strong> (עוסק מורשה 304803810)</div>
             <div>
               <strong>טלפון ראשי: </strong>
               <a href="tel:0584877770" style={{ color: '#1a1a1a', fontWeight: 700, textDecoration: 'none' }}>058-4877-770</a>
