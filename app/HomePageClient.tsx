@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect, useLayoutEffect, useRef, useMemo, memo } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,6 +25,10 @@ import {
   CARDS, ALL_CATS, CONFIG_COLLECTION, CONFIG_DOC, slotKey,
 } from './constants/homepageCards';
 import type { CardDef, SubItem } from './constants/homepageCards';
+import {
+  SECTIONS_COLLECTION, SECTIONS_DOC, DEFAULT_SECTIONS, normalizeSections, buildCategoryHref,
+} from './constants/homepageCategorySections';
+import type { HomepageCategoryItem, HomepageCategorySections } from './constants/homepageCategorySections';
 import lifeEvents from '@/data/lifeEvents';
 import AlgoliaSearch from '@/app/components/search/AlgoliaSearch';
 import ProductCardVideo from '@/app/components/ProductCardVideo';
@@ -250,6 +254,44 @@ function CategoryCard({
   );
 }
 
+// ── Admin-configurable homepage category tile ─────────────────────────────────
+// Rendered in the "קטגוריות נבחרות" (top) and "קטגוריות סת״ם" (bottom) grids.
+// width 'half' = 2 per row, 'full' = spans the whole row (admin-controlled).
+
+function HomeCategoryTile({ item, img, isMobile, onNav }: {
+  item: HomepageCategoryItem;
+  img: string;
+  isMobile: boolean;
+  onNav: (href: string) => void;
+}) {
+  const full = item.width === 'full';
+  return (
+    <div
+      onClick={() => onNav(buildCategoryHref(item))}
+      className={`group ${full ? 'col-span-2' : 'col-span-1'}`}
+      style={{ cursor: 'pointer', background: '#FFFFFF' }}
+    >
+      <div style={{ width: '100%', aspectRatio: full ? (isMobile ? '16 / 9' : '21 / 8') : '4 / 3', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
+        {img ? (
+          <Image
+            fill unoptimized loading="lazy"
+            src={optimizeCloudinaryUrl(img, full ? 1280 : 400)}
+            alt={item.label}
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.015]"
+            sizes={full ? '(max-width: 1280px) 100vw, 1280px' : '(max-width: 640px) 50vw, 33vw'}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f4' }}>{item.emoji || '🛍️'}</div>
+        )}
+      </div>
+      <div style={{ marginTop: 12, textAlign: 'center' }}>
+        <h3 style={{ fontSize: 16, fontWeight: 500, color: '#373A5A', margin: 0 }}>{item.label}</h3>
+        <span className="underline underline-offset-4" style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: '#111111' }}>לצפייה</span>
+      </div>
+    </div>
+  );
+}
+
 // ── Skeleton card for loading state ───────────────────────────────────────────
 
 function SkeletonCategoryCard() {
@@ -347,6 +389,8 @@ const ActivityBar = memo(function ActivityBar({
 export default function HomePageClient() {
   const [isMobile, setIsMobile]       = useState(false);
   const [catImages, setCatImages]     = useState<Record<string, string>>({});
+  const [catSections, setCatSections] = useState<HomepageCategorySections>(DEFAULT_SECTIONS);
+  const sectionImgFetchDone = useRef(false);
   const [slotImages, setSlotImages]   = useState<Record<string, string>>({});
   const [imagesReady, setImagesReady] = useState(true);
   const [wizardOpen, setWizardOpen]   = useState(false);
@@ -558,17 +602,58 @@ export default function HomePageClient() {
       finally { setPromoLoaded(true); }
     }
 
+    // Admin-controlled homepage category sections (top + STaM grids)
+    async function fetchCatSections() {
+      try {
+        const snap = await getDoc(doc(db, SECTIONS_COLLECTION, SECTIONS_DOC));
+        if (snap.exists()) setCatSections(normalizeSections(snap.data()));
+      } catch { /* keep DEFAULT_SECTIONS */ }
+    }
+
     // Defer all Firebase reads so the hero (LCP element) paints first
     const timer = setTimeout(() => {
       Promise.all([
         fetchPinnedImages().then(pinned => setSlotImages(pinned)),
         fetchCatImages(),
+        fetchCatSections(),
       ]);
       fetchFeaturedProducts();
       fetchPromoProducts();
     }, 300);
     return () => clearTimeout(timer);
   }, []);
+
+  // Product-image fallback for admin-added section categories (e.g. a new
+  // sub-category like ראש השנה) that have no image in the categories collection.
+  useEffect(() => {
+    if (sectionImgFetchDone.current) return;
+    if (Object.keys(catImages).length === 0) return; // wait for the base image map
+    const keys = [...new Set(
+      [...catSections.top, ...catSections.stam]
+        .filter(it => !it.imageUrl)
+        .flatMap(it => [it.subCategory, it.cat].filter(Boolean) as string[]),
+    )].filter(k => !catImages[k]);
+    if (keys.length === 0) return;
+    sectionImgFetchDone.current = true;
+    (async () => {
+      const pairs = await Promise.all(keys.map(async key => {
+        try {
+          let snap = await getDocs(query(collection(db, 'products'), where('subCategory', '==', key), limit(1)));
+          if (snap.empty) snap = await getDocs(query(collection(db, 'products'), where('cat', '==', key), limit(1)));
+          if (!snap.empty) {
+            const d = snap.docs[0].data();
+            return [key, (d.imgUrl || d.image_url || '') as string] as const;
+          }
+        } catch { /* ignore */ }
+        return [key, ''] as const;
+      }));
+      setCatImages(prev => {
+        const next = { ...prev };
+        for (const [k, img] of pairs) if (img && !next[k]) next[k] = img;
+        return next;
+      });
+    })();
+  }, [catImages, catSections]);
 
   useEffect(() => {
     async function fetchTestimonials() {
@@ -703,21 +788,6 @@ export default function HomePageClient() {
   // popups disabled
   useEffect(() => {}, []);
   useEffect(() => {}, []);
-
-  // ── Memoized arrays that depend on catImages ───────────────────────────────
-
-  const categoryGridItems = useMemo(() => [
-    { name: 'תפילין קומפלט',  emoji: '🖊️', img: catImages['תפילין קומפלט']  || '', href: '/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98' },
-    { name: 'קלף מזוזה',       emoji: '📜', img: catImages['קלפי מזוזה']      || '', href: '/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94',       fallback: '#1a2744' },
-    { name: 'יודאיקה',         emoji: '✡️', img: catImages['יודאיקה']         || '', href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94' },
-    { name: 'נטלות וכלים',    emoji: '🫙', img: catImages['נטלות וכלים'] || 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776283325/eolm1mte2d2q1zjaijsn.png', href: '/category/%D7%99%D7%95%D7%93%D7%90%D7%99%D7%A7%D7%94?filter=%D7%A0%D7%98%D7%99%D7%9C%D7%AA%20%D7%99%D7%93%D7%99%D7%99%D7%9D%20%D7%95%D7%9E%D7%99%D7%9D%20%D7%90%D7%97%D7%A8%D7%95%D7%A0%D7%99%D7%9D' },
-    { name: 'שבתות וחגים',    emoji: '🕯️', img: catImages['שבתות וחגים'] || 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_800/v1776635301/lsgvbw3tbwfbnv626xv7_ebthks.png', href: '/category/%D7%A9%D7%91%D7%AA%D7%95%D7%AA%20%D7%95%D7%97%D7%92%D7%99%D7%9D' },
-    { name: 'מגילות',          emoji: '📖', img: catImages['מגילות']          || '', href: '/category/%D7%9E%D7%92%D7%99%D7%9C%D7%95%D7%AA' },
-    { name: 'בתי מזוזה',       emoji: '📜', img: catImages['בתי מזוזה']       || '', href: '/category/%D7%91%D7%AA%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94' },
-    { name: 'סט טלית תפילין', emoji: '🕍', img: catImages['סט טלית תפילין'] || '', href: '/category/%D7%A1%D7%98%20%D7%98%D7%9C%D7%99%D7%AA%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F', fallback: '#1a2744' },
-    { name: 'כיפות',          emoji: '🎩', img: catImages['כיפות']          || '', href: '/category/%D7%9B%D7%99%D7%A4%D7%95%D7%AA' },
-    { name: 'סטים ומארזים',  emoji: '🎁', img: catImages['סטים ומארזים']  || '', href: '/category/%D7%A1%D7%98%D7%99%D7%9D%20%D7%95%D7%9E%D7%90%D7%A8%D7%96%D7%99%D7%9D' },
-  ] as { name: string; emoji: string; img: string; href: string; fallback?: string }[], [catImages]);
 
   async function fetchWizardResults(budget: typeof wizardBudget, kashrut: typeof wizardKashrut) {
     setWizardLoading(true);
@@ -1251,34 +1321,16 @@ export default function HomePageClient() {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-7">
-            {([
-              { name: 'חנוכה',        emoji: '🕎', img: catImages['חנוכה']        || '', href: '/category/%D7%97%D7%A0%D7%95%D7%9B%D7%94' },
-              { name: 'סט בר מצווה', emoji: '✡️', img: optimizeCloudinaryUrl('https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777989198/fqm7twz1berprum03u7u.png', 400), href: '/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94' },
-              categoryGridItems.find(c => c.name === 'בתי מזוזה'),
-              categoryGridItems.find(c => c.name === 'סט טלית תפילין'),
-              categoryGridItems.find(c => c.name === 'יודאיקה'),
-              categoryGridItems.find(c => c.name === 'כיפות'),
-              categoryGridItems.find(c => c.name === 'שבתות וחגים'),
-              categoryGridItems.find(c => c.name === 'סטים ומארזים'),
-            ].filter(Boolean) as { name: string; emoji: string; img: string; href: string; fallback?: string }[]).map(cat => (
-              <div key={cat.name}
-                onClick={() => router.push(cat.href)}
-                className="group"
-                style={{ cursor: 'pointer', background: '#FFFFFF' }}
-              >
-                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
-                  {cat.img ? (
-                    <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} className="object-cover transition-transform duration-300 group-hover:scale-[1.015]" sizes="(max-width: 640px) 50vw, 33vw" />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: cat.fallback ?? '#f3f4f4' }}>{cat.emoji}</div>
-                  )}
-                </div>
-                <div style={{ marginTop: 12, textAlign: 'center' }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 500, color: '#373A5A', margin: 0 }}>{cat.name}</h3>
-                  <span className="underline underline-offset-4" style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: '#111111' }}>לצפייה</span>
-                </div>
-              </div>
+          {/* Admin-controlled via דשבורד ← קטגוריות ← תצוגת קטגוריות בדף הבית */}
+          <div className="grid grid-cols-2 gap-4 md:gap-7">
+            {catSections.top.map(item => (
+              <HomeCategoryTile
+                key={item.id}
+                item={item}
+                img={item.imageUrl || catImages[item.subCategory ?? ''] || catImages[item.cat] || catImages[item.label] || ''}
+                isMobile={isMobile}
+                onNav={href => router.push(href)}
+              />
             ))}
           </div>
           <div style={{ textAlign: 'center', marginTop: 40 }}>
@@ -1541,33 +1593,16 @@ export default function HomePageClient() {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות סת״מ</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>כל מוצרי הסופר סת״מ</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-7">
-            {([
-              { name: 'ספרי תורה',     emoji: '📜', img: catImages['ספרי תורה']     || '', href: '/category/%D7%A1%D7%A4%D7%A8%D7%99%20%D7%AA%D7%95%D7%A8%D7%94' },
-              { name: 'קלפי תפילין',   emoji: '📄', img: catImages['קלפי תפילין']   || '', href: '/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F' },
-              { name: 'תפילין קומפלט', emoji: '🖊️', img: catImages['תפילין קומפלט'] || '', href: '/category/%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F%20%D7%A7%D7%95%D7%9E%D7%A4%D7%9C%D7%98' },
-              { name: 'קלפי מזוזה',    emoji: '📜', img: catImages['קלפי מזוזה']    || '', href: '/category/%D7%A7%D7%9C%D7%A4%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94' },
-              { name: 'בר מצווה',      emoji: '✡️', img: catImages['בר מצווה']      || '', href: '/category/%D7%91%D7%A8%20%D7%9E%D7%A6%D7%95%D7%95%D7%94' },
-              { name: 'סט טלית תפילין', emoji: '🎒', img: catImages['סט טלית תפילין'] || '', href: '/category/%D7%A1%D7%98%20%D7%98%D7%9C%D7%99%D7%AA%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F' },
-            ] as { name: string; emoji: string; img: string; href: string }[]).map(cat => (
-              <div
-                key={cat.name}
-                onClick={() => router.push(cat.href)}
-                className="group"
-                style={{ cursor: 'pointer', background: '#FFFFFF' }}
-              >
-                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', position: 'relative', background: '#FFFFFF' }}>
-                  {cat.img ? (
-                    <Image fill unoptimized loading="lazy" src={optimizeCloudinaryUrl(cat.img, 400)} alt={cat.name} className="object-cover transition-transform duration-300 group-hover:scale-[1.015]" sizes="(max-width: 640px) 50vw, 33vw" />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, background: '#f3f4f4' }}>{cat.emoji}</div>
-                  )}
-                </div>
-                <div style={{ marginTop: 12, textAlign: 'center' }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 500, color: '#373A5A', margin: 0 }}>{cat.name}</h3>
-                  <span className="underline underline-offset-4" style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: '#111111' }}>לצפייה</span>
-                </div>
-              </div>
+          {/* Admin-controlled via דשבורד ← קטגוריות ← תצוגת קטגוריות בדף הבית */}
+          <div className="grid grid-cols-2 gap-4 md:gap-7">
+            {catSections.stam.map(item => (
+              <HomeCategoryTile
+                key={item.id}
+                item={item}
+                img={item.imageUrl || catImages[item.subCategory ?? ''] || catImages[item.cat] || catImages[item.label] || ''}
+                isMobile={isMobile}
+                onNav={href => router.push(href)}
+              />
             ))}
           </div>
         </div>

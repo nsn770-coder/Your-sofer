@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
 import { CATS, getSubCats, findParentCat } from '../constants/categories';
 import HomepageConfigTab from './components/HomepageConfigTab';
+import HomepageCategorySectionsTab from './components/HomepageCategorySectionsTab';
 import BestSellersTab from './components/BestSellersTab';
 import InventoryTab from './components/InventoryTab';
 import PrintsTab from './components/PrintsTab';
@@ -3499,6 +3500,14 @@ export default function AdminPage() {
 
       {activeTab === 'categories' && (
         <div className="grid gap-6">
+          <HomepageCategorySectionsTab
+            catImages={categories.reduce<Record<string, string>>((acc, c) => {
+              const img = c.imageUrl || c.imgUrl || '';
+              if (!img) return acc;
+              for (const key of [c.slug, c.displayName, c.name, c.id]) if (key) acc[key] = acc[key] || img;
+              return acc;
+            }, {})}
+          />
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-xl font-black mb-1">🖼️ ניהול קטגוריות</h2>
             <p className="text-sm text-gray-500 mb-6">
