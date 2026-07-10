@@ -1,23 +1,42 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { MEGA_MENU_DATA, categoryUrl } from '@/data/categoriesMenu';
 
 const WA_LINK = 'https://wa.me/972587479933?text=שלום אני מעוניין בעזרה ופרטים נוספים';
 
 interface LinkItem { label: string; path?: string; href?: string; }
 interface Column { title: string; links: LinkItem[]; }
 
-const COLUMNS: Column[] = [
+// ── All categories + subcategories, derived from the same data as the mega menu ──
+interface CatBlock { title: string; path: string; subs: LinkItem[] }
+
+const CATEGORY_BLOCKS: CatBlock[] = [
+  ...MEGA_MENU_DATA.map(item => {
+    const seen = new Set<string>();
+    const subs: LinkItem[] = [];
+    for (const col of item.columns) {
+      for (const s of col.items) {
+        if (!s.filter && s.label.startsWith('כל')) continue; // "כל X" — the block title already links there
+        const key = `${s.cat}|${s.filter ?? ''}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        subs.push({ label: s.label, path: categoryUrl(s.cat, s.filter) });
+      }
+    }
+    return { title: item.label, path: categoryUrl(item.cat), subs };
+  }),
   {
-    title: 'קטגוריות',
-    links: [
-      { label: 'קלפי מזוזה',    path: `/category/${encodeURIComponent('קלפי מזוזה')}` },
-      { label: 'תפילין קומפלט', path: `/category/${encodeURIComponent('תפילין קומפלט')}` },
-      { label: 'סט בר מצווה',   path: '/bar-mitzva' },
-      { label: 'בתי מזוזה',     path: `/category/${encodeURIComponent('בתי מזוזה')}` },
-      { label: 'יודאיקה',       path: `/category/${encodeURIComponent('יודאיקה')}` },
+    title: 'בר מצווה',
+    path: '/bar-mitzva',
+    subs: [
+      { label: 'סט בר מצווה',    path: '/bar-mitzva' },
+      { label: 'כיפות לאירועים', path: '/event-kippot' },
     ],
   },
+];
+
+const COLUMNS: Column[] = [
   {
     title: 'שירות לקוחות',
     links: [
@@ -61,6 +80,7 @@ export default function Footer() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [openCols, setOpenCols] = useState<Set<number>>(new Set());
+  const [openCats, setOpenCats] = useState<Set<number>>(new Set());
 
   if (pathname?.startsWith('/bar-mitzvah')) return null;
 
@@ -73,6 +93,14 @@ export default function Footer() {
 
   function toggleCol(i: number) {
     setOpenCols(prev => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
+  }
+
+  function toggleCat(i: number) {
+    setOpenCats(prev => {
       const next = new Set(prev);
       next.has(i) ? next.delete(i) : next.add(i);
       return next;
@@ -127,8 +155,10 @@ export default function Footer() {
     <>
       <style>{`
         @keyframes ys-footer-slide { from { opacity: 0; } to { opacity: 1; } }
-        .ys-footer-cols { display: grid; grid-template-columns: repeat(5, 1fr); gap: 32px; }
+        .ys-footer-cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
         @media (max-width: 767px) { .ys-footer-cols { grid-template-columns: 1fr; gap: 0; } }
+        .ys-footer-cats { columns: 6 150px; column-gap: 28px; }
+        @media (max-width: 1023px) { .ys-footer-cats { columns: 4 150px; } }
       `}</style>
 
       <footer dir="rtl" style={{ background: '#1F2937', color: '#F9FAFB' }}>
@@ -142,6 +172,78 @@ export default function Footer() {
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
               לא קונים סת״ם בלי לדעת מי כתב אותו
             </div>
+          </div>
+
+          {/* ── All categories + subcategories ── */}
+          <div style={{ marginBottom: isMobile ? 20 : 36 }}>
+            <div style={{ ...colTitleStyle, marginBottom: isMobile ? 4 : 18 }}>קטגוריות</div>
+
+            {isMobile ? (
+              /* Mobile: accordion per category */
+              <div>
+                {CATEGORY_BLOCKS.map((block, i) => {
+                  const isOpen = openCats.has(i);
+                  return (
+                    <div key={block.title} style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                      <button
+                        onClick={() => toggleCat(i)}
+                        style={{
+                          width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                          padding: '12px 0', fontFamily: 'inherit',
+                        }}
+                      >
+                        <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{block.title}</span>
+                        <svg
+                          width="13" height="13" viewBox="0 0 24 24" fill="none"
+                          stroke="rgba(255,255,255,0.5)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                          style={{ flexShrink: 0, transition: 'transform 0.25s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                        >
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </button>
+                      <div style={{
+                        overflow: 'hidden',
+                        maxHeight: isOpen ? 600 : 0,
+                        transition: 'max-height 0.3s ease',
+                        paddingBottom: isOpen ? 12 : 0,
+                        paddingRight: 10,
+                      }}>
+                        <NavLink label={`לכל ${block.title} ←`} path={block.path} />
+                        {block.subs.map(s => (
+                          <NavLink key={`${s.label}-${s.path}`} {...s} />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              /* Desktop: all categories open, masonry columns */
+              <div className="ys-footer-cats">
+                {CATEGORY_BLOCKS.map(block => (
+                  <div key={block.title} style={{ breakInside: 'avoid', marginBottom: 22 }}>
+                    <button
+                      onClick={() => nav(block.path)}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#C9A227'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.9)'; }}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                        fontFamily: 'inherit', textAlign: 'right', display: 'block',
+                        fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
+                        marginBottom: 8, borderBottom: '1px solid rgba(201,162,39,0.35)', paddingBottom: 5,
+                        width: '100%',
+                      }}
+                    >
+                      {block.title}
+                    </button>
+                    {block.subs.map(s => (
+                      <NavLink key={`${s.label}-${s.path}`} {...s} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Columns */}
