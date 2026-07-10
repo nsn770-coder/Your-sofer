@@ -21,6 +21,8 @@ import SiteSettingsTab from './components/SiteSettingsTab';
 import PromotionsTab from './components/PromotionsTab';
 import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES } from '@/app/components/ProductLabelPrint';
 import { getTier } from '@/app/lib/loyalty';
+import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
+import EraToggle from '@/app/components/EraToggle';
 
 interface OrderItem {
   id: string;
@@ -1601,6 +1603,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showCancelled, setShowCancelled] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [era, setEra] = useState<AccountEra>('business');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -1828,12 +1831,17 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
     return `${dd}/${mm}/${d.getFullYear()}`;
   }
 
-  const cancelledCount = orders.filter(o => o.status === 'cancelled').length;
-  const activeCount = orders.filter(o => o.status !== 'cancelled').length;
+  // הזמנות לפי חשבון — עסק (מ-10/07/2026) / עמותה / הכל
+  const eraOrders = orders.filter(o =>
+    isOrderInEra(o as { account?: string }, o.createdAt ? new Date(o.createdAt.seconds * 1000) : null, era)
+  );
+
+  const cancelledCount = eraOrders.filter(o => o.status === 'cancelled').length;
+  const activeCount = eraOrders.filter(o => o.status !== 'cancelled').length;
   const filtersActive = statusFilter !== 'all' || !!dateFrom || !!dateTo;
   const fromDateObj = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
   const toDateObj = dateTo ? new Date(`${dateTo}T23:59:59.999`) : null;
-  const visibleOrders = orders
+  const visibleOrders = eraOrders
     .filter(o => showCancelled ? o.status === 'cancelled' : o.status !== 'cancelled')
     .filter(o => statusFilter === 'all' || o.status === statusFilter)
     .filter(o => {
@@ -1854,6 +1862,9 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
 
   return (
     <div className="space-y-3" dir="rtl">
+      {/* מתג חשבון — עסק / עמותה / הכל */}
+      <EraToggle era={era} setEra={setEra} />
+
       <div className="flex gap-2">
         <button
           onClick={() => setShowCancelled(false)}

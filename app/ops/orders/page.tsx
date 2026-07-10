@@ -5,11 +5,14 @@ import { db } from '@/app/firebase';
 import { useOpsAuth } from '@/app/contexts/OpsAuthContext';
 import type { InternalOrder } from '@/app/ops/types';
 import OrdersTable from '@/components/ops/OrdersTable';
+import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
+import EraToggle from '@/app/components/EraToggle';
 
 export default function AllOrdersPage() {
   const { opsUser } = useOpsAuth();
   const [orders, setOrders] = useState<InternalOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [era, setEra] = useState<AccountEra>('business');
 
   useEffect(() => {
     async function load() {
@@ -36,6 +39,12 @@ export default function AllOrdersPage() {
 
   const showFinancial = opsUser?.role !== 'fulfillment';
 
+  // הזמנות לפי חשבון — עסק (מ-10/07/2026) / עמותה / הכל
+  const eraOrders = orders.filter((o) => {
+    const ts = o.createdAt?.toDate ? o.createdAt.toDate() : o.createdAt ? new Date(o.createdAt) : null;
+    return isOrderInEra(o as { account?: string }, ts, era);
+  });
+
   if (loading) {
     return <div className="flex items-center justify-center py-24 text-gray-400">טוען הזמנות...</div>;
   }
@@ -45,12 +54,15 @@ export default function AllOrdersPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black" style={{ color: '#1E3A8A' }}>כל ההזמנות</h1>
-          <p className="text-gray-500 text-sm mt-1">{orders.length} הזמנות במערכת</p>
+          <p className="text-gray-500 text-sm mt-1">{eraOrders.length} הזמנות במערכת</p>
         </div>
       </div>
 
+      {/* מתג חשבון — עסק / עמותה / הכל */}
+      <EraToggle era={era} setEra={setEra} />
+
       <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-        <OrdersTable orders={orders} showFinancial={showFinancial} highlightDelayed highlightBlocked />
+        <OrdersTable orders={eraOrders} showFinancial={showFinancial} highlightDelayed highlightBlocked />
       </div>
     </div>
   );
