@@ -474,6 +474,8 @@ export async function POST(req: NextRequest) {
         kippotDiscount: kippotDiscountAmount > 0 ? kippotDiscountAmount : null,
         shippingCost: shippingCost || 0, shippingType: shippingType || 'regular',
         status: 'paid', createdAt: FieldValue.serverTimestamp(), paidAt: FieldValue.serverTimestamp(),
+        account: 'business', // charged via the business Sumit account (from 10/07/2026); amuta-era orders have no field
+
         shaliachRef: refCode || null, shaliachId: shaliachId || null, shaliachName: shaliachName || null,
         commissionPercent: commissionPercent || 0, commissionAmount,
         uid: uid || null, guestId: sessionId || null, sessionId: sessionId || null, isGuest: !uid,

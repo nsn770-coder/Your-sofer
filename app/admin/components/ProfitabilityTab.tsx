@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { Product } from '@/app/lib/types';
 import { Order } from '@/app/lib/types';
+import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
+import EraToggle from '@/app/components/EraToggle';
 
 interface ProfitabilityTabProps {
   products: Product[];
@@ -10,6 +12,12 @@ interface ProfitabilityTabProps {
 
 export default function ProfitabilityTab({ products, orders }: ProfitabilityTabProps) {
   const [dateRange, setDateRange] = useState<'day' | 'week' | 'month' | 'quarter' | 'year'>('month');
+  const [era, setEra] = useState<AccountEra>('business');
+
+  const getOrderDateOf = (order: Order): Date =>
+    order.createdAt instanceof Date
+      ? order.createdAt
+      : new Date(((order.createdAt as { seconds: number } | undefined)?.seconds ?? 0) * 1000);
 
   const getFilteredOrders = () => {
     const cutoffDate = new Date();
@@ -23,9 +31,8 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
     }
 
     return orders.filter(order => {
-      const orderDate = order.createdAt instanceof Date
-        ? order.createdAt
-        : new Date(((order.createdAt as { seconds: number } | undefined)?.seconds ?? 0) * 1000);
+      const orderDate = getOrderDateOf(order);
+      if (!isOrderInEra(order as { account?: string }, orderDate, era)) return false;
       return orderDate >= cutoffDate;
     });
   };
@@ -108,6 +115,9 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
     <div>
       <h2 style={{ fontSize: 18, fontWeight: 900, marginBottom: 15 }}>📊 דוח רווחיות</h2>
 
+      {/* עסק / עמותה — המלאי למטה תמיד מחושב על כל ההיסטוריה */}
+      <EraToggle era={era} setEra={setEra} />
+
       <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
         {(['day', 'week', 'month', 'quarter', 'year'] as const).map(range => (
           <button
@@ -153,7 +163,7 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
         <div style={{ background: '#f8f8f8', padding: 15, borderRadius: 8, border: '1px solid #e5e7eb' }}>
           <div style={{ fontSize: 12, color: '#374151', fontWeight: 700 }}>שווי מלאי (טרם נמכר)</div>
           <div style={{ fontSize: 22, fontWeight: 900, color: '#111827' }}>₪{unsoldInventory.value.toFixed(0)}</div>
-          <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{unsoldInventory.count} מוצרים במלאי</div>
+          <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{unsoldInventory.count} מוצרים במלאי · כולל מלאי מתקופת העמותה</div>
         </div>
       </div>
 

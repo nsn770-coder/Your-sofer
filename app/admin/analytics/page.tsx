@@ -17,6 +17,8 @@ import {
   isPaidOrder,
   isPendingPayment,
 } from '@/app/lib/orderStatus';
+import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
+import EraToggle from '@/app/components/EraToggle';
 
 const AnalyticsLineChart = dynamic(() => import('./AnalyticsLineChart'), {
   ssr: false,
@@ -32,6 +34,7 @@ interface Order extends OrderLike {
   email?: string;
   address?: string;
   notes?: string;
+  account?: string; // 'business' | 'amuta' — stamped from 10/07/2026; older orders have none
 }
 
 interface DayStat {
@@ -137,6 +140,7 @@ export default function AnalyticsDashboard() {
   const [dataLoading, setDataLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  const [era, setEra] = useState<AccountEra>('business');
   const [rangePreset, setRangePreset] = useState<RangePreset>('30d');
   const [customFrom, setCustomFrom] = useState(toInputDate(new Date(Date.now() - 29 * 86400000)));
   const [customTo, setCustomTo] = useState(toInputDate(new Date()));
@@ -172,10 +176,11 @@ export default function AnalyticsDashboard() {
   const ordersInRange = useMemo(() => {
     return allOrders.filter(o => {
       const d = getOrderDate(o);
+      if (!isOrderInEra(o, d, era)) return false;
       if (!d) return false;
       return d.getTime() >= range.from.getTime() && d.getTime() <= range.to.getTime();
     });
-  }, [allOrders, range]);
+  }, [allOrders, range, era]);
 
   const stats = useMemo(() => {
     const paid = ordersInRange.filter(isPaidOrder);
@@ -268,6 +273,9 @@ export default function AnalyticsDashboard() {
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 16px 40px' }}>
+
+        {/* ── Account era toggle (business vs. amuta history) ── */}
+        <EraToggle era={era} setEra={setEra} />
 
         {/* ── Date range bar ── */}
         <DateRangeBar

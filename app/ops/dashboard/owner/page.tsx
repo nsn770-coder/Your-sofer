@@ -7,6 +7,8 @@ import { useOpsAuth } from '@/app/contexts/OpsAuthContext';
 import type { InternalOrder, AuditEntry } from '@/app/ops/types';
 import OrdersTable from '@/components/ops/OrdersTable';
 import AuditTimeline from '@/components/ops/AuditTimeline';
+import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
+import EraToggle from '@/app/components/EraToggle';
 
 function StatCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
   return (
@@ -63,6 +65,7 @@ export default function OwnerDashboard() {
   const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'all-orders'>('overview');
+  const [era, setEra] = useState<AccountEra>('business');
 
   useEffect(() => {
     async function load() {
@@ -83,14 +86,21 @@ export default function OwnerDashboard() {
     load();
   }, []);
 
-  const today = countAndRevenue(orders, startOfDay());
-  const week = countAndRevenue(orders, startOfWeek());
-  const month = countAndRevenue(orders, startOfMonth());
+  // Financial views respect the era toggle (business era starts 10/07/2026).
+  const eraOrders = orders.filter((o) => {
+    const ts = o.createdAt?.toDate ? o.createdAt.toDate() : o.createdAt ? new Date(o.createdAt) : null;
+    return isOrderInEra(o as { account?: string }, ts, era);
+  });
 
+  const today = countAndRevenue(eraOrders, startOfDay());
+  const week = countAndRevenue(eraOrders, startOfWeek());
+  const month = countAndRevenue(eraOrders, startOfMonth());
+
+  // Operational alerts stay era-agnostic — an old delayed order still needs care.
   const delayed = orders.filter((o) => o.isDelayed && !['completed', 'delivered', 'cancelled'].includes(o.status));
   const blocked = orders.filter((o) => o.isBlocked && !['completed', 'delivered', 'cancelled'].includes(o.status));
 
-  const byStatus = orders.reduce<Record<string, number>>((acc, o) => {
+  const byStatus = eraOrders.reduce<Record<string, number>>((acc, o) => {
     acc[o.status] = (acc[o.status] || 0) + 1;
     return acc;
   }, {});
@@ -131,6 +141,9 @@ export default function OwnerDashboard() {
           </button>
         ))}
       </div>
+
+      {/* Account era toggle — business vs. amuta history */}
+      <EraToggle era={era} setEra={setEra} />
 
       {activeTab === 'overview' && (
         <>
@@ -210,8 +223,8 @@ export default function OwnerDashboard() {
 
       {activeTab === 'all-orders' && (
         <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-          <h2 className="font-bold text-gray-800 mb-4">כל ההזמנות ({orders.length})</h2>
-          <OrdersTable orders={orders} showFinancial highlightDelayed highlightBlocked />
+          <h2 className="font-bold text-gray-800 mb-4">כל ההזמנות ({eraOrders.length})</h2>
+          <OrdersTable orders={eraOrders} showFinancial highlightDelayed highlightBlocked />
         </div>
       )}
     </div>
