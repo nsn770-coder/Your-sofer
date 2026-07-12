@@ -1,10 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { POLICY_URLS, SHIPPING } from '@/app/config/siteTrust';
 
 /**
  * DeliveryEstimate — תיבת צפי משלוח.
- * מחשבת אוטומטית: היום + 7 ימים. אם התאריך נופל בשבת — נדחה ליום ראשון.
- * מוצגת בדף העגלה ובדף הצ'קאוט (אזור התשלום).
+ * ברירת מחדל: היום + 7 ימים (משלוח רגיל). אם התאריך נופל בשבת — נדחה ליום ראשון.
+ * ניתן להעביר daysRange פר-מוצר (למשל product.days = '7-10') — אז מוצג טווח
+ * ימי עסקים אמיתי במקום תאריך יחיד, כדי לא להציג צפי אחיד למוצרים שונים.
+ * מוצגת בדף העגלה ובדף התשלום (אזור התשלום).
  * מחושב ב-useEffect כדי למנוע hydration mismatch בין SSR ללקוח.
  */
 
@@ -23,7 +27,7 @@ function getDeliveryEstimate(): { dayName: string; dateStr: string } {
 
 function IconTruckSmall({ size = 18, color = '#1E3A8A' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="1" y="3" width="15" height="13" rx="1" />
       <path d="M16 8h4l3 5v4h-7V8z" />
       <circle cx="5.5" cy="18.5" r="2.5" />
@@ -32,7 +36,15 @@ function IconTruckSmall({ size = 18, color = '#1E3A8A' }: { size?: number; color
   );
 }
 
-export default function DeliveryEstimate({ compact = false }: { compact?: boolean }) {
+interface Props {
+  compact?: boolean;
+  /** טווח ימי עסקים פר-מוצר (למשל '7-10'). כשמועבר — מוצג טווח במקום תאריך. */
+  daysRange?: string;
+  /** מוצר בהתאמה אישית — מציג הערת זמן הכנה */
+  customMade?: boolean;
+}
+
+export default function DeliveryEstimate({ compact = false, daysRange, customMade = false }: Props) {
   const [est, setEst] = useState<{ dayName: string; dateStr: string } | null>(null);
 
   useEffect(() => {
@@ -65,10 +77,21 @@ export default function DeliveryEstimate({ compact = false }: { compact?: boolea
       </div>
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: compact ? 12 : 13, fontWeight: 800, color: '#1E3A8A' }}>
-          צפי משלוח: יום {est.dayName}, {est.dateStr} בשעות הצהריים
+          {daysRange
+            ? `זמן אספקה משוער: ${daysRange} ימי עסקים`
+            : `צפי משלוח: יום ${est.dayName}, ${est.dateStr} בשעות הצהריים`}
         </div>
+        {customMade && (
+          <div style={{ fontSize: compact ? 10.5 : 11, color: '#555', marginTop: 2 }}>
+            מוצר בהתאמה אישית — זמן ההכנה כלול בצפי האספקה
+          </div>
+        )}
         <div style={{ fontSize: compact ? 10.5 : 11, color: '#555', marginTop: 2 }}>
-          ההזמנה תישלח עם חברת המשלוחים Sendit עד הבית
+          ההזמנה תישלח עם חברת המשלוחים {SHIPPING.carrierName} עד הבית — יישלח עדכון ומספר מעקב כשההזמנה תצא.
+          {' '}
+          <Link href={POLICY_URLS.shipping} style={{ color: '#1E3A8A', textDecorationLine: 'underline', textDecorationColor: '#93b8e8', textUnderlineOffset: 2 }}>
+            מידע על משלוחים
+          </Link>
         </div>
       </div>
     </div>

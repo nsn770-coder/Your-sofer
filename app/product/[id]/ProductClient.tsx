@@ -15,6 +15,7 @@ import NextImage from 'next/image';
 import CertificatesSection, { type Certificate } from '@/app/components/CertificatesSection';
 import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES } from '@/app/components/ProductLabelPrint';
 import EmbroideryThreadColorPicker from '@/app/components/EmbroideryThreadColorPicker';
+import PaymentMethodsRow from '@/app/components/trust/PaymentMethodsRow';
 import type { ThreadColor } from '@/app/data/threadColors';
 import dynamic from 'next/dynamic';
 const MezuzahUpsellPopup = dynamic(() => import('@/components/MezuzahUpsellPopup'), { ssr: false });
@@ -1534,7 +1535,6 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   const [isMobile, setIsMobile]         = useState(false);
   const [showVideo, setShowVideo]       = useState(false);
   const [activeTab, setActiveTab]       = useState<'details' | 'kashrut' | 'shipping' | 'closeup'>('details');
-  const [currentViewers, setCurrentViewers] = useState(2);
   const [descExpanded, setDescExpanded] = useState(false);
   const buyBoxRef = useRef<HTMLDivElement>(null);
   const mobileBuyBoxRef = useRef<HTMLDivElement>(null);
@@ -1586,6 +1586,15 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
     return () => observer.disconnect();
   }, [isMobile]);
 
+  // תיאום אלמנטים צפים: כשסרגל ההוספה לסל הקבוע מוצג, פס המתנה וכפתור
+  // הוואטסאפ מוזזים מעליו דרך CSS (globals.css — body.product-sticky-bar-active)
+  // כדי שלא יכסו את כפתור התשלום.
+  useEffect(() => {
+    const active = isMobile && stickyBarVisible && !product?.outOfStock;
+    document.body.classList.toggle('product-sticky-bar-active', active);
+    return () => { document.body.classList.remove('product-sticky-bar-active'); };
+  }, [isMobile, stickyBarVisible, product?.outOfStock]);
+
   useEffect(() => {
     const STAM_CHAT_CATS = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה']);
     setStamPage(!!product?.cat && STAM_CHAT_CATS.has(product.cat));
@@ -1599,15 +1608,7 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
     }
   }, [product?.id]);
 
-  useEffect(() => {
-    setCurrentViewers(Math.floor(Math.random() * 5) + 2);
-    let timer: ReturnType<typeof setTimeout>;
-    function scheduleNext() {
-      timer = setTimeout(() => { setCurrentViewers(Math.floor(Math.random() * 5) + 2); scheduleNext(); }, Math.floor(Math.random() * 20000) + 20000);
-    }
-    scheduleNext();
-    return () => clearTimeout(timer);
-  }, []);
+  // הוסר: מונה "צופים עכשיו" אקראי — הוכחה חברתית מפוברקת פוגעת באמון.
 
   useEffect(() => {
     async function load() {
@@ -2163,12 +2164,6 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </div>
       )}
 
-      {/* Urgency text */}
-      {!compact && (
-        <div style={{ fontSize: 12, color: '#c0392b', fontWeight: 600, textAlign: 'center', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-          <Icon.Lightning /> לקוחות מזמינים את המוצר הזה השבוע
-        </div>
-      )}
 
       {/* PRIMARY: Buy Now */}
       {(product.outOfStock || product.comingSoon) ? (
@@ -2230,10 +2225,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '4px 0 12px', padding: '12px 14px', background: '#FAFAF8', border: '1px solid #EDE9DF', borderRadius: 12, direction: 'rtl' }}>
         {[
-          { icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', title: 'רכישה מאובטחת לחלוטין', sub: 'כל העברות מוצפנות ומאובטחות' },
-          { icon: 'M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2zM9 22V12h6v10', title: 'החזרה תוך 14 יום', sub: 'לא מרוצה? נחזיר לך את הכסף' },
-          { icon: 'M1 3h15a1 1 0 011 1v13H1V4a1 1 0 011-1zM16 8h4l3 5v4h-7V8zM5.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM18.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5z', title: 'משלוח לכל הארץ', sub: 'עם מספר מעקב — ישירות אליך הביתה' },
-          { icon: 'M12 22C6 17 4 13 4 9a8 8 0 1116 0c0 4-2 8-8 13z', title: 'תמיכה אישית 24/7', sub: 'נציג אנושי זמין בוואטסאפ' },
+          { icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', title: 'תשלום מאובטח ומוצפן', sub: 'פרטי התשלום מועברים בצורה מאובטחת לספק הסליקה', href: undefined as string | undefined },
+          { icon: 'M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2zM9 22V12h6v10', title: 'ביטול והחזרה בהתאם למדיניות האתר', sub: 'עד 14 יום למוצרים שלא נפתחו — לפרטים במדיניות הביטולים', href: '/legal/returns' as string | undefined },
+          { icon: 'M1 3h15a1 1 0 011 1v13H1V4a1 1 0 011-1zM16 8h4l3 5v4h-7V8zM5.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM18.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5z', title: 'משלוח לכל הארץ', sub: 'עם מספר מעקב — ישירות אליך הביתה', href: undefined as string | undefined },
+          { icon: 'M12 22C6 17 4 13 4 9a8 8 0 1116 0c0 4-2 8-8 13z', title: 'שירות לקוחות אנושי', sub: 'זמינים בוואטסאפ ובטלפון, א׳–ה׳ 09:00–18:00', href: undefined as string | undefined },
         ].map(item => (
           <div key={item.title} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A227" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
@@ -2241,10 +2236,19 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             </svg>
             <div>
               <div style={{ fontSize: 12, fontWeight: 800, color: '#1F2937' }}>{item.title}</div>
-              <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>{item.sub}</div>
+              <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>
+                {item.href ? (
+                  <a href={item.href} style={{ color: '#6B7280', textDecorationLine: 'underline', textDecorationColor: '#ccc', textUnderlineOffset: 2 }}>{item.sub}</a>
+                ) : item.sub}
+              </div>
             </div>
           </div>
         ))}
+      </div>
+
+      {/* אמצעי תשלום — שורה עדינה ליד פעולת הרכישה */}
+      <div style={{ margin: '0 0 12px' }}>
+        <PaymentMethodsRow size="sm" />
       </div>
 
       <a
@@ -2329,8 +2333,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       )}
 
       {/* Trust sentence */}
-      <div style={{ textAlign: 'center', fontSize: 11, color: '#999', marginBottom: compact ? 0 : 4 }}>
-        רכישה מאובטחת | אחריות מלאה | משלוח לכל הארץ
+      <div style={{ textAlign: 'center', fontSize: 11, color: '#777', marginBottom: compact ? 0 : 4 }}>
+        תשלום מאובטח · משלוח לכל הארץ · <a href="/legal/returns" style={{ color: '#777', textDecorationLine: 'underline', textDecorationColor: '#ccc', textUnderlineOffset: 2 }}>ביטול והחזרה לפי מדיניות האתר</a>
       </div>
 
       {/* Rabbinical approval badge - STaM categories only */}
@@ -2370,11 +2374,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   ];
 
   const shippingRows = [
-    { icon: <Icon.Truck />,   k: 'משלוח',  v: `₪35 עד הבית · ${product.days || '7-10'} ימי עסקים` },
+    { icon: <Icon.Truck />,   k: 'משלוח',  v: `₪35 עד הבית · ${product.days || '7-10'} ימי עסקים · עם מספר מעקב` },
     { icon: <Icon.Package />, k: 'אריזה',  v: 'אריזה מוגנת ומהודרת לכל הזמנה' },
-    { icon: <Icon.Return />,  k: 'החזרות', v: 'ניתן להחזיר תוך 14 יום ממועד קבלת המוצר' },
-    { icon: <Icon.X size={14} />, k: 'ביטול', v: 'ביטול אפשרי עד 24 שעות מהרכישה ללא עלות' },
-    { icon: <Icon.Shield />,  k: 'אחריות', v: 'אחריות פלטפורמה מלאה על כל מוצר' },
+    { icon: <Icon.Return />,  k: 'החזרות', v: 'עד 14 יום ממועד הקבלה, למוצרים שלא נפתחו ולא נעשה בהם שימוש — בהתאם למדיניות האתר' },
+    { icon: <Icon.X size={14} />, k: 'ביטול', v: 'ביטול והחזרה בהתאם למדיניות האתר ולחוק הגנת הצרכן' },
+    { icon: <Icon.Shield />,  k: 'שירות', v: 'שירות לקוחות אנושי בוואטסאפ ובטלפון, א׳–ה׳ 09:00–18:00' },
   ];
 
   const HIDE_RELATED_CATS = ['קלפי מזוזה', 'בתי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
@@ -2476,17 +2480,19 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1F2937', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f0f0f0', flexWrap: 'wrap' }}>
-              <Stars n={product.stars || 4.5} size={15} />
-              <span style={{ fontSize: 13, color: '#0e6ba8' }}>({product.reviews || 0} ביקורות)</span>
+              {(product.reviews ?? 0) > 0 ? (
+                <>
+                  {/* דירוג פר-מוצר — מוצג רק כשקיימות ביקורות אמיתיות למוצר */}
+                  <Stars n={product.stars || 5} size={15} />
+                  <span style={{ fontSize: 13, color: '#0e6ba8' }}>({product.reviews} ביקורות)</span>
+                </>
+              ) : (
+                /* אין ביקורות למוצר — קישור ניטרלי לביקורות הכלליות על העסק */
+                <a href="/reviews" style={{ fontSize: 13, color: '#0e6ba8', textDecorationLine: 'underline', textDecorationColor: '#bde0ff', textUnderlineOffset: 2 }}>
+                  לקריאת חוות דעת של לקוחות על החנות
+                </a>
+              )}
               {product.cat && <span style={{ fontSize: 12, color: '#888' }}>| <strong>{product.cat}</strong></span>}
-            </div>
-
-            {/* Social proof badges */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#eff8ff', border: '1px solid #bde0ff', borderRadius: 20, padding: '5px 12px', fontSize: 12, color: '#0e6ba8', fontWeight: 700 }}>
-                <Icon.Eye />
-                <span key={currentViewers}>{currentViewers} צופים עכשיו</span>
-              </div>
             </div>
 
             {/* STaM trust line — above the fold, only for supervised categories */}

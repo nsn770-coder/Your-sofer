@@ -152,9 +152,18 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
             width: '100%', background: busy ? '#888' : '#C9A227', color: busy ? '#fff' : '#1F3D8F',
             border: 'none', borderRadius: 14, height: 52, fontSize: 16, fontWeight: 800,
             cursor: busy ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}
         >
-          {!sumitReady ? 'טוען מודול תשלום...' : busy ? 'מבצע תשלום...' : 'שלם באשראי'}
+          {!sumitReady ? 'טוען מודול תשלום...' : busy ? 'מבצע תשלום...' : (
+            <>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              תשלום מאובטח באשראי
+            </>
+          )}
         </button>
       </form>
     </>

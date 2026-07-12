@@ -11,18 +11,15 @@ import { formatPrice } from '@/app/lib/utils';
 import * as pixel from '@/lib/metaPixel';
 import SumitPaymentForm from '../components/SumitPaymentForm';
 import DeliveryEstimate from '../components/DeliveryEstimate';
+import PaymentMethodsRow from '../components/trust/PaymentMethodsRow';
+import TrustCluster from '../components/trust/TrustCluster';
+import SecurePaymentNotice from '../components/trust/SecurePaymentNotice';
 
 function IconLock({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
 }
 function IconTruck({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>;
-}
-function IconReturn({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>;
-}
-function IconShield({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l7 4v5c0 5-3.5 9.7-7 11-3.5-1.3-7-6-7-11V6l7-4z"/></svg>;
 }
 function IconCheck({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
@@ -43,20 +40,24 @@ function IconHandshake({ size = 14, color = 'currentColor' }: { size?: number; c
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.42 4.58a5.4 5.4 0 00-7.65 0l-.77.78-.77-.78a5.4 5.4 0 00-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>;
 }
 
-function Input({ label, name, value, onChange, onBlur: onBlurProp, placeholder, type = 'text', required = false }: {
+function Input({ label, name, value, onChange, onBlur: onBlurProp, placeholder, type = 'text', required = false, autoComplete, inputMode }: {
   label: string; name: string; value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   placeholder?: string; type?: string; required?: boolean;
+  autoComplete?: string;
+  inputMode?: 'text' | 'tel' | 'email' | 'numeric';
 }) {
   const [focused, setFocused] = useState(false);
   return (
     <div>
-      <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>
-        {label} {required && <span style={{ color: '#c0392b' }}>*</span>}
+      <label htmlFor={`checkout-${name}`} style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>
+        {label} {required && <span style={{ color: '#c0392b' }} aria-hidden="true">*</span>}
       </label>
       <input
+        id={`checkout-${name}`}
         name={name} value={value} onChange={onChange} placeholder={placeholder} type={type}
+        autoComplete={autoComplete} inputMode={inputMode} required={required}
         onFocus={() => setFocused(true)} onBlur={(e) => { setFocused(false); onBlurProp?.(e); }}
         style={{ width: '100%', border: `1.5px solid ${focused ? '#C5A028' : '#e0e0e0'}`, borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.15s', background: '#fafafa' }}
       />
@@ -71,6 +72,8 @@ interface SiteSettings {
 
 interface OrderSummaryProps {
   isSticky: boolean;
+  /** false — ללא מסגרת (כשהרכיב מקונן בתוך MobileOrderSummary) */
+  framed?: boolean;
   items: CartItem[];
   total: number;
   bundleDiscountAmount: number;
@@ -98,7 +101,7 @@ interface OrderSummaryProps {
 }
 
 function OrderSummary({
-  isSticky, items, total,
+  isSticky, framed = true, items, total,
   bundleDiscountAmount, appliedCoupon, setAppliedCoupon, discountAmount,
   finalTotal, selectedGift, giftOptions, giftEnabled, giftEligible,
   giftThreshold, amountToGift, setSelectedGift,
@@ -107,7 +110,7 @@ function OrderSummary({
 }: OrderSummaryProps) {
   const [pointsInput, setPointsInput] = useState('');
   return (
-    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', padding: 16, position: isSticky ? 'sticky' : 'static', top: 20, width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div style={{ background: '#fff', borderRadius: framed ? 16 : 0, border: framed ? '1px solid #e8e2d8' : 'none', padding: 16, position: isSticky ? 'sticky' : 'static', top: 20, width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
       <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
         <IconCart size={15} color="#1E3A8A" /> סיכום הזמנה
       </h3>
@@ -261,10 +264,8 @@ function OrderSummary({
         </div>
       )}
 
-      <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {[{ icon: <IconLock size={13} color="#555" />, text: 'תשלום מאובטח' }, { icon: <IconTruck size={13} color="#555" />, text: 'משלוח לכל הארץ' }, { icon: <IconReturn size={13} color="#555" />, text: 'ביטול 24 שעות' }, { icon: <IconShield size={13} color="#555" />, text: 'אחריות מלאה' }].map(item => (
-          <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#777' }}>{item.icon} {item.text}</div>
-        ))}
+      <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
+        <TrustCluster fontSize={11.5} />
       </div>
       {shaliach && (
         <div style={{ marginTop: 12, padding: '10px 12px', background: '#f0f7ff', borderRadius: 10, fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -272,6 +273,60 @@ function OrderSummary({
           <div><div style={{ color: '#0e6ba8', fontWeight: 700 }}>דרך: {shaliach.chabadName || shaliach.name}</div><div style={{ color: '#555', marginTop: 1 }}>10% מהרכישה יועברו כתרומה</div></div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * MobileOrderSummary — סיכום הזמנה מתקפל בראש מסך ה-Checkout במובייל.
+ * סגור: מספר פריטים + סכום סופי לתשלום (המידע המהותי תמיד גלוי).
+ * פתוח: פירוט מלא (OrderSummary). נגיש: button אמיתי, aria-expanded, aria-controls.
+ */
+function MobileOrderSummary({ itemCount, finalTotal, children }: {
+  itemCount: number;
+  finalTotal: number;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', overflow: 'hidden' }}>
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(o => {
+            const next = !o;
+            if (next) window.gtag?.('event', 'checkout_order_summary_open');
+            return next;
+          });
+        }}
+        aria-expanded={open}
+        aria-controls="mobile-order-summary-panel"
+        style={{
+          width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '14px 16px', fontFamily: 'inherit', direction: 'rtl',
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 800, color: '#1E3A8A' }}>
+          <IconCart size={15} color="#1E3A8A" />
+          סיכום ההזמנה
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#888' }}>({itemCount} {itemCount === 1 ? 'פריט' : 'פריטים'})</span>
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 16, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(finalTotal)}</span>
+          <svg
+            width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="#1E3A8A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            aria-hidden="true"
+            style={{ transition: 'transform 0.25s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </span>
+      </button>
+      <div id="mobile-order-summary-panel" hidden={!open} style={{ borderTop: open ? '1px solid #f0ebe0' : 'none' }}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -436,6 +491,12 @@ export default function CheckoutPage() {
 
   const shippingCost = SHIPPING_REGULAR;
   const finalTotal = total - discountAmount - pointsToUse + shippingCost;
+
+  // מוצר בהתאמה אישית (רקמה / הטבעה / הדפסה) — משפיע על הודעת תנאי הביטול
+  const hasCustomMadeItem = items.some(i =>
+    !!i.embroideryText || !!i.embossingText || !!i.printCustomization ||
+    (i.embroideryOptions && i.embroideryOptions.length > 0)
+  );
 
   function saveAbandonedCartBeforePayment() {
     if (!sessionId || items.length === 0) return;
@@ -637,9 +698,12 @@ export default function CheckoutPage() {
         gap: 20, alignItems: 'start',
       }}>
 
-        {/* Order summary first on mobile so user sees total before filling form */}
+        {/* Order summary first on mobile so user sees total before filling form.
+            Collapsible: item count + final total always visible in the header. */}
         <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}>
-          <OrderSummary isSticky={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} />
+          <MobileOrderSummary itemCount={items.reduce((s, i) => s + i.quantity, 0)} finalTotal={finalTotal}>
+            <OrderSummary isSticky={false} framed={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} />
+          </MobileOrderSummary>
         </div>
 
         {/* Shipping form */}
@@ -654,15 +718,15 @@ export default function CheckoutPage() {
           </div>
           <div style={{ padding: '24px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
-              <Input label="שם מלא" name="name" value={form.name} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ name: e.target.value })} placeholder="ישראל ישראלי" required />
-              <Input label="טלפון" name="phone" value={form.phone} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ phone: e.target.value })} placeholder="050-0000000" type="tel" required />
+              <Input label="שם מלא" name="name" value={form.name} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ name: e.target.value })} placeholder="ישראל ישראלי" autoComplete="name" required />
+              <Input label="טלפון" name="phone" value={form.phone} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ phone: e.target.value })} placeholder="050-0000000" type="tel" inputMode="tel" autoComplete="tel" required />
             </div>
             <div style={{ marginBottom: 14 }}>
-              <Input label="אימייל" name="email" value={form.email} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ email: e.target.value })} placeholder="your@email.com" type="email" required />
+              <Input label="אימייל" name="email" value={form.email} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ email: e.target.value })} placeholder="your@email.com" type="email" inputMode="email" autoComplete="email" required />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: 14, marginBottom: 14 }}>
-              <Input label="רחוב ומספר בית" name="address" value={form.address} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ address: e.target.value })} placeholder="רחוב הרצל 5" required />
-              <Input label="עיר" name="city" value={form.city} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ city: e.target.value })} placeholder="תל אביב" required />
+              <Input label="רחוב ומספר בית" name="address" value={form.address} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ address: e.target.value })} placeholder="רחוב הרצל 5" autoComplete="street-address" required />
+              <Input label="עיר" name="city" value={form.city} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ city: e.target.value })} placeholder="תל אביב" autoComplete="address-level2" required />
             </div>
             <div style={{ marginBottom: 24 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>הערות למשלוח</label>
@@ -700,26 +764,36 @@ export default function CheckoutPage() {
 
             {/* Security notice */}
             {siteSettings.checkoutEnabled && (
-              <div style={{ background: '#f0faf4', border: '1px solid #b7e4c7', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <IconLock size={15} color="#1a6b3c" />
-                <div>
-                  <div style={{ fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>תשלום מאובטח</div>
-                  <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>פרטי האשראי מוצפנים ונשלחים ישירות לחברת הסליקה</div>
-                </div>
+              <div style={{ marginBottom: 16 }}>
+                <SecurePaymentNotice />
               </div>
             )}
 
             {/* Delivery estimate */}
             {siteSettings.checkoutEnabled && (
               <div style={{ marginBottom: 16 }}>
-                <DeliveryEstimate />
+                <DeliveryEstimate customMade={hasCustomMadeItem} />
+              </div>
+            )}
+
+            {/* מוצרים בהתאמה אישית — תנאי ביטול שונים (לפי מדיניות האתר) */}
+            {siteSettings.checkoutEnabled && hasCustomMadeItem && (
+              <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#92400e', lineHeight: 1.6 }}>
+                ההזמנה כוללת מוצר בהתאמה אישית (רקמה / הטבעה / הדפסה). תנאי הביטול עשויים להיות שונים ממוצר רגיל.
+                {' '}
+                <a href="/legal/returns" style={{ color: '#92400e', fontWeight: 700, textDecorationLine: 'underline', textUnderlineOffset: 2 }}>לפרטי מדיניות הביטולים</a>
               </div>
             )}
 
             {/* Call-to-action heading above card form */}
             {siteSettings.checkoutEnabled && (
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', textAlign: 'center', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                <IconCreditCard size={16} color="#1E3A8A" /> פרטי תשלום
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', textAlign: 'center', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <IconCreditCard size={16} color="#1E3A8A" /> פרטי תשלום
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <PaymentMethodsRow size="sm" />
+                </div>
               </div>
             )}
 
@@ -775,8 +849,8 @@ export default function CheckoutPage() {
               )
             )}
             {siteSettings.checkoutEnabled && (
-              <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 6 }}>
-                🔒 תשלום מאובטח · 💳 אשראי · 📱 ביט · ✅ אישור הזמנה מיידי
+              <div style={{ fontSize: 12, color: '#6b7280', textAlign: 'center', marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <IconLock size={12} color="#6b7280" /> תשלום מאובטח · אישור הזמנה מיידי במייל
               </div>
             )}
           </div>

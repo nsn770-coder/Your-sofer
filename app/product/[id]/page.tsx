@@ -180,12 +180,14 @@ async function ProductJsonLd({ id }: { id: string }) {
       returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
       merchantReturnDays: 14,
       returnMethod: 'https://schema.org/ReturnByMail',
-      returnFees: 'https://schema.org/FreeReturn',
+      // תואם למדיניות ההחזרות: עלות המשלוח החוזר חלה על הלקוח
+      returnFees: 'https://schema.org/ReturnShippingFees',
     },
     shippingDetails: [
       {
         '@type': 'OfferShippingDetails',
-        shippingRate: { '@type': 'MonetaryAmount', value: '30', currency: 'ILS' },
+        // תואם לעלות המשלוח בפועל (SHIPPING_REGULAR = 35)
+        shippingRate: { '@type': 'MonetaryAmount', value: '35', currency: 'ILS' },
         deliveryTime: {
           '@type': 'ShippingDeliveryTime',
           handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },

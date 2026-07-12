@@ -2,10 +2,11 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
+// נוסחים עקביים עם siteTrust.ts — לא מציגים מספרים שונים מאלה שבעמוד /reviews
 const ITEMS = [
-  '✓ +1200 משפחות בחרו בנו',
-  '✓ תמיכה מלאה בוואטסאפ גם אחרי הרכישה',
-  '🔒 הזמנה בטוחה בתקן SSL',
+  '✓ אלפי לקוחות כבר רכשו באתר — דירוג 4.8 מתוך 5',
+  '✓ שירות לקוחות אנושי ב-WhatsApp גם אחרי הרכישה',
+  '✓ תשלום מאובטח ומוצפן',
 ];
 
 export default function TrustBar() {

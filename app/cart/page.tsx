@@ -8,43 +8,9 @@ import { db } from '../firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 import DeliveryEstimate from '../components/DeliveryEstimate';
-
-function IconLock() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
-
-function IconTruck() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="1" y="3" width="15" height="13" rx="1" />
-      <path d="M16 8h4l3 5v4h-7V8z" />
-      <circle cx="5.5" cy="18.5" r="2.5" />
-      <circle cx="18.5" cy="18.5" r="2.5" />
-    </svg>
-  );
-}
-
-function IconReturn() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="1 4 1 10 7 10" />
-      <path d="M3.51 15a9 9 0 1 0 .49-4.5" />
-    </svg>
-  );
-}
-
-function IconShield() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  );
-}
+import PaymentMethodsRow from '../components/trust/PaymentMethodsRow';
+import TrustCluster from '../components/trust/TrustCluster';
+import ReviewProof from '../components/trust/ReviewProof';
 
 export default function CartPage() {
   const router = useRouter();
@@ -165,7 +131,7 @@ export default function CartPage() {
             <div style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>הוסף מוצרים מהחנות כדי להתחיל</div>
             <button onClick={() => router.push('/')}
               style={{ background: '#FFFFFF', color: '#1a1a1a', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 32px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-              המשך לקנות
+              המשך בקנייה
             </button>
           </div>
         ) : (
@@ -376,7 +342,7 @@ export default function CartPage() {
               <div style={{ marginTop: 12 }}>
                 <button onClick={() => router.push('/')}
                   style={{ background: 'none', border: 'none', color: '#0e6ba8', fontSize: 13, cursor: 'pointer', padding: 0 }}>
-                  ← המשך לקנות
+                  ← המשך בקנייה
                 </button>
               </div>
             </div>
@@ -556,7 +522,7 @@ export default function CartPage() {
 
               <button onClick={() => router.push('/')}
                 style={{ width: '100%', background: '#FFFFFF', color: '#1a1a1a', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                המשך לקנות
+                המשך בקנייה
               </button>
 
               {user?.role === 'admin' && (
@@ -579,20 +545,14 @@ export default function CartPage() {
                 </div>
               )}
 
-              <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #eee', fontSize: 11, color: '#888', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconLock /> תשלום מאובטח ומוצפן</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconTruck /> משלוח לכל הארץ</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconReturn /> ביטול עד 24 שעות</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><IconShield /> אחריות פלטפורמה מלאה</div>
+              <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid #eee' }}>
+                <PaymentMethodsRow size="md" />
               </div>
-              <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 10, color: '#aaa' }}>אמצעי תשלום:</span>
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/visa.svg" alt="Visa" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/mastercard.svg" alt="Mastercard" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
-                <div style={{ background: '#f5f5f5', borderRadius: 4, padding: '3px 8px' }}>
-                  <span style={{ fontSize: 11, fontWeight: 900, color: '#6b21a8' }}>bit</span>
-                </div>
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/paypal.svg" alt="PayPal" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
+              <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #eee' }}>
+                <TrustCluster fontSize={12} />
+              </div>
+              <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid #eee' }}>
+                <ReviewProof compact />
               </div>
             </div>
           </>

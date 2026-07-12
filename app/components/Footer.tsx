@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { MEGA_MENU_DATA, categoryUrl } from '@/data/categoriesMenu';
+import PaymentMethodsRow from './trust/PaymentMethodsRow';
+import { BUSINESS, TRUST_TEXT } from '@/app/config/siteTrust';
 
 const WA_LINK = 'https://wa.me/972587479933?text=שלום אני מעוניין בעזרה ופרטים נוספים';
 
@@ -82,14 +84,15 @@ export default function Footer() {
   const [openCols, setOpenCols] = useState<Set<number>>(new Set());
   const [openCats, setOpenCats] = useState<Set<number>>(new Set());
 
-  if (pathname?.startsWith('/bar-mitzvah')) return null;
-
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // הערה: ה-return המותנה חייב לבוא אחרי כל ה-hooks (כללי React)
+  if (pathname?.startsWith('/bar-mitzvah')) return null;
 
   function toggleCol(i: number) {
     setOpenCols(prev => {
@@ -292,36 +295,32 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {/* Bottom bar — פרטי עסק, אמצעי תשלום ואבטחה */}
         <div style={{
           borderTop: '1px solid rgba(255,255,255,0.1)',
-          padding: '16px 20px',
+          padding: '20px 20px',
           textAlign: 'center',
           fontSize: 12,
-          color: 'rgba(255,255,255,0.4)',
+          color: 'rgba(255,255,255,0.7)',
         }}>
-          <div style={{ marginBottom: 6, fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
-            Your Sofer — בבעלות ובניהול בואהרון ניסן נסים, עוסק מורשה 304803810
+          <div style={{ marginBottom: 8, fontSize: 13, color: 'rgba(255,255,255,0.85)', fontWeight: 600 }}>
+            {BUSINESS.name} — בבעלות ובניהול {BUSINESS.legalName}, עוסק מורשה {BUSINESS.businessNumber}
           </div>
-          <div style={{ marginBottom: 10, fontSize: 12, color: 'rgba(255,255,255,0.45)', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px' }}>
-            <span>📍 רחוב האורן 18, דימונה</span>
-            <a href="tel:0584877770" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>📞 058-4877-770</a>
-            <a href="https://wa.me/972587479933" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>💬 058-747-9933</a>
-            <a href="mailto:support@your-sofer.com" style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>✉️ support@your-sofer.com</a>
+          <div style={{ marginBottom: 14, fontSize: 13, color: 'rgba(255,255,255,0.75)', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px' }}>
+            <span>📍 {BUSINESS.address}</span>
+            <a href={BUSINESS.phoneHref} style={{ color: 'rgba(255,255,255,0.75)', textDecoration: 'none' }}>📞 {BUSINESS.phone}</a>
+            <a href={BUSINESS.whatsappHref} style={{ color: 'rgba(255,255,255,0.75)', textDecoration: 'none' }}>💬 {BUSINESS.whatsappNumber}</a>
+            <a href={`mailto:${BUSINESS.supportEmail}`} style={{ color: 'rgba(255,255,255,0.75)', textDecoration: 'none' }}>✉️ {BUSINESS.supportEmail}</a>
+            <span>🕐 {BUSINESS.supportHours}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/visa.svg" alt="Visa" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/mastercard.svg" alt="Mastercard" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
-            <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 4, padding: '3px 8px' }}>
-              <span style={{ fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.7)' }}>bit</span>
-            </div>
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/paypal.svg" alt="PayPal" style={{ height: 20, filter: 'grayscale(100%) opacity(0.6)' }} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 4, padding: '3px 10px' }}>
-              <svg width="10" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <span style={{ fontSize: 10, color: '#4ade80', fontWeight: 700 }}>SSL מאובטח</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <PaymentMethodsRow size="sm" onDark />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>
+              <svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              {TRUST_TEXT.paymentBody}
             </div>
           </div>
-          © 2025 Your Sofer — כל הזכויות שמורות
+          <span style={{ color: 'rgba(255,255,255,0.55)' }}>© 2026 {BUSINESS.name} — כל הזכויות שמורות</span>
         </div>
 
       </footer>
