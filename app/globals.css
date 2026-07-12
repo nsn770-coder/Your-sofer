@@ -130,16 +130,18 @@ body.filter-drawer-open .gift-progress-bar {
 
 /* ─── Floating-elements coordination (product page sticky add-to-cart bar) ───
    When the mobile sticky add-to-cart bar is visible on a product page, lift the
-   gift progress bar and the WhatsApp bubble above it so they never cover the
-   price / add-to-cart button. Sticky bar height ≈ 64px + safe-area. */
+   gift progress bar above it. The sticky bar stops 84px short of the right edge
+   (see ProductClient.tsx), so the WhatsApp button sits NEXT to it on the same
+   row: bar on the left, button on the right. We only align the button vertically
+   with the bar and hide its label so it fits the row height (bar ≈ 64px). */
 body.product-sticky-bar-active .gift-progress-bar {
   bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
 }
 body.product-sticky-bar-active .wa-float-wrap {
-  bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+  bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
 }
-body.product-sticky-bar-active.gift-bar-active .wa-float-wrap {
-  bottom: calc(150px + env(safe-area-inset-bottom, 0px)) !important;
+body.product-sticky-bar-active .wa-float-label {
+  display: none;
 }
 body.product-sticky-bar-active #tidio-chat-iframe,
 body.product-sticky-bar-active #tidio-chat {

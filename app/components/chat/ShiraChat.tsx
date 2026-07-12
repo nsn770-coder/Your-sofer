@@ -141,8 +141,8 @@ function WaFloatBubble() {
           to   { opacity: 1; transform: translateY(0) scale(1); }
         }
         .wa-float-wrap {
-          position: fixed; bottom: 24px; left: 16px;
-          display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+          position: fixed; bottom: 24px; right: 16px;
+          display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
           z-index: 9999;
         }
         .wa-float-icon {
@@ -224,7 +224,7 @@ function WaFloatBubble() {
         }
         .wa-bubble-send:hover { background: #1da851; transform: scale(1.01); }
         @media (max-width: 480px) {
-          .wa-float-wrap { left: 14px; bottom: 24px; }
+          .wa-float-wrap { right: 14px; bottom: 24px; }
           .wa-bubble { width: calc(100vw - 32px); max-width: 320px; }
         }
       `}</style>

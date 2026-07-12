@@ -2903,10 +2903,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         <div
           dir="rtl"
           style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
+            // right: 84 — leaves the bottom-right corner free for the floating
+            // WhatsApp button, which sits on the same row (see globals.css).
+            position: 'fixed', bottom: 0, left: 0, right: 84,
             zIndex: 90,
             background: '#fff',
             borderTop: '1px solid #e8e8e8',
+            borderRadius: '0 12px 0 0',
             boxShadow: '0 -4px 16px rgba(0,0,0,0.10)',
             display: 'flex', alignItems: 'center', gap: 12,
             padding: '10px 16px',
