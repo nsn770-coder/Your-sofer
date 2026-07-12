@@ -143,6 +143,20 @@ body.product-sticky-bar-active .wa-float-wrap {
 body.product-sticky-bar-active .wa-float-label {
   display: none;
 }
+/* Gift progress bar visible (it stops 84px short of the right edge) — align the
+   WhatsApp button to its row: bar bottom 14px, height ≈ 48px; icon is 52px, so
+   bottom 12px centers them. Hide the label so only the icon shares the row. */
+body.gift-bar-active .wa-float-wrap {
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+}
+body.gift-bar-active .wa-float-label {
+  display: none;
+}
+/* Both bars visible: gift bar is lifted to 78px, sticky bar owns the bottom
+   row — keep the WhatsApp button aligned with the sticky bar. */
+body.product-sticky-bar-active.gift-bar-active .wa-float-wrap {
+  bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+}
 body.product-sticky-bar-active #tidio-chat-iframe,
 body.product-sticky-bar-active #tidio-chat {
   bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
