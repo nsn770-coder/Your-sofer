@@ -14,9 +14,9 @@ const SHOW_WHATSAPP_ONLY = true;
 // widget was removed from layout.tsx. Set to false to hide the button.
 const SHOW_WA_FLOAT = true;
 
-// Auto-opening chat window (the "נציג זמין כעת" bubble) — disabled for now.
-// Set to true to restore the 20s-idle / cart-add / cart-page auto-open triggers.
-const AUTO_OPEN_BUBBLE = false;
+// Auto-opening chat window (the "נציג זמין כעת" bubble) — restored (July 2026).
+// Triggers: 20s idle, cart-add, and viewing a product / cart / checkout page.
+const AUTO_OPEN_BUBBLE = true;
 
 const WA_NUMBER = '972587479933';
 const WA_DEFAULT_TEXT = 'שלום אני רוצה לברר על מוצר באתר';
@@ -62,9 +62,13 @@ function WaFloatBubble() {
     prevCountRef.current = count;
   }, [count]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Cart-page trigger — open once when user navigates to /cart
+  // Page trigger — open once when user views a product, the cart, or checkout
   useEffect(() => {
-    if (AUTO_OPEN_BUBBLE && pathname === '/cart' && !cartOpenedRef.current && !manuallyClosedRef.current) {
+    const isTriggerPage =
+      pathname === '/cart' ||
+      pathname?.startsWith('/checkout') ||
+      pathname?.startsWith('/product/');
+    if (AUTO_OPEN_BUBBLE && isTriggerPage && !cartOpenedRef.current && !manuallyClosedRef.current) {
       cartOpenedRef.current = true;
       setBubbleText(BUBBLE_TEXT_CART);
       setIsOpen(true);
