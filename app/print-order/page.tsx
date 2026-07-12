@@ -56,9 +56,9 @@ const PRINT_PRODUCTS = {
   },
 } as const;
 
-// ── Tiered kipa pricing: 1–49 → ₪19 | 50–99 → ₪17 | 100–150 → ₪10 | 151–300 → ₪9
+// ── Tiered kipa pricing: 1–29 → ₪19 | 30–99 → ₪12 | 100–150 → ₪10 | 151–300 → ₪9
 const getKipaUnitPrice = (q: number) =>
-  q <= 49 ? 19 : q <= 99 ? 17 : q <= 150 ? 10 : 9;
+  q <= 29 ? 19 : q <= 99 ? 12 : q <= 150 ? 10 : 9;
 
 function getTemplateUrl(pt: ProductType, color: ShirtColor, side: Side): string {
   const raw = pt === 'shirt'
@@ -472,7 +472,7 @@ export default function PrintOrderPage() {
 
   // ── Kipa tier helper for Step 2 hint ─────────────────────────────────────
   function kipaTierHint(q: number): string {
-    if (q <= 49)  return `הוסף ${50  - q} כיפות לקבלת מחיר ₪17 לכיפה`;
+    if (q <= 29)  return `הוסף ${30  - q} כיפות לקבלת מחיר ₪12 לכיפה`;
     if (q <= 99)  return `הוסף ${100 - q} כיפות לקבלת מחיר ₪10 לכיפה`;
     if (q <= 150) return `הוסף ${151 - q} כיפות לקבלת מחיר ₪9 לכיפה`;
     return 'מחיר הכי טוב! ₪9 לכיפה';
@@ -884,7 +884,7 @@ export default function PrintOrderPage() {
                     <div style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>המחירון המדורג תקף לכיפת בד פשתן בלבד</div>
                     <div style={{ fontSize: 15, fontWeight: 900, color: GOLD, marginBottom: 4 }}>מחיר מדורג לפי כמות</div>
                     <div style={{ fontSize: 11, color: '#666', lineHeight: 1.6 }}>
-                      1–49 → ₪19 | 50–99 → ₪17<br />
+                      1–29 → ₪19 | 30–99 → ₪12<br />
                       100–150 → ₪10 | 151+ → ₪9
                     </div>
                   </button>

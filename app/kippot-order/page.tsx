@@ -21,7 +21,7 @@ const TYPE_LABELS: Record<string, string> = {
 const PRINT_AREA = { top: '18%', left: '18%', width: '64%', height: '64%' };
 
 function getBasePrice(qty: number) {
-  return qty <= 49 ? 19 : qty <= 99 ? 17 : qty <= 150 ? 10 : 9;
+  return qty <= 29 ? 19 : qty <= 99 ? 12 : qty <= 150 ? 10 : 9;
 }
 
 function extractPublicId(url: string): string {
@@ -44,7 +44,7 @@ function KippotOrderInner() {
   const router = useRouter();
   const { addItem } = useCart();
 
-  const qty    = Math.max(50, Number(searchParams.get('qty') || 50));
+  const qty    = Math.max(30, Number(searchParams.get('qty') || 30));
   const type   = (searchParams.get('type') || 'print-top') as 'print-top' | 'print-bottom' | 'embroidery';
   const style  = searchParams.get('style') || 'lavan';
   const kippah = KIPPOT_STYLES[style] || KIPPOT_STYLES.lavan;

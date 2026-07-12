@@ -27,7 +27,7 @@ const PRINT_TYPES = [
 type PrintType = typeof PRINT_TYPES[number]['id'];
 
 export default function EventKippotClient() {
-  const [qty, setQty]             = useState(50);
+  const [qty, setQty]             = useState(30);
   const [printType, setPrintType] = useState<PrintType>('print-top');
   const [style, setStyle]         = useState<string | null>(null);
   const { user } = useAuth();
@@ -111,7 +111,7 @@ export default function EventKippotClient() {
         <input
           type="range"
           className="ys-ekip-range"
-          min={50}
+          min={30}
           max={300}
           step={1}
           value={qty}
@@ -119,7 +119,7 @@ export default function EventKippotClient() {
           style={{ touchAction: 'pan-y' }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 11, color: '#9C7B3F', fontWeight: 600 }}>
-          <span>300</span><span>50</span>
+          <span>300</span><span>30</span>
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 20 }}>
@@ -143,7 +143,7 @@ export default function EventKippotClient() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14, alignItems: 'center' }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F' }}>מדרגות:</span>
           {([
-            { range: '50–99',   price: 17, active: qty >= 50  && qty <= 99  },
+            { range: '30–99',   price: 12, active: qty >= 30  && qty <= 99  },
             { range: '100–150', price: 10, active: qty >= 100 && qty <= 150 },
             { range: '151–300', price: 9,  active: qty >= 151              },
           ] as { range: string; price: number; active: boolean }[]).map(({ range, price, active }) => (
