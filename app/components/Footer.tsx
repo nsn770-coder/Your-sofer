@@ -4,8 +4,9 @@ import { useRouter, usePathname } from 'next/navigation';
 import { MEGA_MENU_DATA, categoryUrl } from '@/data/categoriesMenu';
 import PaymentMethodsRow from './trust/PaymentMethodsRow';
 import { BUSINESS, TRUST_TEXT } from '@/app/config/siteTrust';
+import { buildWhatsAppLink, WA_PREFILL } from '@/lib/whatsapp';
 
-const WA_LINK = 'https://wa.me/972587479933?text=שלום אני מעוניין בעזרה ופרטים נוספים';
+const WA_LINK = buildWhatsAppLink(WA_PREFILL.general);
 
 interface LinkItem { label: string; path?: string; href?: string; }
 interface Column { title: string; links: LinkItem[]; }
@@ -42,7 +43,7 @@ const COLUMNS: Column[] = [
   {
     title: 'שירות לקוחות',
     links: [
-      { label: 'שאלות נפוצות',   path: '/madrich/faq' },
+      { label: 'שאלות ותשובות',  path: '/faq' },
       { label: 'מדיניות החזרות', path: '/legal/returns' },
       { label: 'צור קשר',        path: '/contact' },
       { label: 'וואטסאפ',        href: WA_LINK },
@@ -65,7 +66,8 @@ const COLUMNS: Column[] = [
       { label: 'מדיניות פרטיות',      path: '/legal/privacy' },
       { label: 'משלוחים',              path: '/legal/shipping' },
       { label: 'נגישות',               path: '/legal/accessibility' },
-      { label: 'שאלות נפוצות',         path: '/madrich/faq' },
+      { label: 'שאלות ותשובות',        path: '/faq' },
+      { label: 'מדריך שאלות הלכתיות',  path: '/madrich/faq' },
     ],
   },
   {

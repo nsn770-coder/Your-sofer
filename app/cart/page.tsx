@@ -11,6 +11,7 @@ import DeliveryEstimate from '../components/DeliveryEstimate';
 import PaymentMethodsRow from '../components/trust/PaymentMethodsRow';
 import TrustCluster from '../components/trust/TrustCluster';
 import ReviewProof from '../components/trust/ReviewProof';
+import PageFaqSection from '../components/faq/PageFaqSection';
 
 export default function CartPage() {
   const router = useRouter();
@@ -421,6 +422,11 @@ export default function CartPage() {
                   </div>
                 )}
                 {couponError && <div style={{ fontSize: 11, color: '#dc2626', marginTop: 5 }}>{couponError}</div>}
+                {!appliedCoupon && (
+                  <div style={{ fontSize: 11, color: '#888', marginTop: 6, lineHeight: 1.5 }}>
+                    קוד ההצטרפות של 5% מתקבל לאחר ההצטרפות למועדון ונשלח גם למייל.
+                  </div>
+                )}
               </div>
 
               {/* Gift selector */}
@@ -558,6 +564,9 @@ export default function CartPage() {
           </>
         )}
       </div>
+
+      {/* FAQ ממוקד לעגלה — מבצעים, קופונים, נקודות ומשלוח (מקור: data/faq.ts) */}
+      <PageFaqSection pageKey="cart" title="שאלות נפוצות לפני התשלום" max={6} showWhatsAppCta={false} />
     </div>
   );
 }

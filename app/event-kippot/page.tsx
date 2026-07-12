@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import EventKippotClient from './EventKippotClient';
+import PageFaqSection from '@/app/components/faq/PageFaqSection';
 
 const BASE_URL = 'https://your-sofer.com';
 const PAGE_URL = `${BASE_URL}/event-kippot`;
@@ -63,6 +64,14 @@ export default function EventKippotPage() {
       >
         <EventKippotClient />
       </Suspense>
+
+      {/* FAQ ממוקד — נשען על מקור האמת המרכזי data/faq.ts */}
+      <PageFaqSection
+        pageKey="event-kippot"
+        title="שאלות נפוצות על כיפות בהדפסה אישית"
+        max={10}
+        showStartDesignCta
+      />
     </>
   );
 }

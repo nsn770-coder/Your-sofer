@@ -3,6 +3,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/app/contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { getKipaUnitPrice, KIPA_MIN_QTY } from '@/app/lib/kippot';
 
 const NAVY = '#1a1a1a';
 const GOLD = '#C5A028';
@@ -56,9 +57,8 @@ const PRINT_PRODUCTS = {
   },
 } as const;
 
-// ── Tiered kipa pricing: 1–29 → ₪19 | 30–99 → ₪12 | 100–150 → ₪10 | 151–300 → ₪9
-const getKipaUnitPrice = (q: number) =>
-  q <= 29 ? 19 : q <= 99 ? 12 : q <= 150 ? 10 : 9;
+// התמחור מגיע מהמקור המרכזי app/lib/kippot.ts (מינימום 30 יח'):
+// 30–99 → ₪12 | 100–299 → ₪10 | 300+ → ₪9
 
 function getTemplateUrl(pt: ProductType, color: ShirtColor, side: Side): string {
   const raw = pt === 'shirt'
@@ -267,6 +267,9 @@ export default function PrintOrderPage() {
   function selectProduct(pt: ProductType) {
     setProductType(pt);
     setSide(pt === 'shirt' ? 'front' : 'top');
+    // כיפות — הכמות המינימלית להזמנה היא 30 (מקור אמת: app/lib/kippot.ts)
+    if (pt === 'kipa') setQty(q => Math.max(KIPA_MIN_QTY, q));
+    else setQty(q => Math.max(1, q));
     setStep(2);
   }
 
@@ -471,10 +474,11 @@ export default function PrintOrderPage() {
   const overlayActive = isDragging || isHovering;
 
   // ── Kipa tier helper for Step 2 hint ─────────────────────────────────────
+  // מדרגות תואמות למקור המרכזי (app/lib/kippot.ts + data/faq.ts)
   function kipaTierHint(q: number): string {
-    if (q <= 29)  return `הוסף ${30  - q} כיפות לקבלת מחיר ₪12 לכיפה`;
+    if (q < KIPA_MIN_QTY) return `הכמות המינימלית להזמנה היא ${KIPA_MIN_QTY} כיפות`;
     if (q <= 99)  return `הוסף ${100 - q} כיפות לקבלת מחיר ₪10 לכיפה`;
-    if (q <= 150) return `הוסף ${151 - q} כיפות לקבלת מחיר ₪9 לכיפה`;
+    if (q <= 299) return `הוסף ${300 - q} כיפות לקבלת מחיר ₪9 לכיפה`;
     return 'מחיר הכי טוב! ₪9 לכיפה';
   }
 
@@ -884,8 +888,8 @@ export default function PrintOrderPage() {
                     <div style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>המחירון המדורג תקף לכיפת בד פשתן בלבד</div>
                     <div style={{ fontSize: 15, fontWeight: 900, color: GOLD, marginBottom: 4 }}>מחיר מדורג לפי כמות</div>
                     <div style={{ fontSize: 11, color: '#666', lineHeight: 1.6 }}>
-                      1–29 → ₪19 | 30–99 → ₪12<br />
-                      100–150 → ₪10 | 151+ → ₪9
+                      30–99 → ₪12 | 100–299 → ₪10<br />
+                      300+ → ₪9 · מינימום {KIPA_MIN_QTY} יח׳
                     </div>
                   </button>
                 </div>
@@ -972,15 +976,15 @@ export default function PrintOrderPage() {
                         ))}
                       </div>
 
-                      {/* +/- stepper + free-text input */}
+                      {/* +/- stepper + free-text input — מינימום 30 כיפות */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <button
-                          onClick={() => setQty(q => Math.max(1, q - 1))}
+                          onClick={() => setQty(q => Math.max(KIPA_MIN_QTY, q - 1))}
                           style={{ width: 36, height: 36, border: `1.5px solid ${NAVY}`, background: 'none', color: NAVY, fontSize: 20, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >−</button>
                         <input
                           type="number"
-                          min={1}
+                          min={KIPA_MIN_QTY}
                           value={qty}
                           onChange={e => {
                             const n = parseInt(e.target.value, 10);
@@ -988,7 +992,7 @@ export default function PrintOrderPage() {
                           }}
                           onBlur={e => {
                             const n = parseInt(e.target.value, 10);
-                            if (!(n >= 1)) setQty(1);
+                            if (!(n >= KIPA_MIN_QTY)) setQty(KIPA_MIN_QTY);
                           }}
                           style={{
                             width: 68,
@@ -1012,10 +1016,10 @@ export default function PrintOrderPage() {
                       <div style={{ marginTop: 12, padding: '12px 16px', background: '#FEF9EC', border: `1px solid ${GOLD}66` }}>
                         <div style={{ fontSize: 13, color: '#6B5A1A' }}>
                           <strong>₪{kipaUnitPrice} לכיפה</strong>
-                          {qty < 151 && (
+                          {qty < 300 && (
                             <span style={{ fontWeight: 400 }}> — {kipaTierHint(qty)}</span>
                           )}
-                          {qty >= 151 && (
+                          {qty >= 300 && (
                             <span style={{ fontWeight: 400 }}> — מחיר הכי טוב!</span>
                           )}
                         </div>

@@ -1,5 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import PageFaqSection from '@/app/components/faq/PageFaqSection';
 
 export default function ShippingPage() {
   const router = useRouter();
@@ -48,6 +49,9 @@ export default function ShippingPage() {
             טלפון: 058-4877-770 | וואטסאפ: 058-747-9933 | אימייל: support@your-sofer.com
           </Section>
         </div>
+
+        {/* FAQ ממוקד — משלוחים, החזרות ואחריות (מקור: data/faq.ts) */}
+        <PageFaqSection pageKey="shipping" title="שאלות נפוצות על משלוחים והחזרות" max={10} />
       </div>
     </div>
   );

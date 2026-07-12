@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { getAuthLazy } from '@/lib/authLazy';
+import PageFaqSection from '@/app/components/faq/PageFaqSection';
 
 type JoinState = 'idle' | 'signing' | 'joining' | 'success' | 'already' | 'error';
 
@@ -101,10 +102,23 @@ export default function ClubJoinPage() {
           ) : (
             /* ── הצטרפות ── */
             <>
-              {/* הטבות */}
+              {/* שתי ההטבות המרכזיות — בהתאם ל-FAQ המרכזי (data/faq.ts) */}
+              <div style={{ display: 'grid', gap: 10, marginBottom: 18 }}>
+                <div style={{ background: '#FDF8EE', border: `1px solid ${GOLD}55`, borderRadius: 12, padding: '14px 16px' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#9C7B3F', marginBottom: 3 }}>ההטבה הראשונה</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a' }}>5% הנחה על ההזמנה הראשונה</div>
+                  <div style={{ fontSize: 12.5, color: '#6b7280', marginTop: 3 }}>הקוד מופיע באתר ונשלח למייל מיד לאחר ההצטרפות.</div>
+                </div>
+                <div style={{ background: '#FDF8EE', border: `1px solid ${GOLD}55`, borderRadius: 12, padding: '14px 16px' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#9C7B3F', marginBottom: 3 }}>ההטבה הקבועה</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a' }}>10% מסכום המוצרים חוזר כיתרה לרכישה הבאה</div>
+                  <div style={{ fontSize: 12.5, color: '#6b7280', marginTop: 3 }}>נקודה = ₪1 הנחה. הצבירה על המוצרים בלבד, לא על המשלוח.</div>
+                </div>
+              </div>
+
+              {/* הטבות נוספות */}
               <div style={{ display: 'grid', gap: 12, marginBottom: 26 }}>
                 {[
-                  ['💰', 'צבירת נקודות בכל קנייה — נקודה = ₪1 הנחה'],
                   ['🎁', 'זיכוי נקודות רטרואקטיבי על רכישות שכבר עשיתם'],
                   ['⭐', 'מבצעים והטבות בלעדיים לחברי מועדון'],
                   ['📬', 'עדכונים לפני כולם על מוצרים חדשים'],
@@ -159,6 +173,9 @@ export default function ClubJoinPage() {
             </>
           )}
         </div>
+
+        {/* FAQ ממוקד למועדון — מקור אמת מרכזי data/faq.ts */}
+        <PageFaqSection pageKey="club" title="שאלות נפוצות על המועדון" max={8} showWhatsAppCta={false} />
       </div>
     </div>
   );

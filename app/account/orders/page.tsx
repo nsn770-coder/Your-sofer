@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import { collection, query, where, orderBy, getDocs, Timestamp, QueryConstraint } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
+import PageFaqSection from '@/app/components/faq/PageFaqSection';
+import { buildWhatsAppLink, WA_PREFILL } from '@/lib/whatsapp';
+import { trackFaqEvent } from '@/lib/faqAnalytics';
 
 interface OrderItem {
   name: string;
@@ -154,7 +157,10 @@ export default function OrdersPage() {
         <div style={{ background: '#fff', padding: '60px 20px', textAlign: 'center', boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
           <div style={{ fontSize: 40, marginBottom: 16 }}>📦</div>
           <div style={{ fontSize: 16, color: '#555', marginBottom: 8 }}>עדיין אין הזמנות</div>
-          <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 24 }}>הזמנות שתבצע יופיעו כאן</div>
+          <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 12 }}>הזמנות שתבצע יופיעו כאן</div>
+          <div style={{ fontSize: 12.5, color: '#9CA3AF', marginBottom: 24, lineHeight: 1.6, maxWidth: 420, margin: '0 auto 24px' }}>
+            לא מופיעה הזמנה? ודאו שהתחברתם עם אותו חשבון Google שכתובת המייל שלו זהה לכתובת ששימשה בהזמנה.
+          </div>
           <a href="/" style={{ background: '#1a1a1a', color: '#fff', padding: '11px 28px', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-block' }}>
             לחנות
           </a>
@@ -166,6 +172,24 @@ export default function OrdersPage() {
           {orders.map(order => <OrderCard key={order.id} order={order} />)}
         </div>
       )}
+
+      {/* בירור מהיר בוואטסאפ עם קוד הזמנה */}
+      {!loading && (
+        <div style={{ textAlign: 'center', marginTop: 24 }}>
+          <a
+            href={buildWhatsAppLink(WA_PREFILL.orderStatus)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackFaqEvent('faq_order_status_click', { page: '/account/orders' })}
+            style={{ display: 'inline-block', background: '#25D366', color: '#fff', padding: '11px 24px', borderRadius: 10, fontSize: 13.5, fontWeight: 700, textDecoration: 'none' }}
+          >
+            שליחת קוד הזמנה בוואטסאפ 💬
+          </a>
+        </div>
+      )}
+
+      {/* FAQ ממוקד — סטטוס הזמנה ושירות (מקור: data/faq.ts) */}
+      <PageFaqSection pageKey="account" title="שאלות נפוצות" max={6} showWhatsAppCta={false} />
     </div>
   );
 }

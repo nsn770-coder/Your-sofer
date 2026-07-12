@@ -142,10 +142,11 @@ export default function EventKippotClient() {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14, alignItems: 'center' }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F' }}>מדרגות:</span>
+          {/* מדרגות תואמות למקור המרכזי app/lib/kippot.ts + data/faq.ts */}
           {([
             { range: '30–99',   price: 12, active: qty >= 30  && qty <= 99  },
-            { range: '100–150', price: 10, active: qty >= 100 && qty <= 150 },
-            { range: '151–300', price: 9,  active: qty >= 151              },
+            { range: '100–299', price: 10, active: qty >= 100 && qty <= 299 },
+            { range: '300+',    price: 9,  active: qty >= 300              },
           ] as { range: string; price: number; active: boolean }[]).map(({ range, price, active }) => (
             <span key={range} style={{ fontSize: 11, fontWeight: active ? 800 : 400, color: active ? GOLD : '#9C7B3F', background: active ? 'rgba(197,160,40,0.10)' : 'transparent', padding: active ? '2px 8px' : '2px 0', transition: 'all 0.15s' }}>
               {range} = ₪{price}{printType === 'embroidery' ? '+₪5' : ''}

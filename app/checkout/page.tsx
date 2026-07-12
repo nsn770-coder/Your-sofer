@@ -14,6 +14,7 @@ import DeliveryEstimate from '../components/DeliveryEstimate';
 import PaymentMethodsRow from '../components/trust/PaymentMethodsRow';
 import TrustCluster from '../components/trust/TrustCluster';
 import SecurePaymentNotice from '../components/trust/SecurePaymentNotice';
+import PageFaqSection from '../components/faq/PageFaqSection';
 
 function IconLock({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
@@ -861,6 +862,9 @@ export default function CheckoutPage() {
           <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} />
         </div>
       </div>
+
+      {/* FAQ קומפקטי לעמוד התשלום — אמצעי תשלום, משלוח ושינויים (מקור: data/faq.ts) */}
+      <PageFaqSection pageKey="checkout" title="שאלות נפוצות על תשלום ומשלוח" max={6} showWhatsAppCta={false} />
       </div>{/* /centering wrapper */}
     </div>
   );

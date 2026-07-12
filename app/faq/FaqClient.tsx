@@ -1,115 +1,232 @@
 'use client';
-import { useState } from 'react';
 
-const FAQS = [
-  {
-    q: 'מה זה מזוזה כשרה?',
-    a: 'מזוזה כשרה היא קלף עור בהמה שנכתב ביד על ידי סופר מוסמך, עם כוונה לשם מצוות מזוזה. הכתיבה חייבת להיות תקינה לפי ההלכה — כל אות מדויקת, ללא שגיאות, ועל קלף מוכשר כראוי.',
-  },
-  {
-    q: 'מה ההבדל בין רמות הכשרות?',
-    a: 'ישנן מספר רמות: כשר — עומד בדרישות ההלכה הבסיסיות. מהודר — כתיבה ברמה גבוהה יותר, בדיקה קפדנית יותר. מהודר מאוד / גלאי — הרמה הגבוהה ביותר, מומלץ במיוחד לדלת הכניסה.',
-  },
-  {
-    q: 'איך אני יודע שהסופר מוסמך?',
-    a: 'כל סופר ב-YourSofer עבר תהליך אימות. אתה יכול לראות את תעודת ההסמכה שלו בפרופיל. בנוסף, כל מוצר עובר בדיקת מגיה מוסמך לפני משלוח.',
-  },
-  {
-    q: 'מה זה בדיקת מגיה?',
-    a: 'מגיה הוא מומחה לבדיקת ספרי תורה, תפילין ומזוזות. הוא בודק כל אות בקלף תחת הגדלה, מוודא שאין שגיאות ושהכתיבה תקינה לפי ההלכה. אצלנו כל מוצר עובר בדיקה כזו לפני שיוצא.',
-  },
-  {
-    q: 'כמה זמן משלוח?',
-    a: 'בדרך כלל 7-10 ימי עסקים. מחיר המשלוח: ₪35 עד הבית. מוצרים שנכתבים לפי הזמנה עשויים לקחת יותר זמן — יצוין בדף המוצר.',
-  },
-  {
-    q: 'האם אפשר לבחור סופר ספציפי?',
-    a: 'כן. בדפי קלפי מזוזה ותפילין תוכל לראות את שם הסופר ולינק לפרופיל שלו. אם אתה רוצה סופר ספציפי, צור איתנו קשר ונחבר ביניכם.',
-  },
-  {
-    q: 'מה קורה אם המזוזה נפסלת?',
-    a: 'מזוזות ותפילין צריכים בדיקה תקופתית. אם מוצר שקנית אצלנו נמצא פסול בבדיקה תוך שנה מהרכישה — צור קשר ונטפל בזה.',
-  },
-  {
-    q: 'האם אפשר להחזיר מוצר?',
-    a: 'מוצרים שלא נפתחו ניתן להחזיר תוך 14 יום. קלפים שנכתבו לפי הזמנה אישית אינם ניתנים להחזרה. לפרטים נוספים ראה מדיניות החזרות.',
-  },
-  {
-    q: 'האם יש ייעוץ לפני הרכישה?',
-    a: 'כן. אפשר לפנות אלינו בוואטסאפ וניתן ייעוץ אישי — איזה רמת כשרות מתאימה, איזה גודל קלף, ואיזה סופר מתאים לצרכים שלך.',
-  },
-  {
-    q: 'מה ההבדל בין YourSofer לחנות רגילה?',
-    a: 'בחנות רגילה אתה קונה מוצר אנונימי. אצלנו אתה יודע מי כתב, מי בדק, ואפשר לדבר ישירות עם הסופר. בנוסף — אנחנו חוסכים את רווח המתווך, אז אותו תקציב קונה רמה גבוהה יותר.',
-  },
-];
+/**
+ * FaqClient — דף השאלות והתשובות המרכזי.
+ *
+ * כל התוכן מגיע ממקור האמת היחיד data/faq.ts.
+ * כולל: חיפוש בזמן אמת (עם נרמול עברית ומילות מפתח), כפתורי קטגוריות,
+ * אקורדיונים נגישים, כפתור וואטסאפ וכפתור מעקב הזמנה.
+ */
 
-function FaqItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
-  return (
-    <div style={{ borderBottom: '1px solid #E0D8CC' }}>
-      <button
-        onClick={onToggle}
-        style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer',
-          textAlign: 'right', fontFamily: 'inherit',
-        }}
-      >
-        <span style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', flex: 1, textAlign: 'right' }}>{q}</span>
-        <span style={{ color: '#C5A028', fontSize: 16, fontWeight: 700, marginRight: 12, flexShrink: 0 }}>
-          {open ? '▴' : '▾'}
-        </span>
-      </button>
-      <div style={{
-        maxHeight: open ? 400 : 0,
-        overflow: 'hidden',
-        transition: 'max-height 0.28s ease',
-      }}>
-        <div style={{ fontSize: 14, color: '#444', lineHeight: 1.8, padding: '12px 16px', background: '#F8F5F0' }}>
-          {a}
-        </div>
-      </div>
-    </div>
-  );
-}
+import { useMemo, useRef, useState } from 'react';
+import {
+  FAQ_CATEGORIES,
+  FAQ_ITEMS,
+  getFaqByCategory,
+  searchFaq,
+  type FaqCategoryId,
+} from '@/data/faq';
+import { buildWhatsAppLink, WA_PREFILL } from '@/lib/whatsapp';
+import { trackFaqEvent } from '@/lib/faqAnalytics';
+import FaqAccordion from '@/app/components/faq/FaqAccordion';
+
+const GOLD = '#C5A028';
 
 export default function FaqClient() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [query, setQuery] = useState('');
+  const [activeCat, setActiveCat] = useState<FaqCategoryId | null>(null);
+  const searchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const searching = query.trim().length > 0;
+  const searchResults = useMemo(
+    () => (searching ? searchFaq(query) : FAQ_ITEMS),
+    [query, searching],
+  );
+
+  function onSearchChange(value: string) {
+    setQuery(value);
+    if (searchDebounce.current) clearTimeout(searchDebounce.current);
+    if (value.trim().length >= 2) {
+      searchDebounce.current = setTimeout(() => {
+        trackFaqEvent('faq_search', {
+          search_term: value.trim(),
+          results_count: searchFaq(value).length,
+          page: '/faq',
+        });
+      }, 700);
+    }
+  }
+
+  function onCategoryClick(catId: FaqCategoryId) {
+    setActiveCat(prev => (prev === catId ? null : catId));
+    setQuery('');
+    trackFaqEvent('faq_category_click', { category: catId, page: '/faq' });
+    // גלילה עדינה לקטגוריה
+    requestAnimationFrame(() => {
+      document.getElementById(`faq-cat-${catId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  const visibleCategories = activeCat
+    ? FAQ_CATEGORIES.filter(c => c.id === activeCat)
+    : FAQ_CATEGORIES;
 
   return (
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#F5F2EC', minHeight: '100vh' }}>
 
-      {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #1a1a1a 100%)', padding: '52px 20px 44px', textAlign: 'center' }}>
-        <h1 style={{ color: '#fff', fontSize: 34, fontWeight: 900, margin: '0 0 10px' }}>שאלות ותשובות</h1>
-        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, margin: 0 }}>
-          כל מה שרצית לדעת לפני שקונים סת״מ
+      {/* ── Hero ── */}
+      <div style={{ background: '#1a1a1a', padding: '48px 20px 40px', textAlign: 'center' }}>
+        <h1 style={{ color: '#fff', fontSize: 'clamp(26px, 5vw, 34px)', fontWeight: 900, margin: '0 0 10px' }}>
+          שאלות נפוצות
+        </h1>
+        <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 15, margin: '0 auto', maxWidth: 640, lineHeight: 1.7 }}>
+          מצאו תשובות מהירות לשאלות על כיפות בהדפסה אישית, משלוחים, הקדשות, מועדון הלקוחות,
+          מוצרי סת״ם, סטטוס הזמנה, תשלומים והחזרות. לא מצאתם תשובה? ניתן לפנות אלינו ישירות
+          בוואטסאפ ולקבל מענה אנושי מהיר.
         </p>
-      </div>
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 16px 60px' }}>
-        <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, overflow: 'hidden' }}>
-          {FAQS.map((faq, i) => (
-            <FaqItem
-              key={i}
-              q={faq.q}
-              a={faq.a}
-              open={openIndex === i}
-              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
-            />
-          ))}
-        </div>
-
-        <div style={{ marginTop: 40, textAlign: 'center', background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '28px 24px' }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>לא מצאת תשובה?</div>
-          <div style={{ fontSize: 14, color: '#666', marginBottom: 16 }}>צור איתנו קשר בוואטסאפ ונענה תוך דקות</div>
+        {/* כפתורי פעולה עליונים */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginTop: 20 }}>
           <a
-            href="https://wa.me/972587479933"
+            href={buildWhatsAppLink(WA_PREFILL.general)}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackFaqEvent('faq_whatsapp_click', { page: '/faq' })}
+            style={{ background: '#25D366', color: '#fff', padding: '11px 22px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none' }}
+          >
+            💬 וואטסאפ — מענה אנושי מהיר
+          </a>
+          <a
+            href="/account"
+            onClick={() => trackFaqEvent('faq_order_status_click', { page: '/faq' })}
+            style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.35)', padding: '11px 22px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none' }}
+          >
+            מעקב אחר הזמנה / אזור אישי
+          </a>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '28px 16px 60px' }}>
+
+        {/* ── חיפוש ── */}
+        <div style={{ marginBottom: 18 }}>
+          <label htmlFor="faq-search" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
+            חיפוש בשאלות ותשובות
+          </label>
+          <input
+            id="faq-search"
+            type="search"
+            value={query}
+            onChange={e => onSearchChange(e.target.value)}
+            placeholder="חפשו שאלה... (למשל: מחיר כיפות, משלוח, נקודות)"
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              border: `1.5px solid ${query ? GOLD : '#E0D8CC'}`,
+              borderRadius: 12,
+              padding: '13px 16px',
+              fontSize: 15,
+              fontFamily: 'inherit',
+              outline: 'none',
+              background: '#fff',
+              color: '#1a1a1a',
+            }}
+          />
+        </div>
+
+        {/* ── כפתורי קטגוריות ── */}
+        {!searching && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 26 }}>
+            {FAQ_CATEGORIES.map(cat => {
+              const active = activeCat === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => onCategoryClick(cat.id)}
+                  aria-pressed={active}
+                  style={{
+                    background: active ? GOLD : '#fff',
+                    color: active ? '#1a1a1a' : '#444',
+                    border: `1.5px solid ${active ? GOLD : '#E0D8CC'}`,
+                    borderRadius: 20,
+                    padding: '8px 14px',
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    minHeight: 40,
+                  }}
+                >
+                  <span aria-hidden="true" style={{ marginLeft: 5 }}>{cat.icon}</span>
+                  {cat.label}
+                </button>
+              );
+            })}
+            {activeCat && (
+              <button
+                onClick={() => setActiveCat(null)}
+                style={{
+                  background: 'none', border: 'none', color: '#9C7B3F', fontSize: 13,
+                  fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline',
+                }}
+              >
+                הצג הכל
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* ── תוצאות חיפוש ── */}
+        {searching ? (
+          <div>
+            <div style={{ fontSize: 13.5, color: '#666', marginBottom: 12 }}>
+              {searchResults.length > 0
+                ? `נמצאו ${searchResults.length} תשובות עבור "${query.trim()}"`
+                : `לא נמצאו תשובות עבור "${query.trim()}"`}
+            </div>
+            {searchResults.length > 0 ? (
+              <FaqAccordion items={searchResults} />
+            ) : (
+              <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '28px 24px', textAlign: 'center' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>
+                  לא מצאנו תשובה מתאימה
+                </div>
+                <div style={{ fontSize: 13.5, color: '#666', marginBottom: 16 }}>
+                  נסו ניסוח אחר, או דברו איתנו ישירות — עונים מהר.
+                </div>
+                <a
+                  href={buildWhatsAppLink(WA_PREFILL.general)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackFaqEvent('faq_whatsapp_click', { page: '/faq' })}
+                  style={{ display: 'inline-block', background: '#25D366', color: '#fff', padding: '11px 24px', borderRadius: 8, fontSize: 14, fontWeight: 700, textDecoration: 'none' }}
+                >
+                  שאלו אותנו בוואטסאפ ←
+                </a>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* ── קטגוריות ── */
+          visibleCategories.map(cat => {
+            const items = getFaqByCategory(cat.id);
+            if (items.length === 0) return null;
+            return (
+              <section key={cat.id} id={`faq-cat-${cat.id}`} aria-label={cat.label} style={{ marginBottom: 30, scrollMarginTop: 90 }}>
+                <h2 style={{ fontSize: 19, fontWeight: 800, color: '#1a1a1a', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span aria-hidden="true" style={{ fontSize: 17 }}>{cat.icon}</span>
+                  {cat.label}
+                </h2>
+                <FaqAccordion items={items} />
+              </section>
+            );
+          })
+        )}
+
+        {/* ── לא מצאתם תשובה ── */}
+        <div style={{ marginTop: 40, textAlign: 'center', background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '28px 24px' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>לא מצאתם תשובה?</div>
+          <div style={{ fontSize: 14, color: '#666', marginBottom: 16 }}>
+            צרו איתנו קשר בוואטסאפ — בשעות הפעילות עונים בדרך כלל בתוך כדקה.
+          </div>
+          <a
+            href={buildWhatsAppLink(WA_PREFILL.general)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackFaqEvent('faq_human_agent_click', { page: '/faq' })}
             style={{ display: 'inline-block', background: '#25D366', color: '#fff', padding: '12px 28px', borderRadius: 8, fontSize: 15, fontWeight: 700, textDecoration: 'none' }}
           >
-            שלח הודעה בוואטסאפ ←
+            שלחו הודעה בוואטסאפ ←
           </a>
         </div>
       </div>

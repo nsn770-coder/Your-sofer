@@ -2,6 +2,8 @@
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '@/app/contexts/CartContext';
+import PageFaqSection from '@/app/components/faq/PageFaqSection';
+import { getKipaUnitPrice, KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -20,9 +22,7 @@ const TYPE_LABELS: Record<string, string> = {
 
 const PRINT_AREA = { top: '18%', left: '18%', width: '64%', height: '64%' };
 
-function getBasePrice(qty: number) {
-  return qty <= 29 ? 19 : qty <= 99 ? 12 : qty <= 150 ? 10 : 9;
-}
+// התמחור מגיע מהמקור המרכזי app/lib/kippot.ts — אין לשכפל מדרגות מחיר כאן.
 
 function extractPublicId(url: string): string {
   try {
@@ -83,9 +83,9 @@ function KippotOrderInner() {
   const logoImgRef     = useRef<HTMLImageElement>(null);
 
   // ── Price ───────────────────────────────────────────────────────────────────
-  const basePrice  = getBasePrice(qty);
+  const basePrice  = getKipaUnitPrice(qty);
   const typeExtra  = type === 'embroidery' ? 5 : 0;
-  const sideExtra  = addSide ? 3 : 0;
+  const sideExtra  = addSide ? KIPA_EXTRA_SIDE_PRICE : 0;
   const unitPrice  = basePrice + typeExtra + sideExtra;
   const totalPrice = qty * unitPrice;
 
@@ -432,7 +432,7 @@ function KippotOrderInner() {
             <input type="checkbox" checked={addSide} onChange={e => setAddSide(e.target.checked)} style={{ width: 18, height: 18, accentColor: '#C5A028' }} />
             <div>
               <span style={{ fontSize: 14, fontWeight: 700 }}>{type === 'print-top' ? 'הדפסה גם למטה' : 'הדפסה גם למעלה'}</span>
-              <span style={{ color: '#C5A028', fontWeight: 700 }}> +₪3 ליחידה</span>
+              <span style={{ color: '#C5A028', fontWeight: 700 }}> +₪{KIPA_EXTRA_SIDE_PRICE} ליחידה</span>
             </div>
           </label>
           {addSide && (
@@ -457,7 +457,7 @@ function KippotOrderInner() {
           )}
           {sideExtra > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#6B7280' }}>
-              <span>+₪3 × {qty}</span><span>הדפסה צד נוסף</span>
+              <span>+₪{KIPA_EXTRA_SIDE_PRICE} × {qty}</span><span>הדפסה צד נוסף</span>
             </div>
           )}
           <div style={{ borderTop: '1px solid #E5E0D5', paddingTop: 10, display: 'flex', justifyContent: 'space-between', fontWeight: 900, fontSize: 17 }}>
@@ -482,8 +482,12 @@ function KippotOrderInner() {
 
 export default function KippotOrderPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 40, textAlign: 'center' }}>טוען...</div>}>
-      <KippotOrderInner />
-    </Suspense>
+    <>
+      <Suspense fallback={<div style={{ padding: 40, textAlign: 'center' }}>טוען...</div>}>
+        <KippotOrderInner />
+      </Suspense>
+      {/* FAQ ממוקד — מקור אמת מרכזי data/faq.ts; מוצג מתחת לתהליך העיצוב ולא מפריע לו */}
+      <PageFaqSection pageKey="kippot-order" title="שאלות נפוצות על עיצוב והדפסה" max={6} />
+    </>
   );
 }

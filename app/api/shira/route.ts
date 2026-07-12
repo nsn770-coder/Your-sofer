@@ -5,6 +5,34 @@ import {
   EVENT_CATEGORIES,
   CROSS_SELL,
 } from '@/lib/aiProductSearch';
+import { FAQ_ITEMS, normalizeHebrew, type FAQItem } from '@/data/faq';
+
+// ── FAQ knowledge matching ────────────────────────────────────────────────────
+// מאתר את התשובות הקצרות הרלוונטיות ביותר מתוך מקור האמת (data/faq.ts)
+// ומזין אותן לפרומפט — כדי שהבוט יענה תשובות קצרות, חד-משמעיות ומעודכנות
+// במקום להמציא מחירים, זמני אספקה או מדיניות.
+
+function matchFaqItems(text: string, limit = 5): FAQItem[] {
+  const normalized = normalizeHebrew(text);
+  if (!normalized) return [];
+  const scored = FAQ_ITEMS.map(item => {
+    let score = 0;
+    for (const kw of item.keywords ?? []) {
+      if (normalized.includes(normalizeHebrew(kw))) score += 2;
+    }
+    // חפיפת מילים עם נוסח השאלה עצמה
+    const qWords = normalizeHebrew(item.question).split(' ').filter(w => w.length >= 3);
+    for (const w of qWords) {
+      if (normalized.includes(w)) score += 1;
+    }
+    return { item, score };
+  });
+  return scored
+    .filter(s => s.score >= 2)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(s => s.item);
+}
 
 // ── Intent detection ──────────────────────────────────────────────────────────
 
@@ -91,8 +119,18 @@ function buildSystemPrompt(
   products: SearchResult[],
   event: string | null,
   isLargeOrder: boolean,
+  faqMatches: FAQItem[] = [],
 ): string {
   let prompt = BASE_SYSTEM;
+
+  if (faqMatches.length > 0) {
+    prompt += `\n\n── ידע שירות מאומת (FAQ רשמי — מקור אמת) ──
+כשהלקוח שואל שאלת שירות (מחירים, משלוח, מועדון, החזרות, סטטוס),
+עני אך ורק לפי התשובות הבאות, בקצרה וללא תוספות:
+${faqMatches
+  .map(f => `• ש: ${f.question}\n  ת: ${f.shortAnswer}${f.cta ? `\n  קישור לפעולה: ${f.cta.label} — ${f.cta.href}` : ''}`)
+  .join('\n')}`;
+  }
 
   if (products.length > 0) {
     prompt += `\n\n── מוצרים זמינים כעת ──
@@ -109,10 +147,22 @@ ${products
 
   prompt += `\n\n── כללי בטיחות (קבועים — לעולם לא להפר) ──
 • הציגי רק מוצרים שרשומים ברשימה למעלה. אל תמציאי מוצרים שאינם ברשימה.
-• אל תמציאי מחירים — השתמשי אך ורק במחירים הרשומים.
-• אל תבטיחי זמן משלוח ספציפי אלא אם מצוין במפורש בפרטי המוצר.
+• אל תמציאי מחירים — השתמשי אך ורק במחירים הרשומים (במוצרים או ב-FAQ).
+• אל תבטיחי זמן משלוח ספציפי אלא אם מצוין במפורש בפרטי המוצר או ב-FAQ.
 • אם חסר מידע — שאלי שאלה קצרה אחת ובלבד.
-• הציעי עד 3 מוצרים בכל פעם עם קישור ישיר.`;
+• הציעי עד 3 מוצרים בכל פעם עם קישור ישיר.
+
+── כללי שירות קבועים ──
+• מחיר כיפות קטיפה: לעולם אל תנקבי מחיר — הפני להצעת מחיר בוואטסאפ. אל תגידי שקטיפה עולה כמו פשתן או סאטן.
+• הזמנה דחופה: אל תתחייבי לזמן אספקה קצר מ-7 ימים — הציעי בדיקה מול הצוות בוואטסאפ.
+• סטטוס הזמנה: בקשי קוד הזמנה או הפני לאזור האישי (/account). לעולם אל תמציאי סטטוס.
+• זמן אספקה: 7–10 ימים סה"כ מרגע התשלום. לעולם אל תציגי 7–10 ימי ייצור ועוד 7–10 ימי משלוח.
+• מועדון: הנחת ההצטרפות היא 5% (קוד קופון), וההחזר הקבוע הוא 10% מסכום המוצרים כיתרה. אל תבלבלי ביניהם ואל תגידי שהנחת ההצטרפות היא 10%.
+• תשלומים: כרטיסי אשראי או Bit בלבד, עד 4 תשלומים. אל תציגי Google Pay כאמצעי תשלום.
+• מוצר בעיצוב אישי אינו ניתן להחזרה — למעט פגם או אי-התאמה להדמיה שאושרה.
+• אחריות סת״ם חלה רק על רכישה ותשלום דרך האתר — לא על רכישה ישירה מסופר מחוץ לאתר.
+• אם אינך בטוחה בתשובה — אל תמציאי. הציעי מעבר לנציג אנושי בוואטסאפ: https://wa.me/972587479933
+• אם הלקוח מבקש נציג אנושי — תני מיד את קישור הוואטסאפ, בלי שאלות נוספות.`;
 
   if (event && EVENT_CATEGORIES[event]) {
     const cats = EVENT_CATEGORIES[event].join(', ');
@@ -162,6 +212,7 @@ export async function POST(req: NextRequest) {
     const detectedEvent = detectEvent(recentText);
     const priceRange = detectPriceRange(recentText);
     const isLargeOrder = LARGE_ORDER_PATTERN.test(recentText);
+    const faqMatches = matchFaqItems(userMessage);
 
     // Determine search category: direct category match takes priority, then event-based
     const searchCategory =
@@ -177,7 +228,7 @@ export async function POST(req: NextRequest) {
       }),
     ]);
 
-    const systemPrompt = buildSystemPrompt(products, detectedEvent, isLargeOrder);
+    const systemPrompt = buildSystemPrompt(products, detectedEvent, isLargeOrder, faqMatches);
 
     const aiRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

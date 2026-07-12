@@ -72,7 +72,8 @@ export const POLICY_URLS = {
   terms: '/legal/takanon',
   accessibility: '/legal/accessibility',
   contact: '/contact',
-  faq: '/madrich/faq',
+  /** דף השאלות והתשובות המרכזי (מקור תוכן: data/faq.ts) */
+  faq: '/faq',
 } as const;
 
 // ── ביקורות והוכחה חברתית ────────────────────────────────────────────────────

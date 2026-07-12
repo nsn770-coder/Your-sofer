@@ -6,6 +6,8 @@ import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 import { useChatPersona } from './ChatPersonaContext';
 import { useCart } from '@/app/contexts/CartContext';
+// המספר מגיע מהמקור המרכזי (siteTrust דרך lib/whatsapp) — אין להקשיח כאן מספר
+import { WA_NUMBER, buildWhatsAppLink } from '@/lib/whatsapp';
 
 // Set to false to restore ShiraChat
 const SHOW_WHATSAPP_ONLY = true;
@@ -18,7 +20,6 @@ const SHOW_WA_FLOAT = true;
 // Triggers: 20s idle, cart-add, and viewing a product / cart / checkout page.
 const AUTO_OPEN_BUBBLE = true;
 
-const WA_NUMBER = '972587479933';
 const WA_DEFAULT_TEXT = 'שלום אני רוצה לברר על מוצר באתר';
 const BUBBLE_TEXT_IDLE = 'כתבו לנו כאן ונענה לכם מיידית';
 const BUBBLE_TEXT_CART = 'לפרטים נוספים ניתן לשאול כעת — נציג אנושי זמין. יש לנו שלל פתרונות שעוד לא ראיתם';
@@ -238,7 +239,7 @@ const PERSONAS = {
   shira: {
     avatar: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_88/v1777792770/%D7%A9%D7%99%D7%A8%D7%94_itw0l5.png',
     name: 'שירה - יועצת סת״ם',
-    welcome: 'שלום! אני שירה, היועצת שלך לסת״ם ויודאיקה 👋\nאיך אני יכולה לעזור לך היום?',
+    welcome: 'שלום וברוכים הבאים ל-Your Sofer 👋\nאיך אפשר לעזור לכם היום?',
   },
   nissim: {
     avatar: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1777793258/%D7%A6_%D7%90%D7%98_%D7%91%D7%95%D7%98_%D7%94%D7%A8%D7%91_%D7%A0%D7%99%D7%A1%D7%99%D7%9D_lkojgh.png',
@@ -247,10 +248,16 @@ const PERSONAS = {
   },
 };
 
+// פעולות נפוצות בהודעת הפתיחה — נשענות על מאגר ה-FAQ המרכזי (data/faq.ts)
+// שמוזן לבוט דרך /api/shira, כך שהתשובות קצרות, מדויקות ומעודכנות.
 const QUICK_REPLIES = [
-  'עזרי לי לבחור מזוזה',
-  'איך בוחרים תפילין לבר מצווה?',
-  'מה ההבדל בין רמות הכשרות?',
+  'מחירי כיפות עם הדפסה',
+  'זמן אספקה ומשלוחים',
+  'סטטוס הזמנה',
+  'הקדשה ועיצוב אישי',
+  'מועדון לקוחות ונקודות',
+  'מוצרי סת״ם וכשרות',
+  'מעבר לנציג אנושי',
 ];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -614,7 +621,7 @@ export default function ShiraChat() {
 
           {/* Human agent - WhatsApp */}
           <div className="shira-wa-bar">
-            <a href="https://wa.me/972587479933" target="_blank" rel="noopener noreferrer" className="shira-wa-btn">
+            <a href={buildWhatsAppLink()} target="_blank" rel="noopener noreferrer" className="shira-wa-btn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.859L.057 23.286a.75.75 0 00.92.92l5.427-1.476A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.5-5.25-1.377l-.376-.217-3.898 1.059 1.059-3.898-.217-.376A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
