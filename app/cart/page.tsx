@@ -7,6 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
+import DeliveryEstimate from '../components/DeliveryEstimate';
 
 function IconLock() {
   return (
@@ -418,6 +419,11 @@ export default function CartPage() {
                   </div>
                   <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע״מ</div>
                 </div>
+              </div>
+
+              {/* Delivery estimate */}
+              <div style={{ marginBottom: 16 }}>
+                <DeliveryEstimate />
               </div>
 
               {/* Coupon section */}
