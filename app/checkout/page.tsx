@@ -10,6 +10,7 @@ import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 import * as pixel from '@/lib/metaPixel';
 import SumitPaymentForm from '../components/SumitPaymentForm';
+import DeliveryEstimate from '../components/DeliveryEstimate';
 
 function IconLock({ size = 14, color = 'currentColor' }: { size?: number; color?: string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>;
@@ -286,6 +287,7 @@ export default function CheckoutPage() {
   } = useCart();
   const { shaliach, refCode } = useShaliach();
   const [loading, setLoading] = useState(false);
+  const [bitLoading, setBitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ checkoutEnabled: true, checkoutDisabledMessage: '' });
   // ── מימוש נקודות מועדון — נקודה = ₪1, עד 50% מסכום העגלה (אחרי הנחות, לפני משלוח)
@@ -328,6 +330,16 @@ export default function CheckoutPage() {
 
   // Read isMobile before first paint to prevent the false→true CLS flip on mobile
   useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
+
+  // חזרה מביטול תשלום ביט (CancelRedirectURL מחזיר ל-/checkout?bit=cancelled)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('bit') === 'cancelled') {
+      setSubmitError('התשלום בביט בוטל — אפשר לנסות שוב או לשלם באשראי');
+      window.history.replaceState({}, '', '/checkout');
+    }
+  }, []);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -518,6 +530,75 @@ export default function CheckoutPage() {
     setLoading(false);
   }
 
+  // ── תשלום בביט — יצירת דף תשלום מאובטח ב-Sumit והפניה אליו ──────────────────
+  async function handleBitPayment() {
+    setSubmitError(null);
+    setBitLoading(true);
+    saveAbandonedCartBeforePayment();
+    try {
+      const commissionPercent = shaliach?.commissionPercent || 0;
+      const gift = selectedGift ? giftOptions.find(g => g.id === selectedGift) : null;
+
+      // מימוש נקודות מחייב טוקן מאומת — השרת מנכה רק מהחשבון המאומת
+      let idToken: string | null = null;
+      if (pointsToUse > 0) {
+        try {
+          const { getAuthLazy } = await import('@/lib/authLazy');
+          const auth = await getAuthLazy();
+          idToken = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+        } catch (e) {
+          console.error('[checkout] failed to get idToken for points redemption:', e);
+        }
+        if (!idToken) {
+          setSubmitError('מימוש נקודות מחייב התחברות — התחבר מחדש ונסה שוב');
+          setBitLoading(false);
+          return;
+        }
+      }
+
+      const res = await fetch('/api/payment/bit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [
+            ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '', bundlePromo: i.bundlePromo || undefined })),
+            ...(bundleDiscountAmount > 0 ? [{ name: 'מבצע כיפות — חבילות',        price: -bundleDiscountAmount, quantity: 1, cat: '' }] : []),
+            ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
+            ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
+            ...(pointsToUse > 0 ? [{ name: 'הנחת נקודות מועדון', price: -pointsToUse, quantity: 1, cat: '' }] : []),
+          ],
+          total: finalTotal,
+          customer: { name: form.name, email: form.email, phone: form.phone },
+          couponCode: appliedCoupon?.code || undefined,
+          cartItems: items,
+          address: `${form.address}, ${form.city}`,
+          notes: form.notes || '',
+          selectedGift: selectedGift || null,
+          giftLine: gift ? { id: gift.id, name: gift.name, productId: gift.productId } : null,
+          shippingCost, shippingType: 'regular',
+          sessionId,
+          refCode: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
+          commissionPercent,
+          uid: user?.uid || null,
+          pointsUsed: pointsToUse > 0 ? pointsToUse : undefined,
+          idToken: pointsToUse > 0 ? idToken : undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.url) {
+        // הפניה לדף התשלום המאובטח של ביט (Sumit)
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'שגיאה ביצירת התשלום בביט');
+      }
+    } catch (e: any) {
+      setSubmitError('שגיאה: ' + (e.message || 'נסה שוב'));
+      console.error(e);
+      setBitLoading(false);
+    }
+  }
+
   const isFormValid = !!(form.name && form.email && form.phone && form.address && form.city);
 
   return (
@@ -628,6 +709,13 @@ export default function CheckoutPage() {
               </div>
             )}
 
+            {/* Delivery estimate */}
+            {siteSettings.checkoutEnabled && (
+              <div style={{ marginBottom: 16 }}>
+                <DeliveryEstimate />
+              </div>
+            )}
+
             {/* Call-to-action heading above card form */}
             {siteSettings.checkoutEnabled && (
               <div style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', textAlign: 'center', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
@@ -641,18 +729,54 @@ export default function CheckoutPage() {
                   למלא את פרטי המשלוח למעלה כדי להמשיך לתשלום
                 </div>
               ) : (
-                <SumitPaymentForm
-                  companyId={Number(process.env.NEXT_PUBLIC_SUMIT_COMPANY_ID)}
-                  apiPublicKey={process.env.NEXT_PUBLIC_SUMIT_API_PUBLIC_KEY || ''}
-                  disabled={loading}
-                  onToken={handlePaymentToken}
-                  onError={handlePaymentError}
-                />
+                <>
+                  <SumitPaymentForm
+                    companyId={Number(process.env.NEXT_PUBLIC_SUMIT_COMPANY_ID)}
+                    apiPublicKey={process.env.NEXT_PUBLIC_SUMIT_API_PUBLIC_KEY || ''}
+                    disabled={loading || bitLoading}
+                    onToken={handlePaymentToken}
+                    onError={handlePaymentError}
+                  />
+
+                  {/* ── או תשלום בביט ─────────────────────────────────────── */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0 14px' }}>
+                    <div style={{ flex: 1, height: 1, background: '#e8e2d8' }} />
+                    <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 700 }}>או</span>
+                    <div style={{ flex: 1, height: 1, background: '#e8e2d8' }} />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleBitPayment}
+                    disabled={loading || bitLoading}
+                    style={{
+                      width: '100%',
+                      background: (loading || bitLoading) ? '#888' : 'linear-gradient(135deg, #00d1c5, #00a3e0)',
+                      color: '#fff', border: 'none', borderRadius: 14, height: 52,
+                      fontSize: 16, fontWeight: 800,
+                      cursor: (loading || bitLoading) ? 'not-allowed' : 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    }}
+                  >
+                    {bitLoading ? 'מעביר לתשלום בביט...' : (
+                      <>
+                        תשלום בביט
+                        <span style={{
+                          background: '#fff', color: '#00a3e0', borderRadius: 8,
+                          padding: '1px 9px', fontSize: 15, fontWeight: 900,
+                          fontFamily: 'Arial, sans-serif', direction: 'ltr',
+                        }}>bit</span>
+                      </>
+                    )}
+                  </button>
+                  <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', marginTop: 8 }}>
+                    תועברו לדף תשלום מאובטח של ביט, ואחרי האישור תוחזרו לאתר
+                  </div>
+                </>
               )
             )}
             {siteSettings.checkoutEnabled && (
               <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 6 }}>
-                🔒 תשלום מאובטח · 💳 אשראי · ✅ אישור הזמנה מיידי
+                🔒 תשלום מאובטח · 💳 אשראי · 📱 ביט · ✅ אישור הזמנה מיידי
               </div>
             )}
           </div>
