@@ -18,7 +18,6 @@ import { TidioChat } from "@/components/TidioChat";
 import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 import ClubPopupWrapper from "@/components/ClubPopupWrapper";
-import AsyncChatWidget from "@/components/AsyncChatWidget";
 import GiftProgressBar from "./components/GiftProgressBar";
 
 // PERF: Geist removed — its className was on <body> but the inline style
@@ -168,11 +167,6 @@ export default function RootLayout({
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
           })(window,document,"clarity","script","wiozsdfcgm");
         `}</Script>
-
-        {/* ── Async chat widget — injected after first interaction / 8s idle
-               (see components/AsyncChatWidget.tsx) so its script + heavy avatar
-               never compete with LCP/hydration ── */}
-        <AsyncChatWidget />
       </body>
     </html>
   );

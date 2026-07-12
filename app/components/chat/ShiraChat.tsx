@@ -10,16 +10,16 @@ import { useCart } from '@/app/contexts/CartContext';
 // Set to false to restore ShiraChat
 const SHOW_WHATSAPP_ONLY = true;
 
-// Floating WhatsApp button — removed in favor of the async chatbot widget
-// (loaded from layout.tsx). Set to true to bring the WhatsApp button back.
-const SHOW_WA_FLOAT = false;
+// Floating WhatsApp button — restored (July 2026). The async.co.il chatbot
+// widget was removed from layout.tsx. Set to false to hide the button.
+const SHOW_WA_FLOAT = true;
 
 // Auto-opening chat window (the "נציג זמין כעת" bubble) — disabled for now.
 // Set to true to restore the 20s-idle / cart-add / cart-page auto-open triggers.
 const AUTO_OPEN_BUBBLE = false;
 
 const WA_NUMBER = '972587479933';
-const WA_DEFAULT_TEXT = 'שלום, אני מעוניין לברר על מוצר באתר';
+const WA_DEFAULT_TEXT = 'שלום אני רוצה לברר על מוצר באתר';
 const BUBBLE_TEXT_IDLE = 'כתבו לנו כאן ונענה לכם מיידית';
 const BUBBLE_TEXT_CART = 'לפרטים נוספים ניתן לשאול כעת — נציג אנושי זמין. יש לנו שלל פתרונות שעוד לא ראיתם';
 
