@@ -359,13 +359,6 @@ export default function ShiraChat() {
   const { stamPage } = useChatPersona();
   const persona = stamPage ? PERSONAS.nissim : PERSONAS.shira;
   const pathname = usePathname();
-
-  if (pathname?.startsWith('/bar-mitzvah')) return null;
-  if (pathname?.startsWith('/admin')) return null;
-
-  if (SHOW_WHATSAPP_ONLY) {
-    return SHOW_WA_FLOAT ? <WaFloatBubble /> : null;
-  }
   const isHomepage = pathname === '/';
 
   const [isOpen, setIsOpen]               = useState(false);
@@ -409,6 +402,14 @@ export default function ShiraChat() {
   useEffect(() => {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   }, [isOpen]);
+
+  // ה-returns המותנים חייבים לבוא אחרי כל ה-hooks (react-hooks/rules-of-hooks) —
+  // אחרת ניווט צד-לקוח בין עמודים משנה את סדר ה-hooks וגורם לקריסה.
+  if (pathname?.startsWith('/bar-mitzvah')) return null;
+  if (pathname?.startsWith('/admin')) return null;
+  if (SHOW_WHATSAPP_ONLY) {
+    return SHOW_WA_FLOAT ? <WaFloatBubble /> : null;
+  }
 
   const executeSend = async (userText: string) => {
     const updatedMessages: ChatMessage[] = [...messages, { role: 'user', content: userText }];
