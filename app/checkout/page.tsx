@@ -863,9 +863,10 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      {/* FAQ קומפקטי לעמוד התשלום — אמצעי תשלום, משלוח ושינויים (מקור: data/faq.ts) */}
-      <PageFaqSection pageKey="checkout" title="שאלות נפוצות על תשלום ומשלוח" max={6} showWhatsAppCta={false} />
       </div>{/* /centering wrapper */}
+
+      {/* FAQ קומפקטי לעמוד התשלום — מחוץ ל-flex wrapper כדי שיופיע מתחת לטופס ולא לצידו */}
+      <PageFaqSection pageKey="checkout" title="שאלות נפוצות על תשלום ומשלוח" max={6} showWhatsAppCta={false} />
     </div>
   );
 }
