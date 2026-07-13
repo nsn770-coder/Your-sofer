@@ -671,6 +671,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [imgUrl4, setImgUrl4]                 = useState(product.imgUrl4 || '');
   const [imgUrl5, setImgUrl5]                 = useState(product.imgUrl5 || '');
   const [videoUrl, setVideoUrl]               = useState(product.videoUrl || '');
+  const [aiImage, setAiImage]                 = useState(product.aiLifestyleImage || '');
   const [level, setLevel]                     = useState(product.level || '');
   const [nusach, setNusach]                   = useState(product.nusach || '');
   const [closeupImageUrl, setCloseupImageUrl] = useState(product.closeupImageUrl || '');
@@ -751,6 +752,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
       else if (field === 'img4') setImgUrl4(data.secure_url);
       else if (field === 'img5') setImgUrl5(data.secure_url);
       else if (field === 'video') setVideoUrl(data.secure_url);
+      else if (field === 'ai') setAiImage(data.secure_url);
       else if (field === 'closeup') setCloseupImageUrl(data.secure_url);
     } catch { alert('שגיאה בהעלאה'); }
     finally { setUploadingImg(null); }
@@ -786,6 +788,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         desc, extraDesc: extraDesc || undefined,
         cat, days, size: size || undefined, badge: badge || undefined,
         imgUrl, imgUrl2, imgUrl3, imgUrl4, imgUrl5,
+        aiLifestyleImage: aiImage,
         videoUrl: videoUrl || undefined,
         level: isStam ? level : '',
         nusach: isStam ? (nusach || undefined) : undefined,
@@ -946,6 +949,17 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
       {/* § תמונות */}
       <div style={secS}>
         <div style={secTitleS}>§ תמונות וסרטון</div>
+        {(aiImage || product.aiLifestyleImage) && (
+          <div style={{ display: 'flex', gap: 5, alignItems: 'center', marginBottom: 5 }}>
+            {aiImage && <img src={aiImage} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 3, border: '1px solid #2e7d32', flexShrink: 0 }} />}
+            <label style={{ border: '1px solid #4caf50', color: '#81c784', borderRadius: 4, padding: '3px 6px', fontSize: 10, fontWeight: 800, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+              {uploadingImg === 'ai' ? '…' : '🤖'} AI
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleUpload(e, 'ai')} />
+            </label>
+            <input value={aiImage} onChange={e => setAiImage(e.target.value)} placeholder="תמונת AI — מוצגת ראשונה בגלריה" style={{ flex: 1, ...iS, padding: '4px 7px', fontSize: 11 }} />
+            {aiImage && <button type="button" onClick={() => setAiImage('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 12, padding: 2, lineHeight: 1, flexShrink: 0 }}>✕</button>}
+          </div>
+        )}
         {(['main', 'img2', 'img3', 'img4', 'img5'] as const).map((field, idx) => {
           const cur = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : field === 'img3' ? imgUrl3 : field === 'img4' ? imgUrl4 : imgUrl5;
           const setter = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : field === 'img3' ? setImgUrl3 : field === 'img4' ? setImgUrl4 : setImgUrl5;
