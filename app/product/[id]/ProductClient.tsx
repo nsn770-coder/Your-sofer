@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import { doc, getDoc, updateDoc, setDoc, addDoc, collection, getDocs, query, where, limit, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useCart, getEventPrintPricePerUnit } from '../../contexts/CartContext';
+import { useCart, getEventKippahPricePerUnit } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
 import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
@@ -494,8 +494,8 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
 
 // ─── Event Kippot Calculator (A1) ────────────────────────────────────────────
 
-const EVENT_QTY_STEPS = [50, 60, 70, 80, 90, 100, 120, 150, 200, 300, 500, 1000];
-const TABLE_QTYS      = [50, 60, 70, 80, 90, 100, 150, 200, 300, 500, 750, 1000];
+const EVENT_QTY_STEPS = [30, 40, 50, 60, 70, 80, 90, 100, 120, 150, 200, 300, 500, 1000];
+const TABLE_QTYS      = [30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 500, 750, 1000];
 
 function EventKippotCalculator({
   product,
@@ -510,10 +510,10 @@ function EventKippotCalculator({
   const [uploading, setUploading]     = useState(false);
   const [showTable, setShowTable]     = useState(false);
 
-  const printPricePerUnit = getEventPrintPricePerUnit(qty);
-  const kippotTotal       = product.price * qty;
-  const printTotal        = withPrinting ? printPricePerUnit * qty : 0;
-  const grandTotal        = kippotTotal + printTotal;
+  // Tiered per-unit price by quantity — logo printing included in the price
+  const unitPrice   = getEventKippahPricePerUnit(product.price, qty);
+  const kippotTotal = unitPrice * qty;
+  const grandTotal  = kippotTotal;
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -556,12 +556,12 @@ function EventKippotCalculator({
       <div style={{ marginBottom: 14, background: '#f8f9fa', border: '1px solid #e8e8e8', borderRadius: 10, padding: '12px 14px' }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
           <input type="checkbox" checked={withPrinting} onChange={e => setWithPrinting(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#C5A028' }} />
-          הוסף הדפסה אישית (לוגו / טקסט)
+          הוסף הדפסה אישית (לוגו / טקסט) — כלול במחיר!
         </label>
         {withPrinting && (
           <div style={{ marginTop: 10 }}>
-            <div style={{ fontSize: 11, color: '#666', marginBottom: 6 }}>
-              מחיר הדפסה: {qty >= 100 ? '₪5' : qty >= 50 ? '₪7' : '₪20'} ליחידה
+            <div style={{ fontSize: 11, color: '#1a6b3c', fontWeight: 700, marginBottom: 6 }}>
+              ✓ הדפסת הלוגו כלולה במחיר — ללא תוספת תשלום
             </div>
             <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: printFileUrl ? '#f0fdf4' : '#f5f5f5', border: `1.5px dashed ${printFileUrl ? '#86efac' : '#ccc'}`, borderRadius: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#555' }}>
               {uploading ? 'מעלה...' : printFileUrl ? '✓ קובץ הועלה — לחץ להחלפה' : '📁 העלה לוגו / PDF / תמונה'}
@@ -580,13 +580,13 @@ function EventKippotCalculator({
       {/* Price breakdown */}
       <div style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#555', marginBottom: 5 }}>
-          <span>כיפות × {qty}</span>
+          <span>כיפות × {qty} (₪{unitPrice}/יח')</span>
           <span>₪{kippotTotal.toLocaleString()}</span>
         </div>
         {withPrinting && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#555', marginBottom: 5 }}>
-            <span>הדפסה × {qty} (₪{printPricePerUnit}/יח')</span>
-            <span>₪{printTotal.toLocaleString()}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', marginBottom: 5 }}>
+            <span>הדפסה אישית × {qty}</span>
+            <span style={{ fontWeight: 700 }}>כלול במחיר</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16, fontWeight: 900, color: '#1a1a1a', borderTop: '1px solid #f0f0f0', paddingTop: 8, marginTop: 4 }}>
@@ -615,22 +615,21 @@ function EventKippotCalculator({
             <thead>
               <tr style={{ background: '#1a1a1a', color: '#C5A028' }}>
                 <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>כמות</th>
-                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>ללא הדפסה</th>
-                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>כולל הדפסה</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>מחיר לכיפה</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>סה"כ (כולל הדפסה)</th>
               </tr>
             </thead>
             <tbody>
               {TABLE_QTYS.map((n, i) => {
-                const ppu = getEventPrintPricePerUnit(n);
-                const base = product.price * n;
-                const withPrint = base + ppu * n;
+                const ppu = getEventKippahPricePerUnit(product.price, n);
+                const rowTotal = ppu * n;
                 const isActive = n === qty;
                 return (
                   <tr key={n} style={{ background: isActive ? '#fffbf0' : i % 2 === 0 ? '#fff' : '#fafafa', cursor: 'pointer' }}
                     onClick={() => setQty(n)}>
                     <td style={{ padding: '7px 10px', fontWeight: isActive ? 800 : 500, color: isActive ? '#C5A028' : '#333' }}>{n}</td>
-                    <td style={{ padding: '7px 10px', color: '#333' }}>₪{base.toLocaleString()}</td>
-                    <td style={{ padding: '7px 10px', color: '#1a6b3c', fontWeight: 600 }}>₪{withPrint.toLocaleString()} <span style={{ color: '#888', fontWeight: 400 }}>(₪{ppu}/יח')</span></td>
+                    <td style={{ padding: '7px 10px', color: '#333', fontWeight: 600 }}>₪{ppu}</td>
+                    <td style={{ padding: '7px 10px', color: '#1a6b3c', fontWeight: 600 }}>₪{rowTotal.toLocaleString()}</td>
                   </tr>
                 );
               })}
@@ -1864,14 +1863,16 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     if (!product) return;
     removeItem(product.id);
     removeItem(`print-${product.id}`);
-    addItem({ id: product.id, name: product.name, price: product.price, imgUrl: product.imgUrl || product.image_url, quantity: eventQty, cat: 'כיפות' });
+    // Tiered per-unit price by quantity — logo printing included in the price
+    const unitPrice = getEventKippahPricePerUnit(product.price, eventQty);
+    addItem({ id: product.id, name: product.name, price: unitPrice, imgUrl: product.imgUrl || product.image_url, quantity: eventQty, cat: 'כיפות' });
     if (withPrinting) {
-      const ppu = getEventPrintPricePerUnit(eventQty);
-      addItem({ id: `print-${product.id}`, name: `הדפסה לכיפות`, price: ppu, quantity: eventQty, cat: 'הדפסה', imgUrl: product.imgUrl || product.image_url, printCustomization: { uploadedImageUrl: printFileUrl, originalImageUrl: printFileUrl, productType: 'כיפות', side: 'front', bgRemoved: false } });
+      // Print item carries the design file at ₪0 — cost is embedded in the kippah price
+      addItem({ id: `print-${product.id}`, name: `הדפסה לכיפות — כלול במחיר`, price: 0, quantity: eventQty, cat: 'הדפסה', imgUrl: product.imgUrl || product.image_url, printCustomization: { uploadedImageUrl: printFileUrl, originalImageUrl: printFileUrl, productType: 'כיפות', side: 'front', bgRemoved: false } });
     }
     setCartQty(eventQty);
-    window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: product.price * eventQty, items: [{ item_id: product.id, item_name: product.name, price: product.price, quantity: eventQty }] });
-    pixel.addToCart({ id: product.id, name: product.name, price: product.price, quantity: eventQty });
+    window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: unitPrice * eventQty, items: [{ item_id: product.id, item_name: product.name, price: unitPrice, quantity: eventQty }] });
+    pixel.addToCart({ id: product.id, name: product.name, price: unitPrice, quantity: eventQty });
     router.push('/cart');
   }
 

@@ -133,6 +133,8 @@ export async function POST(req: NextRequest) {
       const totalPrintQty = printServiceItems.reduce((s, i) => s + i.quantity, 0);
       const expectedPricePerUnit = getEventPrintPricePerUnit(totalPrintQty);
       for (const psi of printServiceItems) {
+        // ₪0 print items are valid — printing included in the kippah tiered price
+        if (psi.price === 0) continue;
         if (Math.abs(psi.price - expectedPricePerUnit) > 0.02) {
           console.error(`[payment-bit] print price mismatch: ${psi.price} expected ${expectedPricePerUnit}`);
           return NextResponse.json({ error: 'שגיאה בחישוב מחיר הדפסה' }, { status: 400 });

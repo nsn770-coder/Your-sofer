@@ -14,6 +14,18 @@ export function getEventPrintPricePerUnit(qty: number): number {
   return 20;
 }
 
+// ── Event kippot tiered pricing — per-unit price by quantity ─────────────────
+// basePrice (product.price) is the 100–200 tier price; logo printing included.
+// Ratios: 30–39 → ×1.7 | 40–49 → ×1.5 | 50–99 → ×1.2 | 100–200 → ×1 | 200+ → ×0.9
+// For basePrice=10: 17 / 15 / 12 / 10 / 9.
+export function getEventKippahPricePerUnit(basePrice: number, qty: number): number {
+  if (qty > 200)  return Math.round(basePrice * 0.9);
+  if (qty >= 100) return basePrice;
+  if (qty >= 50)  return Math.round(basePrice * 1.2);
+  if (qty >= 40)  return Math.round(basePrice * 1.5);
+  return Math.round(basePrice * 1.7); // 30–39 (and below 30)
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface CartItem {
