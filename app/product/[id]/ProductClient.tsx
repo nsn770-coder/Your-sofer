@@ -6,6 +6,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCart, getEventKippahPricePerUnit } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
+import { EVENT_SCROLL_SECTIONS } from '../../constants/eventScrollSections';
 import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
 import * as pixel from '@/lib/metaPixel';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
@@ -73,6 +74,8 @@ interface Product {
   whyUs?: string[];
   whatYouGet?: string[];
   bundlePromo?: string | null;
+  bundleComponentCodes?: string[] | null;
+  eventScrollSection?: string | null;
   sku?: string | null;
   soferBasePrice?: number;
   receivedFromSupplier?: number;
@@ -687,6 +690,11 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [isEventKippot, setIsEventKippot]             = useState(product.isEventKippot ?? false);
   const [isEventProduct, setIsEventProduct]           = useState(product.isEventProduct ?? false);
   const [customDesign, setCustomDesign]               = useState(product.customDesign ?? false);
+  const [eventScrollSection, setEventScrollSection]   = useState(product.eventScrollSection ?? '');
+  const [bundleCodes, setBundleCodes] = useState<string[]>(() => {
+    const arr = product.bundleComponentCodes ?? [];
+    return [arr[0] ?? '', arr[1] ?? '', arr[2] ?? '', arr[3] ?? ''];
+  });
   const [priority, setPriority]               = useState(String(product.priority ?? 0));
   const [soferId, setSoferId]                 = useState(product.soferId || '');
   const [soferOptions, setSoferOptions]       = useState<{ id: string; name: string }[]>([]);
@@ -802,6 +810,11 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         isEventKippot: isEventKippot,
         isEventProduct: isEventProduct,
         customDesign: customDesign,
+        eventScrollSection: eventScrollSection || null,
+        bundleComponentCodes: (() => {
+          const codes = bundleCodes.map(c => c.trim()).filter(Boolean);
+          return codes.length ? codes : null;
+        })(),
         priority: priority !== '' ? Number(priority) : 0,
         soferId: soferId || undefined,
         sku: sku.trim() || null,
@@ -1062,6 +1075,29 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
             🎨 אפשר עיצוב אישי למוצר זה
             <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>customDesign</span>
           </label>
+          <div>
+            <label style={lS}>שיוך לסקרול בדף &quot;כיפות לאירועים&quot;</label>
+            <select value={eventScrollSection} onChange={e => setEventScrollSection(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
+              <option value="">ללא</option>
+              {EVENT_SCROLL_SECTIONS.map(s => <option key={s.id} value={s.id}>{s.emoji} {s.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={lS}>🧩 מוצר מארז — עד 4 קודי מוצר (מק&quot;ט / ID)</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              {[0, 1, 2, 3].map(i => (
+                <input
+                  key={i}
+                  value={bundleCodes[i]}
+                  onChange={e => setBundleCodes(prev => prev.map((c, idx) => (idx === i ? e.target.value : c)))}
+                  placeholder={`קוד ${i + 1}`}
+                  dir="ltr"
+                  style={{ ...iS, fontFamily: 'monospace' }}
+                />
+              ))}
+            </div>
+            <div style={{ fontSize: 9, color: '#8a7f66', marginTop: 3 }}>הרכיבים יוצגו בהזמנות ברשימה תחת המארז, כולל מיקום במחסן</div>
+          </div>
           {(SOFER_EDIT_CATS.includes(cat) || !!soferId) && (
             <div>
               <label style={lS}>סופר</label>
