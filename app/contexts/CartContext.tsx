@@ -45,6 +45,11 @@ export interface CartItem {
   embossingText?: string;          // אותיות ההטבעה על סידור/ספר
   embossingColor?: 'gold' | 'silver'; // צבע ההטבעה — זהב / כסף
   embossingSurcharge?: number;     // תוספת הטבעה (₪15) כלולה במחיר הפריט
+  // ── אפשרויות ותוספות פר-מוצר (נוסח / צבע / הטבעות / אריזת מתנה) ──────────
+  selectedVariants?: Record<string, string>;  // { 'נוסח': 'אשכנזי', 'צבע': 'שמנת' }
+  selectedAddons?: { id: string; label: string; price: number; pricing: 'flat' | 'perUnit'; text?: string }[];
+  addonsPerUnitSurcharge?: number; // תוספות ליחידה — כלולות במחיר הפריט
+  addonsFlatSurcharge?: number;    // תוספות חד־פעמיות לשורה — מתווספות בחישוב הסל
   selectedCover?: { id: string; name: string; imgUrl: string };
   promoPlan?: string;              // '2+1' for buy-2-get-1-free
   promoPrice?: number;
@@ -225,6 +230,15 @@ function calcTotals(items: CartItem[]) {
 
   const bundleDiscountAmount = Math.round((bundleOriginalSubtotal - bundleDiscountedSubtotal) * 100) / 100;
 
+  // ── תוספות חד־פעמיות (למשל הטבעת הקדשה ₪140) — פעם אחת לכל שורת פריט ──────
+  for (const item of items) {
+    const flat = item.addonsFlatSurcharge ?? 0;
+    if (flat > 0) {
+      total        += flat;
+      discountable += flat;
+    }
+  }
+
   return {
     total:                Math.round(total         * 100) / 100,
     kippotQty,
@@ -283,6 +297,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               selectedKlafId:   product.selectedKlafId   ?? x.selectedKlafId,
               selectedKlafName: product.selectedKlafName ?? x.selectedKlafName,
               selectedCover:    product.selectedCover    ?? x.selectedCover,
+              selectedVariants:       product.selectedVariants       ?? x.selectedVariants,
+              selectedAddons:         product.selectedAddons         ?? x.selectedAddons,
+              addonsPerUnitSurcharge: product.addonsPerUnitSurcharge ?? x.addonsPerUnitSurcharge,
+              addonsFlatSurcharge:    product.addonsFlatSurcharge    ?? x.addonsFlatSurcharge,
             }
           : x
         );
@@ -311,7 +329,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCouponError('');
   }
 
-  const regularTotal = items.reduce((sum, x) => sum + x.price * x.quantity, 0);
+  const regularTotal = items.reduce((sum, x) => sum + x.price * x.quantity + (x.addonsFlatSurcharge ?? 0), 0);
   const {
     total, kippotQty, kippotDiscountActive, kippotDiscountAmount,
     bundleDiscountAmount, discountableTotal,

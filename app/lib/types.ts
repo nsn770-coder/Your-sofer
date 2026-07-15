@@ -45,6 +45,11 @@ export interface Product {
   isExpertRecommended?: boolean;
   isEventKippot?: boolean;
   isEventProduct?: boolean;
+  // ── תוספות בתשלום (הטבעה / אריזת מתנה וכו') — פר מוצר ────────────────────
+  addons?: ProductAddon[];
+  // ── אפשרויות בחירה (נוסח / צבע) — פר מוצר ────────────────────────────────
+  variantOptions?: ProductVariantOption[];
+  minOrderQty?: number;             // מינימום הזמנה אצל הספק (אינפורמטיבי)
   outOfStock?: boolean;
   coverStyle?: string;
   bundlePromo?: string | null;
@@ -100,8 +105,38 @@ export interface Promotion {
   affectedCount?: number;
 }
 
+// ── תוספת בתשלום למוצר (הטבעת הקדשה / הטבעת שם / אריזת מתנה וכו') ────────────
+export interface ProductAddon {
+  id: string;                      // מזהה קבוע, למשל 'dedication' / 'name' / 'giftwrap'
+  label: string;                   // "הטבעת הקדשה"
+  price: number;                   // ₪
+  pricing: 'flat' | 'perUnit';     // flat = חד־פעמי לשורה | perUnit = לכל יחידה
+  minQty?: number;                 // זמין רק מכמות זו ומעלה (למשל 30)
+  requiresText?: boolean;          // דורש טקסט חופשי (נוסח ההקדשה / השם)
+}
+
+// ── אפשרות בחירה במוצר (נוסח / צבע) ──────────────────────────────────────────
+export interface ProductVariantOption {
+  name: string;                    // "נוסח" / "צבע"
+  values: string[];                // ["אשכנזי", "עדות המזרח"]
+  surcharges?: Record<string, number>; // תוספת מחיר ליחידה לפי ערך, למשל { 'משולב': 0.8 }
+}
+
+// ── בחירת תוספת בסל ───────────────────────────────────────────────────────────
+export interface SelectedAddon {
+  id: string;
+  label: string;
+  price: number;
+  pricing: 'flat' | 'perUnit';
+  text?: string;                   // טקסט ההקדשה / השם אם נדרש
+}
+
 export interface CartItem extends Product {
   quantity: number;
+  selectedVariants?: Record<string, string>;  // { 'נוסח': 'אשכנזי', 'צבע': 'שמנת' }
+  selectedAddons?: SelectedAddon[];
+  addonsPerUnitSurcharge?: number; // סה"כ תוספות ליחידה — כלול במחיר הפריט
+  addonsFlatSurcharge?: number;    // תוספות חד־פעמיות לשורה — מתווסף בחישוב הסל
   selectedKlafId?: string;
   selectedKlafName?: string;
   embroideryText?: string;

@@ -218,11 +218,21 @@ export default function CartPage() {
                               {item.selectedCover.name}
                             </div>
                           )}
+                          {item.selectedVariants && Object.keys(item.selectedVariants).length > 0 && (
+                            <div style={{ fontSize: 11, color: '#5B4B12', fontWeight: 600, marginBottom: 4 }}>
+                              {Object.entries(item.selectedVariants).map(([k, v]) => `${k}: ${v}`).join(' · ')}
+                            </div>
+                          )}
+                          {(item.selectedAddons ?? []).map(a => (
+                            <div key={a.id} style={{ fontSize: 11, color: '#92400e', fontWeight: 600, marginBottom: 4 }}>
+                              ✨ {a.label}{a.text ? `: „${a.text}"` : ''} — {a.pricing === 'perUnit' ? `+₪${a.price} ליחידה` : `+₪${a.price} חד־פעמי`}
+                            </div>
+                          ))}
                             <div style={{ fontSize: 17, fontWeight: 900, color: '#1a1a1a' }}>
-                              {formatPrice(item.price * item.quantity)}
+                              {formatPrice(item.price * item.quantity + (item.addonsFlatSurcharge ?? 0))}
                             </div>
                             {item.quantity > 1 && (
-                              <div style={{ fontSize: 11, color: '#888' }}>{formatPrice(item.price)} × {item.quantity}</div>
+                              <div style={{ fontSize: 11, color: '#888' }}>{formatPrice(item.price)} × {item.quantity}{(item.addonsFlatSurcharge ?? 0) > 0 ? ` + ₪${item.addonsFlatSurcharge} חד־פעמי` : ''}</div>
                             )}
                           </div>
                         </div>
@@ -303,6 +313,16 @@ export default function CartPage() {
                               {item.selectedCover.name}
                             </div>
                           )}
+                          {item.selectedVariants && Object.keys(item.selectedVariants).length > 0 && (
+                            <div style={{ fontSize: 12, color: '#5B4B12', fontWeight: 600, marginBottom: 6 }}>
+                              {Object.entries(item.selectedVariants).map(([k, v]) => `${k}: ${v}`).join(' · ')}
+                            </div>
+                          )}
+                          {(item.selectedAddons ?? []).map(a => (
+                            <div key={a.id} style={{ fontSize: 12, color: '#92400e', fontWeight: 600, marginBottom: 6 }}>
+                              ✨ {a.label}{a.text ? `: „${a.text}"` : ''} — {a.pricing === 'perUnit' ? `+₪${a.price} ליחידה` : `+₪${a.price} חד־פעמי`}
+                            </div>
+                          ))}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                             <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 6, overflow: 'hidden' }}>
                               <button onClick={() => updateQty(item.id, item.quantity - 1)}
@@ -329,9 +349,9 @@ export default function CartPage() {
 
                         {/* Price */}
                         <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                          <div style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a' }}>{formatPrice(item.price * item.quantity)}</div>
+                          <div style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a' }}>{formatPrice(item.price * item.quantity + (item.addonsFlatSurcharge ?? 0))}</div>
                           {item.quantity > 1 && (
-                            <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{formatPrice(item.price)} × {item.quantity}</div>
+                            <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{formatPrice(item.price)} × {item.quantity}{(item.addonsFlatSurcharge ?? 0) > 0 ? ` + ₪${item.addonsFlatSurcharge} חד־פעמי` : ''}</div>
                           )}
                         </div>
                       </>

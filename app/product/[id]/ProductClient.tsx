@@ -68,6 +68,9 @@ interface Product {
   priority?: number;
   isEventKippot?: boolean;
   isEventProduct?: boolean;
+  addons?: { id: string; label: string; price: number; pricing: 'flat' | 'perUnit'; minQty?: number; requiresText?: boolean }[];
+  variantOptions?: { name: string; values: string[]; surcharges?: Record<string, number> }[];
+  minOrderQty?: number;
   customDesign?: boolean;
   marketingIntro?: string;
   whoIsItFor?: { emoji: string; text: string }[];
@@ -1565,6 +1568,11 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   const [embossingColor, setEmbossingColor]     = useState<'gold' | 'silver'>('gold');
   const [threadColor, setThreadColor]           = useState<ThreadColor | null>(null); // צבע חוט הרקמה
   const [threadColorError, setThreadColorError] = useState('');
+  // ── אפשרויות ותוספות פר-מוצר (נוסח / צבע / הטבעות / אריזת מתנה) ────────────
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
+  const [variantError, setVariantError]         = useState('');
+  const [addonState, setAddonState]             = useState<Record<string, { enabled: boolean; text: string }>>({});
+  const [addonError, setAddonError]             = useState('');
   const [loading, setLoading]           = useState(!initialProduct);
   const [activeImg, setActiveImg]       = useState(0);
   const [cartQty, setCartQty]           = useState(0);
@@ -1855,6 +1863,22 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   const embThreadFields = embroiderySurcharge > 0 && threadColor
     ? { threadColor: { id: threadColor.id, name: threadColor.name, hex: threadColor.hex } }
     : {};
+
+  // ── תוספות ואפשרויות פר-מוצר (הטבעות / אריזת מתנה / נוסח / צבע) ─────────────
+  const productAddons  = product?.addons ?? [];
+  const variantOptions = product?.variantOptions ?? [];
+  const activeAddons = productAddons.filter(a => {
+    if (!addonState[a.id]?.enabled) return false;
+    if (a.minQty && qty < a.minQty) return false;
+    return true;
+  });
+  const addonsPerUnitSurcharge = activeAddons.filter(a => a.pricing === 'perUnit').reduce((s, a) => s + a.price, 0);
+  const addonsFlatSurcharge    = activeAddons.filter(a => a.pricing === 'flat').reduce((s, a) => s + a.price, 0);
+  // תוספת מחיר לפי ערך אפשרות שנבחר (למשל נוסח משולב יקר יותר) — ליחידה
+  const variantsSurcharge = variantOptions.reduce((s, o) => {
+    const val = selectedVariants[o.name];
+    return s + (val && o.surcharges?.[val] ? o.surcharges[val] : 0);
+  }, 0);
 const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
 
   const MEZUZAH_CERTS: Certificate[] = [
@@ -1946,7 +1970,33 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       setThreadColorError('בחר צבע חוט לרקמה לפני הוספה לסל');
       return;
     }
-    const cartPrice = effectivePrice + liveEmbSurcharge + liveEmbossSurcharge;
+    // ── אפשרויות בחירה (נוסח / צבע) — חובה לבחור בכולן ────────────────────────
+    const missingVariant = variantOptions.find(o => !selectedVariants[o.name]);
+    if (missingVariant) {
+      setVariantError(`נא לבחור ${missingVariant.name}`);
+      return;
+    }
+    // ── תוספות הדורשות טקסט (הקדשה / שם) ─────────────────────────────────────
+    const missingAddonText = activeAddons.find(a => a.requiresText && !(addonState[a.id]?.text ?? '').trim());
+    if (missingAddonText) {
+      setAddonError(`נא להזין טקסט עבור "${missingAddonText.label}"`);
+      return;
+    }
+    setVariantError(''); setAddonError('');
+    const addonFields = (activeAddons.length > 0 || variantOptions.length > 0)
+      ? {
+          ...(variantOptions.length > 0 ? { selectedVariants } : {}),
+          ...(activeAddons.length > 0 ? {
+            selectedAddons: activeAddons.map(a => ({
+              id: a.id, label: a.label, price: a.price, pricing: a.pricing,
+              ...(a.requiresText ? { text: (addonState[a.id]?.text ?? '').trim() } : {}),
+            })),
+            addonsPerUnitSurcharge,
+            addonsFlatSurcharge,
+          } : {}),
+        }
+      : {};
+    const cartPrice = effectivePrice + liveEmbSurcharge + liveEmbossSurcharge + addonsPerUnitSurcharge + variantsSurcharge;
     const embFields = liveEmbSurcharge > 0
       ? { embroideryText: liveEmbText, embroideryOptions, embroiderySurcharge: liveEmbSurcharge }
       : {};
@@ -1958,11 +2008,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       : {};
     if (selectedKlafIds.length > 0) {
       for (let i = 0; i < selectedKlafIds.length; i++) {
-        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], ...embFields, ...liveThreadFields, ...liveEmbossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, selectedKlafId: selectedKlafIds[i], selectedKlafName: selectedKlafNames[i], ...embFields, ...liveThreadFields, ...liveEmbossingFields, ...addonFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     } else {
       for (let i = 0; i < qty; i++) {
-        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...embFields, ...liveThreadFields, ...liveEmbossingFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
+        addItem({ id: product!.id, name: product!.name, price: cartPrice, imgUrl: product!.imgUrl || product!.image_url, quantity: 1, cat: product!.cat || undefined, ...embFields, ...liveThreadFields, ...liveEmbossingFields, ...addonFields, selectedCover: selectedCover || undefined, bundlePromo: product!.bundlePromo || undefined });
       }
     }
     window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: effectivePrice * qty, items: [{ item_id: product!.id, item_name: product!.name, price: effectivePrice, quantity: qty }] });
@@ -2097,6 +2147,73 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               <option key={v} value={v}>{v}</option>
             ))}
           </select>
+        </div>
+      )}
+
+      {/* ── אפשרויות בחירה (נוסח / צבע) ─────────────────────────────────────── */}
+      {variantOptions.map(opt => (
+        <div key={opt.name} style={{ marginBottom: 12 }}>
+          <label style={{ fontSize: 12, fontWeight: 700, color: '#444', display: 'block', marginBottom: 6 }}>{opt.name}:</label>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {opt.values.map(val => {
+              const active = selectedVariants[opt.name] === val;
+              const extra  = opt.surcharges?.[val];
+              return (
+                <button key={val} type="button"
+                  onClick={() => { setSelectedVariants(prev => ({ ...prev, [opt.name]: val })); setVariantError(''); }}
+                  style={{ padding: '9px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif', border: active ? '1.5px solid #C9A227' : '1.5px solid #e0e0e0', background: active ? '#FDF8EC' : '#fff', color: active ? '#8a6d0f' : '#555' }}>
+                  {active ? '✓ ' : ''}{val}{extra ? ` (+₪${extra})` : ''}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      {variantError && (
+        <div style={{ fontSize: 12, color: '#c0392b', fontWeight: 700, marginBottom: 10 }}>{variantError}</div>
+      )}
+
+      {/* ── תוספות בתשלום (הטבעת הקדשה / הטבעת שם / אריזת מתנה) ─────────────── */}
+      {productAddons.length > 0 && (
+        <div style={{ marginBottom: 12, padding: '12px 14px', background: '#fff', border: '1px solid #e5d9c3', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <span style={{ fontSize: 13, fontWeight: 800, color: '#1a1a1a' }}>✨ תוספות למוצר</span>
+          {productAddons.map(a => {
+            const st = addonState[a.id] ?? { enabled: false, text: '' };
+            const locked = !!a.minQty && qty < a.minQty;
+            const priceLabel = a.pricing === 'perUnit' ? `₪${a.price} ליחידה` : `₪${a.price}`;
+            return (
+              <div key={a.id} style={{ opacity: locked ? 0.55 : 1 }}>
+                <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, cursor: locked ? 'not-allowed' : 'pointer' }}>
+                  <span style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: 12.5, fontWeight: 700, color: '#333' }}>{a.label} · {priceLabel}</span>
+                    {a.minQty ? (
+                      <span style={{ fontSize: 11, color: locked ? '#c0392b' : '#888', marginTop: 1 }}>
+                        זמין החל מ־{a.minQty} יחידות{locked ? ` (בחרת ${qty})` : ''}
+                      </span>
+                    ) : null}
+                  </span>
+                  <input type="checkbox" checked={st.enabled && !locked} disabled={locked}
+                    onChange={e => { setAddonState(prev => ({ ...prev, [a.id]: { ...st, enabled: e.target.checked } })); setAddonError(''); }}
+                    style={{ width: 18, height: 18, accentColor: '#C9A227', flexShrink: 0, cursor: locked ? 'not-allowed' : 'pointer' }} />
+                </label>
+                {a.requiresText && st.enabled && !locked && (
+                  <input type="text" value={st.text} maxLength={60}
+                    placeholder={a.id === 'dedication' ? 'נוסח ההקדשה — לדוגמה: לעילוי נשמת...' : 'הטקסט להטבעה'}
+                    onChange={e => setAddonState(prev => ({ ...prev, [a.id]: { ...st, text: e.target.value } }))}
+                    style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif', marginTop: 6 }} />
+                )}
+              </div>
+            );
+          })}
+          {(addonsPerUnitSurcharge > 0 || addonsFlatSurcharge > 0) && (
+            <div style={{ fontSize: 12, color: '#C9A227', fontWeight: 700 }}>
+              {addonsPerUnitSurcharge > 0 && <>תוספות ליחידה: +₪{addonsPerUnitSurcharge}{' '}</>}
+              {addonsFlatSurcharge > 0 && <>· תוספת חד־פעמית: +₪{addonsFlatSurcharge}</>}
+            </div>
+          )}
+          {addonError && (
+            <div style={{ fontSize: 12, color: '#c0392b', fontWeight: 700 }}>{addonError}</div>
+          )}
         </div>
       )}
 

@@ -551,6 +551,8 @@ export default function CheckoutPage() {
           singleUseToken, paymentsCount,
           items: [
             ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '', bundlePromo: i.bundlePromo || undefined })),
+            // תוספות חד־פעמיות (למשל הטבעת הקדשה) — שורה נפרדת בחשבונית
+            ...items.flatMap(i => (i.selectedAddons ?? []).filter(a => a.pricing === 'flat').map(a => ({ name: `${a.label} — ${i.name}`, price: a.price, quantity: 1, cat: '' }))),
             ...(bundleDiscountAmount > 0 ? [{ name: 'מבצע כיפות — חבילות',        price: -bundleDiscountAmount, quantity: 1, cat: '' }] : []),
             ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
@@ -624,6 +626,8 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items: [
             ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '', bundlePromo: i.bundlePromo || undefined })),
+            // תוספות חד־פעמיות (למשל הטבעת הקדשה) — שורה נפרדת בחשבונית
+            ...items.flatMap(i => (i.selectedAddons ?? []).filter(a => a.pricing === 'flat').map(a => ({ name: `${a.label} — ${i.name}`, price: a.price, quantity: 1, cat: '' }))),
             ...(bundleDiscountAmount > 0 ? [{ name: 'מבצע כיפות — חבילות',        price: -bundleDiscountAmount, quantity: 1, cat: '' }] : []),
             ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
             ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
