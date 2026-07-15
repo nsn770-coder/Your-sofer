@@ -42,7 +42,8 @@ const dataArg        = process.argv.find((a) => a.startsWith('--data='));
 const sectionArg     = process.argv.find((a) => a.startsWith('--section='));
 const CATEGORY_NAME  = 'מזכרות לאירועים';
 const SOURCE         = 'hoshenjudaica';
-const SCROLL_SECTION = sectionArg ? sectionArg.split('=')[1] : 'headcovers';
+const sectionVal     = sectionArg ? sectionArg.split('=')[1] : 'headcovers';
+const SCROLL_SECTION = sectionVal === 'none' ? null : sectionVal; // --section=none → גריד ראשי בלי סקרול
 const DATA_FILE      = resolve(__dirname, dataArg ? dataArg.split('=')[1] : 'hoshen-products.json');
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload';
 const UPLOAD_PRESET  = 'yoursofer_upload';
@@ -133,7 +134,7 @@ async function main() {
         badge:              null,
         status:             'active',
         isEventProduct:     true,
-        eventScrollSection: SCROLL_SECTION,
+        ...(SCROLL_SECTION ? { eventScrollSection: SCROLL_SECTION } : {}),
         addons:             HOSHEN_ADDONS,
         source:             SOURCE,
         sourceUrl:          p.sourceUrl,
