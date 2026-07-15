@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '@/app/firebase';
 import {
@@ -84,6 +84,10 @@ export default function StickersTab() {
   const [search, setSearch] = useState('');
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [modal, setModal] = useState<{ invoice: Invoice; rows: ModalRow[] } | null>(null);
+  // ── שיוך קבלה לארגז מחסן ──────────────────────────────────────────────────
+  const [boxInputs, setBoxInputs]   = useState<Record<string, string>>({});
+  const [assigningId, setAssigningId] = useState<string | null>(null);
+  const [assignMsg, setAssignMsg]   = useState<Record<string, string>>({});
   const { printLabels, printArea, printing } = useProductLabelPrint();
 
   // Load products (no auth required — public collection)
@@ -226,6 +230,51 @@ export default function StickersTab() {
     }
     setModal(null);
     printLabels(items.map(({ product }) => toLabel(product)));
+  }
+
+  // ── שיוך כל מוצרי הקבלה לארגז מחסן ───────────────────────────────────────
+  async function assignInvoiceToBox(inv: Invoice) {
+    const box = (boxInputs[inv.id] ?? '').trim();
+    if (!box) {
+      alert('הזן מספר ארגז לפני השיוך');
+      return;
+    }
+    // התאמת פריטי הקבלה למוצרים — אותה לוגיקת SKU כמו בהדפסת מדבקות
+    const matched = new Map<string, StickerProduct>();
+    let unmatched = 0;
+    for (const item of inv.items ?? []) {
+      const n = item.code.replace(/^[A-Z]+/i, '');
+      const product = productSkuMap[n] ?? null;
+      if (product) matched.set(product.id, product);
+      else unmatched++;
+    }
+    if (matched.size === 0) {
+      alert('לא נמצאו מוצרים תואמים בקבלה זו');
+      return;
+    }
+    const label = inv.invoiceNumber ? `#${inv.invoiceNumber}` : inv.supplier;
+    if (!confirm(`לשייך ${matched.size} מוצרים מקבלה ${label} לארגז "${box}"?${unmatched ? `\n(${unmatched} פריטים ללא התאמה ידולגו)` : ''}`)) return;
+
+    setAssigningId(inv.id);
+    let ok = 0, failed = 0;
+    for (const p of matched.values()) {
+      try {
+        await updateDoc(doc(db, 'products', p.id), { warehouseBox: box });
+        ok++;
+      } catch (err) {
+        console.error('[StickersTab] box assign failed:', p.id, err);
+        failed++;
+      }
+    }
+    // עדכון מקומי כדי שהמדבקות יודפסו עם הארגז החדש בלי רענון
+    setProducts(prev => prev.map(p => matched.has(p.id) ? { ...p, warehouseBox: box } : p));
+    setAssigningId(null);
+    setAssignMsg(prev => ({
+      ...prev,
+      [inv.id]: failed
+        ? `⚠️ שויכו ${ok}, נכשלו ${failed}`
+        : `✅ ${ok} מוצרים שויכו לארגז ${box}`,
+    }));
   }
 
   // ── Single-product QR (existing behaviour) ───────────────────────────────
@@ -395,14 +444,37 @@ export default function StickersTab() {
                   <span style={{ color: '#555' }}>{inv.supplier}</span>
                   <span style={{ color: '#888', fontSize: 12 }}>{date}</span>
                   <span style={{ color: '#6366f1', fontSize: 12 }}>{inv.items?.length ?? 0} פריטים</span>
-                  <div style={{ marginRight: 'auto' }}>
+                  {assignMsg[inv.id] && (
+                    <span style={{ fontSize: 11, fontWeight: 700, color: assignMsg[inv.id].startsWith('✅') ? '#15803d' : '#b45309' }}>
+                      {assignMsg[inv.id]}
+                    </span>
+                  )}
+                  <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input
+                      type="text"
+                      placeholder="מס' ארגז"
+                      value={boxInputs[inv.id] ?? ''}
+                      onChange={e => setBoxInputs(prev => ({ ...prev, [inv.id]: e.target.value }))}
+                      style={{ width: 70, padding: '4px 8px', border: '1px solid #ddd', borderRadius: 5, fontSize: 12, textAlign: 'center' }}
+                    />
+                    <button
+                      onClick={() => assignInvoiceToBox(inv)}
+                      disabled={loading || assigningId === inv.id}
+                      style={{
+                        background: assigningId === inv.id ? '#6b7280' : '#0f766e', color: '#fff', border: 'none',
+                        borderRadius: 5, padding: '4px 12px', fontSize: 12,
+                        fontWeight: 700, cursor: assigningId === inv.id ? 'wait' : 'pointer', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {assigningId === inv.id ? '⏳ משייך...' : '📦 שייך לארגז'}
+                    </button>
                     <button
                       onClick={() => openInvoiceModal(inv)}
                       disabled={loading}
                       style={{
                         background: '#4338ca', color: '#fff', border: 'none',
                         borderRadius: 5, padding: '4px 12px', fontSize: 12,
-                        fontWeight: 700, cursor: loading ? 'wait' : 'pointer',
+                        fontWeight: 700, cursor: loading ? 'wait' : 'pointer', whiteSpace: 'nowrap',
                       }}
                     >
                       🖨️ הדפס מדבקות
