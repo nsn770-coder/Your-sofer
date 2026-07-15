@@ -2039,6 +2039,11 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   const isCheapProduct = product.price < 25 && product.cat !== 'כיפות';
   const minQty         = isCheapProduct ? 5 : 1;
   const qtyStep        = 1; // step always 1; minQty=5 enforces the minimum
+  // כמויות לבחירה: 1 עד 20 ברצף, ואז קפיצות עד 300 (לאירועים גדולים)
+  const qtyOptions     = [
+    ...Array.from({ length: 21 - minQty }, (_, i) => minQty + i * qtyStep),
+    25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 120, 150, 200, 250, 300,
+  ];
 
   const BuyBox = ({ compact = false }: { compact?: boolean }) => {
     // customDesign: prominent CTA to the kippah design page (visible to all users)
@@ -2143,7 +2148,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             </div>
           )}
           <select value={qty} onChange={e => setQty(Number(e.target.value))} style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#f8f9fa', cursor: 'pointer' }}>
-            {Array.from({ length: 10 }, (_, i) => minQty + i * qtyStep).map(v => (
+            {qtyOptions.map(v => (
               <option key={v} value={v}>{v}</option>
             ))}
           </select>
