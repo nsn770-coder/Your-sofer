@@ -7,6 +7,7 @@ import { getKipaUnitPrice } from '@/app/lib/kippot';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { Product } from '@/app/lib/types';
 import ProductCard from '@/components/ui/ProductCard';
+import { EVENT_SCROLL_SECTIONS, EVENT_SCROLL_SECTION_IDS } from '@/app/constants/eventScrollSections';
 
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
@@ -26,6 +27,27 @@ const PRINT_TYPES = [
 
 type PrintType = typeof PRINT_TYPES[number]['id'];
 
+function ProductScrollRow({ title, products }: { title: string; products: Product[] }) {
+  if (products.length === 0) return null;
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontSize: 15, fontWeight: 800, color: NAVY, marginBottom: 12 }}>{title}</div>
+      <div className="ys-ekip-scroll" style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, WebkitOverflowScrolling: 'touch' }}>
+        {products.map(p => (
+          <div key={p.id} style={{ flex: '0 0 170px', width: 170 }}>
+            <ProductCard
+              id={p.id} name={p.name} price={p.price}
+              images={[p.imgUrl, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
+              was={p.was} badge={p.badge} isBestSeller={p.isBestSeller}
+              outOfStock={p.outOfStock} cat={p.cat}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function EventKippotClient() {
   const [qty, setQty]             = useState(30);
   const [printType, setPrintType] = useState<PrintType>('print-top');
@@ -34,12 +56,25 @@ export default function EventKippotClient() {
   const [eventProducts, setEventProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    getDocs(query(collection(db, 'products'), where('isEventProduct', '==', true)))
-      .then(snap => setEventProducts(
-        snap.docs.map(d => ({ id: d.id, ...d.data() } as Product))
-                 .filter(p => !p.hidden && !p.outOfStock && p.status !== 'inactive')
-      ));
+    // שתי שאילתות: מוצרי אירועים + מוצרים המשויכים לסקרולים (גם אם אינם מסומנים כמוצר אירוע)
+    Promise.all([
+      getDocs(query(collection(db, 'products'), where('isEventProduct', '==', true))),
+      getDocs(query(collection(db, 'products'), where('eventScrollSection', 'in', EVENT_SCROLL_SECTION_IDS))),
+    ]).then(([eventSnap, scrollSnap]) => {
+      const byId = new Map<string, Product>();
+      [...eventSnap.docs, ...scrollSnap.docs].forEach(d => byId.set(d.id, { id: d.id, ...d.data() } as Product));
+      setEventProducts(
+        Array.from(byId.values()).filter(p => !p.hidden && !p.outOfStock && p.status !== 'inactive')
+      );
+    }).catch(e => console.error('[EventKippot] load products:', e));
   }, []);
+
+  const scrollProducts = (id: string) => eventProducts.filter(p => p.eventScrollSection === id);
+  const bundleProducts = scrollProducts('bundles');
+  const customSections = EVENT_SCROLL_SECTIONS.filter(s => s.id !== 'bundles');
+  const hasCustomSections = customSections.some(s => scrollProducts(s.id).length > 0);
+  // רשת "מוצרים נוספים לאירוע" — רק מוצרים שלא שויכו לסקרול
+  const gridProducts = eventProducts.filter(p => p.isEventProduct && !p.eventScrollSection);
 
   const embroideryExtra = printType === 'embroidery' ? 5 : 0;
   const unitPrice = getKipaUnitPrice(qty) + embroideryExtra;
@@ -53,6 +88,10 @@ export default function EventKippotClient() {
         .ys-ekip-range::-moz-range-thumb { width: 26px; height: 26px; background: ${GOLD}; cursor: pointer; border-radius: 50%; border: none; box-shadow: 0 2px 8px rgba(197,160,40,0.4); }
         .ys-ekip-card { transition: all 0.2s; }
         .ys-ekip-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        .ys-ekip-scroll { scrollbar-width: thin; scrollbar-color: #C5A028 #F3EFE6; }
+        .ys-ekip-scroll::-webkit-scrollbar { height: 6px; }
+        .ys-ekip-scroll::-webkit-scrollbar-track { background: #F3EFE6; }
+        .ys-ekip-scroll::-webkit-scrollbar-thumb { background: #C5A028; border-radius: 3px; }
       `}</style>
 
       {/* Hero */}
@@ -217,11 +256,34 @@ export default function EventKippotClient() {
       <div style={{ textAlign: 'center', fontSize: 13, color: '#9C7B3F', marginTop: 10, fontWeight: 600 }}>
         ✨ בשלב הבא: מעלים לוגו ומקבלים הדמיית AI של הכיפה שלכם — חינם
       </div>
-      {eventProducts.length > 0 && (
+
+      {/* ── מארזים מוכנים ── */}
+      {bundleProducts.length > 0 && (
+        <div style={{ marginTop: 48, borderTop: '1px solid #E5E0D5', paddingTop: 32 }}>
+          <ProductScrollRow title="🎁 מארזים מוכנים לאירוע" products={bundleProducts} />
+        </div>
+      )}
+
+      {/* ── הרכב מארז אישי — 3 סקרולים ── */}
+      {hasCustomSections && (
+        <div style={{ marginTop: bundleProducts.length > 0 ? 24 : 48, borderTop: '1px solid #E5E0D5', paddingTop: 32 }}>
+          <div style={{ fontSize: 'clamp(18px, 2.5vw, 24px)', fontWeight: 900, color: NAVY, marginBottom: 4 }}>
+            הרכב מארז אישי
+          </div>
+          <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>
+            השלימו את הכיפות עם כיסוי ראש, ברכון ונר הבדלה — הכל למשלוח אחד
+          </div>
+          {customSections.map(s => (
+            <ProductScrollRow key={s.id} title={`${s.emoji} ${s.label}`} products={scrollProducts(s.id)} />
+          ))}
+        </div>
+      )}
+
+      {gridProducts.length > 0 && (
         <div style={{ marginTop: 48, borderTop: '1px solid #E5E0D5', paddingTop: 32 }}>
           <div style={{ fontSize: 16, fontWeight: 700, color: NAVY, marginBottom: 16 }}>מוצרים נוספים לאירוע</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-            {eventProducts.map(p => (
+            {gridProducts.map(p => (
               <ProductCard
                 key={p.id} id={p.id} name={p.name} price={p.price}
                 images={[p.imgUrl, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}

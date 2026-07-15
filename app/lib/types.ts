@@ -49,6 +49,7 @@ export interface Product {
   coverStyle?: string;
   bundlePromo?: string | null;
   bundleComponentCodes?: string[];  // מוצר מארז — עד 4 קודי מוצר (מק"ט/ID) של הרכיבים
+  eventScrollSection?: string | null; // שיוך לסקרול בדף כיפות לאירועים (bundles/headcovers/birkonim/havdalah)
 
   // Profitability & Inventory
   soferBasePrice?: number;           // legacy — הועתק ל-supplierCost

@@ -11,6 +11,7 @@ import { getAuthLazy } from '@/lib/authLazy';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
 import { CATS, getSubCats, findParentCat } from '../constants/categories';
+import { EVENT_SCROLL_SECTIONS } from '../constants/eventScrollSections';
 import HomepageConfigTab from './components/HomepageConfigTab';
 import HomepageCategorySectionsTab from './components/HomepageCategorySectionsTab';
 import BestSellersTab from './components/BestSellersTab';
@@ -160,7 +161,6 @@ interface Product {
   soferName?: string;
   soferPrice?: number;
   supplierCost?: number;
-  sourceUrl?: string;
   createdAt?: { seconds: number };
   isExpertRecommended?: boolean;
   isBestSeller?: boolean;
@@ -178,6 +178,8 @@ interface Product {
   subCategory?: string;
   // Bundle (מארז)
   bundleComponentCodes?: string[];
+  // שיוך לסקרול בדף כיפות לאירועים
+  eventScrollSection?: string | null;
 }
 
 interface Sofer {
@@ -701,6 +703,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [isExpertRecommended, setIsExpertRecommended] = useState(product.isExpertRecommended ?? false);
   const [isBestSeller, setIsBestSeller] = useState(product.isBestSeller ?? false);
   const [isEventProduct, setIsEventProduct] = useState(product.isEventProduct ?? false);
+  const [eventScrollSection, setEventScrollSection] = useState(product.eventScrollSection ?? '');
   const [stockCountInput, setStockCountInput] = useState(
     product.stockCount != null ? String(product.stockCount) : ''
   );
@@ -803,6 +806,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         isExpertRecommended: EXPERT_REC_CATS_ADMIN.includes(cat) ? isExpertRecommended : false,
         isBestSeller,
         isEventProduct,
+        eventScrollSection: eventScrollSection || null,
         storageColumn: storageColumn || null,
         storageShelf: storageShelf || null,
         storageNote: storageNote || null,
@@ -1078,6 +1082,15 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               <input type="checkbox" checked={isEventProduct} onChange={e => setIsEventProduct(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
               🎪 מוצר לאירועים
             </label>
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <label style={labelStyle}>שיוך לסקרול בדף &quot;כיפות לאירועים&quot;</label>
+            <select value={eventScrollSection} onChange={e => setEventScrollSection(e.target.value)}
+              style={{ ...inputStyle, background: '#fff' }}>
+              <option value="">ללא</option>
+              {EVENT_SCROLL_SECTIONS.map(s => <option key={s.id} value={s.id}>{s.emoji} {s.label}</option>)}
+            </select>
+            <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>מוצר משויך יופיע בסקרול המתאים בדף /event-kippot (ויוסתר מרשת &quot;מוצרים נוספים לאירוע&quot;)</div>
           </div>
           {stockVisible && (
             <div>
