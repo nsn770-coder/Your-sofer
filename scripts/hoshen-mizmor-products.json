@@ -1,0 +1,142 @@
+[
+  {
+    "supplierId": "6185806",
+    "sku": "HSN-100470",
+    "name": "ברכון ברכת המזון - דגם עיגול - ספרדי",
+    "price": 4,
+    "was": 5,
+    "desc": "ברכון ברכת המזון מפואר עם הטבעה מזהב, עיצוב ייחודי ובלעדי.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/12953160/original/a21aaa6c8d96fda7e842a817cc9be4b1.webp"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/6185806"
+  },
+  {
+    "supplierId": "3521084",
+    "sku": "HSN-100459",
+    "name": "ברכון ברכת המזון מעוצב",
+    "price": 4,
+    "was": null,
+    "desc": "ברכון ברכת המזון מפואר עם הטבעה מזהב, עיצוב ייחודי ובלעדי.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/12897272/original/99038745d2d25f5b374320ebb225fe48.jpg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/3521084"
+  },
+  {
+    "supplierId": "6159484",
+    "sku": "HSN-100435",
+    "name": "ברכון ברכת המזון אשכנזי - דגם מחוספס",
+    "price": 4,
+    "was": 5,
+    "desc": "ברכון ברכת המזון מפואר עם הטבעה מזהב, עיצוב ייחודי ובלעדי.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/13378934/original/47a145d929ce3c6af9928528a2bba138.jpeg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/6159484"
+  },
+  {
+    "supplierId": "6159482",
+    "sku": "HSN-100408",
+    "name": "ברכון ברכת המזון - דגם עיטורי עלים",
+    "price": 4,
+    "was": 5,
+    "desc": "ברכון ברכת המזון מפואר עם הטבעה מזהב, עיצוב ייחודי ובלעדי.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/12897288/original/6738b8fe3b54c3201fde60f576af2308.jpg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/6159482"
+  },
+  {
+    "supplierId": "6159481",
+    "sku": "HSN-100434",
+    "name": "ברכון ברכת המזון - דגם עיטור צבעוני",
+    "price": 4,
+    "was": 5,
+    "desc": "ברכון ברכת המזון מפואר עם הטבעה מזהב, עיצוב ייחודי ובלעדי.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/12897286/original/2a057e912a28cadb28a5b02b0c23e063.jpg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/6159481"
+  },
+  {
+    "supplierId": "6159480",
+    "sku": "HSN-100468",
+    "name": "ברכון ברכת המזון - דגם עיגול - אשכנזי",
+    "price": 4,
+    "was": 5,
+    "desc": "ברכון ברכת המזון מפואר עם הטבעה מזהב, עיצוב ייחודי ובלעדי.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/12897284/original/7f4d14127ba747dd549864139ad9d9d0.jpg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/6159480"
+  },
+  {
+    "supplierId": "5487723",
+    "sku": "HSN-5487723",
+    "name": "חמישה חומשי תורה בכרך אחד למען שמו באהבה החדש",
+    "price": 50,
+    "was": 55,
+    "desc": "חמישה חומשי תורה בכרך אחד — למען שמו באהבה, המהדורה החדשה.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/10943975/original/21fb2a77adc56666b21ceeef61980fcc.jpg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/5487723"
+  },
+  {
+    "supplierId": "4348910",
+    "sku": "HSN-4348910",
+    "name": "ברכון ברכת המזון ספרד (אשכנזי)",
+    "price": 4,
+    "was": 5,
+    "desc": "ברכון ברכת המזון מפואר עם הטבעה מזהב, עיצוב ייחודי ובלעדי.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/8070567/original/6f5f01108b03210477ed2331fecf457c.jpg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/4348910"
+  },
+  {
+    "supplierId": "4828981",
+    "sku": "HSN-2130",
+    "name": "מגנט ברכת מזמור לתודה",
+    "price": 8,
+    "was": null,
+    "desc": "ברכת מזמור לתודה מודפסת בעיצוב ייחודי על מגנט.\nגודל: 15×15 ס\"מ.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/10210400/original/1f739b248b564f12fcd3d7172944db49.jpg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/4828981"
+  },
+  {
+    "supplierId": "8320828",
+    "sku": "HSN-101254",
+    "name": "מגנט מזמור לתודה מהודר",
+    "price": 8,
+    "was": null,
+    "desc": "מגנט מזמור לתודה, דגם מהודר בצבע זהב-לבן.\nגודל: 10×16 ס\"מ.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/17511823/original/988f63459b12bb0a230edaab1e668e73.jpeg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/8320828"
+  },
+  {
+    "supplierId": "8320874",
+    "sku": "HSN-101253",
+    "name": "מגנט מזמור לתודה מהודר ורוד",
+    "price": 8,
+    "was": null,
+    "desc": "מגנט מזמור לתודה, דגם מהודר ורוד.\nגודל: 13×14 ס\"מ.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/17512579/original/2bbd79a48397635b3cf78559d9c682fd.jpeg"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/8320874"
+  },
+  {
+    "supplierId": "4828703",
+    "sku": "HSN-2135",
+    "name": "מגנט ברכת מזמור לתודה",
+    "price": 8,
+    "was": null,
+    "desc": "ברכת מזמור לתודה מודפסת בעיצוב ייחודי על מגנט.\nגודל: אורך 18.5 ס\"מ, רוחב 7 ס\"מ.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/9286013/original/de7383ffb41a8265c10ebcedf02b3944.png"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/4828703"
+  },
+  {
+    "supplierId": "4828953",
+    "sku": "HSN-2136",
+    "name": "מגנט ברכת מזמור לתודה",
+    "price": 8,
+    "was": null,
+    "desc": "ברכת מזמור לתודה מודפסת בעיצוב ייחודי על מגנט.\nגודל: אורך 16 ס\"מ, רוחב 9 ס\"מ.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/9286414/original/e3093c79c419279a493bf39720fd8472.png"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/4828953"
+  },
+  {
+    "supplierId": "4828699",
+    "sku": "HSN-4828699",
+    "name": "מגנט ברכת מזמור לתודה",
+    "price": 8,
+    "was": null,
+    "desc": "ברכת מזמור לתודה מודפסת בעיצוב ייחודי על מגנט, הטבעות בזהב.\nגודל: 15×15 ס\"מ.",
+    "images": ["https://d3m9l0v76dty0.cloudfront.net/system/photos/9286006/original/f4b14ed73414e26cd8abbdc07b91294b.png"],
+    "sourceUrl": "https://www.hoshenjudaica.co.il/items/4828699"
+  }
+]

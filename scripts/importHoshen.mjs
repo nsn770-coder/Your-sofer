@@ -18,6 +18,13 @@
  *   node scripts/importHoshen.mjs             ← DRY-RUN
  *   node scripts/importHoshen.mjs --execute   ← ייבוא בפועל
  *
+ * דגלים:
+ *   --data=<file>      ← קובץ נתונים אחר בתיקיית scripts (ברירת מחדל: hoshen-products.json)
+ *   --section=<id>     ← סקרול בעמוד האירועים (ברירת מחדל: headcovers)
+ *
+ * דוגמה — מזמור לתודה:
+ *   node scripts/importHoshen.mjs --data=hoshen-mizmor-products.json --section=mizmor-letoda --execute
+ *
  * אחרי --execute: סנכרון אלגוליה מהאדמין (הגדרות אתר → סנכרן חיפוש).
  */
 
@@ -31,10 +38,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const EXECUTE        = process.argv.includes('--execute');
+const dataArg        = process.argv.find((a) => a.startsWith('--data='));
+const sectionArg     = process.argv.find((a) => a.startsWith('--section='));
 const CATEGORY_NAME  = 'מזכרות לאירועים';
 const SOURCE         = 'hoshenjudaica';
-const SCROLL_SECTION = 'headcovers';
-const DATA_FILE      = resolve(__dirname, 'hoshen-products.json');
+const SCROLL_SECTION = sectionArg ? sectionArg.split('=')[1] : 'headcovers';
+const DATA_FILE      = resolve(__dirname, dataArg ? dataArg.split('=')[1] : 'hoshen-products.json');
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload';
 const UPLOAD_PRESET  = 'yoursofer_upload';
 const DELAY_MS       = 600;
@@ -79,7 +88,9 @@ async function main() {
 
   const rows = products.map((p) => {
     const price = Math.max(p.price, MIN_PRICE);
-    return { ...p, price, priceRaised: price !== p.price, skip: existingSkus.has(p.sku) };
+    // אם אחרי רצפת ה-5 ₪ המחיר הקודם כבר לא גבוה מהמחיר — מוותרים עליו
+    const was = p.was != null && p.was > price ? p.was : null;
+    return { ...p, price, was, priceRaised: price !== p.price, skip: existingSkus.has(p.sku) };
   });
 
   for (const [i, r] of rows.entries()) {
@@ -90,7 +101,8 @@ async function main() {
   console.log(`\n📋 לייבוא: ${toImport.length} | קיימים: ${rows.length - toImport.length}\n`);
 
   if (!EXECUTE) {
-    console.log('▶️  לביצוע: node scripts/importHoshen.mjs --execute\n');
+    const flags = [dataArg, sectionArg].filter(Boolean).join(' ');
+    console.log(`▶️  לביצוע: node scripts/importHoshen.mjs ${flags ? flags + ' ' : ''}--execute\n`);
     process.exit(0);
   }
 
