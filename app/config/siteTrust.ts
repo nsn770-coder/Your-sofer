@@ -36,15 +36,17 @@ export interface PaymentMethod {
  *
  * מאומת בקוד: כרטיסי אשראי דרך Sumit + bit (דף תשלום Sumit).
  * ישראכרט ודיינרס נוספו עם לוגואים רשמיים שסופקו ע"י בעל האתר.
+ * amex נוסף לבקשת בעל האתר (07/2026).
  * אם אמצעי כלשהו אינו פעיל בהסכם הסליקה — למחוק את השורה שלו כאן.
- * אין להוסיף amex / paypal / applePay / googlePay לפני אישור שהם פעילים.
+ * אין להוסיף paypal / applePay / googlePay לפני אישור שהם פעילים.
  */
 export const ENABLED_PAYMENT_METHODS: PaymentMethod[] = [
-  { id: 'visa',       label: 'Visa',        logoSrc: '/payment/visa.svg',       aspectRatio: 780 / 500 },
-  { id: 'mastercard', label: 'Mastercard',  logoSrc: '/payment/mastercard.svg', aspectRatio: 780 / 500 },
-  { id: 'isracard',   label: 'ישראכרט',     logoSrc: '/payment/isracard.png',   aspectRatio: 4.0 },
-  { id: 'bit',        label: 'bit',         logoSrc: '/payment/bit.png',        aspectRatio: 1.0 },
-  { id: 'diners',     label: 'Diners Club', logoSrc: '/payment/diners.png',     aspectRatio: 3.2 },
+  { id: 'visa',       label: 'Visa',             logoSrc: '/payment/visa.svg',       aspectRatio: 780 / 500 },
+  { id: 'mastercard', label: 'Mastercard',       logoSrc: '/payment/mastercard.svg', aspectRatio: 780 / 500 },
+  { id: 'isracard',   label: 'ישראכרט',          logoSrc: '/payment/isracard.png',   aspectRatio: 4.0 },
+  { id: 'amex',       label: 'American Express', logoSrc: '/payment/amex.svg',       aspectRatio: 780 / 500 },
+  { id: 'bit',        label: 'bit',              logoSrc: '/payment/bit.png',        aspectRatio: 1.0 },
+  { id: 'diners',     label: 'Diners Club',      logoSrc: '/payment/diners.png',     aspectRatio: 3.2 },
 ];
 
 // ── פרטי עסק ──────────────────────────────────────────────────────────────────

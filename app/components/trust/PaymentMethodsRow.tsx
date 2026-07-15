@@ -7,7 +7,8 @@ import { ENABLED_PAYMENT_METHODS, TRUST_TEXT } from '@/app/config/siteTrust';
  * - לוגואים רשמיים בלבד, מקבצים מקומיים ב-public/payment (ללא טעינה מ-CDN חיצוני).
  * - שורת אמון פסיבית: הלוגואים אינם לחיצים ואינם כפתורים.
  * - width/height קבועים למניעת Layout Shift; יחס רוחב-גובה מקורי נשמר.
- * - ללא פילטר grayscale — לוגו מסחרי מוצג בצבעיו המקוריים.
+ * - תצוגה מונוכרומית (grayscale, ללא מסגרות/רקע) — כדי שהלוגואים לא ייראו
+ *   ככפתורים לחיצים ולא יבלבלו לקוחות (07/2026).
  *
  * רכיב שרת (ללא state) — לא מוסיף hydration.
  */
@@ -23,18 +24,15 @@ interface Props {
 
 export default function PaymentMethodsRow({ size = 'md', showLabel = true, onDark = false }: Props) {
   const logoHeight = size === 'sm' ? 22 : 26;
-  const chipPad = size === 'sm' ? '3px 7px' : '4px 9px';
 
+  // לוגו שטוח ואפור — בלי רקע, מסגרת או ריפוד של "כפתור"
   const chipStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: '#fff',
-    border: onDark ? '1px solid rgba(255,255,255,0.25)' : '1px solid #e5e0d6',
-    borderRadius: 8,
-    padding: chipPad,
-    boxSizing: 'border-box',
-    height: logoHeight + (size === 'sm' ? 8 : 10),
+    height: logoHeight,
+    filter: onDark ? 'grayscale(1) brightness(2.2)' : 'grayscale(1)',
+    opacity: onDark ? 0.8 : 0.55,
   };
 
   return (
@@ -62,16 +60,17 @@ export default function PaymentMethodsRow({ size = 'md', showLabel = true, onDar
               />
             </span>
           ) : (
-            /* bit — אין קובץ לוגו רשמי זמין; תג טקסט בצבע המותג (לא לוגו מדומה) */
+            /* bit — אין קובץ לוגו רשמי זמין; תג טקסט אפור (לא לוגו מדומה) */
             <span
               key={pm.id}
               role="img"
               aria-label={pm.label}
               style={{
                 ...chipStyle,
+                filter: 'none',
                 fontSize: size === 'sm' ? 13 : 15,
                 fontWeight: 900,
-                color: '#00a3e0',
+                color: onDark ? 'rgba(255,255,255,0.8)' : '#8a8a8a',
                 fontFamily: 'Arial, sans-serif',
                 direction: 'ltr',
                 lineHeight: 1,
