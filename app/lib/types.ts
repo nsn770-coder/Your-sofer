@@ -48,6 +48,7 @@ export interface Product {
   outOfStock?: boolean;
   coverStyle?: string;
   bundlePromo?: string | null;
+  bundleComponentCodes?: string[];  // מוצר מארז — עד 4 קודי מוצר (מק"ט/ID) של הרכיבים
 
   // Profitability & Inventory
   soferBasePrice?: number;           // legacy — הועתק ל-supplierCost

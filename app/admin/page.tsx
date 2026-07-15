@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, orderBy, query, where,
-  doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, getCountFromServer,
+  doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, getCountFromServer, limit,
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { formatPrice } from '@/app/lib/utils';
@@ -160,6 +160,7 @@ interface Product {
   soferName?: string;
   soferPrice?: number;
   supplierCost?: number;
+  sourceUrl?: string;
   createdAt?: { seconds: number };
   isExpertRecommended?: boolean;
   isBestSeller?: boolean;
@@ -175,6 +176,8 @@ interface Product {
   salePercent?: number;
   saleCampaignId?: string | null;
   subCategory?: string;
+  // Bundle (מארז)
+  bundleComponentCodes?: string[];
 }
 
 interface Sofer {
@@ -704,10 +707,15 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [supplierCost, setSupplierCost] = useState(
     product.supplierCost != null ? String(product.supplierCost) : ''
   );
+  const [sourceUrl, setSourceUrl] = useState(product.sourceUrl ?? '');
   const [storageColumn, setStorageColumn] = useState(product.storageColumn ?? '');
   const [storageShelf, setStorageShelf]   = useState(product.storageShelf != null ? String(product.storageShelf) : '');
   const [storageNote, setStorageNote]     = useState(product.storageNote ?? '');
   const [warehouseBox, setWarehouseBox]   = useState(product.warehouseBox ?? '');
+  const [bundleCodes, setBundleCodes] = useState<string[]>(() => {
+    const arr = product.bundleComponentCodes ?? [];
+    return [arr[0] ?? '', arr[1] ?? '', arr[2] ?? '', arr[3] ?? ''];
+  });
   const { printLabels, printArea } = useProductLabelPrint();
   // מוצר טיוטה שנוצר אוטומטית מהזנת מלאי (ראו InventoryTab.needsCompletion) — בשמירה ראשונה
   // לאחר השלמת הפרטים נוציא אותו ממצב טיוטה (hidden:false, status:'active').
@@ -775,6 +783,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         name, price: Number(price),
         was: was ? Number(was) : null,
         supplierCost: supplierCost ? Number(supplierCost) : null,
+        sourceUrl: sourceUrl.trim() || null,
         desc, cat,
         category: cat,
         ...(subCategory ? { subCategory } : {}),
@@ -798,6 +807,10 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         storageShelf: storageShelf || null,
         storageNote: storageNote || null,
         warehouseBox: warehouseBox || null,
+        bundleComponentCodes: (() => {
+          const codes = bundleCodes.map(c => c.trim()).filter(Boolean);
+          return codes.length ? codes : null;
+        })(),
         ...(isDraftCompletion ? { hidden: false, status: 'active' } : {}),
       });
       // Sync AI knowledge index (fire-and-forget)
@@ -883,6 +896,18 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             <label style={labelStyle}>עלות ספק ₪ (מחיר גולמי, לפני הנחה ומע&quot;מ)</label>
             <input type="number" value={supplierCost} onChange={e => setSupplierCost(e.target.value)} placeholder="לא חובה" style={inputStyle} />
             <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>העלות שלך מחושבת אוטומטית: ערך זה × 0.95 × 1.18</div>
+          </div>
+          <div>
+            <label style={labelStyle}>🔗 קישור למוצר אצל הספק</label>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <input type="url" dir="ltr" value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="לא חובה" style={inputStyle} />
+              {sourceUrl.trim() && (
+                <a href={sourceUrl.trim()} target="_blank" rel="noopener noreferrer"
+                  style={{ flexShrink: 0, fontSize: 13, fontWeight: 700, color: '#1a6fb0', textDecoration: 'none', border: '1px solid #cde', borderRadius: 8, padding: '9px 12px', whiteSpace: 'nowrap' }}>
+                  פתח ↗
+                </a>
+              )}
+            </div>
           </div>
           <div>
             <label style={labelStyle}>קטגוריה</label>
@@ -1102,6 +1127,29 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               placeholder="למשל: 14"
               dir="ltr"
               style={{ ...inputStyle, fontFamily: 'monospace' }} />
+          </div>
+        </div>
+
+        {/* ── מוצר מארז (באנדל) ── */}
+        <div style={{ marginTop: 14, background: '#f5f3ff', border: '1px solid #c4b5fd', borderRadius: 8, padding: '12px 14px' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#5b21b6', marginBottom: 4 }}>🧩 מוצר מארז (באנדל)</div>
+          <div style={{ fontSize: 11, color: '#6d5fa8', marginBottom: 10 }}>
+            אם מוצר זה הוא מארז — הזן עד 4 קודי מוצר (מק&quot;ט או מזהה מוצר) של המוצרים המרכיבים אותו.
+            בהזמנות יוצגו הרכיבים ברשימה תחת המארז, כולל מיקומם במחסן.
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {[0, 1, 2, 3].map(i => (
+              <div key={i}>
+                <label style={labelStyle}>קוד מוצר {i + 1}</label>
+                <input
+                  value={bundleCodes[i]}
+                  onChange={e => setBundleCodes(prev => prev.map((c, idx) => (idx === i ? e.target.value : c)))}
+                  placeholder='מק"ט / ID'
+                  dir="ltr"
+                  style={{ ...inputStyle, fontFamily: 'monospace' }}
+                />
+              </div>
+            ))}
           </div>
         </div>
 
@@ -1620,27 +1668,61 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
   const allProductsCacheRef = useRef<Product[] | null>(null);
   // Feature 5: warehouse info cache for order item display
   const [productDetailsCache, setProductDetailsCache] = useState<Record<string, Product>>({});
+  // Bundle: cache of resolved bundle components, keyed by code (מק"ט או ID). null = לא נמצא
+  const [bundleCache, setBundleCache] = useState<Record<string, Product | null>>({});
+
+  // Bundle: resolve component codes → product docs (by SKU, fallback by doc ID)
+  async function resolveBundleCodes(codes: string[]) {
+    const missing = Array.from(new Set(codes.filter(c => c && bundleCache[c] === undefined)));
+    if (missing.length === 0) return;
+    try {
+      const results = await Promise.all(missing.map(async code => {
+        const bySku = await getDocs(query(collection(db, 'products'), where('sku', '==', code), limit(1)));
+        if (!bySku.empty) {
+          const d = bySku.docs[0];
+          return { code, prod: { id: d.id, ...d.data() } as Product };
+        }
+        try {
+          const byId = await getDoc(doc(db, 'products', code));
+          if (byId.exists()) return { code, prod: { id: byId.id, ...byId.data() } as Product };
+        } catch { /* קוד לא תקין כ-ID */ }
+        return { code, prod: null };
+      }));
+      setBundleCache(prev => {
+        const next = { ...prev };
+        results.forEach(r => { next[r.code] = r.prod; });
+        return next;
+      });
+    } catch (e) {
+      console.error('[OrdersTab] resolveBundleCodes:', e);
+    }
+  }
 
   // Feature 5: load product warehouse info when expanding an order
   async function loadProductDetailsForOrder(orderId: string) {
     const order = orders.find(o => o.id === orderId);
     if (!order?.items?.length) return;
-    const missing = order.items
-      .map(it => it.productId ?? it.id)
-      .filter(pid => pid && !productDetailsCache[pid]);
-    if (missing.length === 0) return;
-    try {
-      const snaps = await Promise.all(missing.map(pid => getDoc(doc(db, 'products', pid))));
-      const updates: Record<string, Product> = {};
-      snaps.forEach((snap, i) => {
-        if (snap.exists()) updates[missing[i]] = { id: snap.id, ...snap.data() } as Product;
-      });
-      if (Object.keys(updates).length > 0) {
-        setProductDetailsCache(prev => ({ ...prev, ...updates }));
+    const pids = order.items.map(it => it.productId ?? it.id).filter(Boolean) as string[];
+    const missing = pids.filter(pid => !productDetailsCache[pid]);
+    const merged: Record<string, Product> = { ...productDetailsCache };
+    if (missing.length > 0) {
+      try {
+        const snaps = await Promise.all(missing.map(pid => getDoc(doc(db, 'products', pid))));
+        const updates: Record<string, Product> = {};
+        snaps.forEach((snap, i) => {
+          if (snap.exists()) updates[missing[i]] = { id: snap.id, ...snap.data() } as Product;
+        });
+        if (Object.keys(updates).length > 0) {
+          Object.assign(merged, updates);
+          setProductDetailsCache(prev => ({ ...prev, ...updates }));
+        }
+      } catch (e) {
+        console.error('[OrdersTab] loadProductDetails:', e);
       }
-    } catch (e) {
-      console.error('[OrdersTab] loadProductDetails:', e);
     }
+    // Bundle: resolve components of any bundle product in this order
+    const codes = pids.flatMap(pid => merged[pid]?.bundleComponentCodes ?? []);
+    if (codes.length > 0) resolveBundleCodes(codes);
   }
 
   async function handleStatusChange(orderId: string, newStatus: string) {
@@ -2186,6 +2268,41 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
                                             <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5 text-xs font-mono w-fit">
                                               📦 {pd.storageColumn && `עמודה ${pd.storageColumn}`}{pd.storageShelf && ` · מדף ${pd.storageShelf}`}{pd.storageNote && ` · ${pd.storageNote}`}
                                             </span>
+                                          );
+                                        })()}
+                                        {/* Bundle: component products list (למלקט במחסן) */}
+                                        {(() => {
+                                          const pd = productDetailsCache[item.productId ?? item.id];
+                                          const codes = pd?.bundleComponentCodes;
+                                          if (!codes || codes.length === 0) return null;
+                                          return (
+                                            <div className="mt-1 bg-violet-50 border border-violet-200 rounded-lg px-3 py-2 w-fit max-w-full">
+                                              <div className="text-violet-800 font-bold mb-1">🧩 מארז — מוצרים כלולים ({codes.length}):</div>
+                                              <div className="flex flex-col gap-1.5">
+                                                {codes.map(code => {
+                                                  const bp = bundleCache[code];
+                                                  return (
+                                                    <div key={code} className="flex items-center gap-2 flex-wrap">
+                                                      <span className="font-mono text-gray-400">{code}</span>
+                                                      {bp === undefined && <span className="text-gray-400">טוען...</span>}
+                                                      {bp === null && <span className="text-red-500 font-medium">⚠️ לא נמצא מוצר עם קוד זה</span>}
+                                                      {bp && (
+                                                        <>
+                                                          {bp.imgUrl && <img src={bp.imgUrl} alt="" className="w-7 h-7 object-cover rounded border border-gray-200 shrink-0" />}
+                                                          <a href={`/product/${bp.id}`} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline hover:text-blue-600">{bp.name}</a>
+                                                          {(bp.storageColumn || bp.storageShelf || bp.warehouseBox) && (
+                                                            <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5 font-mono">
+                                                              📦 {bp.storageColumn && `עמודה ${bp.storageColumn}`}{bp.storageShelf && ` · מדף ${bp.storageShelf}`}{bp.warehouseBox && ` · ארגז ${bp.warehouseBox}`}
+                                                            </span>
+                                                          )}
+                                                          {bp.outOfStock && <span className="text-red-600 font-bold">אזל מהמלאי!</span>}
+                                                        </>
+                                                      )}
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
+                                            </div>
                                           );
                                         })()}
                                         <div className="flex flex-wrap gap-1">
