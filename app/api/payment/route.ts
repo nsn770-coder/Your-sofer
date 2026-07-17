@@ -448,7 +448,10 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Charge succeeded — create the order now (never create one for a failed charge) ──
-    const orderNumber = 'YS-' + Date.now().toString().slice(-6);
+    // מזהה ייחודי אמיתי: 8 ספרות timestamp + 3 ספרות אקראיות.
+    // (הפורמט הישן — 6 ספרות timestamp — חזר על עצמו כל ~17 דקות וגרם
+    // לסיכון שגוגל יזרוק רכישה אמיתית בגלל דדופליקציה על transaction_id זהה.)
+    const orderNumber = 'YS-' + Date.now().toString().slice(-8) + String(Math.floor(Math.random() * 900) + 100);
     const commissionAmount = shaliachId ? computeCommissionAmount(cartItems, commissionPercent || 0) : 0;
 
     let orderRef;

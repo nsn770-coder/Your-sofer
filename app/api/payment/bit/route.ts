@@ -279,7 +279,8 @@ export async function POST(req: NextRequest) {
     // ── יצירת הזמנה ממתינה לפני ההפניה לביט ───────────────────────────────────
     // ההזמנה נוצרת לפני התשלום (בניגוד לאשראי) כי האישור מגיע אסינכרונית ב-IPN.
     // status: pending_payment — לא נספרת כהכנסה עד שה-IPN מסמן paid.
-    const orderNumber = 'YS-' + Date.now().toString().slice(-6);
+    // מזהה ייחודי אמיתי (ראה הערה זהה ב-/api/payment) — מונע התנגשויות transaction_id
+    const orderNumber = 'YS-' + Date.now().toString().slice(-8) + String(Math.floor(Math.random() * 900) + 100);
     const commissionAmount = shaliachId ? computeCommissionAmount(cartItems, commissionPercent || 0) : 0;
 
     // מפתח IPN סודי — נשלח ל-Sumit בלבד; בהזמנה נשמר רק ה-hash (מסמכי orders

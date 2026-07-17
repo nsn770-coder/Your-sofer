@@ -195,18 +195,25 @@ function ThankYouContent() {
   useEffect(() => {
     if (!orderId || emailSent) return;
 
-    async function sendEmail() {
+    async function processOrder() {
       try {
-        // קבל פרטי ההזמנה מ-Firestore
+        // ── שליפת ההזמנה מ-Firestore ──
+        // בתשלום כרטיס ההזמנה נוצרת כבר בסטטוס paid (רק אחרי חיוב מוצלח).
+        // בתשלום ביט ה-IPN של Sumit מסמן paid בצד שרת — ייתכן עיכוב קצר,
+        // לכן ממתינים עד ~15 שניות לפני ויתור.
         console.log('[thank-you] fetching order', orderId);
-        const orderSnap = await getDoc(doc(db, 'orders', orderId!));
-        if (!orderSnap.exists()) {
-          console.error('[thank-you] order not found:', orderId);
-          return;
+        let order: any = null;
+        for (let attempt = 0; attempt < 6; attempt++) {
+          const orderSnap = await getDoc(doc(db, 'orders', orderId!));
+          if (!orderSnap.exists()) {
+            console.error('[thank-you] order not found:', orderId);
+            return;
+          }
+          order = orderSnap.data();
+          if (order.status === 'paid') break;
+          await new Promise(res => setTimeout(res, 2500));
         }
-
-        const order = orderSnap.data();
-        console.log('[thank-you] order loaded, sessionId:', order.sessionId, 'email:', order.email);
+        console.log('[thank-you] order loaded, status:', order.status, 'sessionId:', order.sessionId, 'email:', order.email);
 
         // Gematria blessing
         const createdSec: number =
@@ -218,11 +225,22 @@ function ThankYouContent() {
         setOrderShippingCost(order.shippingCost ?? 0);
         if (typeof order.pointsEarned === 'number') setOrderPointsEarned(order.pointsEarned);
 
-        // עדכן סטטוס הזמנה ל-paid
-        await updateDoc(doc(db, 'orders', orderId!), {
-          status: 'paid',
-          paidAt: new Date().toISOString(),
-        });
+        // ── תשלום שלא אושר בצד שרת (למשל ביט שלא הושלם) — אין מעקב ואין מייל ──
+        // הסטטוס paid נקבע אך ורק בצד השרת (route התשלום / IPN של ביט).
+        // בעבר העמוד סימן כאן paid מצד לקוח — הוסר: אפשר היה "לאשר" הזמנה
+        // רק ע"י פתיחת ה-URL, כולל הזמנות ביט שלא שולמו.
+        if (order.status !== 'paid') {
+          console.warn('[thank-you] order not confirmed paid — skipping tracking & email');
+          return;
+        }
+
+        // ── הגנה מכפילויות: כל תופעות הלוואי (purchase, מייל, עדכוני לקוח) ──
+        // רצות פעם אחת בלבד להזמנה. רענון או חזרה לעמוד לא ישלחו שוב כלום.
+        const processedKey = `order_processed_${orderId}`;
+        let alreadyProcessed = false;
+        try { alreadyProcessed = !!localStorage.getItem(processedKey); } catch {}
+        if (alreadyProcessed) { setEmailSent(true); return; }
+        try { localStorage.setItem(processedKey, '1'); } catch {}
 
         // סמן עגלה נטושה כמומרת
         try {
@@ -306,6 +324,25 @@ function ThankYouContent() {
         });
         // זמין גם ל-Google tag (gtag) עבור Enhanced Conversions
         window.gtag?.('set', 'user_data', userData);
+
+        // ── GA4 purchase — נשלח ישירות דרך gtag ──
+        // חובה: בקונטיינר GTM-PTHMKJ97 אין תג אירוע GA4, ולכן ה-push שלמעלה
+        // מפעיל רק את המרת ה-Ads ולא מגיע ל-GA4 בכלל (רכישות GA4 נעצרו ב-3.7.26
+        // כשהוחלף gtag ב-push). GA4 מבצע דדופליקציה לפי transaction_id, כך שגם
+        // אם יתווסף בעתיד תג GA4 ב-GTM לא תיווצר ספירה כפולה.
+        window.gtag?.('event', 'purchase', {
+          transaction_id: order.orderNumber,
+          value: order.total,
+          currency: 'ILS',
+          shipping: order.shippingCost || 0,
+          ...(order.couponCode ? { coupon: order.couponCode } : {}),
+          items: (order.items || []).map((i: { id: string; name: string; price: number; quantity: number }) => ({
+            item_id: i.id,
+            item_name: i.name,
+            price: i.price,
+            quantity: i.quantity,
+          })),
+        });
 
         // ── Google Ads Conversion — קוד מהקמפיינר (Ben Amsalem) ──
         // מזהה המרה: AW-18095875961/f0NoCLGexLIcEPnO5LRD
@@ -392,7 +429,7 @@ function ThankYouContent() {
       }
     }
 
-    sendEmail();
+    processOrder();
   }, [orderId]);
 
   const hasGift    = orderTotal >= GIFT_THRESHOLD;
