@@ -9,9 +9,23 @@ type GtagItem = {
   index?: number;
 };
 
+// ── חשוב: האירועים נשלחים בפורמט GTM (dataLayer.push) ולא דרך gtag() ──
+// קונטיינר ה-GTM לא מעבד קריאות gtag('event') — רק push עם event מפעיל תגים.
+// אירועי ecommerce נדחפים תחת מפתח ecommerce ונקלטים ע"י תג
+// "GA4 - Ecommerce Events" בקונטיינר (טריגר על שמות האירועים).
+const ECOMMERCE_EVENTS = new Set([
+  'view_item', 'view_item_list', 'select_item', 'add_to_cart',
+  'view_cart', 'begin_checkout', 'add_payment_info',
+]);
+
 function fire(event: string, params?: Record<string, unknown>) {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', event, params);
+  if (typeof window === 'undefined') return;
+  window.dataLayer = window.dataLayer || [];
+  if (ECOMMERCE_EVENTS.has(event)) {
+    window.dataLayer.push({ ecommerce: null }); // איפוס לפי ההנחיה של גוגל
+    window.dataLayer.push({ event, ecommerce: params ?? {} });
+  } else {
+    window.dataLayer.push({ event, ...(params ?? {}) });
   }
 }
 
