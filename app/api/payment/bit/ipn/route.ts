@@ -5,6 +5,8 @@ import { createHash } from 'crypto';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://your-sofer.com';
+
 // ── IPN לתשלום ביט (Sumit) ────────────────────────────────────────────────────
 // Sumit קוראת ל-URL הזה בצד שרת אחרי תשלום ביט מוצלח (כמו בפלאגין הרשמי).
 // אימות: המפתח הסודי ב-query חייב להתאים ל-hash שנשמר בהזמנה בעת היצירה.
@@ -171,8 +173,55 @@ export async function POST(req: NextRequest) {
       paidAt: FieldValue.serverTimestamp(),
       bitDocumentId: documentId || null,
       bitCustomerId: customerId || null,
+      // דגלים שמסומנים כאן כדי שעמוד התודה לא ישלח מייל/סנכרון כפולים —
+      // בזרימת ביט הלקוח משלם באפליקציה ולא תמיד חוזר לאתר, ולכן
+      // המייל והסנכרון חייבים לקרות כאן בצד שרת (תוקן 17.7.26 אחרי
+      // הזמנה אמיתית ששולמה בביט בלי שהלקוח חזר לעמוד התודה).
+      confirmationEmailSent: true,
+      opsSynced: true,
     });
     console.log('[bit-ipn] order confirmed paid:', orderId, order.orderNumber, 'doc:', documentId);
+
+    // ── מייל אישור הזמנה — בצד שרת, לא תלוי בחזרת הלקוח לאתר ────────────────
+    try {
+      const emailRes = await fetch(`${BASE_URL}/api/send-order-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerEmail: order.email,
+          customerName: order.customerName,
+          orderNumber: order.orderNumber,
+          items: order.items,
+          total: order.total,
+          address: order.address,
+        }),
+      });
+      if (!emailRes.ok) throw new Error(`send-order-email returned ${emailRes.status}`);
+      console.log('[bit-ipn] confirmation email sent for', order.orderNumber);
+    } catch (emailErr) {
+      console.error('[bit-ipn] EMAIL FAILED — send manually!', order.orderNumber, emailErr);
+      await orderRef.update({ confirmationEmailSent: false }).catch(() => {});
+    }
+
+    // ── סנכרון למערכת הניהול הפנימית ─────────────────────────────────────────
+    try {
+      await fetch(`${BASE_URL}/api/ops/sync-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          orderNumber: order.orderNumber,
+          customerName: order.customerName,
+          customerEmail: order.email,
+          customerPhone: order.phone || '',
+          items: order.items,
+          total: order.total,
+          address: order.address,
+        }),
+      });
+    } catch (opsErr) {
+      console.error('[bit-ipn] ops sync failed (non-fatal):', opsErr);
+    }
 
     // ── תופעות לוואי (כמו בזרימת האשראי, non-fatal) ───────────────────────────
     // 1. שימוש בקופון

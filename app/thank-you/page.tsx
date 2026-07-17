@@ -377,22 +377,24 @@ function ThankYouContent() {
           } catch {}
         }
 
-        // שלח מייל ללקוח
-        await fetch('/api/send-order-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            customerEmail: order.email,
-            customerName: order.customerName,
-            orderNumber: order.orderNumber,
-            items: order.items,
-            total: order.total,
-            address: order.address,
-          }),
-        });
+        // שלח מייל ללקוח — אלא אם כבר נשלח בצד שרת (IPN של ביט מסמן confirmationEmailSent)
+        if (order.confirmationEmailSent !== true) {
+          await fetch('/api/send-order-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              customerEmail: order.email,
+              customerName: order.customerName,
+              orderNumber: order.orderNumber,
+              items: order.items,
+              total: order.total,
+              address: order.address,
+            }),
+          });
+        }
 
-        // סנכרן לתוך מערכת הניהול הפנימית
-        fetch('/api/ops/sync-order', {
+        // סנכרן לתוך מערכת הניהול הפנימית — אלא אם כבר סונכרן ב-IPN
+        if (order.opsSynced !== true) fetch('/api/ops/sync-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           keepalive: true,
