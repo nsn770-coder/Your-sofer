@@ -96,6 +96,17 @@ export default function RootLayout({
           window.gtag = window.gtag || function(){window.dataLayer.push(arguments);};
         ` }} />
         {/* ── End Google Tag Manager ── */}
+        {/* ── GA4 ישיר (G-PM7GW4MWEJ) — אל תסיר! ──
+            קונטיינר GTM אינו מעבד קריאות gtag('event',...) — הוא מגיב רק ל-
+            dataLayer.push עם event. בלי ה-config הישיר הזה, כל אירועי ה-ecommerce
+            (purchase, view_item, add_to_cart, begin_checkout) לא מגיעים ל-GA4.
+            זה בדיוק מה שקרה ב-3.7.26 כשההגדרה הישירה הוסרה לטובת GTM בלבד.
+            send_page_view:false כי תג ה-Google בקונטיינר כבר שולח page_view. */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-PM7GW4MWEJ" />
+        <script dangerouslySetInnerHTML={{ __html: `
+          gtag('js', new Date());
+          gtag('config', 'G-PM7GW4MWEJ', { send_page_view: false });
+        ` }} />
         <meta name="facebook-domain-verification" content="xuwtu57l434nldfe7p4s8l2sr829jw" />
         <CanonicalTag />
         {/* ── Preconnects & DNS prefetches ── */}
