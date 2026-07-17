@@ -28,6 +28,7 @@ interface PickerOption {
   cat: string;
   subCategory?: string;
   href?: string;
+  emoji?: string;
 }
 
 function buildPickerOptions(): PickerOption[] {
@@ -53,6 +54,7 @@ function buildPickerOptions(): PickerOption[] {
     { group: '⭐ עמודים מיוחדים', label: 'חנוכה (עמוד)',   cat: 'חנוכה' },
     { group: '⭐ עמודים מיוחדים', label: 'פסח (עמוד)',     cat: 'פסח' },
     { group: '⭐ עמודים מיוחדים', label: 'נטלות וכלים',    cat: 'יודאיקה', subCategory: 'נטילת ידיים ומים אחרונים' },
+    { group: '⭐ עמודים מיוחדים', label: 'כיפות לאירועים', cat: 'כיפות לאירועים', href: '/event-kippot', emoji: '🎩' },
     { group: '⭐ עמודים מיוחדים', label: 'כל המוצרים',     cat: 'הכל' },
   );
   return opts;
@@ -293,6 +295,7 @@ function SectionPanel({
       id: newId(), label: opt.label, cat: opt.cat, width: 'half',
       ...(opt.subCategory ? { subCategory: opt.subCategory } : {}),
       ...(opt.href ? { href: opt.href } : {}),
+      ...(opt.emoji ? { emoji: opt.emoji } : {}),
     };
     onItemsChange([...items, item]);
     setPickerIdx('');
