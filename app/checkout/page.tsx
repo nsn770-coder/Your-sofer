@@ -99,6 +99,7 @@ interface OrderSummaryProps {
   pointsToUse: number;
   setPointsToUse: (n: number) => void;
   maxRedeemablePoints: number;
+  shippingCost: number;
 }
 
 function OrderSummary({
@@ -107,7 +108,7 @@ function OrderSummary({
   finalTotal, selectedGift, giftOptions, giftEnabled, giftEligible,
   giftThreshold, amountToGift, setSelectedGift,
   couponInput, setCouponInput, applyCoupon, couponLoading, couponError, shaliach,
-  pointsAvailable, pointsToUse, setPointsToUse, maxRedeemablePoints,
+  pointsAvailable, pointsToUse, setPointsToUse, maxRedeemablePoints, shippingCost,
 }: OrderSummaryProps) {
   const [pointsInput, setPointsInput] = useState('');
   return (
@@ -144,7 +145,11 @@ function OrderSummary({
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13 }}>
           <span style={{ color: '#777', minWidth: 0 }}>משלוח</span>
-          <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(SHIPPING_REGULAR)}</span>
+          {shippingCost === 0 ? (
+            <span style={{ fontWeight: 700, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>🏠 איסוף עצמי · חינם</span>
+          ) : (
+            <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(shippingCost)}</span>
+          )}
         </div>
         {appliedCoupon && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
@@ -356,6 +361,8 @@ export default function CheckoutPage() {
   }, [pointsToUse, maxRedeemablePoints]);
   const [isMobile, setIsMobile] = useState(true);
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', notes: '' });
+  // ── אופן קבלת ההזמנה: משלוח עד הבית / איסוף עצמי (האורן 18, ללא דמי משלוח) ──
+  const [deliveryMethod, setDeliveryMethod] = useState<'shipping' | 'pickup'>('shipping');
 
   const [sessionId] = useState<string>(() => {
     if (typeof window === 'undefined') return '';
@@ -490,7 +497,7 @@ export default function CheckoutPage() {
       .catch(e => console.error('[checkout] partial abandoned_cart FAILED:', e));
   }
 
-  const shippingCost = SHIPPING_REGULAR;
+  const shippingCost = deliveryMethod === 'pickup' ? 0 : SHIPPING_REGULAR;
   const finalTotal = total - discountAmount - pointsToUse + shippingCost;
 
   // מוצר בהתאמה אישית (רקמה / הטבעה / הדפסה) — משפיע על הודעת תנאי הביטול
@@ -562,11 +569,11 @@ export default function CheckoutPage() {
           customer: { name: form.name, email: form.email, phone: form.phone },
           couponCode: appliedCoupon?.code || undefined,
           cartItems: items,
-          address: `${form.address}, ${form.city}`,
+          address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : `${form.address}, ${form.city}`,
           notes: form.notes || '',
           selectedGift: selectedGift || null,
           giftLine: gift ? { id: gift.id, name: gift.name, productId: gift.productId } : null,
-          shippingCost, shippingType: 'regular',
+          shippingCost, shippingType: deliveryMethod === 'pickup' ? 'pickup' : 'regular',
           sessionId,
           refCode: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
           commissionPercent,
@@ -637,11 +644,11 @@ export default function CheckoutPage() {
           customer: { name: form.name, email: form.email, phone: form.phone },
           couponCode: appliedCoupon?.code || undefined,
           cartItems: items,
-          address: `${form.address}, ${form.city}`,
+          address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : `${form.address}, ${form.city}`,
           notes: form.notes || '',
           selectedGift: selectedGift || null,
           giftLine: gift ? { id: gift.id, name: gift.name, productId: gift.productId } : null,
-          shippingCost, shippingType: 'regular',
+          shippingCost, shippingType: deliveryMethod === 'pickup' ? 'pickup' : 'regular',
           sessionId,
           refCode: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
           commissionPercent,
@@ -665,7 +672,7 @@ export default function CheckoutPage() {
     }
   }
 
-  const isFormValid = !!(form.name && form.email && form.phone && form.address && form.city);
+  const isFormValid = !!(form.name && form.email && form.phone && (deliveryMethod === 'pickup' || (form.address && form.city)));
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', overflowX: 'hidden', maxWidth: '100vw' }}>
@@ -707,7 +714,7 @@ export default function CheckoutPage() {
             Collapsible: item count + final total always visible in the header. */}
         <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}>
           <MobileOrderSummary itemCount={items.reduce((s, i) => s + i.quantity, 0)} finalTotal={finalTotal}>
-            <OrderSummary isSticky={false} framed={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} />
+            <OrderSummary isSticky={false} framed={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} />
           </MobileOrderSummary>
         </div>
 
@@ -729,10 +736,38 @@ export default function CheckoutPage() {
             <div style={{ marginBottom: 14 }}>
               <Input label="אימייל" name="email" value={form.email} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ email: e.target.value })} placeholder="your@email.com" type="email" inputMode="email" autoComplete="email" required />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: 14, marginBottom: 14 }}>
-              <Input label="רחוב ומספר בית" name="address" value={form.address} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ address: e.target.value })} placeholder="רחוב הרצל 5" autoComplete="street-address" required />
-              <Input label="עיר" name="city" value={form.city} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ city: e.target.value })} placeholder="תל אביב" autoComplete="address-level2" required />
+            {/* ── בחירת אופן קבלת ההזמנה: משלוח / איסוף עצמי ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+              <button type="button" onClick={() => setDeliveryMethod('shipping')}
+                style={{
+                  border: deliveryMethod === 'shipping' ? '2px solid #1E3A8A' : '1.5px solid #e0e0e0',
+                  background: deliveryMethod === 'shipping' ? '#f4f7ff' : '#fafafa',
+                  borderRadius: 12, padding: '12px 10px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center',
+                }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#1E3A8A' }}>🚚 משלוח עד הבית</div>
+                <div style={{ fontSize: 12, color: '#777', marginTop: 3 }}>{formatPrice(SHIPPING_REGULAR)}</div>
+              </button>
+              <button type="button" onClick={() => setDeliveryMethod('pickup')}
+                style={{
+                  border: deliveryMethod === 'pickup' ? '2px solid #1a6b3c' : '1.5px solid #e0e0e0',
+                  background: deliveryMethod === 'pickup' ? '#f2faf5' : '#fafafa',
+                  borderRadius: 12, padding: '12px 10px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center',
+                }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a6b3c' }}>🏠 איסוף עצמי</div>
+                <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 700, marginTop: 3 }}>האורן 18 · ללא עלות משלוח</div>
+              </button>
             </div>
+            {deliveryMethod === 'pickup' && (
+              <div style={{ background: '#f2faf5', border: '1px solid #bbe3c8', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#1a6b3c', marginBottom: 14, lineHeight: 1.6 }}>
+                ההזמנה תמתין לאיסוף בכתובת <strong>האורן 18</strong>. נעדכן אותך כשהיא מוכנה לאיסוף.
+              </div>
+            )}
+            {deliveryMethod === 'shipping' && (
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: 14, marginBottom: 14 }}>
+                <Input label="רחוב ומספר בית" name="address" value={form.address} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ address: e.target.value })} placeholder="רחוב הרצל 5" autoComplete="street-address" required />
+                <Input label="עיר" name="city" value={form.city} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ city: e.target.value })} placeholder="תל אביב" autoComplete="address-level2" required />
+              </div>
+            )}
             <div style={{ marginBottom: 24 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>הערות למשלוח</label>
               <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="הוראות מיוחדות, קומה, דירה..." rows={2}
@@ -863,7 +898,7 @@ export default function CheckoutPage() {
 
         {/* Order summary — desktop: sticky right column; mobile: hidden via CSS */}
         <div className="checkout-summary-desktop" style={{ display: isMobile ? 'none' : 'block' }}>
-          <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} />
+          <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} />
         </div>
       </div>
 
