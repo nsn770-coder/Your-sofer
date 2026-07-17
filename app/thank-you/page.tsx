@@ -325,24 +325,9 @@ function ThankYouContent() {
         // זמין גם ל-Google tag (gtag) עבור Enhanced Conversions
         window.gtag?.('set', 'user_data', userData);
 
-        // ── GA4 purchase — נשלח ישירות דרך gtag ──
-        // חובה: בקונטיינר GTM-PTHMKJ97 אין תג אירוע GA4, ולכן ה-push שלמעלה
-        // מפעיל רק את המרת ה-Ads ולא מגיע ל-GA4 בכלל (רכישות GA4 נעצרו ב-3.7.26
-        // כשהוחלף gtag ב-push). GA4 מבצע דדופליקציה לפי transaction_id, כך שגם
-        // אם יתווסף בעתיד תג GA4 ב-GTM לא תיווצר ספירה כפולה.
-        window.gtag?.('event', 'purchase', {
-          transaction_id: order.orderNumber,
-          value: order.total,
-          currency: 'ILS',
-          shipping: order.shippingCost || 0,
-          ...(order.couponCode ? { coupon: order.couponCode } : {}),
-          items: (order.items || []).map((i: { id: string; name: string; price: number; quantity: number }) => ({
-            item_id: i.id,
-            item_name: i.name,
-            price: i.price,
-            quantity: i.quantity,
-          })),
-        });
+        // ── GA4 purchase — נשלח דרך תג "GA4 - Purchase" בקונטיינר GTM ──
+        // התג (גרסה 6 ואילך) מאזין ל-push שלמעלה ושולח ל-GA4 עם נתוני ה-ecommerce.
+        // אין לשלוח כאן גם gtag('event','purchase') — זה יוצר ספירה כפולה ב-GA4.
 
         // ── Google Ads Conversion — קוד מהקמפיינר (Ben Amsalem) ──
         // מזהה המרה: AW-18095875961/f0NoCLGexLIcEPnO5LRD
