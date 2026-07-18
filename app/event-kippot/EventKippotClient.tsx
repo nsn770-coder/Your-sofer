@@ -13,10 +13,12 @@ const GOLD = '#C5A028';
 const NAVY = '#111d3a';
 
 const KIPPOT_STYLES = [
-  { id: 'lavan',    label: 'לבן ורדרד',    img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636051/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%9F_%D7%95%D7%A8%D7%93%D7%A8%D7%93_nauwhq.png' },
-  { id: 'beige',    label: "בז'",           img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_fhrr09.png' },
-  { id: 'marva',    label: 'ירוק מרווה',   img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%9E%D7%A8%D7%95%D7%95%D7%94_b5ov4n.png' },
-  { id: 'techelet', label: 'כחול רויאל',   img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%AA%D7%9B%D7%9C%D7%AA_iflyjn.png' },
+  { id: 'lavan',       label: 'לבן ורדרד',    img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636051/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%9F_%D7%95%D7%A8%D7%93%D7%A8%D7%93_nauwhq.png' },
+  { id: 'beige',       label: "בז'",           img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_fhrr09.png' },
+  { id: 'marva',       label: 'ירוק מרווה',   img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%9E%D7%A8%D7%95%D7%95%D7%94_b5ov4n.png' },
+  { id: 'techelet',    label: 'כחול רויאל',   img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%AA%D7%9B%D7%9C%D7%AA_iflyjn.png' },
+  { id: 'white',       label: 'לבן',           img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_25_PM_mcqhle.png' },
+  { id: 'beige-natural', label: "בז' טבעי",    img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_58_PM_wva57o.png' },
 ];
 
 const PRINT_TYPES = [
@@ -92,6 +94,14 @@ export default function EventKippotClient() {
         .ys-ekip-scroll::-webkit-scrollbar { height: 6px; }
         .ys-ekip-scroll::-webkit-scrollbar-track { background: #F3EFE6; }
         .ys-ekip-scroll::-webkit-scrollbar-thumb { background: #C5A028; border-radius: 3px; }
+        .ys-ekip-styles { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        @media (max-width: 640px) {
+          .ys-ekip-styles { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #C5A028 #F3EFE6; }
+          .ys-ekip-styles::-webkit-scrollbar { height: 6px; }
+          .ys-ekip-styles::-webkit-scrollbar-track { background: #F3EFE6; }
+          .ys-ekip-styles::-webkit-scrollbar-thumb { background: #C5A028; border-radius: 3px; }
+          .ys-ekip-styles .ys-ekip-card { flex: 0 0 132px; width: 132px; }
+        }
       `}</style>
 
       {/* Hero */}
@@ -197,7 +207,7 @@ export default function EventKippotClient() {
       {/* שלב 3: בחר סוג כיפה */}
       <div style={{ marginBottom: 28 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 12 }}>3. בחר סוג כיפה</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
+        <div className="ys-ekip-styles">
           {KIPPOT_STYLES.map(s => (
             <button
               key={s.id}
