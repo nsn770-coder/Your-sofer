@@ -1820,6 +1820,12 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   const allMediaOptimized = allMedia.map(u => optimizeCloudinaryUrl(u, 800));
   const allMediaThumb     = allMedia.map(u => optimizeCloudinaryUrl(u, 100));
   const hasVideo = !!product.videoUrl;
+  // פריים פותח מהווידאו (Cloudinary poster) — משמש כתמונת רקע לכפתור הווידאו בגלריה
+  const videoThumb = hasVideo && product.videoUrl!.includes('/video/upload/')
+    ? product.videoUrl!
+        .replace('/video/upload/', '/video/upload/so_0,w_120,h_120,c_fill,q_auto/')
+        .replace(/\.[^./?]+(\?.*)?$/, '.jpg')
+    : null;
   // ── Effective price: clearance > isOnSale (with date check) > base price ──
   const _now = Date.now();
   const _saleActive =
@@ -2641,8 +2647,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               ))}
               {hasVideo && (
                 <button onClick={() => setShowVideo(true)}
-                  style={{ width: isMobile ? 52 : 60, height: isMobile ? 52 : 60, flexShrink: 0, borderRadius: 8, border: `2px solid ${showVideo ? '#7c3aed' : '#e0e0e0'}`, background: showVideo ? '#f5f0ff' : '#f0f0f0', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'border-color 0.15s' }}>
-                  <Icon.Play />
+                  style={{ width: isMobile ? 52 : 60, height: isMobile ? 52 : 60, flexShrink: 0, borderRadius: 8, border: `2px solid ${showVideo ? '#7c3aed' : '#e0e0e0'}`, background: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'border-color 0.15s', position: 'relative', overflow: 'hidden', padding: 0 }}>
+                  {videoThumb && (
+                    <img src={videoThumb} alt="וידאו" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
+                  )}
+                  <span style={{ position: 'relative', zIndex: 1, width: 26, height: 26, borderRadius: '50%', background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.35)' }}>
+                    <Icon.Play />
+                  </span>
                 </button>
               )}
             </div>
