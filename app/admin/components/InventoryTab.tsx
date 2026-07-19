@@ -4,6 +4,9 @@ import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, update
 import { db } from '@/app/firebase';
 import { Product } from '@/app/lib/types';
 import { Order } from '@/app/lib/types';
+import { CATS, getSubCats } from '@/app/constants/categories';
+
+const CLOUDINARY_UPLOAD = 'https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload';
 
 // Feature 6: update inventory from supplier receipt and auto-join active all_in_stock promotion
 export async function updateInventoryFromSupplierReceipt(
@@ -90,6 +93,19 @@ interface ParsedInvoice {
   items: ParsedItem[];
 }
 
+// שורת "מוצר חדש" עבור פריט קבלה שלא נמצא בחנות — האדמין משלים תמונה, קטגוריה ומחיר
+interface NewProductRow {
+  include: boolean;
+  name: string;
+  sku: string;
+  price: string;        // מחיר מכירה באתר
+  cat: string;
+  subCategory: string;
+  imgUrl: string;
+  uploadingImg: boolean;
+  createdId?: string;   // מזהה המוצר אחרי יצירה
+}
+
 export default function InventoryTab({ products, orders, onSave, onEditProduct }: InventoryTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showPendingOnly, setShowPendingOnly] = useState(false);
@@ -106,6 +122,9 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
     { code: '', unitPrice: 0, quantity: 0 },
   ]);
   const [applyingManual, setApplyingManual] = useState(false);
+  const [newRows, setNewRows] = useState<Record<number, NewProductRow>>({});
+  const [creatingProducts, setCreatingProducts] = useState(false);
+  const [createdItemNumbers, setCreatedItemNumbers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     (async () => {
@@ -124,25 +143,45 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
   }, []);
 
   useEffect(() => {
-    if (!parsedInvoice) { setSkuMap({}); return; }
+    if (!parsedInvoice) { setSkuMap({}); setNewRows({}); setCreatedItemNumbers(new Set()); return; }
     (async () => {
       const numbers = new Set(
         parsedInvoice.items
           .map(i => i.code.replace(/^[A-Z]+/i, ''))
           .filter(n => n.length > 0)
       );
-      if (numbers.size === 0) return;
-      // Fetch all products that have a sku, then match by numeric suffix
-      const snap = await getDocs(
-        query(collection(db, 'products'), where('sku', '>=', ' '))
-      );
       const map: Record<string, Product> = {};
-      snap.forEach(d => {
-        const p = { id: d.id, ...d.data() } as Product;
-        const n = (p.sku || '').replace(/^[A-Z]+/i, '');
-        if (n && numbers.has(n)) map[n] = p;
-      });
+      if (numbers.size > 0) {
+        // Fetch all products that have a sku, then match by numeric suffix
+        const snap = await getDocs(
+          query(collection(db, 'products'), where('sku', '>=', ' '))
+        );
+        snap.forEach(d => {
+          const p = { id: d.id, ...d.data() } as Product;
+          const n = (p.sku || '').replace(/^[A-Z]+/i, '');
+          if (n && numbers.has(n)) map[n] = p;
+        });
+      }
       setSkuMap(map);
+      // אתחול שורות "מוצר חדש" לפריטי קבלה שלא נמצאו בחנות
+      const rows: Record<number, NewProductRow> = {};
+      parsedInvoice.items.forEach((item, i) => {
+        const n = item.code.replace(/^[A-Z]+/i, '');
+        if (!map[n]) {
+          rows[i] = {
+            include: true,
+            name: item.name,
+            sku: item.code,
+            price: '',
+            cat: '',
+            subCategory: '',
+            imgUrl: '',
+            uploadingImg: false,
+          };
+        }
+      });
+      setNewRows(rows);
+      setCreatedItemNumbers(new Set());
     })();
   }, [parsedInvoice]);
 
@@ -252,6 +291,8 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
       const receiptItems: { productId: string; quantity: number; unitPrice?: number; price?: number }[] = [];
       for (const item of parsedInvoice.items) {
         const itemNumber = item.code.replace(/^[A-Z]+/i, '');
+        // מוצר שנוצר הרגע מהקבלה — המלאי כבר הוזן בעת היצירה, אין לספור פעמיים
+        if (createdItemNumbers.has(itemNumber)) continue;
         const product = skuMap[itemNumber];
         if (!product) continue;
         const prevReceived = product.receivedFromSupplier ?? 0;
@@ -300,6 +341,106 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
       alert('המלאי עודכן בהצלחה! ✅');
     } finally {
       setApplyingInvoice(false);
+    }
+  }
+
+  function updateNewRow(index: number, patch: Partial<NewProductRow>) {
+    setNewRows(prev => ({ ...prev, [index]: { ...prev[index], ...patch } }));
+  }
+
+  async function handleNewRowImage(index: number, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    updateNewRow(index, { uploadingImg: true });
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'yoursofer_upload');
+      const res = await fetch(CLOUDINARY_UPLOAD, { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error('upload failed');
+      updateNewRow(index, { imgUrl: data.secure_url, uploadingImg: false });
+    } catch {
+      alert('שגיאה בהעלאת התמונה');
+      updateNewRow(index, { uploadingImg: false });
+    } finally {
+      e.target.value = '';
+    }
+  }
+
+  // יצירת מוצרים חדשים מפריטי קבלה שלא נמצאו בחנות
+  async function createNewProductsFromInvoice() {
+    if (!parsedInvoice) return;
+    const entries = Object.entries(newRows).filter(([, r]) => r.include && !r.createdId);
+    if (entries.length === 0) { alert('אין שורות מסומנות ליצירה'); return; }
+    // ולידציה: שם, מחיר וקטגוריה חובה (כמו בטופס מוצר חדש)
+    for (const [i, r] of entries) {
+      if (!r.name.trim() || !r.price || !r.cat) {
+        alert(`שורה ${Number(i) + 1}: שם, מחיר מכירה וקטגוריה הם שדות חובה`);
+        return;
+      }
+    }
+    setCreatingProducts(true);
+    try {
+      const receiptItems: { productId: string; quantity: number; unitPrice?: number; price?: number }[] = [];
+      const created: Product[] = [];
+      const createdNumbers = new Set(createdItemNumbers);
+      const newMap = { ...skuMap };
+
+      for (const [iStr, row] of entries) {
+        const i = Number(iStr);
+        const item = parsedInvoice.items[i];
+        const qty = Number(item?.quantity) || 0;
+        const unitPrice = Number(item?.unitPrice) || 0;
+        const hasImage = !!row.imgUrl;
+        const productData = {
+          name: row.name.trim(),
+          price: Number(row.price),
+          desc: '',
+          cat: row.cat,
+          category: row.cat,
+          ...(row.subCategory ? { subCategory: row.subCategory } : {}),
+          days: '7-10',
+          imgUrl: row.imgUrl || '',
+          sku: row.sku.trim() || null,
+          soferBasePrice: unitPrice,
+          receivedFromSupplier: qty,
+          inStock: qty,
+          outOfStock: qty === 0,
+          stockVisible: true,
+          priority: 50,
+          // בלי תמונה — נשמר כטיוטה מוסתרת עד השלמה, כמו בזרימת ההזנה הידנית
+          hidden: !hasImage,
+          ...(hasImage ? {} : { status: 'draft' }),
+          createdAt: serverTimestamp(),
+        };
+        const ref = await addDoc(collection(db, 'products'), productData);
+        const newProduct = { id: ref.id, ...productData } as unknown as Product;
+        created.push(newProduct);
+        receiptItems.push({ productId: ref.id, quantity: qty, unitPrice, price: Number(row.price) });
+        const n = (row.sku || item?.code || '').replace(/^[A-Z]+/i, '');
+        if (n) { createdNumbers.add(n); newMap[n] = newProduct; }
+        updateNewRow(i, { createdId: ref.id });
+      }
+
+      // צירוף אוטומטי למבצע all_in_stock — כמו בשאר זרימות המלאי
+      if (receiptItems.length > 0) {
+        updateInventoryFromSupplierReceipt(receiptItems).catch(e =>
+          console.error('[InventoryTab] new-products auto-promo join failed (non-fatal):', e)
+        );
+      }
+
+      setCreatedItemNumbers(createdNumbers);
+      setSkuMap(newMap);
+      setAllProducts(prev => [...prev, ...created]);
+
+      const noImage = created.filter(p => !p.imgUrl).length;
+      alert(
+        `🆕 נוצרו ${created.length} מוצרים חדשים!` +
+        (noImage > 0 ? `\n⚠️ ${noImage} מהם ללא תמונה — נשמרו כטיוטה מוסתרת עד שתועלה תמונה.` : '')
+      );
+    } finally {
+      setCreatingProducts(false);
     }
   }
 
@@ -596,6 +737,109 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
                 })}
               </tbody>
             </table>
+
+            {/* 🆕 מוצרים חדשים — פריטי קבלה שלא נמצאו בחנות */}
+            {Object.keys(newRows).length > 0 && (
+              <div style={{ marginTop: 16, background: '#fff', border: '1px solid #93c5fd', borderRadius: 8, padding: 14 }}>
+                <div style={{ fontWeight: 800, marginBottom: 4, color: '#1d4ed8' }}>
+                  🆕 מוצרים חדשים מהקבלה ({Object.values(newRows).filter(r => !r.createdId).length})
+                </div>
+                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 10 }}>
+                  הפריטים הבאים לא נמצאו בחנות. העלה תמונה, בחר קטגוריה וקבע מחיר מכירה — והמוצרים ייווצרו באתר עם המלאי מהקבלה.
+                </div>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #bfdbfe', color: '#374151' }}>
+                      <th style={{ padding: '4px 6px' }}></th>
+                      <th style={{ padding: '4px 6px', textAlign: 'center' }}>תמונה</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'right' }}>שם מוצר</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'right' }}>מק"ט</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'center' }}>קטגוריה</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'center' }}>תת-קטגוריה</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'center' }}>מחיר מכירה</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'center' }}>כמות</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'center' }}>עלות ספק</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(newRows).map(([iStr, row]) => {
+                      const i = Number(iStr);
+                      const item = parsedInvoice.items[i];
+                      if (!item) return null;
+                      const subCats = getSubCats(row.cat);
+                      if (row.createdId) {
+                        return (
+                          <tr key={i} style={{ borderBottom: '1px solid #eff6ff', background: '#f0fdf4' }}>
+                            <td colSpan={9} style={{ padding: '6px 8px', color: '#16a34a', fontWeight: 700 }}>
+                              ✓ נוצר: {row.name} {row.imgUrl ? '' : '(טיוטה — חסרה תמונה)'}
+                            </td>
+                          </tr>
+                        );
+                      }
+                      return (
+                        <tr key={i} style={{ borderBottom: '1px solid #eff6ff', opacity: row.include ? 1 : 0.45 }}>
+                          <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                            <input type="checkbox" checked={row.include} onChange={ev => updateNewRow(i, { include: ev.target.checked })} />
+                          </td>
+                          <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                            <label style={{ cursor: 'pointer', display: 'inline-block' }}>
+                              {row.imgUrl ? (
+                                <img src={row.imgUrl} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd' }} />
+                              ) : (
+                                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: 6, border: '1px dashed #93c5fd', color: '#3b82f6', fontSize: 18, background: '#eff6ff' }}>
+                                  {row.uploadingImg ? '⏳' : '📷'}
+                                </span>
+                              )}
+                              <input type="file" accept="image/*" style={{ display: 'none' }} disabled={row.uploadingImg} onChange={ev => handleNewRowImage(i, ev)} />
+                            </label>
+                          </td>
+                          <td style={{ padding: '4px 6px' }}>
+                            <input type="text" value={row.name} onChange={ev => updateNewRow(i, { name: ev.target.value })}
+                              style={{ width: '100%', minWidth: 140, padding: '4px 6px', border: '1px solid #cbd5e1', borderRadius: 4, fontSize: 12 }} />
+                          </td>
+                          <td style={{ padding: '4px 6px' }}>
+                            <input type="text" value={row.sku} onChange={ev => updateNewRow(i, { sku: ev.target.value })}
+                              style={{ width: 90, padding: '4px 6px', border: '1px solid #cbd5e1', borderRadius: 4, fontSize: 12, fontFamily: 'monospace' }} />
+                          </td>
+                          <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                            <select value={row.cat} onChange={ev => updateNewRow(i, { cat: ev.target.value, subCategory: '' })}
+                              style={{ padding: '4px 6px', border: '1px solid #cbd5e1', borderRadius: 4, fontSize: 12, maxWidth: 130 }}>
+                              <option value="">-- בחר --</option>
+                              {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                          </td>
+                          <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                            {subCats.length > 0 ? (
+                              <select value={row.subCategory} onChange={ev => updateNewRow(i, { subCategory: ev.target.value })}
+                                style={{ padding: '4px 6px', border: '1px solid #cbd5e1', borderRadius: 4, fontSize: 12, maxWidth: 120 }}>
+                                <option value="">-- ללא --</option>
+                                {subCats.map(sc => <option key={sc} value={sc}>{sc}</option>)}
+                              </select>
+                            ) : <span style={{ color: '#d1d5db' }}>—</span>}
+                          </td>
+                          <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                            <input type="number" value={row.price} onChange={ev => updateNewRow(i, { price: ev.target.value })} placeholder="₪"
+                              style={{ width: 70, padding: '4px 6px', border: '1px solid #cbd5e1', borderRadius: 4, fontSize: 12, textAlign: 'center' }} />
+                          </td>
+                          <td style={{ padding: '4px 6px', textAlign: 'center', fontWeight: 700 }}>{item.quantity}</td>
+                          <td style={{ padding: '4px 6px', textAlign: 'center', color: '#6b7280' }}>₪{item.unitPrice}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {Object.values(newRows).some(r => !r.createdId) && (
+                  <button
+                    onClick={createNewProductsFromInvoice}
+                    disabled={creatingProducts}
+                    style={{ marginTop: 12, background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    {creatingProducts ? '⏳ יוצר מוצרים...' : `🆕 צור ${Object.values(newRows).filter(r => r.include && !r.createdId).length} מוצרים חדשים`}
+                  </button>
+                )}
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
               <button
                 onClick={applyInvoice}
