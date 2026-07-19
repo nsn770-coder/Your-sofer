@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
 
   const message = await client.messages.create({
     model:      'claude-opus-4-5',
-    max_tokens: 1024,
+    // קבלות ארוכות (20+ שורות) חורגות מ-1024 טוקנים — ה-JSON נחתך והפענוח נכשל
+    max_tokens: 8192,
     system: SYSTEM_PROMPT,
     messages: [{
       role: 'user',
