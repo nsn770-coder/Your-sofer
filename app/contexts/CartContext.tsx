@@ -3,8 +3,14 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
-// ── Shipping constant — single source of truth used in cart + checkout ────────
+// ── Shipping constants — single source of truth used in cart + checkout ───────
 export const SHIPPING_REGULAR = 35;
+/** סף משלוח חינם: הזמנות מעל סכום זה (אחרי הנחות קופון) — משלוח חינם אוטומטי */
+export const FREE_SHIPPING_THRESHOLD = 600;
+/** עלות משלוח בפועל לפי סכום המוצרים אחרי הנחה */
+export function getShippingCost(productsTotalAfterDiscount: number): number {
+  return productsTotalAfterDiscount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_REGULAR;
+}
 
 // ── Event print tiered pricing (A1) ──────────────────────────────────────────
 // Applies to print-service items (cat='הדפסה') attached to event kippot orders.

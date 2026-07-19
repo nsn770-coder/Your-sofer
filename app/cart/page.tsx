@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart, SHIPPING_REGULAR } from '../contexts/CartContext';
+import { useCart, SHIPPING_REGULAR, FREE_SHIPPING_THRESHOLD } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -85,8 +85,11 @@ export default function CartPage() {
 
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
 
+  // משלוח חינם אוטומטי מעל FREE_SHIPPING_THRESHOLD (אחרי הנחת קופון)
+  const freeShipping = total - discountAmount >= FREE_SHIPPING_THRESHOLD;
+  const cartShippingCost = freeShipping ? 0 : SHIPPING_REGULAR;
   // Final total shown in cart: products + shipping - coupon
-  const cartFinalTotal = total - discountAmount + SHIPPING_REGULAR;
+  const cartFinalTotal = total - discountAmount + cartShippingCost;
 
   return (
     <div style={{
@@ -391,8 +394,17 @@ export default function CartPage() {
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
                   <span style={{ color: '#555' }}>משלוח עד הבית:</span>
-                  <span style={{ fontWeight: 700, color: '#1a1a1a' }}>{formatPrice(SHIPPING_REGULAR)}</span>
+                  {freeShipping ? (
+                    <span style={{ fontWeight: 700, color: '#15803d' }}>חינם! 🎉</span>
+                  ) : (
+                    <span style={{ fontWeight: 700, color: '#1a1a1a' }}>{formatPrice(SHIPPING_REGULAR)}</span>
+                  )}
                 </div>
+                {!freeShipping && (
+                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '8px 10px', marginBottom: 8, fontSize: 12.5, color: '#15803d', fontWeight: 700, textAlign: 'center' }}>
+                    🚚 עוד {formatPrice(FREE_SHIPPING_THRESHOLD - (total - discountAmount))} למשלוח חינם!
+                  </div>
+                )}
                 {appliedCoupon && discountAmount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
                     <span>🏷️ קופון ({appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`}):</span>

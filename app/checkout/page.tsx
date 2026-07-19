@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart, CartItem, SHIPPING_REGULAR } from '../contexts/CartContext';
+import { useCart, CartItem, SHIPPING_REGULAR, FREE_SHIPPING_THRESHOLD } from '../contexts/CartContext';
 import { useShaliach } from '../contexts/ShaliachContext';
 import { serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -100,6 +100,8 @@ interface OrderSummaryProps {
   setPointsToUse: (n: number) => void;
   maxRedeemablePoints: number;
   shippingCost: number;
+  /** משלוח חינם בגלל סף ההזמנה (להבדיל מאיסוף עצמי) */
+  freeShipping: boolean;
 }
 
 function OrderSummary({
@@ -108,7 +110,7 @@ function OrderSummary({
   finalTotal, selectedGift, giftOptions, giftEnabled, giftEligible,
   giftThreshold, amountToGift, setSelectedGift,
   couponInput, setCouponInput, applyCoupon, couponLoading, couponError, shaliach,
-  pointsAvailable, pointsToUse, setPointsToUse, maxRedeemablePoints, shippingCost,
+  pointsAvailable, pointsToUse, setPointsToUse, maxRedeemablePoints, shippingCost, freeShipping,
 }: OrderSummaryProps) {
   const [pointsInput, setPointsInput] = useState('');
   return (
@@ -146,7 +148,11 @@ function OrderSummary({
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13 }}>
           <span style={{ color: '#777', minWidth: 0 }}>משלוח</span>
           {shippingCost === 0 ? (
-            <span style={{ fontWeight: 700, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>🏠 איסוף עצמי · חינם</span>
+            freeShipping ? (
+              <span style={{ fontWeight: 700, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>🚚 משלוח חינם! 🎉</span>
+            ) : (
+              <span style={{ fontWeight: 700, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>🏠 איסוף עצמי · חינם</span>
+            )
           ) : (
             <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(shippingCost)}</span>
           )}
@@ -497,7 +503,9 @@ export default function CheckoutPage() {
       .catch(e => console.error('[checkout] partial abandoned_cart FAILED:', e));
   }
 
-  const shippingCost = deliveryMethod === 'pickup' ? 0 : SHIPPING_REGULAR;
+  // משלוח חינם אוטומטי: הזמנות מעל FREE_SHIPPING_THRESHOLD (אחרי הנחת קופון)
+  const freeShippingEligible = total - discountAmount >= FREE_SHIPPING_THRESHOLD;
+  const shippingCost = deliveryMethod === 'pickup' || freeShippingEligible ? 0 : SHIPPING_REGULAR;
   const finalTotal = total - discountAmount - pointsToUse + shippingCost;
 
   // מוצר בהתאמה אישית (רקמה / הטבעה / הדפסה) — משפיע על הודעת תנאי הביטול
@@ -714,7 +722,7 @@ export default function CheckoutPage() {
             Collapsible: item count + final total always visible in the header. */}
         <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}>
           <MobileOrderSummary itemCount={items.reduce((s, i) => s + i.quantity, 0)} finalTotal={finalTotal}>
-            <OrderSummary isSticky={false} framed={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} />
+            <OrderSummary isSticky={false} framed={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} freeShipping={freeShippingEligible && deliveryMethod !== 'pickup'} />
           </MobileOrderSummary>
         </div>
 
@@ -745,7 +753,9 @@ export default function CheckoutPage() {
                   borderRadius: 12, padding: '12px 10px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center',
                 }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: '#1E3A8A' }}>🚚 משלוח עד הבית</div>
-                <div style={{ fontSize: 12, color: '#777', marginTop: 3 }}>{formatPrice(SHIPPING_REGULAR)}</div>
+                <div style={{ fontSize: 12, color: freeShippingEligible ? '#1a6b3c' : '#777', fontWeight: freeShippingEligible ? 700 : 400, marginTop: 3 }}>
+                  {freeShippingEligible ? 'חינם! 🎉 (הזמנה מעל ₪600)' : formatPrice(SHIPPING_REGULAR)}
+                </div>
               </button>
               <button type="button" onClick={() => setDeliveryMethod('pickup')}
                 style={{
@@ -898,7 +908,7 @@ export default function CheckoutPage() {
 
         {/* Order summary — desktop: sticky right column; mobile: hidden via CSS */}
         <div className="checkout-summary-desktop" style={{ display: isMobile ? 'none' : 'block' }}>
-          <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} />
+          <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} freeShipping={freeShippingEligible && deliveryMethod !== 'pickup'} />
         </div>
       </div>
 
