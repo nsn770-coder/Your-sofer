@@ -154,6 +154,8 @@ interface Product {
   source?: string;
   sku?: string;
   stockCount?: number;
+  inStock?: number;
+  receivedFromSupplier?: number;
   stockVisible?: boolean;
   outOfStock?: boolean;
   outOfStockReason?: string | null;
