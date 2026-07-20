@@ -238,7 +238,10 @@ export default function StickersTab() {
 
   // ── יצירת מוצר חדש מפריט לא-משויך ────────────────────────────────────────
   function updateNewRow(i: number, patch: Partial<NewRowState>) {
-    setNewRows(prev => ({ ...prev, [i]: { price: '', cat: 'יודאיקה', ...prev[i], ...patch } }));
+    setNewRows(prev => {
+      const current: NewRowState = prev[i] ?? { price: '', cat: 'יודאיקה' };
+      return { ...prev, [i]: { ...current, ...patch } };
+    });
   }
 
   async function handleNewRowImage(i: number, e: React.ChangeEvent<HTMLInputElement>) {
