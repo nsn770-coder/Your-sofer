@@ -21,7 +21,7 @@ import StickersTab from './components/StickersTab';
 import ProfitabilityTab from './components/ProfitabilityTab';
 import SiteSettingsTab from './components/SiteSettingsTab';
 import PromotionsTab from './components/PromotionsTab';
-import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES } from '@/app/components/ProductLabelPrint';
+import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES, openPrintWindow } from '@/app/components/ProductLabelPrint';
 import { getTier } from '@/app/lib/loyalty';
 import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
 import EraToggle from '@/app/components/EraToggle';
@@ -2002,9 +2002,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
       </div>`;
     };
 
-    const win = window.open('', '_blank');
-    if (!win) { alert('הדפדפן חסם את חלון ההדפסה — אשר חלונות קופצים לאתר ונסה שוב'); return; }
-    win.document.write(`<!DOCTYPE html>
+    const packingHtml = `<!DOCTYPE html>
 <html dir="rtl" lang="he">
 <head><meta charset="utf-8" /><title>דף אריזה — ${visibleOrders.length} הזמנות</title>
 <style>
@@ -2033,8 +2031,10 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
 <div class="sheet-title">📦 דף אריזה — ${visibleOrders.length} הזמנות (${esc(statusFilter === 'all' ? 'כל הסטטוסים' : statusLabel(statusFilter))}) · ${new Date().toLocaleDateString('he-IL')}</div>
 ${visibleOrders.map(orderBlock).join('\n')}
 <script>setTimeout(function(){window.print();},200); window.onafterprint=function(){window.close();};</script>
-</body></html>`);
-    win.document.close();
+</body></html>`;
+    if (!openPrintWindow(packingHtml)) {
+      alert('הדפדפן חסם את חלון ההדפסה — אשר חלונות קופצים לאתר ונסה שוב');
+    }
   }
 
   if (ordersError) {

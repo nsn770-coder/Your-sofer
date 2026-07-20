@@ -63,6 +63,25 @@ export const PRODUCT_LABEL_PRINT_STYLES = `
   .sticker-box   { font-family: monospace; direction: ltr; }
 `;
 
+/**
+ * פותח מסמך HTML להדפסה בטאב חדש דרך Blob URL.
+ * לא משתמשים ב-document.write על about:blank — לתצוגת ההדפסה של Chrome יש
+ * באג שדוחס מסמכים כאלה לעמודה צרה. מסמך Blob מודפס כדף רגיל.
+ * מחזיר false אם הדפדפן חסם את החלון.
+ */
+export function openPrintWindow(html: string): boolean {
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (!win) {
+    URL.revokeObjectURL(url);
+    return false;
+  }
+  // משחררים את ה-URL אחרי דקה — מספיק זמן לטעינה ולהדפסה
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  return true;
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -98,11 +117,6 @@ export function useProductLabelPrint() {
 
   function printLabels(items: PrintableLabel[]) {
     if (!items.length) return;
-    const win = window.open('', '_blank');
-    if (!win) {
-      alert('הדפדפן חסם את חלון ההדפסה — אשר חלונות קופצים לאתר ונסה שוב');
-      return;
-    }
     setPrinting(true);
     const html = `<!DOCTYPE html>
 <html dir="rtl" lang="he">
@@ -140,8 +154,9 @@ ${items.map(labelHtml).join('\n')}
 </script>
 </body>
 </html>`;
-    win.document.write(html);
-    win.document.close();
+    if (!openPrintWindow(html)) {
+      alert('הדפדפן חסם את חלון ההדפסה — אשר חלונות קופצים לאתר ונסה שוב');
+    }
     setPrinting(false);
   }
 
