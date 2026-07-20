@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared product-label (sticker) printing — extracted from StickersTab so the
@@ -32,18 +33,20 @@ export function qrSrcForProduct(id: string): string {
 export const PRODUCT_LABEL_PRINT_STYLES = `
   @page { margin: 8mm; size: A4 portrait; }
   @media print {
-    body * { visibility: hidden; }
-    #sticker-print-area,
-    #sticker-print-area * { visibility: visible; }
+    /* אזור ההדפסה יושב ישירות תחת body (portal) — מסתירים את כל השאר לגמרי.
+       display:none (ולא visibility) מבטיח שלא ייווצרו עמודים ריקים מגובה הדף. */
+    body > *:not(#sticker-print-area) { display: none !important; }
+    html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
     #sticker-print-area {
-      position: absolute !important;
-      top: 0 !important; left: 0 !important;
+      position: static !important;
+      top: auto !important; left: auto !important;
       display: grid !important;
       grid-template-columns: repeat(3, 60mm) !important;
       gap: 2mm !important;
       padding: 0 !important;
       direction: rtl !important;
       background: #fff !important;
+      z-index: auto !important;
     }
   }
   .sticker {
@@ -150,19 +153,25 @@ export function useProductLabelPrint() {
     setPrintItems(items);
   }
 
-  const printArea = printItems && (
-    <div
-      id="sticker-print-area"
-      ref={printAreaRef}
-      style={{
-        position: 'fixed', top: -9999, left: 0,
-        display: 'grid', gridTemplateColumns: 'repeat(3, 60mm)',
-        gap: '2mm', direction: 'rtl', background: '#fff', zIndex: -1,
-      }}
-    >
-      <ProductLabelGrid items={printItems} />
-    </div>
-  );
+  // Portal ל-body: מנתק את אזור ההדפסה מהיררכיית הדף (transform/overflow של
+  // אבות שוברים position בהדפסה) — כך כלל ההדפסה body > *:not(#sticker-print-area)
+  // עובד תמיד, בלי תלות במבנה המסך שממנו הודפס.
+  const printArea = printItems && typeof document !== 'undefined'
+    ? createPortal(
+        <div
+          id="sticker-print-area"
+          ref={printAreaRef}
+          style={{
+            position: 'fixed', top: -9999, left: 0,
+            display: 'grid', gridTemplateColumns: 'repeat(3, 60mm)',
+            gap: '2mm', direction: 'rtl', background: '#fff', zIndex: -1,
+          }}
+        >
+          <ProductLabelGrid items={printItems} />
+        </div>,
+        document.body
+      )
+    : null;
 
   return { printLabels, printArea, printing: !!printItems };
 }
