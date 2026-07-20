@@ -71,21 +71,24 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
+// כל הסגנונות inline — עמיד לכל התנהגות של מנוע ההדפסה (סטיילשיטים חיצוניים
+// התגלו כלא-אמינים בתצוגת ההדפסה של Chrome בחלון שנוצר עם document.write).
 function labelHtml(p: PrintableLabel): string {
   const imgSrc = cloudImg(p.imgUrl || p.image_url);
   const qrSrc = qrSrcForProduct(p.id);
+  const metaRow = 'display:flex;justify-content:space-between;align-items:baseline;font-size:6.5pt;color:#555;margin-top:0.5mm;flex-shrink:0;';
   return `
-    <div class="sticker">
-      <div class="sticker-top">
-        ${imgSrc ? `<img class="sticker-img" src="${escapeHtml(imgSrc)}" alt="" />` : ''}
-        <img class="${imgSrc ? 'sticker-qr' : 'sticker-qr-full'}" src="${escapeHtml(qrSrc)}" alt="QR" />
+    <div style="width:60mm;height:45mm;border:0.4pt solid #bbb;padding:2mm;box-sizing:border-box;direction:rtl;display:flex;flex-direction:column;overflow:hidden;page-break-inside:avoid;break-inside:avoid;background:#fff;">
+      <div style="display:flex;gap:1.5mm;height:22mm;flex-shrink:0;">
+        ${imgSrc ? `<img src="${escapeHtml(imgSrc)}" alt="" style="flex:1;min-width:0;height:22mm;object-fit:cover;border-radius:1mm;" />` : ''}
+        <img src="${escapeHtml(qrSrc)}" alt="QR" style="${imgSrc ? 'flex:1;min-width:0;height:22mm;object-fit:contain;' : 'width:100%;height:22mm;object-fit:contain;flex:none;'}" />
       </div>
-      <div class="sticker-name">${escapeHtml(p.name ?? '')}</div>
-      <div class="sticker-meta-row">
-        ${p.sku ? `<span class="sticker-sku">${escapeHtml(String(p.sku))}</span>` : ''}
-        ${p.price != null ? `<span class="sticker-price">₪${p.price}</span>` : ''}
+      <div style="font-weight:bold;font-size:7.5pt;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-align:right;direction:rtl;margin-top:1mm;flex:1;">${escapeHtml(p.name ?? '')}</div>
+      <div style="${metaRow}">
+        ${p.sku ? `<span style="font-family:monospace;direction:ltr;">${escapeHtml(String(p.sku))}</span>` : ''}
+        ${p.price != null ? `<span style="font-weight:bold;color:#111;">₪${p.price}</span>` : ''}
       </div>
-      ${p.warehouseBox ? `<div class="sticker-meta-row"><span class="sticker-box">📦 ארגז ${escapeHtml(String(p.warehouseBox))}</span></div>` : ''}
+      ${p.warehouseBox ? `<div style="${metaRow}"><span style="font-family:monospace;direction:ltr;">📦 ארגז ${escapeHtml(String(p.warehouseBox))}</span></div>` : ''}
     </div>`;
 }
 
@@ -108,19 +111,10 @@ export function useProductLabelPrint() {
 <title>מדבקות מוצרים (${items.length})</title>
 <style>
   @page { margin: 8mm; size: A4 portrait; }
-  html, body { margin: 0; padding: 0; background: #fff; font-family: 'Heebo', Arial, sans-serif; }
-  #sticker-print-area {
-    display: grid;
-    grid-template-columns: repeat(3, 60mm);
-    gap: 2mm;
-    direction: rtl;
-    justify-content: start;
-  }
-  ${PRODUCT_LABEL_PRINT_STYLES}
 </style>
 </head>
-<body>
-<div id="sticker-print-area">
+<body style="margin:0;padding:0;background:#fff;font-family:'Heebo',Arial,sans-serif;">
+<div id="sticker-print-area" style="width:186mm;display:flex;flex-wrap:wrap;gap:2mm;direction:rtl;align-content:flex-start;">
 ${items.map(labelHtml).join('\n')}
 </div>
 <script>
