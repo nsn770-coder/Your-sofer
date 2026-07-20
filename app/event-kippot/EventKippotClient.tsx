@@ -24,7 +24,7 @@ const KIPPOT_STYLES = [
 const PRINT_TYPES = [
   { id: 'print-top',    label: 'הדפסה למעלה', desc: 'הדפסה על חלק עליון', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638747/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_%D7%A2%D7%9D_%D7%94%D7%93%D7%A4%D7%A1_%D7%9C%D7%9E%D7%A2%D7%9C%D7%94_dh4nuv.png' },
   { id: 'print-bottom', label: 'הדפסה למטה',  desc: 'הדפסה על שוליים',    img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638855/ChatGPT_Image_Jun_28_2026_12_27_20_PM_amqsji.png' },
-  { id: 'print-both',   label: 'הדפסה למעלה ולמטה', desc: `שני הצדדים · +₪${KIPA_EXTRA_SIDE_PRICE} ליחידה`, img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638747/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_%D7%A2%D7%9D_%D7%94%D7%93%D7%A4%D7%A1_%D7%9C%D7%9E%D7%A2%D7%9C%D7%94_dh4nuv.png' },
+  { id: 'print-both',   label: 'הדפסה למעלה ולמטה', desc: `שני הצדדים · +₪${KIPA_EXTRA_SIDE_PRICE} ליחידה`, img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784534251/WhatsApp_Image_2026-07-20_at_10.56.03_bdot7c.jpg' },
   { id: 'embroidery',   label: 'רקמה',         desc: '+₪5 ליחידה',         img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638923/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%A0%D7%94_%D7%A2%D7%9D_%D7%A8%D7%A7%D7%9E%D7%94_%D7%95%D7%95%D7%A8%D7%95%D7%93_n9tjmk.png' },
 ] as const;
 
