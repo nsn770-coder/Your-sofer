@@ -2410,15 +2410,20 @@ ${visibleOrders.map(orderBlock).join('\n')}
                                           <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
                                           {/* Feature 5: SKU */}
                                           {(() => { const pd = productDetailsCache[item.productId ?? item.id]; return pd?.sku ? <span className="text-gray-400 font-mono">מק&quot;ט: {pd.sku}</span> : null; })()}
-                                          {/* מלאי מול כמות ההזמנה: כמה יש, וכמה חסר להזמין מהספק */}
+                                          {/* מלאי פיזי במחסן מנקודת מבט האורז:
+                                              inStock כבר הופחת בעת ההזמנה, אבל כל עוד ההזמנה הזו לא נשלחה —
+                                              הפריטים עדיין פיזית במחסן, ולכן מחזירים את הכמות שלה לתצוגה.
+                                              (במסך עריכת המוצר נשאר המלאי הזמין, אחרי הפחתת הזמנות תופסות) */}
                                           {(() => {
                                             const pd = productDetailsCache[item.productId ?? item.id];
                                             if (!pd || typeof pd.inStock !== 'number') return null;
-                                            const missing = Math.max(0, item.quantity - pd.inStock);
+                                            const shipped = ['shipped', 'delivered', 'completed'].includes(o.status);
+                                            const physical = pd.inStock + (shipped ? 0 : item.quantity);
+                                            const missing = Math.max(0, item.quantity - physical);
                                             return missing === 0 ? (
-                                              <span className="text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5 font-bold whitespace-nowrap">✓ במלאי: {pd.inStock}</span>
+                                              <span className="text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5 font-bold whitespace-nowrap">✓ במחסן: {physical}</span>
                                             ) : (
-                                              <span className="text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5 font-bold whitespace-nowrap">⚠️ במלאי: {pd.inStock} · להזמין מהספק: {missing}</span>
+                                              <span className="text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5 font-bold whitespace-nowrap">⚠️ במחסן: {physical} · להזמין מהספק: {missing}</span>
                                             );
                                           })()}
                                         </div>
