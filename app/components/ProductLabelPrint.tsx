@@ -1,10 +1,11 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useState, type ReactNode } from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared product-label (sticker) printing — extracted from StickersTab so the
-// same label markup/print engine can be reused from the product edit screens.
+// Shared product-label (sticker) printing.
+// ההדפסה מתבצעת בחלון נפרד ונקי (window.open + document.write) — כמו כפתור
+// "הדפס QR" הבודד. כך אין שום תלות ב-CSS או במבנה של הדף שממנו מדפיסים,
+// מה שפתר עמודים ריקים ופריסה שבורה בתצוגת ההדפסה.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface PrintableLabel {
@@ -30,25 +31,9 @@ export function qrSrcForProduct(id: string): string {
   return `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`https://your-sofer.com/product/${id}`)}`;
 }
 
+// סגנונות המדבקות — משמשים את חלון ההדפסה הנפרד.
+// מיוצא גם לתאימות לאחור (מסכים שמרנדרים <style> בעמוד — לא מזיק).
 export const PRODUCT_LABEL_PRINT_STYLES = `
-  @page { margin: 8mm; size: A4 portrait; }
-  @media print {
-    /* אזור ההדפסה יושב ישירות תחת body (portal) — מסתירים את כל השאר לגמרי.
-       display:none (ולא visibility) מבטיח שלא ייווצרו עמודים ריקים מגובה הדף. */
-    body > *:not(#sticker-print-area) { display: none !important; }
-    html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
-    #sticker-print-area {
-      position: static !important;
-      top: auto !important; left: auto !important;
-      display: grid !important;
-      grid-template-columns: repeat(3, 60mm) !important;
-      gap: 2mm !important;
-      padding: 0 !important;
-      direction: rtl !important;
-      background: #fff !important;
-      z-index: auto !important;
-    }
-  }
   .sticker {
     width: 60mm; height: 45mm;
     border: 0.4pt solid #bbb; padding: 2mm;
@@ -78,100 +63,94 @@ export const PRODUCT_LABEL_PRINT_STYLES = `
   .sticker-box   { font-family: monospace; direction: ltr; }
 `;
 
-// Renders the actual label cards (no wrapper grid — caller positions them).
-export function ProductLabelGrid({ items }: { items: PrintableLabel[] }) {
-  return (
-    <>
-      {items.map((p, i) => {
-        const imgSrc = cloudImg(p.imgUrl || p.image_url);
-        const qrSrc = qrSrcForProduct(p.id);
-        return (
-          <div key={p.id + i} className="sticker">
-            <div className="sticker-top">
-              {imgSrc && <img className="sticker-img" src={imgSrc} alt="" />}
-              <img className={imgSrc ? 'sticker-qr' : 'sticker-qr-full'} src={qrSrc} alt="QR" />
-            </div>
-            <div className="sticker-name">{p.name}</div>
-            <div className="sticker-meta-row">
-              {p.sku && <span className="sticker-sku">{p.sku}</span>}
-              {p.price != null && <span className="sticker-price">₪{p.price}</span>}
-            </div>
-            {p.warehouseBox && (
-              <div className="sticker-meta-row">
-                <span className="sticker-box">📦 ארגז {p.warehouseBox}</span>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </>
-  );
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function labelHtml(p: PrintableLabel): string {
+  const imgSrc = cloudImg(p.imgUrl || p.image_url);
+  const qrSrc = qrSrcForProduct(p.id);
+  return `
+    <div class="sticker">
+      <div class="sticker-top">
+        ${imgSrc ? `<img class="sticker-img" src="${escapeHtml(imgSrc)}" alt="" />` : ''}
+        <img class="${imgSrc ? 'sticker-qr' : 'sticker-qr-full'}" src="${escapeHtml(qrSrc)}" alt="QR" />
+      </div>
+      <div class="sticker-name">${escapeHtml(p.name ?? '')}</div>
+      <div class="sticker-meta-row">
+        ${p.sku ? `<span class="sticker-sku">${escapeHtml(String(p.sku))}</span>` : ''}
+        ${p.price != null ? `<span class="sticker-price">₪${p.price}</span>` : ''}
+      </div>
+      ${p.warehouseBox ? `<div class="sticker-meta-row"><span class="sticker-box">📦 ארגז ${escapeHtml(String(p.warehouseBox))}</span></div>` : ''}
+    </div>`;
 }
 
 // Hook for printing one or many product labels from anywhere in the admin UI.
-// Renders an off-screen print area, waits for label images (QR/product photo)
-// to load, then triggers window.print() — same engine as the original
-// StickersTab sticker-grid flow.
 export function useProductLabelPrint() {
-  const [printItems, setPrintItems] = useState<PrintableLabel[] | null>(null);
-  const printAreaRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!printItems) return;
-    const el = printAreaRef.current;
-    if (!el) return; // print area not mounted yet — should not happen since it renders alongside printItems
-
-    let cancelled = false;
-
-    (async () => {
-      const imgs = Array.from(el.querySelectorAll<HTMLImageElement>('img'));
-      const loads = imgs
-        .filter(img => !img.complete || img.naturalHeight === 0)
-        .map(img => new Promise<void>(resolve => {
-          img.onload = () => resolve();
-          img.onerror = () => resolve();
-        }));
-
-      await Promise.race([
-        Promise.all(loads),
-        new Promise<void>(r => setTimeout(r, 5000)),
-      ]);
-
-      if (!cancelled) window.print();
-    })();
-
-    const onAfterPrint = () => setPrintItems(null);
-    window.addEventListener('afterprint', onAfterPrint, { once: true });
-    return () => {
-      cancelled = true;
-      window.removeEventListener('afterprint', onAfterPrint);
-    };
-  }, [printItems]);
+  const [printing, setPrinting] = useState(false);
 
   function printLabels(items: PrintableLabel[]) {
     if (!items.length) return;
-    setPrintItems(items);
+    const win = window.open('', '_blank');
+    if (!win) {
+      alert('הדפדפן חסם את חלון ההדפסה — אשר חלונות קופצים לאתר ונסה שוב');
+      return;
+    }
+    setPrinting(true);
+    const html = `<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="utf-8" />
+<title>מדבקות מוצרים (${items.length})</title>
+<style>
+  @page { margin: 8mm; size: A4 portrait; }
+  html, body { margin: 0; padding: 0; background: #fff; font-family: 'Heebo', Arial, sans-serif; }
+  #sticker-print-area {
+    display: grid;
+    grid-template-columns: repeat(3, 60mm);
+    gap: 2mm;
+    direction: rtl;
+    justify-content: start;
+  }
+  ${PRODUCT_LABEL_PRINT_STYLES}
+</style>
+</head>
+<body>
+<div id="sticker-print-area">
+${items.map(labelHtml).join('\n')}
+</div>
+<script>
+  (function () {
+    var imgs = Array.prototype.slice.call(document.images);
+    var pending = imgs.filter(function (im) { return !im.complete || im.naturalHeight === 0; });
+    var done = false;
+    function go() {
+      if (done) return;
+      done = true;
+      setTimeout(function () { window.print(); }, 150);
+    }
+    if (pending.length === 0) { go(); }
+    else {
+      var left = pending.length;
+      pending.forEach(function (im) {
+        im.onload = im.onerror = function () { left--; if (left <= 0) go(); };
+      });
+      setTimeout(go, 6000); // רשת איטית — מדפיסים בכל מקרה אחרי 6 שניות
+    }
+    window.onafterprint = function () { window.close(); };
+  })();
+</script>
+</body>
+</html>`;
+    win.document.write(html);
+    win.document.close();
+    setPrinting(false);
   }
 
-  // Portal ל-body: מנתק את אזור ההדפסה מהיררכיית הדף (transform/overflow של
-  // אבות שוברים position בהדפסה) — כך כלל ההדפסה body > *:not(#sticker-print-area)
-  // עובד תמיד, בלי תלות במבנה המסך שממנו הודפס.
-  const printArea = printItems && typeof document !== 'undefined'
-    ? createPortal(
-        <div
-          id="sticker-print-area"
-          ref={printAreaRef}
-          style={{
-            position: 'fixed', top: -9999, left: 0,
-            display: 'grid', gridTemplateColumns: 'repeat(3, 60mm)',
-            gap: '2mm', direction: 'rtl', background: '#fff', zIndex: -1,
-          }}
-        >
-          <ProductLabelGrid items={printItems} />
-        </div>,
-        document.body
-      )
-    : null;
-
-  return { printLabels, printArea, printing: !!printItems };
+  // printArea נשאר ב-API לתאימות לאחור — אין יותר אזור הדפסה בתוך הדף.
+  return { printLabels, printArea: null as ReactNode, printing };
 }
