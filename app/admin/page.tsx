@@ -1950,15 +1950,37 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
     });
 
   // ── דף אריזה להדפסה: כל ההזמנות המסוננות, הזמנה לעמוד — פרטי לקוח, כתובת ופריטים ──
-  function printPackingSheet() {
+  async function printPackingSheet() {
     if (visibleOrders.length === 0) { alert('אין הזמנות להדפסה בסינון הנוכחי'); return; }
     const esc = (s: unknown) => String(s ?? '')
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     const statusLabel = (v: string) => ORDER_STATUSES.find(s => s.value === v)?.label ?? v;
     const fmtDate = (o: Order) => o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('he-IL') : '—';
 
+    // שליפת תמונה ומק"ט לכל פריט מקטלוג המוצרים (עם שימוש בקאש הקיים)
+    const pids = Array.from(new Set(
+      visibleOrders.flatMap(o => (o.items ?? []).map(it => it.productId ?? it.id)).filter(Boolean)
+    )) as string[];
+    const detail: Record<string, Product> = { ...productDetailsCache };
+    const missingPids = pids.filter(pid => !detail[pid]);
+    if (missingPids.length > 0) {
+      try {
+        const snaps = await Promise.all(missingPids.map(pid => getDoc(doc(db, 'products', pid)).catch(() => null)));
+        const updates: Record<string, Product> = {};
+        snaps.forEach((snap, i) => {
+          if (snap && snap.exists()) { const p = { id: snap.id, ...snap.data() } as Product; detail[missingPids[i]] = p; updates[missingPids[i]] = p; }
+        });
+        if (Object.keys(updates).length > 0) setProductDetailsCache(prev => ({ ...prev, ...updates }));
+      } catch (e) { console.error('[printPackingSheet] product details:', e); }
+    }
+    const thumb = (url?: string) => url && url.includes('/upload/')
+      ? url.replace('/upload/', '/upload/w_120,h_120,c_fill,q_auto,f_auto/')
+      : (url || '');
+
     const orderBlock = (o: Order) => {
       const items = (o.items ?? []).map(it => {
+        const pd = detail[it.productId ?? it.id];
+        const imgSrc = thumb(pd?.imgUrl || (pd as unknown as { image_url?: string })?.image_url);
         const extras: string[] = [];
         if (it.selectedKlafName) extras.push(`קלף: ${esc(it.selectedKlafName)}`);
         if (it.embroideryText) extras.push(`רקמה: "${esc(it.embroideryText)}"`);
@@ -1971,8 +1993,10 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         }
         return `<tr>
           <td class="qty">×${it.quantity}</td>
+          <td class="pimg">${imgSrc ? `<img src="${esc(imgSrc)}" alt="" style="width:12mm;height:12mm;object-fit:cover;border-radius:1mm;display:block;" />` : ''}</td>
           <td>
             <div class="iname">${esc(it.name)}</div>
+            ${pd?.sku ? `<div class="isku">מק"ט: ${esc(pd.sku)}</div>` : ''}
             ${extras.length ? `<div class="iextras">${extras.join(' · ')}</div>` : ''}
           </td>
           <td class="chk">☐</td>
@@ -1994,7 +2018,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
             ${o.shaliachName ? `<div>🤝 שליח: ${esc(o.shaliachName)}</div>` : ''}
           </div>
           <table class="oitems">
-            <thead><tr><th class="qty">כמות</th><th>פריט</th><th class="chk">נארז</th></tr></thead>
+            <thead><tr><th class="qty">כמות</th><th class="pimg">תמונה</th><th>פריט</th><th class="chk">נארז</th></tr></thead>
             <tbody>${items}</tbody>
           </table>
           <div class="ototal">סה"כ: ₪${o.total?.toLocaleString('he-IL') ?? '—'}${o.shippingCost ? ` (כולל משלוח ₪${o.shippingCost})` : o.shippingType === 'pickup' ? ' (איסוף עצמי)' : ''}</div>
@@ -2025,6 +2049,8 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
   .qty { width: 12mm; text-align: center !important; font-weight: 900; font-size: 11pt; }
   .chk { width: 12mm; text-align: center !important; font-size: 12pt; }
   .iname { font-weight: 700; }
+  .isku { font-family: monospace; font-size: 8.5pt; color: #555; direction: ltr; text-align: right; margin-top: 0.5mm; }
+  .pimg { width: 14mm; text-align: center !important; }
   .iextras { font-size: 8.5pt; color: #444; margin-top: 0.5mm; }
   .ototal { text-align: left; font-weight: 900; font-size: 10.5pt; margin-top: 2mm; }
   @media print { .no-print { display: none !important; } }
