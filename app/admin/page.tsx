@@ -2027,11 +2027,15 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
   .iname { font-weight: 700; }
   .iextras { font-size: 8.5pt; color: #444; margin-top: 0.5mm; }
   .ototal { text-align: left; font-weight: 900; font-size: 10.5pt; margin-top: 2mm; }
+  @media print { .no-print { display: none !important; } }
 </style></head>
 <body>
+<div class="no-print" style="position:sticky;top:0;background:#1a1a1a;color:#fff;padding:10px 16px;display:flex;gap:12px;align-items:center;direction:rtl;z-index:10;">
+  <button onclick="window.print()" style="background:#C5A028;color:#1a1a1a;border:none;padding:8px 22px;font-weight:900;font-size:15px;cursor:pointer;border-radius:6px;font-family:inherit;">🖨️ הדפסה</button>
+  <span style="font-size:13px;color:#ccc;">עמוד תצוגה — אפשר גם לצלם מסך ולהדפיס את הצילום</span>
+</div>
 <div class="sheet-title">📦 דף אריזה — ${visibleOrders.length} הזמנות (${esc(statusFilter === 'all' ? 'כל הסטטוסים' : statusLabel(statusFilter))}) · ${new Date().toLocaleDateString('he-IL')}</div>
 ${visibleOrders.map(orderBlock).join('\n')}
-<script>setTimeout(function(){window.print();},200); window.onafterprint=function(){window.close();};</script>
 </body></html>`;
     if (!openPrintWindow(packingHtml)) {
       alert('הדפדפן חסם את חלון ההדפסה — אשר חלונות קופצים לאתר ונסה שוב');

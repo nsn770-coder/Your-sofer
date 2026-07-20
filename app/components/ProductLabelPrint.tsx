@@ -125,33 +125,17 @@ export function useProductLabelPrint() {
 <title>מדבקות מוצרים (${items.length})</title>
 <style>
   @page { margin: 8mm; size: A4 portrait; }
+  @media print { .no-print { display: none !important; } }
 </style>
 </head>
 <body style="margin:0;padding:0;background:#fff;font-family:'Heebo',Arial,sans-serif;">
+<div class="no-print" style="position:sticky;top:0;background:#1a1a1a;color:#fff;padding:10px 16px;display:flex;gap:12px;align-items:center;direction:rtl;z-index:10;">
+  <button onclick="window.print()" style="background:#C5A028;color:#1a1a1a;border:none;padding:8px 22px;font-weight:900;font-size:15px;cursor:pointer;border-radius:6px;font-family:inherit;">🖨️ הדפסה</button>
+  <span style="font-size:13px;color:#ccc;">עמוד תצוגה — אפשר גם לצלם מסך ולהדפיס את הצילום</span>
+</div>
 <div id="sticker-print-area" style="width:186mm;display:flex;flex-wrap:wrap;flex-direction:row-reverse;justify-content:flex-start;gap:2mm;direction:ltr;align-content:flex-start;">
 ${items.map(labelHtml).join('\n')}
 </div>
-<script>
-  (function () {
-    var imgs = Array.prototype.slice.call(document.images);
-    var pending = imgs.filter(function (im) { return !im.complete || im.naturalHeight === 0; });
-    var done = false;
-    function go() {
-      if (done) return;
-      done = true;
-      setTimeout(function () { window.print(); }, 150);
-    }
-    if (pending.length === 0) { go(); }
-    else {
-      var left = pending.length;
-      pending.forEach(function (im) {
-        im.onload = im.onerror = function () { left--; if (left <= 0) go(); };
-      });
-      setTimeout(go, 6000); // רשת איטית — מדפיסים בכל מקרה אחרי 6 שניות
-    }
-    window.onafterprint = function () { window.close(); };
-  })();
-</script>
 </body>
 </html>`;
     if (!openPrintWindow(html)) {
