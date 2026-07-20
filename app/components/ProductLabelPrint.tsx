@@ -128,7 +128,7 @@ export function useProductLabelPrint() {
 </style>
 </head>
 <body style="margin:0;padding:0;background:#fff;font-family:'Heebo',Arial,sans-serif;">
-<div id="sticker-print-area" style="width:186mm;display:flex;flex-wrap:wrap;gap:2mm;direction:rtl;align-content:flex-start;">
+<div id="sticker-print-area" style="width:186mm;display:flex;flex-wrap:wrap;flex-direction:row-reverse;justify-content:flex-start;gap:2mm;direction:ltr;align-content:flex-start;">
 ${items.map(labelHtml).join('\n')}
 </div>
 <script>
