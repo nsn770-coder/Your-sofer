@@ -82,6 +82,12 @@ export function openPrintWindow(html: string): boolean {
   return true;
 }
 
+function chunk3<T>(arr: T[]): T[][] {
+  const rows: T[][] = [];
+  for (let i = 0; i < arr.length; i += 3) rows.push(arr.slice(i, i + 3));
+  return rows;
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -133,9 +139,13 @@ export function useProductLabelPrint() {
   <button onclick="window.print()" style="background:#C5A028;color:#1a1a1a;border:none;padding:8px 22px;font-weight:900;font-size:15px;cursor:pointer;border-radius:6px;font-family:inherit;">🖨️ הדפסה</button>
   <span style="font-size:13px;color:#ccc;">עמוד תצוגה — אפשר גם לצלם מסך ולהדפיס את הצילום</span>
 </div>
-<div id="sticker-print-area" style="width:186mm;display:flex;flex-wrap:wrap;flex-direction:row-reverse;justify-content:flex-start;gap:2mm;direction:ltr;align-content:flex-start;">
-${items.map(labelHtml).join('\n')}
-</div>
+<!-- טבלה במקום flex/grid: Chrome לא יודע לעמד flex על פני כמה עמודי הדפסה
+     (מכווץ הכל לעמוד אחד) — טבלאות מתעמדות שורה-שורה באמינות מלאה. -->
+<table dir="rtl" id="sticker-print-area" style="border-collapse:separate;border-spacing:1mm;margin:0;">
+${chunk3(items).map(row => `<tr>
+${row.map(p => `<td style="padding:0;vertical-align:top;">${labelHtml(p)}</td>`).join('\n')}
+</tr>`).join('\n')}
+</table>
 </body>
 </html>`;
     if (!openPrintWindow(html)) {
