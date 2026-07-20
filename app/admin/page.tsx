@@ -1660,7 +1660,8 @@ function PrintCustomizationView({ pc }: { pc: PrintCustomizationData }) {
 function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>>; ordersError?: string | null; }) {
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  // פתיחה מרובה: אפשר להרחיב כמה הזמנות במקביל (Set של מזהים)
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showCancelled, setShowCancelled] = useState(false);
@@ -1777,7 +1778,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
 
   function startEdit(o: Order) {
     setEditingId(o.id);
-    setExpandedId(o.id);
+    setExpandedIds(prev => new Set(prev).add(o.id));
     setEditDraft({
       customerName: o.customerName || '',
       phone: o.phone || '',
@@ -2168,14 +2169,22 @@ ${visibleOrders.map(orderBlock).join('\n')}
             )}
             {visibleOrders.map(o => {
               const meta = getStatusMeta(o.status);
-              const isExpanded = expandedId === o.id;
+              const isExpanded = expandedIds.has(o.id);
               const isCancelled = o.status === 'cancelled';
               const isEditing = editingId === o.id;
               return (
                 <React.Fragment key={o.id}>
                   <tr
                     className={`border-t cursor-pointer ${isCancelled ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
-                    onClick={() => { if (isEditing) return; const next = isExpanded ? null : o.id; setExpandedId(next); if (next) loadProductDetailsForOrder(next); }}
+                    onClick={() => {
+                      if (isEditing) return;
+                      setExpandedIds(prev => {
+                        const next = new Set(prev);
+                        if (next.has(o.id)) next.delete(o.id);
+                        else { next.add(o.id); loadProductDetailsForOrder(o.id); }
+                        return next;
+                      });
+                    }}
                   >
                     <td className="p-3 font-mono text-xs">
                       {o.orderNumber}
