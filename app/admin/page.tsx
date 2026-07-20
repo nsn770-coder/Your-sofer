@@ -1999,7 +1999,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
           <td class="pimg">${imgSrc ? `<img src="${esc(imgSrc)}" alt="" style="width:12mm;height:12mm;object-fit:cover;border-radius:1mm;display:block;" />` : ''}</td>
           <td>
             <div class="iname">${esc(it.name)}</div>
-            ${pd?.sku ? `<div class="isku">מק"ט: ${esc(pd.sku)}</div>` : ''}
+            ${pd?.sku || pd?.warehouseBox ? `<div class="isku">${pd?.sku ? `מק"ט: ${esc(pd.sku)}` : ''}${pd?.sku && pd?.warehouseBox ? ' · ' : ''}${pd?.warehouseBox ? `📦 ארגז ${esc(pd.warehouseBox)}` : ''}</div>` : ''}
             ${extras.length ? `<div class="iextras">${extras.join(' · ')}</div>` : ''}
           </td>
           <td class="chk">☐</td>
@@ -2422,13 +2422,19 @@ ${visibleOrders.map(orderBlock).join('\n')}
                                             );
                                           })()}
                                         </div>
-                                        {/* Feature 5: warehouse location */}
+                                        {/* Feature 5: warehouse location + ארגז */}
                                         {(() => {
                                           const pd = productDetailsCache[item.productId ?? item.id];
-                                          if (!pd?.storageColumn && !pd?.storageShelf) return null;
+                                          if (!pd?.storageColumn && !pd?.storageShelf && !pd?.warehouseBox) return null;
+                                          const parts = [
+                                            pd.warehouseBox && `ארגז ${pd.warehouseBox}`,
+                                            pd.storageColumn && `עמודה ${pd.storageColumn}`,
+                                            pd.storageShelf && `מדף ${pd.storageShelf}`,
+                                            pd.storageNote,
+                                          ].filter(Boolean);
                                           return (
                                             <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5 text-xs font-mono w-fit">
-                                              📦 {pd.storageColumn && `עמודה ${pd.storageColumn}`}{pd.storageShelf && ` · מדף ${pd.storageShelf}`}{pd.storageNote && ` · ${pd.storageNote}`}
+                                              📦 {parts.join(' · ')}
                                             </span>
                                           );
                                         })()}
