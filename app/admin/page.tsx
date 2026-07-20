@@ -1949,6 +1949,94 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
       return true;
     });
 
+  // ── דף אריזה להדפסה: כל ההזמנות המסוננות, הזמנה לעמוד — פרטי לקוח, כתובת ופריטים ──
+  function printPackingSheet() {
+    if (visibleOrders.length === 0) { alert('אין הזמנות להדפסה בסינון הנוכחי'); return; }
+    const esc = (s: unknown) => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const statusLabel = (v: string) => ORDER_STATUSES.find(s => s.value === v)?.label ?? v;
+    const fmtDate = (o: Order) => o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('he-IL') : '—';
+
+    const orderBlock = (o: Order) => {
+      const items = (o.items ?? []).map(it => {
+        const extras: string[] = [];
+        if (it.selectedKlafName) extras.push(`קלף: ${esc(it.selectedKlafName)}`);
+        if (it.embroideryText) extras.push(`רקמה: "${esc(it.embroideryText)}"`);
+        if (it.embroideryOptions?.length) extras.push(`אפשרויות רקמה: ${esc(it.embroideryOptions.join(', '))}`);
+        if (it.threadColor) extras.push(`צבע חוט: ${esc(it.threadColor.id)} ${esc(it.threadColor.name)}`);
+        if (it.selectedCover) extras.push(`כיסוי: ${esc(it.selectedCover.name)}`);
+        if (it.printCustomization) {
+          const pc = it.printCustomization;
+          extras.push(`הדפסה אישית (${pc.side === 'bottom' ? 'למטה' : 'למעלה'})${pc.mockupUrl ? ' — יש הדמיה בהזמנה' : ''}`);
+        }
+        return `<tr>
+          <td class="qty">×${it.quantity}</td>
+          <td>
+            <div class="iname">${esc(it.name)}</div>
+            ${extras.length ? `<div class="iextras">${extras.join(' · ')}</div>` : ''}
+          </td>
+          <td class="chk">☐</td>
+        </tr>`;
+      }).join('');
+
+      return `<div class="order">
+        <div class="ohead">
+          <span class="onum">${esc(o.orderNumber || o.id)}</span>
+          <span>${fmtDate(o)}</span>
+          <span class="ostatus">${esc(statusLabel(o.status))}</span>
+        </div>
+        <div class="obody">
+          <div class="ocustomer">
+            <div class="cname">${esc(o.customerName)}</div>
+            ${o.phone ? `<div>📞 ${esc(o.phone)}</div>` : ''}
+            <div class="oaddr">📍 ${o.shippingType === 'pickup' ? 'איסוף עצמי — האורן 18' : esc(o.address || 'כתובת חסרה!')}</div>
+            ${o.notes ? `<div class="onotes">📝 ${esc(o.notes)}</div>` : ''}
+            ${o.shaliachName ? `<div>🤝 שליח: ${esc(o.shaliachName)}</div>` : ''}
+          </div>
+          <table class="oitems">
+            <thead><tr><th class="qty">כמות</th><th>פריט</th><th class="chk">נארז</th></tr></thead>
+            <tbody>${items}</tbody>
+          </table>
+          <div class="ototal">סה"כ: ₪${o.total?.toLocaleString('he-IL') ?? '—'}${o.shippingCost ? ` (כולל משלוח ₪${o.shippingCost})` : o.shippingType === 'pickup' ? ' (איסוף עצמי)' : ''}</div>
+        </div>
+      </div>`;
+    };
+
+    const win = window.open('', '_blank');
+    if (!win) { alert('הדפדפן חסם את חלון ההדפסה — אשר חלונות קופצים לאתר ונסה שוב'); return; }
+    win.document.write(`<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head><meta charset="utf-8" /><title>דף אריזה — ${visibleOrders.length} הזמנות</title>
+<style>
+  @page { margin: 10mm; size: A4 portrait; }
+  html, body { margin: 0; padding: 0; background: #fff; font-family: 'Heebo', Arial, sans-serif; color: #111; }
+  .sheet-title { font-size: 13pt; font-weight: 900; margin-bottom: 4mm; }
+  .order { border: 1.2pt solid #333; border-radius: 2mm; margin-bottom: 6mm; page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+  .ohead { display: flex; gap: 6mm; align-items: baseline; background: #f0f0f0; border-bottom: 0.8pt solid #333; padding: 2mm 3mm; font-size: 10pt; }
+  .onum { font-weight: 900; font-size: 12pt; }
+  .ostatus { margin-right: auto; font-weight: 700; }
+  .obody { padding: 3mm; }
+  .ocustomer { font-size: 10pt; line-height: 1.7; margin-bottom: 2.5mm; }
+  .cname { font-weight: 900; font-size: 12pt; }
+  .oaddr { font-weight: 700; }
+  .onotes { background: #fffbe6; border: 0.6pt solid #d4b106; padding: 1.5mm 2mm; border-radius: 1mm; margin-top: 1mm; }
+  .oitems { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  .oitems th, .oitems td { border: 0.5pt solid #999; padding: 1.5mm 2mm; text-align: right; vertical-align: top; }
+  .oitems thead th { background: #f7f7f7; font-size: 8.5pt; }
+  .qty { width: 12mm; text-align: center !important; font-weight: 900; font-size: 11pt; }
+  .chk { width: 12mm; text-align: center !important; font-size: 12pt; }
+  .iname { font-weight: 700; }
+  .iextras { font-size: 8.5pt; color: #444; margin-top: 0.5mm; }
+  .ototal { text-align: left; font-weight: 900; font-size: 10.5pt; margin-top: 2mm; }
+</style></head>
+<body>
+<div class="sheet-title">📦 דף אריזה — ${visibleOrders.length} הזמנות (${esc(statusFilter === 'all' ? 'כל הסטטוסים' : statusLabel(statusFilter))}) · ${new Date().toLocaleDateString('he-IL')}</div>
+${visibleOrders.map(orderBlock).join('\n')}
+<script>setTimeout(function(){window.print();},200); window.onafterprint=function(){window.close();};</script>
+</body></html>`);
+    win.document.close();
+  }
+
   if (ordersError) {
     return <div className="bg-white rounded-xl shadow p-10 text-center text-red-600 font-bold">שגיאה בטעינת הזמנות: {ordersError}</div>;
   }
@@ -2016,6 +2104,14 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
             ))}
           </select>
         </div>
+        <button
+          onClick={printPackingSheet}
+          disabled={visibleOrders.length === 0}
+          className="px-4 py-2 rounded-xl text-sm font-bold border border-indigo-700 bg-indigo-700 text-white hover:bg-indigo-800 disabled:bg-gray-300 disabled:border-gray-300 disabled:cursor-not-allowed"
+          title="מדפיס את כל ההזמנות המסוננות — הזמנה לבלוק עם פרטי לקוח, כתובת ופריטים"
+        >
+          🖨️ הדפס דף אריזה ({visibleOrders.length})
+        </button>
       </div>
 
       <div className="bg-white rounded-xl shadow overflow-hidden">
