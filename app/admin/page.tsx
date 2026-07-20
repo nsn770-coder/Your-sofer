@@ -2406,7 +2406,10 @@ ${visibleOrders.map(orderBlock).join('\n')}
                                       <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                                         <div className="flex items-center gap-2 flex-wrap">
                                           <a href={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline hover:text-blue-600">{item.name}</a>
-                                          <span className="text-gray-400">×{item.quantity}</span>
+                                          {/* כמות בולטת — שהאורז יראה מיד כמה יחידות לארוז */}
+                                          <span className={`rounded-lg px-3 py-1 text-lg font-black shrink-0 ${item.quantity > 1 ? 'bg-blue-900 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                            ×{item.quantity}
+                                          </span>
                                           <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
                                           {/* Feature 5: SKU */}
                                           {(() => { const pd = productDetailsCache[item.productId ?? item.id]; return pd?.sku ? <span className="text-gray-400 font-mono">מק&quot;ט: {pd.sku}</span> : null; })()}
