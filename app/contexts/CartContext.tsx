@@ -84,6 +84,8 @@ export interface CartItem {
     mockupUrl?: string;
     // kippot bulk order extras
     designText?: string;
+    /** סגנון עיצוב שנבחר מגלריית הדוגמאות בעמוד ההזמנה */
+    designExample?: string;
     addSide?: boolean;
     addSideText?: string;
     kippahStyle?: string;

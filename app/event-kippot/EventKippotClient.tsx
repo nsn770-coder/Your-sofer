@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/app/firebase';
-import { getKipaUnitPrice } from '@/app/lib/kippot';
+import { getKipaUnitPrice, KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { Product } from '@/app/lib/types';
 import ProductCard from '@/components/ui/ProductCard';
@@ -24,6 +24,7 @@ const KIPPOT_STYLES = [
 const PRINT_TYPES = [
   { id: 'print-top',    label: 'הדפסה למעלה', desc: 'הדפסה על חלק עליון', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638747/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_%D7%A2%D7%9D_%D7%94%D7%93%D7%A4%D7%A1_%D7%9C%D7%9E%D7%A2%D7%9C%D7%94_dh4nuv.png' },
   { id: 'print-bottom', label: 'הדפסה למטה',  desc: 'הדפסה על שוליים',    img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638855/ChatGPT_Image_Jun_28_2026_12_27_20_PM_amqsji.png' },
+  { id: 'print-both',   label: 'הדפסה למעלה ולמטה', desc: `שני הצדדים · +₪${KIPA_EXTRA_SIDE_PRICE} ליחידה`, img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638747/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_%D7%A2%D7%9D_%D7%94%D7%93%D7%A4%D7%A1_%D7%9C%D7%9E%D7%A2%D7%9C%D7%94_dh4nuv.png' },
   { id: 'embroidery',   label: 'רקמה',         desc: '+₪5 ליחידה',         img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638923/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%A0%D7%94_%D7%A2%D7%9D_%D7%A8%D7%A7%D7%9E%D7%94_%D7%95%D7%95%D7%A8%D7%95%D7%93_n9tjmk.png' },
 ] as const;
 
@@ -57,6 +58,41 @@ export default function EventKippotClient() {
   const { user } = useAuth();
   const [eventProducts, setEventProducts] = useState<Product[]>([]);
 
+  // ── אנימציית "שימו לב" לסרגל הכמות: כשהסרגל נכנס לתצוגה הסמן זז עד הקצה
+  //    ואז חוזר מהר למרכז — כדי שהלקוחות יבינו שגרירה מעדכנת את המחיר.
+  //    רצה פעם אחת, ומתבטלת מיד אם המשתמש נגע בסרגל בעצמו.
+  const sliderBoxRef      = useRef<HTMLDivElement>(null);
+  const userTouchedQtyRef = useRef(false);
+  const demoRanRef        = useRef(false);
+  useEffect(() => {
+    const el = sliderBoxRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const obs = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting || demoRanRef.current || userTouchedQtyRef.current) return;
+      demoRanRef.current = true;
+      obs.disconnect();
+      const start = performance.now();
+      const SWEEP_MS = 700;  // 30 → 300 (עד הקצה)
+      const BACK_MS  = 350;  // 300 → 165 (מהר למרכז)
+      function frame(now: number) {
+        if (userTouchedQtyRef.current) return; // המשתמש נגע — עוצרים מיד
+        const t = now - start;
+        if (t <= SWEEP_MS) {
+          setQty(Math.round(30 + (300 - 30) * (t / SWEEP_MS)));
+          requestAnimationFrame(frame);
+        } else if (t <= SWEEP_MS + BACK_MS) {
+          setQty(Math.round(300 - (300 - 165) * ((t - SWEEP_MS) / BACK_MS)));
+          requestAnimationFrame(frame);
+        } else {
+          setQty(165); // נעצר במרכז הסרגל
+        }
+      }
+      requestAnimationFrame(frame);
+    }, { threshold: 0.6 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   useEffect(() => {
     // שתי שאילתות: מוצרי אירועים + מוצרים המשויכים לסקרולים (גם אם אינם מסומנים כמוצר אירוע)
     Promise.all([
@@ -79,7 +115,8 @@ export default function EventKippotClient() {
   const gridProducts = eventProducts.filter(p => p.isEventProduct && !p.eventScrollSection);
 
   const embroideryExtra = printType === 'embroidery' ? 5 : 0;
-  const unitPrice = getKipaUnitPrice(qty) + embroideryExtra;
+  const bothSidesExtra  = printType === 'print-both' ? KIPA_EXTRA_SIDE_PRICE : 0;
+  const unitPrice = getKipaUnitPrice(qty) + embroideryExtra + bothSidesExtra;
   const total = qty * unitPrice;
 
   return (
@@ -115,13 +152,6 @@ export default function EventKippotClient() {
         <div style={{ fontSize: 15, color: '#6B7280', fontWeight: 400, lineHeight: 1.6, maxWidth: 520 }}>
           שם, תאריך ולוגו — הדמיה מיידית, מגוון ענק של צבעים וסגנונות, אספקה בזמן לאירוע.
         </div>
-        <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
-          {[{ icon: '🎩', text: 'בר מצווה' }, { icon: '💒', text: 'חתונות' }, { icon: '🎉', text: 'אירועים פרטיים' }].map(b => (
-            <span key={b.text} style={{ fontSize: 12, fontWeight: 600, color: '#9C7B3F', background: 'rgba(197,160,40,0.08)', padding: '5px 12px' }}>
-              {b.icon} {b.text}
-            </span>
-          ))}
-        </div>
       </div>
 
       {/* שלב 1: סוג עיצוב */}
@@ -155,8 +185,8 @@ export default function EventKippotClient() {
       </div>
 
       {/* שלב 2: כמות */}
-      <div style={{ background: '#fff', border: '1px solid #E5E0D5', padding: 'clamp(16px, 2.5vw, 28px)', marginBottom: 24 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 16 }}>2. בחר כמות</div>
+      <div ref={sliderBoxRef} style={{ background: '#fff', border: '1px solid #E5E0D5', padding: 'clamp(16px, 2.5vw, 28px)', marginBottom: 24 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 16 }}>2. בחר כמות — גררו את הסמן</div>
         <input
           type="range"
           className="ys-ekip-range"
@@ -164,7 +194,8 @@ export default function EventKippotClient() {
           max={300}
           step={1}
           value={qty}
-          onChange={e => setQty(Number(e.target.value))}
+          onChange={e => { userTouchedQtyRef.current = true; setQty(Number(e.target.value)); }}
+          onPointerDown={() => { userTouchedQtyRef.current = true; }}
           style={{ touchAction: 'pan-y' }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 11, color: '#9C7B3F', fontWeight: 600 }}>
@@ -198,7 +229,7 @@ export default function EventKippotClient() {
             { range: '300+',    price: 9,  active: qty >= 300              },
           ] as { range: string; price: number; active: boolean }[]).map(({ range, price, active }) => (
             <span key={range} style={{ fontSize: 11, fontWeight: active ? 800 : 400, color: active ? GOLD : '#9C7B3F', background: active ? 'rgba(197,160,40,0.10)' : 'transparent', padding: active ? '2px 8px' : '2px 0', transition: 'all 0.15s' }}>
-              {range} = ₪{price}{printType === 'embroidery' ? '+₪5' : ''}
+              {range} = ₪{price}{printType === 'embroidery' ? '+₪5' : printType === 'print-both' ? `+₪${KIPA_EXTRA_SIDE_PRICE}` : ''}
             </span>
           ))}
         </div>
@@ -234,33 +265,32 @@ export default function EventKippotClient() {
         </div>
       </div>
 
-      {/* CTA */}
-      {style ? (
-        <a
-          href={`/kippot-order?qty=${qty}&type=${printType}&style=${style}`}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10,
-            background: GOLD,
-            color: '#1a1a1a',
-            fontWeight: 900,
-            fontSize: 17,
-            padding: '18px 32px',
-            textDecoration: 'none',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            transition: 'opacity 0.15s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
-          onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-        >
-          המשך לעיצוב ←
-        </a>
-      ) : (
-        <div style={{ textAlign: 'center', fontSize: 13, color: '#9C7B3F', padding: '16px 0', border: '1px dashed #E5E0D5' }}>
-          בחר סוג כיפה (שלב 3) כדי להמשיך ←
+      {/* CTA — פעיל תמיד: אם לא נבחר דגם, ממשיכים אוטומטית עם הדגם הראשון בקרוסלה */}
+      <a
+        href={`/kippot-order?qty=${qty}&type=${printType}&style=${style ?? KIPPOT_STYLES[0].id}`}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 10,
+          background: GOLD,
+          color: '#1a1a1a',
+          fontWeight: 900,
+          fontSize: 17,
+          padding: '18px 32px',
+          textDecoration: 'none',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+          transition: 'opacity 0.15s',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
+        onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+      >
+        המשך לעיצוב ←
+      </a>
+      {!style && (
+        <div style={{ textAlign: 'center', fontSize: 12, color: '#9C7B3F', marginTop: 8 }}>
+          לא בחרתם דגם? נמשיך עם {KIPPOT_STYLES[0].label} — אפשר לשנות בכל שלב
         </div>
       )}
       <div style={{ textAlign: 'center', fontSize: 13, color: '#9C7B3F', marginTop: 10, fontWeight: 600 }}>

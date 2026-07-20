@@ -19,8 +19,17 @@ const KIPPOT_STYLES: Record<string, { label: string; img: string }> = {
 const TYPE_LABELS: Record<string, string> = {
   'print-top':    'הדפסה למעלה',
   'print-bottom': 'הדפסה למטה',
+  'print-both':   'הדפסה למעלה ולמטה',
   'embroidery':   'רקמה',
 };
+
+// ── דוגמאות עיצוב — הלקוח בוחר סגנון, אפשר לשנות אחרי ההזמנה ──────────────────
+const DESIGN_EXAMPLES: { id: string; label: string; img: string }[] = [
+  { id: 'logo-top',      label: 'לוגו במרכז למעלה',  img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638747/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_%D7%A2%D7%9D_%D7%94%D7%93%D7%A4%D7%A1_%D7%9C%D7%9E%D7%A2%D7%9C%D7%94_dh4nuv.png' },
+  { id: 'rim-text',      label: 'טקסט על השוליים',    img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638855/ChatGPT_Image_Jun_28_2026_12_27_20_PM_amqsji.png' },
+  { id: 'embroidery-classic', label: 'רקמת שם קלאסית', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638923/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%A0%D7%94_%D7%A2%D7%9D_%D7%A8%D7%A7%D7%9E%D7%94_%D7%95%D7%95%D7%A8%D7%95%D7%93_n9tjmk.png' },
+  { id: 'full-print',    label: 'הדפסה מלאה',          img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780252683/%D7%9B%D7%99%D7%A4%D7%94_%D7%90%D7%A4%D7%95%D7%A8%D7%94_%D7%94%D7%93%D7%A4%D7%A1%D7%94_shpljn.jpg' },
+];
 
 const PRINT_AREA = { top: '18%', left: '18%', width: '64%', height: '64%' };
 
@@ -47,14 +56,16 @@ function KippotOrderInner() {
   const { addItem } = useCart();
 
   const qty    = Math.max(30, Number(searchParams.get('qty') || 30));
-  const type   = (searchParams.get('type') || 'print-top') as 'print-top' | 'print-bottom' | 'embroidery';
+  const type   = (searchParams.get('type') || 'print-top') as 'print-top' | 'print-bottom' | 'print-both' | 'embroidery';
   const style  = searchParams.get('style') || 'lavan';
   const kippah = KIPPOT_STYLES[style] || KIPPOT_STYLES.lavan;
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [designText, setDesignText] = useState('');
-  const [addSide, setAddSide]       = useState(false);
+  // 'print-both' — הדפסה משני הצדדים כלולה מראש
+  const [addSide, setAddSide]       = useState(type === 'print-both');
   const [addSideText, setAddSideText] = useState('');
+  const [designExample, setDesignExample] = useState<string | null>(null);
 
   // ── Upload state ────────────────────────────────────────────────────────────
   const [localUrl, setLocalUrl]       = useState<string | null>(null);
@@ -87,7 +98,7 @@ function KippotOrderInner() {
   // ── Price ───────────────────────────────────────────────────────────────────
   const basePrice  = getKipaUnitPrice(qty);
   const typeExtra  = type === 'embroidery' ? 5 : 0;
-  const sideExtra  = addSide ? KIPA_EXTRA_SIDE_PRICE : 0;
+  const sideExtra  = (addSide || type === 'print-both') ? KIPA_EXTRA_SIDE_PRICE : 0;
   const unitPrice  = basePrice + typeExtra + sideExtra;
   const totalPrice = qty * unitPrice;
 
@@ -222,7 +233,7 @@ function KippotOrderInner() {
 
     addItem({
       id: `kippot-bulk-${Date.now()}`,
-      name: `כיפות ${kippah.label} × ${qty} — ${TYPE_LABELS[type]}${addSide ? ' + צד נוסף' : ''}`,
+      name: `כיפות ${kippah.label} × ${qty} — ${TYPE_LABELS[type]}${addSide && type !== 'print-both' ? ' + צד נוסף' : ''}`,
       price: unitPrice,
       quantity: qty,
       imgUrl: kippah.img,
@@ -240,7 +251,10 @@ function KippotOrderInner() {
         mockupUrl:     mockupUrl || undefined,
         // Extra fields saved to order & shown in dashboard
         designText:  designText || undefined,
-        addSide,
+        designExample: designExample
+          ? DESIGN_EXAMPLES.find(d => d.id === designExample)?.label
+          : undefined,
+        addSide: addSide || type === 'print-both',
         addSideText: addSide ? addSideText : undefined,
         kippahStyle: style,
         kippahLabel: kippah.label,
@@ -427,8 +441,55 @@ function KippotOrderInner() {
           style={{ width: '100%', border: '1px solid #E5E0D5', padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
       </div>
 
+      {/* ── דוגמאות עיצוב — השראה ובחירת סגנון ── */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>
+          בחרו סגנון עיצוב <span style={{ fontWeight: 400, color: '#9C7B3F', fontSize: 12 }}>(אופציונלי)</span>
+        </div>
+        <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 10, lineHeight: 1.6 }}>
+          דוגמאות להמחשה — בחרו סגנון שאהבתם ונעצב לפיו. אפשר לבקש שינויים ועדכונים גם אחרי ההזמנה, לפני ההדפסה.
+        </div>
+        <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8, WebkitOverflowScrolling: 'touch' }}>
+          {DESIGN_EXAMPLES.map(d => (
+            <button
+              key={d.id}
+              onClick={() => setDesignExample(designExample === d.id ? null : d.id)}
+              style={{
+                flex: '0 0 128px', width: 128, padding: 0,
+                border: designExample === d.id ? '2px solid #C5A028' : '2px solid #E5E0D5',
+                background: designExample === d.id ? 'rgba(197,160,40,0.06)' : '#fff',
+                cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden',
+              }}
+            >
+              {designExample === d.id && (
+                <div style={{ position: 'absolute', top: 6, left: 6, background: '#C5A028', color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>✓</div>
+              )}
+              <img src={d.img} alt={d.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+              <div style={{ padding: '7px 8px', fontSize: 12, fontWeight: designExample === d.id ? 800 : 600, color: '#1a1a1a' }}>{d.label}</div>
+            </button>
+          ))}
+        </div>
+        {designExample && (
+          <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 700, marginTop: 6 }}>
+            ✓ נבחר: {DESIGN_EXAMPLES.find(d => d.id === designExample)?.label} — נתאם אתכם את העיצוב הסופי לפני ההדפסה
+          </div>
+        )}
+      </div>
+
+      {/* הדפסה משני הצדדים — כלולה בסוג 'למעלה ולמטה' */}
+      {type === 'print-both' && (
+        <div style={{ marginBottom: 20, border: '1px solid #C5A028', background: 'rgba(197,160,40,0.05)', padding: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>
+            ✓ הדפסה למעלה ולמטה <span style={{ color: '#C5A028', fontWeight: 700 }}>(+₪{KIPA_EXTRA_SIDE_PRICE} ליחידה — כלול במחיר)</span>
+          </div>
+          <textarea value={addSideText} onChange={e => setAddSideText(e.target.value)}
+            placeholder="טקסט / עיצוב לצד השני (למטה)..." rows={2}
+            style={{ width: '100%', marginTop: 12, border: '1px solid #E5E0D5', padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
+        </div>
+      )}
+
       {/* צד נוסף */}
-      {type !== 'embroidery' && (
+      {type !== 'embroidery' && type !== 'print-both' && (
         <div style={{ marginBottom: 20, border: '1px solid #E5E0D5', padding: 16 }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
             <input type="checkbox" checked={addSide} onChange={e => setAddSide(e.target.checked)} style={{ width: 18, height: 18, accentColor: '#C5A028' }} />

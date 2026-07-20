@@ -290,33 +290,20 @@ function OrderSummary({
 }
 
 /**
- * MobileOrderSummary — סיכום הזמנה מתקפל בראש מסך ה-Checkout במובייל.
- * סגור: מספר פריטים + סכום סופי לתשלום (המידע המהותי תמיד גלוי).
- * פתוח: פירוט מלא (OrderSummary). נגיש: button אמיתי, aria-expanded, aria-controls.
+ * MobileOrderSummary — סיכום הזמנה בראש מסך ה-Checkout במובייל.
+ * הפריטים גלויים תמיד — ללא כפתור הרחבה (שקיפות מלאה: הלקוח רואה מיד מה בהזמנה).
  */
 function MobileOrderSummary({ itemCount, finalTotal, children }: {
   itemCount: number;
   finalTotal: number;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
   return (
     <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', overflow: 'hidden' }}>
-      <button
-        type="button"
-        onClick={() => {
-          setOpen(o => {
-            const next = !o;
-            if (next) window.gtag?.('event', 'checkout_order_summary_open');
-            return next;
-          });
-        }}
-        aria-expanded={open}
-        aria-controls="mobile-order-summary-panel"
+      <div
         style={{
-          width: '100%', background: 'none', border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '14px 16px', fontFamily: 'inherit', direction: 'rtl',
+          padding: '14px 16px', direction: 'rtl',
         }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 800, color: '#1E3A8A' }}>
@@ -324,19 +311,9 @@ function MobileOrderSummary({ itemCount, finalTotal, children }: {
           סיכום ההזמנה
           <span style={{ fontSize: 12, fontWeight: 600, color: '#888' }}>({itemCount} {itemCount === 1 ? 'פריט' : 'פריטים'})</span>
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 16, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(finalTotal)}</span>
-          <svg
-            width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="#1E3A8A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-            aria-hidden="true"
-            style={{ transition: 'transform 0.25s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </span>
-      </button>
-      <div id="mobile-order-summary-panel" hidden={!open} style={{ borderTop: open ? '1px solid #f0ebe0' : 'none' }}>
+        <span style={{ fontSize: 16, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(finalTotal)}</span>
+      </div>
+      <div id="mobile-order-summary-panel" style={{ borderTop: '1px solid #f0ebe0' }}>
         {children}
       </div>
     </div>

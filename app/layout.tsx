@@ -11,6 +11,7 @@ import Footer from "@/app/components/Footer";
 import ShiraChatLoader from "@/app/components/chat/ShiraChatLoader";
 import ChatCartBridge from "@/app/components/chat/ChatCartBridge";
 import { ChatPersonaProvider } from "@/app/components/chat/ChatPersonaContext";
+import ScrollToTop from "@/app/components/ScrollToTop";
 import MetaPixelPageView from "@/app/components/MetaPixelPageView";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FacebookPixel } from "@/components/FacebookPixel";
@@ -140,6 +141,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <ShaliachProvider>
               <CartProvider>
+                <ScrollToTop />
                 <ChatCartBridge />
                 <NavBar />
                 {children}
