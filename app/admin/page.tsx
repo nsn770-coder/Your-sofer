@@ -2007,9 +2007,10 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
 <head><meta charset="utf-8" /><title>דף אריזה — ${visibleOrders.length} הזמנות</title>
 <style>
   @page { margin: 10mm; size: A4 portrait; }
-  html, body { margin: 0; padding: 0; background: #fff; font-family: 'Heebo', Arial, sans-serif; color: #111; }
-  .sheet-title { font-size: 13pt; font-weight: 900; margin-bottom: 4mm; }
-  .order { border: 1.2pt solid #333; border-radius: 2mm; margin-bottom: 6mm; page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+  /* רוחב מפורש במ"מ על כל בלוק — בלעדיו תצוגת ההדפסה של Chrome דוחסת לעמודה צרה */
+  html, body { margin: 0; padding: 0; background: #fff; font-family: 'Heebo', Arial, sans-serif; color: #111; width: 190mm; direction: rtl; }
+  .sheet-title { font-size: 13pt; font-weight: 900; margin-bottom: 4mm; width: 190mm; direction: rtl; text-align: right; }
+  .order { width: 190mm; box-sizing: border-box; direction: rtl; text-align: right; border: 1.2pt solid #333; border-radius: 2mm; margin-bottom: 6mm; page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
   .ohead { display: flex; gap: 6mm; align-items: baseline; background: #f0f0f0; border-bottom: 0.8pt solid #333; padding: 2mm 3mm; font-size: 10pt; }
   .onum { font-weight: 900; font-size: 12pt; }
   .ostatus { margin-right: auto; font-weight: 700; }
