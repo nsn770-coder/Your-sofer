@@ -2408,6 +2408,17 @@ ${visibleOrders.map(orderBlock).join('\n')}
                                           <span className="text-green-700 font-bold">{formatPrice(item.price * item.quantity)}</span>
                                           {/* Feature 5: SKU */}
                                           {(() => { const pd = productDetailsCache[item.productId ?? item.id]; return pd?.sku ? <span className="text-gray-400 font-mono">מק&quot;ט: {pd.sku}</span> : null; })()}
+                                          {/* מלאי מול כמות ההזמנה: כמה יש, וכמה חסר להזמין מהספק */}
+                                          {(() => {
+                                            const pd = productDetailsCache[item.productId ?? item.id];
+                                            if (!pd || typeof pd.inStock !== 'number') return null;
+                                            const missing = Math.max(0, item.quantity - pd.inStock);
+                                            return missing === 0 ? (
+                                              <span className="text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5 font-bold whitespace-nowrap">✓ במלאי: {pd.inStock}</span>
+                                            ) : (
+                                              <span className="text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5 font-bold whitespace-nowrap">⚠️ במלאי: {pd.inStock} · להזמין מהספק: {missing}</span>
+                                            );
+                                          })()}
                                         </div>
                                         {/* Feature 5: warehouse location */}
                                         {(() => {
