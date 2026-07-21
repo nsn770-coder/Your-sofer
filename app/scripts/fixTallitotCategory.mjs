@@ -1,6 +1,7 @@
 /**
- * fixTallitotCategory.mjs — מעביר את הטליתות המיובאות (source=mofet)
- * מהקטגוריה 'טליתות' לקטגוריה החיה של האתר: 'טליתות וציציות'.
+ * fixTallitotCategory.mjs — תיקון מוצרי הייבוא (טליתות mofet + מארזי חתן rikmat):
+ *  1. טליתות: העברה לקטגוריה החיה 'טליתות וציציות'
+ *  2. הוספת status='active' לכל מוצרי הייבוא — בלעדיו הם לא נכנסים לאינדקס החיפוש (Algolia)
  *
  * Usage: node app/scripts/fixTallitotCategory.mjs
  */
@@ -17,13 +18,27 @@ if (getApps().length === 0) {
 }
 const db = getFirestore();
 
-const snap = await db.collection('products').where('source', '==', 'mofet').get();
-console.log(`נמצאו ${snap.size} מוצרי טליתות מהייבוא`);
+// טליתות: קטגוריה + סטטוס
+const tallitot = await db.collection('products').where('source', '==', 'mofet').get();
+if (tallitot.size > 0) {
+  const batch = db.batch();
+  tallitot.docs.forEach(d => batch.update(d.ref, {
+    cat: 'טליתות וציציות',
+    category: 'טליתות וציציות',
+    status: 'active',
+  }));
+  await batch.commit();
+}
+console.log(`✅ ${tallitot.size} טליתות: קטגוריה "טליתות וציציות" + status active`);
 
-const batch = db.batch();
-snap.docs.forEach(d => batch.update(d.ref, { cat: 'טליתות וציציות', category: 'טליתות וציציות' }));
-await batch.commit();
+// מארזי חתן: סטטוס
+const chatan = await db.collection('products').where('source', '==', 'rikmat').get();
+if (chatan.size > 0) {
+  const batch2 = db.batch();
+  chatan.docs.forEach(d => batch2.update(d.ref, { status: 'active' }));
+  await batch2.commit();
+}
+console.log(`✅ ${chatan.size} מארזי חתן: status active`);
 
-console.log(`✅ ${snap.size} מוצרים הועברו לקטגוריה "טליתות וציציות"`);
-console.log('עכשיו הרץ: node scripts/syncAlgolia.mjs');
+console.log('\nעכשיו הרץ: node scripts/syncAlgolia.mjs — ואז החיפוש ימצא אותם.');
 process.exit(0);
