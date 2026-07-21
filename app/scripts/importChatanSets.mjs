@@ -124,6 +124,7 @@ async function run() {
         sku: null,
         source: 'rikmat',
         sourceUrl: url,
+        status: 'active', // נדרש לאינדקס החיפוש (Algolia)
         stockVisible: false,
         outOfStock: false,
         priority: 60,

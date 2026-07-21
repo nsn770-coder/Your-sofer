@@ -120,6 +120,7 @@ function buildProduct(model, colorName, imageUrls) {
     supplierCost: base.supplierPrice,
     sku: null,
     source: 'mofet',
+    status: 'active', // נדרש לאינדקס החיפוש (Algolia)
     stockVisible: false,
     outOfStock: false,
     priority: 60,
