@@ -1849,7 +1849,8 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
 
   const EMBROIDERY_CATEGORIES = ['כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן', 'תיקי טלית ותפילין'];
   // ── רקמה: ₪50 לכל אופציה (כיסוי טלית / כיסוי תפילין) — במקום ₪5 לאות ──────
-  const EMB_OPTION_PRICE = 50;
+  // רקמה: ₪70 בסטים/תיקי טלית ותפילין, ₪50 בשאר הקטגוריות
+  const EMB_OPTION_PRICE = ['סט טלית תפילין', 'תיקי טלית ותפילין'].includes(product?.cat ?? '') ? 70 : 50;
   const embroideryOptions: string[] = [
     ...(embTalitCover ? ['כיסוי טלית'] : []),
     ...(embTefillinCover ? ['כיסוי תפילין'] : []),
