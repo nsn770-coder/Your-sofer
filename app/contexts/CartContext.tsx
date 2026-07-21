@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { getKipaUnitPrice } from '../lib/kippot';
 
 // ── Shipping constants — single source of truth used in cart + checkout ───────
 export const SHIPPING_REGULAR = 35;
@@ -21,14 +22,12 @@ export function getEventPrintPricePerUnit(qty: number): number {
 }
 
 // ── Event kippot tiered pricing — per-unit price by quantity ─────────────────
-// basePrice (product.price) is the 100–199 tier price; logo printing included.
-// Ratios: <50 → ×15/12 | 50–99 → ×14/12 | 100–199 → ×1 | 200+ → ×10/12
-// For basePrice=12: 15 / 14 / 12 / 10 (המדרגות הרשמיות של כיפות פשתן).
-export function getEventKippahPricePerUnit(basePrice: number, qty: number): number {
-  if (qty >= 200) return Math.round(basePrice * (10 / 12));
-  if (qty >= 100) return basePrice;
-  if (qty >= 50)  return Math.round(basePrice * (14 / 12));
-  return Math.round(basePrice * (15 / 12)); // מתחת ל-50
+// מקור אמת יחיד: app/lib/kippot.ts (זהה לסרגל ב-/event-kippot ול-FAQ):
+//   30–49 → ₪15 | 50–99 → ₪14 | 100–199 → ₪12 | 200+ → ₪10 (הדפסת לוגו כלולה)
+// basePrice נשמר בחתימה לתאימות לאחור אך אינו משפיע — התמחור לפי כמות בלבד,
+// בדיוק כמו בעמוד /event-kippot (המחיר זהה לכל סוגי הכיפות).
+export function getEventKippahPricePerUnit(_basePrice: number, qty: number): number {
+  return getKipaUnitPrice(qty);
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
