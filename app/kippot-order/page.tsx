@@ -26,10 +26,20 @@ const TYPE_LABELS: Record<string, string> = {
 // ── דוגמאות עיצוב — הלקוח בוחר לפי מספר דוגמה, אפשר לשנות אחרי ההזמנה ─────────
 // התווית מוצגת ונשמרת כ"דוגמה N" — כך הלקוח מציין מספר וקל לתאם מולו.
 const DESIGN_EXAMPLE_IMAGES: string[] = [
-  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638747/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_%D7%A2%D7%9D_%D7%94%D7%93%D7%A4%D7%A1_%D7%9C%D7%9E%D7%A2%D7%9C%D7%94_dh4nuv.png',
-  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638855/ChatGPT_Image_Jun_28_2026_12_27_20_PM_amqsji.png',
-  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638923/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%A0%D7%94_%D7%A2%D7%9D_%D7%A8%D7%A7%D7%9E%D7%94_%D7%95%D7%95%D7%A8%D7%95%D7%93_n9tjmk.png',
-  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1780252683/%D7%9B%D7%99%D7%A4%D7%94_%D7%90%D7%A4%D7%95%D7%A8%D7%94_%D7%94%D7%93%D7%A4%D7%A1%D7%94_shpljn.jpg',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613330/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_1_ltpdqu.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613331/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_2_n9a2pt.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613330/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_3_dxoyrx.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613330/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_4_wu6e0q.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613331/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_5_yix1pi.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613331/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_6_avti6x.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613333/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_7_pg2oka.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613334/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_8_mmmmx6.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613335/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_9_qeddzl.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613335/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_10_eemnaq.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613336/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_11_kmubrb.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613336/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_12_efp1fj.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613338/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_13_yajpup.png',
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784613338/%D7%94%D7%93%D7%9E%D7%99%D7%94_%D7%9B%D7%99%D7%A4%D7%94_%D7%93%D7%95%D7%92%D7%9E%D7%94_14_vt58zb.png',
 ];
 const DESIGN_EXAMPLES: { id: string; label: string; img: string }[] =
   DESIGN_EXAMPLE_IMAGES.map((img, i) => ({ id: `example-${i + 1}`, label: `דוגמה ${i + 1}`, img }));
