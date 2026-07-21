@@ -1171,7 +1171,10 @@ export default function CategoryClient({ category }: { category: string }) {
   }, [category, setStamPage]);
 
   const SUBCATEGORY_PAGES = ['חנוכה', 'פסח', 'סטים ומארזים', 'יודאיקה כללי'];
-  const SUBCATEGORY_GROUPS: Record<string, string[]> = {};
+  const SUBCATEGORY_GROUPS: Record<string, string[]> = {
+    // עמוד "סט טלית תפילין" מציג גם את מארזי החתנים (תת-קטגוריה של תיקי טלית ותפילין)
+    'סט טלית תפילין': ['סט טלית תפילין', 'מארז לחתנים'],
+  };
 
   // Case A: recognized ?filter= values that map to a direct subCategory query
   const SUBCAT_QUERY_OVERRIDES: Record<string, Record<string, string>> = {

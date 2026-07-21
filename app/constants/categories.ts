@@ -17,6 +17,7 @@ export const CATS = [
   'קלפי תפילין',
   'כיפות',
   'ספרי קודש וסידורים',
+  'תיקי טלית ותפילין',
 ];
 
 export const SUB_CATS: Record<string, string[]> = {
@@ -26,6 +27,7 @@ export const SUB_CATS: Record<string, string[]> = {
   'בר מצווה':             ['סטים לבר מצווה', 'תפילין קומפלט', 'טליתות', 'מתנות לבר מצווה'],
   'קלפים':                ['קלפי מזוזה', 'קלפי תפילין'],
   'ספרי קודש וסידורים':  ['סידורים ותהילים'],
+  'תיקי טלית ותפילין':   ['מארז לחתנים'],
 };
 
 // ─── Admin product form: hierarchical category selector ───────────────────────
@@ -87,6 +89,10 @@ export const CATEGORY_OPTIONS: CategoryOption[] = [
   { type: 'group', label: 'ספרי קודש וסידורים', children: [
     { label: 'כל הספרים',       value: 'ספרי קודש וסידורים' },
     { label: 'סידורים ותהילים', value: 'ספרי קודש וסידורים|סידורים ותהילים' },
+  ]},
+  { type: 'group', label: 'תיקי טלית ותפילין', children: [
+    { label: 'תיקי טלית ותפילין (כללי)', value: 'תיקי טלית ותפילין' },
+    { label: 'מארז לחתנים',              value: 'תיקי טלית ותפילין|מארז לחתנים' },
   ]},
 ];
 
