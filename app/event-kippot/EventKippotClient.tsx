@@ -204,8 +204,30 @@ export default function EventKippotClient() {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 20 }}>
           <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 80 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>כמות</div>
-            <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: NAVY }}>{qty}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>כמות — לחצו לעריכה</div>
+            {/* קלט ישיר: לחיצה על המספר מאפשרת הקלדת כמות מדויקת */}
+            <input
+              type="number"
+              inputMode="numeric"
+              min={30}
+              max={3000}
+              value={qty}
+              onFocus={() => { userTouchedQtyRef.current = true; }}
+              onChange={e => {
+                userTouchedQtyRef.current = true;
+                const n = parseInt(e.target.value, 10);
+                if (Number.isFinite(n) && n >= 1) setQty(Math.min(3000, n));
+              }}
+              onBlur={e => {
+                const n = parseInt(e.target.value, 10);
+                if (!(n >= 30)) setQty(30);
+              }}
+              style={{
+                fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: NAVY,
+                background: 'transparent', border: 'none', borderBottom: `2px dashed ${GOLD}`,
+                width: 76, padding: 0, fontFamily: 'inherit', outline: 'none', textAlign: 'right',
+              }}
+            />
           </div>
           <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 110 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>מחיר ליחידה</div>
