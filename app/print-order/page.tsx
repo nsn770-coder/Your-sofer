@@ -58,7 +58,7 @@ const PRINT_PRODUCTS = {
 } as const;
 
 // התמחור מגיע מהמקור המרכזי app/lib/kippot.ts (מינימום 30 יח'):
-// 30–99 → ₪12 | 100–299 → ₪10 | 300+ → ₪9
+// 30–49 → ₪15 | 50–99 → ₪14 | 100–199 → ₪12 | 200+ → ₪10
 
 function getTemplateUrl(pt: ProductType, color: ShirtColor, side: Side): string {
   const raw = pt === 'shirt'
@@ -477,9 +477,10 @@ export default function PrintOrderPage() {
   // מדרגות תואמות למקור המרכזי (app/lib/kippot.ts + data/faq.ts)
   function kipaTierHint(q: number): string {
     if (q < KIPA_MIN_QTY) return `הכמות המינימלית להזמנה היא ${KIPA_MIN_QTY} כיפות`;
-    if (q <= 99)  return `הוסף ${100 - q} כיפות לקבלת מחיר ₪10 לכיפה`;
-    if (q <= 299) return `הוסף ${300 - q} כיפות לקבלת מחיר ₪9 לכיפה`;
-    return 'מחיר הכי טוב! ₪9 לכיפה';
+    if (q < 50)   return `הוסף ${50 - q} כיפות לקבלת מחיר ₪14 לכיפה`;
+    if (q <= 99)  return `הוסף ${100 - q} כיפות לקבלת מחיר ₪12 לכיפה`;
+    if (q <= 199) return `הוסף ${200 - q} כיפות לקבלת מחיר ₪10 לכיפה`;
+    return 'מחיר הכי טוב! ₪10 לכיפה';
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -888,8 +889,8 @@ export default function PrintOrderPage() {
                     <div style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>המחירון המדורג תקף לכיפת בד פשתן בלבד</div>
                     <div style={{ fontSize: 15, fontWeight: 900, color: GOLD, marginBottom: 4 }}>מחיר מדורג לפי כמות</div>
                     <div style={{ fontSize: 11, color: '#666', lineHeight: 1.6 }}>
-                      30–99 → ₪12 | 100–299 → ₪10<br />
-                      300+ → ₪9 · מינימום {KIPA_MIN_QTY} יח׳
+                      30–49 → ₪15 | 50–99 → ₪14<br />
+                      100–199 → ₪12 | 200+ → ₪10 · מינימום {KIPA_MIN_QTY} יח׳
                     </div>
                   </button>
                 </div>
