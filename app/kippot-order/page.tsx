@@ -79,6 +79,8 @@ function KippotOrderInner() {
   const [addSide, setAddSide]       = useState(type === 'print-both');
   const [addSideText, setAddSideText] = useState('');
   const [designExample, setDesignExample] = useState<string | null>(null);
+  const [zoomExample, setZoomExample] = useState<number | null>(null); // אינדקס דוגמה מוגדלת
+  const [showCatalog, setShowCatalog] = useState(false);               // קטלוג מלא במסך גדול
 
   // ── Upload state ────────────────────────────────────────────────────────────
   const [localUrl, setLocalUrl]       = useState<string | null>(null);
@@ -460,34 +462,102 @@ function KippotOrderInner() {
           בחרו סגנון עיצוב <span style={{ fontWeight: 400, color: '#9C7B3F', fontSize: 12 }}>(אופציונלי)</span>
         </div>
         <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 10, lineHeight: 1.6 }}>
-          דוגמאות להמחשה — בחרו סגנון שאהבתם ונעצב לפיו. אפשר לבקש שינויים ועדכונים גם אחרי ההזמנה, לפני ההדפסה.
+          בחרו דוגמה שאהבתם ונעצב לפיה — <strong>אפשר לבקש שינויים ועיצוב שונה לגמרי</strong>.
+          לאחר ביצוע ההזמנה תקבלו את ההדמיות המוכנות <strong>לוואטסאפ או למייל</strong> לאישור, לפני ההדפסה.
         </div>
+        <button
+          onClick={() => setShowCatalog(true)}
+          style={{ display: 'block', width: '100%', marginBottom: 10, padding: '11px 0', background: '#1a1a1a', color: '#C5A028', border: 'none', fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}
+        >
+          📖 לצפייה בקטלוג הדוגמאות המלא — בגדול
+        </button>
         <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8, WebkitOverflowScrolling: 'touch' }}>
-          {DESIGN_EXAMPLES.map(d => (
-            <button
+          {DESIGN_EXAMPLES.map((d, i) => (
+            <div
               key={d.id}
-              onClick={() => setDesignExample(designExample === d.id ? null : d.id)}
               style={{
-                flex: '0 0 128px', width: 128, padding: 0,
+                flex: '0 0 128px', width: 128,
                 border: designExample === d.id ? '2px solid #C5A028' : '2px solid #E5E0D5',
                 background: designExample === d.id ? 'rgba(197,160,40,0.06)' : '#fff',
-                cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden',
+                position: 'relative', overflow: 'hidden',
               }}
             >
               {designExample === d.id && (
-                <div style={{ position: 'absolute', top: 6, left: 6, background: '#C5A028', color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>✓</div>
+                <div style={{ position: 'absolute', top: 6, left: 6, background: '#C5A028', color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, zIndex: 2 }}>✓</div>
               )}
-              <img src={d.img} alt={d.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-              <div style={{ padding: '7px 8px', fontSize: 12, fontWeight: designExample === d.id ? 800 : 600, color: '#1a1a1a' }}>{d.label}</div>
-            </button>
+              {/* כפתור הגדלה */}
+              <button
+                onClick={() => setZoomExample(i)}
+                aria-label={`הגדלת ${d.label}`}
+                style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(26,26,26,0.75)', color: '#fff', border: 'none', borderRadius: '50%', width: 26, height: 26, fontSize: 13, cursor: 'pointer', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >🔍</button>
+              <button
+                onClick={() => setDesignExample(designExample === d.id ? null : d.id)}
+                style={{ padding: 0, border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit', width: '100%', textAlign: 'center' }}
+              >
+                <img src={d.img} alt={d.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+                <div style={{ padding: '7px 8px', fontSize: 12, fontWeight: designExample === d.id ? 800 : 600, color: '#1a1a1a' }}>{d.label}</div>
+              </button>
+            </div>
           ))}
         </div>
         {designExample && (
           <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 700, marginTop: 6 }}>
-            ✓ נבחר: {DESIGN_EXAMPLES.find(d => d.id === designExample)?.label} — נתאם אתכם את העיצוב הסופי לפני ההדפסה
+            ✓ נבחר: {DESIGN_EXAMPLES.find(d => d.id === designExample)?.label} — נשלח לכם הדמיה לאישור בוואטסאפ/מייל לפני ההדפסה
           </div>
         )}
       </div>
+
+      {/* ── מודאל הגדלת דוגמה ── */}
+      {zoomExample !== null && DESIGN_EXAMPLES[zoomExample] && (
+        <div
+          onClick={() => setZoomExample(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+        >
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', maxWidth: 560, width: '100%', maxHeight: '90vh', overflow: 'auto', position: 'relative' }}>
+            <button onClick={() => setZoomExample(null)} style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(26,26,26,0.75)', color: '#fff', border: 'none', borderRadius: '50%', width: 32, height: 32, fontSize: 16, cursor: 'pointer', zIndex: 2 }}>✕</button>
+            <img src={DESIGN_EXAMPLES[zoomExample].img} alt={DESIGN_EXAMPLES[zoomExample].label} style={{ width: '100%', display: 'block' }} />
+            <div style={{ padding: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 900 }}>{DESIGN_EXAMPLES[zoomExample].label}</div>
+              <button
+                onClick={() => { setDesignExample(DESIGN_EXAMPLES[zoomExample].id); setZoomExample(null); }}
+                style={{ background: '#C5A028', color: '#1a1a1a', border: 'none', padding: '10px 24px', fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}
+              >✓ בחרו דוגמה זו</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── מודאל קטלוג מלא ── */}
+      {showCatalog && (
+        <div
+          onClick={() => setShowCatalog(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 16, overflowY: 'auto' }}
+        >
+          <div onClick={e => e.stopPropagation()} style={{ background: '#FAF7F0', maxWidth: 900, width: '100%', position: 'relative', padding: '20px 16px 28px' }}>
+            <button onClick={() => setShowCatalog(false)} style={{ position: 'sticky', top: 0, float: 'left', background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 17, cursor: 'pointer', zIndex: 2 }}>✕</button>
+            <div style={{ textAlign: 'center', fontSize: 20, fontWeight: 900, color: '#1a2a5e', marginBottom: 4 }}>קטלוג דוגמאות לעיצוב על כיפה</div>
+            <div style={{ textAlign: 'center', fontSize: 12.5, color: '#6B7280', marginBottom: 18, lineHeight: 1.6 }}>
+              לחצו על דוגמה לבחירה · אפשר לבקש שינויים ועיצוב שונה — ההדמיות יישלחו אליכם לוואטסאפ/מייל לאישור אחרי ההזמנה
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14 }}>
+              {DESIGN_EXAMPLES.map(d => (
+                <button
+                  key={d.id}
+                  onClick={() => { setDesignExample(d.id); setShowCatalog(false); }}
+                  style={{
+                    padding: 0, border: designExample === d.id ? '3px solid #C5A028' : '1px solid #E5E0D5',
+                    background: '#fff', cursor: 'pointer', fontFamily: 'inherit', overflow: 'hidden',
+                  }}
+                >
+                  <img src={d.img} alt={d.label} loading="lazy" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ padding: '9px 8px', fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>{d.label}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* הדפסה משני הצדדים — כלולה בסוג 'למעלה ולמטה' */}
       {type === 'print-both' && (
