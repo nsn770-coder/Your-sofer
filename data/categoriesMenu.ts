@@ -92,7 +92,7 @@ export const MEGA_MENU_DATA: NavMenuItem[] = [
         title: "סטים ומארזים",
         items: [
           { label: "סטי טלית ותפילין", cat: "סט טלית תפילין" },
-          { label: "מארזים לחתן",      cat: "מארז לחתנים" },
+          { label: "מארזים לחתן",      cat: "תיקי טלית ותפילין", filter: "מארז לחתנים" },
         ],
       },
     ],
