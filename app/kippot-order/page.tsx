@@ -467,9 +467,9 @@ function KippotOrderInner() {
         </div>
         <button
           onClick={() => setShowCatalog(true)}
-          style={{ display: 'block', width: '100%', marginBottom: 10, padding: '11px 0', background: '#1a1a1a', color: '#C5A028', border: 'none', fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}
+          style={{ display: 'block', width: '100%', marginBottom: 10, padding: '12px 0', background: '#1a1a1a', color: '#C5A028', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
         >
-          📖 לצפייה בקטלוג הדוגמאות המלא — בגדול
+          לחץ לצפיה בקטלוג העיצובים שלנו
         </button>
         <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8, WebkitOverflowScrolling: 'touch' }}>
           {DESIGN_EXAMPLES.map((d, i) => (
