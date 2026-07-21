@@ -1886,6 +1886,8 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
     const val = selectedVariants[o.name];
     return s + (val && o.surcharges?.[val] ? o.surcharges[val] : 0);
   }, 0);
+  // המחיר המוצג מתעדכן בלייב לפי הווריאציה שנבחרה (למשל מידה עם תוספת מחיר)
+  const displayedPrice = effectivePrice + variantsSurcharge;
 const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
 
   const MEZUZAH_CERTS: Certificate[] = [
@@ -2099,7 +2101,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {!compact && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-            <span style={{ fontSize: 28, fontWeight: 800, color: effectivePrice < product.price ? '#c0392b' : '#1a1a1a' }}>{formatPrice(effectivePrice)}</span>
+            <span style={{ fontSize: 28, fontWeight: 800, color: effectivePrice < product.price ? '#c0392b' : '#1a1a1a' }}>{formatPrice(displayedPrice)}</span>
             {effectivePrice < product.price && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.price)}</span>}
             {effectivePrice >= product.price && product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
             {effectivePct > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{effectivePct}%</span>}
@@ -2117,7 +2119,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           <div style={{ fontSize: 12, color: '#888', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
             <Icon.Truck /> כולל מע״מ · משלוח לכל הארץ
           </div>
-          <InstallmentBadge price={effectivePrice} />
+          <InstallmentBadge price={displayedPrice} />
         </div>
       )}
 
@@ -2692,7 +2694,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             {isMobile && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #f0f0f0' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-                  <span style={{ fontSize: 28, fontWeight: 800, color: effectivePrice < product.price ? '#c0392b' : '#1a1a1a' }}>{formatPrice(effectivePrice)}</span>
+                  <span style={{ fontSize: 28, fontWeight: 800, color: effectivePrice < product.price ? '#c0392b' : '#1a1a1a' }}>{formatPrice(displayedPrice)}</span>
                   {effectivePrice < product.price && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.price)}</span>}
                   {effectivePrice >= product.price && product.was && <span style={{ fontSize: 19, fontWeight: 300, textDecoration: 'line-through', color: '#999' }}>{formatPrice(product.was)}</span>}
                   {effectivePct > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{effectivePct}%</span>}
@@ -2708,7 +2710,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   ) : null;
                 })()}
                 <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Truck /> כולל מע״מ · משלוח לכל הארץ</div>
-                <InstallmentBadge price={effectivePrice} />
+                <InstallmentBadge price={displayedPrice} />
               </div>
             )}
 
@@ -3102,7 +3104,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           }}
         >
           <span style={{ fontSize: 18, fontWeight: 800, color: effectivePrice < product.price ? '#c0392b' : '#1a1a1a', whiteSpace: 'nowrap' }}>
-            {formatPrice(effectivePrice)}
+            {formatPrice(displayedPrice)}
           </span>
           <button
             onClick={handleAddToCart}
