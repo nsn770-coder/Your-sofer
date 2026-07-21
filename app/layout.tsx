@@ -76,7 +76,14 @@ export const metadata: Metadata = {
     images: ['/og-default.png'],
   },
   alternates: {},
-  icons: { icon: '/favicon.png' },
+  // הלוגו המקורי (דמות הסופר) מקלאודינרי באיכות מלאה — 96×96 (כפולה של 48, דרישת גוגל)
+  icons: {
+    icon: [
+      { url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_96,h_96,c_fit,f_png/v1784459751/%D7%A2%D7%99%D7%A6%D7%95%D7%91_%D7%9C%D7%9C%D7%90_%D7%A9%D7%9D_43_gfp2nf.png', sizes: '96x96', type: 'image/png' },
+      { url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_192,h_192,c_fit,f_png/v1784459751/%D7%A2%D7%99%D7%A6%D7%95%D7%91_%D7%9C%D7%9C%D7%90_%D7%A9%D7%9D_43_gfp2nf.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/w_180,h_180,c_fit,f_png/v1784459751/%D7%A2%D7%99%D7%A6%D7%95%D7%91_%D7%9C%D7%9C%D7%90_%D7%A9%D7%9D_43_gfp2nf.png',
+  },
 };
 
 export default function RootLayout({
