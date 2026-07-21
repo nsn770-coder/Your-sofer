@@ -1282,7 +1282,20 @@ export default function CategoryClient({ category }: { category: string }) {
 
     let snap;
     if (SUBCATEGORY_GROUPS[category]) {
-      snap = await getDocs(query(collection(db, 'products'), where('subCategory', 'in', SUBCATEGORY_GROUPS[category]), limit(500)));
+      // מיזוג: גם מוצרים לפי תת-קטגוריה (הקבוצה) וגם מוצרים ישנים ששויכו לקטגוריה ישירות (cat)
+      const [bySub, byCat] = await Promise.all([
+        getDocs(query(collection(db, 'products'), where('subCategory', 'in', SUBCATEGORY_GROUPS[category]), limit(500))),
+        getDocs(query(collection(db, 'products'), where('cat', '==', category), limit(500))),
+      ]);
+      const seenIds = new Set<string>();
+      const mergedDocs: Product[] = [];
+      for (const s of [byCat, bySub]) {
+        for (const d of s.docs) {
+          if (!seenIds.has(d.id)) { seenIds.add(d.id); mergedDocs.push({ id: d.id, ...d.data() } as Product); }
+        }
+      }
+      setAllLoaded(mergedDocs.filter(p => p.hidden !== true));
+      return;
     } else if (SUBCATEGORY_PAGES.includes(category)) {
       snap = await getDocs(query(collection(db, 'products'), where('subCategory', '==', category), limit(500)));
     } else {
