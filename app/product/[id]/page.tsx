@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from 'next';
 import ProductClient from './ProductClient';
 import ProductShell, { type ShellProduct } from './ProductShell';
+import PageFaqSection from '@/app/components/faq/PageFaqSection';
 import { formatPrice } from '@/app/lib/utils';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
@@ -95,7 +96,12 @@ export async function generateMetadata(
   const product = await fetchProduct(id);
 
   if (!product) {
-    return { title: 'מוצר | Your Sofer', description: 'חנות סת"מ - Your Sofer' };
+    // מוצר שנמחק / לא קיים — לא לאנדקס, כדי שגוגל לא יציג "מוצר" גנרי בתוצאות
+    return {
+      title: 'מוצר לא נמצא | Your Sofer',
+      description: 'המוצר אינו זמין יותר. גלו את מגוון מוצרי הסת"מ והיודאיקה שלנו.',
+      robots: { index: false, follow: false },
+    };
   }
 
   const name = product.name ?? 'מוצר';
@@ -238,6 +244,20 @@ async function ProductJsonLd({ id }: { id: string }) {
   );
 }
 
+// ── FAQ ממוקד לפי קטגוריה ────────────────────────────────────────────────────
+// ערכי הקטגוריות חייבים להתאים במדויק לערכי Firestore (case sensitive).
+// מוצרים עם עיצוב אישי → שאלות הקדשה/הדמיה; מוצרי סת״ם → שאלות כשרות/אחריות.
+
+const CUSTOM_DESIGN_CATS = ['כיפות', 'טליתות', 'סידורים', 'כיסויי חלה', 'תיקי תפילין'];
+const STAM_CATS = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה'];
+
+function productFaqKey(cat?: string): 'product-custom' | 'stam' | null {
+  if (!cat) return null;
+  if (CUSTOM_DESIGN_CATS.includes(cat)) return 'product-custom';
+  if (STAM_CATS.includes(cat)) return 'stam';
+  return null;
+}
+
 // ── Page ────────────────────────────────────────────────────────────────────
 
 export default async function ProductPage(
@@ -256,11 +276,20 @@ export default async function ProductPage(
   const shellProduct = product && product.name && product.price != null
     ? ({ ...(product as Record<string, unknown>), id } as ShellProduct)
     : null;
+  const faqKey = productFaqKey(product?.cat);
   return (
     <>
       <ProductJsonLd id={id} />
       {shellProduct && <ProductShell product={shellProduct} />}
       <ProductClient initialProduct={shellProduct} />
+      {/* FAQ ממוקד מתחת לתוכן המוצר — לא מפריע לתהליך ההוספה לסל */}
+      {faqKey && (
+        <PageFaqSection
+          pageKey={faqKey}
+          title={faqKey === 'stam' ? 'שאלות נפוצות על מוצרי סת״ם' : 'שאלות נפוצות על עיצוב אישי'}
+          max={faqKey === 'stam' ? 8 : 6}
+        />
+      )}
     </>
   );
 }

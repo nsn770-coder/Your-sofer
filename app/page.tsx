@@ -4,18 +4,18 @@ import HomePageClient from './HomePageClient';
 const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
-  title: 'Your Sofer - חנות סת"מ | מזוזות, תפילין וספרי תורה',
+  title: 'Your Sofer - אתר היודאיקה הגדול בישראל | כיפות, מתנות ומזכרות לאירועים',
   description:
-    'רכישת מזוזות, תפילין, מגילות וספרי תורה מסופרים מוסמכים - עם תמונת הקלף האמיתי, בדיקה לפני מכירה, ושקיפות מלאה. Your Sofer.',
+    'אתר היודאיקה הגדול בישראל עם מעל 6,000 מוצרים: כיפות בעיצוב אישי, מזכרות ומתנות לאירועים, תיקי טלית ותפילין, תשמישי קדושה ומוצרים לבית היהודי. משלוחים לכל הארץ.',
   alternates: { canonical: BASE_URL },
   openGraph: {
     type: 'website',
     locale: 'he_IL',
     url: BASE_URL,
     siteName: 'Your Sofer',
-    title: 'Your Sofer - חנות סת"מ | מזוזות, תפילין וספרי תורה',
+    title: 'Your Sofer - אתר היודאיקה הגדול בישראל | כיפות, מתנות ומזכרות לאירועים',
     description:
-      'רכישת מזוזות, תפילין, מגילות וספרי תורה מסופרים מוסמכים - עם שקיפות מלאה.',
+      'מעל 6,000 מוצרי יודאיקה: כיפות בעיצוב אישי, מזכרות לאירועים, מתנות ומוצרים לבית היהודי.',
     images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'Your Sofer' }],
   },
 };
@@ -26,7 +26,7 @@ const organizationSchema = {
   name: 'Your Sofer',
   legalName: 'בואהרון ניסן נסים',
   url: BASE_URL,
-  description: 'חנות אונליין לרכישת מוצרי סת״מ ויודאיקה',
+  description: 'אתר היודאיקה הגדול בישראל - כיפות בעיצוב אישי, מזכרות ומתנות לאירועים, תשמישי קדושה ומוצרים לבית היהודי',
   telephone: '058-4877-770',
   email: 'support@your-sofer.com',
   address: {
