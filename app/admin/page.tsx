@@ -85,8 +85,8 @@ function reviewWhatsappLink(o: Order): string | null {
   const intl = digits.startsWith('972') ? digits : digits.startsWith('0') ? `972${digits.slice(1)}` : digits;
   const firstName = (o.customerName ?? '').trim().split(/\s+/)[0] || '';
   const msg =
-    `שלום ${firstName} 😊 כאן Your Sofer.\n` +
-    `מקווים שנהניתם מההזמנה! נשמח מאוד אם תשאירו לנו ביקורת קצרה בגוגל – זה לוקח חצי דקה ועוזר לנו המון:\n` +
+    `שלום ${firstName} 😊 זה ניסים מהחנות Your Sofer שנתן לך את השירות באתר.\n` +
+    `אני מקווה שנהניתם מהשירות. אני בתחילת הדרך של העסק ופתחתי דף ביקורות בגוגל, אשמח שתפרגנו לנו בביקורת 😊 זה יעזור לנו המון:\n` +
     `${GOOGLE_REVIEW_URL}\n` +
     `תודה רבה! 🙏`;
   return `https://wa.me/${intl}?text=${encodeURIComponent(msg)}`;
