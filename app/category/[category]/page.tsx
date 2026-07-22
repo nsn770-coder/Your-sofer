@@ -65,8 +65,8 @@ const CATEGORY_META: Record<string, CategoryMetaEntry> = {
 function getCategoryMeta(category: string): CategoryMetaEntry {
   return (
     CATEGORY_META[category] ?? {
-      title: `קנה ${category} כשר ומאומת | YourSofer`,
-      description: `מבחר ${category} מסופרים מוסמכים. כל מוצר נבדק ע"י מגיה מוסמך. משלוח לכל הארץ.`,
+      title: `${category} - מבחר ענק במקום אחד | Your Sofer`,
+      description: `מבחר ${category} מתוך אתר היודאיקה הגדול בישראל - מעל 6,000 מוצרים. משלוחים לכל הארץ.`,
     }
   );
 }

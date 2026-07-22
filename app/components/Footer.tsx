@@ -85,6 +85,7 @@ export default function Footer() {
   const [isMobile, setIsMobile] = useState(false);
   const [openCols, setOpenCols] = useState<Set<number>>(new Set());
   const [openCats, setOpenCats] = useState<Set<number>>(new Set());
+  const [catsSectionOpen, setCatsSectionOpen] = useState(false); // מובייל: כל בלוק הקטגוריות סגור עד לחיצה
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -175,17 +176,43 @@ export default function Footer() {
               Your Sofer
             </div>
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
-              לא קונים סת״ם בלי לדעת מי כתב אותו
+              אתר היודאיקה הגדול בישראל — כיפות, מתנות ומזכרות לאירועים
             </div>
           </div>
 
           {/* ── All categories + subcategories ── */}
           <div style={{ marginBottom: isMobile ? 20 : 36 }}>
-            <div style={{ ...colTitleStyle, marginBottom: isMobile ? 4 : 18 }}>קטגוריות</div>
+            {isMobile ? (
+              <button
+                onClick={() => setCatsSectionOpen(o => !o)}
+                style={{
+                  width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '12px 0', fontFamily: 'inherit',
+                  borderBottom: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                <span style={{ ...colTitleStyle, marginBottom: 0 }}>קטגוריות</span>
+                <svg
+                  width="13" height="13" viewBox="0 0 24 24" fill="none"
+                  stroke="rgba(255,255,255,0.5)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ flexShrink: 0, transition: 'transform 0.25s', transform: catsSectionOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+            ) : (
+              <div style={{ ...colTitleStyle, marginBottom: 18 }}>קטגוריות</div>
+            )}
 
             {isMobile ? (
-              /* Mobile: accordion per category */
-              <div>
+              /* Mobile: whole section collapsible; accordion per category inside */
+              <div style={{
+                overflow: 'hidden',
+                maxHeight: catsSectionOpen ? 2000 : 0,
+                transition: 'max-height 0.35s ease',
+                paddingRight: catsSectionOpen ? 6 : 0,
+              }}>
                 {CATEGORY_BLOCKS.map((block, i) => {
                   const isOpen = openCats.has(i);
                   return (

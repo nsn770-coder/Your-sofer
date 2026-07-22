@@ -1120,7 +1120,7 @@ export default function HomePageClient() {
 
           {/* h1 — preserved for SEO, visually hidden */}
           <h1 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
-            לקנות ישירות מסופרי סת"ם
+            אתר היודאיקה הגדול בישראל - כיפות, מתנות ומזכרות לאירועים
           </h1>
 
           <p className="ys-hero-sub" style={{
@@ -1529,7 +1529,7 @@ export default function HomePageClient() {
             רק אצלנו ב&nbsp;<span dir="ltr" style={{ unicodeBidi: 'embed' }}>Your Sofer</span>
           </p>
           <p className="text-base md:text-lg" style={{ color: '#4B5563', marginTop: 10, marginBottom: 0 }}>
-            תפגשו ישירות עם סופרי סת&quot;ם ובפערי תיווך נמוכים
+            כל עולם היודאיקה, האירועים והמתנות — מעל 6,000 מוצרים במקום אחד
           </p>
         </div>
         <div
@@ -1544,7 +1544,7 @@ export default function HomePageClient() {
             allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
             allowFullScreen
             loading="lazy"
-            title="סרטון על Your Sofer — קנייה ישירה מסופרי סת״ם"
+            title="סרטון על Your Sofer — אתר היודאיקה הגדול בישראל"
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
           />
         </div>
@@ -1591,8 +1591,8 @@ export default function HomePageClient() {
       {/* ── Sofer STaM categories grid ── */}
       <div className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות סת״מ</h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>כל מוצרי הסופר סת״מ</p>
+          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>עוד קטגוריות נבחרות</h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>גלו עוד ממגוון המוצרים באתר</p>
           {/* Admin-controlled via דשבורד ← קטגוריות ← תצוגת קטגוריות בדף הבית */}
           <div className="grid grid-cols-2 gap-4 md:gap-7">
             {catSections.stam.map(item => (

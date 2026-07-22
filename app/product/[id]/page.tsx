@@ -108,7 +108,7 @@ export async function generateMetadata(
   const desc =
     product.desc ||
     product.description ||
-    `${name} מסופר סת"מ מוסמך - נבדק ומצולם לפני מכירה. Your Sofer.`;
+    `${name} - מתוך מבחר היודאיקה הגדול בישראל. משלוחים לכל הארץ. Your Sofer.`;
   const image = product.imgUrl || product.image_url || product.imgUrl2;
   const priceStr = product.price ? formatPrice(product.price) : '';
   const pageUrl = `${BASE_URL}/product/${id}`;
