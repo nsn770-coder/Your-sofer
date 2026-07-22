@@ -5,7 +5,7 @@ const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
   title: 'צור קשר | YourSofer',
-  description: 'צרו קשר עם Your Sofer — שירות לקוחות בוואטסאפ, מייל ושליחת הודעה. זמינים ימים א׳–ו׳ 8:00–22:00. נשמח לעזור בכל שאלה על מזוזות, תפילין וכל מוצרי הסת״מ.',
+  description: 'צרו קשר עם Your Sofer — שירות לקוחות בוואטסאפ, מייל ושליחת הודעה. נשמח לעזור בכל שאלה על כיפות, מתנות, מזכרות לאירועים וכל מוצרי היודאיקה.',
   alternates: { canonical: `${BASE_URL}/contact` },
   openGraph: {
     type: 'website',

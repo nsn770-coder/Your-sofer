@@ -22,6 +22,13 @@ export default function ContactPage() {
       if (res.ok) {
         setStatus('sent');
         setName(''); setEmail(''); setMessage('');
+        // מדידה: generate_lead ל-GA4 + ads_conversion___1 שמפעיל את המרת
+        // "איש קשר" ב-Google Ads (השם נוצר אוטומטית ע"י גוגל — לא לשנות)
+        try {
+          const w = window as unknown as { gtag?: (...args: unknown[]) => void };
+          w.gtag?.('event', 'generate_lead', { method: 'contact_form' });
+          w.gtag?.('event', 'ads_conversion___1');
+        } catch { /* non-fatal */ }
       } else {
         setStatus('error');
       }
