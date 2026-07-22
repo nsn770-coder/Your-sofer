@@ -93,6 +93,7 @@ const MADRICH_SLUGS = [
   'sofer-ruach', 'soferim', 'tallit-tefillin', 'tefillin-itar', 'tefillin-nesia',
   'tefillin-perudot', 'tefillin-sfaradi', 'tehlich-ktiva', 'tikun-tefillin',
   'tiyug-stam', 'ultimate-faq', 'yirat-shamayim', 'ziyufei-stam',
+  'sugei-kipot', 'kipot-le-eruim', 'sidur-tfila',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

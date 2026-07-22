@@ -10,6 +10,42 @@ const C = {
   muted: '#666',
 };
 
+const JUDAICA_ARTICLES = [
+  {
+    emoji: '🧢',
+    title: 'סוגי כיפות – המדריך המלא',
+    desc: 'סרוגה, בד, קטיפה, בוכרית וירושלמית – מה מאפיין כל סוג ואיך בוחרים מידה',
+    href: '/madrich/sugei-kipot',
+    badge: 'חדש',
+  },
+  {
+    emoji: '🎉',
+    title: 'כיפות לאירועים',
+    desc: 'כמה כיפות להזמין, מה להדפיס, לוחות זמנים וטעויות נפוצות',
+    href: '/madrich/kipot-le-eruim',
+    badge: 'חדש',
+  },
+  {
+    emoji: '📖',
+    title: 'איך בוחרים סידור תפילה',
+    desc: 'נוסחים, גדלים, כריכות והקדשה אישית – כל מה שצריך לדעת',
+    href: '/madrich/sidur-tfila',
+    badge: 'חדש',
+  },
+  {
+    emoji: '🎁',
+    title: 'מתנת חנוכת בית',
+    desc: 'איך לבחור מתנה יהודית מרגשת לחנוכת בית – עיצוב ותקציב',
+    href: '/madrich/matana-chanuka-bayit',
+  },
+  {
+    emoji: '🎁',
+    title: 'סט חתן',
+    desc: 'טלית, תפילין ונרתיקים – המתנה המושלמת לחתן',
+    href: '/madrich/set-chatan',
+  },
+];
+
 const ARTICLES = [
   {
     emoji: '💸',
@@ -307,11 +343,11 @@ export default function MadrichPageClient() {
       {/* Hero */}
       <div style={{ background: `linear-gradient(135deg, ${C.navy} 0%, #1a1a1a 100%)`, padding: '60px 24px 52px', textAlign: 'center', color: '#fff' }}>
         <div style={{ display: 'inline-block', background: C.gold, color: C.navy, fontSize: 12, fontWeight: 800, padding: '4px 14px', borderRadius: 20, marginBottom: 16 }}>
-          מידע חשוב לפני קניית סת״ם
+          מידע חשוב לפני הקנייה
         </div>
-        <h1 style={{ fontSize: 'clamp(26px, 5vw, 42px)', fontWeight: 900, margin: '0 0 16px' }}>מדריך לעולם הסת״ם</h1>
+        <h1 style={{ fontSize: 'clamp(26px, 5vw, 42px)', fontWeight: 900, margin: '0 0 16px' }}>המדריך לעולם היודאיקה</h1>
         <p style={{ fontSize: 'clamp(15px, 2.5vw, 19px)', color: 'rgba(255,255,255,0.8)', maxWidth: 580, margin: '0 auto 28px', lineHeight: 1.6 }}>
-          לא קונים סת״ם בעיניים עצומות.<br />
+          כיפות, אירועים, מתנות וסת״ם –<br />
           כאן תמצאו את כל מה שצריך לדעת לפני שבוחרים.
         </p>
         <button
@@ -331,9 +367,25 @@ export default function MadrichPageClient() {
 
       {/* Articles List */}
       <div style={{ maxWidth: 860, margin: '0 auto', padding: '48px 16px' }}>
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: C.navy, marginBottom: 8, textAlign: 'center' }}>מאמרים ומדריכים</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: C.navy, marginBottom: 8, textAlign: 'center' }}>כיפות, אירועים ומתנות</h2>
         <p style={{ textAlign: 'center', color: C.muted, fontSize: 15, marginBottom: 36 }}>
-          בחרו נושא שמעניין אתכם - כל מאמר נכתב כדי לעזור לכם לקבל החלטה מושכלת
+          מדריכים לבחירת כיפות, מזכרות לאירועים ומתנות מעולם היודאיקה
+        </p>
+
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, marginBottom: 48 }}>
+          {JUDAICA_ARTICLES.map((a, i) => (
+            <ArticleRow
+              key={a.href}
+              article={a}
+              isLast={i === JUDAICA_ARTICLES.length - 1}
+              onClick={() => router.push(a.href)}
+            />
+          ))}
+        </div>
+
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: C.navy, marginBottom: 8, textAlign: 'center' }}>עולם הסת״ם</h2>
+        <p style={{ textAlign: 'center', color: C.muted, fontSize: 15, marginBottom: 36 }}>
+          מזוזות, תפילין וספרי תורה - כל מאמר נכתב כדי לעזור לכם לקבל החלטה מושכלת
         </p>
 
         <div style={{ background: C.white, border: `1px solid ${C.border}` }}>
