@@ -59,22 +59,40 @@ async function getActiveSoferIds(): Promise<string[]> {
   }
 }
 
-// Categories with confirmed products in Firestore (queried 2026-04-26).
-// Sorted by product count descending. 'קלפי תפילין' removed (0 products).
+// All live top-level categories (matches MEGA_MENU_DATA in data/categoriesMenu.ts).
+// Updated 2026-07-22 after the big catalog import (~6,000 products).
 const CATEGORIES = [
-  'בתי מזוזה',           // 353
-  'יודאיקה',             // 324
-  'כיפות',               // 303
-  'סט טלית תפילין',      // 260
-  'תיקי טלית ותפילין',   // 86
-  'מתנות',               // 19
-  'בר מצווה',            // 19
-  'קלפי מזוזה',          // 14
-  'טליתות וציציות',      // 6
-  'מגילות',              // 5
-  'ספרי תורה',           // 3
-  'שבת',                 // 3
-  'תפילין קומפלט',       // 2
+  'בתי מזוזה',
+  'יודאיקה',
+  'כיפות',
+  'סט טלית תפילין',
+  'תיקי טלית ותפילין',
+  'מתנות',
+  'בר מצווה',
+  'קלפי מזוזה',
+  'טליתות וציציות',
+  'מגילות',
+  'ספרי תורה',
+  'שבת',
+  'תפילין קומפלט',
+  'חגים',
+  'תכשיטים',
+  'מוצרי בית כנסת',
+  'ספרי קודש וסידורים',
+];
+
+// All madrich (guide) pages — every app/madrich/*/page.tsx.
+const MADRICH_SLUGS = [
+  'bar-mitzva-tefillin', 'bar-mitzva-tfillin-tfilot', 'batei-mezuza', 'bdika-mezuzot',
+  'bechira', 'bedika', 'behema-gasa', 'brachot-mezuza', 'chavilot-bar-mitzva',
+  'dio-stam', 'faq', 'godel-mezuza', 'kesidran', 'klaf-ivduat-yad', 'klaf-meshurtat',
+  'knia-online', 'kulmus', 'kviyas-mezuza', 'lamah-your-sofer', 'mah-kadai-mezuza',
+  'matana-chanuka-bayit', 'mehudar', 'mezuza-asak', 'mezuza-yeladim', 'mezuza-zola',
+  'michrei-soferim', 'mishloach-lachul', 'nosachim', 'otiyot-vetaguim', 'proyect-binyan',
+  'rashi-rabenu-tam', 'sefer-torah', 'set-chatan', 'shema-israel', 'shuk',
+  'sofer-ruach', 'soferim', 'tallit-tefillin', 'tefillin-itar', 'tefillin-nesia',
+  'tefillin-perudot', 'tefillin-sfaradi', 'tehlich-ktiva', 'tikun-tefillin',
+  'tiyug-stam', 'ultimate-faq', 'yirat-shamayim', 'ziyufei-stam',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -99,15 +117,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/collections`,             lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/search`,                  lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.5 },
     { url: `${BASE_URL}/madrich`,                 lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${BASE_URL}/madrich/bechira`,         lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/madrich/bedika`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/madrich/faq`,             lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/madrich/mehudar`,         lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/madrich/mezuza-zola`,     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/madrich/shuk`,            lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/madrich/soferim`,            lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/madrich/mah-kadai-mezuza`,  lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${BASE_URL}/madrich/tefillin-sfaradi`,  lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    ...MADRICH_SLUGS.map(slug => ({
+      url: `${BASE_URL}/madrich/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })),
+    { url: `${BASE_URL}/categories`,              lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
+    { url: `${BASE_URL}/event-kippot`,            lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
+    ...['wedding', 'new-baby', 'new-home', 'shabbat-home', 'holidays', 'bar-mitzvah', 'reconnect'].map(m => ({
+      url: `${BASE_URL}/moment/${m}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    })),
     { url: `${BASE_URL}/soferim`,                 lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.75 },
     { url: `${BASE_URL}/legal/shipping`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
     { url: `${BASE_URL}/legal/returns`,           lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },

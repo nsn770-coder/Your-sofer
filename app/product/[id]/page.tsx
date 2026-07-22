@@ -277,8 +277,23 @@ export default async function ProductPage(
     ? ({ ...(product as Record<string, unknown>), id } as ShellProduct)
     : null;
   const faqKey = productFaqKey(product?.cat);
+  const breadcrumbSchema = product?.name ? {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'דף הבית', item: BASE_URL },
+      ...(product.cat ? [{ '@type': 'ListItem', position: 2, name: product.cat, item: `${BASE_URL}/category/${encodeURIComponent(product.cat)}` }] : []),
+      { '@type': 'ListItem', position: product.cat ? 3 : 2, name: product.name, item: `${BASE_URL}/product/${id}` },
+    ],
+  } : null;
   return (
     <>
+      {breadcrumbSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+      )}
       <ProductJsonLd id={id} />
       {shellProduct && <ProductShell product={shellProduct} />}
       <ProductClient initialProduct={shellProduct} />

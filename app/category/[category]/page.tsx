@@ -60,6 +60,34 @@ const CATEGORY_META: Record<string, CategoryMetaEntry> = {
     title: 'תכשיטים יהודיים - שרשראות, צמידים ותכשיטי יודאיקה',
     description: 'תכשיטים בהשראה יהודית: שרשראות מגן דוד, חמסות, צמידים ועוד. מתנה מושלמת לכל אירוע. Your Sofer.',
   },
+  'כיפות': {
+    title: 'כיפות - סרוגות, בד, קטיפה, בוכריות והדפסה אישית',
+    description: 'מעל 800 כיפות במקום אחד: כיפות סרוגות, כיפות בד וקטיפה, כיפה בוכרית, כיפות לילדים וכיפות בהדפסה אישית לאירועים. משלוחים לכל הארץ. Your Sofer.',
+  },
+  'שבת': {
+    title: 'מוצרי שבת - פמוטים, כיסויי חלה, כוסות קידוש וקרשי חלה',
+    description: 'כל מה שצריך לשולחן השבת: פמוטים, כיסויי חלה מעוצבים, כוסות קידוש, קרשי חלה, סכיני חלה ומלחיות. מבחר ענק ומשלוחים לכל הארץ. Your Sofer.',
+  },
+  'חגים': {
+    title: 'מוצרים לחגים - חנוכיות, פסח, ראש השנה, פורים וסוכות',
+    description: 'מוצרי חג לכל השנה: חנוכיות מעוצבות, כלי פסח, דבשיות וצלחות סימנים לראש השנה, מתנות לפורים וסוכות. Your Sofer.',
+  },
+  'מוצרי בית כנסת': {
+    title: 'מוצרי בית כנסת - סטנדרים, פרוכות וכלי קודש',
+    description: 'ציוד לבית הכנסת: סטנדרים לבית כנסת, כלי קודש, אביזרי תפילה ומוצרים לספר תורה. מבחר איכותי ומשלוחים לכל הארץ. Your Sofer.',
+  },
+  'ספרי קודש וסידורים': {
+    title: 'סידורים ותהילים - סידורי תפילה בכל הנוסחים',
+    description: 'סידור תפילה לכל נוסח: ספרד, אשכנז ועדות המזרח. סידורים מהודרים, תהילים, ברכונים וספרי קודש - גם עם הקדשה אישית לאירועים. Your Sofer.',
+  },
+  'טליתות וציציות': {
+    title: 'טליתות וציציות - טלית צמר, גופיות ציצית וסטים לחתן',
+    description: 'טליתות צמר מהודרות, ציציות וגופיות ציצית בכל המידות, וסטים מושלמים לחתן ולבר מצווה. משלוחים לכל הארץ. Your Sofer.',
+  },
+  'תיקי טלית ותפילין': {
+    title: 'תיקי טלית ותפילין - מעל 300 דגמים כולל רקמה אישית',
+    description: 'מבחר ענק של תיקי טלית ותפילין: עור אמיתי, עור מדומה, קטיפה ותיקים טרמיים - כולל רקמת שם אישית. מתנה מושלמת לבר מצווה. Your Sofer.',
+  },
 };
 
 function getCategoryMeta(category: string): CategoryMetaEntry {
@@ -88,7 +116,7 @@ export async function generateMetadata(
   const meta = getCategoryMeta(decoded);
   const pageUrl = `${BASE_URL}/category/${encodeURIComponent(decoded)}`;
 
-  const keywords = [decoded, 'כשר', 'מאומת', 'סת"מ', 'סופר מוסמך', 'משלוח לכל הארץ'];
+  const keywords = [decoded, 'יודאיקה', 'חנות יודאיקה', 'מתנות', 'משלוח לכל הארץ', 'your sofer'];
 
   const ogImage = meta.ogImage ?? `${BASE_URL}/og-default.jpg`;
 
@@ -205,6 +233,26 @@ async function CategoryItemListJsonLd({ category }: { category: string }) {
   );
 }
 
+// ── BreadcrumbList JSON-LD ───────────────────────────────────────────────────
+
+function CategoryBreadcrumbJsonLd({ category }: { category: string }) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'דף הבית', item: BASE_URL },
+      { '@type': 'ListItem', position: 2, name: 'כל הקטגוריות', item: `${BASE_URL}/categories` },
+      { '@type': 'ListItem', position: 3, name: category, item: `${BASE_URL}/category/${encodeURIComponent(category)}` },
+    ],
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function CategoryPage(
@@ -215,6 +263,7 @@ export default async function CategoryPage(
 
   return (
     <>
+      <CategoryBreadcrumbJsonLd category={decoded} />
       <CategoryItemListJsonLd category={decoded} />
       <Suspense fallback={<div dir="rtl" className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-400">טוען...</div>}>
         <CategoryClient category={decoded} />
