@@ -2,13 +2,16 @@
 
 // app/components/EmbroideryThreadColorPicker.tsx
 //
-// בורר צבע חוט לרקמה — כפתור שפותח Bottom Sheet במובייל / Modal בדסקטופ,
-// עם גריד עיגולי צבע ממוספרים, חיפוש, בחירה ויזואלית ונגישות RTL מלאה.
+// בורר צבע חוט לרקמה — כפתור שפותח Bottom Sheet במובייל / Modal בדסקטופ.
+// מציג תמונות אמיתיות של גלילי החוט מתוך תמונת הקטלוג (CSS sprite,
+// public/embroidery-threads.jpg). אם התמונה חסרה — נופל חזרה לעיגולי צבע.
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   THREAD_COLORS,
   BRAND_COLOR,
+  THREAD_SPRITE_CANDIDATES,
+  SPRITE_ZOOM,
   type ThreadColor,
 } from "../data/threadColors";
 
@@ -17,6 +20,12 @@ export interface EmbroideryThreadColorPickerProps {
   onChange: (color: ThreadColor) => void;
   required?: boolean;
   error?: string;
+}
+
+interface SpriteInfo {
+  src: string;
+  /** גובה/רוחב של תמונת הקטלוג */
+  aspect: number;
 }
 
 // מחשב האם צבע בהיר (כדי לבחור צבע ✓ מנוגד + מסגרת דקה לצבעים בהירים).
@@ -29,6 +38,25 @@ function isLight(hex: string): boolean {
   return yiq > 180;
 }
 
+function clamp01(n: number): number {
+  return Math.min(1, Math.max(0, n));
+}
+
+// סגנון אריח המציג את אזור הגליל הרלוונטי מתוך תמונת הקטלוג.
+function spriteTileStyle(color: ThreadColor, sprite: SpriteInfo): CSSProperties {
+  const z = SPRITE_ZOOM;
+  const vTiles = z * sprite.aspect; // כמה "אריחים" נכנסים בגובה התמונה
+  const px = clamp01((color.cx * z - 0.5) / (z - 1)) * 100;
+  const py = clamp01((color.cy * vTiles - 0.5) / (vTiles - 1)) * 100;
+  return {
+    backgroundImage: `url("${sprite.src}")`,
+    backgroundSize: `${z * 100}% auto`,
+    backgroundPosition: `${px}% ${py}%`,
+    backgroundRepeat: "no-repeat",
+    backgroundColor: "#F3F4F6",
+  };
+}
+
 export default function EmbroideryThreadColorPicker({
   value,
   onChange,
@@ -37,7 +65,31 @@ export default function EmbroideryThreadColorPicker({
 }: EmbroideryThreadColorPickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [sprite, setSprite] = useState<SpriteInfo | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  // טוען את תמונת הקטלוג פעם אחת; אם אף מועמד לא נטען — נשארים עם עיגולי hex.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      for (const src of THREAD_SPRITE_CANDIDATES) {
+        const dims = await new Promise<{ w: number; h: number } | null>((resolve) => {
+          const img = new window.Image();
+          img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+          img.onerror = () => resolve(null);
+          img.src = src;
+        });
+        if (cancelled) return;
+        if (dims && dims.w > 0) {
+          setSprite({ src, aspect: dims.h / dims.w });
+          return;
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -95,14 +147,22 @@ export default function EmbroideryThreadColorPicker({
       {/* כרטיס צבע נבחר */}
       {value && (
         <div className="mt-3 inline-flex items-center gap-3 rounded-xl border bg-white px-4 py-2.5 shadow-sm">
-          <span
-            aria-hidden="true"
-            className="inline-block h-7 w-7 rounded-full border"
-            style={{
-              backgroundColor: value.hex,
-              borderColor: isLight(value.hex) ? "#D1D5DB" : value.hex,
-            }}
-          />
+          {sprite ? (
+            <span
+              aria-hidden="true"
+              className="inline-block h-9 w-9 rounded-lg border border-gray-200"
+              style={spriteTileStyle(value, sprite)}
+            />
+          ) : (
+            <span
+              aria-hidden="true"
+              className="inline-block h-7 w-7 rounded-full border"
+              style={{
+                backgroundColor: value.hex,
+                borderColor: isLight(value.hex) ? "#D1D5DB" : value.hex,
+              }}
+            />
+          )}
           <span className="text-sm text-gray-800">
             <span className="text-gray-500">צבע חוט נבחר: </span>
             <span className="font-semibold">
@@ -167,7 +227,13 @@ export default function EmbroideryThreadColorPicker({
               {filtered.length === 0 ? (
                 <p className="py-8 text-center text-sm text-gray-500">לא נמצא צבע תואם</p>
               ) : (
-                <div className="grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 lg:grid-cols-8">
+                <div
+                  className={
+                    sprite
+                      ? "grid grid-cols-3 gap-x-3 gap-y-4 sm:grid-cols-5 lg:grid-cols-6"
+                      : "grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 lg:grid-cols-8"
+                  }
+                >
                   {filtered.map((color) => {
                     const selected = value?.id === color.id;
                     const light = isLight(color.hex);
@@ -180,29 +246,59 @@ export default function EmbroideryThreadColorPicker({
                         aria-pressed={selected}
                         className="group flex flex-col items-center gap-1.5 rounded-lg p-1 focus:outline-none focus:ring-2 focus:ring-offset-1"
                       >
-                        <span
-                          className="relative flex h-[42px] w-[42px] items-center justify-center rounded-full transition-transform sm:h-11 sm:w-11 sm:group-hover:scale-110"
-                          style={{
-                            backgroundColor: color.hex,
-                            boxShadow: selected
-                              ? `0 0 0 3px ${BRAND_COLOR}`
-                              : light
-                              ? "inset 0 0 0 1px #D1D5DB"
-                              : "none",
-                          }}
-                        >
-                          {selected && (
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path
-                                d="M5 13l4 4L19 7"
-                                stroke={light ? "#111827" : "#FFFFFF"}
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          )}
-                        </span>
+                        {sprite ? (
+                          /* אריח תמונה אמיתית של הגליל מתוך הקטלוג */
+                          <span
+                            className="relative block aspect-square w-full max-w-[84px] overflow-hidden rounded-xl border transition-transform sm:group-hover:scale-105"
+                            style={{
+                              ...spriteTileStyle(color, sprite),
+                              borderColor: selected ? BRAND_COLOR : "#E5E7EB",
+                              boxShadow: selected ? `0 0 0 2px ${BRAND_COLOR}` : "none",
+                            }}
+                          >
+                            {selected && (
+                              <span
+                                className="absolute left-1 top-1 flex h-5 w-5 items-center justify-center rounded-full"
+                                style={{ backgroundColor: BRAND_COLOR }}
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                  <path
+                                    d="M5 13l4 4L19 7"
+                                    stroke="#FFFFFF"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </span>
+                            )}
+                          </span>
+                        ) : (
+                          /* fallback — עיגול צבע כמו קודם */
+                          <span
+                            className="relative flex h-[42px] w-[42px] items-center justify-center rounded-full transition-transform sm:h-11 sm:w-11 sm:group-hover:scale-110"
+                            style={{
+                              backgroundColor: color.hex,
+                              boxShadow: selected
+                                ? `0 0 0 3px ${BRAND_COLOR}`
+                                : light
+                                ? "inset 0 0 0 1px #D1D5DB"
+                                : "none",
+                            }}
+                          >
+                            {selected && (
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path
+                                  d="M5 13l4 4L19 7"
+                                  stroke={light ? "#111827" : "#FFFFFF"}
+                                  strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            )}
+                          </span>
+                        )}
                         <span
                           className="text-xs font-semibold leading-none"
                           style={{ color: selected ? BRAND_COLOR : "#374151" }}
