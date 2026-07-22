@@ -75,6 +75,23 @@ interface Order {
   items?: OrderItem[];
 }
 
+// ── בקשת ביקורת גוגל בוואטסאפ ────────────────────────────────────────────────
+// להחליף בקישור הביקורות מהפרופיל העסקי: business.google.com → "בקשה לקבלת ביקורות"
+const GOOGLE_REVIEW_URL = 'https://g.page/r/CaQlOx30alHMEAE/review';
+
+function reviewWhatsappLink(o: Order): string | null {
+  const digits = (o.phone ?? '').replace(/\D/g, '');
+  if (!digits) return null;
+  const intl = digits.startsWith('972') ? digits : digits.startsWith('0') ? `972${digits.slice(1)}` : digits;
+  const firstName = (o.customerName ?? '').trim().split(/\s+/)[0] || '';
+  const msg =
+    `שלום ${firstName} 😊 כאן Your Sofer.\n` +
+    `מקווים שנהניתם מההזמנה! נשמח מאוד אם תשאירו לנו ביקורת קצרה בגוגל – זה לוקח חצי דקה ועוזר לנו המון:\n` +
+    `${GOOGLE_REVIEW_URL}\n` +
+    `תודה רבה! 🙏`;
+  return `https://wa.me/${intl}?text=${encodeURIComponent(msg)}`;
+}
+
 interface ProductEntry {
   type: string;
   name: string;
@@ -2230,6 +2247,17 @@ ${visibleOrders.map(orderBlock).join('\n')}
                           >
                             {cancellingId === o.id ? '...' : 'בטל עסקה'}
                           </button>
+                        )}
+                        {!isCancelled && reviewWhatsappLink(o) && (
+                          <a
+                            href={reviewWhatsappLink(o)!}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-bold px-2 py-1 rounded border border-green-300 text-green-700 bg-green-50 hover:bg-green-100 whitespace-nowrap"
+                            title="פותח וואטסאפ עם הודעת בקשת ביקורת מוכנה"
+                          >
+                            💬 בקש ביקורת
+                          </a>
                         )}
                         <button
                           onClick={() => handleDelete(o.id, o.orderNumber)}
