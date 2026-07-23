@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   title: 'הסופרים והיוצרים שלנו | Your Sofer - אתר היודאיקה של ישראל',
   description: 'הסופרים והיוצרים של Your Sofer — אתר היודאיקה הגדול בישראל. כל סופר עבר בדיקה ואימות. מזוזות ותפילין לצד כיפות בעיצוב אישי, מזכרות ומתנות לאירועים.',
   keywords: ['סופר סת"מ', 'סופרי סת"מ', 'מזוזה', 'תפילין', 'יודאיקה', 'כיפות', 'Your Sofer'],
+  // לא לאינדוקס — האתר לא מוכר סת"ם; העמוד נשאר נגיש למי שמגיע אליו ישירות
+  robots: { index: false, follow: true },
   alternates: { canonical: `${BASE_URL}/soferim` },
   openGraph: {
     type: 'website',

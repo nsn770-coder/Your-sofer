@@ -6,6 +6,8 @@ const BASE_URL = 'https://your-sofer.com';
 export const metadata: Metadata = {
   title: 'הצטרפות יוצרים ושותפים | Your Sofer - אתר היודאיקה של ישראל',
   description: 'הצטרפו ל-Your Sofer — אתר היודאיקה הגדול בישראל. יוצרים, סופרים ושליחים מקבלים פרופיל, הזמנות ודשבורד ניהול. רבני קהילה מקבלים 10% מכל הזמנה כתרומה לעמותה שלהם.',
+  // לא לאינדוקס — עמוד תפעולי, לא רלוונטי לתוצאות חיפוש
+  robots: { index: false, follow: true },
   alternates: { canonical: `${BASE_URL}/join` },
   openGraph: {
     type: 'website',
