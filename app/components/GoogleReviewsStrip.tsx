@@ -67,29 +67,33 @@ export default function GoogleReviewsStrip() {
           החוויה שלכם היא ההשראה שלנו! קראו מה הלקוחות מספרים על המוצרים והשירות שלנו.
         </p>
 
-        <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {/* סיכום + כתוב ביקורת */}
-          <div style={{ minWidth: 200, textAlign: 'center', padding: '16px 12px', flexShrink: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 6 }}>
-              <GIcon />
-              <span style={{ fontWeight: 800, fontSize: 17 }}>ביקורות Google</span>
-            </div>
-            {data.rating != null && (
-              <div style={{ marginBottom: 4 }}>
-                <span style={{ fontSize: 26, fontWeight: 900, marginInlineEnd: 8 }}>{data.rating}</span>
-                <Stars n={data.rating || 5} />
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-center" style={{ gap: 16 }}>
+          {/* סיכום + כתוב ביקורת — בדסקטופ בצד, במובייל שורה קטנה מתחת לכרטיסים */}
+          <div className="order-2 md:order-1 w-full md:w-auto flex md:block items-center justify-center gap-4 md:text-center"
+            style={{ padding: '10px 12px', flexShrink: 0 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 4 }}>
+                <GIcon />
+                <span style={{ fontWeight: 800, fontSize: 15 }}>ביקורות Google</span>
               </div>
-            )}
-            {!!data.total && <div style={{ fontSize: 13, color: '#777', marginBottom: 12 }}>{data.total} ביקורות</div>}
+              {data.rating != null && (
+                <div style={{ marginBottom: 2, textAlign: 'center' }}>
+                  <span style={{ fontSize: 20, fontWeight: 900, marginInlineEnd: 6 }}>{data.rating}</span>
+                  <Stars n={data.rating || 5} />
+                </div>
+              )}
+              {!!data.total && <div style={{ fontSize: 12, color: '#777', textAlign: 'center' }} className="md:mb-3">{data.total} ביקורות</div>}
+            </div>
             <a href={data.writeUrl} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'inline-block', border: '1px solid #dadce0', borderRadius: 8, padding: '9px 22px', fontSize: 14, fontWeight: 700, color: '#1a73e8', textDecoration: 'none', background: '#fff' }}>
+              style={{ display: 'inline-block', border: '1px solid #dadce0', borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 700, color: '#1a73e8', textDecoration: 'none', background: '#fff', whiteSpace: 'nowrap' }}>
               כתוב ביקורת
             </a>
           </div>
 
           {/* כרטיסי ביקורות */}
           {hasReviews && (
-            <div style={{ display: 'flex', gap: 14, overflowX: 'auto', padding: '4px 2px 12px', flex: 1, minWidth: 0, scrollbarWidth: 'thin' }}>
+            <div className="order-1 md:order-2 w-full md:flex-1"
+              style={{ display: 'flex', gap: 14, overflowX: 'auto', padding: '4px 2px 12px', minWidth: 0, scrollbarWidth: 'thin' }}>
               {data.reviews.map((rv, i) => {
                 const isLong = rv.text.length > 150;
                 const open = expanded.has(i);

@@ -13,7 +13,6 @@ import { db } from './firebase';
 // PERF: HeroSwiper import removed — it was imported but never rendered,
 // yet still pulled its module graph into the homepage bundle.
 import ProductCard from '@/components/ui/ProductCard';
-const RabbinicalSupervision = dynamic(() => import('./components/RabbinicalSupervision'), { ssr: false, loading: () => <div style={{ height: 420 }} /> });
 
 const NewsletterPopup   = dynamic(() => import('./components/NewsletterPopup'),       { ssr: false, loading: () => <div className="hidden" /> });
 const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => <div style={{ height: 450 }} /> });
@@ -1691,8 +1690,6 @@ export default function HomePageClient() {
         </div>
       )}
 
-      {/* ── Rabbinical Supervision ── */}
-      <RabbinicalSupervision isMobile={isMobile} />
 
 
     </div>
