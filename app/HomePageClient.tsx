@@ -265,6 +265,9 @@ function HomeCategoryTile({ item, img, isMobile, onNav }: {
   onNav: (href: string) => void;
 }) {
   const full = item.width === 'full';
+  // אריח כיפות ומזכרות לאירועים — שם מלא + כותרת גדולה משאר הקטגוריות
+  const isEventTile = item.label.includes('כיפות לאירועים') || item.label.includes('כיפות ומזכרות');
+  const displayLabel = isEventTile ? 'כיפות ומזכרות לאירועים' : item.label;
   return (
     <div
       onClick={() => onNav(buildCategoryHref(item))}
@@ -285,7 +288,7 @@ function HomeCategoryTile({ item, img, isMobile, onNav }: {
         )}
       </div>
       <div style={{ marginTop: 12, textAlign: 'center' }}>
-        <h3 style={{ fontSize: 16, fontWeight: 500, color: '#373A5A', margin: 0 }}>{item.label}</h3>
+        <h3 style={{ fontSize: isEventTile ? 21 : 16, fontWeight: isEventTile ? 700 : 500, color: '#373A5A', margin: 0 }}>{displayLabel}</h3>
         <span className="underline underline-offset-4" style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: '#111111' }}>לצפייה</span>
       </div>
     </div>
