@@ -145,6 +145,7 @@ interface AppUser {
   soferId?: string;
   shaliachId?: string;
   neverLoggedIn?: boolean;
+  createdAt?: { seconds: number } | Date;
 }
 
 interface Product {
@@ -1592,6 +1593,137 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
   );
 }
 
+function EditShaliachStoreModal({ shaliachId, onClose, onSave }: { shaliachId: string; onClose: () => void; onSave: () => void }) {
+  const [form, setForm] = useState({ name: '', chabadName: '', city: '', phone: '', rabbiName: '', logoUrl: '' });
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const snap = await getDoc(doc(db, 'shluchim', shaliachId));
+        if (snap.exists()) {
+          const d = snap.data();
+          setForm({
+            name: d.name || '',
+            chabadName: d.chabadName || '',
+            city: d.city || '',
+            phone: d.phone || '',
+            rabbiName: d.rabbiName || '',
+            logoUrl: d.logoUrl || '',
+          });
+        } else {
+          setNotFound(true);
+        }
+      } catch (e) { console.error(e); setNotFound(true); }
+      finally { setLoading(false); }
+    })();
+  }, [shaliachId]);
+
+  async function uploadToCloudinary(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'yoursofer_upload');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error('שגיאה בהעלאה');
+    return data.secure_url;
+  }
+
+  async function handleSave() {
+    if (!form.name.trim()) { alert('שם הוא שדה חובה'); return; }
+    setSaving(true);
+    try {
+      await setDoc(doc(db, 'shluchim', shaliachId), { ...form, updatedAt: serverTimestamp() }, { merge: true });
+      setSaved(true);
+      onSave();
+      setTimeout(() => { onClose(); }, 1200);
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בשמירה');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = { width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box' };
+  const labelStyle: React.CSSProperties = { fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={onClose}>
+      <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#b45309' }}>🏪 עריכת חנות שליח</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
+        </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>טוען...</div>
+        ) : notFound ? (
+          <div style={{ textAlign: 'center', padding: 40, color: '#b91c1c', fontWeight: 700 }}>לא נמצא פרופיל שליח (shluchim/{shaliachId})</div>
+        ) : (
+          <div style={{ display: 'grid', gap: 14 }}>
+            {/* תצוגה מקדימה — כמו בדשבורד השליח */}
+            <div style={{ background: '#1a1a1a', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+              {form.logoUrl ? (
+                <img src={form.logoUrl} alt="לוגו" style={{ width: 48, height: 48, borderRadius: 10, objectFit: 'cover', border: '2px solid #C5A028' }} />
+              ) : (
+                <div style={{ width: 48, height: 48, borderRadius: 10, background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🟦</div>
+              )}
+              <div>
+                <div style={{ fontSize: 12, color: '#8899aa', marginBottom: 2 }}>תצוגה מקדימה</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>{form.chabadName || form.name || '—'}</div>
+                {form.city && <div style={{ fontSize: 12, color: '#a8c0d8' }}>{form.city}</div>}
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div><label style={labelStyle}>שם מלא *</label><input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} style={inputStyle} /></div>
+              <div><label style={labelStyle}>שם ארגון / חנות (מוצג בדשבורד)</label><input value={form.chabadName} onChange={e => setForm(p => ({ ...p, chabadName: e.target.value }))} style={inputStyle} /></div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div><label style={labelStyle}>עיר</label><input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} style={inputStyle} /></div>
+              <div><label style={labelStyle}>טלפון</label><input value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} style={inputStyle} /></div>
+            </div>
+            <div><label style={labelStyle}>שם רב</label><input value={form.rabbiName} onChange={e => setForm(p => ({ ...p, rabbiName: e.target.value }))} style={inputStyle} /></div>
+            <div>
+              <label style={labelStyle}>לוגו / תמונת חנות</label>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                {form.logoUrl && <img src={form.logoUrl} alt="לוגו" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', border: '2px solid #ddd', flexShrink: 0 }} />}
+                <label style={{ background: '#b45309', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                  {uploadingLogo ? '⏳ מעלה...' : '📷 החלף תמונה'}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setUploadingLogo(true);
+                    try { const url = await uploadToCloudinary(file); setForm(p => ({ ...p, logoUrl: url })); }
+                    catch { alert('שגיאה בהעלאה'); }
+                    finally { setUploadingLogo(false); }
+                  }} />
+                </label>
+                <input value={form.logoUrl} onChange={e => setForm(p => ({ ...p, logoUrl: e.target.value }))} placeholder="או הדבק URL"
+                  style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12, minWidth: 0 }} />
+                {form.logoUrl && (
+                  <button onClick={() => setForm(p => ({ ...p, logoUrl: '' }))} title="הסר תמונה"
+                    style={{ background: '#fee2e2', color: '#b91c1c', border: 'none', borderRadius: 8, padding: '8px 10px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>🗑️</button>
+                )}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 8, alignItems: 'center' }}>
+              <button onClick={handleSave} disabled={saving || uploadingLogo}
+                style={{ flex: 1, background: '#b45309', color: '#fff', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
+                {saving ? '⏳ שומר...' : saved ? '✅ נשמר!' : '💾 שמור שינויים'}
+              </button>
+              <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const ORDER_STATUSES: { value: string; label: string; color: string }[] = [
   { value: 'paid',       label: '⏳ חדש',            color: 'bg-yellow-100 text-yellow-700' },
   { value: 'pending',    label: '🕐 ממתין',           color: 'bg-orange-100 text-orange-700' },
@@ -2659,6 +2791,8 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<TabType>('orders');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>('הכל');
+  const [userSearch, setUserSearch] = useState('');
+  const [editStoreShaliachId, setEditStoreShaliachId] = useState<string | null>(null);
   const [copiedUserId, setCopiedUserId] = useState<string | null>(null);
   const [productSearch, setProductSearch] = useState('');
   const [showAddProduct, setShowAddProduct] = useState(false);
@@ -3641,7 +3775,21 @@ export default function AdminPage() {
   const pendingApps = applications.filter(a => a.status === 'pending');
   const pendingShluchimApps = shluchimApps.filter(a => a.status === 'pending');
   const pendingRabbiRequests = rabbiRequests.filter(r => r.status === 'pending');
-  const filteredUsers = roleFilter === 'הכל' ? users : users.filter(u => u.role === roleFilter);
+  const userCreatedAtMs = (u: AppUser): number => {
+    const c = u.createdAt as { seconds?: number } | Date | undefined;
+    if (!c) return 0;
+    if (c instanceof Date) return c.getTime();
+    if (typeof c.seconds === 'number') return c.seconds * 1000;
+    return 0;
+  };
+  const filteredUsers = users
+    .filter(u => roleFilter === 'הכל' || u.role === roleFilter)
+    .filter(u => {
+      if (!userSearch.trim()) return true;
+      const q = userSearch.trim().toLowerCase();
+      return (u.displayName || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q);
+    })
+    .sort((a, b) => userCreatedAtMs(b) - userCreatedAtMs(a));
   const visibleProducts = products.filter(p => p.hidden !== true);
   const hiddenProducts  = products.filter(p => p.hidden === true);
   const filteredProducts = visibleProducts.filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()) || p.sku?.toLowerCase().includes(productSearch.toLowerCase()));
@@ -4254,17 +4402,28 @@ export default function AdminPage() {
 
       {activeTab === 'users' && (
         <div>
-          <div className="flex gap-2 mb-4 flex-wrap">
+          <div className="flex gap-2 mb-4 flex-wrap items-center">
             {['הכל', 'admin', 'sofer', 'shaliach', 'customer'].map(r => (
               <button key={r} onClick={() => setRoleFilter(r)} className={`px-3 py-1.5 rounded-lg text-sm font-bold transition ${roleFilter === r ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}>{r === 'הכל' ? 'הכל' : ROLE_LABELS[r as UserRole]}</button>
             ))}
+            <div className="relative mr-auto">
+              <input
+                value={userSearch}
+                onChange={e => setUserSearch(e.target.value)}
+                placeholder="🔍 חיפוש לפי שם או אימייל..."
+                className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white w-64 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              />
+              {userSearch && (
+                <button onClick={() => setUserSearch('')} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">✕</button>
+              )}
+            </div>
           </div>
           {usersLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
           : filteredUsers.length === 0 ? <div className="p-10 text-center text-gray-400">אין משתמשים</div>
           : (
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50"><tr><th className="p-3 text-right">משתמש</th><th className="p-3 text-right">אימייל</th><th className="p-3 text-right">תפקיד נוכחי</th><th className="p-3 text-right">שנה תפקיד</th><th className="p-3 text-right">קישור הפניה</th><th className="p-3 text-right">חנות</th></tr></thead>
+                <thead className="bg-gray-50"><tr><th className="p-3 text-right">משתמש</th><th className="p-3 text-right">אימייל</th><th className="p-3 text-right">הצטרף</th><th className="p-3 text-right">תפקיד נוכחי</th><th className="p-3 text-right">שנה תפקיד</th><th className="p-3 text-right">קישור הפניה</th><th className="p-3 text-right">חנות</th></tr></thead>
                 <tbody>
                   {filteredUsers.map(u => (
                     <tr key={u.id} className={`border-t hover:bg-gray-50 ${u.neverLoggedIn ? 'bg-yellow-50' : ''}`}>
@@ -4273,6 +4432,7 @@ export default function AdminPage() {
                         {u.neverLoggedIn && <span className="mr-2 px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">לא התחבר עדיין</span>}
                       </td>
                       <td className="p-3 text-gray-500 text-xs">{u.email}</td>
+                      <td className="p-3 text-gray-500 text-xs whitespace-nowrap">{userCreatedAtMs(u) ? new Date(userCreatedAtMs(u)).toLocaleDateString('he-IL') : '—'}</td>
                       <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs font-bold ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span></td>
                       <td className="p-3">
                         <select value={u.role} disabled={actionLoading === u.id || !!u.neverLoggedIn} onChange={e => changeUserRole(u.id, e.target.value as UserRole)} className="border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
@@ -4283,11 +4443,17 @@ export default function AdminPage() {
                       <td className="p-3">
                         {u.role === 'shaliach' && (
                           u.shaliachId ? (
-                            <button onClick={() => { navigator.clipboard.writeText(`https://your-sofer.com/?ref=${u.shaliachId}`); setCopiedUserId(u.id); setTimeout(() => setCopiedUserId(null), 2000); }}
-                              title={`https://your-sofer.com/?ref=${u.shaliachId}`}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition">
-                              {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
-                            </button>
+                            <div className="flex flex-col gap-1">
+                              <button onClick={() => { navigator.clipboard.writeText(`https://your-sofer.com/?ref=${u.shaliachId}`); setCopiedUserId(u.id); setTimeout(() => setCopiedUserId(null), 2000); }}
+                                title={`https://your-sofer.com/?ref=${u.shaliachId}`}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition w-fit">
+                                {copiedUserId === u.id ? '✅ הועתק' : '📋 העתק קישור'}
+                              </button>
+                              <button onClick={() => setEditStoreShaliachId(u.shaliachId!)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 transition w-fit">
+                                🏪 ערוך חנות
+                              </button>
+                            </div>
                           ) : <span className="text-xs text-gray-400">אין מזהה שליח</span>
                         )}
                       </td>
@@ -4954,6 +5120,7 @@ export default function AdminPage() {
 
       {showAddSofer && <AddSoferModal onClose={() => setShowAddSofer(false)} onSave={() => { loadSoferimFull(); loadSoferim(); }} />}
       {showAddShliach && <AddShliachModal onClose={() => setShowAddShliach(false)} onSave={() => { loadShluchimApplications(); loadUsers(); }} />}
+      {editStoreShaliachId && <EditShaliachStoreModal shaliachId={editStoreShaliachId} onClose={() => setEditStoreShaliachId(null)} onSave={() => loadUsers()} />}
       {showAddProduct && <AddProductModal soferim={soferim} soferimFull={soferimFull} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />}
       {editingProduct && <EditProductModal product={editingProduct} soferim={soferim} soferimFull={soferimFull} onClose={() => setEditingProduct(null)} onSave={() => { loadProducts(); }} />}
       {editingSofer && (
