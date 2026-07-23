@@ -3,6 +3,7 @@ import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { createHash, randomUUID } from 'crypto';
 import type { CartItem } from '@/app/contexts/CartContext';
+import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
 
 // ── תשלום בביט דרך Sumit — Redirect API ──────────────────────────────────────
 // זרימה (זהה לפלאגין הרשמי של Sumit ל-WooCommerce):
@@ -27,12 +28,18 @@ const POINTS_MAX_CART_PERCENT = 0.5;
 // Klaf-bearing items earn a reduced shaliach commission
 const KLAF_COMMISSION_PERCENT = 4;
 
-function computeCommissionAmount(cartItems: CartItem[], commissionPercent: number): number {
+function computeCommissionAmount(
+  cartItems: CartItem[],
+  commissionPercent: number,
+  lineDiscounts?: Record<string, { percent: number; amount: number }> | null,
+): number {
   if (!commissionPercent) return 0;
   let amount = 0;
   for (const item of cartItems) {
     const rate = item.selectedKlafId ? KLAF_COMMISSION_PERCENT : commissionPercent;
-    amount += item.price * item.quantity * rate / 100;
+    // עמלת שליח מחושבת על הסכום אחרי הנחת מבצע SIMCHA (אם חלה על השורה)
+    const base = Math.max(0, item.price * item.quantity - (lineDiscounts?.[item.id]?.amount ?? 0));
+    amount += base * rate / 100;
   }
   return Math.round(amount * 100) / 100;
 }
@@ -190,7 +197,23 @@ export async function POST(req: NextRequest) {
 
     // ── A2: server-side coupon validation ─────────────────────────────────────
     let couponDiscountAmount = 0;
-    if (couponCode) {
+    let simchaBreakdown: Record<string, { percent: number; amount: number }> | null = null;
+
+    if (couponCode === SIMCHA_CODE) {
+      // ── מבצע SIMCHA: חישוב מלא בצד שרת מ-cartItems — לא תלוי ב-Firestore ────
+      const simcha = calcSimchaDiscount(cartItems.map(i => ({
+        id: i.id, price: i.price, quantity: i.quantity, cat: i.cat,
+        hasOtherPromo: !!(i.bundlePromo || i.promoPlan),
+      })));
+      const simchaLine = items.find(i => i.name.includes('הנחת קופון'));
+      const submittedSimchaDisc = simchaLine ? -simchaLine.price : 0;
+      if (Math.abs(submittedSimchaDisc - simcha.totalDiscount) > 0.02) {
+        console.error('[payment-bit] SIMCHA discount mismatch', { submittedSimchaDisc, expected: simcha.totalDiscount });
+        return NextResponse.json({ error: 'שגיאה בחישוב הנחת מבצע SIMCHA' }, { status: 400 });
+      }
+      couponDiscountAmount = simcha.totalDiscount;
+      simchaBreakdown = simcha.totalDiscount > 0 ? simcha.lineDiscounts : null;
+    } else if (couponCode) {
       try {
         const adminDb = getAdminDb();
         const couponSnap = await adminDb.collection('coupons').doc(couponCode).get();
@@ -281,7 +304,7 @@ export async function POST(req: NextRequest) {
     // status: pending_payment — לא נספרת כהכנסה עד שה-IPN מסמן paid.
     // מזהה ייחודי אמיתי (ראה הערה זהה ב-/api/payment) — מונע התנגשויות transaction_id
     const orderNumber = 'YS-' + Date.now().toString().slice(-8) + String(Math.floor(Math.random() * 900) + 100);
-    const commissionAmount = shaliachId ? computeCommissionAmount(cartItems, commissionPercent || 0) : 0;
+    const commissionAmount = shaliachId ? computeCommissionAmount(cartItems, commissionPercent || 0, simchaBreakdown) : 0;
 
     // מפתח IPN סודי — נשלח ל-Sumit בלבד; בהזמנה נשמר רק ה-hash (מסמכי orders
     // קריאים מהקליינט, ולכן אסור לשמור בהם את המפתח עצמו).
@@ -307,6 +330,7 @@ export async function POST(req: NextRequest) {
         ...(giftLine ? [{ id: giftLine.productId || giftLine.id, name: `מתנה: ${giftLine.name}`, price: 0, quantity: 1, isGift: true, giftSourceId: giftLine.id }] : []),
       ],
       total, couponCode: couponCode || null, couponDiscount: couponDiscountAmount > 0 ? couponDiscountAmount : null,
+      discountBreakdown: simchaBreakdown, totalDiscount: couponDiscountAmount > 0 ? couponDiscountAmount : null,
       selectedGift: selectedGift || null,
       kippotDiscount: null,
       shippingCost: shippingCost || 0, shippingType: shippingType || 'regular',

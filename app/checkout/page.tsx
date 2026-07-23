@@ -78,8 +78,8 @@ interface OrderSummaryProps {
   items: CartItem[];
   total: number;
   bundleDiscountAmount: number;
-  appliedCoupon: { code: string; discount: number; type: 'percent' | 'fixed' } | null;
-  setAppliedCoupon: (c: { code: string; discount: number; type: 'percent' | 'fixed' } | null) => void;
+  appliedCoupon: { code: string; discount: number; type: 'percent' | 'fixed' | 'simcha' } | null;
+  setAppliedCoupon: (c: { code: string; discount: number; type: 'percent' | 'fixed' | 'simcha' } | null) => void;
   discountAmount: number;
   finalTotal: number;
   selectedGift: string | null;
@@ -159,7 +159,7 @@ function OrderSummary({
         </div>
         {appliedCoupon && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconTag size={12} color="#1a6b3c" /> קופון ({appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconTag size={12} color="#1a6b3c" /> {appliedCoupon.type === 'simcha' ? 'הנחת מבצע SIMCHA' : `קופון (${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})`}</span>
             <span style={{ paddingLeft: 4 }}>-{formatPrice(discountAmount)}</span>
           </div>
         )}
@@ -184,7 +184,7 @@ function OrderSummary({
         <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#555" /> קוד קופון</div>
         {appliedCoupon ? (
           <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflow: 'hidden' }}>
-            <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} — {appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה</span>
+            <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} — {appliedCoupon.type === 'simcha' ? 'מבצע אירועים' : `${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה`}</span>
             <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', display: 'flex', flexShrink: 0 }}><IconX size={14} /></button>
           </div>
         ) : (

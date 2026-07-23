@@ -224,8 +224,8 @@ export async function POST(req: NextRequest) {
     }
 
     // ── תופעות לוואי (כמו בזרימת האשראי, non-fatal) ───────────────────────────
-    // 1. שימוש בקופון
-    if (order.couponCode) {
+    // 1. שימוש בקופון (SIMCHA הוא קופון מבוסס-חוקים — אין לו מסמך coupons)
+    if (order.couponCode && order.couponCode !== 'SIMCHA') {
       try {
         await adminDb.collection('coupons').doc(order.couponCode).update({
           usedBy: FieldValue.arrayUnion(order.email || order.customerName),

@@ -20,7 +20,7 @@ export default function CartPage() {
     bundleDiscountAmount,
     giftEnabled, giftEligible, giftThreshold, amountToGift, selectedGift, setSelectedGift,
     appliedCoupon, setAppliedCoupon, couponInput, setCouponInput, applyCoupon, couponLoading, couponError,
-    discountAmount,
+    discountAmount, simchaResult,
   } = useCart();
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
@@ -407,7 +407,7 @@ export default function CartPage() {
                 )}
                 {appliedCoupon && discountAmount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
-                    <span>🏷️ קופון ({appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`}):</span>
+                    <span>{appliedCoupon.type === 'simcha' ? '🎉 הנחת מבצע SIMCHA:' : `🏷️ קופון (${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`}):`}</span>
                     <span>-{formatPrice(discountAmount)}</span>
                   </div>
                 )}
@@ -429,12 +429,35 @@ export default function CartPage() {
               <div style={{ marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid #eee' }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8 }}>🏷️ קוד קופון</div>
                 {appliedCoupon ? (
+                  <>
                   <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700 }}>
-                      ✓ {appliedCoupon.code} — {appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה
+                      ✓ {appliedCoupon.code} — {appliedCoupon.type === 'simcha' ? 'מבצע אירועים' : `${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה`}
                     </span>
                     <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 2px' }}>×</button>
                   </div>
+                  {appliedCoupon.type === 'simcha' && simchaResult && (
+                    <div style={{ marginTop: 8, background: simchaResult.totalDiscount > 0 ? '#f0fdf4' : '#fffbeb', border: `1px solid ${simchaResult.totalDiscount > 0 ? '#86efac' : '#fcd34d'}`, borderRadius: 10, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 800, color: simchaResult.totalDiscount > 0 ? '#15803d' : '#92400e', marginBottom: Object.keys(simchaResult.lineDiscounts).length > 0 ? 6 : 0 }}>
+                        {simchaResult.reason}
+                      </div>
+                      {Object.keys(simchaResult.lineDiscounts).length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {items.filter(i => simchaResult.lineDiscounts[i.id]).map(i => {
+                            const d = simchaResult.lineDiscounts[i.id];
+                            const orig = i.price * i.quantity;
+                            return (
+                              <div key={i.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: '#166534', gap: 8 }}>
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{i.name} ({Math.round(d.percent * 100)}%)</span>
+                                <span style={{ whiteSpace: 'nowrap' }}><s style={{ color: '#9ca3af' }}>{formatPrice(orig)}</s> {formatPrice(orig - d.amount)}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  </>
                 ) : (
                   <div style={{ display: 'flex', gap: 6 }}>
                     <input

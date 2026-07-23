@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getKipaUnitPrice } from '../lib/kippot';
+import { calcSimchaDiscount, PROMO_ACTIVE, SIMCHA_CODE, type SimchaResult } from '../lib/promoRules';
 
 // ── Shipping constants — single source of truth used in cart + checkout ───────
 export const SHIPPING_REGULAR = 35;
@@ -118,14 +119,16 @@ interface CartContextType {
   selectedGift:  string | null;
   setSelectedGift: (id: string | null) => void;
   // ── coupon — shared between cart and checkout ─────────────────────────────
-  appliedCoupon: { code: string; discount: number; type: 'percent' | 'fixed' } | null;
-  setAppliedCoupon: (c: { code: string; discount: number; type: 'percent' | 'fixed' } | null) => void;
+  appliedCoupon: { code: string; discount: number; type: 'percent' | 'fixed' | 'simcha' } | null;
+  setAppliedCoupon: (c: { code: string; discount: number; type: 'percent' | 'fixed' | 'simcha' } | null) => void;
   couponInput: string;
   setCouponInput: (v: string) => void;
   couponLoading: boolean;
   couponError: string;
   applyCoupon: () => Promise<void>;
   discountAmount: number;
+  /** תוצאת מבצע SIMCHA — קיימת רק כשהקופון SIMCHA מוחל (מחושבת מחדש על כל שינוי בסל) */
+  simchaResult: SimchaResult | null;
 }
 
 // ── Bundle promo parser ────────────────────────────────────────────────────────
@@ -266,7 +269,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [giftThreshold, setGiftThreshold] = useState(250);
 
   // ── Coupon state — shared between cart page and checkout page ─────────────
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; type: 'percent' | 'fixed' | 'simcha' } | null>(null);
   const [couponInput, setCouponInput] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
@@ -357,11 +360,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!giftEligible && selectedGift) setSelectedGift(null);
   }, [giftEligible, selectedGift]);
 
+  // ── SIMCHA — מחושב מחדש על כל שינוי בסל (רספונסיבי לכמויות) ───────────────
+  const simchaResult: SimchaResult | null = appliedCoupon?.type === 'simcha'
+    ? calcSimchaDiscount(items.map(i => ({
+        id: i.id, price: i.price, quantity: i.quantity, cat: i.cat,
+        hasOtherPromo: !!(i.bundlePromo || i.promoPlan),
+      })))
+    : null;
+
   // ── Coupon discount — same formula as checkout ────────────────────────────
   const discountAmount = appliedCoupon
-    ? appliedCoupon.type === 'fixed'
-      ? Math.min(appliedCoupon.discount, discountableTotal)
-      : Math.round(discountableTotal * appliedCoupon.discount / 100 * 100) / 100
+    ? appliedCoupon.type === 'simcha'
+      ? (simchaResult?.totalDiscount ?? 0)
+      : appliedCoupon.type === 'fixed'
+        ? Math.min(appliedCoupon.discount, discountableTotal)
+        : Math.round(discountableTotal * appliedCoupon.discount / 100 * 100) / 100
     : 0;
 
   async function applyCoupon() {
@@ -369,6 +382,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!code) return;
     if (appliedCoupon) { setCouponError('קופון כבר מוחל'); return; }
     setCouponLoading(true); setCouponError('');
+    // ── SIMCHA: קופון מבצע מבוסס-חוקים — לא קיים ב-Firestore ─────────────────
+    if (code === SIMCHA_CODE) {
+      if (!PROMO_ACTIVE) { setCouponError('קוד הקופון אינו פעיל'); setCouponLoading(false); return; }
+      setAppliedCoupon({ code: SIMCHA_CODE, discount: 0, type: 'simcha' });
+      setCouponInput('');
+      setCouponLoading(false);
+      return;
+    }
     try {
       const snap = await getDoc(doc(db, 'coupons', code));
       if (!snap.exists()) { setCouponError('קוד קופון לא נמצא'); return; }
@@ -401,6 +422,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       couponLoading, couponError,
       applyCoupon,
       discountAmount,
+      simchaResult,
     }}>
       {children}
     </CartContext.Provider>
