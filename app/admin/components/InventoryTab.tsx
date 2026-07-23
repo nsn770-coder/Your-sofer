@@ -216,7 +216,7 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
         ? p.name?.toLowerCase().includes(searchTerm.toLowerCase())
         : (p.receivedFromSupplier ?? 0) > 0;
     })
-    .sort((a, b) => b.computedInStock - a.computedInStock);
+    .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
 
   console.log(`[InventoryTab] Filtered to ${inventoryProducts.length} products in inventory (search: "${searchTerm}")`);
 
