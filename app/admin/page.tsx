@@ -3138,7 +3138,7 @@ export default function AdminPage() {
         getDocs(collection(db, 'users')),
         getDocs(collection(db, 'soferim')),
         getDocs(collection(db, 'products')),
-        getDocs(query(collection(db, 'shluchim'), where('isPersonalStore', '==', true))),
+        getDocs(collection(db, 'shluchim')),
       ]);
       const data: AppUser[] = [];
       usersSnap.forEach(d => data.push({ id: d.id, ...d.data() } as AppUser));
@@ -3160,11 +3160,29 @@ export default function AdminPage() {
           neverLoggedIn: true,
         });
       });
+      // Add shluchim that have no matching users doc (never logged in)
+      const linkedShaliachIds = new Set(data.map(u => u.shaliachId).filter(Boolean));
+      shluchimSnap.forEach(d => {
+        const s = d.data();
+        if (linkedShaliachIds.has(d.id)) return;
+        const shaliachEmail = s.email?.trim().toLowerCase();
+        if (shaliachEmail && userEmails.has(shaliachEmail)) return;
+        data.push({
+          id: d.id,
+          email: s.email || '',
+          displayName: s.name || s.chabadName || '',
+          role: 'shaliach',
+          status: 'active',
+          shaliachId: d.id,
+          neverLoggedIn: true,
+          createdAt: s.createdAt,
+        });
+      });
       const withProducts = new Set<string>();
       productsSnap.forEach(d => { const sid = d.data().soferId; if (sid) withProducts.add(sid); });
       setSoferIdsWithProducts(withProducts);
       const withStore = new Set<string>();
-      shluchimSnap.forEach(d => withStore.add(d.id));
+      shluchimSnap.forEach(d => { if (d.data().isPersonalStore === true) withStore.add(d.id); });
       setSoferUidsWithStore(withStore);
       setUsers(data);
     } catch (e) { console.error(e); }
