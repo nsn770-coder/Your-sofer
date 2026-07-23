@@ -8,6 +8,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import { Product } from '@/app/lib/types';
 import ProductCard from '@/components/ui/ProductCard';
 import { EVENT_SCROLL_SECTIONS, EVENT_SCROLL_SECTION_IDS } from '@/app/constants/eventScrollSections';
+import { PROMO_ACTIVE, MIN_KIPPOT_QTY, MIN_ADDON_QTY } from '@/app/lib/promoRules';
 
 const GOLD = '#C5A028';
 const NAVY = '#111d3a';
@@ -57,6 +58,19 @@ export default function EventKippotClient() {
   const [style, setStyle]         = useState<string | null>(null);
   const { user } = useAuth();
   const [eventProducts, setEventProducts] = useState<Product[]>([]);
+
+  // ── פופאפ מבצע SIMCHA — פעם אחת לסשן ─────────────────────────────────────
+  const [showPromoPopup, setShowPromoPopup] = useState(false);
+  useEffect(() => {
+    if (!PROMO_ACTIVE) return;
+    try { if (sessionStorage.getItem('simchaPopupSeen')) return; } catch { /* private mode */ }
+    const t = setTimeout(() => setShowPromoPopup(true), 800);
+    return () => clearTimeout(t);
+  }, []);
+  function closePromoPopup() {
+    setShowPromoPopup(false);
+    try { sessionStorage.setItem('simchaPopupSeen', '1'); } catch { /* non-fatal */ }
+  }
 
   // ── אנימציית "שימו לב" לסרגל הכמות: כשהסרגל נכנס לתצוגה הסמן זז עד הקצה
   //    ואז חוזר מהר למרכז — כדי שהלקוחות יבינו שגרירה מעדכנת את המחיר.
@@ -140,6 +154,36 @@ export default function EventKippotClient() {
           .ys-ekip-styles .ys-ekip-card { flex: 0 0 132px; width: 132px; }
         }
       `}</style>
+
+      {/* ── פס מבצע SIMCHA — צמוד לחלק העליון של העמוד ── */}
+      {PROMO_ACTIVE && (
+        <div style={{ marginTop: 'calc(-1 * clamp(16px, 3vw, 40px))', marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)', marginBottom: 24, background: NAVY, color: '#fff', textAlign: 'center', padding: '10px 16px', fontSize: 13.5, fontWeight: 700, lineHeight: 1.6 }}>
+          🎉 מבצע SIMCHA: מזמינים {MIN_KIPPOT_QTY}+ כיפות מאותו דגם ומקבלים <span style={{ color: GOLD }}>10%-15% הנחה</span> על מזכרות ומוצרים נלווים ({MIN_ADDON_QTY}+ יח׳ מכל מוצר) · קוד בעגלה: <span style={{ color: GOLD, letterSpacing: 1 }}>SIMCHA</span>
+        </div>
+      )}
+
+      {/* ── פופאפ מבצע SIMCHA ── */}
+      {showPromoPopup && (
+        <div onClick={closePromoPopup} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div onClick={e => e.stopPropagation()} dir="rtl" style={{ background: '#fff', borderRadius: 18, maxWidth: 420, width: '100%', maxHeight: '92vh', overflowY: 'auto', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }}>
+            <button onClick={closePromoPopup} aria-label="סגירה" style={{ position: 'absolute', top: 10, left: 12, width: 30, height: 30, background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', fontSize: 20, color: '#555', cursor: 'pointer', lineHeight: 1, boxShadow: '0 1px 6px rgba(0,0,0,0.2)', zIndex: 1 }}>×</button>
+            <img
+              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_840/v1784837677/ChatGPT_Image_Jul_23_2026_11_14_21_PM_c4gm6t.png"
+              alt="מבצע SIMCHA — הנחה על מזכרות לאירועים"
+              style={{ width: '100%', display: 'block' }}
+            />
+            <div style={{ padding: '12px 16px 16px' }}>
+              <div style={{ fontSize: 12.5, color: '#555', lineHeight: 1.7, marginBottom: 10 }}>
+                בתוקף בהזמנת {MIN_KIPPOT_QTY}+ כיפות מאותו דגם · {MIN_ADDON_QTY}+ יח׳ מכל מוצר נלווה
+                <br />קוד בעגלה: <b style={{ color: NAVY, letterSpacing: 1 }}>SIMCHA</b>
+              </div>
+              <button onClick={closePromoPopup} style={{ background: GOLD, color: NAVY, border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 800, cursor: 'pointer', width: '100%' }}>
+                מעולה, בואו נתחיל ←
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero */}
       <div style={{ marginBottom: 32, borderBottom: '1px solid #E5E0D5', paddingBottom: 24 }}>
