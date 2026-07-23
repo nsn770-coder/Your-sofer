@@ -991,8 +991,18 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
                             🛠 השלם פרטים
                           </button>
                         )}
+                        {!pending && onEditProduct && (
+                          <button
+                            onClick={() => onEditProduct(p)}
+                            title="עריכת מוצר מלאה — כל השדות"
+                            style={{ background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 4, padding: '3px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          >
+                            🛠 ערוך מוצר
+                          </button>
+                        )}
                         <button
                           onClick={() => startEdit(p)}
+                          title="עריכה מהירה — מחיר קנייה וכמות"
                           style={{ background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', borderRadius: 4, padding: '3px 8px', fontSize: 12, cursor: 'pointer' }}
                         >
                           ✏️
