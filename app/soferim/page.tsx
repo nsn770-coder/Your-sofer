@@ -8,17 +8,17 @@ const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
 // ── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'סופרי סת"מ מוסמכים בישראל | YourSofer',
-  description: 'מאגר סופרי סת"מ מוסמכים מכל רחבי ישראל. מצא סופר קרוב אליך לרכישת מזוזות, תפילין, מגילות וספרי תורה.',
-  keywords: ['סופר סת"מ', 'סופרי סת"מ', 'מזוזה', 'תפילין', 'מגילה', 'ספר תורה', 'סת"מ ישראל', 'Your Sofer'],
+  title: 'הסופרים והיוצרים שלנו | Your Sofer - אתר היודאיקה של ישראל',
+  description: 'הסופרים והיוצרים של Your Sofer — אתר היודאיקה הגדול בישראל. כל סופר עבר בדיקה ואימות. מזוזות ותפילין לצד כיפות בעיצוב אישי, מזכרות ומתנות לאירועים.',
+  keywords: ['סופר סת"מ', 'סופרי סת"מ', 'מזוזה', 'תפילין', 'יודאיקה', 'כיפות', 'Your Sofer'],
   alternates: { canonical: `${BASE_URL}/soferim` },
   openGraph: {
     type: 'website',
     locale: 'he_IL',
     url: `${BASE_URL}/soferim`,
     siteName: 'Your Sofer',
-    title: 'סופרי סת"מ מוסמכים בישראל | YourSofer',
-    description: 'מאגר סופרי סת"מ מוסמכים מכל רחבי ישראל. מצא סופר קרוב אליך לרכישת מזוזות, תפילין ומגילות.',
+    title: 'הסופרים והיוצרים שלנו | Your Sofer',
+    description: 'הסופרים והיוצרים של Your Sofer — אתר היודאיקה הגדול בישראל. כל סופר עבר בדיקה ואימות.',
     images: [{ url: `${BASE_URL}/og-default.png`, width: 1200, height: 630, alt: 'סופרי סת"מ | Your Sofer' }],
   },
 };

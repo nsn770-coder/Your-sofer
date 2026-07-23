@@ -76,9 +76,9 @@ export async function GET() {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>Your Sofer — חנות סת"מ</title>
+    <title>Your Sofer — אתר היודאיקה הגדול בישראל</title>
     <link>${SITE}</link>
-    <description>מזוזות, תפילין, קלפים ויודאיקה מסופרים מוסמכים</description>
+    <description>כיפות בעיצוב אישי, מזכרות ומתנות לאירועים, תשמישי קדושה ויודאיקה לבית היהודי</description>
 ${items.join('\n')}
   </channel>
 </rss>`;
@@ -88,6 +88,8 @@ ${items.join('\n')}
       headers: {
         'Content-Type': 'application/xml; charset=utf-8',
         'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+        // הפיד מיועד לפייסבוק בלבד — לא לאינדוקס בחיפוש
+        'X-Robots-Tag': 'noindex, nofollow',
       },
     });
   } catch (err: any) {

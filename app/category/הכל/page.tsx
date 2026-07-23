@@ -8,8 +8,8 @@ const BASE_URL = 'https://your-sofer.com';
 const PAGE_URL  = `${BASE_URL}/category/הכל`;
 
 export const metadata: Metadata = {
-  title: 'כל המוצרים | סת"מ, כיפות ויודאיקה | Your Sofer',
-  description: 'כל מוצרי החנות — מזוזות, תפילין, כיפות, יודאיקה, כלי שולחן ועוד. Your Sofer.',
+  title: 'כל המוצרים | כיפות, מתנות, מזכרות לאירועים ויודאיקה | Your Sofer',
+  description: 'כל מוצרי החנות — כיפות בעיצוב אישי, מזכרות ומתנות לאירועים, יודאיקה, כלי שולחן, מזוזות ותפילין. Your Sofer.',
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: 'website', locale: 'he_IL', url: PAGE_URL,

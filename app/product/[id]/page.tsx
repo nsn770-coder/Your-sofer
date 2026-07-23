@@ -99,7 +99,7 @@ export async function generateMetadata(
     // מוצר שנמחק / לא קיים — לא לאנדקס, כדי שגוגל לא יציג "מוצר" גנרי בתוצאות
     return {
       title: 'מוצר לא נמצא | Your Sofer',
-      description: 'המוצר אינו זמין יותר. גלו את מגוון מוצרי הסת"מ והיודאיקה שלנו.',
+      description: 'המוצר אינו זמין יותר. גלו כיפות בעיצוב אישי, מזכרות לאירועים ומגוון היודאיקה שלנו.',
       robots: { index: false, follow: false },
     };
   }
