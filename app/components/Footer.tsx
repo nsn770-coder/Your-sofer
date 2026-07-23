@@ -34,7 +34,7 @@ const CATEGORY_BLOCKS: CatBlock[] = [
     path: '/bar-mitzva',
     subs: [
       { label: 'סט בר מצווה',    path: '/bar-mitzva' },
-      { label: 'כיפות לאירועים', path: '/event-kippot' },
+      { label: 'כיפות ומזכרות לאירועים', path: '/event-kippot' },
     ],
   },
 ];

@@ -144,7 +144,7 @@ export default function EventKippotClient() {
       {/* Hero */}
       <div style={{ marginBottom: 32, borderBottom: '1px solid #E5E0D5', paddingBottom: 24 }}>
         <div style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 300, color: NAVY, letterSpacing: '-0.5px', lineHeight: 1.2 }}>
-          כיפות לאירועים
+          כיפות ומזכרות לאירועים
         </div>
         <div style={{ fontSize: 'clamp(22px, 3vw, 34px)', fontWeight: 900, color: NAVY, letterSpacing: '-0.5px', lineHeight: 1.2, marginBottom: 12 }}>
           עם הדפסה אישית

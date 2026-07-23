@@ -2,6 +2,7 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart, CartItem, SHIPPING_REGULAR, FREE_SHIPPING_THRESHOLD } from '../contexts/CartContext';
+import type { SimchaResult } from '../lib/promoRules';
 import { useShaliach } from '../contexts/ShaliachContext';
 import { serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -81,6 +82,7 @@ interface OrderSummaryProps {
   appliedCoupon: { code: string; discount: number; type: 'percent' | 'fixed' | 'simcha' } | null;
   setAppliedCoupon: (c: { code: string; discount: number; type: 'percent' | 'fixed' | 'simcha' } | null) => void;
   discountAmount: number;
+  simchaResult: SimchaResult | null;
   finalTotal: number;
   selectedGift: string | null;
   giftOptions: { id: string; name: string; imgUrl?: string }[];
@@ -106,7 +108,7 @@ interface OrderSummaryProps {
 
 function OrderSummary({
   isSticky, framed = true, items, total,
-  bundleDiscountAmount, appliedCoupon, setAppliedCoupon, discountAmount,
+  bundleDiscountAmount, appliedCoupon, setAppliedCoupon, discountAmount, simchaResult,
   finalTotal, selectedGift, giftOptions, giftEnabled, giftEligible,
   giftThreshold, amountToGift, setSelectedGift,
   couponInput, setCouponInput, applyCoupon, couponLoading, couponError, shaliach,
@@ -157,7 +159,7 @@ function OrderSummary({
             <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(shippingCost)}</span>
           )}
         </div>
-        {appliedCoupon && (
+        {appliedCoupon && discountAmount > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconTag size={12} color="#1a6b3c" /> {appliedCoupon.type === 'simcha' ? 'הנחת מבצע SIMCHA' : `קופון (${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})`}</span>
             <span style={{ paddingLeft: 4 }}>-{formatPrice(discountAmount)}</span>
@@ -183,10 +185,17 @@ function OrderSummary({
       <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#555" /> קוד קופון</div>
         {appliedCoupon ? (
+          <>
           <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflow: 'hidden' }}>
             <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconCheck size={12} color="#15803d" /> {appliedCoupon.code} — {appliedCoupon.type === 'simcha' ? 'מבצע אירועים' : `${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה`}</span>
             <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', display: 'flex', flexShrink: 0 }}><IconX size={14} /></button>
           </div>
+          {appliedCoupon.type === 'simcha' && simchaResult && (
+            <div style={{ marginTop: 6, background: simchaResult.totalDiscount > 0 ? '#f0fdf4' : '#fffbeb', border: `1px solid ${simchaResult.totalDiscount > 0 ? '#86efac' : '#fcd34d'}`, borderRadius: 10, padding: '8px 12px', fontSize: 11.5, fontWeight: 700, lineHeight: 1.5, color: simchaResult.totalDiscount > 0 ? '#15803d' : '#92400e' }}>
+              {simchaResult.reason}
+            </div>
+          )}
+          </>
         ) : (
           <div style={{ display: 'flex', gap: 6 }}>
             <input value={couponInput} onChange={e => setCouponInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }} />
@@ -327,7 +336,7 @@ export default function CheckoutPage() {
     items, total, bundleDiscountAmount,
     giftEnabled, giftThreshold, giftEligible, amountToGift, selectedGift, setSelectedGift,
     appliedCoupon, setAppliedCoupon, couponInput, setCouponInput, applyCoupon, couponLoading, couponError,
-    discountAmount,
+    discountAmount, simchaResult,
   } = useCart();
   const { shaliach, refCode } = useShaliach();
   const [loading, setLoading] = useState(false);
@@ -699,7 +708,7 @@ export default function CheckoutPage() {
             Collapsible: item count + final total always visible in the header. */}
         <div className="checkout-summary-mobile" style={{ display: isMobile ? 'block' : 'none' }}>
           <MobileOrderSummary itemCount={items.reduce((s, i) => s + i.quantity, 0)} finalTotal={finalTotal}>
-            <OrderSummary isSticky={false} framed={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} freeShipping={freeShippingEligible && deliveryMethod !== 'pickup'} />
+            <OrderSummary isSticky={false} framed={false} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} simchaResult={simchaResult} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} freeShipping={freeShippingEligible && deliveryMethod !== 'pickup'} />
           </MobileOrderSummary>
         </div>
 
@@ -885,7 +894,7 @@ export default function CheckoutPage() {
 
         {/* Order summary — desktop: sticky right column; mobile: hidden via CSS */}
         <div className="checkout-summary-desktop" style={{ display: isMobile ? 'none' : 'block' }}>
-          <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} freeShipping={freeShippingEligible && deliveryMethod !== 'pickup'} />
+          <OrderSummary isSticky={!isMobile} items={items} total={total} bundleDiscountAmount={bundleDiscountAmount} appliedCoupon={appliedCoupon} setAppliedCoupon={setAppliedCoupon} discountAmount={discountAmount} simchaResult={simchaResult} finalTotal={finalTotal} selectedGift={selectedGift} giftOptions={giftOptions} giftEnabled={giftEnabled} giftEligible={giftEligible} giftThreshold={giftThreshold} amountToGift={amountToGift} setSelectedGift={setSelectedGift} couponInput={couponInput} setCouponInput={setCouponInput} applyCoupon={applyCoupon} couponLoading={couponLoading} couponError={couponError} shaliach={shaliach} pointsAvailable={pointsAvailable} pointsToUse={pointsToUse} setPointsToUse={setPointsToUse} maxRedeemablePoints={maxRedeemablePoints} shippingCost={shippingCost} freeShipping={freeShippingEligible && deliveryMethod !== 'pickup'} />
         </div>
       </div>
 

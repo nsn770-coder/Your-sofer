@@ -360,11 +360,38 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!giftEligible && selectedGift) setSelectedGift(null);
   }, [giftEligible, selectedGift]);
 
+  // ── SIMCHA — שליפת שיוך לעמוד האירועים (isEventProduct) ממסמכי המוצרים ────
+  // הדגלים לא נשמרים על פריט הסל, אז נשלפים פעם אחת לכל מוצר כשהקופון פעיל.
+  const [eventFlags, setEventFlags] = useState<Record<string, { isEventProduct: boolean; eventSection: string | null }>>({});
+  const simchaActive = appliedCoupon?.type === 'simcha';
+  useEffect(() => {
+    if (!simchaActive) return;
+    const missing = items.filter(i => !i.id.startsWith('print-') && eventFlags[i.id] === undefined);
+    if (missing.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const entries: [string, { isEventProduct: boolean; eventSection: string | null }][] = [];
+      for (const it of missing) {
+        try {
+          const snap = await getDoc(doc(db, 'products', it.id));
+          const d = snap.exists() ? snap.data() : null;
+          entries.push([it.id, { isEventProduct: d?.isEventProduct === true, eventSection: d?.eventScrollSection ?? null }]);
+        } catch {
+          entries.push([it.id, { isEventProduct: false, eventSection: null }]);
+        }
+      }
+      if (!cancelled) setEventFlags(prev => ({ ...prev, ...Object.fromEntries(entries) }));
+    })();
+    return () => { cancelled = true; };
+  }, [simchaActive, items, eventFlags]);
+
   // ── SIMCHA — מחושב מחדש על כל שינוי בסל (רספונסיבי לכמויות) ───────────────
-  const simchaResult: SimchaResult | null = appliedCoupon?.type === 'simcha'
+  const simchaResult: SimchaResult | null = simchaActive
     ? calcSimchaDiscount(items.map(i => ({
         id: i.id, price: i.price, quantity: i.quantity, cat: i.cat,
         hasOtherPromo: !!(i.bundlePromo || i.promoPlan),
+        isEventProduct: eventFlags[i.id]?.isEventProduct ?? false,
+        eventSection: eventFlags[i.id]?.eventSection ?? null,
       })))
     : null;
 

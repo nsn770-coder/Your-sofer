@@ -200,19 +200,36 @@ export async function POST(req: NextRequest) {
     let simchaBreakdown: Record<string, { percent: number; amount: number }> | null = null;
 
     if (couponCode === SIMCHA_CODE) {
-      // ── מבצע SIMCHA: חישוב מלא בצד שרת מ-cartItems — לא תלוי ב-Firestore ────
-      const simcha = calcSimchaDiscount(cartItems.map(i => ({
-        id: i.id, price: i.price, quantity: i.quantity, cat: i.cat,
-        hasOtherPromo: !!(i.bundlePromo || i.promoPlan),
-      })));
+      // ── מבצע SIMCHA: חישוב מלא בצד שרת — שיוך אירועים נשלף ממסמכי המוצרים ──
       const simchaLine = items.find(i => i.name.includes('הנחת קופון'));
       const submittedSimchaDisc = simchaLine ? -simchaLine.price : 0;
-      if (Math.abs(submittedSimchaDisc - simcha.totalDiscount) > 0.02) {
-        console.error('[payment-bit] SIMCHA discount mismatch', { submittedSimchaDisc, expected: simcha.totalDiscount });
-        return NextResponse.json({ error: 'שגיאה בחישוב הנחת מבצע SIMCHA' }, { status: 400 });
+      try {
+        const adminDb = getAdminDb();
+        const flagIds = cartItems.filter(i => !i.id.startsWith('print-')).map(i => i.id);
+        const flagMap: Record<string, { isEventProduct: boolean; eventSection: string | null }> = {};
+        if (flagIds.length > 0) {
+          const snaps = await adminDb.getAll(...flagIds.map(id => adminDb.collection('products').doc(id)));
+          for (const s of snaps) {
+            const d = s.exists ? s.data() : null;
+            flagMap[s.id] = { isEventProduct: d?.isEventProduct === true, eventSection: d?.eventScrollSection ?? null };
+          }
+        }
+        const simcha = calcSimchaDiscount(cartItems.map(i => ({
+          id: i.id, price: i.price, quantity: i.quantity, cat: i.cat,
+          hasOtherPromo: !!(i.bundlePromo || i.promoPlan),
+          isEventProduct: flagMap[i.id]?.isEventProduct ?? false,
+          eventSection: flagMap[i.id]?.eventSection ?? null,
+        })));
+        if (Math.abs(submittedSimchaDisc - simcha.totalDiscount) > 0.02) {
+          console.error('[payment-bit] SIMCHA discount mismatch', { submittedSimchaDisc, expected: simcha.totalDiscount });
+          return NextResponse.json({ error: 'שגיאה בחישוב הנחת מבצע SIMCHA' }, { status: 400 });
+        }
+        couponDiscountAmount = simcha.totalDiscount;
+        simchaBreakdown = simcha.totalDiscount > 0 ? simcha.lineDiscounts : null;
+      } catch (simchaErr) {
+        console.error('[payment-bit] SIMCHA validation skipped — Firebase Admin error:', simchaErr);
+        couponDiscountAmount = submittedSimchaDisc;
       }
-      couponDiscountAmount = simcha.totalDiscount;
-      simchaBreakdown = simcha.totalDiscount > 0 ? simcha.lineDiscounts : null;
     } else if (couponCode) {
       try {
         const adminDb = getAdminDb();

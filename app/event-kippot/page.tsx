@@ -7,7 +7,7 @@ const BASE_URL = 'https://your-sofer.com';
 const PAGE_URL = `${BASE_URL}/event-kippot`;
 
 export const metadata: Metadata = {
-  title: 'כיפות לאירועים עם הדפסה אישית | Your Sofer',
+  title: 'כיפות ומזכרות לאירועים עם הדפסה אישית | Your Sofer',
   description: 'כיפות מודפסות לבר מצווה, חתונות ואירועים — שם, תאריך ולוגו. הדמיה מיידית, מחירים מדורגים, משלוח לכל הארץ.',
   keywords: ['כיפות לאירועים', 'כיפות מודפסות', 'הדפסת כיפות', 'כיפות בר מצווה', 'כיפות חתונה', 'כיפות בכמות', 'הדפסה על כיפות'],
   alternates: { canonical: PAGE_URL },
@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     locale: 'he_IL',
     url: PAGE_URL,
     siteName: 'Your Sofer',
-    title: 'כיפות לאירועים עם הדפסה אישית | Your Sofer',
+    title: 'כיפות ומזכרות לאירועים עם הדפסה אישית | Your Sofer',
     description: 'כיפות מודפסות לבר מצווה, חתונות ואירועים. הדמיה מיידית, מחירים מדורגים.',
     images: [{ url: `${BASE_URL}/og-default.jpg`, width: 1200, height: 630, alt: 'כיפות לאירועים' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'כיפות לאירועים | Your Sofer',
+    title: 'כיפות ומזכרות לאירועים | Your Sofer',
     description: 'כיפות מודפסות לבר מצווה, חתונות ואירועים.',
     images: [`${BASE_URL}/og-default.jpg`],
   },

@@ -17,7 +17,7 @@ import CouponStrip from "@/app/components/CouponStrip";
 import { MEGA_MENU_DATA, type NavMenuItem, type NavSubItem } from "@/data/categoriesMenu";
 
 const SIMPLE_NAV = [
-  { label: "כיפות לאירועים", action: "event-kippot" },
+  { label: "כיפות ומזכרות לאירועים", action: "event-kippot" },
   { label: "הסיפור שלנו", action: "about" },
   { label: "שאלות ותשובות", action: "faq" },
   { label: "צור קשר", action: "contact" },
@@ -98,7 +98,7 @@ function NavBarContent() {
               { title: 'כיפות', items: allItems.slice(0, mid) },
               { title: 'עוד',   items: allItems.slice(mid) },
             ]),
-        { title: 'הדפסה', items: [{ label: 'כיפות לאירועים', cat: '__event-kippot' }] },
+        { title: 'הדפסה', items: [{ label: 'כיפות ומזכרות לאירועים', cat: '__event-kippot' }] },
       ],
     };
     return MEGA_MENU_DATA.map(item => (item.id === 'kipot' ? kipotEntry : item));

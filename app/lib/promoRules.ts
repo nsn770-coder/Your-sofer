@@ -11,16 +11,6 @@ export const MIN_ADDON_QTY = 30;    // מוצר נוסף זכאי רק אם כמ
 export const TIER1_DISCOUNT = 0.10; // הקטגוריה עם הסכום הגבוה ביותר
 export const TIER2_DISCOUNT = 0.15; // כל שאר הקטגוריות הזכאיות
 
-// קטגוריות (שדה cat של פריט הסל) שזכאיות להנחת "מוצר נוסף".
-// כיפות ('כיפות') והדפסה ('הדפסה') לעולם לא זכאיות — לא להוסיף אותן לכאן.
-export const ADDON_ELIGIBLE_CATS: string[] = [
-  'מתנות',
-  'יודאיקה',
-  'חגים',
-  'ספרי קודש וסידורים',
-  'תיקי טלית ותפילין',
-];
-
 export interface SimchaItem {
   id: string;
   price: number;
@@ -28,6 +18,10 @@ export interface SimchaItem {
   cat?: string;
   /** פריט שכבר במבצע אחר (bundle / 2+1 / sale) — אין כפל מבצעים */
   hasOtherPromo?: boolean;
+  /** שיוך לעמוד "כיפות ומזכרות לאירועים" (שדה isEventProduct במוצר) */
+  isEventProduct?: boolean;
+  /** סקשן בעמוד האירועים (eventScrollSection) — משמש לקיבוץ המדרגות */
+  eventSection?: string | null;
 }
 
 export interface SimchaResult {
@@ -52,10 +46,12 @@ export function calcSimchaDiscount(items: SimchaItem[]): SimchaResult {
     return { ...EMPTY, reason };
   }
 
-  // ── מוצרים נוספים זכאים: קטגוריה מהרשימה, 30+ יח' לאותו מוצר, בלי מבצע אחר ──
+  // ── מוצרים נוספים זכאים: משויכים לעמוד האירועים (isEventProduct),
+  //    30+ יח' לאותו מוצר, לא כיפות/הדפסה, בלי מבצע אחר ──────────────────────
   const addonItems = items.filter(i =>
-    !!i.cat &&
-    ADDON_ELIGIBLE_CATS.includes(i.cat) &&
+    i.isEventProduct === true &&
+    i.cat !== 'כיפות' &&
+    i.cat !== 'הדפסה' &&
     i.quantity >= MIN_ADDON_QTY &&
     !i.hasOtherPromo &&
     i.price > 0,
@@ -68,11 +64,13 @@ export function calcSimchaDiscount(items: SimchaItem[]): SimchaResult {
     };
   }
 
-  // ── קיבוץ לפי קטגוריה: הגבוהה ביותר → TIER1, השאר → TIER2 ─────────────────
-  // דטרמיניסטי: שובר שוויון לפי סדר א"ב של שם הקטגוריה.
+  // ── קיבוץ לפי סקשן בעמוד האירועים (או קטגוריה כגיבוי):
+  //    הגבוהה ביותר → TIER1, השאר → TIER2 ─────────────────────────────────────
+  // דטרמיניסטי: שובר שוויון לפי סדר א"ב של שם הקבוצה.
+  const groupOf = (it: SimchaItem) => it.eventSection || it.cat || 'אחר';
   const catTotals = new Map<string, number>();
   for (const it of addonItems) {
-    catTotals.set(it.cat!, (catTotals.get(it.cat!) ?? 0) + it.price * it.quantity);
+    catTotals.set(groupOf(it), (catTotals.get(groupOf(it)) ?? 0) + it.price * it.quantity);
   }
   let topCat = '';
   let topVal = -1;
@@ -86,7 +84,7 @@ export function calcSimchaDiscount(items: SimchaItem[]): SimchaResult {
   const lineDiscounts: SimchaResult['lineDiscounts'] = {};
   let totalDiscount = 0;
   for (const it of addonItems) {
-    const percent = it.cat === topCat ? TIER1_DISCOUNT : TIER2_DISCOUNT;
+    const percent = groupOf(it) === topCat ? TIER1_DISCOUNT : TIER2_DISCOUNT;
     // עיגול לש"ח שלם ברמת שורה; הסיכום = סכום השורות
     const amount = Math.round(it.price * it.quantity * percent);
     if (amount > 0) {
