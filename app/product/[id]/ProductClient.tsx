@@ -1596,6 +1596,11 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   const mobileBuyBoxRef = useRef<HTMLDivElement>(null);
   const embroideryTextRef = useRef<HTMLInputElement>(null); // קריאת טקסט רקמה עדכני בזמן הוספה לסל
   const embossingTextRef = useRef<HTMLInputElement>(null);   // קריאת טקסט הטבעה עדכני בזמן הוספה לסל
+  // שדות טקסט של תוספות (הקדשה/שם) — uncontrolled + ref, כמו הרקמה: input מבוקר
+  // בתוך BuyBox (שמוגדר בתוך הקומפוננטה) גורם ל-remount בכל הקלדה ואיבוד פוקוס אחרי תו אחד
+  const addonTextRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const getAddonText = (id: string) =>
+    (addonTextRefs.current[id]?.value ?? addonState[id]?.text ?? '').trim();
   const [stickyBarVisible, setStickyBarVisible] = useState(false);
   const { setStamPage } = useChatPersona();
 
@@ -1981,7 +1986,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       return;
     }
     // ── תוספות הדורשות טקסט (הקדשה / שם) ─────────────────────────────────────
-    const missingAddonText = activeAddons.find(a => a.requiresText && !(addonState[a.id]?.text ?? '').trim());
+    const missingAddonText = activeAddons.find(a => a.requiresText && !getAddonText(a.id));
     if (missingAddonText) {
       setAddonError(`נא להזין טקסט עבור "${missingAddonText.label}"`);
       return;
@@ -1993,7 +1998,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           ...(activeAddons.length > 0 ? {
             selectedAddons: activeAddons.map(a => ({
               id: a.id, label: a.label, price: a.price, pricing: a.pricing,
-              ...(a.requiresText ? { text: (addonState[a.id]?.text ?? '').trim() } : {}),
+              ...(a.requiresText ? { text: getAddonText(a.id) } : {}),
             })),
             addonsPerUnitSurcharge,
             addonsFlatSurcharge,
@@ -2206,9 +2211,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     style={{ width: 18, height: 18, accentColor: '#C9A227', flexShrink: 0, cursor: locked ? 'not-allowed' : 'pointer' }} />
                 </label>
                 {a.requiresText && st.enabled && !locked && (
-                  <input type="text" value={st.text} maxLength={60}
+                  <input type="text" defaultValue={st.text} maxLength={60}
+                    ref={el => { addonTextRefs.current[a.id] = el; }}
                     placeholder={a.id === 'dedication' ? 'נוסח ההקדשה — לדוגמה: לעילוי נשמת...' : 'הטקסט להטבעה'}
-                    onChange={e => setAddonState(prev => ({ ...prev, [a.id]: { ...st, text: e.target.value } }))}
+                    onBlur={e => setAddonState(prev => ({ ...prev, [a.id]: { ...(prev[a.id] ?? st), text: e.target.value } }))}
                     style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif', marginTop: 6 }} />
                 )}
               </div>
