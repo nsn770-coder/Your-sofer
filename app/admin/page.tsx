@@ -1594,7 +1594,7 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
 }
 
 function EditShaliachStoreModal({ shaliachId, onClose, onSave }: { shaliachId: string; onClose: () => void; onSave: () => void }) {
-  const [form, setForm] = useState({ name: '', chabadName: '', city: '', phone: '', rabbiName: '', logoUrl: '' });
+  const [form, setForm] = useState({ name: '', chabadName: '', city: '', phone: '', rabbiName: '', logoUrl: '', commissionPercent: '' });
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -1614,6 +1614,7 @@ function EditShaliachStoreModal({ shaliachId, onClose, onSave }: { shaliachId: s
             phone: d.phone || '',
             rabbiName: d.rabbiName || '',
             logoUrl: d.logoUrl || '',
+            commissionPercent: d.commissionPercent != null ? String(d.commissionPercent) : '',
           });
         } else {
           setNotFound(true);
@@ -1637,7 +1638,10 @@ function EditShaliachStoreModal({ shaliachId, onClose, onSave }: { shaliachId: s
     if (!form.name.trim()) { alert('שם הוא שדה חובה'); return; }
     setSaving(true);
     try {
-      await setDoc(doc(db, 'shluchim', shaliachId), { ...form, updatedAt: serverTimestamp() }, { merge: true });
+      const { commissionPercent, ...rest } = form;
+      const payload: Record<string, unknown> = { ...rest, updatedAt: serverTimestamp() };
+      if (commissionPercent.trim() !== '' && !isNaN(Number(commissionPercent))) payload.commissionPercent = Number(commissionPercent);
+      await setDoc(doc(db, 'shluchim', shaliachId), payload, { merge: true });
       setSaved(true);
       onSave();
       setTimeout(() => { onClose(); }, 1200);
@@ -1686,7 +1690,10 @@ function EditShaliachStoreModal({ shaliachId, onClose, onSave }: { shaliachId: s
               <div><label style={labelStyle}>עיר</label><input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} style={inputStyle} /></div>
               <div><label style={labelStyle}>טלפון</label><input value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} style={inputStyle} /></div>
             </div>
-            <div><label style={labelStyle}>שם רב</label><input value={form.rabbiName} onChange={e => setForm(p => ({ ...p, rabbiName: e.target.value }))} style={inputStyle} /></div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div><label style={labelStyle}>שם רב</label><input value={form.rabbiName} onChange={e => setForm(p => ({ ...p, rabbiName: e.target.value }))} style={inputStyle} /></div>
+              <div><label style={labelStyle}>עמלה (%)</label><input value={form.commissionPercent} onChange={e => setForm(p => ({ ...p, commissionPercent: e.target.value }))} placeholder="15" type="number" min="0" max="100" style={inputStyle} /></div>
+            </div>
             <div>
               <label style={labelStyle}>לוגו / תמונת חנות</label>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -4469,7 +4476,7 @@ export default function AdminPage() {
                               </button>
                               <button onClick={() => setEditStoreShaliachId(u.shaliachId!)}
                                 className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 transition w-fit">
-                                🏪 ערוך חנות
+                                ✏️ עריכת משתמש
                               </button>
                             </div>
                           ) : <span className="text-xs text-gray-400">אין מזהה שליח</span>
