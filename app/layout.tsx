@@ -20,6 +20,7 @@ import { CanonicalTag } from "@/components/CanonicalTag";
 import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 import ClubPopupWrapper from "@/components/ClubPopupWrapper";
 import GiftProgressBar from "./components/GiftProgressBar";
+import GoogleReviewsStrip from "@/app/components/GoogleReviewsStrip";
 
 // PERF: Geist removed — its className was on <body> but the inline style
 // (fontFamily: var(--font-heebo)…) overrode it everywhere, so the font file was
@@ -152,6 +153,7 @@ export default function RootLayout({
                 <ChatCartBridge />
                 <NavBar />
                 {children}
+                <GoogleReviewsStrip />
                 <Footer />
                 <ShiraChatLoader />
                 <ShavuotPopupWrapper />
