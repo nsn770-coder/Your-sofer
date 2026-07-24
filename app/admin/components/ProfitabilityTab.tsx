@@ -102,6 +102,36 @@ export function expenseOccurrencesInRange(
 
 const downloadUrl = (url: string) => url.replace('/upload/', '/upload/fl_attachment/');
 
+/** נרמול תאריך מה-OCR ל-YYYY-MM-DD; נופל להיום אם לא ניתן לפרש */
+function normalizeOcrDate(raw: string | undefined): string {
+  const todayStr = () => toInputDate(new Date());
+  if (!raw) return todayStr();
+  const s = raw.trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+  m = s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/);
+  if (m) {
+    const year = m[3].length === 2 ? `20${m[3]}` : m[3];
+    return `${year}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+  }
+  return todayStr();
+}
+
+// שורה בטבלת האישור של העלאת קבלות מרובה
+interface BulkReceiptRow {
+  fileName: string;
+  status: 'processing' | 'ready' | 'error';
+  receiptUrl: string | null;
+  supplier: string;
+  date: string;          // YYYY-MM-DD
+  invoiceNumber: string;
+  amount: string;        // ניתן לעריכה לפני שמירה
+  category: string;
+  include: boolean;
+  saved?: boolean;
+  error?: string;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 export default function ProfitabilityTab({ products, orders }: ProfitabilityTabProps) {
   const [dateRange, setDateRange] = useState<'day' | 'week' | 'month' | 'quarter' | 'year' | 'custom'>('month');
@@ -133,6 +163,11 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
   const [exportFrom, setExportFrom] = useState('');
   const [exportTo, setExportTo] = useState('');
   const [exporting, setExporting] = useState(false);
+
+  // ── העלאת קבלות מרובה ──
+  const [bulkRows, setBulkRows] = useState<BulkReceiptRow[]>([]);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [bulkSaving, setBulkSaving] = useState(false);
 
   // ── טעינת נתונים פיננסיים ──
   useEffect(() => {
@@ -345,7 +380,8 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
         date: expenseForm.date,
         recurring: expenseForm.recurring,
         overrides: {},
-        source: 'manual',
+        // קניית סחורה נספרת בתזרים בלבד — כמו קבלות מטאב המלאי
+        source: expenseForm.category === 'סחורה מספק' ? 'inventory' : 'manual',
         ...(expenseForm.receiptUrl ? { receiptUrl: expenseForm.receiptUrl } : {}),
         createdAt: serverTimestamp(),
       };
@@ -426,6 +462,105 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
     await updateDoc(doc(db, 'finance_expenses', exp.id), { receiptUrl: url });
     setExpenses(prev => prev.map(x => x.id === exp.id ? { ...x, receiptUrl: url } : x));
     e.target.value = '';
+  }
+
+  // ── העלאת קבלות מרובה: כל קובץ מועלה ל-Cloudinary + נקרא ע"י AI (ספק, תאריך, סכום) ──
+  function updateBulkRow(index: number, patch: Partial<BulkReceiptRow>) {
+    setBulkRows(prev => prev.map((r, i) => i === index ? { ...r, ...patch } : r));
+  }
+
+  async function handleBulkFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    if (files.length === 0) return;
+
+    const startIndex = bulkRows.length;
+    setBulkRows(prev => [
+      ...prev,
+      ...files.map((f): BulkReceiptRow => ({
+        fileName: f.name, status: 'processing', receiptUrl: null,
+        supplier: '', date: toInputDate(new Date()), invoiceNumber: '',
+        amount: '', category: 'סחורה מספק', include: true,
+      })),
+    ]);
+    setBulkProcessing(true);
+
+    try {
+      // עיבוד סדרתי — קובץ אחר קובץ (העלאה + פענוח במקביל לאותו קובץ)
+      for (let i = 0; i < files.length; i++) {
+        const idx = startIndex + i;
+        const file = files[i];
+        try {
+          const parsePromise = (async () => {
+            const fd = new FormData();
+            fd.append('image', file);
+            const res = await fetch('/api/parse-expense-receipt', { method: 'POST', body: fd });
+            return await res.json() as { success?: boolean; supplier?: string; invoiceDate?: string; invoiceNumber?: string; total?: number };
+          })();
+          const [url, parsed] = await Promise.all([uploadReceiptFile(file), parsePromise]);
+
+          if (!url && !parsed.success) {
+            updateBulkRow(idx, { status: 'error', error: 'ההעלאה והפענוח נכשלו' });
+            continue;
+          }
+          updateBulkRow(idx, {
+            status: 'ready',
+            receiptUrl: url,
+            supplier:      parsed.supplier || '',
+            date:          normalizeOcrDate(parsed.invoiceDate),
+            invoiceNumber: parsed.invoiceNumber || '',
+            amount:        parsed.total && parsed.total > 0 ? String(parsed.total) : '',
+            error: !parsed.success ? 'הפענוח נכשל — יש למלא ידנית' : !url ? 'הקובץ לא נשמר במאגר' : undefined,
+          });
+        } catch (err) {
+          console.error('[bulk receipt]', file.name, err);
+          updateBulkRow(idx, { status: 'error', error: 'שגיאה בעיבוד' });
+        }
+      }
+    } finally {
+      setBulkProcessing(false);
+    }
+  }
+
+  async function saveBulkRows() {
+    const toSave = bulkRows
+      .map((r, i) => ({ r, i }))
+      .filter(({ r }) => r.include && !r.saved && r.status !== 'processing');
+    if (toSave.length === 0) { alert('אין שורות לשמירה'); return; }
+    for (const { r, i } of toSave) {
+      const amount = parseFloat(r.amount);
+      if (!amount || amount <= 0) { alert(`שורה ${i + 1} (${r.fileName}): חסר סכום תקין`); return; }
+      if (!r.date) { alert(`שורה ${i + 1} (${r.fileName}): חסר תאריך`); return; }
+    }
+    setBulkSaving(true);
+    try {
+      for (const { r, i } of toSave) {
+        const amount = parseFloat(r.amount);
+        const data = {
+          amount,
+          category:    r.category,
+          description: r.supplier ? `קבלה — ${r.supplier}` : `קבלה (${r.fileName})`,
+          date:        r.date,
+          recurring:   false,
+          overrides:   {},
+          // קניית סחורה נספרת בתזרים בלבד (העלות פר-מוצר כבר ברווח התפעולי)
+          source:      (r.category === 'סחורה מספק' ? 'inventory' : 'manual') as FinanceExpense['source'],
+          supplier:      r.supplier,
+          invoiceNumber: r.invoiceNumber,
+          ...(r.receiptUrl ? { receiptUrl: r.receiptUrl } : {}),
+          createdAt: serverTimestamp(),
+        };
+        const ref = await addDoc(collection(db, 'finance_expenses'), data);
+        setExpenses(prev => [{ id: ref.id, ...data } as unknown as FinanceExpense, ...prev]);
+        updateBulkRow(i, { saved: true });
+      }
+      alert(`✅ נשמרו ${toSave.length} הוצאות עם קבלות`);
+      setBulkRows(prev => prev.filter(r => !r.saved));
+    } catch (e) {
+      alert('שגיאה בשמירה — חלק מהשורות אולי נשמרו'); console.error(e);
+    } finally {
+      setBulkSaving(false);
+    }
   }
 
   // ── שמירת % סליקה ──
@@ -611,6 +746,10 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
         <button onClick={() => { setExpenseFormOpen(o => !o); setIncomeFormOpen(false); }} style={btnStyle('#dc2626')}>
           ➕ הוסף הוצאה
         </button>
+        <label style={{ ...btnStyle('#0d9488'), display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          {bulkProcessing ? '⏳ מעבד קבלות...' : '📤 העלה קבלות (מרובות)'}
+          <input type="file" multiple accept="image/*,.pdf" style={{ display: 'none' }} onChange={handleBulkFiles} disabled={bulkProcessing} />
+        </label>
         <button onClick={() => setReceiptsOpen(o => !o)} style={btnStyle('#7c3aed')}>
           🧾 כל הקבלות ({receiptsList.length})
         </button>
@@ -680,6 +819,95 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
           <div style={{ fontSize: 11, color: '#6b7280', marginTop: 8 }}>
             💡 בהוצאה קבועה אפשר לערוך את הסכום לחודש מסוים בטבלה למטה (✏️ חודש נוכחי) — השינוי חל רק על אותו חודש.
             עמלת הסליקה מחושבת אוטומטית ({clearingPercent}% מעסקאות האשראי) — אין צורך להוסיף אותה ידנית.
+          </div>
+        </div>
+      )}
+
+      {/* ── טבלת אישור: העלאת קבלות מרובה ── */}
+      {bulkRows.length > 0 && (
+        <div style={{ background: '#f0fdfa', border: '1px solid #5eead4', borderRadius: 8, padding: 16, marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ fontWeight: 800 }}>
+              📤 קבלות שהועלו ({bulkRows.length}){bulkProcessing && ' — מעבד...'}
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={saveBulkRows} disabled={bulkSaving || bulkProcessing} style={btnStyle('#0d9488')}>
+                {bulkSaving ? '⏳ שומר...' : `✓ שמור ${bulkRows.filter(r => r.include && !r.saved && r.status !== 'processing').length} הוצאות`}
+              </button>
+              <button onClick={() => setBulkRows([])} disabled={bulkSaving || bulkProcessing} style={btnStyle('#e5e7eb', '#374151')}>
+                נקה
+              </button>
+            </div>
+          </div>
+          <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 10 }}>
+            ה-AI קרא מכל קבלה את הספק, התאריך והסכום — בדוק ותקן במידת הצורך לפני השמירה. קטגוריית &quot;סחורה מספק&quot; נספרת בתזרים בלבד (לא ברווח התפעולי).
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #5eead4' }}>
+                  <th style={{ padding: 6 }}></th>
+                  <th style={{ padding: 6, textAlign: 'right' }}>קובץ</th>
+                  <th style={{ padding: 6, textAlign: 'right' }}>ספק</th>
+                  <th style={{ padding: 6, textAlign: 'center' }}>תאריך</th>
+                  <th style={{ padding: 6, textAlign: 'center' }}>סכום ₪</th>
+                  <th style={{ padding: 6, textAlign: 'center' }}>קטגוריה</th>
+                  <th style={{ padding: 6, textAlign: 'center' }}>קבלה</th>
+                  <th style={{ padding: 6, textAlign: 'center' }}>סטטוס</th>
+                </tr>
+              </thead>
+              <tbody>
+                {bulkRows.map((r, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid #ccfbf1', opacity: r.saved ? 0.5 : r.include ? 1 : 0.45 }}>
+                    <td style={{ padding: 6, textAlign: 'center' }}>
+                      <input type="checkbox" checked={r.include} disabled={!!r.saved}
+                        onChange={ev => updateBulkRow(i, { include: ev.target.checked })} />
+                    </td>
+                    <td style={{ padding: 6, maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={r.fileName}>
+                      {r.fileName}
+                    </td>
+                    <td style={{ padding: 6 }}>
+                      <input type="text" value={r.supplier} disabled={r.status === 'processing' || !!r.saved}
+                        onChange={ev => updateBulkRow(i, { supplier: ev.target.value })}
+                        style={{ width: '100%', minWidth: 110, padding: '3px 6px', border: '1px solid #99f6e4', borderRadius: 4, fontSize: 12 }} />
+                    </td>
+                    <td style={{ padding: 6, textAlign: 'center' }}>
+                      <input type="date" value={r.date} disabled={r.status === 'processing' || !!r.saved}
+                        onChange={ev => updateBulkRow(i, { date: ev.target.value })}
+                        style={{ padding: '3px 6px', border: '1px solid #99f6e4', borderRadius: 4, fontSize: 12 }} />
+                    </td>
+                    <td style={{ padding: 6, textAlign: 'center' }}>
+                      <input type="number" value={r.amount} disabled={r.status === 'processing' || !!r.saved}
+                        onChange={ev => updateBulkRow(i, { amount: ev.target.value })} placeholder="₪"
+                        style={{ width: 85, padding: '3px 6px', border: '1px solid #99f6e4', borderRadius: 4, fontSize: 12, textAlign: 'center', fontWeight: 700 }} />
+                    </td>
+                    <td style={{ padding: 6, textAlign: 'center' }}>
+                      <select value={r.category} disabled={r.status === 'processing' || !!r.saved}
+                        onChange={ev => updateBulkRow(i, { category: ev.target.value })}
+                        style={{ padding: '3px 6px', border: '1px solid #99f6e4', borderRadius: 4, fontSize: 12, maxWidth: 140 }}>
+                        {EXPENSE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </td>
+                    <td style={{ padding: 6, textAlign: 'center' }}>
+                      {r.receiptUrl
+                        ? <a href={r.receiptUrl} target="_blank" rel="noreferrer" style={{ color: '#0d9488', fontWeight: 700 }}>👁</a>
+                        : r.status === 'processing' ? '⏳' : <span style={{ color: '#f59e0b' }} title="הקובץ לא נשמר במאגר">⚠️</span>}
+                    </td>
+                    <td style={{ padding: 6, textAlign: 'center', fontSize: 11 }}>
+                      {r.saved
+                        ? <span style={{ color: '#16a34a', fontWeight: 700 }}>✓ נשמר</span>
+                        : r.status === 'processing'
+                          ? <span style={{ color: '#0369a1' }}>⏳ מעבד...</span>
+                          : r.status === 'error'
+                            ? <span style={{ color: '#dc2626', fontWeight: 700 }} title={r.error}>✕ שגיאה</span>
+                            : r.error
+                              ? <span style={{ color: '#d97706', fontWeight: 700 }} title={r.error}>⚠️ בדוק</span>
+                              : <span style={{ color: '#16a34a' }}>מוכן</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
