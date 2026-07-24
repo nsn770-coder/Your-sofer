@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 // רצועת ביקורות גוגל — מוצגת בכל עמוד מעל הפוטר.
 // שולפת מ-/api/google-reviews (קאש 6 שעות). אם ה-API לא מוגדר —
@@ -43,6 +44,7 @@ function GIcon() {
 }
 
 export default function GoogleReviewsStrip() {
+  const pathname = usePathname();
   const [data, setData] = useState<GData | null>(null);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
@@ -53,6 +55,7 @@ export default function GoogleReviewsStrip() {
       .catch(() => setData(null));
   }, []);
 
+  if (pathname?.startsWith('/admin/emails')) return null; // נטען כ-iframe באדמין
   if (!data || !data.writeUrl) return null;
 
   const hasReviews = data.configured && data.reviews.length > 0;

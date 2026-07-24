@@ -95,7 +95,7 @@ export default function Footer() {
   }, []);
 
   // הערה: ה-return המותנה חייב לבוא אחרי כל ה-hooks (כללי React)
-  if (pathname?.startsWith('/bar-mitzvah')) return null;
+  if (pathname?.startsWith('/bar-mitzvah') || pathname?.startsWith('/admin/emails')) return null;
 
   function toggleCol(i: number) {
     setOpenCols(prev => {

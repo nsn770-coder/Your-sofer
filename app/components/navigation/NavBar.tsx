@@ -490,6 +490,7 @@ function NavBarContent() {
 
 export default function NavBar() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/ops') || pathname?.startsWith('/bar-mitzvah')) return null;
+  // /admin/emails נטען כ-iframe בתוך האדמין — בלי מעטפת האתר
+  if (pathname?.startsWith('/ops') || pathname?.startsWith('/bar-mitzvah') || pathname?.startsWith('/admin/emails')) return null;
   return <NavBarContent />;
 }
