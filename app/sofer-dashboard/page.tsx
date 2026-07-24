@@ -573,7 +573,7 @@ export default function SoferDashboard() {
                 {storeStatus === 'none' && !showStoreForm && (
                   <>
                     <p style={{ fontSize: 14, color: '#555', lineHeight: 1.7, marginBottom: 16 }}>
-                      פתח חנות אישית עם קישור ייחודי שלך. לקוחות שירכשו דרך הקישור יזוכו לך ב-10% עמלה.
+                      פתח חנות אישית עם קישור ייחודי שלך. לקוחות שירכשו דרך הקישור יזוכו לך ב-15% עמלה.
                     </p>
                     <button onClick={() => setShowStoreForm(true)}
                       style={{ background: '#1a3a2a', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 24px', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>

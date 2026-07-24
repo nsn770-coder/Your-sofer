@@ -291,7 +291,7 @@ function OrderSummary({
       {shaliach && (
         <div style={{ marginTop: 12, padding: '10px 12px', background: '#f0f7ff', borderRadius: 10, fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
           <IconHandshake size={13} color="#0e6ba8" />
-          <div><div style={{ color: '#0e6ba8', fontWeight: 700 }}>דרך: {shaliach.chabadName || shaliach.name}</div><div style={{ color: '#555', marginTop: 1 }}>10% מהרכישה יועברו כתרומה</div></div>
+          <div><div style={{ color: '#0e6ba8', fontWeight: 700 }}>דרך: {shaliach.chabadName || shaliach.name}</div><div style={{ color: '#555', marginTop: 1 }}>15% מהרכישה יועברו כתרומה</div></div>
         </div>
       )}
     </div>

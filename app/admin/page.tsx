@@ -3140,7 +3140,7 @@ export default function AdminPage() {
         email: req.soferEmail,
         uid: req.soferUid,
         refCode,
-        commissionPercent: 10,
+        commissionPercent: 15,
         status: 'active',
         isRabbi: false,
         isPersonalStore: true,
@@ -3179,7 +3179,7 @@ export default function AdminPage() {
         name: app.name, chabadName: app.chabadName || '', city: app.city,
         phone: app.phone, email: app.email || '', rabbiName: app.rabbiName || '',
         logoUrl: app.logoUrl || '', status: 'active', createdAt: serverTimestamp(),
-        commissionPercent: 0,
+        commissionPercent: 15,
       });
       if (uid) {
         await updateDoc(doc(db, 'users', uid), { role: 'shaliach', shaliachId: uid });
@@ -4106,6 +4106,29 @@ export default function AdminPage() {
 
       {activeTab === 'commissions' && (
         <div className="bg-white rounded-xl shadow overflow-hidden">
+          {/* עדכון חד-פעמי: כל השליחים/רבנים עם עמלת 10% → 15% */}
+          <div className="p-3 border-b flex items-center justify-between flex-wrap gap-2">
+            <span className="text-xs text-gray-500">עמלת תוכנית השותפים: 15% (קלפים: 4%)</span>
+            <button
+              onClick={async () => {
+                if (!window.confirm('לעדכן את כל השליחים והרבנים עם עמלה של 10% ל-15%?')) return;
+                try {
+                  const snap = await getDocs(collection(db, 'shluchim'));
+                  let updated = 0;
+                  for (const d of snap.docs) {
+                    if (Number(d.data().commissionPercent) === 10) {
+                      await updateDoc(doc(db, 'shluchim', d.id), { commissionPercent: 15 });
+                      updated++;
+                    }
+                  }
+                  alert(`✅ עודכנו ${updated} שליחים/רבנים ל-15%`);
+                } catch (e) { alert('שגיאה בעדכון'); console.error(e); }
+              }}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+            >
+              ⬆️ עדכן את כל בעלי 10% ל-15%
+            </button>
+          </div>
           {shaliachOrders.length === 0 ? <div className="p-10 text-center text-gray-400">אין הזמנות שליחים עדיין</div> : (
             <table className="w-full text-sm">
               <thead className="bg-gray-50"><tr><th className="p-3 text-right">מספר הזמנה</th><th className="p-3 text-right">שליח</th><th className="p-3 text-right">סכום</th><th className="p-3 text-right">אחוז</th><th className="p-3 text-right">עמלה</th></tr></thead>

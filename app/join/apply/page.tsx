@@ -185,7 +185,7 @@ export default function ShaliachApplyPage() {
           <div style={{ background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 12, padding: 20, marginBottom: 20 }}>
             <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1a1a1a', marginBottom: 10 }}>💰 מידע על תרומות</h3>
             <div style={{ fontSize: 14, color: '#333', lineHeight: 1.8 }}>
-              <div>• <strong>10%</strong> מכל הזמנה דרך הלינק שלך יועברו לעמותה</div>
+              <div>• <strong>15%</strong> מכל הזמנה דרך הלינק שלך יועברו לעמותה</div>
               <div>• תשלום חודשי ישירות לחשבון העמותה</div>
               <div>• דשבורד עם נתוני מכירות ותרומות בזמן אמת</div>
               <div>• לינק אישי עם ברנדינג של העמותה שלך</div>

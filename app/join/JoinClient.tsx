@@ -77,7 +77,7 @@ export default function JoinPage() {
             <div style={{ fontSize: 56, marginBottom: 12 }}>🏛️</div>
             <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 8 }}>הצטרף כרב קהילה</h2>
             <p style={{ color: '#a8c0d8', fontSize: 14, lineHeight: 1.6 }}>
-              הפנה את קהילתך לקנות סת"מ מאומת - 10% מכל הזמנה יועברו כתרומה לעמותה שלך
+              הפנה את קהילתך לקנות סת"מ מאומת - 15% מכל הזמנה יועברו כתרומה לעמותה שלך
             </p>
           </div>
           <div style={{ padding: '28px' }}>
@@ -85,7 +85,7 @@ export default function JoinPage() {
               {[
                 'לינק אישי עם ברנדינג של העמותה שלך',
                 'באנר מותאם אישית על האתר',
-                '10% מכל הזמנה כתרומה לעמותה',
+                '15% מכל הזמנה כתרומה לעמותה',
                 'דשבורד מכירות ותרומות',
                 'תמיכה ייעודית לרבני קהילה',
                 'הצגה בדף רבני הקהילה',
@@ -98,7 +98,7 @@ export default function JoinPage() {
             </div>
 
             <div style={{ background: '#f0f4ff', borderRadius: 8, padding: '14px 16px', marginBottom: 20, fontSize: 13 }}>
-              <div style={{ fontWeight: 700, marginBottom: 4, color: '#1a1a1a' }}>תרומה: 10% מכל הזמנה לעמותה</div>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: '#1a1a1a' }}>תרומה: 15% מכל הזמנה לעמותה</div>
               <div style={{ color: '#888' }}>הכסף מועבר ישירות לעמותה שלך מדי חודש</div>
             </div>
 
@@ -118,7 +118,7 @@ export default function JoinPage() {
             {[
               { icon: '🛡️', title: 'פיקוח הלכתי', desc: 'כל מוצר עובר בדיקת מחשב ופיקוח רבני מוסמך' },
               { icon: '📈', title: 'קהל לקוחות גדול', desc: 'גישה לאלפי לקוחות פוטנציאליים ברחבי הארץ' },
-              { icon: '💰', title: 'תרומה לעמותה', desc: '10% מכל הזמנה מועברים לעמותת הקהילה שלך' },
+              { icon: '💰', title: 'תרומה לעמותה', desc: '15% מכל הזמנה מועברים לעמותת הקהילה שלך' },
               { icon: '🔧', title: 'כלים מתקדמים', desc: 'דשבורד ניהול, נתונים ודוחות בלחיצה אחת' },
               { icon: '🤝', title: 'תמיכה מלאה', desc: 'צוות מקצועי זמין לעזור בכל שאלה' },
               { icon: '🌟', title: 'מוניטין ואמון', desc: 'פלטפורמה מובילה בתחום סת"מ בישראל' },
