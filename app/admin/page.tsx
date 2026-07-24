@@ -2428,6 +2428,38 @@ ${visibleOrders.map(orderBlock).join('\n')}
                             👑 הזמן למועדון
                           </a>
                         )}
+                        {!isCancelled && (
+                          <button
+                            onClick={async () => {
+                              const email = window.prompt(
+                                'שיוך ההזמנה למשתמש רשום + זיכוי נקודות.\nאימייל של המשתמש הרשום (כפי שמופיע בטאב משתמשים):',
+                                o.email || ''
+                              );
+                              if (!email || !email.trim()) return;
+                              try {
+                                const _auth = await getAuthLazy();
+                                const idToken = await _auth.currentUser?.getIdToken(true);
+                                if (!idToken) throw new Error('לא מחובר');
+                                const res = await fetch('/api/admin/link-order-loyalty', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+                                  body: JSON.stringify({ orderId: o.id, userEmail: email.trim() }),
+                                });
+                                const data = await res.json();
+                                if (!res.ok) { alert('❌ ' + (data.error || 'שגיאה')); return; }
+                                alert(data.alreadyProcessed
+                                  ? `✅ ההזמנה שויכה ל-${data.userName} (הנקודות כבר זוכו בעבר)`
+                                  : `✅ ההזמנה שויכה ל-${data.userName} וזוכו ${data.pointsEarned} נקודות`);
+                              } catch (e) {
+                                alert('שגיאה בשיוך'); console.error(e);
+                              }
+                            }}
+                            className="text-xs font-bold px-2 py-1 rounded border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 whitespace-nowrap"
+                            title="שיוך ההזמנה למשתמש רשום (לפי אימייל) וזיכוי נקודות מועדון — למקרים שההזמנה בוצעה כאורח או עם אימייל אחר"
+                          >
+                            🎁 שייך משתמש
+                          </button>
+                        )}
                         <button
                           onClick={() => handleDelete(o.id, o.orderNumber)}
                           disabled={deletingId === o.id}
