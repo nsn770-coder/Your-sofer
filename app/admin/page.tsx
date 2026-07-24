@@ -92,6 +92,23 @@ function reviewWhatsappLink(o: Order): string | null {
   return `https://wa.me/${intl}?text=${encodeURIComponent(msg)}`;
 }
 
+// הודעת וואטסאפ מוכנה עם הזמנה להצטרף למועדון הלקוחות
+function clubWhatsappLink(o: Order): string | null {
+  const digits = (o.phone ?? '').replace(/\D/g, '');
+  if (!digits) return null;
+  const intl = digits.startsWith('972') ? digits : digits.startsWith('0') ? `972${digits.slice(1)}` : digits;
+  const firstName = (o.customerName ?? '').trim().split(/\s+/)[0] || '';
+  const msg =
+    `שלום ${firstName} 😊 זה ניסים מהחנות Your Sofer שנתן לך את השירות באתר.\n` +
+    `רציתי להזמין אותך להצטרף בחינם למועדון הלקוחות שלנו 🎁\n` +
+    `במועדון צוברים 10% נקודות על כל קנייה (הנקודות שוות כסף לקנייה הבאה), ומקבלים גישה למבצעים והטבות בלעדיות לחברי מועדון בלבד.\n` +
+    `וגם — מקבלים נקודות על רכישות שכבר ביצעת! למשל אם רכשת ב-700 ש"ח, תקבל 70 נקודות בשווי 70 ש"ח 💰\n` +
+    `ההצטרפות בלחיצה אחת כאן:\n` +
+    `https://your-sofer.com/club\n` +
+    `נשמח לראותך במועדון! 🙏`;
+  return `https://wa.me/${intl}?text=${encodeURIComponent(msg)}`;
+}
+
 interface ProductEntry {
   type: string;
   name: string;
@@ -2398,6 +2415,17 @@ ${visibleOrders.map(orderBlock).join('\n')}
                             title="פותח וואטסאפ עם הודעת בקשת ביקורת מוכנה"
                           >
                             💬 בקש ביקורת
+                          </a>
+                        )}
+                        {!isCancelled && clubWhatsappLink(o) && (
+                          <a
+                            href={clubWhatsappLink(o)!}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-bold px-2 py-1 rounded border border-purple-300 text-purple-700 bg-purple-50 hover:bg-purple-100 whitespace-nowrap"
+                            title="פותח וואטסאפ עם הזמנה מוכנה להצטרפות למועדון הלקוחות"
+                          >
+                            👑 הזמן למועדון
                           </a>
                         )}
                         <button
