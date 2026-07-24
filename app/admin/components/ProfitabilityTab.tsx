@@ -412,6 +412,14 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
     setExpenses(prev => prev.map(e => e.id === exp.id ? { ...e, amount } : e));
   }
 
+  /** שינוי קטגוריה של הוצאה קיימת — מעדכן גם את source (סחורה=תזרים בלבד, אחר=תפעולי) */
+  async function changeExpenseCategory(exp: FinanceExpense, newCategory: string) {
+    // הוצאות מלאי אוטומטיות שמקורן בטאב מלאי נשארות סחורה; שינוי ידני דורס
+    const newSource: FinanceExpense['source'] = newCategory === 'סחורה מספק' ? 'inventory' : 'manual';
+    await updateDoc(doc(db, 'finance_expenses', exp.id), { category: newCategory, source: newSource });
+    setExpenses(prev => prev.map(e => e.id === exp.id ? { ...e, category: newCategory, source: newSource } : e));
+  }
+
   /** עריכת סכום לחודש ספציפי בהוצאה קבועה — נשמר כ-override רק לאותו חודש */
   async function editExpenseMonthAmount(exp: FinanceExpense) {
     const mk = monthKeyOf(new Date());
@@ -1123,7 +1131,16 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
                       <td style={{ padding: 8 }}>
                         {exp.recurring ? `כל חודש ב-${new Date(exp.date + 'T12:00:00').getDate()} (מ-${exp.date})` : exp.date}
                       </td>
-                      <td style={{ padding: 8 }}>{exp.category}</td>
+                      <td style={{ padding: 8 }}>
+                        <select
+                          value={EXPENSE_CATEGORIES.includes(exp.category as typeof EXPENSE_CATEGORIES[number]) ? exp.category : 'אחר'}
+                          onChange={ev => changeExpenseCategory(exp, ev.target.value)}
+                          title="שינוי קטגוריה — משפיע על החישוב: סחורה מספק נספרת בתזרים בלבד, שאר הקטגוריות מנוכות מהרווח התפעולי"
+                          style={{ padding: '3px 6px', border: '1px solid #e5e7eb', borderRadius: 4, fontSize: 12, maxWidth: 150, background: '#fff', cursor: 'pointer' }}
+                        >
+                          {EXPENSE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </td>
                       <td style={{ padding: 8 }}>
                         {[exp.description, exp.supplier ? `ספק: ${exp.supplier}` : '', exp.invoiceNumber ? `#${exp.invoiceNumber}` : ''].filter(Boolean).join(' | ') || '—'}
                       </td>
