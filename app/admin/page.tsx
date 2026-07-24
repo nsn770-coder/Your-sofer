@@ -387,6 +387,8 @@ interface Customer {
   tierIcon: string;
   createdAt?: string;
   type: 'רשום' | 'אורח';
+  // משתמש רשום ששילם אבל צבירת הנקודות מעולם לא רצה עבורו (totalSpent=0 ב-users)
+  pointsPending?: boolean;
 }
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -2897,9 +2899,11 @@ export default function AdminPage() {
       // 1. Registered buyers: users with totalSpent > 0
       const usersSnap = await getDocs(collection(db, 'users'));
       const registeredByUid = new Map<string, Record<string, unknown>>();
+      const allUsersByUid = new Map<string, Record<string, unknown>>();
       const registeredEmails = new Set<string>();
       usersSnap.forEach(d => {
         const u = d.data();
+        allUsersByUid.set(d.id, u);
         if ((u.totalSpent as number | undefined ?? 0) > 0) {
           registeredByUid.set(d.id, u);
           const email = (u.email as string || '').toLowerCase().trim();
@@ -2914,6 +2918,8 @@ export default function AdminPage() {
 
       // Count paid orders per uid (for registered users)
       const uidOrderCount = new Map<string, number>();
+      // Sum paid order totals per uid — fallback for users whose loyalty claim never ran
+      const uidOrderSum = new Map<string, number>();
       // Aggregate guest orders by email
       const guestMap = new Map<string, { totalSpent: number; orderCount: number; name: string; phone: string }>();
 
@@ -2925,6 +2931,7 @@ export default function AdminPage() {
 
         if (uid) {
           uidOrderCount.set(uid, (uidOrderCount.get(uid) ?? 0) + 1);
+          uidOrderSum.set(uid, (uidOrderSum.get(uid) ?? 0) + total);
         } else if (email && !registeredEmails.has(email)) {
           if (!guestMap.has(email)) {
             guestMap.set(email, {
@@ -2966,9 +2973,37 @@ export default function AdminPage() {
         });
       }
 
+      // Registered users who PAID (orders with their uid) but loyalty never accrued
+      // (users.totalSpent == 0) — e.g. עדי אלפי: התחברה עם גוגל, שילמה, אך צבירת
+      // הנקודות בדף התודה מעולם לא רצה. בלי זה הם נעלמים לגמרי מרשימת הלקוחות.
+      for (const [uid, orderSum] of uidOrderSum.entries()) {
+        if (registeredByUid.has(uid)) continue;
+        const u = allUsersByUid.get(uid);
+        if (!u || orderSum <= 0) continue;
+        const tierDef = getTier(orderSum);
+        data.push({
+          id:            uid,
+          name:          (u.displayName as string) || (u.name as string) || '',
+          email:         (u.email as string) || '',
+          phone:         (u.phone as string) || '',
+          totalOrders:   uidOrderCount.get(uid) ?? 0,
+          totalSpent:    orderSum,
+          loyaltyPoints: (u.loyaltyPoints as number) ?? 0,
+          tier:          tierDef.id,
+          tierLabel:     tierDef.label,
+          tierIcon:      tierDef.icon,
+          createdAt:     undefined,
+          type:          'רשום',
+          pointsPending: true,
+        });
+        const email = (u.email as string || '').toLowerCase().trim();
+        if (email) registeredEmails.add(email);
+      }
+
       // Guests (pure — email not linked to any user account)
       for (const [email, g] of guestMap.entries()) {
         if (g.totalSpent <= 0) continue;
+        if (registeredEmails.has(email)) continue; // כבר מופיע כרשום (כולל pointsPending)
         data.push({
           id:            `guest_${email}`,
           name:          g.name,
@@ -4997,7 +5032,14 @@ export default function AdminPage() {
                           ) : <span className="text-gray-300">—</span>}
                         </td>
                         <td className="p-3 text-center font-bold text-purple-700">
-                          {c.type === 'רשום' ? c.loyaltyPoints : <span className="text-gray-300">—</span>}
+                          {c.type === 'רשום' ? (
+                            c.pointsPending ? (
+                              <span title="שילם/ה כמשתמש רשום אך צבירת הנקודות לא רצה (לא נכנס/ה לדף התודה או לדף המועדון אחרי התשלום). ההוצאה מחושבת מההזמנות בפועל."
+                                className="px-2 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
+                                ⚠️ טרם נצברו
+                              </span>
+                            ) : c.loyaltyPoints
+                          ) : <span className="text-gray-300">—</span>}
                         </td>
                         <td className="p-3 text-center font-bold text-blue-700">{c.totalOrders}</td>
                         <td className="p-3 text-left font-bold text-green-700">{formatPrice(c.totalSpent)}</td>

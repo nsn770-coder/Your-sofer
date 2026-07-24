@@ -7,6 +7,28 @@ import { Order } from '@/app/lib/types';
 import { CATS, getSubCats } from '@/app/constants/categories';
 
 const CLOUDINARY_UPLOAD = 'https://api.cloudinary.com/v1_1/dyxzq3ucy/image/upload';
+// קבלות ספק נשמרות ב-Cloudinary (auto — תומך גם ב-PDF) ומקושרות להוצאה בטאב רווחיות
+const CLOUDINARY_RECEIPT_UPLOAD = 'https://api.cloudinary.com/v1_1/dyxzq3ucy/auto/upload';
+
+/** נרמול תאריך קבלה מה-OCR ל-YYYY-MM-DD; נופל להיום אם לא ניתן לפרש */
+function normalizeInvoiceDate(raw: string | undefined): string {
+  const todayStr = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  if (!raw) return todayStr();
+  const s = raw.trim();
+  // YYYY-MM-DD
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+  // DD/MM/YYYY או DD.MM.YYYY או DD-MM-YYYY
+  m = s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/);
+  if (m) {
+    const year = m[3].length === 2 ? `20${m[3]}` : m[3];
+    return `${year}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+  }
+  return todayStr();
+}
 
 // Feature 6: update inventory from supplier receipt and auto-join active all_in_stock promotion
 export async function updateInventoryFromSupplierReceipt(
@@ -113,6 +135,8 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
   const [saving, setSaving] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [parsedInvoice, setParsedInvoice] = useState<ParsedInvoice | null>(null);
+  // URL של קובץ הקבלה ב-Cloudinary — מועלה במקביל ל-OCR ונשמר עם החשבונית וההוצאה
+  const [receiptFileUrl, setReceiptFileUrl] = useState<string | null>(null);
   const [applyingInvoice, setApplyingInvoice] = useState(false);
   const [skuMap, setSkuMap] = useState<Record<string, Product>>({});
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -244,11 +268,32 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
     if (!file) return;
     setUploading(true);
     setParsedInvoice(null);
+    setReceiptFileUrl(null);
     try {
+      // העלאה ל-Cloudinary במקביל ל-OCR — כדי שהקבלה תישמר במאגר ותקושר להוצאה
+      const cloudinaryUpload = (async () => {
+        try {
+          const fd = new FormData();
+          fd.append('file', file);
+          fd.append('upload_preset', 'yoursofer_upload');
+          const r = await fetch(CLOUDINARY_RECEIPT_UPLOAD, { method: 'POST', body: fd });
+          const d = await r.json();
+          return (d.secure_url as string) ?? null;
+        } catch (err) {
+          console.error('[InventoryTab] receipt cloudinary upload failed:', err);
+          return null;
+        }
+      })();
+
       const form = new FormData();
       form.append('image', file);
       const res = await fetch('/api/parse-receipt', { method: 'POST', body: form });
       const data = await res.json();
+
+      const url = await cloudinaryUpload;
+      setReceiptFileUrl(url);
+      if (!url) console.warn('[InventoryTab] הקבלה לא נשמרה ב-Cloudinary (לא חוסם את עדכון המלאי)');
+
       if (!data.success) { alert('שגיאה בניתוח: ' + (data.error ?? 'שגיאה לא ידועה')); return; }
       setParsedInvoice(data as ParsedInvoice);
     } catch (err) {
@@ -328,6 +373,7 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
             quantity:  Number(i.quantity)  || 0,
             unitPrice: Number(i.unitPrice) || 0,
           })),
+          ...(receiptFileUrl ? { receiptUrl: receiptFileUrl } : {}),
           processedAt: serverTimestamp(),
         });
       } catch (invoiceErr: unknown) {
@@ -337,8 +383,33 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
         return;
       }
 
+      // רישום הקבלה כהוצאה בטאב רווחיות — הסכום המלא של הקבלה, כולל קישור לקובץ
+      try {
+        const invoiceTotal = parsedInvoice.items.reduce(
+          (s, i) => s + (Number(i.quantity) || 0) * (Number(i.unitPrice) || 0), 0);
+        if (invoiceTotal > 0) {
+          await addDoc(collection(db, 'finance_expenses'), {
+            amount:        invoiceTotal,
+            category:      'סחורה מספק',
+            description:   `קבלת סחורה — ${parsedInvoice.supplier || 'ספק'}`,
+            date:          normalizeInvoiceDate(parsedInvoice.invoiceDate),
+            recurring:     false,
+            overrides:     {},
+            source:        'inventory',
+            supplier:      parsedInvoice.supplier || '',
+            invoiceNumber: parsedInvoice.invoiceNumber || '',
+            ...(receiptFileUrl ? { receiptUrl: receiptFileUrl } : {}),
+            createdAt:     serverTimestamp(),
+          });
+        }
+      } catch (expErr) {
+        console.error('[InventoryTab] finance_expenses add failed:', expErr);
+        alert('⚠️ המלאי עודכן אך רישום ההוצאה בטאב רווחיות נכשל — ניתן להוסיף ידנית.');
+      }
+
       setParsedInvoice(null);
-      alert('המלאי עודכן בהצלחה! ✅');
+      setReceiptFileUrl(null);
+      alert('המלאי עודכן בהצלחה! ✅ הקבלה נשמרה ונרשמה כהוצאה בטאב רווחיות.');
     } finally {
       setApplyingInvoice(false);
     }
@@ -546,6 +617,26 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
         setAllProducts(prev => [...prev, ...createdProducts]);
       }
 
+      // רישום ההזנה הידנית כהוצאת סחורה בטאב רווחיות
+      try {
+        const manualTotal = rows.reduce((s, r) => s + (Number(r.unitPrice) || 0) * (Number(r.quantity) || 0), 0);
+        if (manualTotal > 0) {
+          const d = new Date();
+          await addDoc(collection(db, 'finance_expenses'), {
+            amount:      manualTotal,
+            category:    'סחורה מספק',
+            description: `הזנת מלאי ידנית (${rows.length} פריטים)`,
+            date:        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+            recurring:   false,
+            overrides:   {},
+            source:      'inventory',
+            createdAt:   serverTimestamp(),
+          });
+        }
+      } catch (expErr) {
+        console.error('[InventoryTab] manual finance_expenses add failed:', expErr);
+      }
+
       setManualRows([{ code: '', unitPrice: 0, quantity: 0 }]);
       setManualFormOpen(false);
 
@@ -708,6 +799,9 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
           <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: 16, marginBottom: 16 }}>
             <div style={{ fontWeight: 700, marginBottom: 8 }}>
               📄 חשבונית #{parsedInvoice.invoiceNumber} — {parsedInvoice.supplier} ({parsedInvoice.invoiceDate})
+              {receiptFileUrl
+                ? <span style={{ marginRight: 8, fontSize: 11, fontWeight: 700, color: '#16a34a', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 4, padding: '1px 6px' }}>✓ קובץ הקבלה נשמר</span>
+                : <span style={{ marginRight: 8, fontSize: 11, fontWeight: 700, color: '#92400e', background: '#fef3c7', border: '1px solid #fcd34d', borderRadius: 4, padding: '1px 6px' }}>⚠️ הקובץ לא נשמר במאגר</span>}
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
@@ -849,7 +943,7 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
                 {applyingInvoice ? '⏳ מעדכן...' : '✓ עדכן מלאי'}
               </button>
               <button
-                onClick={() => setParsedInvoice(null)}
+                onClick={() => { setParsedInvoice(null); setReceiptFileUrl(null); }}
                 style={{ background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 700, cursor: 'pointer' }}
               >
                 ביטול

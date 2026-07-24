@@ -286,5 +286,19 @@ service cloud.firestore {
     match /invoices/{id} {
       allow read, write: if isAdmin();
     }
+
+    // ── Finance: הכנסות/הוצאות ידניות + הגדרות רווחיות (טאב רווחיות באדמין) ──
+
+    match /finance_incomes/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /finance_expenses/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /finance_settings/{id} {
+      allow read, write: if isAdmin();
+    }
   }
 }
