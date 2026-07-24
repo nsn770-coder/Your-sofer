@@ -287,6 +287,16 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // ── ניהול מיילים באדמין: תבניות + היסטוריית שליחות ──────────────────────
+
+    match /emailTemplates/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /sentEmails/{id} {
+      allow read, write: if isAdmin();
+    }
+
     // ── Finance: הכנסות/הוצאות ידניות + הגדרות רווחיות (טאב רווחיות באדמין) ──
 
     match /finance_incomes/{id} {
