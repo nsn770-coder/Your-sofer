@@ -200,7 +200,9 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
 
   // ── טווח תאריכים ──
   const getRangeBounds = (): { from: Date; to: Date } => {
+    // סוף היום — כדי שהוצאות/הכנסות שנרשמו היום (נשמרות בשעה 12:00) ייספרו גם בבוקר
     const to = new Date();
+    to.setHours(23, 59, 59, 999);
     if (dateRange === 'custom' && customFrom && customTo) {
       return { from: new Date(customFrom + 'T00:00:00'), to: new Date(customTo + 'T23:59:59') };
     }
