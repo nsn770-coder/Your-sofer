@@ -1,6 +1,8 @@
 'use client';
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/app/firebase';
 import { useCart } from '@/app/contexts/CartContext';
 import PageFaqSection from '@/app/components/faq/PageFaqSection';
 import { getKipaUnitPrice, KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
@@ -72,6 +74,17 @@ function KippotOrderInner() {
   const type   = (searchParams.get('type') || 'print-top') as 'print-top' | 'print-bottom' | 'print-both' | 'embroidery';
   const style  = searchParams.get('style') || 'lavan';
   const kippah = KIPPOT_STYLES[style] || KIPPOT_STYLES.lavan;
+
+  // ── שיוך דגם ← מוצר אמיתי (settings/eventKippotStyles) — לניכוי מלאי ורווחיות ──
+  const [styleProductId, setStyleProductId] = useState<string | null>(null);
+  useEffect(() => {
+    getDoc(doc(db, 'settings', 'eventKippotStyles'))
+      .then(snap => {
+        const map = snap.exists() ? snap.data() as Record<string, { productId?: string }> : {};
+        setStyleProductId(map[style]?.productId ?? null);
+      })
+      .catch(() => setStyleProductId(null)); // לא חוסם הזמנה אם אין שיוך
+  }, [style]);
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [designText, setDesignText] = useState('');
@@ -248,6 +261,8 @@ function KippotOrderInner() {
 
     addItem({
       id: `kippot-bulk-${Date.now()}`,
+      // שיוך למוצר אמיתי — המלאי יורד והרווחיות מחושבת לפי עלות המוצר
+      ...(styleProductId ? { productId: styleProductId } : {}),
       name: `כיפות ${kippah.label} × ${qty} — ${TYPE_LABELS[type]}${addSide && type !== 'print-both' ? ' + צד נוסף' : ''}`,
       price: unitPrice,
       quantity: qty,

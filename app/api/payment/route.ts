@@ -504,7 +504,7 @@ export async function POST(req: NextRequest) {
         address: address || '', notes: notes || '',
         items: [
           ...cartItems.map(i => ({
-            id: i.id, productId: i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity,
+            id: i.id, productId: i.productId || i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity,
             selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null,
             embroideryText: i.embroideryText || null,
             embroideryOptions: i.embroideryOptions || null, embroiderySurcharge: i.embroiderySurcharge || null,

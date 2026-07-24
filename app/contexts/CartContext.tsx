@@ -35,6 +35,9 @@ export function getEventKippahPricePerUnit(_basePrice: number, qty: number): num
 
 export interface CartItem {
   id: string;
+  /** מזהה מוצר אמיתי ב-Firestore — כשה-id הוא סינתטי (למשל הזמנת כיפות לאירועים).
+      זורם לפריט ההזמנה ומאפשר ניכוי מלאי וחישוב רווחיות לפי המוצר. */
+  productId?: string;
   name: string;
   price: number;
   imgUrl?: string;

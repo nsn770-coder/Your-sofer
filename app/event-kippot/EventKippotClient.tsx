@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { getKipaUnitPrice, KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
 import { useAuth } from '@/app/contexts/AuthContext';
@@ -58,6 +58,65 @@ export default function EventKippotClient() {
   const [style, setStyle]         = useState<string | null>(null);
   const { user } = useAuth();
   const [eventProducts, setEventProducts] = useState<Product[]>([]);
+  const isAdmin = user?.role === 'admin';
+
+  // ── שיוך דגם ← מוצר בחנות (settings/eventKippotStyles) — מלאי ורווחיות ──
+  const [styleMap, setStyleMap] = useState<Record<string, { productId: string; sku: string; name: string }>>({});
+  const [styleProducts, setStyleProducts] = useState<Record<string, Product>>({});
+  const [assigning, setAssigning] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const snap = await getDoc(doc(db, 'settings', 'eventKippotStyles'));
+        if (!snap.exists()) return;
+        const map = snap.data() as Record<string, { productId: string; sku: string; name: string }>;
+        setStyleMap(map);
+        const prods: Record<string, Product> = {};
+        await Promise.all(Object.entries(map).map(async ([styleId, m]) => {
+          if (!m?.productId) return;
+          const pSnap = await getDoc(doc(db, 'products', m.productId));
+          if (pSnap.exists()) prods[styleId] = { id: pSnap.id, ...pSnap.data() } as Product;
+        }));
+        setStyleProducts(prods);
+      } catch (e) { console.error('[EventKippot] style map load:', e); }
+    })();
+  }, []);
+
+  // אדמין: שיוך דגם לקוד מוצר (SKU) — חיפוש מדויק ואז לפי ספרות הקוד
+  async function assignStyleProduct(styleId: string, styleLabel: string) {
+    const input = window.prompt(`קוד מוצר (SKU) לשיוך לדגם "${styleLabel}":`, styleMap[styleId]?.sku ?? '');
+    if (!input || !input.trim()) return;
+    const code = input.trim();
+    setAssigning(styleId);
+    try {
+      let product: Product | null = null;
+      const exact = await getDocs(query(collection(db, 'products'), where('sku', '==', code)));
+      if (!exact.empty) {
+        product = { id: exact.docs[0].id, ...exact.docs[0].data() } as Product;
+      } else {
+        // התאמה לפי ספרות הקוד — כמו בטאב המלאי
+        const digits = code.replace(/^[A-Z]+/i, '');
+        if (digits) {
+          const snap = await getDocs(query(collection(db, 'products'), where('sku', '>=', ' ')));
+          snap.forEach(d => {
+            if (product) return;
+            const p = { id: d.id, ...d.data() } as Product;
+            if ((p.sku || '').replace(/^[A-Z]+/i, '') === digits) product = p;
+          });
+        }
+      }
+      if (!product) { alert(`לא נמצא מוצר עם קוד "${code}"`); return; }
+      const found: Product = product;
+      const entry = { productId: found.id, sku: found.sku || code, name: found.name || '' };
+      await setDoc(doc(db, 'settings', 'eventKippotStyles'), { [styleId]: entry }, { merge: true });
+      setStyleMap(prev => ({ ...prev, [styleId]: entry }));
+      setStyleProducts(prev => ({ ...prev, [styleId]: found }));
+      alert(`✅ הדגם "${styleLabel}" שויך למוצר: ${found.name}\nמהיום הזמנות כיפות מהדגם הזה יורדות מהמלאי שלו ונספרות ברווחיות.`);
+    } catch (e) {
+      alert('שגיאה בשיוך'); console.error(e);
+    } finally { setAssigning(null); }
+  }
 
   // ── פופאפ מבצע SIMCHA — פעם אחת לסשן ─────────────────────────────────────
   const [showPromoPopup, setShowPromoPopup] = useState(false);
@@ -306,29 +365,59 @@ export default function EventKippotClient() {
       <div style={{ marginBottom: 28 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 12 }}>3. בחר סוג כיפה</div>
         <div className="ys-ekip-styles">
-          {KIPPOT_STYLES.map(s => (
-            <button
-              key={s.id}
-              className="ys-ekip-card"
-              onClick={() => setStyle(style === s.id ? null : s.id)}
-              style={{
-                border: style === s.id ? `2px solid ${GOLD}` : '2px solid #E5E0D5',
-                background: '#fff',
-                padding: 0,
-                cursor: 'pointer',
-                textAlign: 'center',
-                fontFamily: 'inherit',
-                position: 'relative',
-                overflow: 'hidden',
-              }}
-            >
-              {style === s.id && (
-                <div style={{ position: 'absolute', top: 6, left: 6, background: GOLD, color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>✓</div>
-              )}
-              <img src={s.img} alt={s.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-              <div style={{ padding: '8px 10px', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{s.label}</div>
-            </button>
-          ))}
+          {KIPPOT_STYLES.map(s => {
+            const mapped  = styleMap[s.id];
+            const product = styleProducts[s.id];
+            const stock   = typeof product?.inStock === 'number' ? product.inStock : null;
+            return (
+              <div key={s.id} className="ys-ekip-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                <button
+                  onClick={() => setStyle(style === s.id ? null : s.id)}
+                  style={{
+                    border: style === s.id ? `2px solid ${GOLD}` : '2px solid #E5E0D5',
+                    background: '#fff',
+                    padding: 0,
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    fontFamily: 'inherit',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    width: '100%',
+                  }}
+                >
+                  {style === s.id && (
+                    <div style={{ position: 'absolute', top: 6, left: 6, background: GOLD, color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>✓</div>
+                  )}
+                  <img src={s.img} alt={s.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ padding: '8px 10px', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{s.label}</div>
+                </button>
+                {/* אדמין: שיוך הדגם למוצר בחנות + תצוגת מלאי */}
+                {isAdmin && (
+                  <div style={{ padding: '4px 2px 0', fontSize: 10.5, lineHeight: 1.5, textAlign: 'center' }}>
+                    {mapped ? (
+                      <div style={{ color: '#374151' }}>
+                        🔗 {mapped.sku}
+                        {stock != null && (
+                          <span style={{ fontWeight: 800, color: stock <= 0 ? '#dc2626' : stock < 50 ? '#d97706' : '#16a34a' }}>
+                            {' '}· במלאי: {stock}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{ color: '#dc2626', fontWeight: 700 }}>לא משויך למוצר</div>
+                    )}
+                    <button
+                      onClick={() => assignStyleProduct(s.id, s.label)}
+                      disabled={assigning === s.id}
+                      style={{ background: 'none', border: 'none', color: '#1d4ed8', fontWeight: 700, fontSize: 10.5, cursor: 'pointer', fontFamily: 'inherit', padding: 0, textDecoration: 'underline' }}
+                    >
+                      {assigning === s.id ? '⏳ משייך...' : mapped ? 'שנה שיוך' : '🔗 שייך מוצר'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
