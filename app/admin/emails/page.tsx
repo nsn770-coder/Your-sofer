@@ -38,6 +38,35 @@ const TEMPLATE_META: Record<string, { label: string }> = {
   cart_abandonment:   { label: 'נטישת עגלה' },
   newsletter_welcome: { label: 'ברוך הבא / ניוזלטר' },
   custom_update:      { label: 'עדכון כללי ללקוח' },
+  club_invitation:    { label: 'הזמנה למועדון פרימיום' },
+};
+
+// תבנית ההזמנה למועדון (עותק זהה קיים ב-seed של /api/admin/send-bulk-email)
+const CLUB_INVITATION_TEMPLATE = {
+  subject: 'הוזמנת למועדון הפרימיום של Your Sofer — 10% חזרה על כל קנייה 🎁',
+  bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#111d3a">
+<a href="https://your-sofer.com/club" style="display:block">
+  <img src="https://your-sofer.com/club-og.jpg" alt="הצטרפו למועדון Your Sofer" style="width:100%;display:block;border-radius:12px"/>
+</a>
+<h2 style="color:#C5A028;margin-top:24px">מקומך במועדון הפרימיום שלנו שמור 🎁</h2>
+<p>שלום,</p>
+<p>כלקוח/ה וחבר/ה של <strong>Your Sofer</strong> — רצינו להזמין אותך אישית להצטרף בחינם למועדון הלקוחות שלנו.</p>
+<table dir="rtl" style="width:100%;border-collapse:collapse;margin:16px 0">
+  <tr><td style="padding:8px 0;font-size:15px">💰 <strong>10% חזרה בנקודות</strong> על כל קנייה — כל נקודה שווה 1 ₪ לקנייה הבאה</td></tr>
+  <tr><td style="padding:8px 0;font-size:15px">⏪ <strong>נקודות רטרואקטיביות</strong> — גם על רכישות שכבר ביצעת! רכשת ב-700 ₪? תקבל/י 70 נקודות בשווי 70 ₪</td></tr>
+  <tr><td style="padding:8px 0;font-size:15px">🏷️ <strong>מבצעים והטבות בלעדיות</strong> לחברי מועדון בלבד</td></tr>
+  <tr><td style="padding:8px 0;font-size:15px">✡️ מגוון ענק של סת"ם ויודאיקה — עם שירות אישי</td></tr>
+</table>
+<div style="text-align:center;margin:30px 0">
+  <a href="https://your-sofer.com/club" style="background:#C5A028;color:#111d3a;padding:16px 40px;text-decoration:none;border-radius:10px;font-weight:bold;font-size:17px;display:inline-block">
+    הצטרפות בחינם בלחיצה אחת ←
+  </a>
+</div>
+<p style="font-size:13px;color:#666;text-align:center">ההצטרפות עם חשבון Google — שניות ואתם בפנים, והנקודות על רכישות העבר נכנסות מיד.</p>
+<hr style="border:none;border-top:1px solid #eee;margin:20px 0"/>
+<p style="font-size:12px;color:#888;text-align:center">YourSofer — יודאיקה בסטנדרט הגבוה ביותר · your-sofer.com</p>
+</div>`,
+  isActive: true,
 };
 
 
@@ -97,6 +126,7 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; bodyHtml: string; isA
 </div>`,
     isActive: true,
   },
+  club_invitation: CLUB_INVITATION_TEMPLATE,
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -18,7 +18,11 @@ const SOURCE_LABELS: Record<string, string> = {
   mezuzah_funnel: 'פאנל מזוזות',
   newsletter:     'ניוזלטר',
   lead:           'ליד',
+  order_customer: 'לקוח (רכש באתר)',
 };
+
+// סטטוסים שנחשבים "לקוח ששילם" — זהים ליתר הדשבורד
+const PAID_STATUSES = new Set(['paid', 'completed', 'shipped', 'packing', 'magiah']);
 
 /**
  * Returns every contact eligible to receive a newsletter:
@@ -51,6 +55,32 @@ export async function getEligibleRecipients(): Promise<NewsletterRecipient[]> {
       createdAt:   data.createdAt,
     });
   });
+
+  // ── Source 2: לקוחות ששילמו באתר (אימייל מתוך ההזמנות) ────────────────────
+  // בסיס "לקוח קיים": מי שרכש באתר רשאי לקבל דיוור על שירותים דומים,
+  // עם קישור הסרה בכל מייל. optOut נבדק שוב בצד השרת מול leads לפני שליחה.
+  try {
+    const ordersSnap = await getDocs(collection(db, 'orders'));
+    ordersSnap.forEach(d => {
+      const data = d.data();
+      if (!PAID_STATUSES.has(String(data.status ?? ''))) return;
+      const email = (data.email as string | undefined)?.toLowerCase().trim();
+      if (!email) return;
+      all.push({
+        id:          'order_' + d.id,
+        name:        (data.customerName as string) || '',
+        email,
+        phone:       (data.phone as string) || '',
+        source:      'order_customer',
+        sourceLabel: SOURCE_LABELS.order_customer,
+        consent:     true,
+        optOut:      false,
+        createdAt:   data.createdAt as { seconds: number } | undefined,
+      });
+    });
+  } catch (e) {
+    console.error('[getEligibleRecipients] orders source failed (non-fatal):', e);
+  }
 
   // TODO: בעתיד — הוסף users עם newsletterSubscribed
   // const usersSnap = await getDocs(
