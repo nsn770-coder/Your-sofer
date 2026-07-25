@@ -115,6 +115,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `
           gtag('js', new Date());
           gtag('config', 'G-PM7GW4MWEJ', { send_page_view: false });
+          gtag('config', 'AW-18095875961');
         ` }} />
         <meta name="facebook-domain-verification" content="xuwtu57l434nldfe7p4s8l2sr829jw" />
         <CanonicalTag />
