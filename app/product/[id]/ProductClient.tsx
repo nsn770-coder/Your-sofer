@@ -1565,6 +1565,8 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   const [embossingEnabled, setEmbossingEnabled] = useState(false); // הטבעה על סידור/ספר — ₪15
   const [embossingText, setEmbossingText]       = useState('');
   const [embossingColor, setEmbossingColor]     = useState<'gold' | 'silver'>('gold');
+  // הטבעה לכל הכמות — גלופה חד־פעמית ₪130 לכל היחידות יחד (במקום ₪15 ליחידה)
+  const [embossingBulkMode, setEmbossingBulkMode] = useState(false);
   const [threadColor, setThreadColor]           = useState<ThreadColor | null>(null); // צבע חוט הרקמה
   const [threadColorError, setThreadColorError] = useState('');
   // ── אפשרויות ותוספות פר-מוצר (נוסח / צבע / הטבעות / אריזת מתנה) ────────────
@@ -1860,10 +1862,14 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   // ── הטבעה: קטגוריית ספרי קודש וסידורים — ₪15 קבוע ─────────────────────────
   const EMBOSSING_CATEGORIES = ['ספרי קודש וסידורים'];
   const EMBOSSING_PRICE = 15;
+  const EMBOSSING_BULK_PRICE = 130; // גלופה חד־פעמית — הטבעה לכל הכמות יחד
   const showEmbossing = !!product?.cat && EMBOSSING_CATEGORIES.some(c => product.cat!.includes(c));
-  const embossingSurcharge = showEmbossing && embossingEnabled && embossingText.trim() ? EMBOSSING_PRICE : 0;
+  const embossingSurcharge = showEmbossing && embossingEnabled && !embossingBulkMode && embossingText.trim() ? EMBOSSING_PRICE : 0;
+  const embossingBulkActive = showEmbossing && embossingEnabled && embossingBulkMode && !!embossingText.trim();
   const embossingFields = embossingSurcharge > 0
     ? { embossingText: embossingText.trim(), embossingColor, embossingSurcharge }
+    : embossingBulkActive
+    ? { embossingText: embossingText.trim(), embossingColor, embossingSurcharge: 0 }
     : {};
 
   // ── צבע חוט לרקמה — נדרש כאשר הרקמה פעילה (טקסט + אופציה נבחרה) ──────────────
@@ -1965,7 +1971,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     const liveEmbText = (embroideryTextRef.current?.value ?? embroideryText).trim();
     const liveEmbSurcharge = liveEmbText ? embroideryOptions.length * EMB_OPTION_PRICE : 0;
     const liveEmbossText = (embossingTextRef.current?.value ?? embossingText).trim();
-    const liveEmbossSurcharge = showEmbossing && embossingEnabled && liveEmbossText ? EMBOSSING_PRICE : 0;
+    const liveEmbossSurcharge = showEmbossing && embossingEnabled && !embossingBulkMode && liveEmbossText ? EMBOSSING_PRICE : 0;
+    // הטבעה לכל הכמות — גלופה חד־פעמית ₪130 לשורה (לא ליחידה)
+    const liveBulkEmboss = showEmbossing && embossingEnabled && embossingBulkMode && !!liveEmbossText;
     // סנכרון ל-state לתצוגה עקבית (תוספת מחיר / כרטיס פריט)
     if (liveEmbText !== embroideryText) setEmbroideryText(liveEmbText);
     if (liveEmbossText !== embossingText) setEmbossingText(liveEmbossText);
@@ -1992,16 +2000,23 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       return;
     }
     setVariantError(''); setAddonError('');
-    const addonFields = (activeAddons.length > 0 || variantOptions.length > 0)
+    // תוספת הטבעה לכל הכמות — נכנסת כתוספת חד־פעמית לשורה (כמו הטבעת הקדשה)
+    const bulkEmbossAddon = liveBulkEmboss
+      ? [{ id: 'embossing-bulk', label: 'הטבעה לכל הכמות (גלופה חד־פעמית)', price: EMBOSSING_BULK_PRICE, pricing: 'flat' as const, text: liveEmbossText }]
+      : [];
+    const addonFields = (activeAddons.length > 0 || variantOptions.length > 0 || bulkEmbossAddon.length > 0)
       ? {
           ...(variantOptions.length > 0 ? { selectedVariants } : {}),
-          ...(activeAddons.length > 0 ? {
-            selectedAddons: activeAddons.map(a => ({
-              id: a.id, label: a.label, price: a.price, pricing: a.pricing,
-              ...(a.requiresText ? { text: getAddonText(a.id) } : {}),
-            })),
+          ...((activeAddons.length > 0 || bulkEmbossAddon.length > 0) ? {
+            selectedAddons: [
+              ...activeAddons.map(a => ({
+                id: a.id, label: a.label, price: a.price, pricing: a.pricing,
+                ...(a.requiresText ? { text: getAddonText(a.id) } : {}),
+              })),
+              ...bulkEmbossAddon,
+            ],
             addonsPerUnitSurcharge,
-            addonsFlatSurcharge,
+            addonsFlatSurcharge: addonsFlatSurcharge + (bulkEmbossAddon.length > 0 ? EMBOSSING_BULK_PRICE : 0),
           } : {}),
         }
       : {};
@@ -2014,6 +2029,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       : {};
     const liveEmbossingFields = liveEmbossSurcharge > 0
       ? { embossingText: liveEmbossText, embossingColor, embossingSurcharge: liveEmbossSurcharge }
+      : liveBulkEmboss
+      ? { embossingText: liveEmbossText, embossingColor, embossingSurcharge: 0 }
       : {};
     if (selectedKlafIds.length > 0) {
       for (let i = 0; i < selectedKlafIds.length; i++) {
@@ -2279,7 +2296,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               <span style={{ fontSize: 13, fontWeight: 800, color: '#1a1a1a', display: 'flex', alignItems: 'center', gap: 5 }}>
                 <Icon.Pen /> הוספת הטבעה אישית
               </span>
-              <span style={{ fontSize: 11, color: '#888', marginTop: 2 }}>הטבעת אותיות / שם על הכריכה · תוספת ₪{EMBOSSING_PRICE}</span>
+              <span style={{ fontSize: 11, color: '#888', marginTop: 2 }}>הטבעת אותיות / שם על הכריכה · ₪{EMBOSSING_PRICE} ליחידה או ₪{EMBOSSING_BULK_PRICE} לכל הכמות</span>
             </span>
             <input type="checkbox" checked={embossingEnabled} onChange={e => setEmbossingEnabled(e.target.checked)}
               style={{ width: 18, height: 18, accentColor: '#C9A227', flexShrink: 0, cursor: 'pointer' }} />
@@ -2287,6 +2304,23 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
           {embossingEnabled && (
             <div style={{ marginTop: 12 }}>
+              {/* בחירת אופן חיוב: ליחידה או גלופה חד־פעמית לכל הכמות */}
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 6 }}>אופן החיוב:</div>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <button type="button" onClick={() => setEmbossingBulkMode(false)}
+                  style={{ flex: 1, padding: '9px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif', textAlign: 'center', border: !embossingBulkMode ? '1.5px solid #C9A227' : '1.5px solid #e0e0e0', background: !embossingBulkMode ? '#FDF8EC' : '#fff', color: !embossingBulkMode ? '#8a6d0f' : '#555' }}>
+                  {!embossingBulkMode ? '✓ ' : ''}ליחידה · +₪{EMBOSSING_PRICE}
+                </button>
+                <button type="button" onClick={() => setEmbossingBulkMode(true)}
+                  style={{ flex: 1.4, padding: '9px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif', textAlign: 'center', border: embossingBulkMode ? '1.5px solid #C9A227' : '1.5px solid #e0e0e0', background: embossingBulkMode ? '#FDF8EC' : '#fff', color: embossingBulkMode ? '#8a6d0f' : '#555' }}>
+                  {embossingBulkMode ? '✓ ' : ''}לכל הכמות · ₪{EMBOSSING_BULK_PRICE} חד־פעמי
+                </button>
+              </div>
+              {embossingBulkMode && (
+                <div style={{ fontSize: 11, color: '#8a6d0f', background: '#FDF8EC', border: '1px solid #ecdcb0', borderRadius: 8, padding: '6px 10px', marginBottom: 10, lineHeight: 1.5 }}>
+                  💡 משתלם בהזמנת כמות: גלופה אחת לכל היחידות — אותה הטבעה על כולן, ₪{EMBOSSING_BULK_PRICE} סה&quot;כ במקום ₪{EMBOSSING_PRICE} ליחידה.
+                </div>
+              )}
               <label style={{ fontSize: 12, fontWeight: 700, color: '#444', display: 'block', marginBottom: 4 }}>האותיות שיופיעו בהטבעה:</label>
               <input type="text" ref={embossingTextRef} defaultValue={embossingText} placeholder="לדוגמה: משפחת כהן" maxLength={30}
                 style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
@@ -2311,7 +2345,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                 <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginTop: 6 }}>יש להזין את האותיות להטבעה</div>
               )}
               {embossingSurcharge > 0 && (
-                <div style={{ fontSize: 12, color: '#C9A227', fontWeight: 700, marginTop: 6 }}>תוספת הטבעה: +₪{EMBOSSING_PRICE}</div>
+                <div style={{ fontSize: 12, color: '#C9A227', fontWeight: 700, marginTop: 6 }}>תוספת הטבעה: +₪{EMBOSSING_PRICE} ליחידה</div>
+              )}
+              {embossingBulkActive && (
+                <div style={{ fontSize: 12, color: '#C9A227', fontWeight: 700, marginTop: 6 }}>תוספת הטבעה לכל הכמות: +₪{EMBOSSING_BULK_PRICE} חד־פעמי</div>
               )}
             </div>
           )}
