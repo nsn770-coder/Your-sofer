@@ -281,14 +281,15 @@ function KippotOrderInner() {
         imageScale:    imgScale,
         imageRotation: imgRotation,
         logoWidthPct,
-        mockupUrl:     mockupUrl || undefined,
+        // אין לשמור undefined — Firestore זורק שגיאה על ערכים כאלה בהמשך הזרימה
+        ...(mockupUrl ? { mockupUrl } : {}),
         // Extra fields saved to order & shown in dashboard
-        designText:  designText || undefined,
-        designExample: designExample
-          ? DESIGN_EXAMPLES.find(d => d.id === designExample)?.label
-          : undefined,
+        ...(designText ? { designText } : {}),
+        ...(designExample && DESIGN_EXAMPLES.find(d => d.id === designExample)?.label
+          ? { designExample: DESIGN_EXAMPLES.find(d => d.id === designExample)!.label }
+          : {}),
         addSide: addSide || type === 'print-both',
-        addSideText: addSide ? addSideText : undefined,
+        ...(addSide && addSideText ? { addSideText } : {}),
         kippahStyle: style,
         kippahLabel: kippah.label,
         printType:   type,

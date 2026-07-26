@@ -450,6 +450,13 @@ export default function CheckoutPage() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
+  // Firestore זורק שגיאה סינכרונית על ערכי undefined מקוננים (למשל
+  // printCustomization מהזמנת כיפות בלי טקסט/הדמיה) — JSON round-trip מנקה אותם.
+  function cleanForFirestore<T>(v: T | null | undefined): T | null {
+    if (v === null || v === undefined) return null;
+    try { return JSON.parse(JSON.stringify(v)); } catch { return null; }
+  }
+
   function savePartialAbandonedCart(latest?: Partial<typeof form>) {
     const f = { ...formRef.current, ...latest };
     console.log('[abandon] fired', { sessionId, phone: f.phone, email: f.email, items: items.length });
@@ -460,7 +467,7 @@ export default function CheckoutPage() {
     const cartItemsSnap = items.map(i => ({
       id: i.id, name: i.name, price: i.price, quantity: i.quantity,
       imgUrl: i.imgUrl ?? null,
-      printCustomization: i.printCustomization ?? null,
+      printCustomization: cleanForFirestore(i.printCustomization),
     }));
 
     setDoc(doc(db, 'abandoned_carts', sessionId), {
@@ -508,23 +515,29 @@ export default function CheckoutPage() {
   );
 
   function saveAbandonedCartBeforePayment() {
-    if (!sessionId || items.length === 0) return;
-    const f = formRef.current;
-    setDoc(doc(db, 'abandoned_carts', sessionId), {
-      sessionId,
-      name: f.name, phone: f.phone, email: f.email,
-      address: `${f.address}, ${f.city}`,
-      cartItems: items.map(i => ({
-        id: i.id, name: i.name, price: i.price, quantity: i.quantity,
-        imgUrl: i.imgUrl ?? null,
-        printCustomization: i.printCustomization ?? null,
-      })),
-      cartTotal: total,
-      updatedAt: serverTimestamp(),
-      converted: false,
-      convertedOrderId: null,
-      ...(abandonedSavedRef.current ? {} : { createdAt: serverTimestamp() }),
-    }, { merge: true }).catch(e => console.error('[checkout] abandoned_cart save FAILED:', e));
+    // שמירת עגלה נטושה היא nice-to-have — אסור שכשל בה יחסום תשלום.
+    // setDoc זורק סינכרונית על נתונים לא תקינים, ולכן כל הגוף עטוף try/catch.
+    try {
+      if (!sessionId || items.length === 0) return;
+      const f = formRef.current;
+      setDoc(doc(db, 'abandoned_carts', sessionId), {
+        sessionId,
+        name: f.name || null, phone: f.phone || null, email: f.email || null,
+        address: `${f.address}, ${f.city}`,
+        cartItems: items.map(i => ({
+          id: i.id, name: i.name, price: i.price, quantity: i.quantity,
+          imgUrl: i.imgUrl ?? null,
+          printCustomization: cleanForFirestore(i.printCustomization),
+        })),
+        cartTotal: total,
+        updatedAt: serverTimestamp(),
+        converted: false,
+        convertedOrderId: null,
+        ...(abandonedSavedRef.current ? {} : { createdAt: serverTimestamp() }),
+      }, { merge: true }).catch(e => console.error('[checkout] abandoned_cart save FAILED:', e));
+    } catch (e) {
+      console.error('[checkout] abandoned_cart save threw (non-fatal):', e);
+    }
   }
 
   async function handlePaymentToken(singleUseToken: string, paymentsCount: number) {
