@@ -124,8 +124,7 @@ export async function GET(req: Request) {
       ${imageLink ? `<g:image_link>${esc(imageLink)}</g:image_link>` : ''}
       ${additionalImages.map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('\n      ')}
       <g:availability>${esc(availability)}</g:availability>
-      <g:price>${(d.was && (d.was as number) > price) ? (d.was as number).toFixed(2) : price.toFixed(2)} ILS</g:price>
-      ${(d.was && (d.was as number) > price) ? `<g:sale_price>${price.toFixed(2)} ILS</g:sale_price>` : ''}
+      <g:price>${price.toFixed(2)} ILS</g:price>
       <g:brand>${esc(brand)}</g:brand>
       <g:condition>${esc(condition)}</g:condition>
       <g:identifier_exists>${esc(identifierExists)}</g:identifier_exists>
