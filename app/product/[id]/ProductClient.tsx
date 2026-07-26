@@ -1682,7 +1682,17 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
           setProduct(p);
           trackViewItem({ item_id: p.id, item_name: p.name, price: p.price, item_category: p.cat });
           pixel.viewContent({ id: p.id, name: p.name, price: p.price, category: p.cat });
-          if (p.cat) {
+          // מוצר אירועים (כיפות ומזכרות לאירועים): במקום "מוצרים דומים" —
+          // סקרול מוצרים מתוך עמוד /event-kippot + כפתור מעבר לעמוד.
+          if (p.isEventProduct || p.eventScrollSection) {
+            const evSnap = await getDocs(query(collection(db, 'products'), where('isEventProduct', '==', true), limit(13)));
+            const evData: Product[] = [];
+            evSnap.forEach(d => {
+              const ep = { id: d.id, ...d.data() } as Product;
+              if (ep.id !== p.id && (ep as any).active !== false) evData.push(ep);
+            });
+            setRelated(evData.slice(0, 12));
+          } else if (p.cat) {
             const relSnap = await getDocs(query(collection(db, 'products'), where('cat', '==', p.cat), orderBy('priority', 'desc'), limit(5)));
             const relData: Product[] = [];
             relSnap.forEach(d => { if (d.id !== p.id) relData.push({ id: d.id, ...d.data() } as Product); });
@@ -2598,6 +2608,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
   const HIDE_RELATED_CATS = ['קלפי מזוזה', 'בתי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות'];
   const showRelated = related.length > 0 && !HIDE_RELATED_CATS.includes(product?.cat || '');
+  // מוצר ששייך לעמוד "כיפות ומזכרות לאירועים" — סקרול מוצרי אירועים + כפתור לעמוד
+  const isEventProd = !!(product?.isEventProduct || product?.eventScrollSection);
 
   return (
     <div style={{ minHeight: '100vh', background: '#F5F2EC', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
@@ -2924,15 +2936,31 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         {/* Related products */}
         {related.length > 0 && (
           <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
-            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Icon.Cart size={18} color="#0f1111" /> משלים את הרכישה שלך
-            </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: isMobile ? 10 : 14, overflow: 'hidden', width: '100%' }}>
+            {isEventProd ? (
+              <div style={{ marginBottom: 16 }}>
+                <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Icon.Cart size={18} color="#0f1111" /> עוד כיפות ומזכרות לאירועים
+                </h2>
+                <button
+                  onClick={() => router.push('/event-kippot')}
+                  style={{ width: isMobile ? '100%' : 'auto', background: '#C5A028', color: '#1a1a1a', border: 'none', borderRadius: 24, padding: '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(197,160,40,0.35)' }}
+                >
+                  כנס לעמוד כיפות ומזכרות — מחירים ומבצעים מיוחדים ←
+                </button>
+              </div>
+            ) : (
+              <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: '#0f1111', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Icon.Cart size={18} color="#0f1111" /> משלים את הרכישה שלך
+              </h2>
+            )}
+            <div style={isEventProd
+              ? { display: 'flex', gap: isMobile ? 10 : 14, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' as const, WebkitOverflowScrolling: 'touch' as const, width: '100%' }
+              : { display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: isMobile ? 10 : 14, overflow: 'hidden', width: '100%' }}>
               {related.map(r => {
                 const rImg = optimizeCloudinaryUrl(r.imgUrl || r.image_url || '', 400) || undefined;
                 return (
                   <div key={r.id} onClick={() => router.push(`/product/${r.id}`)}
-                    style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%', boxSizing: 'border-box' as const }}
+                    style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 10, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%', boxSizing: 'border-box' as const, ...(isEventProd ? { flexShrink: 0, width: isMobile ? 148 : 178 } : {}) }}
                     onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)')}
                     onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)')}>
                     <div style={{ paddingTop: '100%', position: 'relative', background: '#f7f8f8' }}>
