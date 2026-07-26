@@ -440,28 +440,37 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── A7: whole-shekel charge — round every line at payload build ──────────
-    // Product prices are stored whole (A1/A2), but percent coupons and promo
-    // allocations can re-introduce fractions on discount lines. The customer-
-    // facing UI displays whole shekels (formatPrice rounds), so the charge must
-    // match: round each line's final unit price; the charged total is then the
-    // exact sum of the (whole) lines. Validations above already ran on the raw
-    // client values with the old 0.02 tolerance — rounding happens strictly
-    // after all discounts are validated and allocated.
+    // ── A7: whole-shekel charge total ────────────────────────────────────────
+    // Unit prices may legitimately carry agorot (e.g. embroidery ₪5 + inner
+    // print ₪1.5 → ₪18.50/unit) and their LINE total is often already whole
+    // (18.50 × 50 = 925). So we do NOT round unit prices — that inflates the
+    // charge by up to ±0.5 × quantity (a real ₪25 overcharge on 50 units).
+    // Instead: keep lines exact (2 decimals), and if the SUM lands on a
+    // fraction (percent coupons, odd quantities), add one tiny adjustment
+    // line (±0.50 max) so the charged total is a whole shekel — matching the
+    // rounded total the customer sees (formatPrice rounds the display).
+    const round2 = (n: number) => Math.round(n * 100) / 100;
     const chargeItems = items.map(item => ({
       name:      item.name,
       quantity:  item.quantity,
-      unitPrice: Math.round(item.price),
+      unitPrice: round2(item.price),
     }));
-    const chargedTotal = chargeItems.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
-    // Sanity: rounding may shift the client total by at most ±0.5 per fractional
-    // line. Anything beyond ±2 means the client and server disagree — abort.
+    let chargedTotal = round2(chargeItems.reduce((s, i) => s + i.unitPrice * i.quantity, 0));
+    // מדיניות עיגול: מחירים שנקבעו ידנית (כולל חצאי שקל כמו ₪1.5 להדפס) נשמרים
+    // בדיוק; רק אגורות "מוזרות" (תוצאת קופון אחוזים וכד') מתעגלות — לחצי השקל
+    // הקרוב (19.44 → 19.50, 19.24 → 19.00). תוספת העיגול לכל היותר ±25 אגורות.
+    const snappedTotal = Math.round(chargedTotal * 2) / 2;
+    if (snappedTotal !== chargedTotal) {
+      const adj = round2(snappedTotal - chargedTotal); // between -0.25 and +0.25
+      chargeItems.push({ name: 'עיגול אגורות', quantity: 1, unitPrice: adj });
+      console.log('[payment] A7 rounding adjustment line:', adj, '→ total:', snappedTotal);
+      chargedTotal = snappedTotal;
+    }
+    // Sanity: the whole-shekel total may differ from the client total by the
+    // adjustment only. Anything beyond ±2 means client/server disagree — abort.
     if (!Number.isFinite(chargedTotal) || Math.abs(chargedTotal - total) > 2) {
       console.error('[payment] rounded-total mismatch', { total, chargedTotal });
       return NextResponse.json({ error: 'שגיאה בחישוב הסכום לחיוב' }, { status: 400 });
-    }
-    if (chargedTotal !== total) {
-      console.log('[payment] A7 rounding applied — clientTotal:', total, '→ chargedTotal:', chargedTotal);
     }
 
     // ── Charge the card via the SingleUseToken (PCI: never touches our server) ──

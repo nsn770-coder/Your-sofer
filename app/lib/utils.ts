@@ -42,6 +42,11 @@ export function formatPrice(price: number | string | null | undefined): string {
   if (price === null || price === undefined) return '₪0.00';
   const num = typeof price === 'string' ? parseFloat(price) : price;
   if (isNaN(num)) return '₪0.00';
-  const rounded = Math.round(num);
-  return `₪${rounded.toLocaleString('he-IL')}.00`;
+  // מדיניות עיגול תצוגה — זהה לעיגול החיוב (payment route):
+  // חצאי שקל לגיטימיים ונשמרים (₪18.50); אגורות אחרות מתעגלות לחצי הקרוב.
+  const snapped = Math.round(num * 2) / 2;
+  const whole = Math.floor(snapped);
+  return snapped === whole
+    ? `₪${whole.toLocaleString('he-IL')}.00`
+    : `₪${whole.toLocaleString('he-IL')}.50`;
 }
