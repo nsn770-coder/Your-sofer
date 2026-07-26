@@ -201,7 +201,8 @@ export default function PromotionsTab() {
         for (const p of chunk) {
           const ref = doc(db, 'products', p.id);
           if (activate) {
-            const salePrice = Math.round(p.price * (1 - promo.discountValue / 100) * 100) / 100;
+            // Whole shekels only (pricing-integrity): no agorot in salePrice
+            const salePrice = Math.round(p.price * (1 - promo.discountValue / 100));
             batch.update(ref, {
               isOnSale: true,
               salePrice,

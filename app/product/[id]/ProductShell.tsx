@@ -16,7 +16,7 @@
 // change them here too, or the shell→client swap will visibly jump.
 // ─────────────────────────────────────────────────────────────────────────────
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
-import { formatPrice } from '@/app/lib/utils';
+import { formatPrice, effectivePrice as computeEffectivePrice } from '@/app/lib/utils';
 
 // Mirrors ProductClient's Product fields used above the fold (plain JSON).
 export interface ShellProduct {
@@ -75,23 +75,12 @@ export default function ProductShell({ product }: { product: ShellProduct }) {
   const mainImage = allMedia[0] ? optimizeCloudinaryUrl(allMedia[0], 800) : null;
   const thumbs = allMedia.map(u => optimizeCloudinaryUrl(u, 100));
 
-  // ── Effective price — KEEP IN SYNC with ProductClient ──
+  // ── Effective price — shared single source of truth (app/lib/utils) ──
   const price = product.price ?? 0;
   // Server component rendered once per request — reading the clock here is
   // safe and required for the sale-window check (same as ProductClient does).
   // eslint-disable-next-line react-hooks/purity
-  const now = Date.now();
-  const saleActive =
-    product.isOnSale === true &&
-    product.salePrice != null &&
-    (product.saleStartsAt == null || new Date(product.saleStartsAt).getTime() <= now) &&
-    (product.saleEndsAt == null || new Date(product.saleEndsAt).getTime() >= now);
-  const effectivePrice =
-    product.clearanceDiscount === true && product.clearanceSalePrice != null
-      ? product.clearanceSalePrice
-      : saleActive
-        ? product.salePrice!
-        : price;
+  const effectivePrice = computeEffectivePrice(product);
   const effectivePct = effectivePrice < price
     ? (product.salePercent ?? Math.round((1 - effectivePrice / price) * 100))
     : 0;

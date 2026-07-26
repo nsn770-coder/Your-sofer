@@ -437,6 +437,30 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── A7: whole-shekel charge — round every line at payload build ──────────
+    // Product prices are stored whole (A1/A2), but percent coupons and promo
+    // allocations can re-introduce fractions on discount lines. The customer-
+    // facing UI displays whole shekels (formatPrice rounds), so the charge must
+    // match: round each line's final unit price; the charged total is then the
+    // exact sum of the (whole) lines. Validations above already ran on the raw
+    // client values with the old 0.02 tolerance — rounding happens strictly
+    // after all discounts are validated and allocated.
+    const chargeItems = items.map(item => ({
+      name:      item.name,
+      quantity:  item.quantity,
+      unitPrice: Math.round(item.price),
+    }));
+    const chargedTotal = chargeItems.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+    // Sanity: rounding may shift the client total by at most ±0.5 per fractional
+    // line. Anything beyond ±2 means the client and server disagree — abort.
+    if (!Number.isFinite(chargedTotal) || Math.abs(chargedTotal - total) > 2) {
+      console.error('[payment] rounded-total mismatch', { total, chargedTotal });
+      return NextResponse.json({ error: 'שגיאה בחישוב הסכום לחיוב' }, { status: 400 });
+    }
+    if (chargedTotal !== total) {
+      console.log('[payment] A7 rounding applied — clientTotal:', total, '→ chargedTotal:', chargedTotal);
+    }
+
     // ── Charge the card via the SingleUseToken (PCI: never touches our server) ──
     const chargeBody = {
       SingleUseToken: singleUseToken,
@@ -450,17 +474,17 @@ export async function POST(req: NextRequest) {
         Phone:        customer.phone,
         SearchMode:   0,
       },
-      Items: items.map(item => ({
+      Items: chargeItems.map(item => ({
         Item:      { Name: item.name },
         Quantity:  item.quantity,
-        UnitPrice: item.price,
+        UnitPrice: item.unitPrice,
       })),
       Payments_Count:      paymentsCount,
       VATIncluded:         true,
       SendDocumentByEmail: true,
     };
 
-    console.log('[payment] charging Sumit — total:', total, 'items:', items.length, 'paymentsCount:', paymentsCount, 'CompanyID set:', !!SUMIT_COMPANY_ID);
+    console.log('[payment] charging Sumit — total:', chargedTotal, 'items:', chargeItems.length, 'paymentsCount:', paymentsCount, 'CompanyID set:', !!SUMIT_COMPANY_ID);
     const response = await fetch(SUMIT_API_URL, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -515,8 +539,11 @@ export async function POST(req: NextRequest) {
           })),
           ...(giftLine ? [{ id: giftLine.productId || giftLine.id, name: `מתנה: ${giftLine.name}`, price: 0, quantity: 1, isGift: true, giftSourceId: giftLine.id }] : []),
         ],
-        total, couponCode: couponCode || null, couponDiscount: couponDiscountAmount > 0 ? couponDiscountAmount : null,
-        discountBreakdown: simchaBreakdown, totalDiscount: couponDiscountAmount > 0 ? couponDiscountAmount : null,
+        // A7: the order records what was actually charged — whole-shekel lines
+        total: chargedTotal,
+        ...(chargedTotal !== total ? { totalBeforeRounding: total } : {}),
+        couponCode: couponCode || null, couponDiscount: couponDiscountAmount > 0 ? Math.round(couponDiscountAmount) : null,
+        discountBreakdown: simchaBreakdown, totalDiscount: couponDiscountAmount > 0 ? Math.round(couponDiscountAmount) : null,
         selectedGift: selectedGift || null,
         kippotDiscount: kippotDiscountAmount > 0 ? kippotDiscountAmount : null,
         shippingCost: shippingCost || 0, shippingType: shippingType || 'regular',
@@ -560,7 +587,7 @@ export async function POST(req: NextRequest) {
       // ── Loyalty accrual (non-fatal — never blocks payment response) ──────────
       // total כבר אחרי הנחת הנקודות — הצבירה היא רק על מה ששולם בפועל.
       try {
-        await accruePoints(adminDb, orderRef.id, uid || null, customer.email, total, shippingCost || 0, cartItems);
+        await accruePoints(adminDb, orderRef.id, uid || null, customer.email, chargedTotal, shippingCost || 0, cartItems);
       } catch (loyaltyErr) {
         console.error('[payment] loyalty accrual failed (non-fatal):', loyaltyErr);
       }

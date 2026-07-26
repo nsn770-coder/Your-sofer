@@ -504,8 +504,8 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
     setSaving(true);
     try {
       await addDoc(collection(db, 'products'), {
-        name, price: Number(price),
-        was: was ? Number(was) : null,
+        name, price: Math.round(Number(price)),
+        was: was ? Math.round(Number(was)) : null,
         supplierCost: supplierCost ? Number(supplierCost) : null,
         desc, cat,
         category: cat,
@@ -822,8 +822,8 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
     setSaving(true);
     try {
       await updateDoc(doc(db, 'products', product.id), {
-        name, price: Number(price),
-        was: was ? Number(was) : null,
+        name, price: Math.round(Number(price)),
+        was: was ? Math.round(Number(was)) : null,
         supplierCost: supplierCost ? Number(supplierCost) : null,
         sourceUrl: sourceUrl.trim() || null,
         desc, cat,
@@ -3863,11 +3863,11 @@ export default function AdminPage() {
         for (const ch of lines[i]) { if (ch === '"') { inQ = !inQ; } else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; } else cur += ch; }
         cols.push(cur.trim());
         const get = (idx: number) => idx >= 0 ? (cols[idx] || '').replace(/^"|"$/g, '').trim() : '';
-        const name = get(nameIdx); const price = parseFloat(get(priceIdx));
+        const name = get(nameIdx); const price = Math.round(parseFloat(get(priceIdx)));
         if (!name || isNaN(price) || price <= 0) { skipped++; continue; }
         const catVal = get(catIdx) || 'כללי';
         const productData: any = { name, cat: catVal, category: catVal, price, status: 'active', priority: 50, isBestSeller: false, badge: null };
-        const wasVal = get(wasIdx); if (wasVal) productData.was = parseFloat(wasVal);
+        const wasVal = get(wasIdx); if (wasVal) productData.was = Math.round(parseFloat(wasVal));
         const descVal = get(descIdx); if (descVal) productData.desc = descVal;
         const badgeVal = get(badgeIdx); if (badgeVal) productData.badge = badgeVal;
         const daysVal = get(daysIdx); if (daysVal) productData.days = daysVal;

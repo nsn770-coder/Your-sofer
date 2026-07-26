@@ -22,6 +22,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useCart, CartItem } from '../../contexts/CartContext';
 import { addToCart as pixelAddToCart } from '@/lib/metaPixel';
+import { effectivePrice } from '@/app/lib/utils';
 
 type BridgeResult = { ok: true; cartCount: number } | { ok: false; error: string };
 
@@ -52,24 +53,6 @@ function isInStock(d: Record<string, unknown>): boolean {
   if (d.stockStatus === 'out_of_stock') return false;
   if (d.availability === 'out_of_stock') return false;
   return true;
-}
-
-// Effective price: clearance > active sale (with date window) > base price —
-// mirrors app/product/[id]/ProductClient.tsx.
-function effectivePrice(d: Record<string, unknown>): number {
-  const price = Number(d.price ?? 0);
-  const now = Date.now();
-  const saleActive =
-    d.isOnSale === true &&
-    d.salePrice != null &&
-    (d.saleStartsAt == null || new Date(String(d.saleStartsAt)).getTime() <= now) &&
-    (d.saleEndsAt == null || new Date(String(d.saleEndsAt)).getTime() >= now);
-
-  if (d.clearanceDiscount === true && d.clearanceSalePrice != null) {
-    return Number(d.clearanceSalePrice);
-  }
-  if (saleActive) return Number(d.salePrice);
-  return price;
 }
 
 export default function ChatCartBridge() {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
+import { effectivePrice } from '@/app/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -125,6 +126,7 @@ export async function GET(req: Request) {
       ${additionalImages.map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('\n      ')}
       <g:availability>${esc(availability)}</g:availability>
       <g:price>${price.toFixed(2)} ILS</g:price>
+      ${(() => { const eff = effectivePrice(d); return eff > 0 && eff < price ? `<g:sale_price>${eff.toFixed(2)} ILS</g:sale_price>` : ''; })()}
       <g:brand>${esc(brand)}</g:brand>
       <g:condition>${esc(condition)}</g:condition>
       <g:identifier_exists>${esc(identifierExists)}</g:identifier_exists>

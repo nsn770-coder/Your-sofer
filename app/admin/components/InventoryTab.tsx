@@ -68,7 +68,8 @@ export async function updateInventoryFromSupplierReceipt(
       };
       if (activePromotion && item.price != null && item.quantity > 0) {
         data.isOnSale = true;
-        data.salePrice = Math.round(item.price * (1 - activePromotion.discountValue / 100) * 100) / 100;
+        // Whole shekels only (pricing-integrity): no agorot in salePrice
+        data.salePrice = Math.round(item.price * (1 - activePromotion.discountValue / 100));
         data.salePercent = activePromotion.discountValue;
         data.saleCampaignId = activePromotion.id;
         data.saleStartsAt = activePromotion.startsAt ?? null;

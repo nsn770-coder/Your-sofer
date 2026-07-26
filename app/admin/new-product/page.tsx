@@ -105,8 +105,8 @@ export default function AdminNewProductPage() {
     try {
       const ref = await addDoc(collection(db, 'products'), {
         name: name.trim(),
-        price: Number(price),
-        ...(was ? { was: Number(was) } : {}),
+        price: Math.round(Number(price)),
+        ...(was ? { was: Math.round(Number(was)) } : {}),
         desc,
         ...(extraDesc ? { extraDesc } : {}),
         cat,

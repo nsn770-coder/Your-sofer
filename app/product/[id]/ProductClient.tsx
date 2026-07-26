@@ -10,7 +10,7 @@ import { EVENT_SCROLL_SECTIONS } from '../../constants/eventScrollSections';
 import { trackViewItem, trackOpenSoferProfile, trackOpenKashrutCertificate } from '@/lib/analytics';
 import * as pixel from '@/lib/metaPixel';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
-import { formatPrice } from '@/app/lib/utils';
+import { formatPrice, effectivePrice as computeEffectivePrice } from '@/app/lib/utils';
 import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import NextImage from 'next/image';
 import CertificatesSection, { type Certificate } from '@/app/components/CertificatesSection';
@@ -1842,19 +1842,8 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
         .replace('/video/upload/', '/video/upload/so_0,w_120,h_120,c_fill,q_auto/')
         .replace(/\.[^./?]+(\?.*)?$/, '.jpg')
     : null;
-  // ── Effective price: clearance > isOnSale (with date check) > base price ──
-  const _now = Date.now();
-  const _saleActive =
-    product.isOnSale === true &&
-    product.salePrice != null &&
-    (product.saleStartsAt == null || new Date(product.saleStartsAt).getTime() <= _now) &&
-    (product.saleEndsAt   == null || new Date(product.saleEndsAt).getTime()   >= _now);
-  const effectivePrice =
-    product.clearanceDiscount === true && product.clearanceSalePrice != null
-      ? product.clearanceSalePrice
-      : _saleActive
-        ? product.salePrice!
-        : product.price;
+  // ── Effective price — shared single source of truth (app/lib/utils) ──
+  const effectivePrice = computeEffectivePrice(product);
   // % badge for isOnSale/clearance discount; separate from the was-based discount
   const effectivePct = effectivePrice < product.price
     ? (product.salePercent ?? Math.round((1 - effectivePrice / product.price) * 100))

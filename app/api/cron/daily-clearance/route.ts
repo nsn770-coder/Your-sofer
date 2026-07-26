@@ -49,7 +49,8 @@ export async function GET(req: NextRequest) {
       toMark.push({
         id:        docSnap.id,
         name:      p.name ?? '',
-        salePrice: Math.round(p.price * 0.9 * 100) / 100,
+        // Whole shekels only (pricing-integrity): no agorot in clearanceSalePrice
+        salePrice: Math.round(p.price * 0.9),
         origPrice: p.price,
       });
     } else if (p.inStock <= 0 && hasCleared) {

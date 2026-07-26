@@ -52,7 +52,8 @@ async function dailyInventoryClearance() {
       !hasCleared;
 
     if (eligible) {
-      const salePrice = Math.round(p.price * 0.9 * 100) / 100;
+      // Whole shekels only (pricing-integrity): no agorot in clearanceSalePrice
+      const salePrice = Math.round(p.price * 0.9);
       toMark.push({ id: docSnap.id, name: p.name ?? '', price: p.price, salePrice, inStock: p.inStock });
     } else if (p.inStock <= 0 && hasCleared) {
       toRemove.push({ id: docSnap.id, name: p.name ?? '', originalPrice: p.originalPrice ?? p.price });
