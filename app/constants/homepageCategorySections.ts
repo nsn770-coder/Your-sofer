@@ -3,13 +3,14 @@
 // Admin-controlled category display for the homepage:
 //   top  — "קטגוריות נבחרות" (upper section)
 //   stam — "קטגוריות סת״ם"   (lower section, under the soferim row)
+//   more — "עוד קטגוריות"    (horizontal scroll strip near the page bottom)
 //
 // The admin dashboard (categories tab) edits this config; the homepage reads it.
 // Stored in Firestore at homepageConfig/categorySections. When the doc is
 // missing/empty the homepage falls back to DEFAULT_SECTIONS (the historical
 // hardcoded lists), so nothing changes until the admin actively edits.
 
-export type SectionKey = 'top' | 'stam';
+export type SectionKey = 'top' | 'stam' | 'more';
 
 export type ItemWidth = 'half' | 'full'; // half = 2 per row, full = whole row
 
@@ -27,6 +28,7 @@ export interface HomepageCategoryItem {
 export interface HomepageCategorySections {
   top: HomepageCategoryItem[];
   stam: HomepageCategoryItem[];
+  more: HomepageCategoryItem[];
 }
 
 // Firestore config path (same collection as the category-cards config)
@@ -63,6 +65,18 @@ export const DEFAULT_SECTIONS: HomepageCategorySections = {
     { id: 'stam-barmitz', label: 'בר מצווה',          cat: 'בר מצווה',        emoji: '✡️', width: 'half' },
     { id: 'stam-setalit', label: 'סט טלית תפילין',  cat: 'סט טלית תפילין', emoji: '🎒', width: 'half' },
   ],
+  // "עוד קטגוריות" — horizontal scroll strip near the bottom of the homepage.
+  // Mirrors the historical hardcoded MORE_CAT_DEFS list + the event-kippot page.
+  more: [
+    { id: 'more-eventkip', label: 'כיפות ומזכרות לאירועים', cat: 'כיפות לאירועים', href: '/event-kippot', emoji: '🎩', width: 'half' },
+    { id: 'more-setalit',  label: 'סט טלית תפילין',  cat: 'סט טלית תפילין', emoji: '🕍', width: 'half' },
+    { id: 'more-sifrei',   label: 'ספרי תורה',        cat: 'ספרי תורה',       emoji: '📜', width: 'half' },
+    { id: 'more-pesach',   label: 'פסח',              cat: 'פסח',             emoji: '🍷', width: 'half' },
+    { id: 'more-klafT',    label: 'קלפי תפילין',     cat: 'קלפי תפילין',    emoji: '📄', width: 'half' },
+    { id: 'more-tfilin',   label: 'תפילין קומפלט',   cat: 'תפילין קומפלט',  emoji: '⬛', width: 'half' },
+    { id: 'more-klafM',    label: 'קלפי מזוזה',       cat: 'קלפי מזוזה',      emoji: '📜', width: 'half' },
+    { id: 'more-barmitz',  label: 'בר מצווה',         cat: 'בר מצווה',        emoji: '🎉', width: 'half' },
+  ],
 };
 
 /** Normalizes a raw Firestore doc into a valid sections object (with fallbacks). */
@@ -86,5 +100,6 @@ export function normalizeSections(raw: unknown): HomepageCategorySections {
   return {
     top:  clean(d.top,  DEFAULT_SECTIONS.top),
     stam: clean(d.stam, DEFAULT_SECTIONS.stam),
+    more: clean(d.more, DEFAULT_SECTIONS.more),
   };
 }

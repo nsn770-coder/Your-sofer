@@ -1,8 +1,9 @@
 'use client';
 // ─── HomepageCategorySectionsTab ──────────────────────────────────────────────
-// Admin manager for the two homepage category sections:
+// Admin manager for the three homepage category sections:
 //   🔝 top  — "קטגוריות נבחרות" (upper homepage)
 //   📜 stam — "קטגוריות סת״ם" (lower homepage, under the soferim row)
+//   🎠 more — "עוד קטגוריות" (horizontal scroll strip near the page bottom)
 //
 // Capabilities: add any category OR sub-category (e.g. חגים ← ראש השנה),
 // drag-and-drop ordering (+ arrows + direct position picker), per-item width
@@ -54,7 +55,7 @@ function buildPickerOptions(): PickerOption[] {
     { group: '⭐ עמודים מיוחדים', label: 'חנוכה (עמוד)',   cat: 'חנוכה' },
     { group: '⭐ עמודים מיוחדים', label: 'פסח (עמוד)',     cat: 'פסח' },
     { group: '⭐ עמודים מיוחדים', label: 'נטלות וכלים',    cat: 'יודאיקה', subCategory: 'נטילת ידיים ומים אחרונים' },
-    { group: '⭐ עמודים מיוחדים', label: 'כיפות לאירועים', cat: 'כיפות לאירועים', href: '/event-kippot', emoji: '🎩' },
+    { group: '⭐ עמודים מיוחדים', label: 'כיפות ומזכרות לאירועים', cat: 'כיפות לאירועים', href: '/event-kippot', emoji: '🎩' },
     { group: '⭐ עמודים מיוחדים', label: 'כל המוצרים',     cat: 'הכל' },
   );
   return opts;
@@ -66,7 +67,12 @@ const PICKER_GROUPS  = [...new Set(PICKER_OPTIONS.map(o => o.group))];
 const SECTION_META: Record<SectionKey, { title: string; subtitle: string; accent: string }> = {
   top:  { title: '🔝 חלק עליון — "קטגוריות נבחרות"', subtitle: 'מוצג בראש דף הבית', accent: '#4F46E5' },
   stam: { title: '📜 חלק תחתון — "קטגוריות סת״ם"',  subtitle: 'מוצג מתחת לשורת הסופרים', accent: '#B45309' },
+  more: { title: '🎠 פס "עוד קטגוריות" — תחתית העמוד', subtitle: 'פס גלילה אופקי בתחתית דף הבית — הקטגוריות שנבחרות כאן יוצגו בו באופן קבוע', accent: '#0F766E' },
 };
+
+/** Cycle target for the "move to another section" button. */
+const NEXT_SECTION: Record<SectionKey, SectionKey> = { top: 'stam', stam: 'more', more: 'top' };
+const SECTION_SHORT: Record<SectionKey, string> = { top: 'חלק עליון', stam: 'חלק תחתון', more: 'פס עוד קטגוריות' };
 
 function newId() {
   return `hci-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -95,7 +101,7 @@ async function uploadToCloudinary(file: File): Promise<string> {
 // ─── Single item row ──────────────────────────────────────────────────────────
 
 function ItemRow({
-  item, index, total, accent, catImages,
+  item, index, total, accent, catImages, showWidth, moveTargetLabel,
   onChange, onRemove, onMove, onMoveToOther, onDragStart, onDragOver, onDrop, dragging,
 }: {
   item: HomepageCategoryItem;
@@ -103,6 +109,8 @@ function ItemRow({
   total: number;
   accent: string;
   catImages: Record<string, string>;
+  showWidth: boolean;
+  moveTargetLabel: string;
   onChange: (patch: Partial<HomepageCategoryItem>) => void;
   onRemove: () => void;
   onMove: (toIndex: number) => void;
@@ -182,7 +190,8 @@ function ItemRow({
         </div>
       </div>
 
-      {/* Width toggle */}
+      {/* Width toggle (irrelevant for the horizontal strip) */}
+      {showWidth && (
       <div className="flex rounded-lg overflow-hidden border border-gray-200 flex-shrink-0" title="רוחב בפריסת דף הבית">
         {(['half', 'full'] as ItemWidth[]).map(w => (
           <button
@@ -198,6 +207,7 @@ function ItemRow({
           </button>
         ))}
       </div>
+      )}
 
       {/* Actions */}
       <div className="flex items-center gap-1 flex-shrink-0">
@@ -210,7 +220,7 @@ function ItemRow({
           className="w-7 h-7 rounded-md border border-gray-200 text-xs hover:bg-gray-50 disabled:opacity-40">
           {uploading ? '⏳' : '📷'}
         </button>
-        <button type="button" title="העבר לחלק השני" onClick={onMoveToOther}
+        <button type="button" title={`העבר ל${moveTargetLabel}`} onClick={onMoveToOther}
           className="w-7 h-7 rounded-md border border-gray-200 text-xs hover:bg-gray-50">⇅</button>
         <button type="button" title="הסר מהתצוגה" onClick={onRemove}
           className="w-7 h-7 rounded-md border border-red-100 text-xs text-red-500 hover:bg-red-50">🗑</button>
@@ -221,11 +231,38 @@ function ItemRow({
 
 // ─── Layout preview ───────────────────────────────────────────────────────────
 
-function SectionPreview({ items, accent, catImages }: {
+function SectionPreview({ items, accent, catImages, horizontal }: {
   items: HomepageCategoryItem[];
   accent: string;
   catImages: Record<string, string>;
+  horizontal?: boolean;
 }) {
+  if (horizontal) {
+    // Mirrors the homepage "עוד קטגוריות" scroll strip (RTL: first item on the right)
+    return (
+      <div className="flex gap-1.5 overflow-x-auto bg-gray-50 border border-dashed border-gray-300 rounded-xl p-3" style={{ direction: 'rtl' }}>
+        {items.map(it => {
+          const img = it.imageUrl || catImages[it.subCategory ?? ''] || catImages[it.cat] || '';
+          return (
+            <div key={it.id} className="flex-shrink-0" style={{ width: 84 }}>
+              <div style={{
+                width: '100%', aspectRatio: '4 / 3', borderRadius: 6, overflow: 'hidden',
+                background: img ? `url(${img}) center/cover` : '#E5E7EB',
+                border: `1px solid ${accent}44`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {!img && <span style={{ fontSize: 20 }}>{it.emoji || '🖼️'}</span>}
+              </div>
+              <p className="text-[10px] font-bold text-gray-700 text-center mt-1 truncate">{it.label}</p>
+            </div>
+          );
+        })}
+        {items.length === 0 && (
+          <div className="w-full text-center text-xs text-gray-400 py-4">אין קטגוריות בפס — הוסף מהרשימה למטה</div>
+        )}
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-2 gap-1.5 bg-gray-50 border border-dashed border-gray-300 rounded-xl p-3">
       {items.map(it => {
@@ -323,7 +360,7 @@ function SectionPanel({
 
       <div className="p-4 grid gap-2">
         {/* Preview */}
-        {showPreview && <SectionPreview items={items} accent={meta.accent} catImages={catImages} />}
+        {showPreview && <SectionPreview items={items} accent={meta.accent} catImages={catImages} horizontal={section === 'more'} />}
 
         {/* Rows */}
         <div className="grid gap-2 mt-1">
@@ -335,6 +372,8 @@ function SectionPanel({
               total={items.length}
               accent={meta.accent}
               catImages={catImages}
+              showWidth={section !== 'more'}
+              moveTargetLabel={SECTION_SHORT[NEXT_SECTION[section]]}
               dragging={dragIdx === i}
               onChange={patch => onItemsChange(items.map(x => x.id === it.id ? { ...x, ...patch } : x))}
               onRemove={() => onItemsChange(items.filter(x => x.id !== it.id))}
@@ -413,7 +452,7 @@ export default function HomepageCategorySectionsTab({ catImages }: { catImages: 
   }
 
   function moveToOther(from: SectionKey, item: HomepageCategoryItem) {
-    const to: SectionKey = from === 'top' ? 'stam' : 'top';
+    const to: SectionKey = NEXT_SECTION[from];
     setSections(prev => ({
       ...prev,
       [from]: prev[from].filter(x => x.id !== item.id),
@@ -429,6 +468,7 @@ export default function HomepageCategorySectionsTab({ catImages }: { catImages: 
       await setDoc(doc(db, SECTIONS_COLLECTION, SECTIONS_DOC), {
         top:  sections.top.map(sanitizeItem),
         stam: sections.stam.map(sanitizeItem),
+        more: sections.more.map(sanitizeItem),
         updatedAt: Date.now(),
       });
       setSaved(true);
@@ -439,8 +479,8 @@ export default function HomepageCategorySectionsTab({ catImages }: { catImages: 
   }
 
   function restoreDefaults() {
-    if (!confirm('לשחזר את שתי הרשימות לברירת המחדל המקורית של דף הבית?')) return;
-    setSections({ top: [...DEFAULT_SECTIONS.top], stam: [...DEFAULT_SECTIONS.stam] });
+    if (!confirm('לשחזר את כל הרשימות לברירת המחדל המקורית של דף הבית?')) return;
+    setSections({ top: [...DEFAULT_SECTIONS.top], stam: [...DEFAULT_SECTIONS.stam], more: [...DEFAULT_SECTIONS.more] });
     setDirty(true);
     setSaved(false);
   }
@@ -461,6 +501,7 @@ export default function HomepageCategorySectionsTab({ catImages }: { catImages: 
           <p className="text-sm text-gray-500">
             בחר אילו קטגוריות (כולל תתי-קטגוריות, למשל <b>ראש השנה</b> מתוך <b>חגים</b>) יוצגו בכל חלק,
             גרור לשינוי סדר, וקבע לכל קטגוריה רוחב — <b>◧ חצי</b> (2 בשורה) או <b>⬛ שורה מלאה</b>.
+            בנוסף ניתן לנהל את פס <b>"עוד קטגוריות"</b> שבתחתית דף הבית — הקטגוריות שנבחרות בו יוצגו שם באופן קבוע, כולל תמונה לכל קטגוריה (📷).
           </p>
         </div>
         <button type="button" onClick={restoreDefaults}
@@ -474,6 +515,10 @@ export default function HomepageCategorySectionsTab({ catImages }: { catImages: 
           onItemsChange={items => update('top', items)}  onMoveToOther={it => moveToOther('top', it)} />
         <SectionPanel section="stam" items={sections.stam} catImages={catImages}
           onItemsChange={items => update('stam', items)} onMoveToOther={it => moveToOther('stam', it)} />
+        <div className="xl:col-span-2">
+          <SectionPanel section="more" items={sections.more} catImages={catImages}
+            onItemsChange={items => update('more', items)} onMoveToOther={it => moveToOther('more', it)} />
+        </div>
       </div>
 
       {/* Save bar */}

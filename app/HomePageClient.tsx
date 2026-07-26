@@ -336,15 +336,8 @@ const CLEAR_PATH_ITEMS = [
   { label: 'צפה בכל המוצרים', href: '/category/יודאיקה' },
 ] as const;
 
-const MORE_CAT_DEFS = [
-  { slug: 'סט טלית תפילין', emoji: '🕍' },
-  { slug: 'ספרי תורה',       emoji: '📜' },
-  { slug: 'פסח',             emoji: '🍷' },
-  { slug: 'קלפי תפילין',    emoji: '📄' },
-  { slug: 'תפילין קומפלט',  emoji: '⬛' },
-  { slug: 'קלפי מזוזה',      emoji: '📜' },
-  { slug: 'בר מצווה',        emoji: '🎉' },
-] as const;
+// "עוד קטגוריות" strip — admin-controlled via דשבורד ← קטגוריות (section: more).
+// Defaults live in DEFAULT_SECTIONS.more (constants/homepageCategorySections.ts).
 
 // ── Activity bar - owns its own timer, never re-renders the parent ─────────────
 
@@ -631,7 +624,7 @@ export default function HomePageClient() {
     if (sectionImgFetchDone.current) return;
     if (Object.keys(catImages).length === 0) return; // wait for the base image map
     const keys = [...new Set(
-      [...catSections.top, ...catSections.stam]
+      [...catSections.top, ...catSections.stam, ...catSections.more]
         .filter(it => !it.imageUrl)
         .flatMap(it => [it.subCategory, it.cat].filter(Boolean) as string[]),
     )].filter(k => !catImages[k]);
@@ -1500,11 +1493,12 @@ export default function HomePageClient() {
             scrollSnapType: 'x mandatory',
           } as React.CSSProperties}
         >
-          {MORE_CAT_DEFS.map(cat => {
-            const img = catImages[cat.slug] ? optimizeCloudinaryUrl(catImages[cat.slug], 300) : '';
+          {catSections.more.map(item => {
+            const rawImg = item.imageUrl || catImages[item.subCategory ?? ''] || catImages[item.cat] || catImages[item.label] || '';
+            const img = rawImg ? optimizeCloudinaryUrl(rawImg, 300) : '';
             return (
-              <div key={cat.slug}
-                onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
+              <div key={item.id}
+                onClick={() => router.push(buildCategoryHref(item))}
                 className="w-40 md:w-[200px]"
                 style={{ cursor: 'pointer', flexShrink: 0, scrollSnapAlign: 'start', transition: 'transform 0.2s ease' } as React.CSSProperties}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
@@ -1512,12 +1506,12 @@ export default function HomePageClient() {
               >
                 <div style={{ width: '100%', aspectRatio: '4 / 3', borderRadius: 0, overflow: 'hidden', background: img ? '#000' : '#e8e4dc', position: 'relative' }}>
                   {img ? (
-                    <Image fill unoptimized loading="lazy" src={img} alt={cat.slug} style={{ objectFit: 'cover' }} sizes="200px" />
+                    <Image fill unoptimized loading="lazy" src={img} alt={item.label} style={{ objectFit: 'cover' }} sizes="200px" />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{cat.emoji}</div>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{item.emoji || '🖼️'}</div>
                   )}
                 </div>
-                <p style={{ fontSize: 11, textAlign: 'center', color: '#1a1a1a', fontWeight: 600, marginTop: 8 }}>{cat.slug}</p>
+                <p style={{ fontSize: 11, textAlign: 'center', color: '#1a1a1a', fontWeight: 600, marginTop: 8 }}>{item.label}</p>
               </div>
             );
           })}
