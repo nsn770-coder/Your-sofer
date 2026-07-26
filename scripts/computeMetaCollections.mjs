@@ -77,6 +77,10 @@ async function run() {
       cat: d.cat ?? d.category ?? '',
       subCategory: d.subCategory ?? '',
       createdAt: d.createdAt?.seconds ?? 0,
+      // Same membership rule as app/event-kippot (EventKippotClient):
+      // flagged event products OR products assigned to an event scroll section
+      isEvent: d.isEventProduct === true ||
+               (typeof d.eventScrollSection === 'string' && d.eventScrollSection.length > 0),
       sales: toNum(d.salesCount) ?? toNum(d.orderCount) ?? 0,
       isBundle: Array.isArray(d.bundleComponentCodes) && d.bundleComponentCodes.length > 0,
     });
@@ -96,6 +100,8 @@ async function run() {
       // keyword: substring match on cat + subCategory + product name —
       // for cross-category collections (e.g. בר מצווה spread across cats)
       if (col.keyword && !`${p.cat} ${p.subCategory} ${p.name}`.includes(col.keyword)) return false;
+      // event: true — only products shown on the event-kippot page
+      if (col.event === true && !p.isEvent) return false;
       if (col.minPrice != null && p.price < col.minPrice) return false;
       if (col.maxPrice != null && p.price > col.maxPrice) return false;
       return true;

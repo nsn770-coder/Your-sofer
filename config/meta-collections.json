@@ -9,6 +9,7 @@
   ],
   "excludeBundles": true,
   "collections": [
+    { "name": "event-kippot",      "method": "all", "event": true },
     { "name": "best-sellers",      "method": "best-selling", "limit": 100 },
     { "name": "new-arrivals",      "method": "newest",       "limit": 100 },
     { "name": "premium",           "method": "highest-price", "limit": 50 },
