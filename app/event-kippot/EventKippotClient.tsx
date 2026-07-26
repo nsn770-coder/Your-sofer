@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { collection, getDocs, query, where, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
-import { getKipaUnitPrice, KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
+import { getKipaUnitPrice, getKipaMaterial, KIPA_MATERIAL_LABELS, KIPA_EXTRA_SIDE_PRICE, DEFAULT_STYLE_PRODUCT_MAP } from '@/app/lib/kippot';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { Product } from '@/app/lib/types';
 import ProductCard from '@/components/ui/ProductCard';
@@ -20,6 +20,7 @@ const KIPPOT_STYLES = [
   { id: 'techelet',    label: 'כחול רויאל',   img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%AA%D7%9B%D7%9C%D7%AA_iflyjn.png' },
   { id: 'white',       label: 'לבן',           img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_25_PM_mcqhle.png' },
   { id: 'beige-natural', label: "בז' טבעי",    img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_58_PM_wva57o.png' },
+  { id: 'satin-white', label: 'סאטן',          img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781586601/a8c7n05vniv34n4qw44g.jpg' },
 ];
 
 const PRINT_TYPES = [
@@ -69,8 +70,8 @@ export default function EventKippotClient() {
     (async () => {
       try {
         const snap = await getDoc(doc(db, 'settings', 'eventKippotStyles'));
-        if (!snap.exists()) return;
-        const map = snap.data() as Record<string, { productId: string; sku: string; name: string }>;
+        // ברירת מחדל מהקוד (למשל סאטן ← UK00321); Firestore גובר עליה
+        const map = { ...DEFAULT_STYLE_PRODUCT_MAP, ...(snap.exists() ? snap.data() as Record<string, { productId: string; sku: string; name: string }> : {}) };
         setStyleMap(map);
         const prods: Record<string, Product> = {};
         await Promise.all(Object.entries(map).map(async ([styleId, m]) => {
@@ -189,7 +190,10 @@ export default function EventKippotClient() {
 
   const embroideryExtra = printType === 'embroidery' ? 5 : 0;
   const bothSidesExtra  = printType === 'print-both' ? KIPA_EXTRA_SIDE_PRICE : 0;
-  const unitPrice = getKipaUnitPrice(qty) + embroideryExtra + bothSidesExtra;
+  // תמחור לפי חומר הדגם הנבחר: פשתן (ברירת מחדל) או סאטן
+  const selectedStyleId = style ?? KIPPOT_STYLES[0].id;
+  const material  = getKipaMaterial(selectedStyleId);
+  const unitPrice = getKipaUnitPrice(qty, material) + embroideryExtra + bothSidesExtra;
   const total = qty * unitPrice;
 
   return (
@@ -346,9 +350,12 @@ export default function EventKippotClient() {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14, alignItems: 'center' }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F' }}>מדרגות:</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F' }}>מדרגות ({KIPA_MATERIAL_LABELS[material]}):</span>
           {/* מדרגות תואמות למקור המרכזי app/lib/kippot.ts + data/faq.ts */}
-          {([
+          {(material === 'satin' ? [
+            { range: '30–49',  price: 8,  active: qty >= 30 && qty <= 49 },
+            { range: '50+',    price: 6,  active: qty >= 50              },
+          ] : [
             { range: '30–49',  price: 14, active: qty >= 30  && qty <= 49 },
             { range: '50–99',  price: 12, active: qty >= 50  && qty <= 99 },
             { range: '100+',   price: 10, active: qty >= 100             },
@@ -387,8 +394,13 @@ export default function EventKippotClient() {
                   {style === s.id && (
                     <div style={{ position: 'absolute', top: 6, left: 6, background: GOLD, color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>✓</div>
                   )}
-                  <img src={s.img} alt={s.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-                  <div style={{ padding: '8px 10px', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{s.label}</div>
+                  <img src={s.img} alt={`${s.label} — ${KIPA_MATERIAL_LABELS[getKipaMaterial(s.id)]}`} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ padding: '8px 10px 2px', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{s.label}</div>
+                  {/* סוג הכיפה — מוצג מתחת לכל דגם */}
+                  <div style={{ padding: '0 10px 8px', fontSize: 11, fontWeight: 600, color: '#9C7B3F' }}>
+                    {KIPA_MATERIAL_LABELS[getKipaMaterial(s.id)]}
+                    {getKipaMaterial(s.id) === 'satin' && <span style={{ color: GOLD, fontWeight: 800 }}> · מ-₪6 ליח'</span>}
+                  </div>
                 </button>
                 {/* אדמין: שיוך הדגם למוצר בחנות + תצוגת מלאי */}
                 {isAdmin && (

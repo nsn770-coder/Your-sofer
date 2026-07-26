@@ -5,7 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useCart } from '@/app/contexts/CartContext';
 import PageFaqSection from '@/app/components/faq/PageFaqSection';
-import { getKipaUnitPrice, KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
+import { getKipaUnitPrice, getKipaMaterial, KIPA_MATERIAL_LABELS, KIPA_EXTRA_SIDE_PRICE, DEFAULT_STYLE_PRODUCT_MAP } from '@/app/lib/kippot';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -16,6 +16,7 @@ const KIPPOT_STYLES: Record<string, { label: string; img: string }> = {
   techelet: { label: 'כחול רויאל', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%AA%D7%9B%D7%9C%D7%AA_iflyjn.png' },
   'white':         { label: 'לבן',       img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_25_PM_mcqhle.png' },
   'beige-natural': { label: "בז' טבעי",  img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_58_PM_wva57o.png' },
+  'satin-white':   { label: 'סאטן',      img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781586601/a8c7n05vniv34n4qw44g.jpg' },
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -80,10 +81,11 @@ function KippotOrderInner() {
   useEffect(() => {
     getDoc(doc(db, 'settings', 'eventKippotStyles'))
       .then(snap => {
-        const map = snap.exists() ? snap.data() as Record<string, { productId?: string }> : {};
+        // ברירת מחדל מהקוד (למשל סאטן ← UK00321); Firestore גובר עליה
+        const map = { ...DEFAULT_STYLE_PRODUCT_MAP, ...(snap.exists() ? snap.data() as Record<string, { productId?: string }> : {}) };
         setStyleProductId(map[style]?.productId ?? null);
       })
-      .catch(() => setStyleProductId(null)); // לא חוסם הזמנה אם אין שיוך
+      .catch(() => setStyleProductId(DEFAULT_STYLE_PRODUCT_MAP[style]?.productId ?? null)); // לא חוסם הזמנה אם אין שיוך
   }, [style]);
 
   // ── Form state ──────────────────────────────────────────────────────────────
@@ -123,8 +125,8 @@ function KippotOrderInner() {
   const printAreaRef   = useRef<HTMLDivElement>(null);
   const logoImgRef     = useRef<HTMLImageElement>(null);
 
-  // ── Price ───────────────────────────────────────────────────────────────────
-  const basePrice  = getKipaUnitPrice(qty);
+  // ── Price — לפי חומר הדגם (פשתן/סאטן) ──────────────────────────────────────
+  const basePrice  = getKipaUnitPrice(qty, getKipaMaterial(style));
   const typeExtra  = type === 'embroidery' ? 5 : 0;
   const sideExtra  = (addSide || type === 'print-both') ? KIPA_EXTRA_SIDE_PRICE : 0;
   const unitPrice  = basePrice + typeExtra + sideExtra;
@@ -315,6 +317,7 @@ function KippotOrderInner() {
         <img src={kippah.img} alt={kippah.label} style={{ width: 80, height: 80, objectFit: 'cover', flexShrink: 0, border: '2px solid #C5A028' }} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 900 }}>{kippah.label}</div>
+          <div style={{ fontSize: 12, color: '#9C7B3F', fontWeight: 700, marginTop: 2 }}>{KIPA_MATERIAL_LABELS[getKipaMaterial(style)]}</div>
           <div style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>{TYPE_LABELS[type]}</div>
           <div style={{ fontSize: 13, color: '#C5A028', fontWeight: 700, marginTop: 6 }}>₪{unitPrice} × {qty} = ₪{totalPrice.toLocaleString('he-IL')}</div>
         </div>

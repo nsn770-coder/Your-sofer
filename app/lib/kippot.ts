@@ -1,6 +1,7 @@
 // ── תמחור כיפות בהדפסה אישית — מקור אמת יחיד ─────────────────────────────────
 // המדרגות חייבות להיות זהות למה שמוצג ב-FAQ (data/faq.ts):
-//   30–49 → ₪14 | 50–99 → ₪12 | 100+ → ₪10  (כיפות פשתן, כולל הדפסה)
+//   פשתן: 30–49 → ₪14 | 50–99 → ₪12 | 100+ → ₪10  (כולל הדפסה)
+//   סאטן: 30–49 → ₪8  | 50+  → ₪6                 (כולל עיצוב אישי)
 // המינימום להזמנה הוא 30 יחידות (נאכף בעמודי ההזמנה).
 // הזמנות מתחת ל-30 אינן זמינות באתר — פונים לוואטסאפ.
 
@@ -9,5 +10,27 @@ export const KIPA_MIN_QTY = 30;
 /** תוספת הדפסה בצד שני — לכל כיפה */
 export const KIPA_EXTRA_SIDE_PRICE = 1.5;
 
-export const getKipaUnitPrice = (q: number): number =>
-  q < 50 ? 14 : q <= 99 ? 12 : 10;
+export type KipaMaterial = 'linen' | 'satin';
+
+/** דגמים מסוג סאטן (לפי style id) — כל השאר פשתן */
+export const SATIN_STYLE_IDS = new Set<string>(['satin-white']);
+
+export const getKipaMaterial = (styleId: string): KipaMaterial =>
+  SATIN_STYLE_IDS.has(styleId) ? 'satin' : 'linen';
+
+export const KIPA_MATERIAL_LABELS: Record<KipaMaterial, string> = {
+  linen: 'כיפה פשתן',
+  satin: 'כיפת סאטן',
+};
+
+export const getKipaUnitPrice = (q: number, material: KipaMaterial = 'linen'): number =>
+  material === 'satin'
+    ? (q < 50 ? 8 : 6)
+    : (q < 50 ? 14 : q <= 99 ? 12 : 10);
+
+// ── שיוך ברירת מחדל דגם ← מוצר בחנות (ניכוי מלאי) ────────────────────────────
+// ערך ב-Firestore (settings/eventKippotStyles) גובר על ברירת המחדל הזו —
+// היא קיימת כדי שדגמים חדשים יהיו משויכים מהרגע הראשון, בלי צעד ידני.
+export const DEFAULT_STYLE_PRODUCT_MAP: Record<string, { productId: string; sku: string; name: string }> = {
+  'satin-white': { productId: 'GA6IaHppba8peGVGHGud', sku: 'UK00321', name: 'כיפת סאטן' },
+};

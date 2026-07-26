@@ -24,11 +24,11 @@ export function getEventPrintPricePerUnit(qty: number): number {
 
 // ── Event kippot tiered pricing — per-unit price by quantity ─────────────────
 // מקור אמת יחיד: app/lib/kippot.ts (זהה לסרגל ב-/event-kippot ול-FAQ):
-//   30–49 → ₪14 | 50–99 → ₪12 | 100+ → ₪10 (הדפסת לוגו כלולה)
-// basePrice נשמר בחתימה לתאימות לאחור אך אינו משפיע — התמחור לפי כמות בלבד,
-// בדיוק כמו בעמוד /event-kippot (המחיר זהה לכל סוגי הכיפות).
-export function getEventKippahPricePerUnit(_basePrice: number, qty: number): number {
-  return getKipaUnitPrice(qty);
+//   פשתן: 30–49 → ₪14 | 50–99 → ₪12 | 100+ → ₪10 (הדפסת לוגו כלולה)
+//   סאטן: 30–49 → ₪8  | 50+  → ₪6 (עיצוב אישי כלול)
+// basePrice נשמר בחתימה לתאימות לאחור אך אינו משפיע — התמחור לפי כמות וחומר.
+export function getEventKippahPricePerUnit(_basePrice: number, qty: number, material: 'linen' | 'satin' = 'linen'): number {
+  return getKipaUnitPrice(qty, material);
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
