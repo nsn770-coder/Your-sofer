@@ -4,6 +4,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
 import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
+import { isBulkEventKippotLine } from '@/app/lib/kippot';
 
 // ── מימוש נקודות מועדון ──────────────────────────────────────────────────────
 // נקודה = ₪1 הנחה. ניתן לממש עד 50% מסכום המוצרים בעגלה (אחרי הנחות, לפני משלוח).
@@ -364,6 +365,8 @@ export async function POST(req: NextRequest) {
           if (item.bundlePromo) continue; // already counted in bundleDiscountedTotal
           if (item.cat === 'הדפסה') continue;
           if (item.cat === 'כיפות' && kippotDiscountActive) continue;
+          // כיפות לאירועים בכמויות (30+) — לא זכאיות לקופון (מקביל ל-CartContext)
+          if (isBulkEventKippotLine(item)) continue;
           serverDiscountableTotal += item.price * item.quantity;
         }
 

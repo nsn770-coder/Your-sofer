@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { getKipaUnitPrice } from '../lib/kippot';
+import { getKipaUnitPrice, isBulkEventKippotLine } from '../lib/kippot';
 import { calcSimchaDiscount, PROMO_ACTIVE, SIMCHA_CODE, type SimchaResult } from '../lib/promoRules';
 
 // ── Shipping constants — single source of truth used in cart + checkout ───────
@@ -166,8 +166,9 @@ function calcTotals(items: CartItem[]) {
       const orig = item.price * item.quantity;
       kippotSubtotal += orig;
       total += orig * (1 - kippotDiscountRate);
-      // Kippot receiving 30% are NOT eligible for coupon
-      if (!kippotDiscountActive) discountable += orig;
+      // Kippot receiving 30% are NOT eligible for coupon.
+      // כיפות לאירועים בכמויות (30+) — מחירי מדרגות נמוכים, לא זכאיות לקופון.
+      if (!kippotDiscountActive && !isBulkEventKippotLine(item)) discountable += orig;
 
     } else if (isPrintService) {
       // Print service charged at face value (tiered rate already embedded in price)

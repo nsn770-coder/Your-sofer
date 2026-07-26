@@ -3,6 +3,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart, CartItem, SHIPPING_REGULAR, FREE_SHIPPING_THRESHOLD } from '../contexts/CartContext';
 import type { SimchaResult } from '../lib/promoRules';
+import { isBulkEventKippotLine } from '../lib/kippot';
 import { useShaliach } from '../contexts/ShaliachContext';
 import { serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -205,6 +206,12 @@ function OrderSummary({
           </div>
         )}
         {couponError && <div style={{ fontSize: 11, color: '#dc2626', marginTop: 5 }}>{couponError}</div>}
+        {/* קופונים אינם חלים על כיפות לאירועים בכמויות (מחירי מדרגות) */}
+        {appliedCoupon && appliedCoupon.type !== 'simcha' && items.some(isBulkEventKippotLine) && (
+          <div style={{ fontSize: 11, color: '#92400e', marginTop: 5, fontWeight: 600 }}>
+            שימו לב: הקופון אינו חל על כיפות לאירועים בכמויות — המחירים שם הם מחירי מדרגות מוזלים.
+          </div>
+        )}
       </div>
       {/* ── מימוש נקודות מועדון — נקודה = ₪1, עד 50% מסכום העגלה ── */}
       {pointsAvailable > 0 && (

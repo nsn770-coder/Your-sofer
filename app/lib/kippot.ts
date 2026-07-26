@@ -23,6 +23,15 @@ export const KIPA_MATERIAL_LABELS: Record<KipaMaterial, string> = {
   satin: 'כיפת סאטן',
 };
 
+/**
+ * שורת סל של "כיפות לאירועים בכמויות" (30+ יחידות, קטגוריית כיפות) —
+ * מחירי המדרגות שם נמוכים ולא משאירים מרווח להנחה, ולכן השורה אינה
+ * זכאית לקופונים (למשל ברכה5). חייב להיות זהה בקליינט (CartContext)
+ * ובשרת (app/api/payment/route.ts), אחרת אימות הקופון ייכשל.
+ */
+export const isBulkEventKippotLine = (i: { cat?: string; quantity: number }): boolean =>
+  i.cat === 'כיפות' && i.quantity >= KIPA_MIN_QTY;
+
 export const getKipaUnitPrice = (q: number, material: KipaMaterial = 'linen'): number =>
   material === 'satin'
     ? (q < 50 ? 8 : 6)
