@@ -244,18 +244,18 @@ export default function CartPage() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between' }}>
                           {/* Qty stepper */}
                           <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 6, overflow: 'hidden' }}>
-                            <button onClick={() => updateQty(item.id, item.quantity - 1)}
+                            <button onClick={() => updateQty(item.id, item.quantity - 1)} aria-label={`הקטנת כמות של ${item.name}`}
                               style={{ width: 34, height: 34, background: '#f8f9fa', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, color: '#333' }}>−</button>
-                            <span style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 700, borderRight: '1px solid #ddd', borderLeft: '1px solid #ddd', lineHeight: '34px' }}>
+                            <span aria-live="polite" style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 700, borderRight: '1px solid #ddd', borderLeft: '1px solid #ddd', lineHeight: '34px' }}>
                               {item.quantity}
                             </span>
-                            <button onClick={() => updateQty(item.id, item.quantity + 1)}
+                            <button onClick={() => updateQty(item.id, item.quantity + 1)} aria-label={`הגדלת כמות של ${item.name}`}
                               style={{ width: 34, height: 34, background: '#f8f9fa', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, color: '#333' }}>+</button>
                           </div>
 
                           {/* Actions */}
                           <div style={{ display: 'flex', gap: 12 }}>
-                            <button onClick={() => removeItem(item.id)}
+                            <button onClick={() => removeItem(item.id)} aria-label={`הסרת ${item.name} מהסל`}
                               style={{ background: 'none', border: 'none', color: '#c0392b', fontSize: 13, cursor: 'pointer', padding: 0, fontWeight: 600 }}>
                               הסר
                             </button>
@@ -328,16 +328,16 @@ export default function CartPage() {
                           ))}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                             <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 6, overflow: 'hidden' }}>
-                              <button onClick={() => updateQty(item.id, item.quantity - 1)}
+                              <button onClick={() => updateQty(item.id, item.quantity - 1)} aria-label={`הקטנת כמות של ${item.name}`}
                                 style={{ width: 32, height: 32, background: '#f8f9fa', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, color: '#333' }}>−</button>
-                              <span style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 700, borderRight: '1px solid #ddd', borderLeft: '1px solid #ddd', lineHeight: '32px' }}>
+                              <span aria-live="polite" style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 700, borderRight: '1px solid #ddd', borderLeft: '1px solid #ddd', lineHeight: '32px' }}>
                                 {item.quantity}
                               </span>
-                              <button onClick={() => updateQty(item.id, item.quantity + 1)}
+                              <button onClick={() => updateQty(item.id, item.quantity + 1)} aria-label={`הגדלת כמות של ${item.name}`}
                                 style={{ width: 32, height: 32, background: '#f8f9fa', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, color: '#333' }}>+</button>
                             </div>
-                            <span style={{ color: '#ddd' }}>|</span>
-                            <button onClick={() => removeItem(item.id)}
+                            <span style={{ color: '#ddd' }} aria-hidden="true">|</span>
+                            <button onClick={() => removeItem(item.id)} aria-label={`הסרת ${item.name} מהסל`}
                               style={{ background: 'none', border: 'none', color: '#0e6ba8', fontSize: 13, cursor: 'pointer', padding: 0 }}
                               onMouseEnter={e => (e.currentTarget.style.color = '#c0392b')}
                               onMouseLeave={e => (e.currentTarget.style.color = '#0e6ba8')}>
@@ -434,7 +434,7 @@ export default function CartPage() {
                     <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700 }}>
                       ✓ {appliedCoupon.code} — {appliedCoupon.type === 'simcha' ? 'מבצע אירועים' : `${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה`}
                     </span>
-                    <button onClick={() => setAppliedCoupon(null)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 2px' }}>×</button>
+                    <button onClick={() => setAppliedCoupon(null)} aria-label="הסרת הקופון" style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 2px' }}>×</button>
                   </div>
                   {appliedCoupon.type === 'simcha' && simchaResult && (
                     <div style={{ marginTop: 8, background: simchaResult.totalDiscount > 0 ? '#f0fdf4' : '#fffbeb', border: `1px solid ${simchaResult.totalDiscount > 0 ? '#86efac' : '#fcd34d'}`, borderRadius: 10, padding: '10px 12px' }}>

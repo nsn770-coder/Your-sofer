@@ -2172,7 +2172,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               ⚠️ מוצר זה נמכר החל מ־5 יחידות
             </div>
           )}
-          <select value={qty} onChange={e => setQty(Number(e.target.value))} style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#f8f9fa', cursor: 'pointer' }}>
+          <select value={qty} onChange={e => setQty(Number(e.target.value))} aria-label="בחירת כמות" style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#f8f9fa', cursor: 'pointer' }}>
             {qtyOptions.map(v => (
               <option key={v} value={v}>{v}</option>
             ))}
@@ -2656,6 +2656,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                 </video>
               ) : (
                 <img src={allMediaOptimized[activeImg] || '/placeholder.png'} alt={product.name} onClick={() => setZoomVisible(true)}
+                  /* נגישות: הגדלת תמונה גם במקלדת */
+                  role="button" tabIndex={0} aria-label={`הגדלת תמונה: ${product.name}`}
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setZoomVisible(true); } }}
                   /* LCP: main product image — eager + high priority (preloaded in page.tsx) */
                   loading="eager"
                   fetchPriority="high"
@@ -2678,12 +2681,14 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', scrollbarWidth: 'none', borderTop: '1px solid #f0f0f0' }}>
               {allMedia.map((img, i) => (
                 <button key={i} onClick={() => { setActiveImg(i); setShowVideo(false); }}
+                  aria-label={`תמונה ${i + 1} מתוך ${allMedia.length}${activeImg === i && !showVideo ? ' (מוצגת)' : ''}`}
+                  aria-pressed={activeImg === i && !showVideo}
                   style={{ width: isMobile ? 52 : 60, height: isMobile ? 52 : 60, flexShrink: 0, borderRadius: 8, overflow: 'hidden', border: `2px solid ${activeImg === i && !showVideo ? '#C5A028' : '#e0e0e0'}`, background: '#fff', cursor: 'pointer', padding: 2, transition: 'border-color 0.15s' }}>
-                  <img src={allMediaThumb[i]} alt={`תמונה ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={e => (e.currentTarget.style.display = 'none')} />
+                  <img src={allMediaThumb[i]} alt="" aria-hidden="true" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={e => (e.currentTarget.style.display = 'none')} />
                 </button>
               ))}
               {hasVideo && (
-                <button onClick={() => setShowVideo(true)}
+                <button onClick={() => setShowVideo(true)} aria-label="הצגת סרטון המוצר"
                   style={{ width: isMobile ? 52 : 60, height: isMobile ? 52 : 60, flexShrink: 0, borderRadius: 8, border: `2px solid ${showVideo ? '#7c3aed' : '#e0e0e0'}`, background: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'border-color 0.15s', position: 'relative', overflow: 'hidden', padding: 0 }}>
                   {videoThumb && (
                     <img src={videoThumb} alt="וידאו" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
@@ -3074,15 +3079,17 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
       {/* Zoom Modal */}
       {zoomVisible && allMedia.length > 0 && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setZoomVisible(false)}>
-          <img src={optimizeCloudinaryUrl(allMedia[activeImg], 1600)} alt={product.name} style={{ maxWidth: '92vw', maxHeight: '92vh', objectFit: 'contain', borderRadius: 8 }} />
-          <button onClick={() => setZoomVisible(false)} style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div role="dialog" aria-modal="true" aria-label={`תצוגה מוגדלת: ${product.name}`}
+          onKeyDown={e => { if (e.key === 'Escape') setZoomVisible(false); }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setZoomVisible(false)}>
+          <img src={optimizeCloudinaryUrl(allMedia[activeImg], 1600)} alt={`${product.name} — תמונה ${activeImg + 1} מתוך ${allMedia.length}`} style={{ maxWidth: '92vw', maxHeight: '92vh', objectFit: 'contain', borderRadius: 8 }} />
+          <button onClick={() => setZoomVisible(false)} aria-label="סגירת תצוגה מוגדלת" autoFocus style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon.X size={18} />
           </button>
           {allMedia.length > 1 && (
             <>
-              <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i + 1) % allMedia.length); }} style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>‹</button>
-              <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i - 1 + allMedia.length) % allMedia.length); }} style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>›</button>
+              <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i + 1) % allMedia.length); }} aria-label="התמונה הבאה" style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>‹</button>
+              <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i - 1 + allMedia.length) % allMedia.length); }} aria-label="התמונה הקודמת" style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>›</button>
             </>
           )}
         </div>

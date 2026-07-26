@@ -21,6 +21,7 @@ import ShavuotPopupWrapper from "@/components/ShavuotPopupWrapper";
 import ClubPopupWrapper from "@/components/ClubPopupWrapper";
 import GiftProgressBar from "./components/GiftProgressBar";
 import GoogleReviewsStrip from "@/app/components/GoogleReviewsStrip";
+import AccessibilityWidget from "@/app/components/AccessibilityWidget";
 
 // PERF: Geist removed — its className was on <body> but the inline style
 // (fontFamily: var(--font-heebo)…) overrode it everywhere, so the font file was
@@ -150,9 +151,13 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <ShaliachProvider>
               <CartProvider>
+                {/* נגישות: קישור דילוג לתוכן הראשי — האלמנט הראשון שמקבל פוקוס */}
+                <a href="#main-content" className="skip-link">דילוג לתוכן הראשי</a>
                 <ScrollToTop />
                 <ChatCartBridge />
                 <NavBar />
+                {/* עוגן יעד לקישור הדילוג — לפני תוכן העמוד */}
+                <div id="main-content" tabIndex={-1} style={{ outline: 'none' }} />
                 {children}
                 <GoogleReviewsStrip />
                 <Footer />
@@ -160,6 +165,7 @@ export default function RootLayout({
                 <ShavuotPopupWrapper />
                 <ClubPopupWrapper />
                 <GiftProgressBar />
+                <AccessibilityWidget />
               </CartProvider>
             </ShaliachProvider>
           </Suspense>

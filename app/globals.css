@@ -93,6 +93,109 @@ body {
 .ys-fade-card.ys-visible { opacity: 1; transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {
   .ys-fade-card { opacity: 1; transform: none; transition: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════ נגישות — ת"י 5568 / WCAG 2.0 AA ═══════════ */
+
+/* קישור "דילוג לתוכן הראשי" — מוסתר עד קבלת פוקוס מקלדת */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  right: 16px;
+  z-index: 100000;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 16px;
+  outline: 3px solid #C5A028;
+  outline-offset: 2px;
+}
+
+/* מוקד מקלדת נראה — על כל האתר (WCAG 2.4.7) */
+:focus-visible {
+  outline: 3px solid #0b57d0 !important;
+  outline-offset: 2px !important;
+  border-radius: 2px;
+}
+.a11y-contrast :focus-visible {
+  outline-color: #ffff00 !important;
+}
+
+/* ── מצבי ווידג'ט הנגישות (מוחלים כ-class על <html>) ── */
+
+/* הגדלת טקסט — שתי דרגות */
+html.a11y-text-1 { font-size: 112.5%; }
+html.a11y-text-2 { font-size: 125%; }
+
+/* ניגודיות גבוהה */
+html.a11y-contrast body,
+html.a11y-contrast body * {
+  background-color: #000 !important;
+  background-image: none !important;
+  color: #fff !important;
+  border-color: #fff !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+html.a11y-contrast a,
+html.a11y-contrast a * { color: #ffff00 !important; }
+html.a11y-contrast button,
+html.a11y-contrast [role="button"] {
+  background-color: #000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+html.a11y-contrast img,
+html.a11y-contrast video { filter: none !important; opacity: 1 !important; }
+
+/* הדגשת קישורים */
+html.a11y-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+}
+
+/* עצירת אנימציות ותנועה */
+html.a11y-no-motion *,
+html.a11y-no-motion *::before,
+html.a11y-no-motion *::after {
+  animation-play-state: paused !important;
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* פונט קריא */
+html.a11y-readable body,
+html.a11y-readable body * {
+  font-family: Arial, 'Segoe UI', sans-serif !important;
+  letter-spacing: 0.02em;
+}
+
+/* טקסט מוסתר חזותית אך נגיש לקוראי מסך */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Checkout: force single-column on mobile — must live in <head> CSS so iOS Safari

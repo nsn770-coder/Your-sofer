@@ -395,13 +395,14 @@ function NavBarContent() {
                 </div>
               )}
             </div>
-            <div onClick={() => router.push("/cart")} style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>
+            <button onClick={() => router.push("/cart")} aria-label={`סל קניות, ${count} פריטים`}
+              style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", gap: 3, background: "none", border: "none", padding: 0, fontFamily: "inherit" }}>
               <div style={{ position: "relative" }}>
-                <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                {count > 0 && <span style={{ position: "absolute", top: -4, left: -4, background: "#C5A028", color: "#1a1a1a", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
+                <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="1.8" aria-hidden="true" focusable="false"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                {count > 0 && <span aria-hidden="true" style={{ position: "absolute", top: -4, left: -4, background: "#C5A028", color: "#1a1a1a", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
               </div>
               <div style={{ fontSize: 11, color: "#1a1a1a", fontWeight: 700 }}>סל ({count})</div>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -442,9 +443,11 @@ function NavBarContent() {
                   onMouseEnter={() => handleEnter(item.id)}
                   onMouseLeave={handleLeave}
                 >
-                  <button onClick={() => handleSelect(item.cat)} style={{ background: "none", border: "none", color: activeId === item.id ? "#C5A028" : "#1a1a1a", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 500, borderBottom: activeId === item.id ? "2px solid #C5A028" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
+                  <button onClick={() => handleSelect(item.cat)} onFocus={() => handleEnter(item.id)}
+                    aria-expanded={activeId === item.id} aria-haspopup="true"
+                    style={{ background: "none", border: "none", color: activeId === item.id ? "#C5A028" : "#1a1a1a", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 500, borderBottom: activeId === item.id ? "2px solid #C5A028" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
                     {item.label}
-                    <span style={{ fontSize: 9, color: "#C5A028", display: "inline-block", transition: "transform 0.2s ease", transform: activeId === item.id ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
+                    <span aria-hidden="true" style={{ fontSize: 9, color: "#C5A028", display: "inline-block", transition: "transform 0.2s ease", transform: activeId === item.id ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
                   </button>
                   {activeId === item.id && <MegaPanel item={item} onSelect={handleSelect} />}
                 </div>
