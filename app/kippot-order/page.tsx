@@ -266,7 +266,7 @@ function KippotOrderInner() {
       id: `kippot-bulk-${Date.now()}`,
       // שיוך למוצר אמיתי — המלאי יורד והרווחיות מחושבת לפי עלות המוצר
       ...(styleProductId ? { productId: styleProductId } : {}),
-      name: `כיפות ${kippah.label} × ${qty} — ${TYPE_LABELS[type]}${addSide && type !== 'print-both' ? ' + צד נוסף' : ''}`,
+      name: `כיפות ${kippah.label} × ${qty} — ${TYPE_LABELS[type]}${addSide && type !== 'print-both' ? (type === 'embroidery' ? ' + הדפס פנימי' : ' + צד נוסף') : ''}`,
       price: unitPrice,
       quantity: qty,
       imgUrl: kippah.img,
@@ -591,19 +591,21 @@ function KippotOrderInner() {
         </div>
       )}
 
-      {/* צד נוסף */}
-      {type !== 'embroidery' && type !== 'print-both' && (
+      {/* צד נוסף — בהדפסה: הצד השני; ברקמה: הדפס בצד התחתון הפנימי */}
+      {type !== 'print-both' && (
         <div style={{ marginBottom: 20, border: '1px solid #E5E0D5', padding: 16 }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
             <input type="checkbox" checked={addSide} onChange={e => setAddSide(e.target.checked)} style={{ width: 18, height: 18, accentColor: '#C5A028' }} />
             <div>
-              <span style={{ fontSize: 14, fontWeight: 700 }}>{type === 'print-top' ? 'הדפסה גם למטה' : 'הדפסה גם למעלה'}</span>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>
+                {type === 'embroidery' ? 'הוספת הדפס בצד התחתון הפנימי של הכיפה' : type === 'print-top' ? 'הדפסה גם למטה' : 'הדפסה גם למעלה'}
+              </span>
               <span style={{ color: '#C5A028', fontWeight: 700 }}> +₪{KIPA_EXTRA_SIDE_PRICE} ליחידה</span>
             </div>
           </label>
           {addSide && (
             <textarea value={addSideText} onChange={e => setAddSideText(e.target.value)}
-              placeholder="טקסט / עיצוב לצד הנוסף..." rows={2}
+              placeholder={type === 'embroidery' ? 'טקסט / עיצוב להדפס הפנימי (שם, תאריך, לוגו)...' : 'טקסט / עיצוב לצד הנוסף...'} rows={2}
               style={{ width: '100%', marginTop: 12, border: '1px solid #E5E0D5', padding: '10px 14px', fontSize: 14, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
           )}
         </div>
