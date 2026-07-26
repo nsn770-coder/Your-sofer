@@ -13,7 +13,7 @@ export const KIPA_EXTRA_SIDE_PRICE = 1.5;
 export type KipaMaterial = 'linen' | 'satin';
 
 /** דגמים מסוג סאטן (לפי style id) — כל השאר פשתן */
-export const SATIN_STYLE_IDS = new Set<string>(['satin-white']);
+export const SATIN_STYLE_IDS = new Set<string>(['satin-white', 'satin-white-18']);
 
 export const getKipaMaterial = (styleId: string): KipaMaterial =>
   SATIN_STYLE_IDS.has(styleId) ? 'satin' : 'linen';
@@ -41,5 +41,6 @@ export const getKipaUnitPrice = (q: number, material: KipaMaterial = 'linen'): n
 // ערך ב-Firestore (settings/eventKippotStyles) גובר על ברירת המחדל הזו —
 // היא קיימת כדי שדגמים חדשים יהיו משויכים מהרגע הראשון, בלי צעד ידני.
 export const DEFAULT_STYLE_PRODUCT_MAP: Record<string, { productId: string; sku: string; name: string }> = {
-  'satin-white': { productId: 'GA6IaHppba8peGVGHGud', sku: 'UK00321', name: 'כיפת סאטן' },
+  'satin-white':    { productId: 'GA6IaHppba8peGVGHGud', sku: 'UK00321', name: 'כיפת סאטן' },
+  'satin-white-18': { productId: 'qcGTjNpP2eoqyxM6Ns4L', sku: 'UK11889', name: 'כיפה סטן לבן 18 ס"מ' },
 };
