@@ -1,0 +1,19 @@
+{
+  "_readme": [
+    "קובץ תצורה לקולקציות פרסום של פיד המטא (custom_label_4).",
+    "עריכה: שנה כאן → הרץ node scripts/computeMetaCollections.mjs → הסנפשוט נשמר ב-Firestore (feedConfig/metaCollectionsSnapshot) והפיד קורא רק ממנו (B6 דטרמיניזם).",
+    "methods: all | random | lowest-price | highest-price | newest | best-selling | manual",
+    "שדות אופציונליים: limit (ברירת מחדל 50), cat (סינון לפי קטגוריה), subCategory, keyword (חיפוש בקטגוריה+תת+שם), ids (ל-manual), seed (ל-random),",
+    "minPrice / maxPrice. מוצר שנתפס בכמה קולקציות מקבל את הראשונה לפי הסדר כאן.",
+    "excludeBundles: מוצרים עם bundleComponentCodes לא נכנסים לקולקציות (B7). אפשר לעקוף פר-קולקציה עם includeBundles: true."
+  ],
+  "excludeBundles": true,
+  "collections": [
+    { "name": "best-sellers",      "method": "best-selling", "limit": 100 },
+    { "name": "new-arrivals",      "method": "newest",       "limit": 100 },
+    { "name": "premium",           "method": "highest-price", "limit": 50 },
+    { "name": "entry-price",       "method": "lowest-price",  "limit": 50, "minPrice": 25 },
+    { "name": "bar-mitzvah",       "method": "all", "keyword": "בר מצו" },
+    { "name": "kippot",            "method": "all", "cat": "כיפות" }
+  ]
+}
