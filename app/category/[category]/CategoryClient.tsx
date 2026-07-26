@@ -1176,6 +1176,18 @@ export default function CategoryClient({ category }: { category: string }) {
     'סט טלית תפילין': ['סט טלית תפילין', 'מארז לחתנים'],
   };
 
+  // עמודים שממזגים כמה קטגוריות (cat) לעמוד אחד.
+  // "תיקי טלית ותפילין" מציג את כל הכיסויים/תיקים לטלית ותפילין באתר —
+  // גם אלה השמורים תחת cat "סט טלית תפילין" (סטים עור מדומה, סטים בד,
+  // תיקים טרמי, סטים קטיפה וכו') — סה"כ ~390 מוצרים.
+  // בתי תפילין מוחרגים כי הם אינם כיסויים.
+  const MERGED_CAT_PAGES: Record<string, { cats: string[]; excludeSubCats?: string[] }> = {
+    'תיקי טלית ותפילין': {
+      cats: ['תיקי טלית ותפילין', 'סט טלית תפילין'],
+      excludeSubCats: ['בתי תפילין'],
+    },
+  };
+
   // Case A: recognized ?filter= values that map to a direct subCategory query
   const SUBCAT_QUERY_OVERRIDES: Record<string, Record<string, string>> = {
     'יודאיקה': { 'נטילת ידיים': 'נטילת ידיים ומים אחרונים', 'נטלות': 'נטילת ידיים ומים אחרונים' },
@@ -1277,6 +1289,28 @@ export default function CategoryClient({ category }: { category: string }) {
         }
       }
       setAllLoaded(merged.filter(p => p.hidden !== true));
+      return;
+    }
+
+    // עמוד ממוזג: מושך כמה קטגוריות (cat) במקביל ומאחד ללא כפילויות
+    const mergedDef = MERGED_CAT_PAGES[category];
+    if (mergedDef) {
+      const snaps = await Promise.all(
+        mergedDef.cats.map(c =>
+          getDocs(query(collection(db, 'products'), where('cat', '==', c), orderBy('priority', 'desc'), limit(1000)))
+        )
+      );
+      const seenIds = new Set<string>();
+      const merged: Product[] = [];
+      for (const s of snaps) {
+        for (const d of s.docs) {
+          if (seenIds.has(d.id)) continue;
+          seenIds.add(d.id);
+          merged.push({ id: d.id, ...d.data() } as Product);
+        }
+      }
+      const excluded = mergedDef.excludeSubCats ?? [];
+      setAllLoaded(merged.filter(p => p.hidden !== true && !excluded.includes(p.subCategory ?? '')));
       return;
     }
 

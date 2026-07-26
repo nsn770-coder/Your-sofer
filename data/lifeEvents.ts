@@ -108,6 +108,8 @@ export const lifeEvents: LifeEvent[] = [
       { category: 'בר מצווה',             subCategories: 'all' },
       { category: 'כיפות',               subCategories: 'all' },
       { category: 'טליתות וציציות',       subCategories: 'all' },
+      // מוצרי דף המזכרות לאירועים — כפתור סינון "מזכרות לאירועים" בעמוד
+      { category: 'מזכרות לאירועים',      subCategories: 'all', tabLabel: 'מזכרות לאירועים' },
     ],
     // הדפסות לאירועים — route בלבד, לא קטגוריה ב-Firestore
     externalLinks: [

@@ -165,17 +165,29 @@ function parseField(field: any): any {
 
 interface ProductStub { id: string; name: string; url: string }
 
+// עמודים שממזגים כמה קטגוריות — חייב להיות תואם ל-MERGED_CAT_PAGES ב-CategoryClient
+const MERGED_CAT_PAGES_SEO: Record<string, string[]> = {
+  'תיקי טלית ותפילין': ['תיקי טלית ותפילין', 'סט טלית תפילין'],
+};
+
 async function fetchCategoryProducts(category: string): Promise<ProductStub[]> {
   try {
+    const mergedCats = MERGED_CAT_PAGES_SEO[category];
     const body = {
       structuredQuery: {
         from: [{ collectionId: 'products' }],
         where: {
-          fieldFilter: {
-            field: { fieldPath: 'cat' },
-            op: 'EQUAL',
-            value: { stringValue: category },
-          },
+          fieldFilter: mergedCats
+            ? {
+                field: { fieldPath: 'cat' },
+                op: 'IN',
+                value: { arrayValue: { values: mergedCats.map(c => ({ stringValue: c })) } },
+              }
+            : {
+                field: { fieldPath: 'cat' },
+                op: 'EQUAL',
+                value: { stringValue: category },
+              },
         },
         select: { fields: [{ fieldPath: 'name' }] },
         limit: 100,
