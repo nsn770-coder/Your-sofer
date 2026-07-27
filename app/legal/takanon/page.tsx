@@ -12,7 +12,7 @@ export default function TakanonPage() {
       <div style={{ maxWidth: 820, margin: '32px auto', padding: '0 16px 48px' }}>
         <div style={{ background: '#fff', borderRadius: 14, padding: '32px 28px', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
           <h1 style={{ fontSize: 26, fontWeight: 900, color: '#1a1a1a', marginBottom: 6 }}>תקנון האתר</h1>
-          <p style={{ fontSize: 13, color: '#888', marginBottom: 28 }}>עדכון אחרון: אפריל 2025</p>
+          <p style={{ fontSize: 13, color: '#888', marginBottom: 28 }}>עדכון אחרון: יולי 2026</p>
 
           <Section title="1. כללי">
             ברוכים הבאים לאתר Your Sofer (להלן: "האתר"). האתר מופעל על-ידי Your Sofer ומשמש כפלטפורמה למכירת מוצרי סת"מ ויודאיקה מאומתים. השימוש באתר מהווה הסכמה מלאה לתנאי תקנון זה.
@@ -42,11 +42,15 @@ export default function TakanonPage() {
             כל התכנים באתר - תמונות, טקסטים, לוגו ועיצוב - הם רכוש Your Sofer. אין להעתיק, לשכפל או לעשות שימוש מסחרי בתכנים ללא אישור מפורש בכתב.
           </Section>
 
-          <Section title="8. שינויים בתקנון">
+          <Section title="8. תנאים ספציפיים לתשלום בכרטיס Diners Club">
+            גם כרטיסי Diners Club ניתנים לשימוש באתר דרך מערכת התשלומים המאובטחת שלנו. כל רוכש המשתמש בכרטיס Diners Club מסכים לתקנון זה והמחייב הסכמה פעיל למטרות ציות להוראות חברת Diners Club הבינלאומית. חייבים להסכים לתקנון זה כדי להשלים את ההזמנה, וסירוב להסכמה ימנע את ביצוע התשלום.
+          </Section>
+
+          <Section title="9. שינויים בתקנון">
             האתר רשאי לעדכן תקנון זה בכל עת. המשך השימוש באתר לאחר פרסום עדכון מהווה הסכמה לנוסח המעודכן.
           </Section>
 
-          <Section title="9. יצירת קשר">
+          <Section title="10. יצירת קשר">
             לכל שאלה: טלפון 058-4877-770 | וואטסאפ: 058-747-9933 | אימייל: support@your-sofer.com
           </Section>
         </div>

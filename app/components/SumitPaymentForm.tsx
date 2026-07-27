@@ -36,6 +36,7 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
   const [sumitReady, setSumitReady] = useState(false);
   const [tokenizing, setTokenizing] = useState(false);
   const [paymentsCount, setPaymentsCount] = useState(1);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     if (sumitReady) window.OfficeGuy?.Payments.InitEditors();
@@ -50,6 +51,10 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
     }
     if (!form.checkValidity()) {
       form.reportValidity();
+      return;
+    }
+    if (!termsAccepted) {
+      onError('חייב להסכים לתקנון כדי להמשיך בתשלום');
       return;
     }
 
@@ -145,13 +150,47 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
           </select>
         </div>
 
+        <div style={{ marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <input
+            type="checkbox"
+            id="terms-checkbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            disabled={busy}
+            required
+            style={{ width: 20, height: 20, cursor: busy ? 'not-allowed' : 'pointer', flexShrink: 0 }}
+          />
+          <label htmlFor="terms-checkbox" style={{ fontSize: 14, cursor: busy ? 'not-allowed' : 'pointer', margin: 0, color: '#333', lineHeight: 1.4 }}>
+            אני מסכים ל
+            <button
+              type="button"
+              onClick={() => window.open('/legal/takanon', '_blank')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#1F3D8F',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                fontSize: 14,
+                fontWeight: 600,
+                padding: 0,
+                marginRight: 4,
+                marginLeft: 4,
+              }}
+            >
+              תקנון התשלום
+            </button>
+            (דרישה חובה להשלמת התשלום) <span style={{ color: '#c0392b' }}>*</span>
+          </label>
+        </div>
+
         <button
           type="submit"
-          disabled={busy || !sumitReady}
+          disabled={busy || !sumitReady || !termsAccepted}
           style={{
-            width: '100%', background: busy ? '#888' : '#C9A227', color: busy ? '#fff' : '#1F3D8F',
+            width: '100%', background: (busy || !termsAccepted) ? '#888' : '#C9A227', color: (busy || !termsAccepted) ? '#fff' : '#1F3D8F',
             border: 'none', borderRadius: 14, height: 52, fontSize: 16, fontWeight: 800,
-            cursor: busy ? 'not-allowed' : 'pointer',
+            cursor: (busy || !termsAccepted) ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}
         >
