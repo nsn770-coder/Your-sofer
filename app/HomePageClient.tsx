@@ -1482,6 +1482,60 @@ export default function HomePageClient({ productCount }: { productCount: number 
           בנוסף האמבד של Cloudinary משך ~170KB של JS/CSS לנגן בעמוד הבית.
           כותרת המשנה שם גם הצהירה "מעל 6,000 מוצרים", בסתירה ל-4,960 בפועל. */}
 
+      {/* ── באנר "בנה מארז משלך" ──
+          ממוקם מעל "הסופרים שלנו", מיד אחרי גריד הקטגוריות. */}
+      <section
+        aria-labelledby="build-bundle-title"
+        // NAVY_BUILD נשאר כרקע גיבוי — נצבע מיד, כך שאין הבזק לבן לפני
+        // שהתמונה נטענת, וגם אם היא נכשלת הטקסט הלבן נשאר קריא.
+        style={{ background: NAVY_BUILD, direction: 'rtl', position: 'relative', overflow: 'hidden' }}
+        className="px-5 py-14 md:px-8 md:py-20"
+      >
+        {/* תמונת הרקע — position:absolute כדי שלא תשפיע על גובה הסקשן (אפס CLS).
+            lazy: הסקשן נמצא מתחת לקיפול ולא אמור להתחרות על ה-LCP. */}
+        <img
+          src={optimizeCloudinaryUrl(BUILD_BANNER_IMG, 1600)}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+        />
+        {/* שכבת ההכהיה — גוון הכחול של המותג ולא שחור נייטרלי, כדי שהבאנר
+            יישאר חלק מהשפה הוויזואלית. 0.72 נבחר כדי לשמור ניגודיות מספקת
+            לטקסט לבן מעל כל אזור בתמונה. */}
+        <div
+          aria-hidden="true"
+          style={{ position: 'absolute', inset: 0, background: 'rgba(38,41,66,0.72)', zIndex: 1 }}
+        />
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: 2.5, margin: '0 0 10px' }}>
+            חדש
+          </p>
+          <h2
+            id="build-bundle-title"
+            className="text-2xl md:text-[32px]"
+            style={{ fontWeight: 300, color: '#FFFFFF', letterSpacing: '-0.01em', margin: '0 0 12px', lineHeight: 1.3 }}
+          >
+            בנו את מארז החתנים שלכם
+          </h2>
+          <p style={{ fontSize: 15, lineHeight: 1.7, color: 'rgba(255,255,255,0.82)', margin: '0 auto 24px', maxWidth: 560 }}>
+            כיסוי לטלית ותפילין, רקמת שם, טלית וסידור — אתם בוחרים כל פריט,
+            אנחנו אורזים מארז אחד מהודר. עם הנחת מארז אוטומטית.
+          </p>
+          <a
+            href="/build"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              background: '#C5A028', color: '#1a1a1a', textDecoration: 'none',
+              height: 50, padding: '0 38px', fontSize: 15, fontWeight: 700,
+            }}
+          >
+            התחילו לבנות ←
+          </a>
+        </div>
+      </section>
+
       {/* ── Soferim horizontal row ── */}
       {soferimList.length > 0 && (
         <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 0 24px' : '56px 0 32px', direction: 'rtl' }}>
@@ -1546,61 +1600,6 @@ export default function HomePageClient({ productCount }: { productCount: number 
           לצפייה במאגר הסופרים שלנו ←
         </button>
       </div>
-
-      {/* ── באנר "בנה מארז משלך" ──
-          מיקום לפי המתחרים: rikmat.com מציג את "הרכיבו את המארז שלכם" באמצע
-          דף הבית, אחרי בלוקי הקטגוריות/המוצרים ולפני שאר התוכן. */}
-      <section
-        aria-labelledby="build-bundle-title"
-        // NAVY_BUILD נשאר כרקע גיבוי — נצבע מיד, כך שאין הבזק לבן לפני
-        // שהתמונה נטענת, וגם אם היא נכשלת הטקסט הלבן נשאר קריא.
-        style={{ background: NAVY_BUILD, direction: 'rtl', position: 'relative', overflow: 'hidden' }}
-        className="px-5 py-14 md:px-8 md:py-20"
-      >
-        {/* תמונת הרקע — position:absolute כדי שלא תשפיע על גובה הסקשן (אפס CLS).
-            lazy: הסקשן נמצא הרבה מתחת לקיפול ולא אמור להתחרות על ה-LCP. */}
-        <img
-          src={optimizeCloudinaryUrl(BUILD_BANNER_IMG, 1600)}
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          decoding="async"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
-        />
-        {/* שכבת ההכהיה — גוון הכחול של המותג ולא שחור נייטרלי, כדי שהבאנר
-            יישאר חלק מהשפה הוויזואלית. 0.72 נבחר כדי לשמור ניגודיות מספקת
-            לטקסט לבן מעל כל אזור בתמונה. */}
-        <div
-          aria-hidden="true"
-          style={{ position: 'absolute', inset: 0, background: 'rgba(38,41,66,0.72)', zIndex: 1 }}
-        />
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: 2.5, margin: '0 0 10px' }}>
-            חדש
-          </p>
-          <h2
-            id="build-bundle-title"
-            className="text-2xl md:text-[32px]"
-            style={{ fontWeight: 300, color: '#FFFFFF', letterSpacing: '-0.01em', margin: '0 0 12px', lineHeight: 1.3 }}
-          >
-            בנו את מארז החתנים שלכם
-          </h2>
-          <p style={{ fontSize: 15, lineHeight: 1.7, color: 'rgba(255,255,255,0.82)', margin: '0 auto 24px', maxWidth: 560 }}>
-            כיסוי לטלית ותפילין, רקמת שם, טלית וסידור — אתם בוחרים כל פריט,
-            אנחנו אורזים מארז אחד מהודר. עם הנחת מארז אוטומטית.
-          </p>
-          <a
-            href="/build"
-            style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              background: '#C5A028', color: '#1a1a1a', textDecoration: 'none',
-              height: 50, padding: '0 38px', fontSize: 15, fontWeight: 700,
-            }}
-          >
-            התחילו לבנות ←
-          </a>
-        </div>
-      </section>
 
       {/* ── Live Reviews Carousel ── */}
       {liveReviews.length > 0 && (
