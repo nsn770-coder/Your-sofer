@@ -77,6 +77,17 @@ function IconActivityShield() {
 /** כחול המותג — רקע גיבוי לבאנר "בנה מארז משלך" */
 const NAVY_BUILD = '#373A5A';
 
+/**
+ * יעד מונה המוצרים בשורת הבידול.
+ *
+ * מספר קבוע ולא ספירה חיה מ-Firestore, משתי סיבות:
+ *  1. הנוסח מצהיר "מעל ל-5,000". ספירה חיה מחזירה כרגע 4,960 — כלומר המונה
+ *     היה סותר את המשפט שהוא עצמו נמצא בתוכו.
+ *  2. הספירה החיה עלתה בקריאת getCountFromServer בכל טעינת דף בית.
+ * אם תרצה מונה חי — צריך גם לשנות את הנוסח ל"עם X מוצרים".
+ */
+const PRODUCT_COUNT_TARGET = 5000;
+
 /** תמונת הרקע של באנר בניית המארז (Cloudinary) */
 const BUILD_BANNER_IMG =
   'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785053622/fnpsrderg3ldjuksmzbd.png';
@@ -394,6 +405,10 @@ export default function HomePageClient() {
   const [heroVideoOn, setHeroVideoOn] = useState(false);
   const [bsVisible, setBsVisible] = useState(false);
   const bsSectionRef = useRef<HTMLDivElement>(null);
+  // מונה המוצרים — כתיבה ישירה ל-DOM ולא דרך state, אחרת ~120 רינדורים
+  // מיותרים של דף הבית במהלך שתי שניות האנימציה.
+  const countRowRef = useRef<HTMLDivElement>(null);
+  const countValueRef = useRef<HTMLSpanElement>(null);
   const cardsRef   = useRef<HTMLDivElement>(null);
   const router     = useRouter();
   const { shaliach } = useShaliach();
@@ -685,6 +700,46 @@ export default function HomePageClient() {
     // below the fold - defer
     const timer = setTimeout(fetchCounts, 1500);
     return () => clearTimeout(timer);
+  }, []);
+
+  /**
+   * מונה המוצרים בשורת הבידול.
+   *
+   * מתחיל רק כשהשורה נכנסת לתצוגה — מונה שרץ מחוץ למסך מבזבז את האפקט.
+   * עקומה: ease-out בחזקת 4 — זינוק מהיר מ-0 והאטה חדה לקראת הסוף, כך
+   * שהעין נתפסת על המספר הסופי. prefers-reduced-motion מקבל את המספר מיד.
+   */
+  useEffect(() => {
+    const row = countRowRef.current;
+    const out = countValueRef.current;
+    if (!row || !out) return;
+
+    const finalText = PRODUCT_COUNT_TARGET.toLocaleString('he-IL');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      out.textContent = finalText;
+      return;
+    }
+
+    let rafId = 0;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      obs.disconnect();
+
+      const DURATION = 1800;
+      const start = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min((now - start) / DURATION, 1);
+        const eased = 1 - Math.pow(1 - t, 4);
+        out.textContent = t < 1
+          ? Math.round(PRODUCT_COUNT_TARGET * eased).toLocaleString('he-IL')
+          : finalText;
+        if (t < 1) rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
+    }, { threshold: 0.6 });
+
+    obs.observe(row);
+    return () => { obs.disconnect(); cancelAnimationFrame(rafId); };
   }, []);
 
   // Section-level IO for BestSellers: preload first 2 videos when section is 300px away
@@ -1190,16 +1245,37 @@ export default function HomePageClient() {
         </div>
       </section>
 
-      {/* ── שורת הבידול ──
-          החליפה את פס המונים (משפחות / סופרים / מוצרים / דירוג ממוצע), 07/2026.
-          לאף אחד משני אתרי הייחוס בנישה אין פס מונים מספרי, והמונה "+4960"
-          גם סתר את מסר ה-5,000+ ששאר האתר מצהיר. */}
-      <div className="px-4 pt-2 pb-9 md:px-8 md:pt-4 md:pb-14" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4', direction: 'rtl' }}>
+      {/* ── שורת הבידול, עם מונה עולה ──
+          החליפה את פס ארבעת המונים (משפחות / סופרים / מוצרים / דירוג), 07/2026.
+          נשאר רק המונה שהוא הבידול בפועל — מספר המוצרים. */}
+      <div ref={countRowRef} className="px-4 pt-2 pb-9 md:px-8 md:pt-4 md:pb-14" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4', direction: 'rtl' }}>
         <p
           className="text-xl md:text-[26px]"
           style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center', fontWeight: 300, color: '#373A5A', lineHeight: 1.4, letterSpacing: '-0.01em' }}
         >
-          האתר הכי גדול בישראל עם מעל ל-5,000 מוצרים לבית היהודי
+          {/* קורא מסך מקבל את המשפט השלם פעם אחת, בלי הקראה של כל שלב בספירה */}
+          <span className="sr-only">
+            האתר הכי גדול בישראל עם מעל ל-{PRODUCT_COUNT_TARGET.toLocaleString('he-IL')} מוצרים לבית היהודי
+          </span>
+          <span aria-hidden="true">
+            האתר הכי גדול בישראל עם מעל ל-
+            <span
+              ref={countValueRef}
+              style={{
+                display: 'inline-block',
+                // רוחב מינימלי + ספרות ברוחב אחיד: המספר גדל מ-0 ל-5,000
+                // בלי שהמשפט סביבו יזוז. בלי זה השורה רוטטת לאורך כל האנימציה.
+                minWidth: '3.4em',
+                textAlign: 'center',
+                fontVariantNumeric: 'tabular-nums',
+                fontWeight: 700,
+                color: '#C5A028',
+              }}
+            >
+              0
+            </span>
+            {' '}מוצרים לבית היהודי
+          </span>
         </p>
       </div>
 
