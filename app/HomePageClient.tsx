@@ -77,17 +77,6 @@ function IconActivityShield() {
 /** כחול המותג — רקע גיבוי לבאנר "בנה מארז משלך" */
 const NAVY_BUILD = '#373A5A';
 
-/**
- * יעד מונה המוצרים בשורת הבידול.
- *
- * מספר קבוע ולא ספירה חיה מ-Firestore, משתי סיבות:
- *  1. הנוסח מצהיר "מעל ל-5,000". ספירה חיה מחזירה כרגע 4,960 — כלומר המונה
- *     היה סותר את המשפט שהוא עצמו נמצא בתוכו.
- *  2. הספירה החיה עלתה בקריאת getCountFromServer בכל טעינת דף בית.
- * אם תרצה מונה חי — צריך גם לשנות את הנוסח ל"עם X מוצרים".
- */
-const PRODUCT_COUNT_TARGET = 5000;
-
 /** תמונת הרקע של באנר בניית המארז (Cloudinary) */
 const BUILD_BANNER_IMG =
   'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785053622/fnpsrderg3ldjuksmzbd.png';
@@ -370,7 +359,7 @@ const ActivityBar = memo(function ActivityBar({
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function HomePageClient() {
+export default function HomePageClient({ productCount }: { productCount: number }) {
   const [isMobile, setIsMobile]       = useState(false);
   const [catImages, setCatImages]     = useState<Record<string, string>>({});
   const [catSections, setCatSections] = useState<HomepageCategorySections>(DEFAULT_SECTIONS);
@@ -714,7 +703,7 @@ export default function HomePageClient() {
     const out = countValueRef.current;
     if (!row || !out) return;
 
-    const finalText = PRODUCT_COUNT_TARGET.toLocaleString('he-IL');
+    const finalText = productCount.toLocaleString('he-IL');
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       out.textContent = finalText;
       return;
@@ -731,7 +720,7 @@ export default function HomePageClient() {
         const t = Math.min((now - start) / DURATION, 1);
         const eased = 1 - Math.pow(1 - t, 4);
         out.textContent = t < 1
-          ? Math.round(PRODUCT_COUNT_TARGET * eased).toLocaleString('he-IL')
+          ? Math.round(productCount * eased).toLocaleString('he-IL')
           : finalText;
         if (t < 1) rafId = requestAnimationFrame(tick);
       };
@@ -740,7 +729,7 @@ export default function HomePageClient() {
 
     obs.observe(row);
     return () => { obs.disconnect(); cancelAnimationFrame(rafId); };
-  }, []);
+  }, [productCount]);
 
   // Section-level IO for BestSellers: preload first 2 videos when section is 300px away
   useEffect(() => {
@@ -1255,10 +1244,10 @@ export default function HomePageClient() {
         >
           {/* קורא מסך מקבל את המשפט השלם פעם אחת, בלי הקראה של כל שלב בספירה */}
           <span className="sr-only">
-            האתר הכי גדול בישראל עם מעל ל-{PRODUCT_COUNT_TARGET.toLocaleString('he-IL')} מוצרים לבית היהודי
+            האתר הכי גדול בישראל עם {productCount.toLocaleString('he-IL')} מוצרים לבית היהודי
           </span>
           <span aria-hidden="true">
-            האתר הכי גדול בישראל עם מעל ל-
+            האתר הכי גדול בישראל עם{' '}
             <span
               ref={countValueRef}
               style={{

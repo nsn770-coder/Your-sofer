@@ -62,7 +62,50 @@ const organizationSchema = {
 const HERO_POSTER =
   'https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1080/v1782769100/WhatsApp_Image_2026-06-29_at_21.52.31_1_m59ykm.jpg';
 
-export default function HomePage() {
+const FIREBASE_PROJECT = 'your-sofer';
+const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
+
+/** מוצג אם הספירה נכשלה — כדי שהמונה לעולם לא יראה 0 */
+const PRODUCT_COUNT_FALLBACK = 4900;
+
+/**
+ * ספירה מדויקת של המוצרים בקטלוג, בשרת ובקאש.
+ *
+ * runAggregationQuery מחזיר COUNT בלי להוריד מסמכים — קריאה אחת זולה, לא
+ * סריקה של 5,000 רשומות. הגרסה הקודמת של המונה קראה getCountFromServer
+ * **בדפדפן של כל מבקר**; כאן זה רץ פעם בשעה בשרת, והמספר כבר יושב ב-HTML
+ * הראשוני (טוב גם לרינדור וגם לזחלנים).
+ */
+async function fetchProductCount(): Promise<number> {
+  try {
+    const res = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:runAggregationQuery?key=${FIREBASE_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          structuredAggregationQuery: {
+            structuredQuery: { from: [{ collectionId: 'products' }] },
+            aggregations: [{ alias: 'count', count: {} }],
+          },
+        }),
+        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(8000),
+      },
+    );
+    if (!res.ok) return PRODUCT_COUNT_FALLBACK;
+    const rows = await res.json();
+    const raw = rows?.[0]?.result?.aggregateFields?.count?.integerValue;
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? n : PRODUCT_COUNT_FALLBACK;
+  } catch {
+    return PRODUCT_COUNT_FALLBACK; // timeout / רשת — העמוד ממשיך להיבנות
+  }
+}
+
+export default async function HomePage() {
+  const productCount = await fetchProductCount();
+
   return (
     <>
       {/* React hoists this into <head> of the prerendered HTML */}
@@ -71,7 +114,7 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
-      <HomePageClient />
+      <HomePageClient productCount={productCount} />
       <PageFaqSection
         pageKey="home"
         ids={HOME_FAQ_IDS}
