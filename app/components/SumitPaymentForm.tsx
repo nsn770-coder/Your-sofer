@@ -37,6 +37,7 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
   const [tokenizing, setTokenizing] = useState(false);
   const [paymentsCount, setPaymentsCount] = useState(1);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
 
   useEffect(() => {
     if (sumitReady) window.OfficeGuy?.Payments.InitEditors();
@@ -89,6 +90,53 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
 
   return (
     <>
+      {termsModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px',
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: 14,
+            maxHeight: '90vh',
+            width: '100%',
+            maxWidth: 700,
+            overflow: 'auto',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+          }}>
+            <div style={{ position: 'sticky', top: 0, background: '#1a1a1a', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10000 }}>
+              <span style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>תקנון התשלום</span>
+              <button
+                onClick={() => setTermsModalOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#C5A028',
+                  fontSize: 28,
+                  cursor: 'pointer',
+                  padding: 0,
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ padding: '32px 28px', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
+              <TermsContent />
+            </div>
+          </div>
+        </div>
+      )}
+
       <Script
         src="https://code.jquery.com/jquery-3.7.1.min.js"
         strategy="afterInteractive"
@@ -164,7 +212,7 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
             אני מסכים ל
             <button
               type="button"
-              onClick={() => window.open('/legal/takanon', '_blank')}
+              onClick={() => setTermsModalOpen(true)}
               style={{
                 background: 'none',
                 border: 'none',
@@ -206,5 +254,66 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
         </button>
       </form>
     </>
+  );
+}
+
+function TermsContent() {
+  return (
+    <div>
+      <p style={{ fontSize: 13, color: '#888', marginBottom: 28 }}>עדכון אחרון: יולי 2026</p>
+
+      <TermsSection title="1. כללי">
+        ברוכים הבאים לאתר Your Sofer (להלן: "האתר"). האתר מופעל על-ידי Your Sofer ומשמש כפלטפורמה למכירת מוצרי סת"מ ויודאיקה מאומתים. השימוש באתר מהווה הסכמה מלאה לתנאי תקנון זה.
+      </TermsSection>
+
+      <TermsSection title="2. הזמנות ורכישות">
+        כל הזמנה כפופה לאישור זמינות המוצר ואימות פרטי התשלום. האתר שומר לעצמו את הזכות לבטל הזמנה שנעשתה עקב טעות בתמחור או בתיאור המוצר. לאחר אישור ההזמנה תשלח הודעת אישור לכתובת האימייל שסופקה.
+      </TermsSection>
+
+      <TermsSection title="3. מחירים ותשלום">
+        כל המחירים באתר כוללים מע"מ (17%) אלא אם צוין אחרת. התשלום מתבצע באמצעות כרטיס אשראי דרך מערכת סליקה מאובטחת. האתר אינו שומר פרטי כרטיס אשראי.
+      </TermsSection>
+
+      <TermsSection title="4. אספקה ומשלוחים">
+        זמני האספקה המוערכים מפורטים בדף המוצר. האתר אינו אחראי לעיכובים הנובעים מגורמים חיצוניים (שביתות, מזג אוויר, עיכובי שליחות). ניתן לתאם איסוף עצמי בדימונה בתיאום מוקדם.
+      </TermsSection>
+
+      <TermsSection title="5. ביטולים והחזרות">
+        ניתן לבטל עסקה בהתאם לחוק הגנת הצרכן (תשנ"ח–1997). מוצרי סת"מ שנפתחה אריזתם ו/או שנעשה בהם שימוש אינם ניתנים להחזרה מטעמי קדושה וכשרות. פרטים מלאים בעמוד מדיניות ההחזרים.
+      </TermsSection>
+
+      <TermsSection title="6. אחריות למוצרים">
+        כל מוצרי הסת"מ באתר כשרים לכתחילה ובודקו על-ידי סופרים מוסמכים. במקרה של פגם המתגלה תוך 30 יום מהאספקה יוחלף המוצר ללא עלות.
+      </TermsSection>
+
+      <TermsSection title="7. קניין רוחני">
+        כל התכנים באתר - תמונות, טקסטים, לוגו ועיצוב - הם רכוש Your Sofer. אין להעתיק, לשכפל או לעשות שימוש מסחרי בתכנים ללא אישור מפורש בכתב.
+      </TermsSection>
+
+      <TermsSection title="8. תנאים ספציפיים לתשלום בכרטיס Diners Club">
+        גם כרטיסי Diners Club ניתנים לשימוש באתר דרך מערכת התשלומים המאובטחת שלנו. כל רוכש המשתמש בכרטיס Diners Club מסכים לתקנון זה והמחייב הסכמה פעיל למטרות ציות להוראות חברת Diners Club הבינלאומית. חייבים להסכים לתקנון זה כדי להשלים את ההזמנה, וסירוב להסכמה ימנע את ביצוע התשלום.
+      </TermsSection>
+
+      <TermsSection title="9. שינויים בתקנון">
+        האתר רשאי לעדכן תקנון זה בכל עת. המשך השימוש באתר לאחר פרסום עדכון מהווה הסכמה לנוסח המעודכן.
+      </TermsSection>
+
+      <TermsSection title="10. יצירת קשר">
+        לכל שאלה: טלפון 058-4877-770 | וואטסאפ: 058-747-9933 | אימייל: support@your-sofer.com
+      </TermsSection>
+    </div>
+  );
+}
+
+function TermsSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a', marginBottom: 8, borderRight: '3px solid #C5A028', paddingRight: 10 }}>
+        {title}
+      </h2>
+      <p style={{ fontSize: 14, color: '#444', lineHeight: 1.8, margin: 0 }}>
+        {children}
+      </p>
+    </div>
   );
 }
