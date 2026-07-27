@@ -1,12 +1,27 @@
 ﻿import type { Metadata } from 'next';
 import HomePageClient from './HomePageClient';
+import PageFaqSection from '@/app/components/faq/PageFaqSection';
+
+/**
+ * סדר השאלות בדף הבית — מפורש בכוונה.
+ * getFaqForPage ממיין לפי ה-priority הגלובלי, שמשותף לדף ה-FAQ ולשאר
+ * העמודים; שינוי שלו כדי לסדר את דף הבית היה מזיז שאלות גם שם.
+ * מקור התוכן נשאר data/faq.ts בלבד — כאן רק הסדר.
+ */
+const HOME_FAQ_IDS = [
+  'shipping-time',        // כמה זמן לוקח המשלוח
+  'dedication-products',  // על אילו מוצרים אפשר להוסיף הקדשה
+  'home-events-bulk',     // כיפות ומזכרות לאירועים בכמויות
+  'returns-regular',      // מדיניות ההחזרות
+  'home-about-us',        // מי עומד מאחורי האתר
+];
 
 const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
   title: 'Your Sofer - אתר היודאיקה הגדול בישראל | כיפות, מתנות ומזכרות לאירועים',
   description:
-    'אתר היודאיקה הגדול בישראל עם מעל 6,000 מוצרים: כיפות בעיצוב אישי, מזכרות ומתנות לאירועים, תיקי טלית ותפילין, תשמישי קדושה ומוצרים לבית היהודי. משלוחים לכל הארץ.',
+    'האתר הכי גדול בישראל עם מעל ל-5,000 מוצרים לבית היהודי: תכשיטים ומתנות בעיצוב אישי, כיפות ומזכרות לאירועים, תיקי טלית ותפילין ותשמישי קדושה. משלוחים לכל הארץ.',
   alternates: { canonical: BASE_URL },
   openGraph: {
     type: 'website',
@@ -15,7 +30,7 @@ export const metadata: Metadata = {
     siteName: 'Your Sofer',
     title: 'Your Sofer - אתר היודאיקה הגדול בישראל | כיפות, מתנות ומזכרות לאירועים',
     description:
-      'מעל 6,000 מוצרי יודאיקה: כיפות בעיצוב אישי, מזכרות לאירועים, מתנות ומוצרים לבית היהודי.',
+      'האתר הכי גדול בישראל עם מעל ל-5,000 מוצרים לבית היהודי: תכשיטים ומתנות בעיצוב אישי, כיפות ומזכרות לאירועים.',
     images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'Your Sofer' }],
   },
 };
@@ -57,6 +72,11 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
       <HomePageClient />
+      <PageFaqSection
+        pageKey="home"
+        ids={HOME_FAQ_IDS}
+        title="שאלות ותשובות"
+      />
     </>
   );
 }

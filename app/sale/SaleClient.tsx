@@ -137,7 +137,7 @@ export default function SaleClient() {
                     outOfStock={p.outOfStock}
                     isBestSeller={p.isBestSeller}
                     badge={p.badge}
-                    was={p.was}
+                    was={p.was} productDoc={p}
                     createdAt={p.createdAt}
                     aboveFold={i < 8}
                     {...clearanceProps}

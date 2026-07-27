@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Heebo, Cormorant_Garamond } from "next/font/google";
 import { Suspense } from "react";
 import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ShaliachProvider } from "./contexts/ShaliachContext";
+import AnnouncementBar from "@/app/components/AnnouncementBar";
 import NavBar from "@/app/components/navigation/NavBar";
 import Footer from "@/app/components/Footer";
 import ShiraChatLoader from "@/app/components/chat/ShiraChatLoader";
@@ -23,35 +23,22 @@ import GiftProgressBar from "./components/GiftProgressBar";
 import GoogleReviewsStrip from "@/app/components/GoogleReviewsStrip";
 import AccessibilityWidget from "@/app/components/AccessibilityWidget";
 
-// PERF: Geist removed — its className was on <body> but the inline style
-// (fontFamily: var(--font-heebo)…) overrode it everywhere, so the font file was
-// preloaded with display:swap on every page and never actually rendered.
-// One less woff2 in the critical chain + one less potential font-swap CLS source.
-const heebo = Heebo({ subsets: ["hebrew", "latin"], display: "optional", variable: "--font-heebo" });
-// PERF: Frank Ruhl Libre removed — next/font preloaded 5 weights × 2 subsets on
-// every page, but the only selector using it (.brand-story) appears in no component.
-// globals.css still maps --font-frank to a serif fallback if it's ever reused.
-// PERF: Cormorant trimmed 5 weights → the 3 actually used (300 = hero title +
-// homepage h2s, 600 = h1/h2/h3 default in globals.css, 700 = bold headings).
-// 2 fewer preloaded woff2 files on every page — the font chain was the longest
-// item in the critical request path (2.6s on slow 4G).
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '600', '700'],
-  display: 'swap',
-  variable: '--font-cormorant',
-});
+// נגישות + PERF: כל פונטי Google הוסרו (Heebo, Cormorant). האתר עבר לפונט
+// מערכת קריא — Arial — בכל הרכיבים, כולל כותרות (בעקבות משוב שהפונט הקריא
+// מתפריט הנגישות נוח יותר). אפס קבצי woff2 בשרשרת הקריטית = LCP מהיר יותר.
+// var(--font-heebo) ו-var(--font-cormorant) ממופים ל-Arial ב-globals.css,
+// כך שכל ההפניות הקיימות ממשיכות לעבוד.
 
 const BASE_URL = 'https://your-sofer.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'Your Sofer | כיפות לאירועים בעיצוב אישי - אתר היודאיקה הגדול בישראל',
+    default: 'YourSofer | תכשיטים ומתנות בעיצוב אישי, יודאיקה מהודרת וכיפות לאירועים',
     template: '%s | Your Sofer',
   },
   description:
-    'אתר היודאיקה הגדול בישראל: מעל 6,000 מוצרים — 800+ סוגי כיפות לאירועים בעיצוב אישי, 300+ תיקי ומארזי טלית ותפילין, מזכרות ומתנות לאירועים, כלי שולחן ותשמישי קדושה לבית היהודי. משלוחים לכל הארץ.',
+    'תכשיטים עם שם, מתנות בחריטה אישית, כיפות מודפסות לאירועים ותשמישי קדושה מהודרים. משלוח מהיר לכל הארץ עם מספר מעקב · תשלום מאובטח.',
   keywords: [
     'יודאיקה', 'חנות יודאיקה', 'כיפות', 'כיפות בעיצוב אישי', 'כיפות לאירועים',
     'מזכרות לאירועים', 'מתנות לאירועים', 'מתנות לבר מצווה', 'תיקי טלית ותפילין',
@@ -66,15 +53,15 @@ export const metadata: Metadata = {
     locale: 'he_IL',
     url: BASE_URL,
     siteName: 'Your Sofer',
-    title: 'Your Sofer | כיפות לאירועים בעיצוב אישי - אתר היודאיקה הגדול בישראל',
+    title: 'YourSofer | תכשיטים ומתנות בעיצוב אישי, יודאיקה מהודרת וכיפות לאירועים',
     description:
-      'מעל 6,000 מוצרי יודאיקה: 800+ סוגי כיפות בעיצוב אישי, 300+ תיקי טלית ותפילין, מזכרות ומתנות לאירועים.',
+      'מעל 5,000 מוצרים לבית היהודי: תכשיטים ומתנות בעיצוב אישי, 800+ סוגי כיפות, 300+ תיקי טלית ותפילין ומזכרות לאירועים.',
     images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'Your Sofer' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Your Sofer | כיפות לאירועים בעיצוב אישי - אתר היודאיקה הגדול בישראל',
-    description: 'מעל 6,000 מוצרי יודאיקה: 800+ סוגי כיפות בעיצוב אישי, מזכרות ומתנות לאירועים.',
+    title: 'YourSofer | תכשיטים ומתנות בעיצוב אישי, יודאיקה מהודרת וכיפות לאירועים',
+    description: 'מעל 5,000 מוצרים לבית היהודי: תכשיטים ומתנות בעיצוב אישי, 800+ סוגי כיפות, מזכרות לאירועים.',
     images: ['/og-default.png'],
   },
   alternates: {},
@@ -94,7 +81,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100%' }} className={`overflow-x-hidden ${cormorant.variable}`}>
+    <html lang="he" dir="rtl" style={{ overflowX: 'hidden', maxWidth: '100%' }} className="overflow-x-hidden">
       <head>
         {/* ── Google Tag Manager ── */}
         <script dangerouslySetInnerHTML={{ __html: `
@@ -131,7 +118,7 @@ export default function RootLayout({
             it fetched a high-priority image on EVERY page and competed with the real LCP.
             The homepage hero poster is now preloaded from app/page.tsx instead. */}
       </head>
-      <body className={`${heebo.variable} overflow-x-hidden`} style={{ overflowX: 'hidden', maxWidth: '100%', fontFamily: 'var(--font-heebo), Arial, sans-serif' }}>
+      <body className="overflow-x-hidden" style={{ overflowX: 'hidden', maxWidth: '100%', fontFamily: "Arial, 'Segoe UI', sans-serif" }}>
         {/* ── Google Tag Manager (noscript) ── */}
         <noscript>
           <iframe
@@ -155,6 +142,7 @@ export default function RootLayout({
                 <a href="#main-content" className="skip-link">דילוג לתוכן הראשי</a>
                 <ScrollToTop />
                 <ChatCartBridge />
+                <AnnouncementBar />
                 <NavBar />
                 {/* עוגן יעד לקישור הדילוג — לפני תוכן העמוד */}
                 <div id="main-content" tabIndex={-1} style={{ outline: 'none' }} />

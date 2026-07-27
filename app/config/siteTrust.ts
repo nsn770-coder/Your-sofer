@@ -96,8 +96,8 @@ export const SHIPPING = {
   /** עלות משלוח רגיל — חייב להתאים ל-SHIPPING_REGULAR ב-CartContext */
   regularCost: 35,
   /** סף משלוח חינם — חייב להתאים ל-FREE_SHIPPING_THRESHOLD ב-CartContext */
-  freeShippingThreshold: 600,
-  freeShippingText: 'משלוח חינם בהזמנה מעל ₪600',
+  freeShippingThreshold: 500,
+  freeShippingText: 'משלוח חינם בהזמנה מעל ₪500',
   carrierName: 'Sendit',
   trackingAvailable: true,
   standardDeliveryText: 'משלוח לכל הארץ עם מספר מעקב',

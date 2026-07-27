@@ -29,7 +29,7 @@ function normalizeIsraeliPhone(v: string): string | null {
   return /^0(5\d{8}|[2-9]\d{7})$/.test(d) ? d : null;
 }
 
-export default function ClubPopup() {
+export default function ClubPopup({ forceOpen = false }: { forceOpen?: boolean } = {}) {
   const [visible, setVisible]       = useState(false);
   const [isMobile, setIsMobile]     = useState(false);
   const [screen, setScreen]         = useState<'form' | 'thanks'>('form');
@@ -46,10 +46,27 @@ export default function ClubPopup() {
   const phoneRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY)) return;
     setIsMobile(window.innerWidth < 640);
+
+    // פתיחה יזומה מבחוץ (טופ-בר ההטבה) — עוקפת את חסימת ה-sessionStorage
+    // ואת ההשהיה. אופט-אין בלבד: אם האירוע לא נורה, ההתנהגות זהה לקודם.
+    // KEEP IN SYNC with OPEN_CLUB_EVENT ב-app/components/AnnouncementBar.tsx
+    const openNow = () => { setScreen('form'); setVisible(true); };
+    window.addEventListener('ys:open-club', openNow);
+
+    // הצ'אנק נטען דינמית — כשהפתיחה יזומה, האירוע כבר נורה לפני ה-mount,
+    // ולכן ה-wrapper מעביר אותה גם כ-prop.
+    if (forceOpen) openNow();
+
+    if (sessionStorage.getItem(SESSION_KEY)) {
+      return () => window.removeEventListener('ys:open-club', openNow);
+    }
     const t = setTimeout(() => setVisible(true), DELAY_MS);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('ys:open-club', openNow);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function close() {

@@ -336,7 +336,7 @@ export default function MomentClient({
                   priority={p.priority}
                   isBestSeller={p.isBestSeller}
                   badge={p.badge}
-                  was={p.was}
+                  was={p.was} productDoc={p}
                   createdAt={p.createdAt}
                   hidden={p.hidden}
                   hasKlafSelection={p.hasKlafSelection}

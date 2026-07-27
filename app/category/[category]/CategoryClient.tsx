@@ -56,6 +56,8 @@ interface Product {
   expectedArrivalDate?: string | null;
   coverStyle?: string;
   bundlePromo?: string | null;
+  /** מוצר מארז — עד 4 קודי רכיבים. מזין את הבאדג' "מארז מהודר" בכרטיס. */
+  bundleComponentCodes?: string[] | null;
   clearanceDiscount?: boolean;
   clearanceSalePrice?: number;
   originalPrice?: number;
@@ -1761,7 +1763,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 id={p.id} name={p.name} price={p.price}
                                 images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]} aiLifestyleImage={p.aiLifestyleImage}
                                 priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge} bundlePromo={p.bundlePromo}
-                                was={p.was} createdAt={p.createdAt} aboveFold={idx < 2}
+                                was={p.was} productDoc={p} isBundle={!!p.bundleComponentCodes?.length} createdAt={p.createdAt} aboveFold={idx < 2}
                                 hasKlafSelection={p.hasKlafSelection} cat={p.cat}
                                 soferId={p.soferId}
                                 soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
@@ -2018,7 +2020,7 @@ export default function CategoryClient({ category }: { category: string }) {
                       <ProductCard id={p.id} name={p.name} price={p.price}
                         images={[p.imgUrl || p.image_url, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]} aiLifestyleImage={p.aiLifestyleImage}
                         priority={p.priority} isBestSeller={p.isBestSeller} badge={p.badge} bundlePromo={p.bundlePromo}
-                        was={p.was} createdAt={p.createdAt} aboveFold={idx < 4}
+                        was={p.was} productDoc={p} isBundle={!!p.bundleComponentCodes?.length} createdAt={p.createdAt} aboveFold={idx < 4}
                         hasKlafSelection={p.hasKlafSelection} cat={p.cat}
                         soferId={p.soferId}
                         soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
@@ -2107,7 +2109,7 @@ export default function CategoryClient({ category }: { category: string }) {
                           isBestSeller={p.isBestSeller}
                           badge={p.badge}
                           bundlePromo={p.bundlePromo}
-                          was={p.was}
+                          was={p.was} productDoc={p} isBundle={!!p.bundleComponentCodes?.length}
                           createdAt={p.createdAt}
                           aboveFold={idx < 4}
                           hasKlafSelection={p.hasKlafSelection}
@@ -2155,7 +2157,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 isBestSeller={p.isBestSeller}
                                 badge={p.badge}
                                 bundlePromo={p.bundlePromo}
-                                was={p.was}
+                                was={p.was} productDoc={p} isBundle={!!p.bundleComponentCodes?.length}
                                 createdAt={p.createdAt}
                                 aboveFold={start === 0 && idx < 4}
                                 hasKlafSelection={p.hasKlafSelection}

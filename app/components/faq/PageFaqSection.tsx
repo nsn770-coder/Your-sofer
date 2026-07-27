@@ -9,7 +9,7 @@
  */
 
 import { usePathname } from 'next/navigation';
-import { getFaqForPage, type FaqPageKey } from '@/data/faq';
+import { getFaqForPage, getFaqByIds, type FaqPageKey } from '@/data/faq';
 import { buildWhatsAppLink, WA_PREFILL } from '@/lib/whatsapp';
 import { trackFaqEvent } from '@/lib/faqAnalytics';
 import FaqAccordion from './FaqAccordion';
@@ -21,10 +21,16 @@ export default function PageFaqSection({
   showStartDesignCta = false,
   startDesignHref = '/event-kippot',
   showWhatsAppCta = true,
+  ids,
+  emitJsonLd = true,
 }: {
   pageKey: FaqPageKey;
   title?: string;
   max?: number;
+  /** רשימת מזהים מפורשת — גוברת על pageKey וקובעת גם את הסדר */
+  ids?: string[];
+  /** שידור JSON-LD מסוג FAQPage. לכבות אם יש עוד סקשן FAQ באותה כתובת. */
+  emitJsonLd?: boolean;
   /** CTA ראשי "התחילו לעצב את הכיפות שלכם" (לעמודי כיפות) */
   showStartDesignCta?: boolean;
   /** יעד ה-CTA הראשי */
@@ -33,8 +39,20 @@ export default function PageFaqSection({
   showWhatsAppCta?: boolean;
 }) {
   const pathname = usePathname();
-  const items = getFaqForPage(pageKey, max);
+  const items = ids?.length ? getFaqByIds(ids) : getFaqForPage(pageKey, max);
   if (items.length === 0) return null;
+
+  // FAQPage — fullAnswer הוא הטקסט שמוצג בפועל באקורדיון, ולכן זה הטקסט
+  // שנכנס לסימון. \n מומר לרווח: הסכימה מצפה למחרוזת אחת רציפה.
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map(it => ({
+      '@type': 'Question',
+      name: it.question,
+      acceptedAnswer: { '@type': 'Answer', text: it.fullAnswer.replace(/\n+/g, ' ') },
+    })),
+  };
 
   return (
     <section
@@ -47,6 +65,13 @@ export default function PageFaqSection({
         fontFamily: "'Heebo', Arial, sans-serif",
       }}
     >
+      {emitJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+
       <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1a1a1a', margin: '0 0 16px', textAlign: 'center' }}>
         {title}
       </h2>

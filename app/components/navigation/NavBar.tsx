@@ -17,6 +17,8 @@ import CouponStrip from "@/app/components/CouponStrip";
 import { MEGA_MENU_DATA, type NavMenuItem, type NavSubItem } from "@/data/categoriesMenu";
 
 const SIMPLE_NAV = [
+  { label: "בנה מארז משלך ✦", action: "build" },
+  { label: "מתנות לאירועים 🎁", action: "gifts" },
   { label: "כיפות ומזכרות לאירועים", action: "event-kippot" },
   { label: "הסיפור שלנו", action: "about" },
   { label: "שאלות ותשובות", action: "faq" },
@@ -195,6 +197,8 @@ function NavBarContent() {
     else if (action === "contact") router.push("/contact");
     else if (action === "print-order") router.push("/print-order");
     else if (action === "event-kippot") router.push("/event-kippot");
+    else if (action === "gifts") router.push("/gifts");
+    else if (action === "build") router.push("/build");
   }
 
   return (
@@ -453,15 +457,21 @@ function NavBarContent() {
                 </div>
               ))}
               <div style={{ width: 1, height: 20, background: "#E7E2D8", margin: "0 4px" }} />
-              {SIMPLE_NAV.map(nav => (
-                <button key={nav.action} onClick={() => handleAction(nav.action)}
-                  style={{ background: "none", border: "none", color: "#555", padding: "9px 11px", fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", borderBottom: "2px solid transparent", transition: "all 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.color = "#1a1a1a"; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = "#555"; }}
-                >
-                  {nav.label}
-                </button>
-              ))}
+              {SIMPLE_NAV.map(nav => {
+                // "מתנות לאירועים" הוא יעד מסחרי ולא קישור שירות — מודגש
+                // בזהב המותג במקום באפור של שאר הפריטים בקבוצה.
+                const promoted = nav.action === "gifts" || nav.action === "build";
+                const base = promoted ? "#9C7B3F" : "#555";
+                return (
+                  <button key={nav.action} onClick={() => handleAction(nav.action)}
+                    style={{ background: "none", border: "none", color: base, padding: "9px 11px", fontSize: promoted ? 13 : 12.5, fontWeight: promoted ? 700 : 400, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", borderBottom: "2px solid transparent", transition: "all 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.color = promoted ? "#C5A028" : "#1a1a1a"; if (promoted) e.currentTarget.style.borderBottomColor = "#C5A028"; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = base; e.currentTarget.style.borderBottomColor = "transparent"; }}
+                  >
+                    {nav.label}
+                  </button>
+                );
+              })}
               <div style={{ marginRight: 'auto' }} />
               <button
                 onClick={() => router.push('/soferim')}

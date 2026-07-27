@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from 'next';
 import ProductClient from './ProductClient';
 import ProductShell, { type ShellProduct } from './ProductShell';
+import BundleContents from './BundleContents';
 import PageFaqSection from '@/app/components/faq/PageFaqSection';
 import { formatPrice } from '@/app/lib/utils';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
@@ -46,6 +47,8 @@ interface ProductData {
   sofer?: string;
   stars?: number;
   reviews?: number;
+  /** מוצר מארז — עד 4 קודי רכיבים (מק״ט / doc ID). ראו BundleContents. */
+  bundleComponentCodes?: string[] | null;
 }
 
 interface ReviewItem {
@@ -297,6 +300,8 @@ export default async function ProductPage(
       <ProductJsonLd id={id} />
       {shellProduct && <ProductShell product={shellProduct} />}
       <ProductClient initialProduct={shellProduct} />
+      {/* "מה כלול במארז" — רק למוצרים עם bundleComponentCodes; מחזיר null אחרת */}
+      <BundleContents codes={product?.bundleComponentCodes ?? null} />
       {/* FAQ ממוקד מתחת לתוכן המוצר — לא מפריע לתהליך ההוספה לסל */}
       {faqKey && (
         <PageFaqSection

@@ -34,7 +34,7 @@ const CATEGORY_META: Record<string, CategoryMetaEntry> = {
   },
   'מתנות': {
     title: 'מזכרות ומתנות לאירועים - חנוכת בית, בר מצווה וחגים',
-    description: 'מזכרות ומתנות לאירועים: חנוכת בית, בר מצווה, שבת חתן וחגים. מבחר ענק מתוך 6,000 מוצרי היודאיקה של Your Sofer. משלוחים לכל הארץ.',
+    description: 'מזכרות ומתנות לאירועים: חנוכת בית, בר מצווה, שבת חתן וחגים. מבחר ענק מתוך מעל 5,000 מוצרי היודאיקה של Your Sofer. משלוחים לכל הארץ.',
   },
   'מגילות': {
     title: 'מגילות אסתר ומגילות נוספות - כתובות ביד',
@@ -94,7 +94,7 @@ function getCategoryMeta(category: string): CategoryMetaEntry {
   return (
     CATEGORY_META[category] ?? {
       title: `${category} - מבחר ענק במקום אחד | Your Sofer`,
-      description: `מבחר ${category} מתוך אתר היודאיקה הגדול בישראל - מעל 6,000 מוצרים. משלוחים לכל הארץ.`,
+      description: `מבחר ${category} מתוך האתר הכי גדול בישראל - מעל ל-5,000 מוצרים לבית היהודי. משלוחים לכל הארץ.`,
     }
   );
 }

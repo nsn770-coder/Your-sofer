@@ -7,7 +7,7 @@ import ProductBadge from '@/components/ui/ProductBadge';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
-import { formatPrice } from '@/app/lib/utils';
+import { formatPrice, effectivePrice as computeEffectivePrice, type EffectivePriceFields } from '@/app/lib/utils';
 
 interface Props {
   id: string;
@@ -36,6 +36,15 @@ interface Props {
   originalPrice?: number;
   comingSoon?: boolean;
   expectedArrivalDate?: string | null; // 'YYYY-MM-DD'
+  /**
+   * מסמך המוצר הגולמי — לחישוב המחיר האפקטיבי דרך effectivePrice() בלבד.
+   * בלעדיו הכרטיס מתעלם ממבצע מתוזמן (isOnSale / salePrice / saleStartsAt /
+   * saleEndsAt) ומציג מחיר מלא בזמן שעמוד המוצר מציג מחיר מבצע.
+   * העברה: productDoc={p}.
+   */
+  productDoc?: EffectivePriceFields;
+  /** מוצר מארז — מציג באדג' "מארז מהודר" */
+  isBundle?: boolean;
 }
 
 /** 'YYYY-MM-DD' → 'DD/MM/YYYY' */
@@ -102,7 +111,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 export default function ProductCard({
   id, name, price, images, aiLifestyleImage, priority, isBestSeller, badge, bundlePromo, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
   soferId, soferName, soferPhoto, horizontal, outOfStock, clearanceDiscount, clearanceSalePrice, originalPrice,
-  comingSoon, expectedArrivalDate,
+  comingSoon, expectedArrivalDate, productDoc, isBundle,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -148,10 +157,20 @@ export default function ProductCard({
   const imgSrc       = optimizeCloudinaryUrl(thumbRaw, 400) || null;
   const itemInCart   = items.find(i => i.id === id);
   const qty          = itemInCart?.quantity ?? 0;
+  // מקור אמת יחיד למחיר: effectivePrice() — אותו חישוב בדיוק כמו בעמוד המוצר
+  // ובפידים. clearance ומבצע מתוזמן כבר מטופלים בתוכו; אין לשכפל כאן לוגיקה.
+  const source: EffectivePriceFields = productDoc ?? {
+    price, clearanceDiscount, clearanceSalePrice,
+  };
+  const displayPrice = computeEffectivePrice({ ...source, price: source.price ?? price });
   const hasClearance = clearanceDiscount === true && typeof clearanceSalePrice === 'number';
-  const displayPrice = hasClearance ? clearanceSalePrice! : price;
-  const hasSale      = !hasClearance && typeof was === 'number' && was > price;
-  const savePct      = hasSale ? Math.round((1 - price / was!) * 100) : 0;
+  // מחיר-לפני-הנחה: was גובר; אם אין was אבל המחיר האפקטיבי נמוך מהמחיר
+  // הבסיסי (מבצע/מלאי) — המחיר הבסיסי הוא ה"לפני".
+  const compareAt    = typeof was === 'number' && was > displayPrice
+    ? was
+    : (displayPrice < price ? price : null);
+  const hasSale      = compareAt !== null;
+  const savePct      = hasSale ? Math.round((1 - displayPrice / compareAt!) * 100) : 0;
   const isNew        = (() => {
     if (!createdAt?.seconds) return false;
     return createdAt.seconds > Date.now() / 1000 - 7 * 24 * 60 * 60;
@@ -162,7 +181,10 @@ export default function ProductCard({
   function handleAdd(e: React.MouseEvent) {
     e.stopPropagation();
     if (notPurchasable) return;
-    addItem({ id, name, price, imgUrl: imgSrc ?? undefined, quantity: 1, cat, bundlePromo: bundlePromo ?? undefined });
+    // ⚠️ displayPrice ולא price: הכרטיס הוסיף עד כה לסל את המחיר הבסיסי גם
+    // כשהוצג מחיר מבצע/מלאי — כלומר הלקוח חויב יותר ממה שראה, ובסכום שונה
+    // מהוספה של אותו מוצר מעמוד המוצר (שם משתמשים ב-cartPrice האפקטיבי).
+    addItem({ id, name, price: displayPrice, imgUrl: imgSrc ?? undefined, quantity: 1, cat, bundlePromo: bundlePromo ?? undefined });
     try { localStorage.removeItem('bmWizard_step'); } catch {}
   }
 
@@ -259,11 +281,19 @@ export default function ProductCard({
               10% הנחת מלאי
             </span>
           )}
-          {hasSale && (
-            <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#373A5A' }}>
-              {savePct}% הנחה
+          {hasSale && !hasClearance && (
+            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: '#C5A028', color: '#111111' }}>
+              מבצע {savePct}%-
             </span>
           )}
+          {isBundle && (
+            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: '#373A5A', color: '#C5A028' }}>
+              ✦ מארז מהודר
+            </span>
+          )}
+          {/* תגית "רקמה אישית" הוסרה (07/2026) — היא הצטברה מעל התמונה יחד עם
+              "חדש"/"מבצע"/"מארז" והסתירה את המוצר. ההתאמה האישית מוצגת בעמוד
+              המוצר, ליד כפתור ההוספה לסל. */}
           {isNew && (
             <span className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#FFFFFF', color: '#373A5A', border: '1px solid #373A5A' }}>
               חדש
@@ -306,12 +336,11 @@ export default function ProductCard({
           <span style={{ fontSize: 17, fontWeight: 700, color: '#111111', lineHeight: 1 }}>
             {formatPrice(displayPrice)}
           </span>
-          {hasClearance && (
-            <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(originalPrice ?? price)}</span>
-          )}
-          {hasSale && (
-            <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(was!)}</span>
-          )}
+          {hasClearance ? (
+            <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(originalPrice ?? was ?? price)}</span>
+          ) : hasSale ? (
+            <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(compareAt!)}</span>
+          ) : null}
         </div>
 
         {/* Cart button — minimal underlined text link */}

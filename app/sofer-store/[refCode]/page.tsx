@@ -212,7 +212,7 @@ export default function SoferStorePage() {
                     price={p.price}
                     images={[p.imgUrl || p.imageUrl].filter(Boolean) as string[]}
                     badge={p.badge}
-                    was={p.was}
+                    was={p.was} productDoc={p}
                     aboveFold={idx < 4}
                   />
                 ))}

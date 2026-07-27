@@ -28,6 +28,7 @@ export type FaqCategoryId =
   | 'returns';
 
 export type FaqPageKey =
+  | 'home'              // דף הבית — 5 שאלות הפתיחה הרחבות
   | 'event-kippot'      // עמוד כיפות בהדפסה אישית
   | 'kippot-order'      // עמוד עיצוב/הזמנת כיפות
   | 'product-custom'    // עמודי מוצר עם עיצוב אישי
@@ -106,6 +107,36 @@ export const FAQ_ITEMS: FAQItem[] = [
 
   // ═══ קטגוריה 1 — כיפות בהדפסה אישית ═══
 
+  // ── שאלות ייעודיות לדף הבית ──────────────────────────────────────────────
+  // מנוסחות רחב (כניסה ראשונה לאתר), ומצטרפות לשאלות הקיימות שסומנו
+  // ב-pages: ['home'] — shipping-time, dedication-products, returns-regular.
+  {
+    id: 'home-events-bulk',
+    category: 'kippot',
+    question: 'אתם מספקים כיפות ומזכרות לאירועים בכמויות?',
+    fullAnswer:
+      'כן — זו אחת ההתמחויות שלנו. אנחנו מספקים כיפות בהדפסה אישית ומזכרות לבר מצווה, חתונות ואירועים, עם מחירי כמות מיוחדים.\n' +
+      'הכמות המינימלית לכיפות בהדפסה אישית היא 30 יחידות. לקבלת הצעה לאירוע — דברו איתנו בוואטסאפ.',
+    shortAnswer:
+      'כן. כיפות מודפסות ומזכרות לאירועים במחירי כמות; מינימום 30 יחידות לכיפות בהדפסה אישית.',
+    keywords: ['אירועים', 'כמויות', 'מחיר כמות', 'בר מצווה', 'חתונה', 'מזכרות', 'כיפות'],
+    pages: ['home'],
+    priority: 3,
+    cta: CTA_WA_GENERAL,
+  },
+  {
+    id: 'home-about-us',
+    category: 'orders',
+    question: 'מי עומד מאחורי האתר?',
+    fullAnswer:
+      'YourSofer הוא עסק ישראלי מדימונה שמתמחה ביודאיקה ובמתנות בעיצוב אישי.\n' +
+      'אנחנו עובדים ישירות מול סופרים ויוצרים מוסמכים, ומלווים כל הזמנה אישית עד שהיא מגיעה אליכם.',
+    shortAnswer:
+      'YourSofer הוא עסק ישראלי מדימונה המתמחה ביודאיקה ובמתנות בעיצוב אישי, בעבודה ישירה מול סופרים ויוצרים מוסמכים.',
+    keywords: ['מי אתם', 'עלינו', 'העסק', 'דימונה', 'אודות'],
+    pages: ['home'],
+    priority: 5,
+  },
   {
     id: 'kippot-min-quantity',
     category: 'kippot',
@@ -301,7 +332,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     shortAnswer:
       'ניתן להוסיף הקדשה לכיפות, כיסויי ראש, ברכונים, סידורים, כיסויי טלית ומוצרים נוספים המסומנים באתר כמתאימים לעיצוב אישי.',
     keywords: ['הקדשה', 'עיצוב אישי', 'מוצרים', 'רקמה', 'הטבעה'],
-    pages: ['product-custom'],
+    pages: ['product-custom', 'home'],
     priority: 1,
   },
   {
@@ -404,7 +435,7 @@ export const FAQ_ITEMS: FAQItem[] = [
       'זמן האספקה הכולל הוא בדרך כלל 7–10 ימים מרגע התשלום, ולעיתים ההזמנה מגיעה מוקדם יותר.',
     shortAnswer: 'זמן האספקה הכולל הוא בדרך כלל 7–10 ימים מרגע התשלום.',
     keywords: ['זמן משלוח', 'אספקה', 'כמה זמן', 'ימים'],
-    pages: ['shipping', 'checkout'],
+    pages: ['shipping', 'checkout', 'home'],
     priority: 3,
   },
   {
@@ -974,7 +1005,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     shortAnswer:
       'מוצר רגיל ניתן להחזיר בתוך 14 ימים ולקבל זיכוי, בהתאם למדיניות האתר.',
     keywords: ['החזרה', 'החזר', '14 יום', 'זיכוי', 'ביטול', 'ביטול עסקה'],
-    pages: ['shipping'],
+    pages: ['shipping', 'home'],
     priority: 1,
     cta: { label: 'למדיניות ההחזרות המלאה', href: '/legal/returns', type: 'internal' },
   },
@@ -1037,6 +1068,20 @@ export function getFaqForPage(page: FaqPageKey, max = 8): FAQItem[] {
     .filter(item => item.pages?.includes(page))
     .sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99))
     .slice(0, max);
+}
+
+/**
+ * מחזיר שאלות לפי רשימת מזהים מפורשת, **בסדר שנמסר**.
+ *
+ * למה זה קיים: getFaqForPage ממיין לפי priority הגלובלי, שמשותף לכל העמודים
+ * ולדף ה-FAQ. כשרוצים סדר ספציפי בעמוד אחד (למשל דף הבית — משלוח קודם),
+ * שינוי ה-priority היה מזיז את השאלה גם בכל שאר המקומות. כאן הסדר מקומי.
+ *
+ * מזהה שלא נמצא פשוט מדולג — כך שמחיקת שאלה לא שוברת עמוד.
+ */
+export function getFaqByIds(ids: string[]): FAQItem[] {
+  const byId = new Map(FAQ_ITEMS.map(i => [i.id, i]));
+  return ids.map(id => byId.get(id)).filter(Boolean) as FAQItem[];
 }
 
 /** מחזיר את השאלות של קטגוריה, ממוינות לפי priority */

@@ -760,7 +760,8 @@ export default function CheckoutPage() {
                 }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: '#1E3A8A' }}>🚚 משלוח עד הבית</div>
                 <div style={{ fontSize: 12, color: freeShippingEligible ? '#1a6b3c' : '#777', fontWeight: freeShippingEligible ? 700 : 400, marginTop: 3 }}>
-                  {freeShippingEligible ? 'חינם! 🎉 (הזמנה מעל ₪600)' : formatPrice(SHIPPING_REGULAR)}
+                  {/* הסף נקרא מהקבוע — היה כאן ₪600 קשיח שנשאר מאחור בכל שינוי מדיניות */}
+                  {freeShippingEligible ? `חינם! 🎉 (הזמנה מעל ${formatPrice(FREE_SHIPPING_THRESHOLD)})` : formatPrice(SHIPPING_REGULAR)}
                 </div>
               </button>
               <button type="button" onClick={() => setDeliveryMethod('pickup')}

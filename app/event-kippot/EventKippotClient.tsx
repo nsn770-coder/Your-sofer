@@ -44,7 +44,7 @@ function ProductScrollRow({ title, products }: { title: string; products: Produc
             <ProductCard
               id={p.id} name={p.name} price={p.price}
               images={[p.imgUrl, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-              was={p.was} badge={p.badge} isBestSeller={p.isBestSeller}
+              was={p.was} productDoc={p} badge={p.badge} isBestSeller={p.isBestSeller}
               outOfStock={p.outOfStock} cat={p.cat}
             />
           </div>
@@ -495,7 +495,7 @@ export default function EventKippotClient() {
               <ProductCard
                 key={p.id} id={p.id} name={p.name} price={p.price}
                 images={[p.imgUrl, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
-                was={p.was} badge={p.badge} isBestSeller={p.isBestSeller}
+                was={p.was} productDoc={p} badge={p.badge} isBestSeller={p.isBestSeller}
                 outOfStock={p.outOfStock} cat={p.cat}
               />
             ))}

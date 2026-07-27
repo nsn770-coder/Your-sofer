@@ -555,7 +555,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
                     isBestSeller={p.isBestSeller}
                     badge={p.badge}
                     bundlePromo={p.bundlePromo}
-                    was={p.was}
+                    was={p.was} productDoc={p}
                     createdAt={p.createdAt}
                     aboveFold={idx < 4}
                     hasKlafSelection={p.hasKlafSelection}

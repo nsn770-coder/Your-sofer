@@ -8,7 +8,7 @@ import { calcSimchaDiscount, PROMO_ACTIVE, SIMCHA_CODE, type SimchaResult } from
 // ── Shipping constants — single source of truth used in cart + checkout ───────
 export const SHIPPING_REGULAR = 35;
 /** סף משלוח חינם: הזמנות מעל סכום זה (אחרי הנחות קופון) — משלוח חינם אוטומטי */
-export const FREE_SHIPPING_THRESHOLD = 600;
+export const FREE_SHIPPING_THRESHOLD = 500;
 /** עלות משלוח בפועל לפי סכום המוצרים אחרי הנחה */
 export function getShippingCost(productsTotalAfterDiscount: number): number {
   return productsTotalAfterDiscount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_REGULAR;
@@ -62,6 +62,9 @@ export interface CartItem {
   promoPlan?: string;              // '2+1' for buy-2-get-1-free
   promoPrice?: number;
   bundlePromo?: string;            // e.g. '4for100', '12for100'
+  /** מארז שנבנה ב-/build — מזהי המוצרים של הרכיבים, ללקיטה ולתצוגה בהזמנה.
+      ה-id של השורה עצמה סינתטי (bundle-chatan-…) ואינו קיים ב-Firestore. */
+  bundleComponentCodes?: string[];
   // ── רווחיות ──────────────────────────────────────────────────────────────
   purchasePrice?: number;          // מחיר קנייה מהספק
   finalPrice?: number;             // מחיר סופי אחרי הנחות

@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import { doc, getDoc, updateDoc, setDoc, addDoc, collection, getDocs, query, where, limit, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useCart, getEventKippahPricePerUnit } from '../../contexts/CartContext';
+import { useCart, getEventKippahPricePerUnit, FREE_SHIPPING_THRESHOLD, SHIPPING_REGULAR } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
 import { EVENT_SCROLL_SECTIONS } from '../../constants/eventScrollSections';
@@ -305,6 +305,21 @@ function TrustIcons({ hasSofer }: { hasSofer?: boolean }) {
 // ─── Trust Block ─────────────────────────────────────────────────────────────
 
 const STAM_CATEGORIES = ['קלפי מזוזה', 'בתי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'בר מצווה'];
+
+/**
+ * קטגוריות שבהן המוצר הוא **קלף כתוב ביד** בפועל.
+ *
+ * ⚠️ התאמה מדויקת בלבד — אין להשתמש כאן ב-includes/substring.
+ * הגרסה הקודמת בדקה `cat.includes('תפילין')`, ולכן הבלוק "מה אתה מקבל"
+ * (קלף כתוב ביד · בדיקת מגיה · תעודת כשרות) הוצג גם על 'תיקי טלית ותפילין',
+ * 'כיסוי תפילין' ו-'סט טלית תפילין' — תיקים ובדים שאין בהם קלף בכלל.
+ *
+ * 'בתי מזוזה' מוחרג במכוון: בית מזוזה הוא מארז, לא קלף.
+ * 'בר מצווה' מוחרג כי הקטגוריה מערבת סטים עם מתנות ומזכרות.
+ */
+const HANDWRITTEN_SCROLL_CATS = new Set([
+  'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה',
+]);
 const RABBINICAL_CATEGORIES = new Set(['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה']);
 
 function TrustBlock({ isStam }: { isStam: boolean }) {
@@ -1544,7 +1559,9 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   const searchParams = useSearchParams();
   const fromWizardParam = searchParams.get('from') === 'bar-mitzva';
   const [fromWizardLS, setFromWizardLS] = useState(false);
-  const { addItem, removeItem, updateQty } = useCart();
+  // total מגיע מ-CartContext — אותו מקור שמזין את GiftProgressBar ואת העגלה.
+  // אין לחשב כאן סכום עגלה מחדש.
+  const { addItem, removeItem, updateQty, total: cartTotal } = useCart();
   const { user } = useAuth();
 
   // PERF: initialProduct is the server-fetched product (same data as the SSR
@@ -1854,7 +1871,7 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
     ? Math.round((1 - product.price / product.was) * 100)
     : 0;
 
-  const EMBROIDERY_CATEGORIES = ['כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן', 'תיקי טלית ותפילין'];
+  const EMBROIDERY_CATEGORIES =['כיסוי טלית', 'סט טלית תפילין', 'בר מצווה', 'סט לבר מצוה', 'סט לחתן', 'תיקי טלית ותפילין'];
   // ── רקמה: כפתור אחד "הוספת רקמה" — ₪50 בכל הקטגוריות ──────────────────────
   const EMB_OPTION_PRICE = 50;
   const embroideryOptions: string[] = embEnabled ? ['רקמה אישית'] : [];
@@ -2461,6 +2478,32 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             </div>
           </div>
         ))}
+
+        {/* ── מחוון משלוח חינם ──
+            הסף והסכום נקראים מ-CartContext (FREE_SHIPPING_THRESHOLD + total) —
+            אותו מקור בדיוק שמזין את העגלה, הצ'קאאוט ו-GiftProgressBar.
+            החישוב הוא על העגלה **אחרי** הוספת המוצר הזה, כי הסף חל על סכום
+            ההזמנה ולא על מוצר בודד — הצגה לפי מחיר המוצר בלבד הייתה מטעה. */}
+        {(() => {
+          const projected = cartTotal + effectivePrice * qty;
+          const remaining = Math.round(FREE_SHIPPING_THRESHOLD - projected);
+          const eligible  = remaining <= 0;
+          return (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              marginTop: 4, paddingTop: 10, borderTop: '1px dashed #E5E0D3',
+              fontSize: 12, fontWeight: 700,
+              color: eligible ? '#1a6b3c' : '#8a6d0f',
+            }}>
+              <span aria-hidden="true" style={{ fontSize: 14, lineHeight: 1 }}>{eligible ? '✓' : '🚚'}</span>
+              <span>
+                {eligible
+                  ? 'ההזמנה זכאית למשלוח חינם'
+                  : `הוסיפו עוד ${formatPrice(remaining)} למשלוח חינם`}
+              </span>
+            </div>
+          );
+        })()}
       </div>
 
       {/* אמצעי תשלום — שורה עדינה ליד פעולת הרכישה */}
@@ -2491,8 +2534,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         שאלות? דברו איתנו בוואטסאפ
       </a>
 
-      {/* Offer Stack — STaM categories */}
-      {product.cat && ['מזוזה','תפילין','קלף','ספר תורה'].some(k => product.cat!.includes(k)) && (
+      {/* Offer Stack — קלפים כתובים ביד בלבד (ראו HANDWRITTEN_SCROLL_CATS) */}
+      {product.cat && HANDWRITTEN_SCROLL_CATS.has(product.cat) && (
         <div style={{
           background: '#F0EBE0', borderRadius: 10, padding: '12px 14px',
           marginBottom: 8, direction: 'rtl',
@@ -2512,7 +2555,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               {item}
             </div>
           ))}
-          <div style={{ fontSize: 10, color: '#888', marginTop: 6 }}>* הפרטים משתנים לפי סוג המוצר</div>
+          {/* ההסתייגות "הפרטים משתנים לפי סוג המוצר" הוסרה — היא נועדה לכסות
+              על כך שהבלוק הוצג גם על מוצרים שאינם קלף. עכשיו הוא מדויק. */}
         </div>
       )}
 
@@ -2591,7 +2635,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   ];
 
   const shippingRows = [
-    { icon: <Icon.Truck />,   k: 'משלוח',  v: `₪35 עד הבית · חינם בהזמנה מעל ₪600 · ${product.days || '7-10'} ימי עסקים · עם מספר מעקב` },
+    // הסף ועלות המשלוח נקראים מהקבועים — היו כאן ₪600/₪35 קשיחים
+    { icon: <Icon.Truck />,   k: 'משלוח',  v: `${formatPrice(SHIPPING_REGULAR)} עד הבית · חינם בהזמנה מעל ${formatPrice(FREE_SHIPPING_THRESHOLD)} · ${product.days || '7-10'} ימי עסקים · עם מספר מעקב` },
     { icon: <Icon.Package />, k: 'אריזה',  v: 'אריזה מוגנת ומהודרת לכל הזמנה' },
     { icon: <Icon.Return />,  k: 'החזרות', v: 'עד 14 יום ממועד הקבלה, למוצרים שלא נפתחו ולא נעשה בהם שימוש — בהתאם למדיניות האתר' },
     { icon: <Icon.X size={14} />, k: 'ביטול', v: 'ביטול והחזרה בהתאם למדיניות האתר ולחוק הגנת הצרכן' },
@@ -2708,6 +2753,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           <div style={{ background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', marginTop: isMobile ? 8 : 0 }}>
             <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1F2937', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
 
+            {/* הבאדג' "ניתן להוסיף רקמת שם אישית" הוסר (07/2026) — אפשרויות
+                הרקמה/ההטבעה/ההקדשה מוצגות ממילא בתוך ה-BuyBox ליד כפתור
+                ההוספה לסל, ושם הן גם ניתנות לפעולה. */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f0f0f0', flexWrap: 'wrap' }}>
               {(product.reviews ?? 0) > 0 ? (
                 <>

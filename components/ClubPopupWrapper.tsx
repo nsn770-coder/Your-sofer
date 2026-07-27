@@ -17,20 +17,30 @@ const SESSION_KEY = 'ys_club_popup_seen'; // KEEP IN SYNC with ClubPopup.tsx
 
 export default function ClubPopupWrapper() {
   const [armed, setArmed] = useState(false);
+  // פתיחה יזומה מהטופ-בר: טוענת את הצ'אנק גם אם הפופאפ כבר נראה בסשן הזה,
+  // ומועברת כ-prop כי האירוע נורה לפני שהצ'אנק סיים להיטען.
+  const [forceOpen, setForceOpen] = useState(false);
 
   useEffect(() => {
+    const openFromBar = () => { setForceOpen(true); setArmed(true); };
+    window.addEventListener('ys:open-club', openFromBar);
+
+    let seen = false;
     try {
-      if (sessionStorage.getItem(SESSION_KEY)) return; // already seen — skip chunk
+      seen = !!sessionStorage.getItem(SESSION_KEY); // already seen — skip chunk
     } catch { /* sessionStorage unavailable */ }
+
+    if (seen) return () => window.removeEventListener('ys:open-club', openFromBar);
 
     const arm = () => setArmed(true);
     const events: (keyof WindowEventMap)[] = ['scroll', 'pointerdown', 'keydown', 'touchstart'];
     events.forEach(e => window.addEventListener(e, arm, { once: true, passive: true }));
     return () => {
       events.forEach(e => window.removeEventListener(e, arm));
+      window.removeEventListener('ys:open-club', openFromBar);
     };
   }, []);
 
   if (!armed) return null;
-  return <ClubPopup />;
+  return <ClubPopup forceOpen={forceOpen} />;
 }

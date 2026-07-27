@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'כל הקטגוריות | כיפות, מתנות, מזכרות לאירועים ויודאיקה | Your Sofer',
   description:
-    'כל קטגוריות המוצרים ב-Your Sofer: כיפות בעיצוב אישי, מזכרות ומתנות לאירועים, תיקי טלית ותפילין, שבת, חגים, תשמישי קדושה ומוצרים לבית היהודי. מעל 6,000 מוצרים במקום אחד.',
+    'כל קטגוריות המוצרים ב-Your Sofer: כיפות בעיצוב אישי, מזכרות ומתנות לאירועים, תיקי טלית ותפילין, שבת, חגים, תשמישי קדושה ומוצרים לבית היהודי. מעל 5,000 מוצרים במקום אחד.',
   alternates: { canonical: 'https://your-sofer.com/categories' },
   openGraph: {
     type: 'website',

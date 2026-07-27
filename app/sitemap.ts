@@ -1,4 +1,5 @@
 ﻿import { MetadataRoute } from 'next';
+import { OCCASIONS } from '@/data/occasions';
 
 const BASE_URL = 'https://your-sofer.com';
 const FIREBASE_PROJECT = 'your-sofer';
@@ -130,6 +131,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.7,
+    })),
+    { url: `${BASE_URL}/build`,                   lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE_URL}/gifts`,                   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
+    ...OCCASIONS.map(o => ({
+      url: `${BASE_URL}/gifts/${o.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
     })),
     { url: `${BASE_URL}/legal/shipping`,          lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
     { url: `${BASE_URL}/legal/returns`,           lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },

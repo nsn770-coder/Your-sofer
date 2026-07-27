@@ -490,7 +490,7 @@ export default function AllProductsClient() {
                       isBestSeller={p.isBestSeller}
                       badge={p.badge}
                       bundlePromo={p.bundlePromo}
-                      was={p.was}
+                      was={p.was} productDoc={p}
                       createdAt={p.createdAt}
                       aboveFold={idx < 8}
                       hasKlafSelection={p.hasKlafSelection}

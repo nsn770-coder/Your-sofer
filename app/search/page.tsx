@@ -417,7 +417,7 @@ export default function SearchPage() {
                   images={[hit.image].filter(Boolean)}
                   isBestSeller={hit.isBestSeller}
                   badge={hit.badge}
-                  was={hit.was}
+                  was={hit.was} productDoc={hit}
                   priority={hit.priority}
                   cat={hit.cat}
                 />

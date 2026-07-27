@@ -7,7 +7,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import {
   collection, query, where, orderBy, limit, getDocs,
-  doc, getDoc, addDoc, serverTimestamp, getCountFromServer,
+  doc, getDoc, addDoc, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
 // PERF: HeroSwiper import removed — it was imported but never rendered,
@@ -72,36 +72,10 @@ function IconActivityShield() {
   );
 }
 
-// Counter icons — gold
-function IconCounterPen({ isMobile }: { isMobile: boolean }) {
-  return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
-    </svg>
-  );
-}
-function IconCounterBox({ isMobile }: { isMobile: boolean }) {
-  return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
-      <polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
-    </svg>
-  );
-}
-function IconCounterCheck({ isMobile }: { isMobile: boolean }) {
-  return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-function IconCounterStar({ isMobile }: { isMobile: boolean }) {
-  return (
-    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 24 24" fill="#C5A028" stroke="none">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-    </svg>
-  );
-}
+// (אייקוני המונים הוסרו יחד עם פס המונים — 07/2026)
+
+/** כחול המותג — רקע באנר "בנה מארז משלך" */
+const NAVY_BUILD = '#373A5A';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -390,16 +364,6 @@ export default function HomePageClient() {
   const [imagesReady, setImagesReady] = useState(true);
   const [wizardOpen, setWizardOpen]   = useState(false);
   const [weeklyProducts, setWeeklyProducts] = useState(0);
-  const [soferimCount, setSoferimCount]     = useState(0);
-  const [productsCount, setProductsCount]   = useState(0);
-  const countersRef = useRef<HTMLDivElement>(null);
-  const [countersVisible, setCountersVisible] = useState(false);
-
-  // DOM refs for counter animation - avoids 72 React re-renders per second
-  const productsValRef  = useRef<HTMLSpanElement>(null);
-  const soferimValRef   = useRef<HTMLSpanElement>(null);
-  const customersValRef = useRef<HTMLSpanElement>(null);
-
   const [wizardStep, setWizardStep]     = useState(0);
   const [wizardFor, setWizardFor]       = useState<'self' | 'gift' | null>(null);
   const [wizardBudget, setWizardBudget] = useState<'low' | 'mid' | 'high' | null>(null);
@@ -417,7 +381,6 @@ export default function HomePageClient() {
   const [newsletterEmail, setNewsletterEmail]   = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
-  const [videoStarted, setVideoStarted] = useState(false);
   // PERF (homepage lab LCP ~14.6s): the hero <video autoPlay> started downloading
   // several MB immediately, hogging bandwidth during the LCP window — and its
   // first rendered frame registered as the LCP element. Until armed, we show the
@@ -426,7 +389,6 @@ export default function HomePageClient() {
   // The video element carries the same poster, so the takeover is seamless.
   const [heroVideoOn, setHeroVideoOn] = useState(false);
   const [bsVisible, setBsVisible] = useState(false);
-  const videoWrapperRef = useRef<HTMLDivElement>(null);
   const bsSectionRef = useRef<HTMLDivElement>(null);
   const cardsRef   = useRef<HTMLDivElement>(null);
   const router     = useRouter();
@@ -702,69 +664,24 @@ export default function HomePageClient() {
     fetchLiveReviews();
   }, []);
 
+  // PERF: שתי קריאות getCountFromServer (soferim + products) הוסרו יחד עם פס
+  // המונים — הן שירתו רק אותו. נשארה רק שאילתת "נוספו השבוע" לפס הפעילות.
   useEffect(() => {
     async function fetchCounts() {
       try {
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         const weekTs = { seconds: Math.floor(oneWeekAgo.getTime() / 1000), nanoseconds: 0 };
-        const [soferimSnap, productsSnap, weeklySnap] = await Promise.all([
-          getCountFromServer(collection(db, 'soferim')),
-          getCountFromServer(collection(db, 'products')),
-          getDocs(query(collection(db, 'products'), where('createdAt', '>=', weekTs), limit(100))),
-        ]);
-        setSoferimCount(soferimSnap.data().count);
-        setProductsCount(productsSnap.data().count);
+        const weeklySnap = await getDocs(
+          query(collection(db, 'products'), where('createdAt', '>=', weekTs), limit(100)),
+        );
         setWeeklyProducts(weeklySnap.size);
       } catch { /* non-fatal */ }
     }
-    // Counter section is below the fold - defer
+    // below the fold - defer
     const timer = setTimeout(fetchCounts, 1500);
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    const el = countersRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setCountersVisible(true); obs.disconnect(); }
-    }, { threshold: 0.3 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  // Counter animation - writes directly to DOM refs, zero React re-renders
-  useEffect(() => {
-    if (!countersVisible) return;
-    const targets = { soferim: soferimCount || 12, products: productsCount || 180, customers: 1200 };
-    const duration = 1200;
-    const start = performance.now();
-    let rafId: number;
-    function tick(now: number) {
-      const t = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - t, 3);
-      if (productsValRef.current)  productsValRef.current.textContent  = `${Math.round(targets.products  * ease)}+`;
-      if (soferimValRef.current)   soferimValRef.current.textContent   = String(Math.round(targets.soferim   * ease));
-      if (customersValRef.current) customersValRef.current.textContent = `${Math.round(targets.customers * ease)}+`;
-      if (t < 1) rafId = requestAnimationFrame(tick);
-    }
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [countersVisible, soferimCount, productsCount]);
-
-  // Lazy autoplay: start video when wrapper scrolls into view (≥50% visible)
-  useEffect(() => {
-    const el = videoWrapperRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !videoStarted) {
-        setVideoStarted(true);
-        obs.disconnect();
-      }
-    }, { threshold: 0.5 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [videoStarted]);
 
   // Section-level IO for BestSellers: preload first 2 videos when section is 300px away
   useEffect(() => {
@@ -1216,11 +1133,10 @@ export default function HomePageClient() {
         style={{ background: '#FFFFFF', direction: 'rtl' }}
       >
         <div className="mb-5 md:mb-7" style={{ textAlign: 'center', padding: '0 20px' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, marginTop: 0 }}>
+          {/* כותרת המשנה "מה מביא אתכם אלינו?" הוסרה (07/2026) — הכרטיסים
+              מסבירים את עצמם, והכותרת רק דחפה אותם מטה במובייל. */}
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 0, marginTop: 0 }}>
             רגעי חיים
-          </p>
-          <p className="text-2xl md:text-[30px]" style={{ fontWeight: 300, color: '#3A2E1A', letterSpacing: '-0.01em', margin: 0 }}>
-            מה מביא אתכם אלינו?
           </p>
         </div>
 
@@ -1270,44 +1186,17 @@ export default function HomePageClient() {
         </div>
       </section>
 
-      {/* ── Live Counters ── */}
-      <div ref={countersRef} className="px-4 pt-4 pb-8 md:px-8 md:pt-6 md:pb-12" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4' }}>
-        <div className="px-4 py-6 md:px-10 md:py-8" style={{
-          maxWidth: 900, margin: '0 auto',
-          background: '#fff',
-          borderRadius: 0,
-          border: '1px solid #EDEDEF',
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-          gap: 0,
-          overflowX: isMobile ? 'auto' : 'visible',
-        }}>
-          {/* לקוחות מרוצים */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
-            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterCheck isMobile={false} /></span>
-            <span ref={customersValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0+</span>
-            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>משפחות כבר בחרו בנו</span>
-          </div>
-          {/* סופרים מוסמכים */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
-            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterPen isMobile={false} /></span>
-            <span ref={soferimValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0</span>
-            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>סופרים מוסמכים</span>
-          </div>
-          {/* מוצרים באתר */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', borderLeft: '1px solid #E7E2D8', flex: 1 }}>
-            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterBox isMobile={false} /></span>
-            <span ref={productsValRef} style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>0+</span>
-            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>מוצרים באתר</span>
-          </div>
-          {/* דירוג ממוצע */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: isMobile ? '0 10px' : '0 16px', flex: 1 }}>
-            <span style={{ color: '#C9A227', display: 'flex', alignItems: 'center', marginBottom: 2 }}><IconCounterStar isMobile={false} /></span>
-            <span style={{ fontSize: 22, fontWeight: 800, color: '#C9A227', lineHeight: 1 }}>4.8</span>
-            <span style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.3 }}>דירוג ממוצע</span>
-          </div>
-        </div>
+      {/* ── שורת הבידול ──
+          החליפה את פס המונים (משפחות / סופרים / מוצרים / דירוג ממוצע), 07/2026.
+          לאף אחד משני אתרי הייחוס בנישה אין פס מונים מספרי, והמונה "+4960"
+          גם סתר את מסר ה-5,000+ ששאר האתר מצהיר. */}
+      <div className="px-4 pt-2 pb-9 md:px-8 md:pt-4 md:pb-14" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4', direction: 'rtl' }}>
+        <p
+          className="text-xl md:text-[26px]"
+          style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center', fontWeight: 300, color: '#373A5A', lineHeight: 1.4, letterSpacing: '-0.01em' }}
+        >
+          האתר הכי גדול בישראל עם מעל ל-5,000 מוצרים לבית היהודי
+        </p>
       </div>
 
       {/* ── 4. Category grid ── */}
@@ -1518,33 +1407,11 @@ export default function HomePageClient() {
         </div>
       </div>
 
-      {/* ── Cloudinary video ── */}
-      <div className="px-4 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF' }}>
-        <div className="mb-5 md:mb-7" style={{ maxWidth: 896, margin: '0 auto', textAlign: 'center', direction: 'rtl' }}>
-          <p className="text-[28px] md:text-4xl" style={{ fontWeight: 300, color: '#373A5A', margin: 0, lineHeight: 1.25, letterSpacing: '-0.01em' }}>
-            רק אצלנו ב&nbsp;<span dir="ltr" style={{ unicodeBidi: 'embed' }}>Your Sofer</span>
-          </p>
-          <p className="text-base md:text-lg" style={{ color: '#4B5563', marginTop: 10, marginBottom: 0 }}>
-            כל עולם היודאיקה, האירועים והמתנות — מעל 6,000 מוצרים במקום אחד
-          </p>
-        </div>
-        <div
-          ref={videoWrapperRef}
-          style={{ maxWidth: 896, margin: '0 auto', borderRadius: 0, overflow: 'hidden', border: '1px solid #EDEDEF', position: 'relative', aspectRatio: '16 / 9' }}
-        >
-          {/* PERF: loading="lazy" — the embed pulls ~170KB of player JS/CSS from
-              jsDelivr; below the fold it now loads only when scrolled near.
-              title fixes the Lighthouse a11y "frame without title" flag. */}
-          <iframe
-            src={`https://player.cloudinary.com/embed/?cloud_name=dyxzq3ucy&public_id=download_mijfs3&autoplay=${videoStarted ? 'true' : 'false'}&muted=true`}
-            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-            allowFullScreen
-            loading="lazy"
-            title="סרטון על Your Sofer — אתר היודאיקה הגדול בישראל"
-            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-          />
-        </div>
-      </div>
+      {/* ── סקשן הווידאו "רק אצלנו ב-Your Sofer" הוסר (07/2026) ──
+          שני אתרי הייחוס בנישה מציגים וידאו רק כ-hero בראש העמוד, לא באמצע:
+          rikmat.com מריץ סרטון אחד למעלה, ול-vehidarta.com אין וידאו כלל.
+          בנוסף האמבד של Cloudinary משך ~170KB של JS/CSS לנגן בעמוד הבית.
+          כותרת המשנה שם גם הצהירה "מעל 6,000 מוצרים", בסתירה ל-4,960 בפועל. */}
 
       {/* ── Soferim horizontal row ── */}
       {soferimList.length > 0 && (
@@ -1610,6 +1477,42 @@ export default function HomePageClient() {
           לצפייה במאגר הסופרים שלנו ←
         </button>
       </div>
+
+      {/* ── באנר "בנה מארז משלך" ──
+          מיקום לפי המתחרים: rikmat.com מציג את "הרכיבו את המארז שלכם" באמצע
+          דף הבית, אחרי בלוקי הקטגוריות/המוצרים ולפני שאר התוכן. */}
+      <section
+        aria-labelledby="build-bundle-title"
+        style={{ background: NAVY_BUILD, direction: 'rtl' }}
+        className="px-5 py-11 md:px-8 md:py-14"
+      >
+        <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: 2.5, margin: '0 0 10px' }}>
+            חדש
+          </p>
+          <h2
+            id="build-bundle-title"
+            className="text-2xl md:text-[32px]"
+            style={{ fontWeight: 300, color: '#FFFFFF', letterSpacing: '-0.01em', margin: '0 0 12px', lineHeight: 1.3 }}
+          >
+            בנו את מארז החתנים שלכם
+          </h2>
+          <p style={{ fontSize: 15, lineHeight: 1.7, color: 'rgba(255,255,255,0.82)', margin: '0 auto 24px', maxWidth: 560 }}>
+            כיסוי לטלית ותפילין, רקמת שם, טלית וסידור — אתם בוחרים כל פריט,
+            אנחנו אורזים מארז אחד מהודר. עם הנחת מארז אוטומטית.
+          </p>
+          <a
+            href="/build"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              background: '#C5A028', color: '#1a1a1a', textDecoration: 'none',
+              height: 50, padding: '0 38px', fontSize: 15, fontWeight: 700,
+            }}
+          >
+            התחילו לבנות ←
+          </a>
+        </div>
+      </section>
 
       {/* ── Live Reviews Carousel ── */}
       {liveReviews.length > 0 && (
@@ -1684,7 +1587,39 @@ export default function HomePageClient() {
         </div>
       )}
 
+      {/* ── הסיפור של YourSofer ──
+          ממוקם אחרי כל סקשני המוצרים ולפני ה-FAQ (שנמצא ב-app/page.tsx),
+          בדיוק כמו בשני אתרי הייחוס בנישה: rikmat.com מציג "About Rikmat
+          HaMelech" ו-vehidarta.com מציג "הסיפור של והדרת" באותו מיקום —
+          למטה, אחרי המוצרים, עם קישור "קראו עוד" לעמוד אודות. */}
+      <section
+        aria-labelledby="our-story-title"
+        style={{ background: '#FAF8F3', borderTop: '1px solid #EDEDEF', direction: 'rtl' }}
+        className="px-5 py-12 md:px-8 md:py-16"
+      >
+        <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
+            עלינו
+          </p>
 
+          <h2
+            id="our-story-title"
+            className="text-2xl md:text-[32px]"
+            style={{ fontWeight: 300, color: '#373A5A', letterSpacing: '-0.01em', margin: '0 0 18px', lineHeight: 1.3 }}
+          >
+            הסיפור של YourSofer
+          </h2>
+
+          <p style={{ fontSize: 15.5, lineHeight: 1.85, color: '#4B5563', margin: '0 0 26px' }}>
+            YourSofer נולד מתוך אהבה לעולם היודאיקה ורצון להנגיש מתנות מהודרות עם נשמה — תכשיטים
+            בעיצוב אישי, כיפות מעוצבות לאירועים ותשמישי קדושה מוקפדים. אנחנו עובדים מדימונה, ישירות
+            מול סופרים ויוצרים מוסמכים, ומאמינים שמתנה טובה היא כזו שנושאת שם, תאריך או הקדשה —
+            ונשארת שנים.
+          </p>
+
+          <a href="/about" className="ys-outline-btn">קראו עוד ←</a>
+        </div>
+      </section>
 
     </div>
   );
