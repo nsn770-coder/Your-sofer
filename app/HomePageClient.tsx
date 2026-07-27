@@ -74,8 +74,12 @@ function IconActivityShield() {
 
 // (אייקוני המונים הוסרו יחד עם פס המונים — 07/2026)
 
-/** כחול המותג — רקע באנר "בנה מארז משלך" */
+/** כחול המותג — רקע גיבוי לבאנר "בנה מארז משלך" */
 const NAVY_BUILD = '#373A5A';
+
+/** תמונת הרקע של באנר בניית המארז (Cloudinary) */
+const BUILD_BANNER_IMG =
+  'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785053622/fnpsrderg3ldjuksmzbd.png';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -1483,10 +1487,29 @@ export default function HomePageClient() {
           דף הבית, אחרי בלוקי הקטגוריות/המוצרים ולפני שאר התוכן. */}
       <section
         aria-labelledby="build-bundle-title"
-        style={{ background: NAVY_BUILD, direction: 'rtl' }}
-        className="px-5 py-11 md:px-8 md:py-14"
+        // NAVY_BUILD נשאר כרקע גיבוי — נצבע מיד, כך שאין הבזק לבן לפני
+        // שהתמונה נטענת, וגם אם היא נכשלת הטקסט הלבן נשאר קריא.
+        style={{ background: NAVY_BUILD, direction: 'rtl', position: 'relative', overflow: 'hidden' }}
+        className="px-5 py-14 md:px-8 md:py-20"
       >
-        <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+        {/* תמונת הרקע — position:absolute כדי שלא תשפיע על גובה הסקשן (אפס CLS).
+            lazy: הסקשן נמצא הרבה מתחת לקיפול ולא אמור להתחרות על ה-LCP. */}
+        <img
+          src={optimizeCloudinaryUrl(BUILD_BANNER_IMG, 1600)}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+        />
+        {/* שכבת ההכהיה — גוון הכחול של המותג ולא שחור נייטרלי, כדי שהבאנר
+            יישאר חלק מהשפה הוויזואלית. 0.72 נבחר כדי לשמור ניגודיות מספקת
+            לטקסט לבן מעל כל אזור בתמונה. */}
+        <div
+          aria-hidden="true"
+          style={{ position: 'absolute', inset: 0, background: 'rgba(38,41,66,0.72)', zIndex: 1 }}
+        />
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: 2.5, margin: '0 0 10px' }}>
             חדש
           </p>
