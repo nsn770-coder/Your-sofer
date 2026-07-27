@@ -177,7 +177,8 @@ export default function BundleBuilderClient({ products }: { products: MomentProd
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 14 }}>
               {stepProducts.map(p => {
                 const selected = picked[step.id]?.id === p.id;
-                const img = optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 300);
+                // סדר זהה ל-ProductCard: תמונת ה-AI lifestyle גוברת
+                const img = optimizeCloudinaryUrl(p.aiLifestyleImage || p.imgUrl || p.image_url || '', 300);
                 return (
                   <button
                     key={p.id}

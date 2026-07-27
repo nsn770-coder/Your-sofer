@@ -47,6 +47,7 @@ export default function OccasionGrid({ products }: { products: MomentProduct[] }
             name={p.name}
             price={p.price}
             images={[p.imgUrl ?? p.image_url ?? '', p.imgUrl2 ?? '', p.imgUrl3 ?? ''].filter(Boolean)}
+            aiLifestyleImage={p.aiLifestyleImage}
             priority={p.priority}
             isBestSeller={p.isBestSeller}
             badge={p.badge}

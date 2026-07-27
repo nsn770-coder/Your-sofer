@@ -36,6 +36,8 @@ export interface MomentProduct {
   image_url?: string;
   imgUrl2?: string;
   imgUrl3?: string;
+  /** תמונת ה-AI lifestyle — גוברת על imgUrl בתצוגת גריד, כמו ב-ProductCard */
+  aiLifestyleImage?: string;
   priority?: number;
   isBestSeller?: boolean;
   badge?: string | null;
@@ -81,7 +83,7 @@ export interface MomentProduct {
  *    undefined בזמן ריצה בלי שום שגיאת טייפים.
  */
 const SELECT_FIELDS = [
-  'name', 'price', 'imgUrl', 'image_url', 'imgUrl2', 'imgUrl3',
+  'name', 'price', 'imgUrl', 'image_url', 'imgUrl2', 'imgUrl3', 'aiLifestyleImage',
   'priority', 'isBestSeller', 'badge', 'was', 'createdAt', 'hidden',
   'cat', 'subCategory', 'filterAttributes', 'hasKlafSelection',
   'soferId', 'soferName', 'soferPhoto', 'stars', 'outOfStock',
