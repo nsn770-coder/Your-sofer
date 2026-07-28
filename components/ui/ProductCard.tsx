@@ -305,8 +305,8 @@ export default function ProductCard({
             </span>
           )}
           {cat === 'כיפות' && (
-            <span style={{ background: '#111111', color: '#C5A028', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '4px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
-              🎁 2nd 10%, 3+ 15%
+            <span style={{ background: 'transparent', color: '#1a1a1a', border: '2px solid #1a1a1a', borderRadius: 4, fontSize: 11, fontWeight: 700, padding: '5px 10px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+              מוצר 2 ב-10% הנחה, 3 ומעלה 15%
             </span>
           )}
         </div>

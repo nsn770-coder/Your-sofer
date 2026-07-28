@@ -1579,6 +1579,30 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       </div>
 
+      {/* ── Kippot Discount Banner ── */}
+      {category === 'כיפות' && (
+        <div style={{ background: '#FFF8E7', borderTop: '2px solid #1a1a1a', borderBottom: '2px solid #1a1a1a', padding: '20px', marginBottom: 20, direction: 'rtl' }}>
+          <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+              🎁 <span>מבצע כיפות מיוחד!</span>
+            </div>
+            <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>
+              <p style={{ margin: '0 0 8px 0' }}>
+                <strong>זהו מבצע נוסף למחיר המוזל של המוצר:</strong> כל כיפה שתוסיפו לסל מקבלת הנחה אוטומטית בהתאם לכמות.
+              </p>
+              <ul style={{ margin: '8px 0 0 20px', paddingLeft: 0 }}>
+                <li style={{ marginBottom: 4 }}>✓ <strong>המוצר ה-1:</strong> מחיר מלא</li>
+                <li style={{ marginBottom: 4 }}>✓ <strong>המוצר ה-2:</strong> 10% הנחה</li>
+                <li>✓ <strong>המוצר ה-3 ומעלה:</strong> 15% הנחה</li>
+              </ul>
+              <p style={{ margin: '8px 0 0 0', color: '#777', fontSize: 12 }}>
+                ההנחה מיושמת על המוצר הזול ביותר כדי להצליח לך את הרכישה שלך.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
 {/* ── Curation banner - appears BELOW the category header ── */}
       {curation && (
         <div
