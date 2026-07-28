@@ -54,7 +54,6 @@ export default function AdminNewProductPage() {
   const [whatYouGetList, setWhatYouGetList]               = useState<string[]>([]);
   const [saving, setSaving]                               = useState(false);
   const [uploadingImg, setUploadingImg]                   = useState<string | null>(null);
-  const [fontStyle, setFontStyle]                         = useState('');
 
   useEffect(() => {
     getDocs(collection(db, 'soferim'))
@@ -76,7 +75,6 @@ export default function AdminNewProductPage() {
   const isStam    = STAM_ADMIN_CATS.has(cat);
   const showSofer = SOFER_EDIT_CATS.includes(cat) || !!soferId;
   const showSize  = ['קלפי מזוזה', 'בתי מזוזה'].some(c => cat.includes(c));
-  const showFont  = cat === 'כיפות';
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>, field: string) {
     const file = e.target.files?.[0];
@@ -138,7 +136,6 @@ export default function AdminNewProductPage() {
         ...(soferId ? { soferId } : {}),
         sku: sku.trim() || null,
         warehouseBox: warehouseBox.trim(),
-        ...(fontStyle ? { fontStyle } : {}),
         ...(marketingIntroTxt ? { marketingIntro: marketingIntroTxt } : {}),
         ...(whoIsItForList.length ? { whoIsItFor: whoIsItForList } : {}),
         ...(whyUsList.length ? { whyUs: whyUsList } : {}),
@@ -236,29 +233,6 @@ export default function AdminNewProductPage() {
             <select value={size} onChange={e => setSize(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
               <option value="">— בחר גודל —</option>
               {['6','7','10','12','15','20','25','30'].map(s => <option key={s} value={s}>{s} ס"מ</option>)}
-            </select>
-          </div>
-        )}
-
-        {/* § גופן — כיפות בלבד */}
-        {showFont && (
-          <div style={secS}>
-            <div style={secTitleS}>§ בחירת גופן</div>
-            <select value={fontStyle} onChange={e => setFontStyle(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
-              <option value="">— בחר גופן —</option>
-              <option value="font1">גופן 1</option>
-              <option value="font2">גופן 2</option>
-              <option value="font3">גופן 3</option>
-              <option value="font4">גופן 4</option>
-              <option value="font5">גופן 5</option>
-              <option value="font6">גופן 6</option>
-              <option value="font7">גופן 7</option>
-              <option value="font8">גופן 8</option>
-              <option value="font9">גופן 9</option>
-              <option value="font10">גופן 10</option>
-              <option value="font11">גופן 11</option>
-              <option value="font12">גופן 12</option>
-              <option value="font13">גופן 13</option>
             </select>
           </div>
         )}
