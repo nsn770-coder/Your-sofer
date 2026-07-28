@@ -1590,11 +1590,11 @@ export default function CategoryClient({ category }: { category: string }) {
           position: 'relative',
           overflow: 'hidden'
         }}>
-          {/* Dark purple overlay */}
+          {/* Dark overlay — matches build-bundle banner color exactly */}
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'rgba(88, 60, 120, 0.72)',
+            background: 'rgba(38, 41, 66, 0.72)',
             zIndex: 1
           }} />
 
