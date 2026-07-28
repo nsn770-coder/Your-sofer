@@ -263,8 +263,8 @@ export async function POST(req: NextRequest) {
     }
 
     // ── A1: kippot tiered discount validation ────────────────────────────────
-    // חל אוטומטית על כל כיפות בקטגוריה כיפות
-    const kippotProductItems = productItems.filter(i => i.cat === 'כיפות');
+    // חל אוטומטית על כל כיפות בקטגוריה כיפות — אך לא על כיפות לאירועים (30+)
+    const kippotProductItems = productItems.filter(i => i.cat === 'כיפות' && !isBulkEventKippotLine(i));
     let expectedBundleDiscount = 0;
     let bundleDiscountedTotal  = 0;
 
@@ -359,7 +359,7 @@ export async function POST(req: NextRequest) {
           if (item.bundlePromo) continue; // already counted in bundleDiscountedTotal
           if (item.cat === 'הדפסה') continue;
           if (item.cat === 'כיפות' && kippotDiscountActive) continue;
-          // כיפות לאירועים בכמויות (30+) — לא זכאיות לקופון (מקביל ל-CartContext)
+          // כיפות לאירועים בכמויות (30+) — לא זכאיות לקופון
           if (isBulkEventKippotLine(item)) continue;
           serverDiscountableTotal += item.price * item.quantity;
         }

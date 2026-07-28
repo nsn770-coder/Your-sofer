@@ -4,6 +4,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { createHash, randomUUID } from 'crypto';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
+import { isBulkEventKippotLine } from '@/app/lib/kippot';
 
 // ── תשלום בביט דרך Sumit — Redirect API ──────────────────────────────────────
 // זרימה (זהה לפלאגין הרשמי של Sumit ל-WooCommerce):
@@ -158,8 +159,8 @@ export async function POST(req: NextRequest) {
     }
 
     // ── A1: kippot tiered discount validation ────────────────────────────────
-    // חל אוטומטית על כל כיפות בקטגוריה כיפות
-    const kippotProductItems = productItems.filter(i => i.cat === 'כיפות');
+    // חל אוטומטית על כל כיפות בקטגוריה כיפות — אך לא על כיפות לאירועים (30+)
+    const kippotProductItems = productItems.filter(i => i.cat === 'כיפות' && !isBulkEventKippotLine(i));
     let expectedBundleDiscount = 0;
     let bundleDiscountedTotal  = 0;
 
@@ -250,6 +251,8 @@ export async function POST(req: NextRequest) {
         for (const item of productItems) {
           if (item.bundlePromo) continue;
           if (item.cat === 'הדפסה') continue;
+          // כיפות לאירועים בכמויות (30+) לא זכאיות לקופון
+          if (isBulkEventKippotLine(item)) continue;
           serverDiscountableTotal += item.price * item.quantity;
         }
 
@@ -349,7 +352,7 @@ export async function POST(req: NextRequest) {
       total, couponCode: couponCode || null, couponDiscount: couponDiscountAmount > 0 ? couponDiscountAmount : null,
       discountBreakdown: simchaBreakdown, totalDiscount: couponDiscountAmount > 0 ? couponDiscountAmount : null,
       selectedGift: selectedGift || null,
-      kippotDiscount: null,
+      kippotDiscount: expectedBundleDiscount > 0 ? expectedBundleDiscount : null,
       shippingCost: shippingCost || 0, shippingType: shippingType || 'regular',
       status: 'pending_payment', createdAt: FieldValue.serverTimestamp(),
       account: 'business',

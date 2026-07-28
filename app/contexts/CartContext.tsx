@@ -193,11 +193,11 @@ function calcTotals(items: CartItem[]) {
   }
 
   // ── Kippot tiered discount (2nd unit: 10%, 3rd+: 15%) ───────────────────────
-  // חל אוטומטית על כל כיפות בקטגוריה כיפות, הנחה על הזול מבינהם
+  // חל אוטומטית על כל כיפות בקטגוריה כיפות — אך לא על כיפות לאירועים (30+)
   let bundleOriginalSubtotal   = 0;
   let bundleDiscountedSubtotal = 0;
 
-  const kippotItems = items.filter(i => i.cat === 'כיפות');
+  const kippotItems = items.filter(i => i.cat === 'כיפות' && !isBulkEventKippotLine(i));
   if (kippotItems.length > 0) {
     const kippotPrices: number[] = [];
     for (const item of kippotItems) {
