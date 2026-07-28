@@ -356,6 +356,13 @@ export default function ProductCard({
           ) : null}
         </div>
 
+        {/* Kippot promo text */}
+        {cat === 'כיפות' && (
+          <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 600, marginTop: 4, marginBottom: 4, lineHeight: 1.3 }}>
+            מוצר 2 ב-10% הנחה<br />3 ומעלה 15%
+          </div>
+        )}
+
         {/* Cart button — minimal underlined text link */}
         <div style={{ marginTop: 'auto', paddingTop: 6, textAlign: 'right' }} onClick={e => e.stopPropagation()}>
           {notPurchasable ? (
