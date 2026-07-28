@@ -168,10 +168,12 @@ function calcTotals(items: CartItem[]) {
     if (isKippot) {
       const orig = item.price * item.quantity;
       kippotSubtotal += orig;
-      total += orig * (1 - kippotDiscountRate);
-      // Kippot receiving 30% are NOT eligible for coupon.
-      // כיפות לאירועים בכמויות (30+) — מחירי מדרגות נמוכים, לא זכאיות לקופון.
-      if (!kippotDiscountActive && !isBulkEventKippotLine(item)) discountable += orig;
+      // כיפות לאירועים בכמויות (30+) — מחיר מדרגות מלא, בלי הנחת מדרגות ובלי קופון.
+      // כיפות רגילות מטופלות אך ורק בבלוק הנחת המדרגות למטה —
+      // אסור להוסיף אותן כאן ל-total (ספירה כפולה שגרמה לדחיית תשלום בשרת).
+      if (isBulkEventKippotLine(item)) {
+        total += orig;
+      }
 
     } else if (isPrintService) {
       // Print service charged at face value (tiered rate already embedded in price)
