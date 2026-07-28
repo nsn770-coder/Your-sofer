@@ -9,13 +9,15 @@ export default function ShaliachApplyPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [applicationType, setApplicationType] = useState<'community' | 'merchant'>('community');
   const [form, setForm] = useState({
     name: '',
-    chabadName: '',
+    organizationName: '',
+    organizationNumber: '',
     city: '',
     phone: '',
     email: '',
-    rabbiName: '',
+    leaderName: '',
     logoUrl: '',
   });
 
@@ -60,6 +62,7 @@ export default function ShaliachApplyPage() {
     try {
       await addDoc(collection(db, 'shluchim_applications'), {
         ...form,
+        type: applicationType,
         status: 'pending',
         createdAt: serverTimestamp(),
       });
@@ -98,27 +101,84 @@ export default function ShaliachApplyPage() {
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer', display: 'inline-block', marginBottom: 12 }}>
           <span style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>Your Sofer</span>
         </div>
-        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', margin: 0 }}>הצטרף כרב קהילה</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', margin: 0 }}>הצטרפות - בחר סוג</h1>
         <p style={{ color: '#a8c0d8', marginTop: 8, fontSize: 15 }}>מלא את הפרטים ונחזור אליך בהקדם</p>
+      </div>
+
+      {/* Type Selector */}
+      <div style={{ maxWidth: 580, margin: '24px auto', padding: '0 16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <button
+            type="button"
+            onClick={() => setApplicationType('community')}
+            style={{
+              padding: '16px',
+              background: applicationType === 'community' ? '#1a1a1a' : '#fff',
+              color: applicationType === 'community' ? '#fff' : '#1a1a1a',
+              border: `2px solid ${applicationType === 'community' ? '#1a1a1a' : '#ddd'}`,
+              borderRadius: 10,
+              fontSize: 15,
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            🏛️ רב קהילה / עמותה
+          </button>
+          <button
+            type="button"
+            onClick={() => setApplicationType('merchant')}
+            style={{
+              padding: '16px',
+              background: applicationType === 'merchant' ? '#1a1a1a' : '#fff',
+              color: applicationType === 'merchant' ? '#fff' : '#1a1a1a',
+              border: `2px solid ${applicationType === 'merchant' ? '#1a1a1a' : '#ddd'}`,
+              borderRadius: 10,
+              fontSize: 15,
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            🏪 סוחר / עסק
+          </button>
+        </div>
       </div>
 
       <div style={{ maxWidth: 580, margin: '32px auto', padding: '0 16px' }}>
         <form onSubmit={handleSubmit}>
 
-          {/* פרטי העמותה */}
+          {/* פרטים */}
           <div style={cardStyle}>
-            <h3 style={sectionTitle}>🏛️ פרטי העמותה</h3>
+            <h3 style={sectionTitle}>
+              {applicationType === 'community' ? '🏛️ פרטי העמותה' : '🏪 פרטי העסק'}
+            </h3>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>שם רב הקהילה (שם מלא) *</label>
+              <label style={labelStyle}>
+                {applicationType === 'community' ? 'שם רב הקהילה (שם מלא) *' : 'שם בעל העסק (שם מלא) *'}
+              </label>
               <input name="name" value={form.name} onChange={handleChange}
-                placeholder="הרב ישראל ישראלי" style={inputStyle} required />
+                placeholder={applicationType === 'community' ? 'הרב ישראל ישראלי' : 'יצחק כהן'}
+                style={inputStyle} required />
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>שם העמותה</label>
-              <input name="chabadName" value={form.chabadName} onChange={handleChange}
-                placeholder="עמותת קהילת ישראל תל אביב" style={inputStyle} />
+              <label style={labelStyle}>
+                {applicationType === 'community' ? 'שם העמותה או הארגון' : 'שם העסק'}
+              </label>
+              <input name="organizationName" value={form.organizationName} onChange={handleChange}
+                placeholder={applicationType === 'community' ? 'עמותת קהילת ישראל תל אביב' : 'כהן וברים לעסקים'}
+                style={inputStyle} />
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>
+                {applicationType === 'community' ? 'מספר עמותה' : 'מספר עסק / מס. תאגיד'}
+              </label>
+              <input name="organizationNumber" value={form.organizationNumber} onChange={handleChange}
+                placeholder={applicationType === 'community' ? '580001234' : '501234567'}
+                style={inputStyle} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
@@ -128,9 +188,12 @@ export default function ShaliachApplyPage() {
                   placeholder="תל אביב" style={inputStyle} required />
               </div>
               <div>
-                <label style={labelStyle}>שם הרב/הרבנית</label>
-                <input name="rabbiName" value={form.rabbiName} onChange={handleChange}
-                  placeholder="הרב כהן" style={inputStyle} />
+                <label style={labelStyle}>
+                  {applicationType === 'community' ? 'שם הרב/הרבנית' : 'תפקיד / תחום'}
+                </label>
+                <input name="leaderName" value={form.leaderName} onChange={handleChange}
+                  placeholder={applicationType === 'community' ? 'הרב כהן' : 'מנהל'}
+                  style={inputStyle} />
               </div>
             </div>
 
@@ -143,14 +206,17 @@ export default function ShaliachApplyPage() {
               <div>
                 <label style={labelStyle}>אימייל</label>
                 <input name="email" value={form.email} onChange={handleChange}
-                  placeholder="info@amuta.org.il" type="email" style={inputStyle} />
+                  placeholder={applicationType === 'community' ? 'info@amuta.org.il' : 'info@business.co.il'}
+                  type="email" style={inputStyle} />
               </div>
             </div>
           </div>
 
           {/* לוגו */}
           <div style={cardStyle}>
-            <h3 style={sectionTitle}>🖼️ לוגו העמותה</h3>
+            <h3 style={sectionTitle}>
+              🖼️ לוגו {applicationType === 'community' ? 'העמותה' : 'העסק'}
+            </h3>
             <p style={{ fontSize: 13, color: '#555', marginBottom: 16, background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 8, padding: '10px 14px' }}>
               הלוגו יופיע בבאנר האתר כשלקוחות נכנסים דרך הלינק שלך - מומלץ להעלות לוגו ברור ומקצועי.
             </p>
@@ -181,14 +247,27 @@ export default function ShaliachApplyPage() {
             </div>
           </div>
 
-          {/* מידע על תרומות */}
-          <div style={{ background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 12, padding: 20, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1a1a1a', marginBottom: 10 }}>💰 מידע על תרומות</h3>
+          {/* מידע על תנאים */}
+          <div style={{ background: applicationType === 'community' ? '#f0f4ff' : '#f0fff4', border: `1px solid ${applicationType === 'community' ? '#c8d4f0' : '#c8e6c9'}`, borderRadius: 12, padding: 20, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1a1a1a', marginBottom: 10 }}>
+              {applicationType === 'community' ? '💰 מידע על תרומות' : '💼 מידע על שותפות'}
+            </h3>
             <div style={{ fontSize: 14, color: '#333', lineHeight: 1.8 }}>
-              <div>• <strong>15%</strong> מכל הזמנה דרך הלינק שלך יועברו לעמותה</div>
-              <div>• תשלום חודשי ישירות לחשבון העמותה</div>
-              <div>• דשבורד עם נתוני מכירות ותרומות בזמן אמת</div>
-              <div>• לינק אישי עם ברנדינג של העמותה שלך</div>
+              {applicationType === 'community' ? (
+                <>
+                  <div>• <strong>15%</strong> מכל הזמנה דרך הלינק שלך יועברו לעמותה</div>
+                  <div>• תשלום חודשי ישירות לחשבון העמותה</div>
+                  <div>• דשבורד עם נתוני מכירות ותרומות בזמן אמת</div>
+                  <div>• לינק אישי עם ברנדינג של העמותה שלך</div>
+                </>
+              ) : (
+                <>
+                  <div>• הצגה של המוצרים שלך בפלטפורמה</div>
+                  <div>• ניהול הזמנות ודשבורד מכירות</div>
+                  <div>• דשבורד עם נתוני מכירות בזמן אמת</div>
+                  <div>• תמיכה מהצוות של YourSofer</div>
+                </>
+              )}
             </div>
           </div>
 
