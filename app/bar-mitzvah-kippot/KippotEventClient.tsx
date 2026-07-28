@@ -14,6 +14,23 @@ const PAGE_SIZE = 16;
 
 const MATERIAL_OPTIONS = ['בד', 'זמש', 'פשתן', 'ארטמן', 'משי', 'סרוגות'];
 
+// Font options with Cloudinary URLs
+const FONT_OPTIONS = [
+  { id: 'font1', label: 'גופן 1', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227543/1_l7bigs.png' },
+  { id: 'font2', label: 'גופן 2', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227543/2_pp7jro.png' },
+  { id: 'font3', label: 'גופן 3', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/3_ris5da.png' },
+  { id: 'font4', label: 'גופן 4', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227543/4_ynhswc.png' },
+  { id: 'font5', label: 'גופן 5', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/5_kf2gyf.png' },
+  { id: 'font6', label: 'גופן 6', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/6_vmhq22.png' },
+  { id: 'font7', label: 'גופן 7', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/7_hn4bya.png' },
+  { id: 'font8', label: 'גופן 8', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/8_ylf0a4.png' },
+  { id: 'font9', label: 'גופן 9', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/9_wkkhyp.png' },
+  { id: 'font10', label: 'גופן 10', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227545/10_wurmx8.png' },
+  { id: 'font11', label: 'גופן 11', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227546/11_uibqqw.png' },
+  { id: 'font12', label: 'גופן 12', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227546/12_xmq6il.png' },
+  { id: 'font13', label: 'גופן 13', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227547/13_fbtohh.png' },
+];
+
 const SORT_LABELS: Record<SortBy, string> = {
   popular:    'הכי נמכר',
   price_asc:  'מחיר: נמוך לגבוה',
@@ -37,6 +54,7 @@ interface Product {
   hidden?: boolean;
   priority?: number;
   subCategory?: string;
+  fontStyle?: string;
   was?: number | null;
   isBestSeller?: boolean;
   badge?: string | null;
@@ -186,6 +204,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
   const [sortBy,         setSortBy]         = useState<SortBy>('popular');
   const [subCatFilter,   setSubCatFilter]   = useState('');
   const [materialFilter, setMaterialFilter] = useState('');
+  const [fontFilter,     setFontFilter]     = useState('');
   const [minPrice,       setMinPrice]       = useState('');
   const [maxPrice,       setMaxPrice]       = useState('');
   const [currentPage,    setCurrentPage]    = useState(1);
@@ -244,6 +263,10 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
       );
     }
 
+    if (fontFilter) {
+      result = result.filter(p => p.fontStyle === fontFilter);
+    }
+
     if (minPrice !== '') {
       result = result.filter(p => p.price >= Number(minPrice));
     }
@@ -252,7 +275,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
     }
 
     return applySort(result, sortBy);
-  }, [allProducts, subCatFilter, materialFilter, minPrice, maxPrice, sortBy]);
+  }, [allProducts, subCatFilter, materialFilter, fontFilter, minPrice, maxPrice, sortBy]);
 
   // ── Pagination ───────────────────────────────────────────────────────────────
 
@@ -262,7 +285,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [subCatFilter, materialFilter, minPrice, maxPrice, sortBy]);
+  }, [subCatFilter, materialFilter, fontFilter, minPrice, maxPrice, sortBy]);
 
   // ── Infinite scroll ──────────────────────────────────────────────────────────
 
@@ -284,7 +307,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
     gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  const anyFilterActive = !!(subCatFilter || materialFilter || minPrice || maxPrice);
+  const anyFilterActive = !!(subCatFilter || materialFilter || fontFilter || minPrice || maxPrice);
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
@@ -505,7 +528,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
           {/* Clear filters */}
           {anyFilterActive && (
             <button
-              onClick={() => { setSubCatFilter(''); setMaterialFilter(''); setMinPrice(''); setMaxPrice(''); }}
+              onClick={() => { setSubCatFilter(''); setMaterialFilter(''); setFontFilter(''); setMinPrice(''); setMaxPrice(''); }}
               style={{
                 background: 'none', border: 'none', color: '#dc2626',
                 fontSize: 12, fontWeight: 700, cursor: 'pointer',
@@ -515,6 +538,63 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
               נקה ✕
             </button>
           )}
+        </div>
+
+        {/* ── Font Selection Row (like style selection) ──────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <label style={{ fontSize: 12, fontWeight: 700, color: NAVY, display: 'block', marginBottom: 8 }}>
+            בחר גופן:
+          </label>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+            <Pill
+              label="הכל"
+              active={fontFilter === ''}
+              onClick={() => setFontFilter('')}
+            />
+
+            {FONT_OPTIONS.map(font => {
+              const active = fontFilter === font.id;
+              return (
+                <button
+                  key={font.id}
+                  onClick={() => setFontFilter(font.id)}
+                  title={font.label}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4,
+                    width: isMobile ? 60 : 70,
+                    padding: '8px 6px',
+                    background: active ? '#EEF3FF' : '#fff',
+                    border: `1.5px solid ${active ? NAVY : '#D1D5DB'}`,
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <img
+                    src={font.url}
+                    alt={font.label}
+                    style={{
+                      width: isMobile ? 40 : 48,
+                      height: isMobile ? 40 : 48,
+                      objectFit: 'contain',
+                    }}
+                  />
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: active ? 700 : 600,
+                    color: active ? NAVY : '#555',
+                  }}>
+                    {font.id.replace('font', '')}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* ── Grid ──────────────────────────────────────────────────────────── */}

@@ -48,6 +48,23 @@ const DESIGN_EXAMPLE_IMAGES: string[] = [
 const DESIGN_EXAMPLES: { id: string; label: string; img: string }[] =
   DESIGN_EXAMPLE_IMAGES.map((img, i) => ({ id: `example-${i + 1}`, label: `דוגמה ${i + 1}`, img }));
 
+// ── Font options with Cloudinary URLs
+const FONT_OPTIONS = [
+  { id: 'font1', label: 'גופן 1', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227543/1_l7bigs.png' },
+  { id: 'font2', label: 'גופן 2', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227543/2_pp7jro.png' },
+  { id: 'font3', label: 'גופן 3', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/3_ris5da.png' },
+  { id: 'font4', label: 'גופן 4', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227543/4_ynhswc.png' },
+  { id: 'font5', label: 'גופן 5', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/5_kf2gyf.png' },
+  { id: 'font6', label: 'גופן 6', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/6_vmhq22.png' },
+  { id: 'font7', label: 'גופן 7', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/7_hn4bya.png' },
+  { id: 'font8', label: 'גופן 8', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/8_ylf0a4.png' },
+  { id: 'font9', label: 'גופן 9', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227544/9_wkkhyp.png' },
+  { id: 'font10', label: 'גופן 10', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227545/10_wurmx8.png' },
+  { id: 'font11', label: 'גופן 11', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227546/11_uibqqw.png' },
+  { id: 'font12', label: 'גופן 12', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227546/12_xmq6il.png' },
+  { id: 'font13', label: 'גופן 13', url: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1785227547/13_fbtohh.png' },
+];
+
 const PRINT_AREA = { top: '18%', left: '18%', width: '64%', height: '64%' };
 
 // התמחור מגיע מהמקור המרכזי app/lib/kippot.ts — אין לשכפל מדרגות מחיר כאן.
@@ -97,6 +114,7 @@ function KippotOrderInner() {
   const [designExample, setDesignExample] = useState<string | null>(null);
   const [zoomExample, setZoomExample] = useState<number | null>(null); // אינדקס דוגמה מוגדלת
   const [showCatalog, setShowCatalog] = useState(false);               // קטלוג מלא במסך גדול
+  const [selectedFont, setSelectedFont] = useState<string | null>(null); // בחירת גופן
 
   // ── Upload state ────────────────────────────────────────────────────────────
   const [localUrl, setLocalUrl]       = useState<string | null>(null);
@@ -287,6 +305,10 @@ function KippotOrderInner() {
         ...(designText ? { designText } : {}),
         ...(designExample && DESIGN_EXAMPLES.find(d => d.id === designExample)?.label
           ? { designExample: DESIGN_EXAMPLES.find(d => d.id === designExample)!.label }
+          : {}),
+        ...(selectedFont ? { selectedFont: selectedFont } : {}),
+        ...(selectedFont && FONT_OPTIONS.find(f => f.id === selectedFont)?.label
+          ? { selectedFontLabel: FONT_OPTIONS.find(f => f.id === selectedFont)!.label }
           : {}),
         addSide: addSide || type === 'print-both',
         ...(addSide && addSideText ? { addSideText } : {}),
@@ -524,6 +546,78 @@ function KippotOrderInner() {
         {designExample && (
           <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 700, marginTop: 6 }}>
             ✓ נבחר: {DESIGN_EXAMPLES.find(d => d.id === designExample)?.label} — נשלח לכם הדמיה לאישור בוואטסאפ/מייל לפני ההדפסה
+          </div>
+        )}
+      </div>
+
+      {/* ── בחירת גופן ── */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>
+          בחרו גופן <span style={{ fontWeight: 400, color: '#9C7B3F', fontSize: 12 }}>(אופציונלי)</span>
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button
+            onClick={() => setSelectedFont(null)}
+            style={{
+              background: selectedFont === null ? '#1a2a5e' : '#fff',
+              color: selectedFont === null ? '#fff' : '#555',
+              border: `1.5px solid ${selectedFont === null ? '#1a2a5e' : '#D1D5DB'}`,
+              borderRadius: 20, padding: '5px 16px',
+              fontSize: 13, fontWeight: selectedFont === null ? 700 : 500,
+              cursor: 'pointer', fontFamily: 'inherit',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.15s',
+            }}
+          >
+            הכל
+          </button>
+
+          {FONT_OPTIONS.map(font => {
+            const active = selectedFont === font.id;
+            return (
+              <button
+                key={font.id}
+                onClick={() => setSelectedFont(font.id)}
+                title={font.label}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 4,
+                  width: 70,
+                  padding: '8px 6px',
+                  background: active ? '#EEF3FF' : '#fff',
+                  border: `1.5px solid ${active ? '#1a2a5e' : '#D1D5DB'}`,
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <img
+                  src={font.url}
+                  alt={font.label}
+                  style={{
+                    width: 48,
+                    height: 48,
+                    objectFit: 'contain',
+                  }}
+                />
+                <span style={{
+                  fontSize: 10,
+                  fontWeight: active ? 700 : 600,
+                  color: active ? '#1a2a5e' : '#555',
+                }}>
+                  {font.id.replace('font', '')}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        {selectedFont && (
+          <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 700, marginTop: 6 }}>
+            ✓ נבחר: {FONT_OPTIONS.find(f => f.id === selectedFont)?.label}
           </div>
         )}
       </div>
