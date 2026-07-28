@@ -1581,30 +1581,46 @@ export default function CategoryClient({ category }: { category: string }) {
 
       {/* ── Kippot Discount Banner ── */}
       {category === 'כיפות' && (
-        <div style={{ background: 'linear-gradient(135deg, #FFFAEC 0%, #FFF8E7 100%)', borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #e5e0d0', padding: '28px 20px', marginBottom: 24, direction: 'rtl', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-          <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10, letterSpacing: '-0.5px' }}>
+        <div style={{
+          background: 'url(https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1200/u78fjg4usbno7nxest0e.png) center/cover no-repeat',
+          borderTop: '3px solid #1a1a1a',
+          padding: '40px 20px',
+          marginBottom: 24,
+          direction: 'rtl',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Dark purple overlay */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(88, 60, 120, 0.72)',
+            zIndex: 1
+          }} />
+
+          <div style={{ maxWidth: '80rem', margin: '0 auto', position: 'relative', zIndex: 2 }}>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#FFF', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10, letterSpacing: '-0.5px', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
               🎁 <span>מבצע כיפות נוסף</span>
             </div>
-            <div style={{ fontSize: 13, color: '#444', lineHeight: 1.7 }}>
-              <p style={{ margin: '0 0 12px 0', fontWeight: 500 }}>
+            <div style={{ fontSize: 14, color: '#FFF', lineHeight: 1.7 }}>
+              <p style={{ margin: '0 0 14px 0', fontWeight: 500, textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
                 מבצע נוסף ומיוחד שחל על כל כיפה שתוסיף לסל — הנחה אוטומטית שחוסכת לך עד 15%!
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
-                <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: '10px 12px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>מוצר 1</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
+                <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', backdropFilter: 'blur(10px)' }}>
+                  <div style={{ fontSize: 11, color: '#666', marginBottom: 4, fontWeight: 600 }}>מוצר 1</div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>מחיר מלא</div>
                 </div>
-                <div style={{ background: '#fff', border: '1px solid #C5A028', borderRadius: 6, padding: '10px 12px', textAlign: 'center' }}>
+                <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', border: '2px solid #C5A028', backdropFilter: 'blur(10px)' }}>
                   <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, marginBottom: 4 }}>מוצר 2</div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>10% הנחה</div>
                 </div>
-                <div style={{ background: '#fff', border: '1px solid #C5A028', borderRadius: 6, padding: '10px 12px', textAlign: 'center' }}>
+                <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', border: '2px solid #C5A028', backdropFilter: 'blur(10px)' }}>
                   <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, marginBottom: 4 }}>מוצר 3+</div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>15% הנחה</div>
                 </div>
               </div>
-              <p style={{ margin: '0', color: '#777', fontSize: 12, fontStyle: 'italic' }}>
+              <p style={{ margin: '0', color: '#FFF', fontSize: 13, fontStyle: 'italic', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
                 💡 ההנחה מיושמת אוטומטית על המוצר הזול ביותר לחיסכון מקסימלי
               </p>
             </div>
