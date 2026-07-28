@@ -564,33 +564,27 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 4,
-                    width: isMobile ? 60 : 70,
-                    padding: '8px 6px',
+                    gap: 0,
+                    width: isMobile ? 75 : 90,
+                    padding: 0,
                     background: active ? '#EEF3FF' : '#fff',
-                    border: `1.5px solid ${active ? NAVY : '#D1D5DB'}`,
-                    borderRadius: 8,
+                    border: `2px solid ${active ? NAVY : '#D1D5DB'}`,
+                    borderRadius: 10,
                     cursor: 'pointer',
                     fontFamily: 'inherit',
                     transition: 'all 0.15s',
+                    overflow: 'hidden',
                   }}
                 >
                   <img
                     src={font.url}
                     alt={font.label}
                     style={{
-                      width: isMobile ? 40 : 48,
-                      height: isMobile ? 40 : 48,
-                      objectFit: 'contain',
+                      width: isMobile ? 150 : 192,
+                      height: isMobile ? 150 : 192,
+                      objectFit: 'cover',
                     }}
                   />
-                  <span style={{
-                    fontSize: 10,
-                    fontWeight: active ? 700 : 600,
-                    color: active ? NAVY : '#555',
-                  }}>
-                    {font.id.replace('font', '')}
-                  </span>
                 </button>
               );
             })}

@@ -115,6 +115,7 @@ function KippotOrderInner() {
   const [zoomExample, setZoomExample] = useState<number | null>(null); // אינדקס דוגמה מוגדלת
   const [showCatalog, setShowCatalog] = useState(false);               // קטלוג מלא במסך גדול
   const [selectedFont, setSelectedFont] = useState<string | null>(null); // בחירת גופן
+  const [showFontModal, setShowFontModal] = useState(false);           // מודאל בחירת גופן
 
   // ── Upload state ────────────────────────────────────────────────────────────
   const [localUrl, setLocalUrl]       = useState<string | null>(null);
@@ -552,68 +553,41 @@ function KippotOrderInner() {
 
       {/* ── בחירת גופן ── */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>
           בחרו גופן <span style={{ fontWeight: 400, color: '#9C7B3F', fontSize: 12 }}>(אופציונלי)</span>
         </div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-          <button
-            onClick={() => setSelectedFont(null)}
-            style={{
-              background: selectedFont === null ? '#1a2a5e' : '#fff',
-              color: selectedFont === null ? '#fff' : '#555',
-              border: `1.5px solid ${selectedFont === null ? '#1a2a5e' : '#D1D5DB'}`,
-              borderRadius: 20, padding: '5px 16px',
-              fontSize: 13, fontWeight: selectedFont === null ? 700 : 500,
-              cursor: 'pointer', fontFamily: 'inherit',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.15s',
-            }}
-          >
-            הכל
-          </button>
-
-          {FONT_OPTIONS.map(font => {
-            const active = selectedFont === font.id;
-            return (
+        <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 10 }}>
+          בחרו גופן להדפסה על הכיפה — הגופן יישמר בהזמנה שלכם.
+        </div>
+        <button
+          onClick={() => setShowFontModal(true)}
+          style={{ display: 'block', width: '100%', marginBottom: 10, padding: '12px 0', background: '#1a1a1a', color: '#C5A028', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
+        >
+          לחץ לבחיר גופן
+        </button>
+        <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8, WebkitOverflowScrolling: 'touch' }}>
+          {FONT_OPTIONS.map((f, i) => (
+            <div
+              key={f.id}
+              style={{
+                flex: '0 0 100px', width: 100,
+                border: selectedFont === f.id ? '2px solid #1a2a5e' : '2px solid #E5E0D5',
+                background: selectedFont === f.id ? 'rgba(26,42,94,0.06)' : '#fff',
+                position: 'relative', overflow: 'hidden',
+              }}
+            >
+              {selectedFont === f.id && (
+                <div style={{ position: 'absolute', top: 6, left: 6, background: '#1a2a5e', color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, zIndex: 2 }}>✓</div>
+              )}
               <button
-                key={font.id}
-                onClick={() => setSelectedFont(font.id)}
-                title={font.label}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 4,
-                  width: 70,
-                  padding: '8px 6px',
-                  background: active ? '#EEF3FF' : '#fff',
-                  border: `1.5px solid ${active ? '#1a2a5e' : '#D1D5DB'}`,
-                  borderRadius: 8,
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  transition: 'all 0.15s',
-                }}
+                onClick={() => setSelectedFont(f.id)}
+                style={{ padding: 0, border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit', width: '100%', textAlign: 'center' }}
               >
-                <img
-                  src={font.url}
-                  alt={font.label}
-                  style={{
-                    width: 48,
-                    height: 48,
-                    objectFit: 'contain',
-                  }}
-                />
-                <span style={{
-                  fontSize: 10,
-                  fontWeight: active ? 700 : 600,
-                  color: active ? '#1a2a5e' : '#555',
-                }}>
-                  {font.id.replace('font', '')}
-                </span>
+                <img src={f.url} alt={f.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+                <div style={{ padding: '7px 6px', fontSize: 11, fontWeight: selectedFont === f.id ? 800 : 600, color: '#1a1a1a' }}>גופן {f.id.replace('font', '')}</div>
               </button>
-            );
-          })}
+            </div>
+          ))}
         </div>
         {selectedFont && (
           <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 700, marginTop: 6 }}>
@@ -727,6 +701,37 @@ function KippotOrderInner() {
           </div>
         </div>
       </div>
+
+      {/* מודאל קטלוג גופנים */}
+      {showFontModal && (
+        <div
+          onClick={() => setShowFontModal(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 16, overflowY: 'auto' }}
+        >
+          <div onClick={e => e.stopPropagation()} style={{ background: '#FAF7F0', maxWidth: 900, width: '100%', position: 'relative', padding: '20px 16px 28px' }}>
+            <button onClick={() => setShowFontModal(false)} style={{ position: 'sticky', top: 0, float: 'left', background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 17, cursor: 'pointer', zIndex: 2 }}>✕</button>
+            <div style={{ textAlign: 'center', fontSize: 20, fontWeight: 900, color: '#1a2a5e', marginBottom: 4 }}>בחרו גופן להדפסה</div>
+            <div style={{ textAlign: 'center', fontSize: 12.5, color: '#6B7280', marginBottom: 18, lineHeight: 1.6 }}>
+              לחצו על גופן לבחירה · הגופן שנבחר יישמר בהזמנה שלכם
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
+              {FONT_OPTIONS.map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => { setSelectedFont(f.id); setShowFontModal(false); }}
+                  style={{
+                    padding: 0, border: selectedFont === f.id ? '3px solid #1a2a5e' : '1px solid #E5E0D5',
+                    background: '#fff', cursor: 'pointer', fontFamily: 'inherit', overflow: 'hidden',
+                  }}
+                >
+                  <img src={f.url} alt={f.label} loading="lazy" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ padding: '12px 10px', fontSize: 15, fontWeight: 800, color: '#1a1a1a', textAlign: 'center' }}>גופן {f.id.replace('font', '')}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* הוסף לעגלה */}
       <button
