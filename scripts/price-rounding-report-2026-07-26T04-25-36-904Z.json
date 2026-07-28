@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-07-26T04:25:36.904Z",
+  "backupFile": "price-backup-2026-07-26T04-11-40-251Z.json",
+  "totalDocsNow": 4963,
+  "verifiedAgainstBackup": 4963,
+  "newProductsNotInBackup": 0,
+  "writePhase": {
+    "docsUpdated": 4629,
+    "priceWrites": 4629,
+    "wasWrites": 0,
+    "batchesCommitted": 12
+  },
+  "productsChanged": 4629,
+  "price": {
+    "changed": 4629,
+    "up": 2098,
+    "down": 2531,
+    "upDelta": 473.88,
+    "downDelta": 688.5,
+    "netDelta": -214.62
+  },
+  "was": {
+    "changed": 0,
+    "up": 0,
+    "down": 0,
+    "upDelta": 0,
+    "downDelta": 0,
+    "netDelta": 0
+  },
+  "stillFractionalAfterPass": 0,
+  "fractionalExamples": []
+}

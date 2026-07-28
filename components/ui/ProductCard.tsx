@@ -304,6 +304,11 @@ export default function ProductCard({
               ✦ בחר את הקלף שלך
             </span>
           )}
+          {cat === 'כיפות' && (
+            <span style={{ background: '#111111', color: '#C5A028', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '4px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+              🎁 2nd 10%, 3+ 15%
+            </span>
+          )}
         </div>
       </div>
 

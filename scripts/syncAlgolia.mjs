@@ -33,7 +33,15 @@ const privateKey  = (process.env.FIREBASE_PRIVATE_KEY  ?? '').replace(/\\n/g, '\
 const projectId   = process.env.FIREBASE_PROJECT_ID ?? 'your-sofer';
 
 if (!getApps().length) {
-  initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
+  if (clientEmail && privateKey) {
+    initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
+  } else {
+    // fallback: service account JSON בשורש הפרויקט
+    const sa = JSON.parse(
+      readFileSync(resolve(__dirname, '../your-sofer-firebase-adminsdk-fbsvc-418544c2de.json'), 'utf8')
+    );
+    initializeApp({ credential: cert(sa) });
+  }
 }
 const db = getFirestore();
 

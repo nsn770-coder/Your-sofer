@@ -13,7 +13,7 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { v2 as cloudinary } from 'cloudinary';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 
@@ -92,6 +92,7 @@ const CATEGORY_QUOTAS = [
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry');
 const FORCE = args.includes('--force'); // בלי דילוג — מרנדר גם מוצרים שכבר יש להם תמונת AI
+const VERIFY_EXISTING = args.includes('--verify-existing'); // בדוק תמונות AI קיימות מול המקור; ייצר מחדש רק את הלא-תואמות
 const ALL = args.includes('--all');     // כל האתר — מתעלם מ-CATEGORY_QUOTAS
 const catArg = args.find((a) => a.startsWith('--cat='))?.split('=')[1];
 const fieldArg = args.find((a) => a.startsWith('--field='))?.split('=')[1] || 'category';
@@ -111,6 +112,49 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const imageModel = genAI.getGenerativeModel({
   model: 'gemini-2.5-flash-image',
 });
+// מודל ראייה זול לאימות — משווה מקור מול תוצאה
+const verifyModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+const MATCH_THRESHOLD  = 8; // ציון התאמה מינימלי (0–10) לאישור תמונה
+const MAX_GEN_ATTEMPTS = 3; // נסיונות יצירה לכל מוצר לפני ויתור
+
+// ─── אימות: האם התמונה שנוצרה מציגה בדיוק את אותו מוצר? ─────
+async function verifyProductMatch(srcPart, genBase64) {
+  const verifyPrompt = `Image 1 is the ORIGINAL product photo. Image 2 is an AI-generated marketing photo of the same product.
+Compare ONLY the product itself (ignore background, surface, lighting, angle, crop).
+Check: shape, proportions, colors, materials, texture, embroidery/engraving, lettering, patterns, hardware (zippers, clasps, handles), and decorative details.
+Return ONLY JSON, no markdown:
+{"score": <integer 0-10, 10 = identical product>, "differences": "<short concrete list of product differences, empty string if none>"}`;
+  const result = await verifyModel.generateContent([
+    srcPart,
+    { inlineData: { mimeType: 'image/png', data: genBase64 } },
+    { text: verifyPrompt },
+  ]);
+  const raw = result.response.text().replace(/```json|```/g, '').trim();
+  try {
+    const j = JSON.parse(raw);
+    return { score: Number(j.score) || 0, differences: String(j.differences || '') };
+  } catch {
+    return { score: 0, differences: 'verification response was not valid JSON' };
+  }
+}
+
+// ─── אימות תמונת AI קיימת מול המקור (למצב --verify-existing) ─────
+// מחזיר {score, differences} או null אם ההורדה נכשלה.
+async function verifyExistingImage(product) {
+  try {
+    const srcUrl = resolveSourceImage(product);
+    if (!srcUrl) return null;
+    const [srcResp, genResp] = await Promise.all([fetch(srcUrl), fetch(product.aiLifestyleImage)]);
+    if (!srcResp.ok || !genResp.ok) return null;
+    const srcMime = srcResp.headers.get('content-type')?.split(';')[0] || 'image/jpeg';
+    const srcPart = { inlineData: { mimeType: srcMime, data: Buffer.from(await srcResp.arrayBuffer()).toString('base64') } };
+    const genB64 = Buffer.from(await genResp.arrayBuffer()).toString('base64');
+    return await verifyProductMatch(srcPart, genB64);
+  } catch {
+    return null;
+  }
+}
 
 // שדות התמונה בסכימה של YourSofer: imgUrl (string) ו-images (array). לא imageUrl/image.
 function resolveSourceImage(product) {
@@ -134,26 +178,46 @@ async function generateAndUpload(product, prompt) {
   if (!imgResp.ok) throw new Error(`טעינת תמונת מקור נכשלה: HTTP ${imgResp.status}`);
   const mimeType = imgResp.headers.get('content-type')?.split(';')[0] || 'image/jpeg';
   const buf = Buffer.from(await imgResp.arrayBuffer());
+  const srcPart = { inlineData: { mimeType, data: buf.toString('base64') } };
 
-  const parts = [
-    { inlineData: { mimeType, data: buf.toString('base64') } },
-    { text: prompt },
-  ];
+  // לולאת יצירה + אימות: תמונה שלא עוברת אימות התאמה לא נשמרת לעולם.
+  let lastDifferences = '';
+  for (let attempt = 1; attempt <= MAX_GEN_ATTEMPTS; attempt++) {
+    let attemptPrompt = prompt;
+    if (lastDifferences) {
+      attemptPrompt += `
 
-  const result = await imageModel.generateContent(parts);
-  const imgPart = result.response.candidates?.[0]?.content?.parts?.find(
-    (p) => p.inlineData
-  );
-  if (!imgPart) throw new Error('Gemini לא החזיר תמונה');
+CRITICAL — A PREVIOUS ATTEMPT CHANGED THE PRODUCT. These details were WRONG and must match the reference image exactly this time:
+${lastDifferences}
+Treat the product in the reference image as a locked, unchangeable physical object. Only the environment may be created.`;
+    }
 
-  const dataUri = `data:image/png;base64,${imgPart.inlineData.data}`;
-  const upload = await cloudinary.uploader.upload(dataUri, {
-    folder: 'yoursofer/ai-lifestyle',
-    upload_preset: 'yoursofer_upload',
-    public_id: `ai_${product.id}`,
-    overwrite: true,
-  });
-  return upload.secure_url;
+    const result = await imageModel.generateContent([srcPart, { text: attemptPrompt }]);
+    const imgPart = result.response.candidates?.[0]?.content?.parts?.find(
+      (p) => p.inlineData
+    );
+    if (!imgPart) throw new Error('Gemini לא החזיר תמונה');
+
+    const { score, differences } = await verifyProductMatch(srcPart, imgPart.inlineData.data);
+    if (score >= MATCH_THRESHOLD) {
+      const dataUri = `data:image/png;base64,${imgPart.inlineData.data}`;
+      const upload = await cloudinary.uploader.upload(dataUri, {
+        folder: 'yoursofer/ai-lifestyle',
+        upload_preset: 'yoursofer_upload',
+        public_id: `ai_${product.id}`,
+        overwrite: true,
+      });
+      if (attempt > 1) console.log(`   🔁 עבר אימות בניסיון ${attempt} (ציון ${score}/10)`);
+      return { url: upload.secure_url, score, attempts: attempt };
+    }
+
+    lastDifferences = differences;
+    console.warn(`   ⚠️ ניסיון ${attempt}/${MAX_GEN_ATTEMPTS}: ציון התאמה ${score}/10 — ${differences.slice(0, 150)}`);
+  }
+
+  const err = new Error(`המוצר בתמונה לא תואם למקור אחרי ${MAX_GEN_ATTEMPTS} ניסיונות: ${lastDifferences.slice(0, 200)}`);
+  err.isMismatch = true;
+  throw err;
 }
 
 // ─── עיבוד מוצר בודד ───────────────────────────────────────
@@ -161,9 +225,21 @@ async function processProduct(db, product, i, total) {
   const label = `[${i + 1}/${total}] ${product.title || product.name || product.id}`;
   try {
     // resume — דילוג על מוצר שכבר עבר עיבוד (אלא אם --force). חוסך קריאות Gemini/Cloudinary.
-    if (!DRY_RUN && !FORCE && product.aiLifestyleImage) {
-      console.log(`⏭️  ${label} — כבר קיים, מדלג`);
-      return { ok: true, skipped: true };
+    // שדה קיים אך ריק ('') = האדמין מחק את התמונה ידנית — לא לייצר מחדש.
+    if (!DRY_RUN && !FORCE && product.aiLifestyleImage !== undefined) {
+      const wasDeleted = !product.aiLifestyleImage;
+      if (wasDeleted || !VERIFY_EXISTING) {
+        console.log(`⏭️  ${label} — ${wasDeleted ? 'נמחק ידנית באדמין' : 'כבר קיים'}, מדלג`);
+        return { ok: true, skipped: true };
+      }
+      // --verify-existing: בדוק את התמונה הקיימת; אם תואמת — דלג, אחרת ייצר מחדש
+      const check = await verifyExistingImage(product);
+      if (check && check.score >= MATCH_THRESHOLD) {
+        await db.collection('products').doc(product.id).update({ aiMatchScore: check.score });
+        console.log(`✔️  ${label} — תמונה קיימת תואמת (${check.score}/10), מדלג`);
+        return { ok: true, skipped: true };
+      }
+      console.warn(`🔄 ${label} — תמונה קיימת לא תואמת (${check ? check.score + '/10 — ' + check.differences.slice(0, 120) : 'בדיקה נכשלה'}), מייצר מחדש`);
     }
 
     const { profile, prompt } = await buildImagePrompt(product);
@@ -175,17 +251,26 @@ async function processProduct(db, product, i, total) {
       return { ok: true, dry: true };
     }
 
-    const url = await generateAndUpload(product, prompt);
+    const { url, score, attempts } = await generateAndUpload(product, prompt);
     await db.collection('products').doc(product.id).update({
       aiLifestyleImage: url,
       aiProfile: profile,          // הפרופיל נשמר — לא צריך לנתח שוב
       aiImageGeneratedAt: new Date().toISOString(),
+      aiMatchScore: score,         // ציון אימות ההתאמה למקור (0–10)
     });
-    console.log(`✅ ${label} → ${url}`);
+    console.log(`✅ ${label} → ${url} (התאמה ${score}/10, ${attempts} נסיונות)`);
     return { ok: true };
   } catch (err) {
     console.error(`❌ ${label}: ${err.message}`);
-    return { ok: false, error: err.message };
+    // תמונה קיימת שנמצאה לא-תואמת וגם היצירה מחדש נכשלה — מסירים אותה מהאתר.
+    // ('' = לא ייווצר מחדש אוטומטית; מופיע בדוח ה-mismatches לטיפול ידני)
+    if (!DRY_RUN && err.isMismatch && product.aiLifestyleImage) {
+      try {
+        await db.collection('products').doc(product.id).update({ aiLifestyleImage: '' });
+        console.warn('   🗑 התמונה הלא-תואמת הוסרה מהמוצר');
+      } catch {}
+    }
+    return { ok: false, error: err.message, mismatch: !!err.isMismatch, id: product.id, name: product.title || product.name || '' };
   }
 }
 
@@ -197,6 +282,7 @@ async function main() {
   console.log('Visual DNA:', VISUAL_DNA.brand, '|', VISUAL_DNA.palette, '\n');
 
   let done = 0, failed = 0, skipped = 0, processed = 0;
+  const mismatches = []; // מוצרים שנפסלו באימות ההתאמה — לדוח בסוף
 
   // עיבוד רשימת מוצרים עם דיווח התקדמות ו-throttle
   async function runList(products, header) {
@@ -205,7 +291,10 @@ async function main() {
       const r = await processProduct(db, products[i], i, products.length);
       if (r.skipped) skipped++;
       else if (r.ok) done++;
-      else failed++;
+      else {
+        failed++;
+        if (r.mismatch) mismatches.push({ id: r.id, name: r.name, error: r.error });
+      }
       processed++;
 
       // דיווח התקדמות כל 50 מוצרים
@@ -249,6 +338,12 @@ async function main() {
 
   console.log(`\n═══════════════════════════`);
   console.log(`סיום. סה"כ מעובדים: ${processed} | הצלחות: ${done} | דילוגים: ${skipped} | כשלונות: ${failed}`);
+  if (mismatches.length) {
+    const reportPath = resolve(__dirname, './output/ai-image-mismatches.json');
+    mkdirSync(resolve(__dirname, './output'), { recursive: true });
+    writeFileSync(reportPath, JSON.stringify({ generatedAt: new Date().toISOString(), count: mismatches.length, mismatches }, null, 2));
+    console.log(`⚠️ ${mismatches.length} מוצרים נפסלו באימות התאמה — דוח: ${reportPath}`);
+  }
   if (!DRY_RUN) console.log('זכור: npm run algolia:sync אם צריך לרענן אינדקס.');
 }
 

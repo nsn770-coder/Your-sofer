@@ -1,0 +1,43 @@
+{
+  "date": "2026-07-15",
+  "ok": 5,
+  "failed": 0,
+  "errors": [],
+  "log": [
+    {
+      "id": "HEdWhwCMILUSlo7PY1mN",
+      "sku": "MSN-1223",
+      "name": "כיסוי ראש וכתפיים לאירועים",
+      "price": 15.9,
+      "images": 3
+    },
+    {
+      "id": "38hFet3cuICDWmEVtY7i",
+      "sku": "MSN-10670",
+      "name": "כיסוי ראש לבן בשילוב טקסטורת פרחים",
+      "price": 18.9,
+      "images": 3
+    },
+    {
+      "id": "A6RTFwdw99iWk1NltsOY",
+      "sku": "MSN-10484",
+      "name": "כיסוי ראש לבן בשילוב טקסטורה זהב עדינה",
+      "price": 18.9,
+      "images": 3
+    },
+    {
+      "id": "IKAnZkS7GDPgmqHi8rO4",
+      "sku": "MSN-10481",
+      "name": "כיסוי ראש לבן בשילוב טקסטורה כסף עדינה",
+      "price": 18.9,
+      "images": 3
+    },
+    {
+      "id": "V9EHwAFkxzBYXcAUZCPG",
+      "sku": "MSN-7837",
+      "name": "מארז 50 כיפות ו-50 כיסוי ראש לאירועים",
+      "price": 1490,
+      "images": 1
+    }
+  ]
+}

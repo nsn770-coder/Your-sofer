@@ -1,0 +1,4206 @@
+{
+  "generatedAt": "2026-07-26T19:06:10.776Z",
+  "rule": "+40 (100-800), +30 (50-99), was raised by same delta",
+  "changes": [
+    {
+      "id": "01vMYSEQLWPknn5USxbF",
+      "name": "סט טלית תפילין דמוי עור שחור עם אותיות זהב",
+      "sku": null,
+      "before": {
+        "price": 150,
+        "was": 210
+      },
+      "after": {
+        "price": 190,
+        "was": 250
+      },
+      "delta": 40
+    },
+    {
+      "id": "03OOw8HcpYUBnMiLP8qH",
+      "name": "סט טלית תפילין דמוי עור שחור עם הדפס \"ויברכך\" זהב",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "06Pccf0KOf0pbYDLUp68",
+      "name": "סט טלית תפילין – ברכה בטון עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "0AjCnlEf5roHyP7YQllh",
+      "name": "תיק טלית תפילין דמוי עור אפור בהיר \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "0EAvxUG0Vx9QVNEPoepx",
+      "name": "סט טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "0EMJ9JnuABlW5ydS6mB1",
+      "name": "סט טלית תפילין בד פשתן",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "0IZu2XFyDuatMGHVwKct",
+      "name": "סט טלית תפילין דמוי עור לבן עם ריקמת 'ויברכך'",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "0JPxad6EY6RagIAtLvBG",
+      "name": "סט טלית תפילין מפשתן",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "0LHuzNgd3DDIqxMEWr3V",
+      "name": "סט טלית תפילין קטיפה לבנה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 60,
+        "was": 84
+      },
+      "after": {
+        "price": 90,
+        "was": 114
+      },
+      "delta": 30
+    },
+    {
+      "id": "0MzUFrwnr5zPdU5dlx1o",
+      "name": "סט טלית תפילין קטיפה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 70,
+        "was": 98
+      },
+      "after": {
+        "price": 100,
+        "was": 128
+      },
+      "delta": 30
+    },
+    {
+      "id": "0NouvrRwRMrwH7x9n6QA",
+      "name": "תיק תפילין 'אדיר' טרמי ירוק זית",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "0OtQA3ZQ8FsKrrbkumL8",
+      "name": "סט טלית תפילין קטיפה משי \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "0Ox3kwq3whKyjd8MjJXd",
+      "name": "סט טלית תפילין דמוי עור לבן \"ויברכך\" – אותיות זהב",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "0PPAf2SZR4YCnPFXa2j2",
+      "name": "סט טלית תפילין מהודר דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "0PzuIJ2LoSvj5gitbAj8",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "0QCxLs0hscwo7p1OUpUJ",
+      "name": "סט טלית תפילין דמוי עור כסף עם כיתוב יברכך",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "0RQ0cBCuxA5z3o2snwCl",
+      "name": "סט טלית תפילין דמוי עור צבע כותל עם הבלטה",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "0X48nVyQgpl1AJ4xTyMf",
+      "name": "סט טלית תפילין דמוי עור יברכך",
+      "sku": null,
+      "before": {
+        "price": 100,
+        "was": 140
+      },
+      "after": {
+        "price": 140,
+        "was": 180
+      },
+      "delta": 40
+    },
+    {
+      "id": "0ZeBDaAsqcNgR3JPkNMw",
+      "name": "סט טלית תפילין מפשתן – עיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 100,
+        "was": 140
+      },
+      "after": {
+        "price": 140,
+        "was": 180
+      },
+      "delta": 40
+    },
+    {
+      "id": "0cjdUV8aHNci7LmEQRoa",
+      "name": "סט טלית תפילין דמוי עור שחור עם כיתוב \"ויברכך\" בכסף",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "0g53egA4IIY6nxy5pMn4",
+      "name": "סט טלית תפילין דמוי עור אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "0iGZGKtFhnwr4dpEebaU",
+      "name": "סט טלית תפילין דמוי עור יברכך",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "0mD7vxi2Op2gpvuvSRSC",
+      "name": "תיק טלית תפילין דמוי עור לבן \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "0pUCUetF6v2B9uGgUkr2",
+      "name": "סט טלית ותפילין דמוי עור לבן עם הבלטה \"האש שלי\"",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "0roBnkY6btMwwqVA3nN6",
+      "name": "תיק מפואר לטלית ותפילין עם ידית",
+      "sku": null,
+      "before": {
+        "price": 241,
+        "was": 336
+      },
+      "after": {
+        "price": 281,
+        "was": 376
+      },
+      "delta": 40
+    },
+    {
+      "id": "0vM9w1RrmlMkmTF7jjlY",
+      "name": "סט טלית ותפילין דמוי עור שחור",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "0xC1Xhw7nf5s1Aq4Pt0C",
+      "name": "תיק תפילין דמוי עור ירוק זית",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "10GSwqpxwLRzeGqXF0bI",
+      "name": "סט טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "12J0bjEMiCOYT6E5Nb17",
+      "name": "תיק לטלית ותפילין דמוי עור שחור",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "16rEy2RuilIVPRW0QCOO",
+      "name": "זוג בתי תפילין מופת פלסטיק עם פלקטה כסוף",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "18niDv3s6kcaTeBAMgNL",
+      "name": "סט טלית ותפילין קטיפה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 70,
+        "was": 98
+      },
+      "after": {
+        "price": 100,
+        "was": 128
+      },
+      "delta": 30
+    },
+    {
+      "id": "1E7zb1Wx7lGwXkxpyd5p",
+      "name": "סט טלית ותפילין דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "1HqD0EfWxSmBE7ME7ept",
+      "name": "תיק תפילין דמוי עור טרמי שחור",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "1JJLvUqgNUI1JupGAxJT",
+      "name": "תיק תפילין דמוי עור טרמי שחור",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "1XMeiN1zzZedQDTuPyZ2",
+      "name": "סט טלית תפילין דמוי עור בעיצוב כותל",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "1Yh1Dr7gQHDsqUhBEivC",
+      "name": "סט טלית תפילין דמוי עור לבן בעיצוב כותל",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "1c1x9ltlqZp4MCXBWX8E",
+      "name": "תיק טלית ותפילין פיו שחור \"יברכך\" – 40×32 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "1gd8NhIMyYDt6SEZ5WKa",
+      "name": "סט טלית תפילין דמוי עור חום כהה עם כיתוב 'יברכך'",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "1illIq0YbsCCzce0rpNN",
+      "name": "תיק טלית ותפילין שחור עם ידית של רש\"י ר\"ת",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "1pY2cnJWhK6jKk7LzWXx",
+      "name": "סט טלית תפילין דמוי עור לבן עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "1qyCMXawX7lYe4XZdQxF",
+      "name": "זוג בתי תפילין \"מופת\" פלסטיק כסוף עם פלקטה",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "1rhvdkmxNO5ADodFvBcF",
+      "name": "תיק תפילין דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 50,
+        "was": 70
+      },
+      "after": {
+        "price": 80,
+        "was": 100
+      },
+      "delta": 30
+    },
+    {
+      "id": "1rsA7Os3xSxEVhDtrRTD",
+      "name": "סט טלית תפילין דמוי עור לבן עם כיתוב \"ויברכך\"",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "1sxeuKpiy7coBjn3rzhh",
+      "name": "תיק טלית תפילין דמוי עור שחור עם כיתוב \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "1wNJ0IM1tXCT6FVTaFnR",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "1x6vQhDP3fuZquj48d9l",
+      "name": "סט טלית תפילין קטיפת משי",
+      "sku": null,
+      "before": {
+        "price": 110,
+        "was": 154
+      },
+      "after": {
+        "price": 150,
+        "was": 194
+      },
+      "delta": 40
+    },
+    {
+      "id": "1xX1gs7CiBVVjyiQPQiP",
+      "name": "סט טלית ותפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "1yMKMeBRgUzaE08Sk46B",
+      "name": "סט טלית ותפילין קטיפה משי מהודר",
+      "sku": null,
+      "before": {
+        "price": 110,
+        "was": 154
+      },
+      "after": {
+        "price": 150,
+        "was": 194
+      },
+      "delta": 40
+    },
+    {
+      "id": "20NMfeFgpv9YAVG0ZvuH",
+      "name": "סט טלית תפילין קטיפה משי \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "22dWXGaI6q8gVh7PfaUT",
+      "name": "סט טלית תפילין דמוי עור אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "23IsedPxv9FbKzM3TNsO",
+      "name": "סט טלית תפילין בד דמוי פשתן",
+      "sku": null,
+      "before": {
+        "price": 90,
+        "was": 126
+      },
+      "after": {
+        "price": 120,
+        "was": 156
+      },
+      "delta": 30
+    },
+    {
+      "id": "26cKTVHnq7J8KgQzM9Hd",
+      "name": "תיק תפילין חום כהה עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "273kWSPNeIvN7crGdpsE",
+      "name": "זוג בתי תפילין מופת כסוף עם פלקטה",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "27Lv75aOfQS3GpOXN5es",
+      "name": "סט טלית תפילין דמוי עור יברכך",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "287y21Ny3SxABB4wbFID",
+      "name": "סט טלית תפילין בד דמוי פשתן עם הדפס \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "2887Ahl981uQDAZSk4CF",
+      "name": "תיק אחסון תפילין טרמי אפור בהיר – דגם אדיר",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "29zjoMArbVI7m1o9Mti5",
+      "name": "סט טלית תפילין קורדרוי \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 90,
+        "was": 126
+      },
+      "after": {
+        "price": 120,
+        "was": 156
+      },
+      "delta": 30
+    },
+    {
+      "id": "2CiEvgeCXRkRc80w2oMS",
+      "name": "תיק טלית תפילין דמוי עור שחור – עיצוב \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "2Fy4LxrXfGjfOB2fCx8y",
+      "name": "סט טלית תפילין קטיפה משי – 36X29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 110,
+        "was": 154
+      },
+      "after": {
+        "price": 150,
+        "was": 194
+      },
+      "delta": 40
+    },
+    {
+      "id": "2HbncFXN9Erj1QvrxaMz",
+      "name": "סט טלית תפילין קטיפה לבנה עם ריקמה – 36X29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 60,
+        "was": 84
+      },
+      "after": {
+        "price": 90,
+        "was": 114
+      },
+      "delta": 30
+    },
+    {
+      "id": "2HfwtSS0Mv9M3Rr2YQAU",
+      "name": "תיק תפילין דמוי עור עם רצועה",
+      "sku": null,
+      "before": {
+        "price": 70,
+        "was": 98
+      },
+      "after": {
+        "price": 100,
+        "was": 128
+      },
+      "delta": 30
+    },
+    {
+      "id": "2NRuCxzozl4kkDofiJ8X",
+      "name": "סט טלית תפילין דמוי עור בעיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "2Szo230Dys7pChZWacUi",
+      "name": "סט טלית תפילין דמוי עור כסף עם כיתוב \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "2T97GXR4DnuLyUF4Fo05",
+      "name": "זוג בתי תפילין \"מופת\" כסוף פלסטיק עם פלקטה",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "2TIroDYJLhTqfU0YeRVE",
+      "name": "תיק הגשה לטלית תפילין עם ידית",
+      "sku": null,
+      "before": {
+        "price": 241,
+        "was": 336
+      },
+      "after": {
+        "price": 281,
+        "was": 376
+      },
+      "delta": 40
+    },
+    {
+      "id": "2VQVnjCIW1OdPc34Zfcy",
+      "name": "סט טלית תפילין ארוג אפור בהיר עם רקמה",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "2Vzm8Bij4xIZTPhgrQ0q",
+      "name": "סט טלית תפילין מפשתן אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "2X9XmDSNlTGzoQqvIr1q",
+      "name": "סט טלית תפילין דמוי עור בטון עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "2XyHsFzVxRPG4Uo4vBYf",
+      "name": "סט טלית תפילין עם רקמה בולטת",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "2a4uwKcxfV09O99i8RVA",
+      "name": "תיק טלית תפילין מהודר דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "2bAmQ6riNCe935zBDdXx",
+      "name": "סט טלית תפילין דמוי עור לבן – עיצוב \"ויברכך\" זהב",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "2emRqZskk512k7EHHCZe",
+      "name": "סט טלית תפילין ועטרה קטיפה \"יברכך\" בעיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "2hvikfImjGxeOWE6EKpX",
+      "name": "תיק תפילין דמוי עור כחול כהה",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "2ivRvliQkKiDiqnFT4QX",
+      "name": "תיק תפילין דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 281,
+        "was": 392
+      },
+      "after": {
+        "price": 321,
+        "was": 432
+      },
+      "delta": 40
+    },
+    {
+      "id": "2ucm4xWkY797OUg4raSC",
+      "name": "סט טלית תפילין דמוי עור בעיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 100,
+        "was": 140
+      },
+      "after": {
+        "price": 140,
+        "was": 180
+      },
+      "delta": 40
+    },
+    {
+      "id": "2vPbzEq6ZRkjOCfIfFIf",
+      "name": "תיק טלית ותפילין דמוי עור קאמל – עיצוב מהודר עם כיתוב יברכך",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "2zcPUuSwyFgq4sSmZWM3",
+      "name": "סט טלית תפילין כחול כהה דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "356MdqbZvZhNKbQpsStn",
+      "name": "תיק טלית תפילין דמוי עור שחור עם כיתוב 'יברכך'",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "3EoGqAw8PduXdDHGMOmc",
+      "name": "סט תיק טלית ותפילין לבן – יברכך אותיות זהב",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "3GLqeNPqx5x6am3b39SI",
+      "name": "תיק טלית תפילין דמוי עור קאמל עם רקמה 'יברכך'",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "3HYju81KANsp5VtBCZ8U",
+      "name": "תיק תפילין דמוי עור כחול כהה",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "3IkPbYfYu8kFu5BYcKTN",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "3J9CsPSpEVNjx40lMKsJ",
+      "name": "סט טלית תפילין בד פשתן עם כיתוב \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "3MJMbNurb7IBRpjAmGlw",
+      "name": "זוג בתי תפילין מופת פלסטיק כסוף עם פלקטה – מידה 33",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "3NcPWjczpswm4I9IEO7y",
+      "name": "זוג בתי תפילין מופת פלסטיק כסוף עם פלקטה – מידה 35",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "3NsxicZUFVUFrk03YzdM",
+      "name": "תיק תפילין דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 50,
+        "was": 70
+      },
+      "after": {
+        "price": 80,
+        "was": 100
+      },
+      "delta": 30
+    },
+    {
+      "id": "3QUdb1lveJdmoftZwa1x",
+      "name": "סט טלית תפילין דמוי עור לבן מהודר",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "3WkknYOlE2DxnpGKN8Ig",
+      "name": "תיק טלית ותפילין דמוי עור שחור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "3aNtLIkfxBQp4O0nuTC3",
+      "name": "סט טלית ותפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 100,
+        "was": 140
+      },
+      "after": {
+        "price": 140,
+        "was": 180
+      },
+      "delta": 40
+    },
+    {
+      "id": "3cB0RngV5PaIR9XwSYu3",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "3gTlF5y0pq04ZhKshDh9",
+      "name": "סט טלית ותפילין קורדרוי",
+      "sku": null,
+      "before": {
+        "price": 90,
+        "was": 126
+      },
+      "after": {
+        "price": 120,
+        "was": 156
+      },
+      "delta": 30
+    },
+    {
+      "id": "3mz7KZ44DH58wVpFjNkE",
+      "name": "סט טלית תפילין בד ארוג אפור עם רקמה",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "3pN5IfMkY2MyCbL9dxuJ",
+      "name": "סט טלית תפילין קטיפה כחול כהה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 60,
+        "was": 84
+      },
+      "after": {
+        "price": 90,
+        "was": 114
+      },
+      "delta": 30
+    },
+    {
+      "id": "3pYqiJyp6HwRwQkRumEQ",
+      "name": "סט טלית תפילין קטיפה כחול כהה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 60,
+        "was": 84
+      },
+      "after": {
+        "price": 90,
+        "was": 114
+      },
+      "delta": 30
+    },
+    {
+      "id": "3risolYxqvBTpK0wPE4q",
+      "name": "סט טלית תפילין דמוי עור לבן עם כיתוב \"ויברכך\"",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "3x40NVduENyvtXXsN2un",
+      "name": "סט טלית תפילין דמוי עור בעיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "3xRiRfcS0GYWt6wUIehk",
+      "name": "תיק טלית ותפילין דמוי עור עם ידית",
+      "sku": null,
+      "before": {
+        "price": 241,
+        "was": 336
+      },
+      "after": {
+        "price": 281,
+        "was": 376
+      },
+      "delta": 40
+    },
+    {
+      "id": "41FMlbp7hYJLAScSKJnV",
+      "name": "סט טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "46xOKSzuIfirdEjEnoE0",
+      "name": "סט טלית ותפילין יברכך דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "47vPam6IGCNv4DYe4sMp",
+      "name": "סט טלית ותפילין רש\"י ר\"ת דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 241,
+        "was": 336
+      },
+      "after": {
+        "price": 281,
+        "was": 376
+      },
+      "delta": 40
+    },
+    {
+      "id": "47xh9P2HavPizURtA0Pv",
+      "name": "סט טלית תפילין דמוי עור בטון עם הדפס \"ויברכך\" כסף",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "4EkQtM4QGJQ3Ov4LQATE",
+      "name": "תיק תפילין מפואר עם ידית",
+      "sku": null,
+      "before": {
+        "price": 50,
+        "was": 70
+      },
+      "after": {
+        "price": 80,
+        "was": 100
+      },
+      "delta": 30
+    },
+    {
+      "id": "4F36MEMYlQfQMaDzbKwZ",
+      "name": "תיק טלית ותפילין דמוי עור אפור כהה עם הדפס \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "4Inh2r4OCW0qwdenrQpD",
+      "name": "סט טלית ותפילין דמוי עור לבן עם כיתוב ויברכך",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "4NEPzEOVZmNguocSuEi8",
+      "name": "סט טלית תפילין דמוי עור שחור עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "4NRzXb3cboTWmEfV3B70",
+      "name": "תיק תפילין דמוי עור שחור עם רקמה מפואר",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "4SC98GC5YPZP5SpKpTcV",
+      "name": "סט טלית ותפילין פיו אפור בהיר",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "4TQ21vtS1iUBUGaIjV1S",
+      "name": "סט טלית תפילין ועטרה פשתן \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "4WxSKDp1zMYt9WMjTQqe",
+      "name": "סט טלית תפילין קטיפה משי \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "4XSaxRV9rlhj5YrBkOsx",
+      "name": "תיק טלית תפילין דמוי עור שחור מהודר",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "4Y9J8JsjplzguB7dLvLq",
+      "name": "סט טלית תפילין עם רקמה בולטת",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "4YffCGZAi1vFxYWYOofs",
+      "name": "תיק תפילין \"אדיר\" טרמי ג'ינס כחול כהה",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "4c69aGCxPm8Dw51PFGy8",
+      "name": "סט טלית תפילין פיו לבן – אותיות בולטות יברכך",
+      "sku": null,
+      "before": {
+        "price": 150,
+        "was": 210
+      },
+      "after": {
+        "price": 190,
+        "was": 250
+      },
+      "delta": 40
+    },
+    {
+      "id": "4c9mZWGCaGGl6BMKhPGm",
+      "name": "זוג בתי תפילין \"מופת\" פלסטיק כסוף עם פלקטה",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "4krCJtFWzc42igvQSp58",
+      "name": "תיק תפילין דמוי עור – 25×22 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 50,
+        "was": 70
+      },
+      "after": {
+        "price": 80,
+        "was": 100
+      },
+      "delta": 30
+    },
+    {
+      "id": "4lE4NcrlCA5KUEpBiSbI",
+      "name": "תיק תפילין קטן חום כהה עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "4lM7JRhXLvOu62AKDUTa",
+      "name": "סט טלית תפילין רקמה בולטת",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "4o3axDFNj4KcgLigTHJW",
+      "name": "סט טלית תפילין קטיפה עם רקמה בולטת",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "4qEsHmWpKr6szkI2ROWh",
+      "name": "סט טלית תפילין דמוי עור לבן עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "4qvm3aYYTTZsaBrsjnTk",
+      "name": "סט טלית תפילין קטיפה כחול כהה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 60,
+        "was": 84
+      },
+      "after": {
+        "price": 90,
+        "was": 114
+      },
+      "delta": 30
+    },
+    {
+      "id": "4uTdVZc4YTmmuUg55CMZ",
+      "name": "תיק תפילין דמוי עור שחור – 22 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "58BWFNOrLwM5mXasoDvZ",
+      "name": "תיק טלית תפילין דמוי עור אפור ולבן – עיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "58tYemjyRuQ75PT8DIe9",
+      "name": "תיק טלית תפילין דמוי עור לבן עם עיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "5APdusAQ8Mle5zKuhUmw",
+      "name": "סט טלית תפילין שחור עם כיתוב \"יברכך\" בזהב",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "5JeI3VFnSwM15HUlik0D",
+      "name": "סט טלית תפילין בד פשתן עם עיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "5KGfMGgWslvFOOd6P3he",
+      "name": "סט טלית תפילין קטיפה משי \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "5UDAv2jd9KLAczzLHRBF",
+      "name": "סט טלית תפילין פשתן עם גימור מוקפד",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "5Vm7RGDtuyeustUYO6PW",
+      "name": "סט טלית תפילין דמוי עור אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "5daHlOdr4qMYYf4OeLBO",
+      "name": "תיק לטלית ותפילין דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "5daJ5rnHxeA12AQHJixO",
+      "name": "סט טלית ותפילין בד דמוי פשתן",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "5lzgyqxAbVK9NdjXPkPV",
+      "name": "סט טלית תפילין דמוי עור שחור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "5mzYfHmUSl7QF9m3MtVT",
+      "name": "תיק טלית תפילין דמוי עור שחור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "5oqh2iVOZV7xH0kZDBrB",
+      "name": "תיק טלית ותפילין דמוי עור שחור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "5srqiLdPNpYWcsvJtwxn",
+      "name": "סט טלית תפילין בעיצוב אלגנטי – רקמה כסף",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "5vYo7OIqCaNOOuw9onZp",
+      "name": "סט טלית תפילין דמוי עור בטון עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "5x1YQdKwk4dOLxZjBjw1",
+      "name": "סט טלית תפילין קטיפה כחול כהה ואפור עם רקמה",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "5xX38ZBVsfpHOobVorfB",
+      "name": "סט טלית תפילין דמוי עור לבן עם אותיות כסף בולטות",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "5yYB6aBkh6tx1qjjLBk2",
+      "name": "סט טלית תפילין דמוי עור בגוון אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "5z86JMDPJWiCwl3xAnnT",
+      "name": "סט טלית תפילין קטיפה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 70,
+        "was": 98
+      },
+      "after": {
+        "price": 100,
+        "was": 128
+      },
+      "delta": 30
+    },
+    {
+      "id": "69GD7Ca49zWyo6WsZWCT",
+      "name": "תיק תפילין דמוי עור ירוק עם כיתוב יברכך",
+      "sku": null,
+      "before": {
+        "price": 281,
+        "was": 392
+      },
+      "after": {
+        "price": 321,
+        "was": 432
+      },
+      "delta": 40
+    },
+    {
+      "id": "6FgCfs6ImuzICxhZ849c",
+      "name": "סט טלית תפילין דמוי עור שחור עם ריקמת יברכך",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "6LJyx09M7L1Aj98siSNh",
+      "name": "סט טלית תפילין דמוי עור לבן עם כיתוב \"שיויתי\" וטלטוג כסף",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "6PT8AA6I7kXu0bjngbyz",
+      "name": "סט טלית תפילין דמוי עור לבן עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "6WoTNKCrivfW7InskKcV",
+      "name": "סט טלית תפילין קטיפה משי \"האש שלי\"",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "6ZocTViMAeNLnDwrnl26",
+      "name": "סט טלית תפילין דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "6auN3zYi1M2QdCrmte4Y",
+      "name": "סט טלית תפילין דמוי עור שחור עם כיתוב \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "6b5VZOZatY82W82j5nn1",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "6mkSiVq21Qj3wgNX99a6",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "6uNVURsyVA0wGAXcV394",
+      "name": "סט טלית תפילין קורדרוי \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 90,
+        "was": 126
+      },
+      "after": {
+        "price": 120,
+        "was": 156
+      },
+      "delta": 30
+    },
+    {
+      "id": "6yg5MukgWE2nwiC9nwT2",
+      "name": "סט טלית תפילין פיו שחור עם רקמה זהב",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "70KgQgqbF12S9XskFkh7",
+      "name": "סט טלית תפילין דמוי עור כחול כהה",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "70zKxQED6seF0YIHBwtx",
+      "name": "סט טלית ותפילין עם רקמה בולטת",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "72efoxsKRQiM1Pxr4Fsg",
+      "name": "סט טלית תפילין מפשתן בגוון טבעי",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "75nlfuVD02YPrdaOrSqi",
+      "name": "סט טלית תפילין דמוי עור קאמל מהודר",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "7I9edpaiCZu4ArEfaAnQ",
+      "name": "סט טלית תפילין לבן \"יברכך\" אותיות כסף בולטות",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "7JTjqeqPyyIDaB8NWA8N",
+      "name": "תיק לטלית תפילין עם ידית בעיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 241,
+        "was": 336
+      },
+      "after": {
+        "price": 281,
+        "was": 376
+      },
+      "delta": 40
+    },
+    {
+      "id": "7TCFmg0sr6Z9gLOM4ke4",
+      "name": "זוג בתי תפילין מופת – פלסטיק כסוף עם פלקטה",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "7aOuyoqx2yC8V92raTeh",
+      "name": "סט טלית תפילין מפשתן – 36×29 ס״מ",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "7azBlpyty0A6DF2TH565",
+      "name": "סט טלית תפילין קטיפה משי \"יברכך\" – 36×29 ס״מ",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "7dX3o7ynwlO1AjOZhdCQ",
+      "name": "סט טלית תפילין דגם כותל בטון עם אותיות בולטות כסף",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "7fANnkZ7tMYZDSDww9oK",
+      "name": "תיק טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "7qEGnn37odarLiSJFMka",
+      "name": "סט טלית ותפילין שחור עם כיתוב זהב",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "7sjXtOgrLCJLss4u2Coa",
+      "name": "סט טלית תפילין דמוי עור אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "7uYdbUCZVbFYLLa43Lzf",
+      "name": "סט טלית תפילין דמוי עור לבן עם רקמה יברכך",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "7w1JYveiSeXIJojuwTHs",
+      "name": "תיק תפילין קטן שחור דמוי עור עם רקמה האש שלי",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "87kVxTQNxRRENMZA2tkz",
+      "name": "סט טלית תפילין בד דמוי פשתן 'יברכך'",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "8NZXLSx6Hb5MMRYb6VwS",
+      "name": "סט טלית תפילין פשתן עם כיתוב \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "8Nx3WYTEWqFDWMYoT2Zs",
+      "name": "סט טלית תפילין דמוי עור אפור עם כיתוב \"יברכך\" בכסף",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "8W0jVxbF7C3b1jnas71J",
+      "name": "סט תיק טלית ותפילין שחור עם אותיות זהב בולטות",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "8dXN2QmwUREbcupJ1ndx",
+      "name": "סט טלית תפילין קטיפה עם ריקמה 'האש שלי'",
+      "sku": null,
+      "before": {
+        "price": 100,
+        "was": 140
+      },
+      "after": {
+        "price": 140,
+        "was": 180
+      },
+      "delta": 40
+    },
+    {
+      "id": "8iJm7LtfjBtmLP7nh9ow",
+      "name": "סט טלית תפילין קטיפה כחול כהה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 60,
+        "was": 84
+      },
+      "after": {
+        "price": 90,
+        "was": 114
+      },
+      "delta": 30
+    },
+    {
+      "id": "8m4cDfXGSd6O14TGb8Hi",
+      "name": "תיק תפלין \"אדיר\" ג'ינס כחול לאחסון",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "8nWsUMFe9wquwSWb7dlB",
+      "name": "תיק תפלין \"אדיר\" טרמי שחור – 23 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "8ptUnVi1KrLnzboZXwZL",
+      "name": "סט טלית תפילין בד דמוי פשתן",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "8qbbLGdfuOVrYrgzrClZ",
+      "name": "סט טלית תפילין שחור עם אותיות זהב בולטות",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "8qyAm8qopFz90ozEkGek",
+      "name": "סט טלית תפילין קטיפה כחול עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 70,
+        "was": 98
+      },
+      "after": {
+        "price": 100,
+        "was": 128
+      },
+      "delta": 30
+    },
+    {
+      "id": "8wjin5DTj7dz0BmHuYRD",
+      "name": "סט טלית ותפילין דמוי עור שחור – עיצוב ירושלמי",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "94kg4Wp6Agntk5D2u7Di",
+      "name": "סט טלית תפילין קורדרוי – 160 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 90,
+        "was": 126
+      },
+      "after": {
+        "price": 120,
+        "was": 156
+      },
+      "delta": 30
+    },
+    {
+      "id": "97EziFQgE2Gi7cBgJo15",
+      "name": "סט טלית תפילין פיו כותל לבן עם אותיות בולטות זהב",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "99pNaXmg5cn2EtlrAZjk",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 100,
+        "was": 140
+      },
+      "after": {
+        "price": 140,
+        "was": 180
+      },
+      "delta": 40
+    },
+    {
+      "id": "9A63n6oGRu1mBAeLQRYj",
+      "name": "תיק תפילין דמוי עור ירוק זית",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "9AsTljqF4w5qFPPVH1NS",
+      "name": "סט תיקים לטלית ולתפילין ברכת כהנים שחור",
+      "sku": null,
+      "before": {
+        "price": 329,
+        "was": 461
+      },
+      "after": {
+        "price": 369,
+        "was": 501
+      },
+      "delta": 40
+    },
+    {
+      "id": "9CXMBk60F1qhMcCyCBDe",
+      "name": "סט טלית ותפילין פיו – אותיות בולטות יברכך בשחור",
+      "sku": null,
+      "before": {
+        "price": 150,
+        "was": 210
+      },
+      "after": {
+        "price": 190,
+        "was": 250
+      },
+      "delta": 40
+    },
+    {
+      "id": "9DLzNRvxS1DPDxAMGo1P",
+      "name": "סט טלית ותפילין פיו מחורר שחור",
+      "sku": null,
+      "before": {
+        "price": 150,
+        "was": 210
+      },
+      "after": {
+        "price": 190,
+        "was": 250
+      },
+      "delta": 40
+    },
+    {
+      "id": "9IKmxEK7e2XproDrNGAg",
+      "name": "סט טלית תפילין דמוי עור אפור עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "9IhGaIGV9WpqOEwoLR8y",
+      "name": "תיק טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "9MrfoCKveQL1b7XGte3B",
+      "name": "סט טלית ותפילין דמוי עור שחור",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "9P2ib7IgIQL1SKNjRoHD",
+      "name": "תיק טלית ותפילין דמוי עור שחור עם כיתוב \"האש שלי\"",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "9V6cuTtdkIZOMYII7EYW",
+      "name": "סט טלית תפילין דמוי עור לבן עם אותיות \"ויברכך\"",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "9giRyAE9tgz2NtwDo5I0",
+      "name": "סט טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "9xw7Czw6TijLUqKajDlD",
+      "name": "תיק טלית תפילין דמוי עור קרם",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "A570JjIferwhRzgCxHCk",
+      "name": "תיק טלית ותפילין דמוי עור בגימור מפואר",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "ACxijItMq1ZiD8cBAhbn",
+      "name": "תיק תפילין דמוי עור שחור בעיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "AFMwoZH3ETJLgDrrgVz7",
+      "name": "תיק טלית תפילין דמוי עור שחור עם ריקמה יברכך",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "AHfutiNUZ8gCJ81eTEWv",
+      "name": "תיק טלית תפילין דמוי עור כחול",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "AIbDbwyDRRr23FNUmaPT",
+      "name": "סט טלית תפילין דמוי עור אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "AL9FWgHayEIQGAmbyDw3",
+      "name": "סט טלית תפילין דמוי עור בגימור אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "ALdQYWucMDWLrt0kc3UC",
+      "name": "סט טלית תפילין לבן דמוי עור עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "ALvtsgU42HCnDOTRfSA0",
+      "name": "סט טלית תפילין בד פשתן בגימור אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "AcFx8wWwneL8cYQV4pRM",
+      "name": "סט טלית תפילין קורדרוי \"יברכך\" 3629 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 90,
+        "was": 126
+      },
+      "after": {
+        "price": 120,
+        "was": 156
+      },
+      "delta": 30
+    },
+    {
+      "id": "AeovgJNHw2jhou7e7qAU",
+      "name": "תיק תפ \"אדיר\" טרמי פשתן ירוק זית לאחסון תפלין 23 ס...",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "AonM0BPbTBzWHTGBpLdA",
+      "name": "סט טלית תפילין דמוי עור יברכך 36X29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "ArmPyyJNVWOyGIlvNFgh",
+      "name": "סט טלית תפילין דמוי עור כסף עם כיתוב 'יברכך'",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "Auv7YRYUAPfjWwinObel",
+      "name": "סט טלית תפילין לבן דמוי עור עיצוב \"ירושלים\" זהב",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "AxkhX7NH6kLtEukRvVYO",
+      "name": "סט טלית ותפילין דמוי עור – דגם יברכך",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "B1whcOXaR0ufxzLIKH3b",
+      "name": "סט טלית תפילין דמוי עור \"יברכך\" – 36×29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "BD457R7lAZoyqDpC6ubq",
+      "name": "תיק תפילין טרמי דמוי עור בגוון חום",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "BJme0KdDSgbebbIK84KB",
+      "name": "סט טלית ותפילין דמוי עור שחור עם עיטור כתר כסף",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "BKUAhV5lmSt3rXpTWcu3",
+      "name": "תיק תפילין דמוי עור שחור אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 50,
+        "was": 70
+      },
+      "after": {
+        "price": 80,
+        "was": 100
+      },
+      "delta": 30
+    },
+    {
+      "id": "BR5pCWVtdZhAoXxPJJsx",
+      "name": "סט טלית ותפילין בד דמוי פשתן יברכך",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "BiLcmkKrw63zM9PzwBmA",
+      "name": "סט טלית תפילין דמוי עור שחור אותיות בולטות \"שיויתי\" כסף 36X29 ס\"מ...",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "Bt7xxhNmu7w2ZXOhzE1d",
+      "name": "תיק טלית ותפילין עור לבן עם רצועה",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "Bue5Af4O59rZRKDFInMJ",
+      "name": "תיק תפילין דמוי עור עם ריקמה 36X29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "BytNVLipUibuIfEMeCE4",
+      "name": "סט טלית ותפילין דמוי עור רש\"י ר\"ת",
+      "sku": null,
+      "before": {
+        "price": 241,
+        "was": 336
+      },
+      "after": {
+        "price": 281,
+        "was": 376
+      },
+      "delta": 40
+    },
+    {
+      "id": "C1w8j1QeGlMsxfdwA5NE",
+      "name": "סט טלית תפילין בד קטיפה \"האש שלי\" 36X29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "C3mOL9wAju6qdf70qBzZ",
+      "name": "סט טלית תפילין דמוי עור שחור אותיות בולטות \"ויברכך...",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "C5W6sLznwApBAYlo1Rsv",
+      "name": "סט טלית תפילין דמוי עור 36X29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "C9Lp2wZRcwX5o7LLwZoa",
+      "name": "תיק תפילין דמוי עור שחור עם עיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "CEBh4WuKUNUAB280O7GX",
+      "name": "סט טלית תפילין לבן דמוי עור עם ריקמה ואבנים 36X29 ס\"מ...",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "CMELWvmetKB6YPlqSof6",
+      "name": "סט טלית תפילין דמוי עור מהודר 36X30 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "CYGL0k96DqybfyTNDHEC",
+      "name": "תיק טלית ותפילין דמוי עור בעיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "CYXZjoUJJopP6lrSBKhK",
+      "name": "תיק תפילין אדיר בטרמי אפור ופשתן",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "CikVHoGMQ7kmyBe94rxR",
+      "name": "סט טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "CjdCFj2DpnrHQl8KJxqN",
+      "name": "סט טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "CqgaOQM0i5BUUg9ozimh",
+      "name": "סט טלית תפילין בד קטיפה משי 36X29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 110,
+        "was": 154
+      },
+      "after": {
+        "price": 150,
+        "was": 194
+      },
+      "delta": 40
+    },
+    {
+      "id": "Cxt2fOCI6YGlg0LEOxVM",
+      "name": "תיק תפילין אדיר פשתן אפור כהה – 23 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "D4cOe0NOQDgtZ3W1y3sd",
+      "name": "תיק תפילין דמוי עור כחול יברכך",
+      "sku": null,
+      "before": {
+        "price": 281,
+        "was": 392
+      },
+      "after": {
+        "price": 321,
+        "was": 432
+      },
+      "delta": 40
+    },
+    {
+      "id": "DAScjApz6KAITldnCtJn",
+      "name": "תיק טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "DCveCkOXJFgGzmSr23rR",
+      "name": "תיק טלית תפילין לבן דמוי עור עם הנושא \"האש שלי\"",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "DF3Y0Gu5rNjhzp6a9IN9",
+      "name": "רקמה על 2 כיסויים",
+      "sku": "1234",
+      "before": {
+        "price": 90,
+        "was": null
+      },
+      "after": {
+        "price": 120,
+        "was": null
+      },
+      "delta": 30
+    },
+    {
+      "id": "DHESY3zAMZNxo3pBERqx",
+      "name": "סט טלית תפילין כותל לבן עם אותיות זהב בולטות",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "DaM7EtcdYPKAygLFnARC",
+      "name": "סט טלית תפילין ועטרה קטיפה \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "DchwvnXVDZTQMmWLALjI",
+      "name": "תיק תפילין דמוי עור אפור עם בידוד תרמי",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "DcoUCzi3zFEVhR0UBlMp",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "DdAuBM3d0boiHmsxtUE2",
+      "name": "סט טלית תפילין דמוי עור יברכך",
+      "sku": null,
+      "before": {
+        "price": 150,
+        "was": 210
+      },
+      "after": {
+        "price": 190,
+        "was": 250
+      },
+      "delta": 40
+    },
+    {
+      "id": "DgncFSHmMSzUZnNoq2o3",
+      "name": "סט טלית ותפילין דמוי עור יברכך",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "DhfMV9uHJd1z5gvv7Gnh",
+      "name": "סט טלית תפילין ארוג כחול רקמה יברכך",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "Dhs0BDHBgwT3iRVax8Qa",
+      "name": "סט טלית תפילין דמוי עור אפור אותיות בולטות \"שיויתי\" כסף 36X29 ס\"מ...",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "DsSokwvIAs2rrLEjAS7u",
+      "name": "תיק טלית תפילין דמוי עור חום עם רקמת יברכך",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "DtoISHESC1RYulyM6e4V",
+      "name": "תיק תפילין דמוי עור ברונזה משופשף",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "DvHO0EdbKL21mHvuabTQ",
+      "name": "תיק טלית ותפילין דמוי עור לבן עם הדפס יברכך",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "E0wUv2oPEk8gfGLCA5db",
+      "name": "סט טלית תפילין בד דמוי פשתן \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "E5gMiqkIfGcU8GlXcDkl",
+      "name": "זוג בתי תפילין \"מופת\" כסוף עם פלקטה",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "EOJnyNKEjNd2yIxPe0LN",
+      "name": "סט טלית תפילין מפשתן",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "ERNxqyHJTG3AKZ2kM9Ot",
+      "name": "תיק תפילין דמוי עור כחול בעיצוב קוביות",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "EnqZ9ZDwUY4FlAMQLmkn",
+      "name": "תיק תפילין דמוי עור שחור – איחסון אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "F0l18RxL8npuzT9oT5cw",
+      "name": "סט טלית ותפילין דמוי עור עם הדפס יברכך",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "FBB5Zl2LPFz6Ci60tQK8",
+      "name": "סט טלית תפילין בד דמוי פשתן",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "FCjD5GJItgWjSmet0lji",
+      "name": "סט טלית תפילין דמוי עור בגוון קאמל",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "FDWpOnOMbzpxwVYm5H31",
+      "name": "תיק טלית תפילין דמוי עור קאמל מהודר",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "FrapmWWWV7xaAvo2xIlE",
+      "name": "סט טלית תפילין מהודר דמוי עור",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "G72tcrGjxt4hk3CE2uBn",
+      "name": "סט טלית ותפילין דמוי עור שחור עם אותיות בולטות",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "GIwOfiCJu5acYbNX1yg5",
+      "name": "תיק מפואר לטלית ותפילין עם ידית",
+      "sku": null,
+      "before": {
+        "price": 241,
+        "was": 336
+      },
+      "after": {
+        "price": 281,
+        "was": 376
+      },
+      "delta": 40
+    },
+    {
+      "id": "GMQJBOAuzRaBzqpiSp7r",
+      "name": "סט טלית תפילין ועטרה בפשתן",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "GUlK0J1RA0bOFCO1xPCc",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "GYHkQ4aJEvZwxTyzXqYY",
+      "name": "סט טלית תפילין דמוי עור כסף עם כיתוב יברכך",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "Gg3Kuaqldw5T97w5tw4N",
+      "name": "סט טלית ותפילין דמוי עור אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "GvMWpO9vC0jWU6fUkIk2",
+      "name": "סט טלית תפילין פשתן – עיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "Gx1DQJr6exCX0c5PMEm6",
+      "name": "סט טלית תפילין קטיפה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 100,
+        "was": 140
+      },
+      "after": {
+        "price": 140,
+        "was": 180
+      },
+      "delta": 40
+    },
+    {
+      "id": "HObcq7S0Ud7Vb6qaKZKa",
+      "name": "סט טלית תפילין ארוג אפור רקמה יברכך",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "HQ7uTNN7cuKDmnr7zQII",
+      "name": "סט טלית תפילין קטיפה כחול בהיר עם ריקמה 36X29 ס\"מ...",
+      "sku": null,
+      "before": {
+        "price": 60,
+        "was": 84
+      },
+      "after": {
+        "price": 90,
+        "was": 114
+      },
+      "delta": 30
+    },
+    {
+      "id": "HZiss4uy1VWptejHvlj5",
+      "name": "תיק תפילין דמוי עור שחור",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "I9eS9Vo1WNp2ihOEMDbO",
+      "name": "סט טלית תפילין מהודר בד ארוג כחול כהה וכחול בהיר עם רקמה 36X29 ס\"מ...",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "IAT1kxiN9JqXaBwF26oI",
+      "name": "תיק טלית תפילין מהודר דמוי עור קרם רקמה יברכך 3... — עותק",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "IgRGJoPAgEmeA5mrdRrT",
+      "name": "סט טלית תפילין פיו לבן עם רקמה בולטת ואותיות בולטות יברכך...",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "IpCV5KI5ItfcuIeBII3h",
+      "name": "סט טלית תפילין דמוי עור אפור בטון",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "JBSvKUkxYC7ov86zGtcj",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "JJs530I4QkpDjAJ0lYvT",
+      "name": "סט טלית תפילין פיו שחור",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "JaqgsE1JIWGN594Qpg6D",
+      "name": "סט טלית תפילין עיצוב כותל בטון אותיות בולטות כסף",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "KEOYlN4pehLHm3kDfCoM",
+      "name": "סט טלית ותפילין דמוי עור שחור עם כסף – יברכך",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "KL7FSynuZkNs9SqUil4P",
+      "name": "תיק טלית ותפילין דמוי עור אפור כהה",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "KUTanzXPAiIWQQxN1eyq",
+      "name": "סט טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "KeWevprgAMDdFHkG4NBS",
+      "name": "סט טלית תפילין דמוי עור עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "KlLvCjcEq2OV96JtORom",
+      "name": "סט טלית תפילין רקמה בולטת – דוגמת יברכך מרובע",
+      "sku": null,
+      "before": {
+        "price": 181,
+        "was": 252
+      },
+      "after": {
+        "price": 221,
+        "was": 292
+      },
+      "delta": 40
+    },
+    {
+      "id": "KlQOlPI8VzP3jx2qLLKu",
+      "name": "זוג בתי תפילין מופת פלסטיק בציפוי כסף עם פלקטה",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "L8n0nIDRY9hN2qYOhxXv",
+      "name": "סט טלית תפילין ועטרה פשתן 'יברכך' – 29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "M6FUHCcUihioeKedWKc0",
+      "name": "סט טלית ותפילין קורדרוי \"יברכך\"",
+      "sku": null,
+      "before": {
+        "price": 90,
+        "was": 126
+      },
+      "after": {
+        "price": 120,
+        "was": 156
+      },
+      "delta": 30
+    },
+    {
+      "id": "MGULOQ4m6xQ6tNsyguuq",
+      "name": "סט טלית ותפילין דמוי עור חום",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "MGa375OPhjiLdR596hnV",
+      "name": "סט טלית ותפילין מפשתן",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "MLmCFHtcYwxJq2mykGT8",
+      "name": "סט טלית תפילין דמוי עור 36X29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "Ndpv7n9lOyJeiUOzph6M",
+      "name": "סט טלית תפילין קטיפה כחול כהה עם הדפס 'שמע ישראל'",
+      "sku": null,
+      "before": {
+        "price": 100,
+        "was": 140
+      },
+      "after": {
+        "price": 140,
+        "was": 180
+      },
+      "delta": 40
+    },
+    {
+      "id": "NkWwhgHFlLGFJpacvAsh",
+      "name": "תיק טלית תפילין דמוי עור לבן עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 220,
+        "was": 308
+      },
+      "after": {
+        "price": 260,
+        "was": 348
+      },
+      "delta": 40
+    },
+    {
+      "id": "NuV7NRIYtD7zxYqV6MUC",
+      "name": "סט טלית תפילין דמוי עור לבן \"כותל\" – עיצוב אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "Nwpjz9yC1JsZjznTEvTq",
+      "name": "סט טלית תפילין דמוי עור שחור עם כיתוב זהב",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "O4xwEmsuTihHra2p1gqv",
+      "name": "סט טלית תפילין בד פשתן תבר אלגנטי",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "OLlzQRvnE80pzJsB5txj",
+      "name": "סט טלית תפילין דמוי עור מהודר",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "OoRbYYP9mhwGloMhY5pO",
+      "name": "סט תיקים לטלית ולתפילין עם ברכת כהנים – צבע אבן",
+      "sku": null,
+      "before": {
+        "price": 329,
+        "was": 461
+      },
+      "after": {
+        "price": 369,
+        "was": 501
+      },
+      "delta": 40
+    },
+    {
+      "id": "P7hCQJXPKNOF604mkWmy",
+      "name": "זוג בתי תפילין \"מופת\" פלסטיק כסוף עם פלקטה - מידה 36...",
+      "sku": null,
+      "before": {
+        "price": 54,
+        "was": 76
+      },
+      "after": {
+        "price": 84,
+        "was": 106
+      },
+      "delta": 30
+    },
+    {
+      "id": "PAPD7lzHMD8L02wq0CN5",
+      "name": "סט טלית תפילין מפיו לבן",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "PJlnRpg75uJcNW7kqAaI",
+      "name": "תיק לאחסון תפילין דמוי עור שחור",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "PQCEuQCRYHpCOkPl5htp",
+      "name": "סט טלית ותפילין דמוי עור לבן עם כתב כסף",
+      "sku": null,
+      "before": {
+        "price": 200,
+        "was": 280
+      },
+      "after": {
+        "price": 240,
+        "was": 320
+      },
+      "delta": 40
+    },
+    {
+      "id": "Q2UGgXFPuKXkJnkJKLTj",
+      "name": "סט טלית ותפילין דמוי עור שחור עם כיתוב",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "QN4MBJkqDAie5VWJYmBE",
+      "name": "סט טלית תפילין דמוי עור לבן אותיות בולטות \"יברכך\" כסף 31X38 ס\"מ...",
+      "sku": null,
+      "before": {
+        "price": 160,
+        "was": 224
+      },
+      "after": {
+        "price": 200,
+        "was": 264
+      },
+      "delta": 40
+    },
+    {
+      "id": "QwKMGgIjKUQ40WQDIQNv",
+      "name": "סט טלית תפילין דמוי עור קרם בעיצוב מהודר",
+      "sku": null,
+      "before": {
+        "price": 140,
+        "was": 196
+      },
+      "after": {
+        "price": 180,
+        "was": 236
+      },
+      "delta": 40
+    },
+    {
+      "id": "R1R4o5YldY7fpdG9Boll",
+      "name": "סט טלית תפילין דמוי עור עם ריקמה אפור",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "SnKMGHUjaYxFSVJGzye5",
+      "name": "סט טלית תפילין דמוי עור מהודר 36X29 ס\"מ",
+      "sku": null,
+      "before": {
+        "price": 120,
+        "was": 168
+      },
+      "after": {
+        "price": 160,
+        "was": 208
+      },
+      "delta": 40
+    },
+    {
+      "id": "TElmBbfp7tlElKd1jUsb",
+      "name": "סט טלית תפילין מפשתן",
+      "sku": null,
+      "before": {
+        "price": 81,
+        "was": 112
+      },
+      "after": {
+        "price": 111,
+        "was": 142
+      },
+      "delta": 30
+    },
+    {
+      "id": "TKxfLlCI1JXfCpVNcJOA",
+      "name": "תיק אדיר לאחסון תפלין – טרמי צבאי שחור",
+      "sku": null,
+      "before": {
+        "price": 260,
+        "was": 364
+      },
+      "after": {
+        "price": 300,
+        "was": 404
+      },
+      "delta": 40
+    },
+    {
+      "id": "Tld3d4bdhQniPc1G4rRj",
+      "name": "סט טלית תפילין פיו מחורר בצבע חום",
+      "sku": null,
+      "before": {
+        "price": 150,
+        "was": 210
+      },
+      "after": {
+        "price": 190,
+        "was": 250
+      },
+      "delta": 40
+    },
+    {
+      "id": "TtB6yMeHVoy8ggPWCjew",
+      "name": "סט טלית ותפילין קטיפה כחול כהה עם ריקמה",
+      "sku": null,
+      "before": {
+        "price": 70,
+        "was": 98
+      },
+      "after": {
+        "price": 100,
+        "was": 128
+      },
+      "delta": 30
+    }
+  ]
+}

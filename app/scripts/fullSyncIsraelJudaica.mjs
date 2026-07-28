@@ -25,6 +25,17 @@
  *       (SUPPLIER_EMAIL / SUPPLIER_PASSWORD ב-.env.local; --no-enrich לדילוג)
  *     • DRY-RUN כותב scripts/new-products-candidates-<תאריך>.csv
  *     • EXECUTE כותב לוג scripts/import-log-<תאריך>.json
+ *
+ * דגלים נוספים (07/2026):
+ *   --codes=1152,1153,1154,1155,1156,1157,1158,1159  ← קטגוריות ספציפיות בלבד
+ *       (מדלג על גילוי קטגוריות; מחיקה נחסמת אוטומטית לבטיחות)
+ *   --price-mult=2  ← מחיר מכירה = ספק × 2, מחיר מחוק = ספק × 2.5
+ *       (ללא הדגל: הנוסחה הרגילה ×1.568 / ×1.96)
+ *   תיאור: נשלף אוטומטית מ"פרטי המוצר" (חומר/צבע/גודל) בשלב ההעשרה → שדה description
+ *
+ * דוגמה — ייבוא כל בתי המזוזה עם מחיר כפול:
+ *   node app/scripts/fullSyncIsraelJudaica.mjs --import-only --codes=1152,1153,1154,1155,1156,1157,1158,1159 --price-mult=2
+ *   node app/scripts/fullSyncIsraelJudaica.mjs --import-only --codes=1152,1153,1154,1155,1156,1157,1158,1159 --price-mult=2 --execute
  */
 
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
@@ -42,9 +53,21 @@ const args        = process.argv.slice(2);
 const EXECUTE     = args.includes('--execute');
 const IMPORT_ONLY = args.includes('--import-only');
 const NO_ENRICH   = args.includes('--no-enrich');
-const SKIP_DELETE = args.includes('--skip-delete') || IMPORT_ONLY; // import-only: לעולם לא מוחקים
+// --codes=1153,1155  ← הרצה על קטגוריות ספציפיות בלבד (מדלג על גילוי קטגוריות חדשות)
+const codesArg    = args.find(a => a.startsWith('--codes='));
+const ONLY_CODES  = codesArg ? new Set(codesArg.split('=')[1].split(',').map(s => s.trim())) : null;
+
+// בטיחות: עם --codes אסור למחוק — רשימת הספק חלקית וכל השאר ייראה כ"פסק"
+const SKIP_DELETE = args.includes('--skip-delete') || IMPORT_ONLY || !!ONLY_CODES;
 const SKIP_IMPORT = args.includes('--skip-import');
 const DRY_RUN     = !EXECUTE;
+
+// --price-mult=2  ← מחיר מכירה = מחיר ספק × N (ברירת מחדל: הנוסחה הרגילה 1.4×1.12)
+const multArg     = args.find(a => a.startsWith('--price-mult='));
+const PRICE_MULT  = multArg ? parseFloat(multArg.split('=')[1]) : null;
+if (multArg && (!PRICE_MULT || PRICE_MULT <= 0)) { console.error('❌ --price-mult לא תקין'); process.exit(1); }
+if (ONLY_CODES) console.log(`🎯 הרצה על קטגוריות: ${[...ONLY_CODES].join(', ')}`);
+if (PRICE_MULT) console.log(`💰 מכפיל מחיר: ×${PRICE_MULT} (מחיר מחוק: ×${(PRICE_MULT * 1.25).toFixed(2)})`);
 
 if (IMPORT_ONLY) console.log('🛡️  IMPORT-ONLY — ללא מחיקות וללא עדכון מוצרים קיימים. חדשים בלבד (draft).\n');
 
@@ -120,6 +143,7 @@ const CATEGORY_MAP = [
   { code: '1151', label: 'כיפות סרוגות DMC',     cat: 'כיפות',              subCategory: 'סרוגות ד.מ.צ.' },
   { code: '1153', label: 'מזוזות זכוכית',         cat: 'בתי מזוזה',          subCategory: 'מזוזות זכוכית' },
   { code: '1154', label: 'מזוזות אלומיניום',      cat: 'בתי מזוזה',          subCategory: 'מזוזות אלומיניום' },
+  { code: '1155', label: 'מזוזות פולירזין',       cat: 'בתי מזוזה',          subCategory: 'מזוזות פולירזין' },
   { code: '1156', label: 'מזוזות לרכב',           cat: 'בתי מזוזה',          subCategory: 'מזוזות לרכב' },
   { code: '1157', label: 'מזוזות מתכת',           cat: 'בתי מזוזה',          subCategory: 'מזוזות מתכת' },
   { code: '1158', label: 'מזוזות עץ',             cat: 'בתי מזוזה',          subCategory: 'מזוזות עץ' },
@@ -266,7 +290,8 @@ async function enrichNewProducts(newSkus) {
   // newSkus: Array<[sku, { catEntry, rawProduct }]>
   const cache = loadEnrichCache();
   const result = new Map(Object.entries(cache).map(([k, v]) => [k, v]));
-  const pending = newSkus.filter(([sku]) => !cache[sku]);
+  // entry ישן בלי description נחשב pending (נוסף 07/2026)
+  const pending = newSkus.filter(([sku]) => !cache[sku] || cache[sku].description === undefined);
 
   if (NO_ENRICH) {
     console.log('  ⏭  --no-enrich — דילוג העשרה (מחיר סוחר/כמות באריזה)');
@@ -337,18 +362,36 @@ async function enrichNewProducts(newSkus) {
     }
     console.log(`  💰 נמצאו מחירים ל-${Object.keys(dealerPrices).length} SKUs`);
 
-    // 2) כמות באריזה — דף מוצר לכל מוצר חדש (resumable cache)
+    // 2) כמות באריזה + תיאור (פרטי המוצר) — דף מוצר לכל מוצר חדש (resumable cache)
     let sinceFlush = 0;
     for (let i = 0; i < pending.length; i++) {
-      const [sku] = pending[i];
-      let entry = { price: dealerPrices[sku] ?? null, packSize: 1 };
+      const [sku, { catEntry, rawProduct }] = pending[i];
+      let entry = { price: dealerPrices[sku] ?? null, packSize: 1, description: null };
       try {
-        await page.goto(`${BASE_URL}/index.php?option=com_art&view=product&sku=${sku}&lang=he`,
-          { waitUntil: 'domcontentloaded', timeout: 45000 });
-        await page.waitForTimeout(1200);
+        // sku= לא תמיד מרנדר; code=<product_code>&Itemid=280 הוא הקישור שהאתר עצמו משתמש בו
+        const prodUrl = rawProduct?.product_code
+          ? `${BASE_URL}/index.php?option=com_art&view=product&code=${rawProduct.product_code}&Itemid=280&lang=he`
+          : `${BASE_URL}/index.php?option=com_art&view=product&sku=${sku}&lang=he`;
+        await page.goto(prodUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+        await page.waitForTimeout(1500);
         const bodyText = await page.evaluate(() => document.body.innerText);
         const m = bodyText.match(/נמכר באריזה של\s*(\d+)\s*יחידות/);
         if (m) entry.packSize = Number(m[1]);
+
+        // תיאור מתוך "פרטי המוצר": חומר / צבע / גודל / משקל
+        const block = bodyText.split('פרטי המוצר')[1]?.split(/פריטים נבחרים|Previous/)[0] || '';
+        const attr = (label) => block.match(new RegExp(`${label}\\s*:\\s*([^\\n]+)`))?.[1]?.trim() || null;
+        const material = attr('חומר'), color = attr('צבע'), size = attr('גודל');
+        if (material || color || size) {
+          const parts = [];
+          if (catEntry?.cat === 'בתי מזוזה') {
+            parts.push(/לרכב/.test(catEntry?.subCategory || '') ? 'מזוזה לרכב' : 'בית מזוזה מהודר');
+          }
+          if (material) parts.push(`עשוי ${material}`);
+          if (color)    parts.push(`בצבע ${color}`);
+          if (size)     parts.push(`בגודל ${size} ס"מ`);
+          entry.description = `${parts.join(' ')}. מבית ארט יודאיקה — עיצוב איכותי ועמיד לבית היהודי.`;
+        }
       } catch (e) {
         process.stdout.write(`  ⚠️  ${sku}: ${e.message}\n`);
       }
@@ -380,11 +423,11 @@ function csvEscape(v) {
 }
 
 function writeCandidatesCsv(rows) {
-  const header = ['קוד UK', 'שם', 'מחיר ספק', 'מחיר אצלנו', 'מחיר מחוק', 'מגיע בקרוב', 'תאריך צפי', 'כמות באריזה', 'קטגוריה', 'תת-קטגוריה', 'תמונה'];
+  const header = ['קוד UK', 'שם', 'תיאור', 'מחיר ספק', 'מחיר אצלנו', 'מחיר מחוק', 'מגיע בקרוב', 'תאריך צפי', 'כמות באריזה', 'קטגוריה', 'תת-קטגוריה', 'תמונה'];
   const lines = [header.join(',')];
   for (const r of rows) {
     lines.push([
-      r.sku, r.name, r.purchasePrice ?? '', r.price ?? '', r.was ?? '',
+      r.sku, r.name, r.description ?? '', r.purchasePrice ?? '', r.price ?? '', r.was ?? '',
       r.comingSoon ? 'כן' : '', r.comingSoon ? formatArriveDate(r.expectedArrivalDate) : '',
       r.packSize ?? 1, r.category, r.subCategory, r.imgUrl ?? '',
     ].map(csvEscape).join(','));
@@ -426,10 +469,11 @@ async function discoverNewCategories() {
 async function fetchAllSupplierSkus() {
   console.log('\n══ שלב 2: שליפת כל SKUs מהספק ══\n');
   const supplierSkus = new Map(); // sku → { catEntry, rawProduct }
-  let totalCats = CATEGORY_MAP.length;
+  const catMap = ONLY_CODES ? CATEGORY_MAP.filter(c => ONLY_CODES.has(c.code)) : CATEGORY_MAP;
+  let totalCats = catMap.length;
 
-  for (let i = 0; i < CATEGORY_MAP.length; i++) {
-    const entry = CATEGORY_MAP[i];
+  for (let i = 0; i < catMap.length; i++) {
+    const entry = catMap[i];
     process.stdout.write(`  [${i+1}/${totalCats}] code=${entry.code} (${entry.label})... `);
     try {
       const products = await fetchAllSkusForCode(entry.code);
@@ -545,9 +589,10 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
   for (const [sku, { catEntry, rawProduct }] of newSkus) {
     const enriched      = enrichment.get(sku) || {};
     const purchasePrice = enriched.price ?? (rawProduct.price ? parseFloat(rawProduct.price) : null);
-    // מחיר סופי = ספק × 1.4 × 1.12 | מחיר מחוק = ספק × 1.4 × 1.40 (מעוגל לשקל שלם)
-    const salePrice     = purchasePrice ? Math.round(purchasePrice * 1.4 * 1.12) : null;
-    let   wasPrice      = purchasePrice ? Math.round(purchasePrice * 1.4 * 1.40) : null;
+    // ברירת מחדל: מחיר סופי = ספק × 1.4 × 1.12 | מחיר מחוק = ספק × 1.4 × 1.40
+    // עם --price-mult=N: מחיר סופי = ספק × N | מחיר מחוק = ספק × N × 1.25
+    const salePrice     = purchasePrice ? Math.round(purchasePrice * (PRICE_MULT ?? 1.4 * 1.12)) : null;
+    let   wasPrice      = purchasePrice ? Math.round(purchasePrice * (PRICE_MULT ? PRICE_MULT * 1.25 : 1.4 * 1.40)) : null;
     if (wasPrice != null && salePrice != null && wasPrice <= salePrice) wasPrice = salePrice + 1;
 
     const expectedArrivalDate = parseArriveDate(rawProduct.arrive_date);
@@ -563,6 +608,11 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
       comingSoon:    !!expectedArrivalDate,
       expectedArrivalDate,
       packSize:      enriched.packSize ?? 1,
+      // תיאור: מ"פרטי המוצר" (העשרה); fallback — נבנה מהשם
+      description:   enriched.description
+        ?? (rawProduct.name_he
+              ? `${catEntry.cat === 'בתי מזוזה' ? (/לרכב/.test(catEntry.subCategory) ? 'מזוזה לרכב — ' : 'בית מזוזה מהודר — ') : ''}${rawProduct.name_he}. מבית ארט יודאיקה — עיצוב איכותי ועמיד לבית היהודי.`
+              : null),
       category:      catEntry.cat,
       subCategory:   catEntry.subCategory,
       imgUrl:        buildImgUrl(rawProduct.image),
@@ -620,6 +670,7 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
       category:      c.category,
       subCategory:   c.subCategory,
       hidden:        true, // טיוטה — לא מוצג באתר עד פרסום ידני (הדפים מסננים לפי hidden)
+      description:   c.description || null,
       imgUrl:        cloudinaryUrl || c.imgUrl || null,
       purchasePrice: c.purchasePrice,
       price:         c.price,
@@ -630,6 +681,7 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
       stockStatus:   c.comingSoon ? 'coming_soon' : 'in_stock',
       outOfStock:    c.comingSoon, // טרם במלאי — צפייה כן, רכישה לא
       status:        'draft', // טיוטה — פרסום ידני בלבד
+      priority:      50, // חובה! דפי קטגוריה ממיינים orderBy('priority') — בלי השדה המוצר לא מוצג
       supplierCatCode: c.catEntry.code,
       createdAt:     FieldValue.serverTimestamp(),
     };
@@ -664,7 +716,8 @@ async function main() {
   }
   console.log('═'.repeat(60));
 
-  const newCats = await discoverNewCategories();
+  const newCats = ONLY_CODES ? [] : await discoverNewCategories();
+  if (ONLY_CODES) console.log('\n⏭  --codes פעיל — דילוג על גילוי קטגוריות חדשות.');
   const supplierSkus = await fetchAllSupplierSkus();
   const firestoreProducts = await loadFirestoreProducts();
 

@@ -52,17 +52,17 @@ const serviceAccount = JSON.parse(readFileSync(SA_PATH, 'utf8'));
 if (getApps().length === 0) initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore();
 
-// ── Pricing: supplier × 3, rounded up to nearest X9.90 ───────────────────────
-function roundUp90(n) {
-  const floored   = Math.floor(n);
-  const base      = floored - (floored % 10);
-  const candidate = base + 9.9;
+// ── Pricing: supplier × factor, rounded UP to nearest whole X9 (A6) ──────────
+// roundUp90 RETIRED: X9.90 fractional prices are forbidden — whole shekels only.
+function roundUpWhole9(n) {
+  const base = Math.floor(n / 10) * 10;
+  const candidate = base + 9;
   return candidate < n ? candidate + 10 : candidate;
 }
 
 function calcKippotPrice(supplierPrice) {
   if (!supplierPrice || isNaN(supplierPrice) || supplierPrice <= 0) return 0;
-  return roundUp90(supplierPrice * PRICE_FACTOR);
+  return roundUpWhole9(supplierPrice * PRICE_FACTOR);
 }
 
 // ── Supplier fetch helpers (identical pattern to importAllIsraelJudaica.mjs) ──

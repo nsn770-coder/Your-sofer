@@ -1,0 +1,9 @@
+{
+  "generatedAt": "2026-07-26T04:11:46.776Z",
+  "rule": "Math.round() to whole shekel, same as formatPrice()",
+  "totalProducts": 4963,
+  "checked": 4963,
+  "cleanCount": 4963,
+  "collisionCount": 0,
+  "collisions": []
+}

@@ -61,7 +61,7 @@ export default function ContactPage() {
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '28px', marginBottom: 24 }}>
           <h2 style={{ color: '#1a1a1a', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
           <div style={{ background: 'rgba(30,58,138,0.05)', border: '1px solid rgba(30,58,138,0.15)', borderRadius: 6, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#1a1a1a' }}>
-            Your Sofer היא חנות אונליין לרכישת מוצרי סת״מ ויודאיקה, בבעלות ובניהול <strong>בואהרון ניסן נסים</strong> — עוסק מורשה 304803810.
+            Your Sofer הוא אתר היודאיקה הגדול בישראל — כיפות, מתנות ומזכרות לאירועים, בבעלות ובניהול <strong>בואהרון ניסן נסים</strong> — עוסק מורשה 304803810.
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[

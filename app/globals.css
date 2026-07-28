@@ -20,18 +20,21 @@
   --color-gold-600: #B45309;
 }
 
+/* פונט האתר: Arial (פונט מערכת קריא) בכל הרכיבים, כולל כותרות.
+   המשתנים הישנים ממופים ל-Arial כדי שכל הפניה קיימת תמשיך לעבוד. */
 :root {
-  --font-frank: 'Frank Ruhl Libre', serif;
-  --font-cormorant: 'Cormorant Garamond', serif;
+  --font-heebo: Arial, 'Segoe UI', sans-serif;
+  --font-frank: Arial, 'Segoe UI', sans-serif;
+  --font-cormorant: Arial, 'Segoe UI', sans-serif;
 }
 
 .brand-story {
-  font-family: var(--font-frank), serif !important;
+  font-family: var(--font-frank), sans-serif !important;
 }
 
 h1, h2, h3 {
-  font-family: var(--font-cormorant), serif;
-  font-weight: 600;
+  font-family: Arial, 'Segoe UI', sans-serif;
+  font-weight: 700;
   letter-spacing: -0.01em;
 }
 

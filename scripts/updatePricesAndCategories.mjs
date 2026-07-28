@@ -21,22 +21,24 @@ if (!getApps().length) initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore();
 
 // ── Pricing formula ───────────────────────────────────────────────────────────
-function roundUp90(n) {
-  const floored = Math.floor(n);
-  const base = floored - (floored % 10);
-  const candidate = base + 9.9;
+// roundUp90 RETIRED (A6): prices must be whole shekels — X9.90 is forbidden.
+// roundUpWhole9 keeps the psychological price point (ends in 9) but whole:
+// rounds UP to the nearest ...9 (e.g. 105.3 → 109), never below the input.
+function roundUpWhole9(n) {
+  const base = Math.floor(n / 10) * 10;
+  const candidate = base + 9;
   return candidate < n ? candidate + 10 : candidate;
 }
 
 function calcPrice(supplierPrice, isJewelry = false) {
-  if (isJewelry) return roundUp90(supplierPrice * 3.18);
+  if (isJewelry) return roundUpWhole9(supplierPrice * 3.18);
   let m;
   if (supplierPrice <= 10)       m = 3.00;
   else if (supplierPrice <= 150) m = 2.18;
   else if (supplierPrice <= 200) m = 1.98;
   else if (supplierPrice <= 399) m = 1.78;
   else                            m = 1.68;
-  return roundUp90(supplierPrice * m);
+  return roundUpWhole9(supplierPrice * m);
 }
 
 // מחיר קבוע: מחיר_ספק_בשח × multiplier, מעוגל לשקל שלם

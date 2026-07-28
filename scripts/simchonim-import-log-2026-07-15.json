@@ -1,0 +1,169 @@
+{
+  "date": "2026-07-15",
+  "ok": 20,
+  "failed": 0,
+  "skippedOOS": [],
+  "errors": [],
+  "log": [
+    {
+      "id": "SqI3odADspH614rbrX3W",
+      "sku": "SIM-99400",
+      "name": "ברכון כיס – דגם פסטל",
+      "price": 5,
+      "variants": 2,
+      "images": 3
+    },
+    {
+      "id": "w1kz2nYa8J4HnwyRfJtp",
+      "sku": "SIM-99660",
+      "name": "זמירות שבת דגם ירושלים",
+      "price": 6.6,
+      "variants": 1,
+      "images": 3
+    },
+    {
+      "id": "RNdAZLWfe6nIo0NI3ZVv",
+      "sku": "SIM-99683",
+      "name": "זמירות 12X17 בהטבעה אישית",
+      "price": 8.2,
+      "variants": 2,
+      "images": 3
+    },
+    {
+      "id": "kmiRSXQ9QZVFjZnePlUd",
+      "sku": "SIM-997781",
+      "name": "זמירות שבת דגם סילבר",
+      "price": 8,
+      "variants": 2,
+      "images": 3
+    },
+    {
+      "id": "bOnmNarPVYPHyEFQxT4Z",
+      "sku": "SIM-99197",
+      "name": "זמירות דגם מדליה",
+      "price": 8.8,
+      "variants": 2,
+      "images": 3
+    },
+    {
+      "id": "CAw0pkOBa0pWT0mR137p",
+      "sku": "SIM-99354",
+      "name": "זמירות דגם מעין עולם הבא",
+      "price": 7.9,
+      "variants": 2,
+      "images": 3
+    },
+    {
+      "id": "ffA85yyiaTGmQtB11dEN",
+      "sku": "SIM-99254",
+      "name": "זמירות דגם נצנצים",
+      "price": 7.9,
+      "variants": 2,
+      "images": 3
+    },
+    {
+      "id": "Ys4JbZ2goxnHQo77bpaq",
+      "sku": "SIM-99507",
+      "name": "ברכון כיס מק\"ט 507",
+      "price": 5,
+      "variants": 1,
+      "images": 1
+    },
+    {
+      "id": "drCjaxqxx6AmLXzKNx5S",
+      "sku": "SIM-99410",
+      "name": "ברכון כיס לבר מצווה מק\"ט 410",
+      "price": 5,
+      "variants": 1,
+      "images": 2
+    },
+    {
+      "id": "E35VjKhiixKPfeUvB4Xj",
+      "sku": "SIM-99504",
+      "name": "ברכון כיס מק\"ט 504",
+      "price": 5,
+      "variants": 1,
+      "images": 1
+    },
+    {
+      "id": "sCvl4dXzTO2i9FdkGSrT",
+      "sku": "SIM-991441",
+      "name": "ברכון כיס מדליה שחור",
+      "price": 5,
+      "variants": 2,
+      "images": 2
+    },
+    {
+      "id": "70bwmwwj7trlppYOYg7C",
+      "sku": "SIM-99509",
+      "name": "ברכון כיס מק\"ט 509",
+      "price": 5,
+      "variants": 2,
+      "images": 3
+    },
+    {
+      "id": "DeWsPOqZ2hudkKnM75jA",
+      "sku": "SIM-99398",
+      "name": "ברכון כיס – בת מצוה",
+      "price": 5,
+      "variants": 1,
+      "images": 2
+    },
+    {
+      "id": "u1ORYb1mkqDMcQDwiKyg",
+      "sku": "SIM-99741",
+      "name": "ברכון פרמידה",
+      "price": 5,
+      "variants": 2,
+      "images": 1
+    },
+    {
+      "id": "kt1H5d9R0BKpgYosm5tt",
+      "sku": "SIM-99396",
+      "name": "ברכון כיס – בר מצוה",
+      "price": 5,
+      "variants": 1,
+      "images": 1
+    },
+    {
+      "id": "chcfOvzqxc9kwCN59IIb",
+      "sku": "SIM-1307",
+      "name": "כרטיס הפרשת חלה",
+      "price": 5,
+      "variants": 0,
+      "images": 1
+    },
+    {
+      "id": "QsWbU7XdSn5DTGgxUENq",
+      "sku": "SIM-991499",
+      "name": "ברכון דגם שיש",
+      "price": 5,
+      "variants": 1,
+      "images": 1
+    },
+    {
+      "id": "s1J8lP2jjKtIA7LaDPZh",
+      "sku": "SIM-997751",
+      "name": "ברכון דגם יהלום",
+      "price": 5.7,
+      "variants": 2,
+      "images": 2
+    },
+    {
+      "id": "DbHutkQWX6pPATaKU55m",
+      "sku": "SIM-99969",
+      "name": "זמירות דגם אלמוג",
+      "price": 6.9,
+      "variants": 2,
+      "images": 3
+    },
+    {
+      "id": "AAdwjnyHiJa9iE1hLmFr",
+      "sku": "SIM-8016",
+      "name": "מגנט בקשה למוצאי שבת עם בשמים",
+      "price": 18,
+      "variants": 0,
+      "images": 1
+    }
+  ]
+}

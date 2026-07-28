@@ -211,6 +211,11 @@ export default function ProductShell({ product }: { product: ShellProduct }) {
                     ✦ מבצע חבילה: {bundleLabel}
                   </div>
                 )}
+                {product.cat === 'כיפות' && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', background: '#1a1a1a', color: '#C5A028', fontSize: 13, fontWeight: 800, padding: '5px 12px', borderRadius: 8, marginBottom: 8, marginRight: 8, letterSpacing: '0.01em' }}>
+                    🎁 2nd ב-10%, 3+ ב-15%
+                  </div>
+                )}
                 <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck /> כולל מע״מ · משלוח לכל הארץ</div>
                 {effectivePrice > 99 && (
                   <div style={{ background: '#f0f7ff', border: '1px solid #bde0ff', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#1a1a1a', display: 'flex', alignItems: 'center', gap: 8 }}>
