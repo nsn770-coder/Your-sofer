@@ -395,7 +395,7 @@ export default function CartPage() {
                 </div>
                 {bundleDiscountAmount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
-                    <span>🎁 מבצע כיפות חבילות:</span>
+                    <span>🎁 מבצע כיפות: 2nd ב-10%, 3+ ב-15%</span>
                     <span>-{formatPrice(bundleDiscountAmount)}</span>
                   </div>
                 )}

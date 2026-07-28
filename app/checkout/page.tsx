@@ -144,7 +144,7 @@ function OrderSummary({
         </div>
         {bundleDiscountAmount > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מבצע כיפות חבילות</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מבצע כיפות: 2nd ב-10%, 3+ ב-15%</span>
             <span style={{ paddingLeft: 4 }}>-{formatPrice(bundleDiscountAmount)}</span>
           </div>
         )}

@@ -192,56 +192,42 @@ function calcTotals(items: CartItem[]) {
     }
   }
 
-  // ── Bundle promo (NforX) ─────────────────────────────────────────────────────
-  const bundleGroups = new Map<string, CartItem[]>();
-  for (const item of items) {
-    if (!item.bundlePromo) continue;
-    const grp = bundleGroups.get(item.bundlePromo) ?? [];
-    grp.push(item);
-    bundleGroups.set(item.bundlePromo, grp);
-  }
-
+  // ── Kippot tiered discount (2nd unit: 10%, 3rd+: 15%) ───────────────────────
+  // חל אוטומטית על כל כיפות בקטגוריה כיפות, הנחה על הזול מבינהם
   let bundleOriginalSubtotal   = 0;
   let bundleDiscountedSubtotal = 0;
 
-  for (const [promoKey, grpItems] of bundleGroups) {
-    // When 30% wins, kippot bundlePromo were already handled in the main loop above
-    const activeItems = kippotDiscountActive
-      ? grpItems.filter(i => i.cat !== 'כיפות')
-      : grpItems;
-
-    const parsed = parseBundle(promoKey);
-    if (!parsed) {
-      for (const item of activeItems) {
-        const orig = item.price * item.quantity;
-        total += orig;
-        discountable += orig;
+  const kippotItems = items.filter(i => i.cat === 'כיפות');
+  if (kippotItems.length > 0) {
+    const kippotPrices: number[] = [];
+    for (const item of kippotItems) {
+      for (let i = 0; i < item.quantity; i++) {
+        kippotPrices.push(item.price);
       }
-      continue;
     }
 
-    if (activeItems.length === 0) continue;
+    if (kippotPrices.length > 0) {
+      // Sort by price descending (apply discount to cheapest items)
+      const sorted = [...kippotPrices].sort((a, b) => b - a);
+      let discountedTotal = 0;
 
-    const { n, bundlePrice } = parsed;
+      for (let i = 0; i < sorted.length; i++) {
+        const p = sorted[i];
+        if (i === 0) {
+          discountedTotal += p; // 1st: full price
+        } else if (i === 1) {
+          discountedTotal += p * 0.9; // 2nd: 10% off
+        } else {
+          discountedTotal += p * 0.85; // 3rd+: 15% off
+        }
+      }
 
-    const units: number[] = [];
-    for (const item of activeItems) {
-      for (let i = 0; i < item.quantity; i++) units.push(item.price);
+      const origTotal = sorted.reduce((s, p) => s + p, 0);
+      bundleOriginalSubtotal   = origTotal;
+      bundleDiscountedSubtotal = discountedTotal;
+      total += discountedTotal;
+      discountable += discountedTotal; // Kippot items eligible for coupon
     }
-    units.sort((a, b) => b - a);
-
-    const fullBundles    = Math.floor(units.length / n);
-    const promoUnits     = units.slice(0, fullBundles * n);
-    const remainderUnits = units.slice(fullBundles * n);
-
-    const origPromo     = promoUnits.reduce((s, p) => s + p, 0);
-    const discPromo     = fullBundles * bundlePrice;
-    const remainderCost = remainderUnits.reduce((s, p) => s + p, 0);
-
-    bundleOriginalSubtotal   += origPromo;
-    bundleDiscountedSubtotal += discPromo;
-    total += discPromo + remainderCost;
-    discountable += discPromo + remainderCost; // Bundle items eligible for coupon
   }
 
   const bundleDiscountAmount = Math.round((bundleOriginalSubtotal - bundleDiscountedSubtotal) * 100) / 100;

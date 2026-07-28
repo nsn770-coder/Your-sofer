@@ -59,10 +59,18 @@ interface PaymentItem {
   bundlePromo?: string;
 }
 
-function parseBundle(key: string): { n: number; bundlePrice: number } | null {
-  const m = key.match(/^(\d+)for(\d+)$/);
-  if (!m) return null;
-  return { n: parseInt(m[1]), bundlePrice: parseInt(m[2]) };
+// ── Tiered kippot discount helper ────────────────────────────────────────────
+// 1st unit: full price, 2nd: 10% off, 3rd+: 15% off (discount on cheapest)
+function calcTieredKippotDiscount(prices: number[]): number {
+  if (prices.length === 0) return 0;
+  const sorted = [...prices].sort((a, b) => b - a);
+  let discounted = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    if (i === 0) discounted += sorted[i];
+    else if (i === 1) discounted += sorted[i] * 0.9;
+    else discounted += sorted[i] * 0.85;
+  }
+  return sorted.reduce((s, p) => s + p, 0) - discounted;
 }
 
 export async function POST(req: NextRequest) {
@@ -149,49 +157,41 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── A1: bundle promo validation (NforX) ───────────────────────────────────
-    const bundleGroups = new Map<string, PaymentItem[]>();
-    for (const item of productItems) {
-      if (!item.bundlePromo) continue;
-      const grp = bundleGroups.get(item.bundlePromo) ?? [];
-      grp.push(item);
-      bundleGroups.set(item.bundlePromo, grp);
-    }
-
+    // ── A1: kippot tiered discount validation ────────────────────────────────
+    // חל אוטומטית על כל כיפות בקטגוריה כיפות
+    const kippotProductItems = productItems.filter(i => i.cat === 'כיפות');
     let expectedBundleDiscount = 0;
     let bundleDiscountedTotal  = 0;
-    for (const [promoKey, grpItems] of bundleGroups) {
-      const parsed = parseBundle(promoKey);
-      if (!parsed) {
-        for (const item of grpItems) {
-          bundleDiscountedTotal += item.price * item.quantity;
+
+    if (kippotProductItems.length > 0) {
+      const kippotPrices: number[] = [];
+      for (const item of kippotProductItems) {
+        for (let i = 0; i < item.quantity; i++) {
+          kippotPrices.push(item.price);
         }
-        continue;
       }
-      const { n, bundlePrice } = parsed;
 
-      const units: number[] = [];
-      for (const item of grpItems) {
-        for (let i = 0; i < item.quantity; i++) units.push(item.price);
+      if (kippotPrices.length > 0) {
+        const discount = calcTieredKippotDiscount(kippotPrices);
+        expectedBundleDiscount = Math.round(discount * 100) / 100;
+
+        const sorted = [...kippotPrices].sort((a, b) => b - a);
+        let discounted = 0;
+        for (let i = 0; i < sorted.length; i++) {
+          if (i === 0) discounted += sorted[i];
+          else if (i === 1) discounted += sorted[i] * 0.9;
+          else discounted += sorted[i] * 0.85;
+        }
+        bundleDiscountedTotal = Math.round(discounted * 100) / 100;
       }
-      units.sort((a, b) => b - a);
-
-      const fullBundles    = Math.floor(units.length / n);
-      const promoUnits     = units.slice(0, fullBundles * n);
-      const remainderUnits = units.slice(fullBundles * n);
-      const origPromo      = promoUnits.reduce((s, p) => s + p, 0);
-      const discPromo      = fullBundles * bundlePrice;
-      const remainderCost  = remainderUnits.reduce((s, p) => s + p, 0);
-      expectedBundleDiscount += Math.round((origPromo - discPromo) * 100) / 100;
-      bundleDiscountedTotal  += discPromo + remainderCost;
     }
 
     if (expectedBundleDiscount > 0) {
-      const bundleDiscountLine  = items.find(i => i.name.includes('מבצע כיפות — חבילות'));
+      const bundleDiscountLine  = items.find(i => i.name.includes('מבצע כיפות') || i.name.includes('הנחה'));
       const submittedBundleDisc = bundleDiscountLine ? -bundleDiscountLine.price : 0;
       if (Math.abs(submittedBundleDisc - expectedBundleDiscount) > 0.02) {
-        console.error(`[payment-bit] bundle discount mismatch`, { expectedBundleDiscount, submittedBundleDisc });
-        return NextResponse.json({ error: 'שגיאה בחישוב הנחת חבילות הכיפות' }, { status: 400 });
+        console.error(`[payment-bit] kippot discount mismatch`, { expectedBundleDiscount, submittedBundleDisc });
+        return NextResponse.json({ error: 'שגיאה בחישוב הנחת כיפות' }, { status: 400 });
       }
     }
 
