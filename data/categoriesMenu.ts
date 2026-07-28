@@ -22,6 +22,31 @@ export interface NavMenuItem {
 
 export const MEGA_MENU_DATA: NavMenuItem[] = [
   {
+    id: "event-gifts", label: "מתנות לאירועים", cat: "מתנות",
+    columns: [
+      {
+        title: "מתנות לאירועים",
+        items: [
+          { label: "כל המתנות לאירועים", cat: "מתנות" },
+          { label: "מתנות לבר מצווה", cat: "מתנות" },
+          { label: "מתנות לחתונה", cat: "מתנות" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "event-kippot", label: "כיפות ומזכרות לאירועים", cat: "כיפות",
+    columns: [
+      {
+        title: "כיפות ומזכרות",
+        items: [
+          { label: "כל הכיפות", cat: "כיפות" },
+          { label: "מזכרות לאירועים", cat: "מזכרות לאירועים" },
+        ],
+      },
+    ],
+  },
+  {
     id: "mezuzot", label: "בתי מזוזה", cat: "בתי מזוזה",
     columns: [
       {

@@ -491,8 +491,6 @@ function NavBarContent() {
         simpleNav={SIMPLE_NAV}
         onSelect={handleSelect}
         onAction={handleAction}
-        onMoment={handleMoment}
-        lifeEvents={lifeEvents}
         user={user}
         signInWithGoogle={signInWithGoogle}
         logout={logout}

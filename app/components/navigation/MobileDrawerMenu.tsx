@@ -8,8 +8,6 @@ export interface NavColumn { title: string; items: NavSubItem[]; }
 export interface NavMenuItem { id: string; label: string; cat: string; columns: NavColumn[]; }
 export interface SimpleNavItem { label: string; action: string; }
 
-interface LifeEventItem { id: string; title: string; }
-
 interface MobileDrawerMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -17,8 +15,6 @@ interface MobileDrawerMenuProps {
   simpleNav: SimpleNavItem[];
   onSelect: (cat: string, filter?: string) => void;
   onAction: (action: string) => void;
-  onMoment: (id: string) => void;
-  lifeEvents: LifeEventItem[];
   user: { displayName?: string | null; photoURL?: string | null; role?: string; firstName?: string } | null;
   signInWithGoogle: () => void;
   logout: () => void;
@@ -140,8 +136,6 @@ export default function MobileDrawerMenu({
   simpleNav,
   onSelect,
   onAction,
-  onMoment,
-  lifeEvents,
   user,
   signInWithGoogle,
   logout,
@@ -193,35 +187,6 @@ export default function MobileDrawerMenu({
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
-
-          {/* ── Life events section — Warm Jewish Elegance ── */}
-          <div style={{ background: '#F4EADB', padding: '14px 20px 18px', borderBottom: '1px solid #E0D4C5' }}>
-            <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12, marginTop: 0 }}>
-              רגעי חיים
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {lifeEvents.map((ev, i) => (
-                <button
-                  key={ev.id}
-                  onClick={() => onMoment(ev.id)}
-                  style={{
-                    background: '#fff',
-                    border: '1px solid #E0D4C5',
-                    color: '#3A2E1A',
-                    padding: '11px 14px',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    textAlign: 'right',
-                    fontFamily: 'inherit',
-                    gridColumn: (i === lifeEvents.length - 1 && lifeEvents.length % 2 !== 0) ? 'span 2' : undefined,
-                  }}
-                >
-                  {ev.title}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* ── Sale row ── */}
           <button
