@@ -441,7 +441,7 @@ export default function PrintOrderPage() {
         else setMockupError('general');
         return;
       }
-      setMockupResult({ imageBase64: data.imageBase64, mimeType: data.mimeType });
+      setMockupResult({ imageBase64: data.imageBase64, mimeType: data.imageMimeType || 'image/png' });
     } catch {
       setMockupError('general');
     } finally {

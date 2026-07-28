@@ -225,7 +225,7 @@ function KippotOrderInner() {
       if (!res.ok) { setAiError('general'); return; }
       const data = await res.json();
       if (!data.imageBase64) { setAiError('general'); return; }
-      setAiResult({ imageBase64: data.imageBase64, mimeType: data.mimeType || 'image/png' });
+      setAiResult({ imageBase64: data.imageBase64, mimeType: data.imageMimeType || 'image/png' });
     } catch {
       setAiError('general');
     } finally {

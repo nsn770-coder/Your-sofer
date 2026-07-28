@@ -206,7 +206,7 @@ export async function POST(req: NextRequest) {
       typeof kippahColor === 'string' ? kippahColor : undefined,
     );
 
-    return NextResponse.json({ imageBase64, mimeType: imageMimeType });
+    return NextResponse.json({ imageBase64, imageMimeType });
 
   } catch (err: unknown) {
     if (err instanceof ServiceDisabledError) {
