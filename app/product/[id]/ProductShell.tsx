@@ -144,7 +144,7 @@ export default function ProductShell({ product }: { product: ShellProduct }) {
           <div className="ps-grid">
             {/* ── Column 1: Images ── */}
             <div className="ps-imgcard" style={{ background: '#fff', overflow: 'hidden' }}>
-              <div style={{ position: 'relative', background: '#fafafa', cursor: 'zoom-in' }}>
+              <div style={{ position: 'relative', background: '#fafafa', cursor: 'zoom-in', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {mainImage ? (
                   // LCP element — in the initial HTML; matches the preload in page.tsx
                   // eslint-disable-next-line @next/next/no-img-element
@@ -155,6 +155,13 @@ export default function ProductShell({ product }: { product: ShellProduct }) {
                   <div className="ps-img" style={{ width: '100%' }} />
                 )}
               </div>
+              {product.cat === 'כיפות' && (
+                <div style={{ position: 'absolute', bottom: 12, left: 12, background: 'linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)', padding: '8px 12px 8px 16px', borderRadius: '0 8px 0 0', zIndex: 10 }}>
+                  <span style={{ color: '#1a1a1a', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                    מוצר 2: 10% | 3+: 15%
+                  </span>
+                </div>
+              )}
               <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', scrollbarWidth: 'none', borderTop: '1px solid #f0f0f0' }}>
                 {allMedia.map((_, i) => (
                   <span key={i} className="ps-thumb" style={{ flexShrink: 0, borderRadius: 8, overflow: 'hidden', border: `2px solid ${i === 0 ? '#C5A028' : '#e0e0e0'}`, background: '#fff', padding: 2, display: 'inline-block', boxSizing: 'border-box' }}>
@@ -209,11 +216,6 @@ export default function ProductShell({ product }: { product: ShellProduct }) {
                 {bundleLabel && (
                   <div style={{ display: 'inline-flex', alignItems: 'center', background: '#1a1a1a', color: '#C5A028', fontSize: 13, fontWeight: 800, padding: '5px 12px', borderRadius: 8, marginBottom: 8, letterSpacing: '0.01em' }}>
                     ✦ מבצע חבילה: {bundleLabel}
-                  </div>
-                )}
-                {product.cat === 'כיפות' && (
-                  <div style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', color: '#1a1a1a', border: '2px solid #1a1a1a', fontSize: 13, fontWeight: 800, padding: '6px 14px', borderRadius: 6, marginBottom: 8, marginRight: 8 }}>
-                    מוצר 2 ב-10% הנחה, 3 ומעלה 15%
                   </div>
                 )}
                 <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck /> כולל מע״מ · משלוח לכל הארץ</div>

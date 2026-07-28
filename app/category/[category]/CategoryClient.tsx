@@ -1581,22 +1581,31 @@ export default function CategoryClient({ category }: { category: string }) {
 
       {/* ── Kippot Discount Banner ── */}
       {category === 'כיפות' && (
-        <div style={{ background: '#FFF8E7', borderTop: '2px solid #1a1a1a', borderBottom: '2px solid #1a1a1a', padding: '20px', marginBottom: 20, direction: 'rtl' }}>
+        <div style={{ background: 'linear-gradient(135deg, #FFFAEC 0%, #FFF8E7 100%)', borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #e5e0d0', padding: '28px 20px', marginBottom: 24, direction: 'rtl', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
           <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-              🎁 <span>מבצע כיפות מיוחד!</span>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10, letterSpacing: '-0.5px' }}>
+              🎁 <span>מבצע כיפות נוסף</span>
             </div>
-            <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>
-              <p style={{ margin: '0 0 8px 0' }}>
-                <strong>זהו מבצע נוסף למחיר המוזל של המוצר:</strong> כל כיפה שתוסיפו לסל מקבלת הנחה אוטומטית בהתאם לכמות.
+            <div style={{ fontSize: 13, color: '#444', lineHeight: 1.7 }}>
+              <p style={{ margin: '0 0 12px 0', fontWeight: 500 }}>
+                מבצע נוסף ומיוחד שחל על כל כיפה שתוסיף לסל — הנחה אוטומטית שחוסכת לך עד 15%!
               </p>
-              <ul style={{ margin: '8px 0 0 20px', paddingLeft: 0 }}>
-                <li style={{ marginBottom: 4 }}>✓ <strong>המוצר ה-1:</strong> מחיר מלא</li>
-                <li style={{ marginBottom: 4 }}>✓ <strong>המוצר ה-2:</strong> 10% הנחה</li>
-                <li>✓ <strong>המוצר ה-3 ומעלה:</strong> 15% הנחה</li>
-              </ul>
-              <p style={{ margin: '8px 0 0 0', color: '#777', fontSize: 12 }}>
-                ההנחה מיושמת על המוצר הזול ביותר כדי להצליח לך את הרכישה שלך.
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div style={{ background: '#fff', border: '1px solid #ddd', borderRadius: 6, padding: '10px 12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>מוצר 1</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>מחיר מלא</div>
+                </div>
+                <div style={{ background: '#fff', border: '1px solid #C5A028', borderRadius: 6, padding: '10px 12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, marginBottom: 4 }}>מוצר 2</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>10% הנחה</div>
+                </div>
+                <div style={{ background: '#fff', border: '1px solid #C5A028', borderRadius: 6, padding: '10px 12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, marginBottom: 4 }}>מוצר 3+</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>15% הנחה</div>
+                </div>
+              </div>
+              <p style={{ margin: '0', color: '#777', fontSize: 12, fontStyle: 'italic' }}>
+                💡 ההנחה מיושמת אוטומטית על המוצר הזול ביותר לחיסכון מקסימלי
               </p>
             </div>
           </div>
