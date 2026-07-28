@@ -582,7 +582,20 @@ export default function CheckoutPage() {
           total: finalTotal,
           customer: { name: form.name, email: form.email, phone: form.phone },
           couponCode: appliedCoupon?.code || undefined,
-          cartItems: items,
+          cartItems: items.map(i => {
+            // Filter out large image URLs from printCustomization to prevent payload bloat
+            if (!i.printCustomization) return i;
+            return {
+              ...i,
+              printCustomization: {
+                ...i.printCustomization,
+                // Omit large base64 image URLs — they're not needed for order processing
+                uploadedImageUrl: '',
+                originalImageUrl: '',
+                mockupUrl: undefined,
+              },
+            };
+          }),
           address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : `${form.address}, ${form.city}`,
           notes: form.notes || '',
           selectedGift: selectedGift || null,
@@ -641,6 +654,18 @@ export default function CheckoutPage() {
         }
       }
 
+      const payloadSize = JSON.stringify({
+        items: [
+          ...items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, cat: i.cat || '', bundlePromo: i.bundlePromo || undefined })),
+          ...items.flatMap(i => (i.selectedAddons ?? []).filter(a => a.pricing === 'flat').map(a => ({ name: `${a.label} — ${i.name}`, price: a.price, quantity: 1, cat: '' }))),
+          ...(bundleDiscountAmount > 0 ? [{ name: 'מבצע כיפות — חבילות', price: -bundleDiscountAmount, quantity: 1, cat: '' }] : []),
+          ...(shippingCost > 0 ? [{ name: 'משלוח', price: shippingCost, quantity: 1, cat: '' }] : []),
+          ...(appliedCoupon && discountAmount > 0 ? [{ name: `הנחת קופון — ${appliedCoupon.code}`, price: -discountAmount, quantity: 1, cat: '' }] : []),
+          ...(pointsToUse > 0 ? [{ name: 'הנחת נקודות מועדון', price: -pointsToUse, quantity: 1, cat: '' }] : []),
+        ],
+      }).length;
+      console.log(`[checkout] Sending payment request, payload size: ${(payloadSize / 1024).toFixed(1)}KB, items: ${items.length}`);
+
       const res = await fetch('/api/payment/bit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -657,7 +682,20 @@ export default function CheckoutPage() {
           total: finalTotal,
           customer: { name: form.name, email: form.email, phone: form.phone },
           couponCode: appliedCoupon?.code || undefined,
-          cartItems: items,
+          cartItems: items.map(i => {
+            // Filter out large image URLs from printCustomization to prevent payload bloat
+            const filtered: CartItem = { ...i };
+            if (filtered.printCustomization) {
+              filtered.printCustomization = {
+                ...filtered.printCustomization,
+                // Omit large base64 image URLs — they're not needed for order processing
+                uploadedImageUrl: '',
+                originalImageUrl: '',
+                mockupUrl: undefined,
+              };
+            }
+            return filtered;
+          }),
           address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : `${form.address}, ${form.city}`,
           notes: form.notes || '',
           selectedGift: selectedGift || null,

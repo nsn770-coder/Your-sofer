@@ -40,7 +40,14 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
   const [termsModalOpen, setTermsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (sumitReady) window.OfficeGuy?.Payments.InitEditors();
+    if (sumitReady) {
+      try {
+        window.OfficeGuy?.Payments.InitEditors();
+      } catch (err) {
+        console.error('[SumitPaymentForm] InitEditors failed:', err);
+        setScriptError('Sumit');
+      }
+    }
   }, [sumitReady]);
 
   function handleSubmit(e: React.FormEvent) {
@@ -87,9 +94,21 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
   const labelStyle: React.CSSProperties = { display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 };
 
   const busy = disabled || tokenizing;
+  const [scriptError, setScriptError] = useState<string | null>(null);
 
   return (
     <>
+      {scriptError && (
+        <div style={{
+          background: '#fef2f2', border: '1.5px solid #fca5a5', borderRadius: 12,
+          padding: '12px 16px', marginBottom: 14, display: 'flex', alignItems: 'flex-start', gap: 10,
+        }}>
+          <span style={{ fontSize: 16, flexShrink: 0 }} aria-hidden="true">⚠️</span>
+          <div style={{ fontSize: 13, color: '#b91c1c', fontWeight: 600, lineHeight: 1.5 }}>
+            שגיאה בטעינת מודול התשלום. אנא רענן את הדף ונסה שוב. אם הבעיה נמשכת, אנא צור קשר: 058-747-9933
+          </div>
+        </div>
+      )}
       {termsModalOpen && (
         <div style={{
           position: 'fixed',
@@ -141,12 +160,14 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
         src="https://code.jquery.com/jquery-3.7.1.min.js"
         strategy="afterInteractive"
         onLoad={() => setJqueryReady(true)}
+        onError={() => setScriptError('jQuery')}
       />
       {jqueryReady && (
         <Script
           src="https://app.sumit.co.il/scripts/payments.js"
           strategy="afterInteractive"
           onLoad={() => setSumitReady(true)}
+          onError={() => setScriptError('Sumit')}
         />
       )}
 
