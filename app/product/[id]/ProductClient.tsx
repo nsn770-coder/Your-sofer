@@ -1877,8 +1877,8 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   const embroideryOptions: string[] = embEnabled ? ['רקמה אישית'] : [];
   const embroiderySurcharge = embroideryText.trim() ? embroideryOptions.length * EMB_OPTION_PRICE : 0;
 
-  // ── הטבעה: קטגוריית ספרי קודש וסידורים — ₪15 קבוע ─────────────────────────
-  const EMBOSSING_CATEGORIES = ['ספרי קודש וסידורים'];
+  // ── הטבעה: קטגוריית ספרי קודש וברכונים — ₪15 קבוע ─────────────────────────
+  const EMBOSSING_CATEGORIES = ['ספרי קודש וברכונים'];
   const EMBOSSING_PRICE = 15;
   const EMBOSSING_BULK_PRICE = 130; // גלופה חד־פעמית — הטבעה לכל הכמות יחד
   const showEmbossing = !!product?.cat && EMBOSSING_CATEGORIES.some(c => product.cat!.includes(c));

@@ -113,7 +113,7 @@ export const OCCASIONS: Occasion[] = [
     relatedCategories: [
       { category: 'תכשיטים', subCategories: 'all' },
       { category: 'תיקי טלית ותפילין', subCategories: 'all' },
-      { category: 'ספרי קודש וסידורים', subCategories: 'all' },
+      { category: 'ספרי קודש וברכונים', subCategories: 'all' },
       { category: 'כיפות', subCategories: 'all' },
       { category: 'מתנות', subCategories: 'all' },
     ],

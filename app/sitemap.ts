@@ -79,7 +79,7 @@ const CATEGORIES = [
   'חגים',
   'תכשיטים',
   'מוצרי בית כנסת',
-  'ספרי קודש וסידורים',
+  'ספרי קודש וברכונים',
 ];
 
 // All madrich (guide) pages — every app/madrich/*/page.tsx.

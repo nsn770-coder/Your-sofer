@@ -158,7 +158,7 @@ export default function SidurTfilaPage() {
           <CTAStrip
             title="סידורים ותהילים בכל הנוסחים – גם עם הקדשה אישית"
             buttons={[
-              { label: 'לסידורים ותהילים ←', href: '/category/ספרי קודש וסידורים', variant: 'primary' },
+              { label: 'לסידורים ותהילים ←', href: '/category/ספרי קודש וברכונים', variant: 'primary' },
               { label: 'מתנות לאירועים', href: '/category/מתנות', variant: 'secondary' },
             ]}
           />

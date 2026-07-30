@@ -49,7 +49,7 @@ export const lifeEvents: LifeEvent[] = [
     relatedCategories: [
       { category: 'בתי מזוזה',          subCategories: 'all' },
       { category: 'כיפות',              subCategories: 'all' },
-      { category: 'ספרי קודש וסידורים', subCategories: 'all' },
+      { category: 'ספרי קודש וברכונים', subCategories: 'all' },
       { category: 'מתנות',              subCategories: 'all' },
       { category: 'יודאיקה',            subCategories: ['דמויות חסידים', 'מגנטים'] },
     ],
@@ -126,7 +126,7 @@ export const lifeEvents: LifeEvent[] = [
       { category: 'קלפי מזוזה',          subCategories: 'all' },
       { category: 'תפילין קומפלט',        subCategories: 'all' },
       { category: 'טליתות וציציות',       subCategories: 'all' },
-      { category: 'ספרי קודש וסידורים',  subCategories: 'all' },
+      { category: 'ספרי קודש וברכונים',  subCategories: 'all' },
       { category: 'מוצרי בית כנסת',      subCategories: 'all' },
       { category: 'מגילות',              subCategories: 'all' },
       { category: 'ספרי תורה',           subCategories: 'all' },

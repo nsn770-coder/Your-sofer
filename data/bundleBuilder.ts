@@ -70,7 +70,7 @@ export const BUNDLE_STEPS: BundleStep[] = [
     label: 'סידור',
     title: 'בחרו סידור',
     subtitle: 'לסיום — סידור תפילה, עם אפשרות להטבעת שם',
-    source: [{ category: 'ספרי קודש וסידורים', subCategories: 'all' }],
+    source: [{ category: 'ספרי קודש וברכונים', subCategories: 'all' }],
   },
 ];
 

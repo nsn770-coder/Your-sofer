@@ -25,7 +25,7 @@ const EMBROIDERY_CATEGORIES = [
 ];
 
 /** KEEP IN SYNC with EMBOSSING_CATEGORIES ב-ProductClient.tsx (בדיקת includes) */
-const EMBOSSING_CATEGORIES = ['ספרי קודש וסידורים'];
+const EMBOSSING_CATEGORIES = ['ספרי קודש וברכונים'];
 
 export interface PersonalizationFields {
   cat?: string;

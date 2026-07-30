@@ -91,6 +91,14 @@ const nextConfig: NextConfig = {
         destination: '/category/%D7%91%D7%AA%D7%99%20%D7%9E%D7%96%D7%95%D7%96%D7%94',
         permanent: true,
       },
+      // ספרי קודש וסידורים → ספרי קודש וברכונים (renamed 2026-07-30)
+      // ה-URL הישן מאונדקס ב-Search Console ומופיע בפיד המרצ'נט — בלי ה-301
+      // כל הקישורים האלה היו מחזירים 404.
+      {
+        source: '/category/%D7%A1%D7%A4%D7%A8%D7%99%20%D7%A7%D7%95%D7%93%D7%A9%20%D7%95%D7%A1%D7%99%D7%93%D7%95%D7%A8%D7%99%D7%9D',
+        destination: '/category/%D7%A1%D7%A4%D7%A8%D7%99%20%D7%A7%D7%95%D7%93%D7%A9%20%D7%95%D7%91%D7%A8%D7%9B%D7%95%D7%A0%D7%99%D7%9D',
+        permanent: true,
+      },
       // כיסוי תפילין → סט טלית תפילין (category merged 2026-06-04)
       {
         source: '/category/%D7%9B%D7%99%D7%A1%D7%95%D7%99%20%D7%AA%D7%A4%D7%99%D7%9C%D7%99%D7%9F',
