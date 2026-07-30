@@ -9,7 +9,7 @@ import { serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
-import { formatPrice } from '@/app/lib/utils';
+import { formatPrice, calculateVAT } from '@/app/lib/utils';
 import * as pixel from '@/lib/metaPixel';
 import SumitPaymentForm from '../components/SumitPaymentForm';
 import DeliveryEstimate from '../components/DeliveryEstimate';

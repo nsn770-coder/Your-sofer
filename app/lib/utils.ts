@@ -50,3 +50,22 @@ export function formatPrice(price: number | string | null | undefined): string {
     ? `₪${whole.toLocaleString('he-IL')}.00`
     : `₪${whole.toLocaleString('he-IL')}.50`;
 }
+
+// ── VAT Calculation — המחירים במערכת כוללים מע"מ (18%) ─────────────────────
+// פונקציה לפירוק מע"מ מסכום הכולל מע"מ.
+// צריך בכל דוחות, קבלות, ותצוגת checkout.
+export function calculateVAT(priceWithVAT: number): { basePrice: number; vat: number; totalPrice: number } {
+  const VAT_RATE = 0.18;
+  const VAT_MULTIPLIER = 1 + VAT_RATE; // 1.18
+
+  // חלק ללא מע"מ = סכום / 1.18
+  const basePrice = Math.round((priceWithVAT / VAT_MULTIPLIER) * 100) / 100;
+
+  // מע"מ = סכום - חלק ללא מע"מ
+  const vat = Math.round((priceWithVAT - basePrice) * 100) / 100;
+
+  // בקרה — סה"כ לא צריך לסטות מ-priceWithVAT
+  const totalPrice = Math.round((basePrice + vat) * 100) / 100;
+
+  return { basePrice, vat, totalPrice };
+}

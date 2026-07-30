@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// ── VAT Calculation Helper ──────────────────────────────────────────────────────
+function calculateVAT(priceWithVAT: number): { basePrice: number; vat: number; totalPrice: number } {
+  const VAT_RATE = 0.18;
+  const VAT_MULTIPLIER = 1 + VAT_RATE; // 1.18
+  const basePrice = Math.round((priceWithVAT / VAT_MULTIPLIER) * 100) / 100;
+  const vat = Math.round((priceWithVAT - basePrice) * 100) / 100;
+  const totalPrice = Math.round((basePrice + vat) * 100) / 100;
+  return { basePrice, vat, totalPrice };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { customerEmail, customerName, orderNumber, items, total, address, phone } = await req.json();
+    const vatBreakdown = calculateVAT(total);
 
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
     if (!RESEND_API_KEY) {
@@ -44,8 +55,9 @@ export async function POST(req: NextRequest) {
           <tbody>${itemsHtml}</tbody>
         </table>
         <div style="text-align:left;margin-top:16px;font-size:18px;font-weight:bold;color:#1E3A8A;">
-          סה"כ: ₪${total}
+          סה"כ לתשלום: ₪${total.toFixed(2)}
         </div>
+        <div style="font-size:11px;color:#999;margin-top:4px;">כולל מע"מ</div>
       </div>
 
       ${address ? `<p style="color:#555;"><strong>כתובת למשלוח:</strong> ${address}</p>` : ''}
@@ -79,7 +91,11 @@ export async function POST(req: NextRequest) {
   <h2>🛒 הזמנה חדשה! #${orderNumber}</h2>
   <p><strong>לקוח:</strong> ${customerName}</p>
   <p><strong>אימייל:</strong> ${customerEmail}</p>
-  <p><strong>סכום:</strong> ₪${total}</p>
+  <div style="background:#f5f5f5;padding:12px;border-radius:6px;margin:12px 0;">
+    <p style="margin:0 0 6px;"><strong>סכום ללא מע"מ:</strong> ₪${vatBreakdown.basePrice.toFixed(2)}</p>
+    <p style="margin:0 0 6px;color:#d97706;"><strong>מע"מ (18%):</strong> ₪${vatBreakdown.vat.toFixed(2)}</p>
+    <p style="margin:0;color:#1E3A8A;font-size:16px;font-weight:bold;"><strong>סה"כ:</strong> ₪${vatBreakdown.totalPrice.toFixed(2)}</p>
+  </div>
   ${address ? `<p><strong>כתובת:</strong> ${address}</p>` : ''}
   <hr/>
   <p><strong>פריטים:</strong></p>
