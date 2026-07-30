@@ -188,6 +188,14 @@ interface Product {
   sourceUrl?: string;
   source?: string;
   sku?: string;
+  /** ספק שממנו יובא המוצר (למשל 'simchonim') — נכתב ע"י סקריפטי הייבוא */
+  supplier?: string;
+  /** מק"ט המוצר אצל הספק — לזיהוי בהזמנות ובסינכרון מחירים */
+  supplier_sku?: string;
+  /** קישור לעמוד המוצר אצל הספק (מקביל ל-sourceUrl, נכתב ע"י הייבוא) */
+  supplier_url?: string;
+  /** המחיר אצל הספק לפני התוספת שלנו — להשוואה בלבד */
+  original_price?: number;
   stockCount?: number;
   inStock?: number;
   receivedFromSupplier?: number;
@@ -749,7 +757,10 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [supplierCost, setSupplierCost] = useState(
     product.supplierCost != null ? String(product.supplierCost) : ''
   );
-  const [sourceUrl, setSourceUrl] = useState(product.sourceUrl ?? '');
+  // sourceUrl הוא השדה הוותיק; הייבוא האוטומטי כותב supplier_url.
+  // נופלים לשני כדי שמוצרים מיובאים יציגו את הקישור בלי מיגרציה.
+  const [sourceUrl, setSourceUrl] = useState(product.sourceUrl ?? product.supplier_url ?? '');
+  const [supplierSku, setSupplierSku] = useState(product.supplier_sku ?? '');
   const [storageColumn, setStorageColumn] = useState(product.storageColumn ?? '');
   const [storageShelf, setStorageShelf]   = useState(product.storageShelf != null ? String(product.storageShelf) : '');
   const [storageNote, setStorageNote]     = useState(product.storageNote ?? '');
@@ -826,6 +837,9 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         was: was ? Math.round(Number(was)) : null,
         supplierCost: supplierCost ? Number(supplierCost) : null,
         sourceUrl: sourceUrl.trim() || null,
+        // נשמר גם ב-supplier_url כדי שהייבוא האוטומטי לא ידרוס עריכה ידנית
+        supplier_url: sourceUrl.trim() || null,
+        supplier_sku: supplierSku.trim() || null,
         desc, cat,
         category: cat,
         ...(subCategory ? { subCategory } : {}),
@@ -940,17 +954,56 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             <input type="number" value={supplierCost} onChange={e => setSupplierCost(e.target.value)} placeholder="לא חובה" style={inputStyle} />
             <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>העלות שלך מחושבת אוטומטית: ערך זה × 0.95 × 1.18</div>
           </div>
-          <div>
-            <label style={labelStyle}>🔗 קישור למוצר אצל הספק</label>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              <input type="url" dir="ltr" value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="לא חובה" style={inputStyle} />
-              {sourceUrl.trim() && (
-                <a href={sourceUrl.trim()} target="_blank" rel="noopener noreferrer"
-                  style={{ flexShrink: 0, fontSize: 13, fontWeight: 700, color: '#1a6fb0', textDecoration: 'none', border: '1px solid #cde', borderRadius: 8, padding: '9px 12px', whiteSpace: 'nowrap' }}>
-                  פתח ↗
-                </a>
+          {/* ── פרטי ספק: מק"ט + קישור ── */}
+          <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, padding: '10px 12px', background: '#fafafa' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 13, fontWeight: 800, color: '#374151' }}>📦 פרטי ספק</span>
+              {product.supplier && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#1a6fb0', background: '#eaf3fb', border: '1px solid #cde', borderRadius: 6, padding: '2px 7px' }}>
+                  {product.supplier}
+                </span>
               )}
             </div>
+
+            <div>
+              <label style={labelStyle}>מק&quot;ט אצל הספק</label>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input
+                  type="text" dir="ltr" value={supplierSku}
+                  onChange={e => setSupplierSku(e.target.value)}
+                  placeholder="לא חובה" style={inputStyle}
+                />
+                {supplierSku.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => { navigator.clipboard?.writeText(supplierSku.trim()); }}
+                    title="העתק מק״ט"
+                    style={{ flexShrink: 0, fontSize: 13, fontWeight: 700, color: '#374151', background: '#fff', border: '1px solid #d1d5db', borderRadius: 8, padding: '9px 12px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    העתק
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div style={{ marginTop: 8 }}>
+              <label style={labelStyle}>🔗 קישור למוצר אצל הספק</label>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input type="url" dir="ltr" value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="לא חובה" style={inputStyle} />
+                {sourceUrl.trim() && (
+                  <a href={sourceUrl.trim()} target="_blank" rel="noopener noreferrer"
+                    style={{ flexShrink: 0, fontSize: 13, fontWeight: 700, color: '#1a6fb0', textDecoration: 'none', border: '1px solid #cde', borderRadius: 8, padding: '9px 12px', whiteSpace: 'nowrap' }}>
+                    פתח ↗
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {product.original_price != null && (
+              <div style={{ fontSize: 11, color: '#6b7280', marginTop: 8 }}>
+                מחיר אצל הספק: ₪{product.original_price}
+                {product.price != null && ` · אצלנו: ₪${product.price} (${Math.round(((product.price / product.original_price) - 1) * 100)}%+)`}
+              </div>
+            )}
           </div>
           <div>
             <label style={labelStyle}>קטגוריה</label>

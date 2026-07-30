@@ -424,6 +424,8 @@ async function main() {
         subCategory: c.subCategory,
         supplier_category_path: c.path,
         supplier_sku: d.sku || null,
+        // sourceUrl הוא השדה שטופס עריכת המוצר באדמין קורא — חייב להתמלא גם הוא
+        sourceUrl: r.item.url,
         description: d.shortDesc || null,
         descriptionLong: d.fullDesc || null,
         supplier_options: JSON.stringify(heOptions),
