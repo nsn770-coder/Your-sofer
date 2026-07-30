@@ -49,7 +49,14 @@ export default function BundleBuilderClient({ products }: { products: MomentProd
   const stepProducts = useMemo(() => {
     if (!step.source) return [];
     const cats = new Set(step.source.map(s => s.category));
-    return products.filter(p => p.cat && cats.has(p.cat) && !p.outOfStock);
+    return products.filter(p =>
+      p.cat &&
+      cats.has(p.cat) &&
+      !p.outOfStock &&
+      // הוריד מארזים מוכנים (שיש להם "מארז" בשם) מבנה את המארז
+      // אך השאיר אותם בקטגוריות הרגילות
+      !p.name.toLowerCase().includes('מארז')
+    );
   }, [step, products]);
 
   // ── תמחור ──
