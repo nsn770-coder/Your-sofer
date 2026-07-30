@@ -365,6 +365,31 @@ export default function ProductCard({
 
         {/* Cart button — minimal underlined text link */}
         <div style={{ marginTop: 'auto', paddingTop: 6, textAlign: 'right' }} onClick={e => e.stopPropagation()}>
+          {/* Tefilin Komplet — hint + add covers button */}
+          {cat === 'תפילין קומפלט' && qty === 0 && !notPurchasable && (
+            <div style={{ marginBottom: 8, fontSize: 11, color: '#6B7280', lineHeight: 1.4 }}>
+              ניתן לבחור גם סט כיסויים לטלית ותפילין
+            </div>
+          )}
+          {cat === 'תפילין קומפלט' && qty > 0 && !notPurchasable && (
+            <div style={{ marginBottom: 8 }}>
+              <a
+                href="/category/סט%20טלית%20תפילין"
+                onClick={e => e.stopPropagation()}
+                style={{
+                  display: 'inline-block',
+                  color: '#111111', fontSize: 12, fontWeight: 600,
+                  textDecoration: 'underline', textUnderlineOffset: 4,
+                  cursor: 'pointer', transition: 'color 0.2s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#373A5A'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#111111'; }}
+              >
+                ➕ הוסף כיסוי מתאים
+              </a>
+            </div>
+          )}
+
           {notPurchasable ? (
             <a
               href={`https://wa.me/972587479933?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + name)}`}
