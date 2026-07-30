@@ -426,6 +426,10 @@ async function main() {
         supplier_sku: d.sku || null,
         // sourceUrl הוא השדה שטופס עריכת המוצר באדמין קורא — חייב להתמלא גם הוא
         sourceUrl: r.item.url,
+        // ⚠️ חובה: שאילתת עמוד הקטגוריה היא orderBy('priority'), ו-Firestore
+        // מחריג מסמך שחסר בו שדה המיון. בלי זה המוצר לא נראה בקטלוג בכלל.
+        priority: 50,
+        status: 'active',
         description: d.shortDesc || null,
         descriptionLong: d.fullDesc || null,
         supplier_options: JSON.stringify(heOptions),

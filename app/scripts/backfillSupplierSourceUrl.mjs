@@ -1,10 +1,17 @@
 /**
  * backfillSupplierSourceUrl.mjs
  *
- * סקריפטי הייבוא כתבו supplier_url, אבל טופס עריכת המוצר באדמין קורא sourceUrl.
- * הסקריפט הזה ממלא sourceUrl מ-supplier_url לכל מוצר מיובא שחסר לו.
+ * משלים שדות שסקריפטי הייבוא לא כתבו, ובלעדיהם המוצרים לא מוצגים:
  *
- * לא דורס sourceUrl שהוזן ידנית.
+ *   1. priority  ⚠️ קריטי — שאילתת עמוד הקטגוריה היא
+ *        where('cat','==',cat) + orderBy('priority','desc')
+ *      ו-Firestore מחריג לגמרי מסמך שחסר בו שדה המיון. בלי priority
+ *      המוצר קיים ב-DB אבל בלתי נראה בקטלוג.
+ *
+ *   2. status: 'active'  — האדמין מסתמך עליו לסינון טיוטות
+ *   3. sourceUrl         — טופס עריכת המוצר קורא אותו, הייבוא כתב supplier_url
+ *
+ * לא דורס ערכים קיימים.
  *
  * node app/scripts/backfillSupplierSourceUrl.mjs            # בדיקה
  * node app/scripts/backfillSupplierSourceUrl.mjs --fix      # ביצוע
@@ -30,22 +37,33 @@ async function main() {
   console.log(`\n📦 ${snap.size} מוצרי simchonim\n`);
 
   const todo = [];
-  let already = 0;
+  const missing = { priority: 0, status: 0, sourceUrl: 0 };
 
   snap.forEach(d => {
     const p = d.data();
-    if (p.sourceUrl) { already++; return; }
-    if (p.supplier_url) todo.push({ ref: d.ref, name: p.name, url: p.supplier_url, sku: p.supplier_sku });
+    const update = {};
+
+    // ⚠️ הסיבה שהמוצרים לא הופיעו בקטלוג
+    if (p.priority == null) { update.priority = 50; missing.priority++; }
+    if (!p.status) { update.status = 'active'; missing.status++; }
+    if (!p.sourceUrl && p.supplier_url) { update.sourceUrl = p.supplier_url; missing.sourceUrl++; }
+
+    if (Object.keys(update).length) {
+      todo.push({ ref: d.ref, name: p.name, cat: p.cat, update });
+    }
   });
 
-  console.log(`   כבר יש sourceUrl: ${already}`);
-  console.log(`   דורשים מילוי:     ${todo.length}\n`);
+  console.log('   שדות חסרים:');
+  console.log(`      priority (חוסם תצוגה!): ${missing.priority}`);
+  console.log(`      status:                 ${missing.status}`);
+  console.log(`      sourceUrl:              ${missing.sourceUrl}`);
+  console.log(`\n   מוצרים לעדכון: ${todo.length}\n`);
 
   if (todo.length === 0) { console.log('✅ אין מה למלא'); return; }
 
   console.log('דוגמאות:');
   todo.slice(0, 5).forEach(t =>
-    console.log(`   · ${t.name}  [מק"ט ${t.sku || '-'}]`)
+    console.log(`   · ${t.name}  [${t.cat}]  →  ${Object.keys(t.update).join(', ')}`)
   );
 
   if (!fix) {
@@ -57,7 +75,7 @@ async function main() {
   for (let i = 0; i < todo.length; i += 400) {
     const batch = db.batch();
     for (const t of todo.slice(i, i + 400)) {
-      batch.set(t.ref, { sourceUrl: t.url }, { merge: true });
+      batch.set(t.ref, t.update, { merge: true });
       n++;
     }
     await batch.commit();
@@ -65,6 +83,7 @@ async function main() {
   }
 
   console.log(`\n✅ ${n} מוצרים עודכנו`);
+  console.log('⚠️  להריץ:  node scripts/syncAlgolia.mjs');
 }
 
 main().catch(e => { console.error('❌', e); process.exit(1); });
