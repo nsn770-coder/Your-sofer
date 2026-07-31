@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { waitUntil } from '@vercel/functions';
 import { getAdminDb } from '@/lib/firebaseAdmin';
-import { handleIncomingMessage } from '@/lib/whatsappAgent';
+import { handleIncomingMessage } from './handler';
+import { sendWhatsAppMessage } from '@/lib/whatsappSend';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -107,16 +108,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // waitUntil keeps the Vercel function alive after the response is sent,
   // so Claude + Meta send complete even though we return 200 immediately.
   waitUntil(
-    handleIncomingMessage(from, text).catch((err) => {
-      console.error('[whatsapp webhook] handleIncomingMessage unhandled error:', err);
-      db.collection('whatsappLogs').add({
-        type: 'handler_error',
-        from,
-        messageId,
-        error: String(err),
-        timestamp: new Date(),
-      }).catch(() => {});
-    }),
+    handleIncomingMessage(from, text)
+      .then((reply) => {
+        if (reply) {
+          return sendWhatsAppMessage(from, reply);
+        }
+      })
+      .catch((err) => {
+        console.error('[whatsapp webhook] handleIncomingMessage unhandled error:', err);
+        db.collection('whatsappLogs').add({
+          type: 'handler_error',
+          from,
+          messageId,
+          error: String(err),
+          timestamp: new Date(),
+        }).catch(() => {});
+      }),
   );
 
   console.error(`[whatsapp webhook] ack sent, processing in background for from=${from}`);
