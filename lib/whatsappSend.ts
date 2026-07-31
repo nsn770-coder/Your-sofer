@@ -4,10 +4,10 @@ const GRAPH_API_VERSION = 'v21.0';
 
 export async function sendWhatsAppMessage(to: string, body: string): Promise<void> {
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+  const accessToken = process.env.WHATSAPP_API_TOKEN;
 
   if (!phoneNumberId || !accessToken) {
-    await logError('send_error', to, 'WHATSAPP_PHONE_NUMBER_ID or WHATSAPP_ACCESS_TOKEN not configured', body);
+    await logError('send_error', to, 'WHATSAPP_PHONE_NUMBER_ID or WHATSAPP_API_TOKEN not configured', body);
     return;
   }
 
