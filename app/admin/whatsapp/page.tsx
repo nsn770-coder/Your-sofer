@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { getAuthLazy } from '@/lib/authLazy';
@@ -12,6 +12,7 @@ interface ConvMessage {
   role: 'user' | 'assistant' | 'admin';
   content: string;
   ts: number;
+  followup?: boolean;
 }
 
 interface Conversation {
@@ -52,12 +53,35 @@ export default function WhatsAppAdminPage() {
   const [selectedId, setSelectedId] = useState<string | null>(searchParams.get('phone'));
   const [replyText, setReplyText] = useState('');
   const [sending, setSending] = useState(false);
+  const [followupEnabled, setFollowupEnabled] = useState(true);
+  const [followupLoading, setFollowupLoading] = useState(true);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');
   }, [user, loading, router]);
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+    getDoc(doc(db, 'siteConfig', 'whatsapp'))
+      .then((snap) => {
+        setFollowupEnabled(snap.exists() ? snap.data()?.followupEnabled !== false : true);
+      })
+      .catch((e) => console.error('[admin/whatsapp] load followup config error', e))
+      .finally(() => setFollowupLoading(false));
+  }, [user]);
+
+  async function toggleFollowup(next: boolean) {
+    setFollowupEnabled(next);
+    try {
+      await setDoc(doc(db, 'siteConfig', 'whatsapp'), { followupEnabled: next }, { merge: true });
+    } catch (e) {
+      console.error('[admin/whatsapp] toggleFollowup error', e);
+      alert('שגיאה בעדכון הגדרת הפולואפ');
+      setFollowupEnabled(!next);
+    }
+  }
 
   // ── Live conversation list ─────────────────────────────────────────────────
 
@@ -132,9 +156,25 @@ export default function WhatsAppAdminPage() {
       <div style={{ maxWidth: 1300, margin: '0 auto' }}>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-          <a href="/admin" style={{ color: '#1E3A8A', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>← חזרה לניהול</a>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>💬 שיחות WhatsApp</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <a href="/admin" style={{ color: '#1E3A8A', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>← חזרה לניהול</a>
+            <h1 style={{ fontSize: 24, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>💬 שיחות WhatsApp</h1>
+          </div>
+          {!followupLoading && (
+            <button
+              onClick={() => toggleFollowup(!followupEnabled)}
+              title="הפעלה/כיבוי גלובלי של פולואפ אוטומטי לכל השיחות"
+              style={{
+                padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                fontSize: 12.5, fontWeight: 700,
+                background: followupEnabled ? '#e5e7eb' : '#e11d48',
+                color: followupEnabled ? '#333' : '#fff',
+              }}
+            >
+              {followupEnabled ? '⏰ פולואפ אוטומטי פעיל — לחץ לכיבוי' : '⏰ פולואפ אוטומטי כבוי — לחץ להפעלה'}
+            </button>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: 16, height: 'calc(100vh - 130px)' }}>
@@ -228,6 +268,7 @@ export default function WhatsAppAdminPage() {
                           {!isUser && (
                             <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 3, opacity: 0.9 }}>
                               {m.role === 'admin' ? '👨 אדמין' : '🤖 בוט'}
+                              {m.followup && ' · ⏰ פולואפ'}
                             </div>
                           )}
                           <div style={{ whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.4 }}>{m.content}</div>

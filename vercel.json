@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/sync-simchonim",
       "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/api/cron/whatsapp-followup",
+      "schedule": "0 * * * *"
     }
   ]
 }
