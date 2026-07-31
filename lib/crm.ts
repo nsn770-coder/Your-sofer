@@ -8,6 +8,10 @@ export interface CrmNote {
   ts: number;
 }
 
+// AI lead scoring — set by handler.ts's scoreConversation() after every bot
+// reply, analyzing the whole WhatsApp conversation. Never overwrites status.
+export type AiTemp = 'חם' | 'פושר' | 'קר' | 'לא מעוניין';
+
 export interface CrmLead {
   phone: string;
   name?: string | null;
@@ -20,6 +24,10 @@ export interface CrmLead {
   assignedTo?: string | null;
   createdAt?: unknown;
   lastContactAt?: unknown;
+  aiTemp?: AiTemp | null;
+  aiIntent?: string | null;
+  needsHuman?: boolean;
+  aiUpdatedAt?: unknown;
 }
 
 export const CRM_STATUSES: CrmStatus[] = [
@@ -47,6 +55,17 @@ export const CRM_SOURCE_COLORS: Record<CrmSource, string> = {
   facebook: '#4a3aa7',
   'טלפון': '#eda100',
   'אחר': '#008300',
+};
+
+export const AI_TEMPS: AiTemp[] = ['חם', 'פושר', 'קר', 'לא מעוניין'];
+
+// Explicit temperature/urgency scale (not a categorical identity palette) —
+// red/orange/gray/black per spec, matching the universal hot→cold convention.
+export const AI_TEMP_COLORS: Record<AiTemp, string> = {
+  'חם': '#dc2626',
+  'פושר': '#f97316',
+  'קר': '#6b7280',
+  'לא מעוניין': '#111827',
 };
 
 // Normalizes a phone number for cross-format matching (WhatsApp E.164-ish digits

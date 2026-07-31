@@ -9,7 +9,8 @@ import {
 } from 'recharts';
 import {
   CRM_STATUSES, CRM_SOURCES, CRM_STATUS_COLORS, CRM_SOURCE_COLORS, normalizePhone,
-  type CrmStatus, type CrmSource, type CrmNote,
+  AI_TEMPS, AI_TEMP_COLORS,
+  type CrmStatus, type CrmSource, type CrmNote, type AiTemp,
 } from '@/lib/crm';
 
 const navy = '#1E3A8A';
@@ -35,6 +36,10 @@ interface CrmLeadRow {
   assignedTo?: string | null;
   createdAt?: unknown;
   lastContactAt?: unknown;
+  aiTemp?: AiTemp | null;
+  aiIntent?: string | null;
+  needsHuman?: boolean;
+  aiUpdatedAt?: unknown;
 }
 
 interface OrderRow {
@@ -292,6 +297,26 @@ function LeadDetailModal({
             <input type="date" value={followUpAt} onChange={(e) => setFollowUpAt(e.target.value)} style={inputStyle} />
           </div>
         </div>
+
+        {(lead.aiTemp || lead.aiIntent) && (
+          <div style={{ background: '#f9fafb', border: '1px solid #eee', borderRadius: 10, padding: '10px 14px', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: lead.aiIntent ? 6 : 0 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#666' }}>🤖 ניתוח AI:</span>
+              {lead.aiTemp && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', borderRadius: 5, padding: '3px 9px', background: AI_TEMP_COLORS[lead.aiTemp] ?? '#9ca3af' }}>
+                  {lead.aiTemp}
+                </span>
+              )}
+              {lead.needsHuman && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', borderRadius: 5, padding: '3px 9px', background: '#dc2626' }}>
+                  🔥 דורש טיפול אנושי
+                </span>
+              )}
+            </div>
+            {lead.aiIntent && <div style={{ fontSize: 13, color: '#333' }}>{lead.aiIntent}</div>}
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
           <button onClick={() => setFollowUpQuick(1)} style={quickBtnStyle}>מחר</button>
           <button onClick={() => setFollowUpQuick(3)} style={quickBtnStyle}>עוד 3 ימים</button>
@@ -478,6 +503,7 @@ export default function CrmPage() {
 
   const [statusFilter, setStatusFilter] = useState<string>('הכל');
   const [sourceFilter, setSourceFilter] = useState<string>('הכל');
+  const [tempFilter, setTempFilter] = useState<string>('הכל');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [searchQ, setSearchQ] = useState('');
@@ -548,8 +574,16 @@ export default function CrmPage() {
 
   const tasksDue = useMemo(
     () => leads
-      .filter((l) => typeof l.followUpAt === 'number' && (l.followUpAt as number) <= Date.now())
-      .sort((a, b) => (a.followUpAt as number) - (b.followUpAt as number)),
+      .filter((l) => {
+        const followUpDue = typeof l.followUpAt === 'number' && (l.followUpAt as number) <= Date.now();
+        const isHot = l.needsHuman === true || l.aiTemp === 'חם';
+        return followUpDue || isHot;
+      })
+      .sort((a, b) => {
+        const aFU = typeof a.followUpAt === 'number' ? a.followUpAt : Infinity;
+        const bFU = typeof b.followUpAt === 'number' ? b.followUpAt : Infinity;
+        return aFU - bFU;
+      }),
     [leads],
   );
 
@@ -603,6 +637,7 @@ export default function CrmPage() {
   const filteredLeads = leads.filter((l) => {
     if (statusFilter !== 'הכל' && l.status !== statusFilter) return false;
     if (sourceFilter !== 'הכל' && l.source !== sourceFilter) return false;
+    if (tempFilter !== 'הכל' && (l.aiTemp ?? null) !== tempFilter) return false;
     if (dateFrom) {
       const d = toDate(l.createdAt);
       if (!d || d < new Date(dateFrom)) return false;
@@ -696,14 +731,23 @@ export default function CrmPage() {
             </h2>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {tasksDue.map((l) => {
-                const overdueDays = Math.floor((Date.now() - (l.followUpAt as number)) / DAY_MS);
+                const followUpDue = typeof l.followUpAt === 'number' && (l.followUpAt as number) <= Date.now();
+                const isHot = l.needsHuman === true || l.aiTemp === 'חם';
+                const overdueDays = followUpDue ? Math.floor((Date.now() - (l.followUpAt as number)) / DAY_MS) : 0;
                 return (
                   <div key={l.id} style={{ background: '#fff', border: '1px solid #fecaca', borderRight: '4px solid #e11d48', borderRadius: 10, padding: '12px 16px', minWidth: 240, boxShadow: '0 2px 6px rgba(0,0,0,.05)' }}>
                     <div style={{ fontWeight: 700, color: navy, fontSize: 14 }}>{l.name || l.phone}</div>
                     <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>{l.phone}</div>
-                    <div style={{ fontSize: 11, color: '#e11d48', fontWeight: 700, marginBottom: 8 }}>
-                      {overdueDays > 0 ? `⏰ באיחור ${overdueDays} ימים` : '⏰ להיום'}
-                    </div>
+                    {followUpDue && (
+                      <div style={{ fontSize: 11, color: '#e11d48', fontWeight: 700, marginBottom: 6 }}>
+                        {overdueDays > 0 ? `⏰ באיחור ${overdueDays} ימים` : '⏰ להיום'}
+                      </div>
+                    )}
+                    {isHot && (
+                      <div style={{ fontSize: 11, color: '#fff', background: '#dc2626', fontWeight: 700, borderRadius: 5, padding: '3px 8px', display: 'inline-block', marginBottom: 8 }}>
+                        🔥 ליד חם — דורש טיפול
+                      </div>
+                    )}
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       <a href={`/admin/whatsapp?phone=${encodeURIComponent(l.id)}`} style={{ ...quickBtnStyle, background: '#25D366', color: '#fff', textDecoration: 'none' }}>💬 וואטסאפ</a>
                       <a href={`tel:${l.phone}`} style={{ ...quickBtnStyle, background: '#eda100', color: '#fff', textDecoration: 'none' }}>📞 התקשר</a>
@@ -764,6 +808,13 @@ export default function CrmPage() {
             </select>
           </div>
           <div>
+            <label style={{ fontSize: 11, color: '#666', display: 'block', marginBottom: 4 }}>🌡️ חום ליד</label>
+            <select value={tempFilter} onChange={(e) => setTempFilter(e.target.value)} style={inputStyle}>
+              <option value="הכל">הכל</option>
+              {AI_TEMPS.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div>
             <label style={{ fontSize: 11, color: '#666', display: 'block', marginBottom: 4 }}>מתאריך</label>
             <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} style={inputStyle} />
           </div>
@@ -795,15 +846,16 @@ export default function CrmPage() {
                 <th style={{ padding: '10px 14px' }}>מקור</th>
                 <th style={{ padding: '10px 14px' }}>סטטוס</th>
                 <th style={{ padding: '10px 14px' }}>שלב מכירה</th>
+                <th style={{ padding: '10px 14px' }}>🌡️ חום</th>
                 <th style={{ padding: '10px 14px' }}>פנייה אחרונה</th>
                 <th style={{ padding: '10px 14px' }}>פעולות</th>
               </tr>
             </thead>
             <tbody>
               {leadsLoading ? (
-                <tr><td colSpan={7} style={{ padding: 20, textAlign: 'center', color: '#999' }}>טוען לידים...</td></tr>
+                <tr><td colSpan={8} style={{ padding: 20, textAlign: 'center', color: '#999' }}>טוען לידים...</td></tr>
               ) : filteredLeads.length === 0 ? (
-                <tr><td colSpan={7} style={{ padding: 20, textAlign: 'center', color: '#999' }}>לא נמצאו לידים</td></tr>
+                <tr><td colSpan={8} style={{ padding: 20, textAlign: 'center', color: '#999' }}>לא נמצאו לידים</td></tr>
               ) : (
                 filteredLeads.map((l) => {
                   const createdDate = toDate(l.createdAt);
@@ -838,6 +890,16 @@ export default function CrmPage() {
                         placeholder="—"
                         style={{ ...inputStyle, padding: '4px 8px', fontSize: 12.5, width: 120 }}
                       />
+                    </td>
+                    <td style={{ padding: '8px 14px' }} title={l.aiIntent ?? ''}>
+                      {l.aiTemp && (
+                        <span style={{
+                          fontSize: 11, fontWeight: 700, color: '#fff', borderRadius: 5, padding: '3px 9px',
+                          background: AI_TEMP_COLORS[l.aiTemp] ?? '#9ca3af', whiteSpace: 'nowrap',
+                        }}>
+                          {l.aiTemp}
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: '8px 14px', color: '#666', fontSize: 12 }}>{fmtDate(l.lastContactAt)}</td>
                     <td style={{ padding: '8px 14px' }}>

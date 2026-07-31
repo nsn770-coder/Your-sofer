@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { waitUntil } from '@vercel/functions';
 import { getAdminDb } from '@/lib/firebaseAdmin';
-import { handleIncomingMessage } from './handler';
+import { handleIncomingMessage, scoreConversation } from './handler';
 import { sendWhatsAppMessage } from '@/lib/whatsappSend';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -124,10 +124,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // so Claude + Meta send complete even though we return 200 immediately.
   waitUntil(
     handleIncomingMessage(from, text, contactName, referral)
-      .then((reply) => {
+      .then(async (reply) => {
+        // Send the customer-facing reply first — scoring is a background
+        // enrichment step and must never delay message delivery.
         if (reply) {
-          return sendWhatsAppMessage(from, reply);
+          await sendWhatsAppMessage(from, reply);
         }
+        await scoreConversation(from).catch((err) => {
+          console.error('[whatsapp webhook] scoreConversation failed (non-fatal):', err);
+        });
       })
       .catch((err) => {
         console.error('[whatsapp webhook] handleIncomingMessage unhandled error:', err);

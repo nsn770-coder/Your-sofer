@@ -2964,9 +2964,20 @@ export default function AdminPage() {
   }, [user]);
 
   async function loadCrmFollowUpsDue() {
+    // Full fetch + JS filter rather than 2-3 separate count queries — a lead can
+    // match more than one condition (due follow-up, needsHuman, aiTemp "חם") and
+    // a Firestore count query can't dedupe across an OR of different fields.
     try {
-      const snap = await getCountFromServer(query(collection(db, 'crmLeads'), where('followUpAt', '<=', Date.now())));
-      setCrmFollowUpsDue(snap.data().count);
+      const snap = await getDocs(collection(db, 'crmLeads'));
+      const now = Date.now();
+      let count = 0;
+      snap.forEach((d) => {
+        const data = d.data();
+        const followUpDue = typeof data.followUpAt === 'number' && data.followUpAt <= now;
+        const isHot = data.needsHuman === true || data.aiTemp === 'חם';
+        if (followUpDue || isHot) count++;
+      });
+      setCrmFollowUpsDue(count);
     } catch (e) { console.error(e); }
   }
 

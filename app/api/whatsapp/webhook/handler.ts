@@ -1,5 +1,6 @@
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { searchAiKnowledge, type SearchResult } from '@/lib/aiProductSearch';
+import { AI_TEMPS, type AiTemp } from '@/lib/crm';
 
 // Present only when the customer tapped a Click-to-WhatsApp ad (Facebook/Instagram).
 export interface WaReferral {
@@ -271,6 +272,90 @@ export async function handleIncomingMessage(
 
   console.error(`[whatsapp handler] DONE for from=${senderId}`);
   return reply;
+}
+
+// ── AI lead scoring ────────────────────────────────────────────────────────────
+// Runs after the bot reply has already been sent to the customer (called from
+// route.ts, not awaited before sendWhatsAppMessage) — a second, short Haiku
+// call that classifies the whole conversation and updates crmLeads. Never
+// touches `status`, so it can't clobber anything an admin set manually.
+
+const SCORING_SYSTEM = `אתה מנתח שיחות מכירה עבור חנות יודאיקה בשם Your Sofer.
+קרא את השיחה המלאה בין הלקוח לנציג/בוט, והחזר אך ורק אובייקט JSON תקין — בלי טקסט נוסף, בלי markdown, בלי הסברים — בפורמט הבא בדיוק:
+{"aiTemp": "חם" | "פושר" | "קר" | "לא מעוניין", "aiIntent": "משפט קצר בעברית שמתאר מה הלקוח רוצה", "needsHuman": true | false}
+
+הגדרות aiTemp:
+- "חם": הלקוח מוכן לרכוש, שואל על תשלום או משלוח, או ביקש הצעת מחיר.
+- "פושר": הלקוח מתעניין ושואל שאלות, אבל עדיין לא סגר.
+- "קר": סקרנות בלבד, בלי כוונת רכישה ברורה.
+- "לא מעוניין": הלקוח אמר במפורש שהוא לא מעוניין.
+
+needsHuman = true אם מתקיים אחד מהבאים:
+- הלקוח מבקש לדבר עם נציג אנושי.
+- נשאלה שאלה שהבוט כנראה לא ידע לענות עליה נכון.
+- יש תלונה מצד הלקוח.
+- מדובר בהזמנה שעולה מעל 500 ש"ח.
+- נשאלה שאלה הלכתית (כשרות, דין, הלכה).
+
+aiIntent לדוגמה: "מחפש 40 כיפות לבר מצווה עם הדפסה".`;
+
+export async function scoreConversation(senderId: string): Promise<void> {
+  const db = getAdminDb();
+  try {
+    const convSnap = await db.collection('whatsappConversations').doc(senderId).get();
+    if (!convSnap.exists) return;
+
+    const messages = (convSnap.data()?.messages as ConvMessage[] | undefined) ?? [];
+    if (messages.length === 0) return;
+
+    const claudeMessages = messages
+      .slice(-20)
+      .map((m) => ({ role: (m.role === 'admin' ? 'assistant' : m.role) as 'user' | 'assistant', content: m.content }));
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY ?? '',
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 200,
+        system: SCORING_SYSTEM,
+        messages: claudeMessages,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Claude scoring ${res.status}: ${errText.slice(0, 200)}`);
+    }
+
+    const data = (await res.json()) as { content?: { text?: string }[] };
+    const raw = (data.content?.[0]?.text ?? '').trim();
+    const jsonText = raw.replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+    const parsed = JSON.parse(jsonText) as { aiTemp?: string; aiIntent?: string; needsHuman?: boolean };
+
+    if (!parsed.aiTemp || !AI_TEMPS.includes(parsed.aiTemp as AiTemp)) {
+      console.error('[whatsapp handler] scoreConversation: invalid aiTemp in response:', parsed.aiTemp);
+      return;
+    }
+
+    await db.collection('crmLeads').doc(senderId).set(
+      {
+        aiTemp: parsed.aiTemp as AiTemp,
+        aiIntent: parsed.aiIntent ?? null,
+        needsHuman: parsed.needsHuman === true,
+        aiUpdatedAt: new Date(),
+      },
+      { merge: true },
+    );
+
+    console.error(`[whatsapp handler] scoreConversation done for ${senderId}: aiTemp=${parsed.aiTemp} needsHuman=${parsed.needsHuman}`);
+  } catch (err) {
+    console.error('[whatsapp handler] scoreConversation error:', err);
+  }
 }
 
 // ── Firestore logger ──────────────────────────────────────────────────────────
