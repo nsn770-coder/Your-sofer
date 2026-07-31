@@ -30,27 +30,41 @@ async function main() {
   // 1. כמה מוצרים בקטגוריה בסך הכל (בלי מיון)
   const plain = await db.collection('products').where('cat', '==', CAT).get();
 
-  // 2. מה שהעמוד באמת מקבל — עם orderBy
-  const ordered = await db.collection('products')
+  // 2. אותה שאילתה בלי limit — מבדיל בין שתי סיבות שונות לפער:
+  //    (א) מסמך בלי priority → Firestore מחריג אותו לגמרי
+  //    (ב) יותר מ-1000 מוצרים  → נחתך ע"י ה-limit של העמוד
+  const orderedAll = await db.collection('products')
     .where('cat', '==', CAT)
     .orderBy('priority', 'desc')
-    .limit(1000)
     .get();
 
-  console.log(`   בקטגוריה (בלי מיון):        ${plain.size}`);
-  console.log(`   מה שהעמוד מקבל (orderBy):   ${ordered.size}`);
+  const PAGE_LIMIT = 1000;
+  const delivered = Math.min(orderedAll.size, PAGE_LIMIT);
 
-  const gap = plain.size - ordered.size;
-  if (gap > 0) {
-    console.log(`\n   ⚠️  ${gap} מוצרים נופלים — חסר להם priority:`);
-    const orderedIds = new Set(ordered.docs.map(d => d.id));
-    plain.docs.filter(d => !orderedIds.has(d.id)).slice(0, 10)
+  console.log(`   בקטגוריה (בלי מיון):        ${plain.size}`);
+  console.log(`   עוברים את orderBy:          ${orderedAll.size}`);
+  console.log(`   מה שהעמוד מקבל (limit ${PAGE_LIMIT}): ${delivered}`);
+
+  const missingPriority = plain.size - orderedAll.size;
+  const cutByLimit = orderedAll.size - delivered;
+
+  if (missingPriority > 0) {
+    console.log(`\n   ❌ ${missingPriority} מוצרים חסרי priority — בלתי נראים לחלוטין:`);
+    const ids = new Set(orderedAll.docs.map(d => d.id));
+    plain.docs.filter(d => !ids.has(d.id)).slice(0, 10)
       .forEach(d => console.log(`      · ${d.data().name}`));
+    console.log('      → תיקון: הוסף priority (ברירת מחדל 50)');
   } else {
-    console.log('\n   ✅ אין פער — כל מוצרי הקטגוריה מגיעים לעמוד');
+    console.log('\n   ✅ לכל המוצרים יש priority');
+  }
+
+  if (cutByLimit > 0) {
+    console.log(`\n   ⚠️  ${cutByLimit} מוצרים נחתכים ע"י limit(${PAGE_LIMIT}) בעמוד הקטגוריה`);
+    console.log('      → אלה המוצרים עם ה-priority הנמוך; הם לא נגישים בגלילה');
   }
 
   // 3. פירוט לפי ספק ותת-קטגוריה
+  const ordered = orderedAll;
   const bySupplier = {};
   const bySub = {};
   ordered.forEach(d => {
