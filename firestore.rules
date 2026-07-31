@@ -315,5 +315,10 @@ service cloud.firestore {
     match /whatsappConversations/{id} {
       allow read, write: if isAdmin();
     }
+
+    // ── CRM leads (admin-only, /admin/crm) ──────────────────────────────────
+    match /crmLeads/{id} {
+      allow read, write: if isAdmin();
+    }
   }
 }

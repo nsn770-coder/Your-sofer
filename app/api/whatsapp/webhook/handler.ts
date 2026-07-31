@@ -1,6 +1,42 @@
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { searchAiKnowledge, type SearchResult } from '@/lib/aiProductSearch';
 
+// ── CRM lead hook ──────────────────────────────────────────────────────────────
+// Every inbound WhatsApp message upserts a crmLeads doc (keyed by phone) so
+// /admin/crm has a lead for every conversation, without overwriting fields an
+// admin has since edited (status, name once known, etc).
+
+async function upsertCrmLead(
+  db: ReturnType<typeof getAdminDb>,
+  phone: string,
+  name: string | null,
+): Promise<void> {
+  const leadRef = db.collection('crmLeads').doc(phone);
+  try {
+    const snap = await leadRef.get();
+    if (!snap.exists) {
+      await leadRef.set({
+        phone,
+        name: name ?? null,
+        source: 'whatsapp',
+        status: 'חדש',
+        saleStage: null,
+        notes: [],
+        followUpAt: null,
+        assignedTo: null,
+        createdAt: new Date(),
+        lastContactAt: new Date(),
+      });
+    } else {
+      const updates: Record<string, unknown> = { lastContactAt: new Date() };
+      if (name && !snap.data()?.name) updates.name = name;
+      await leadRef.set(updates, { merge: true });
+    }
+  } catch (err) {
+    console.error('[whatsapp handler] upsertCrmLead error:', err);
+  }
+}
+
 // ── Judaica-specific intent detection ─────────────────────────────────────────
 
 const EVENT_PATTERNS: { pattern: RegExp; event: string }[] = [
@@ -97,11 +133,14 @@ interface ConvMessage {
 export async function handleIncomingMessage(
   senderId: string,
   messageText: string,
+  contactName: string | null = null,
 ): Promise<string | null> {
   console.error(`[whatsapp handler] START from=${senderId} text="${messageText.slice(0, 60)}"`);
 
   const db = getAdminDb();
   const convRef = db.collection('whatsappConversations').doc(senderId);
+
+  await upsertCrmLead(db, senderId, contactName);
 
   // 1. Load conversation history + mute state
   let history: ConvMessage[] = [];

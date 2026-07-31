@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
@@ -45,10 +45,11 @@ function fmtTime(ts: number): string {
 export default function WhatsAppAdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [convsLoading, setConvsLoading] = useState(true);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(searchParams.get('phone'));
   const [replyText, setReplyText] = useState('');
   const [sending, setSending] = useState(false);
 

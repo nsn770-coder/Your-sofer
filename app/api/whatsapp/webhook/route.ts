@@ -23,6 +23,7 @@ interface MetaWebhookPayload {
       value: {
         messages?: Array<MetaTextMessage & { type: string }>;
         statuses?: unknown[];
+        contacts?: Array<{ wa_id: string; profile?: { name?: string } }>;
         metadata?: { phone_number_id: string; display_phone_number: string };
       };
     }>;
@@ -59,6 +60,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let from = '';
   let text = '';
   let messageId = '';
+  let contactName: string | null = null;
 
   for (const change of changes) {
     if (change.field !== 'messages') continue;
@@ -68,6 +70,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       from = textMsg.from;
       text = textMsg.text?.body?.trim() ?? '';
       messageId = textMsg.id;
+      contactName = change.value?.contacts?.find((c) => c.wa_id === textMsg.from)?.profile?.name ?? null;
       break;
     }
   }
@@ -108,7 +111,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // waitUntil keeps the Vercel function alive after the response is sent,
   // so Claude + Meta send complete even though we return 200 immediately.
   waitUntil(
-    handleIncomingMessage(from, text)
+    handleIncomingMessage(from, text, contactName)
       .then((reply) => {
         if (reply) {
           return sendWhatsAppMessage(from, reply);

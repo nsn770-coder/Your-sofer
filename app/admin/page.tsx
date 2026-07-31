@@ -4037,6 +4037,9 @@ export default function AdminPage() {
         <a href="/admin/whatsapp" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-green-700 hover:text-white" style={{ textDecoration: 'none' }}>
           💬 שיחות WhatsApp
         </a>
+        <a href="/admin/crm" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-blue-700 hover:text-white" style={{ textDecoration: 'none' }}>
+          📇 CRM לקוחות
+        </a>
       </div>
 
       {/* ── תוכן טאבים ── */}
