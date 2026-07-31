@@ -13,6 +13,7 @@ import ChatCartBridge from "@/app/components/chat/ChatCartBridge";
 import { ChatPersonaProvider } from "@/app/components/chat/ChatPersonaContext";
 import ScrollToTop from "@/app/components/ScrollToTop";
 import MetaPixelPageView from "@/app/components/MetaPixelPageView";
+import AttributionTracker from "@/app/components/AttributionTracker";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FacebookPixel } from "@/components/FacebookPixel";
 import { TidioChat } from "@/components/TidioChat";
@@ -160,6 +161,8 @@ export default function RootLayout({
         </AuthProvider>
         </ChatPersonaProvider>
         <SpeedInsights />
+
+        <AttributionTracker />
 
         {/* ── Meta Pixel - deferred until user interaction ── */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (

@@ -27,6 +27,7 @@ interface CrmLeadRow {
   phone: string;
   name?: string | null;
   source: CrmSource;
+  sourceDetail?: string | null;
   status: CrmStatus;
   saleStage?: string | null;
   notes?: CrmNote[];
@@ -273,6 +274,14 @@ function LeadDetailModal({
           <div>
             <label style={{ fontSize: 11, color: '#666', display: 'block', marginBottom: 4 }}>טלפון</label>
             <input value={lead.phone} disabled style={{ ...inputStyle, background: '#f5f5f5', color: '#888' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 11, color: '#666', display: 'block', marginBottom: 4 }}>מקור</label>
+            <div style={{ ...inputStyle, background: '#f5f5f5', color: CRM_SOURCE_COLORS[lead.source] ?? '#333', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 9, height: 9, borderRadius: 3, background: CRM_SOURCE_COLORS[lead.source] ?? '#ccc' }} />
+              {lead.source}
+              {lead.sourceDetail && <span style={{ fontWeight: 400, color: '#888', fontSize: 12 }}>— {lead.sourceDetail}</span>}
+            </div>
           </div>
           <div>
             <label style={{ fontSize: 11, color: '#666', display: 'block', marginBottom: 4 }}>אחראי/ת</label>

@@ -6,12 +6,21 @@ import { sendWhatsAppMessage } from '@/lib/whatsappSend';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+interface MetaReferral {
+  source_type?: string;
+  source_id?: string;
+  source_url?: string;
+  headline?: string;
+  ctwa_clid?: string;
+}
+
 interface MetaTextMessage {
   id: string;
   from: string;
   type: 'text';
   text: { body: string };
   timestamp: string;
+  referral?: MetaReferral;
 }
 
 interface MetaWebhookPayload {
@@ -61,6 +70,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let text = '';
   let messageId = '';
   let contactName: string | null = null;
+  let referral: MetaReferral | null = null;
 
   for (const change of changes) {
     if (change.field !== 'messages') continue;
@@ -71,6 +81,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       text = textMsg.text?.body?.trim() ?? '';
       messageId = textMsg.id;
       contactName = change.value?.contacts?.find((c) => c.wa_id === textMsg.from)?.profile?.name ?? null;
+      // Present when the customer tapped a Click-to-WhatsApp ad (Facebook/Instagram)
+      referral = textMsg.referral ?? null;
       break;
     }
   }
@@ -111,7 +123,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // waitUntil keeps the Vercel function alive after the response is sent,
   // so Claude + Meta send complete even though we return 200 immediately.
   waitUntil(
-    handleIncomingMessage(from, text, contactName)
+    handleIncomingMessage(from, text, contactName, referral)
       .then((reply) => {
         if (reply) {
           return sendWhatsAppMessage(from, reply);

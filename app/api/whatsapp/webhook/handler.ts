@@ -1,6 +1,15 @@
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { searchAiKnowledge, type SearchResult } from '@/lib/aiProductSearch';
 
+// Present only when the customer tapped a Click-to-WhatsApp ad (Facebook/Instagram).
+export interface WaReferral {
+  source_type?: string;
+  source_id?: string;
+  source_url?: string;
+  headline?: string;
+  ctwa_clid?: string;
+}
+
 // ── CRM lead hook ──────────────────────────────────────────────────────────────
 // Every inbound WhatsApp message upserts a crmLeads doc (keyed by phone) so
 // /admin/crm has a lead for every conversation, without overwriting fields an
@@ -10,18 +19,21 @@ async function upsertCrmLead(
   db: ReturnType<typeof getAdminDb>,
   phone: string,
   name: string | null,
+  referral: WaReferral | null,
 ): Promise<void> {
   const leadRef = db.collection('crmLeads').doc(phone);
   try {
     const snap = await leadRef.get();
     if (!snap.exists) {
+      const fromAd = !!referral;
       await leadRef.set({
         phone,
         name: name ?? null,
-        source: 'whatsapp',
+        source: fromAd ? 'facebook' : 'whatsapp',
+        sourceDetail: fromAd ? [referral!.headline, referral!.source_id].filter(Boolean).join(' — ') || null : null,
         status: 'חדש',
         saleStage: null,
-        notes: [],
+        notes: fromAd ? [{ text: `הגיע ממודעת פייסבוק: ${referral!.headline ?? 'ללא כותרת'}`, ts: Date.now() }] : [],
         followUpAt: null,
         assignedTo: null,
         createdAt: new Date(),
@@ -134,13 +146,14 @@ export async function handleIncomingMessage(
   senderId: string,
   messageText: string,
   contactName: string | null = null,
+  referral: WaReferral | null = null,
 ): Promise<string | null> {
   console.error(`[whatsapp handler] START from=${senderId} text="${messageText.slice(0, 60)}"`);
 
   const db = getAdminDb();
   const convRef = db.collection('whatsappConversations').doc(senderId);
 
-  await upsertCrmLead(db, senderId, contactName);
+  await upsertCrmLead(db, senderId, contactName, referral);
 
   // 1. Load conversation history + mute state
   let history: ConvMessage[] = [];
@@ -172,7 +185,7 @@ export async function handleIncomingMessage(
     ].slice(-30);
 
     await convRef
-      .set({ messages: updated, phone: senderId, updatedAt: new Date() }, { merge: true })
+      .set({ messages: updated, phone: senderId, updatedAt: new Date(), ...(referral ? { referral } : {}) }, { merge: true })
       .catch((err) => {
         console.error('[whatsapp handler] save muted history error:', err);
         return logEvent(db, 'save_history_error', senderId, String(err));
@@ -249,7 +262,7 @@ export async function handleIncomingMessage(
   ].slice(-30);
 
   await convRef
-    .set({ messages: updated, phone: senderId, updatedAt: new Date() }, { merge: true })
+    .set({ messages: updated, phone: senderId, updatedAt: new Date(), ...(referral ? { referral } : {}) }, { merge: true })
     .then(() => console.error('[whatsapp handler] conversation saved'))
     .catch((err) => {
       console.error('[whatsapp handler] save history error:', err);

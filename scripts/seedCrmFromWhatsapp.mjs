@@ -72,6 +72,19 @@ function toMillis(ts) {
   return null;
 }
 
+// Mirrors lib/crm.ts's sourceFromAttribution — kept inline since this is a
+// standalone Node script (can't import the app's TS path aliases).
+function sourceFromAttribution(attribution) {
+  const utmSource = (attribution?.utm_source ?? '').toLowerCase();
+  if (attribution?.gclid || utmSource === 'google') {
+    return { source: 'google', sourceDetail: attribution?.utm_campaign ?? null };
+  }
+  if (attribution?.fbclid || ['facebook', 'fb', 'ig'].includes(utmSource)) {
+    return { source: 'facebook', sourceDetail: attribution?.utm_campaign ?? null };
+  }
+  return { source: 'אתר', sourceDetail: attribution?.utm_campaign ?? null };
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -97,16 +110,18 @@ async function main() {
     const messages = convoDoc.data().messages ?? [];
     const firstMsgTs = messages[0]?.ts ?? null;
     const updatedAtMs = toMillis(convoDoc.data().updatedAt) ?? Date.now();
+    const referral = convoDoc.data().referral ?? null;
 
-    console.log(`  + lead from whatsapp: ${phone}`);
+    console.log(`  + lead from whatsapp: ${phone}${referral ? ' (via FB/IG ad)' : ''}`);
     if (!DRY_RUN) {
       await db.collection('crmLeads').doc(convoDoc.id).set({
         phone,
         name: null,
-        source: 'whatsapp',
+        source: referral ? 'facebook' : 'whatsapp',
+        sourceDetail: referral ? [referral.headline, referral.source_id].filter(Boolean).join(' — ') || null : null,
         status: 'חדש',
         saleStage: null,
-        notes: [],
+        notes: referral ? [{ text: `הגיע ממודעת פייסבוק: ${referral.headline ?? 'ללא כותרת'}`, ts: Date.now() }] : [],
         followUpAt: null,
         assignedTo: null,
         createdAt: firstMsgTs ? new Date(firstMsgTs) : new Date(updatedAtMs),
@@ -139,13 +154,15 @@ async function main() {
   for (const [norm, order] of latestOrderByPhone) {
     if (existingByNormPhone.has(norm)) continue;
 
-    console.log(`  + lead from order: ${order.phone} (${order.customerName ?? 'ללא שם'})`);
+    const { source, sourceDetail } = sourceFromAttribution(order.attribution);
+    console.log(`  + lead from order: ${order.phone} (${order.customerName ?? 'ללא שם'}) — source=${source}`);
     if (!DRY_RUN) {
       const leadId = normalizePhone(order.phone) || order.id;
       await db.collection('crmLeads').doc(leadId).set({
         phone: order.phone,
         name: order.customerName ?? null,
-        source: 'אתר',
+        source,
+        sourceDetail,
         status: 'עסקה נסגרה',
         saleStage: null,
         notes: [],

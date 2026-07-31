@@ -11,6 +11,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice, calculateVAT } from '@/app/lib/utils';
 import * as pixel from '@/lib/metaPixel';
+import { getStoredAttribution } from '@/lib/attribution';
 import SumitPaymentForm from '../components/SumitPaymentForm';
 import DeliveryEstimate from '../components/DeliveryEstimate';
 import PaymentMethodsRow from '../components/trust/PaymentMethodsRow';
@@ -607,6 +608,7 @@ export default function CheckoutPage() {
           uid: user?.uid || null,
           pointsUsed: pointsToUse > 0 ? pointsToUse : undefined,
           idToken: pointsToUse > 0 ? idToken : undefined,
+          attribution: getStoredAttribution(),
         }),
       });
 
@@ -707,6 +709,7 @@ export default function CheckoutPage() {
           uid: user?.uid || null,
           pointsUsed: pointsToUse > 0 ? pointsToUse : undefined,
           idToken: pointsToUse > 0 ? idToken : undefined,
+          attribution: getStoredAttribution(),
         }),
       });
 

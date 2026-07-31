@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
 
     // ── CRM: auto-close a matching lead now that this phone has ordered ────────
     try {
-      await closeLeadForOrder(adminDb, order.phone, order.orderNumber);
+      await closeLeadForOrder(adminDb, order.phone, order.orderNumber, order.attribution);
     } catch (crmErr) {
       console.error('[bit-ipn] CRM lead close failed (non-fatal):', crmErr);
     }

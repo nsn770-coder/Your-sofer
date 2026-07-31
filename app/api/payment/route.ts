@@ -5,7 +5,7 @@ import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
 import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
 import { isBulkEventKippotLine } from '@/app/lib/kippot';
-import { closeLeadForOrder } from '@/lib/crm';
+import { closeLeadForOrder, type OrderAttribution } from '@/lib/crm';
 
 // ── מימוש נקודות מועדון ──────────────────────────────────────────────────────
 // נקודה = ₪1 הנחה. ניתן לממש עד 50% מסכום המוצרים בעגלה (אחרי הנחות, לפני משלוח).
@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
       cartItems, address, notes, selectedGift, giftLine,
       shippingCost, shippingType,
       sessionId, refCode, shaliachId, shaliachName, commissionPercent,
-      uid, pointsUsed, idToken,
+      uid, pointsUsed, idToken, attribution,
     } = await req.json() as {
       items:          PaymentItem[];
       total:          number;
@@ -224,6 +224,7 @@ export async function POST(req: NextRequest) {
       uid?: string | null;
       pointsUsed?: number;
       idToken?: string | null;
+      attribution?: OrderAttribution | null;
     };
 
     if (!singleUseToken) {
@@ -564,6 +565,7 @@ export async function POST(req: NextRequest) {
         pointsUsed: requestedPoints > 0 ? requestedPoints : null,
         pointsDiscount: requestedPoints > 0 ? requestedPoints : null,
         pointsRedeemed: false,
+        attribution: attribution ?? null,
       });
 
       const sideEffects: Promise<unknown>[] = [];
@@ -601,7 +603,7 @@ export async function POST(req: NextRequest) {
 
       // ── CRM: auto-close a matching lead now that this phone has ordered ──────
       try {
-        await closeLeadForOrder(adminDb, customer.phone, orderNumber);
+        await closeLeadForOrder(adminDb, customer.phone, orderNumber, attribution);
       } catch (crmErr) {
         console.error('[payment] CRM lead close failed (non-fatal):', crmErr);
       }

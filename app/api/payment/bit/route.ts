@@ -5,6 +5,7 @@ import { createHash, randomUUID } from 'crypto';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
 import { isBulkEventKippotLine } from '@/app/lib/kippot';
+import type { OrderAttribution } from '@/lib/crm';
 
 // ── תשלום בביט דרך Sumit — Redirect API ──────────────────────────────────────
 // זרימה (זהה לפלאגין הרשמי של Sumit ל-WooCommerce):
@@ -99,7 +100,7 @@ export async function POST(req: NextRequest) {
       cartItems, address, notes, selectedGift, giftLine,
       shippingCost, shippingType,
       sessionId, refCode, shaliachId, shaliachName, commissionPercent,
-      uid, pointsUsed, idToken,
+      uid, pointsUsed, idToken, attribution,
     } = await req.json() as {
       items:          PaymentItem[];
       total:          number;
@@ -120,6 +121,7 @@ export async function POST(req: NextRequest) {
       uid?: string | null;
       pointsUsed?: number;
       idToken?: string | null;
+      attribution?: OrderAttribution | null;
     };
 
     if (!customer?.name || !customer?.email || !customer?.phone) {
@@ -370,6 +372,7 @@ export async function POST(req: NextRequest) {
       pointsUsed: requestedPoints > 0 ? requestedPoints : null,
       pointsDiscount: requestedPoints > 0 ? requestedPoints : null,
       pointsRedeemed: false,
+      attribution: attribution ?? null,
     });
 
     // ── beginredirect — קבלת דף תשלום ביט מאובטח מ-Sumit ──────────────────────
