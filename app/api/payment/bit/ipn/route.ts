@@ -4,6 +4,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { createHash } from 'crypto';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
+import { closeLeadForOrder } from '@/lib/crm';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://your-sofer.com';
 
@@ -181,6 +182,13 @@ export async function POST(req: NextRequest) {
       opsSynced: true,
     });
     console.log('[bit-ipn] order confirmed paid:', orderId, order.orderNumber, 'doc:', documentId);
+
+    // ── CRM: auto-close a matching lead now that this phone has ordered ────────
+    try {
+      await closeLeadForOrder(adminDb, order.phone, order.orderNumber);
+    } catch (crmErr) {
+      console.error('[bit-ipn] CRM lead close failed (non-fatal):', crmErr);
+    }
 
     // ── מייל אישור הזמנה — בצד שרת, לא תלוי בחזרת הלקוח לאתר ────────────────
     try {

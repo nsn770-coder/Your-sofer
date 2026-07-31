@@ -49,3 +49,42 @@ export function normalizePhone(phone: string | null | undefined): string {
   const digits = (phone ?? '').replace(/\D/g, '');
   return digits.slice(-9);
 }
+
+// ── Checkout hook: auto-close a lead when its phone number places an order ────
+// Scans crmLeads and matches by normalized phone rather than doc ID, since doc
+// IDs vary by how the lead was created (WhatsApp senderId, seed-script phone,
+// manual entry). A full collection read is fine at this collection's size —
+// switch to a `where('phoneNormalized', ...)` query if it grows into the
+// thousands.
+
+interface FirestoreLike {
+  collection(path: string): {
+    get(): Promise<{ docs: Array<{ id: string; data(): Record<string, unknown>; ref: { set(data: Record<string, unknown>, opts: { merge: boolean }): Promise<unknown> } }> }>;
+  };
+}
+
+export async function closeLeadForOrder(
+  db: FirestoreLike,
+  phone: string | null | undefined,
+  orderNumber: string,
+): Promise<void> {
+  const norm = normalizePhone(phone);
+  if (!norm) return;
+  try {
+    const snap = await db.collection('crmLeads').get();
+    const match = snap.docs.find((d) => normalizePhone((d.data().phone as string | undefined) ?? d.id) === norm);
+    if (!match) return;
+
+    const existingNotes = (match.data().notes as CrmNote[] | undefined) ?? [];
+    await match.ref.set(
+      {
+        status: 'עסקה נסגרה' as CrmStatus,
+        lastContactAt: new Date(),
+        notes: [...existingNotes, { text: `נוצרה הזמנה חדשה: #${orderNumber}`, ts: Date.now() }],
+      },
+      { merge: true },
+    );
+  } catch (err) {
+    console.error('[crm] closeLeadForOrder error:', err);
+  }
+}

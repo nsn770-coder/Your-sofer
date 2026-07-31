@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, setDoc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+} from 'recharts';
 import {
   CRM_STATUSES, CRM_SOURCES, CRM_STATUS_COLORS, CRM_SOURCE_COLORS, normalizePhone,
   type CrmStatus, type CrmSource, type CrmNote,
@@ -12,6 +14,11 @@ import {
 
 const navy = '#1E3A8A';
 const gold = '#C5A028';
+
+const quickBtnStyle: React.CSSProperties = {
+  background: '#eef2f7', color: navy, border: 'none', borderRadius: 6,
+  padding: '5px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -39,6 +46,19 @@ interface OrderRow {
   createdAt?: unknown;
 }
 
+interface WaMessage {
+  role: 'user' | 'assistant' | 'admin';
+  ts: number;
+}
+
+interface WaConversation {
+  id: string;
+  messages?: WaMessage[];
+}
+
+const STALE_NEW_MS = 24 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function toDate(ts: unknown): Date | null {
@@ -60,6 +80,32 @@ function fmtDateShort(ts: unknown): string {
   const d = toDate(ts);
   if (!d) return '—';
   return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
+
+function fmtDuration(ms: number): string {
+  const sec = Math.round(ms / 1000);
+  if (sec < 60) return `${sec} שניות`;
+  const min = Math.round(sec / 60);
+  if (min < 60) return `${min} דקות`;
+  const hr = Math.round(min / 60);
+  return `${hr} שעות`;
+}
+
+function csvEscape(value: unknown): string {
+  return `"${String(value ?? '').replace(/"/g, '""')}"`;
+}
+
+function downloadCsv(filename: string, rows: string[][]) {
+  const csv = rows.map((row) => row.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // ─── New Lead Modal ───────────────────────────────────────────────────────────
@@ -184,6 +230,18 @@ function LeadDetailModal({
     }
   }
 
+  async function setFollowUpQuick(daysFromNow: number) {
+    const target = new Date(Date.now() + daysFromNow * DAY_MS);
+    setFollowUpAt(target.toISOString().slice(0, 10));
+    try {
+      await updateDoc(doc(db, 'crmLeads', lead.id), { followUpAt: target.getTime() });
+      onUpdate(lead.id, { followUpAt: target.getTime() });
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בעדכון תזכורת');
+    }
+  }
+
   async function addNote() {
     if (!noteText.trim()) return;
     const newNote: CrmNote = { text: noteText.trim(), ts: Date.now() };
@@ -224,6 +282,11 @@ function LeadDetailModal({
             <label style={{ fontSize: 11, color: '#666', display: 'block', marginBottom: 4 }}>תזכורת למעקב</label>
             <input type="date" value={followUpAt} onChange={(e) => setFollowUpAt(e.target.value)} style={inputStyle} />
           </div>
+        </div>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+          <button onClick={() => setFollowUpQuick(1)} style={quickBtnStyle}>מחר</button>
+          <button onClick={() => setFollowUpQuick(3)} style={quickBtnStyle}>עוד 3 ימים</button>
+          <button onClick={() => setFollowUpQuick(7)} style={quickBtnStyle}>שבוע</button>
         </div>
         <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
           <button onClick={saveDetails} disabled={saving}
@@ -335,6 +398,62 @@ function DistributionPie({
   );
 }
 
+// ─── Reports Tab ──────────────────────────────────────────────────────────────
+
+function ReportsTab({
+  leadsByWeek, conversionBySource, botAvgResponseMs,
+}: {
+  leadsByWeek: { שבוע: string; לידים: number }[];
+  conversionBySource: { source: CrmSource; total: number; closed: number; rate: number }[];
+  botAvgResponseMs: number | null;
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginBottom: 24 }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: navy, margin: '0 0 12px' }}>📈 לידים חדשים לפי שבוע (8 שבועות אחרונים)</h3>
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={leadsByWeek} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="שבוע" tick={{ fontSize: 12, fill: '#666' }} />
+            <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#666' }} width={30} />
+            <Tooltip contentStyle={{ borderRadius: 8, fontSize: 13 }} labelStyle={{ direction: 'rtl' }} />
+            <Bar dataKey="לידים" fill="#2a78d6" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div style={{ background: '#fff', borderRadius: 14, padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: navy, margin: '0 0 12px' }}>🎯 שיעור המרה לפי מקור (הפכו ל&quot;עסקה נסגרה&quot;)</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {conversionBySource.map((c) => (
+            <div key={c.source}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: 3, background: CRM_SOURCE_COLORS[c.source] }} />
+                  {c.source}
+                </span>
+                <span style={{ fontWeight: 700, color: navy }}>{c.rate}% ({c.closed}/{c.total})</span>
+              </div>
+              <div style={{ background: '#f0f0f0', borderRadius: 6, height: 8, overflow: 'hidden' }}>
+                <div style={{ width: `${c.rate}%`, height: '100%', background: CRM_SOURCE_COLORS[c.source] }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ background: '#fff', borderRadius: 14, padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: navy, margin: '0 0 8px' }}>🤖 זמן תגובה ממוצע של הבוט</h3>
+        {botAvgResponseMs === null ? (
+          <div style={{ fontSize: 13, color: '#999' }}>אין עדיין מספיק נתונים</div>
+        ) : (
+          <div style={{ fontSize: 28, fontWeight: 900, color: '#2a78d6' }}>{fmtDuration(botAvgResponseMs)}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function CrmPage() {
@@ -344,6 +463,9 @@ export default function CrmPage() {
   const [leads, setLeads] = useState<CrmLeadRow[]>([]);
   const [leadsLoading, setLeadsLoading] = useState(true);
   const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [conversations, setConversations] = useState<WaConversation[]>([]);
+
+  const [pageTab, setPageTab] = useState<'leads' | 'reports'>('leads');
 
   const [statusFilter, setStatusFilter] = useState<string>('הכל');
   const [sourceFilter, setSourceFilter] = useState<string>('הכל');
@@ -382,6 +504,15 @@ export default function CrmPage() {
     }).catch((e) => console.error('[admin/crm] load orders error', e));
   }, [user]);
 
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+    getDocs(collection(db, 'whatsappConversations')).then((snap) => {
+      const list: WaConversation[] = [];
+      snap.forEach((d) => list.push({ id: d.id, ...(d.data() as any) }));
+      setConversations(list);
+    }).catch((e) => console.error('[admin/crm] load conversations error', e));
+  }, [user]);
+
   // ── Dashboard stats (over ALL leads, not the filtered table) ────────────────
 
   const stats = useMemo(() => {
@@ -403,6 +534,60 @@ export default function CrmPage() {
     () => CRM_SOURCES.map((s) => ({ name: s, count: leads.filter((l) => l.source === s).length })).filter((d) => d.count > 0),
     [leads],
   );
+
+  // ── "המשימות שלי להיום" — follow-ups due or overdue ─────────────────────────
+
+  const tasksDue = useMemo(
+    () => leads
+      .filter((l) => typeof l.followUpAt === 'number' && (l.followUpAt as number) <= Date.now())
+      .sort((a, b) => (a.followUpAt as number) - (b.followUpAt as number)),
+    [leads],
+  );
+
+  // ── Reports tab data ──────────────────────────────────────────────────────────
+
+  const leadsByWeek = useMemo(() => {
+    const weeks: { label: string; start: number; count: number }[] = [];
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    for (let i = 7; i >= 0; i--) {
+      const start = now.getTime() - i * 7 * DAY_MS;
+      const label = new Date(start).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+      weeks.push({ label, start, count: 0 });
+    }
+    for (const l of leads) {
+      const d = toDate(l.createdAt);
+      if (!d) continue;
+      const t = d.getTime();
+      for (let i = weeks.length - 1; i >= 0; i--) {
+        if (t >= weeks[i].start) { weeks[i].count++; break; }
+      }
+    }
+    return weeks.map((w) => ({ שבוע: w.label, לידים: w.count }));
+  }, [leads]);
+
+  const conversionBySource = useMemo(
+    () => CRM_SOURCES.map((s) => {
+      const total = leads.filter((l) => l.source === s).length;
+      const closed = leads.filter((l) => l.source === s && l.status === 'עסקה נסגרה').length;
+      return { source: s, total, closed, rate: total > 0 ? Math.round((closed / total) * 100) : 0 };
+    }),
+    [leads],
+  );
+
+  const botAvgResponseMs = useMemo(() => {
+    const deltas: number[] = [];
+    for (const c of conversations) {
+      const msgs = c.messages ?? [];
+      for (let i = 0; i < msgs.length - 1; i++) {
+        if (msgs[i].role === 'user' && msgs[i + 1].role === 'assistant') {
+          deltas.push(msgs[i + 1].ts - msgs[i].ts);
+        }
+      }
+    }
+    if (deltas.length === 0) return null;
+    return deltas.reduce((s, d) => s + d, 0) / deltas.length;
+  }, [conversations]);
 
   // ── Filtered table ───────────────────────────────────────────────────────────
 
@@ -441,6 +626,36 @@ export default function CrmPage() {
     }
   }
 
+  async function markTaskDone(id: string) {
+    try {
+      await updateDoc(doc(db, 'crmLeads', id), { followUpAt: null });
+      patchLead(id, { followUpAt: null });
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בעדכון');
+    }
+  }
+
+  async function postponeTaskTomorrow(id: string) {
+    const target = Date.now() + DAY_MS;
+    try {
+      await updateDoc(doc(db, 'crmLeads', id), { followUpAt: target });
+      patchLead(id, { followUpAt: target });
+    } catch (e) {
+      console.error(e);
+      alert('שגיאה בעדכון');
+    }
+  }
+
+  function exportFilteredCsv() {
+    const headers = ['שם', 'טלפון', 'מקור', 'סטטוס', 'שלב מכירה', 'אחראי', 'תאריך יצירה', 'פנייה אחרונה', 'תזכורת'];
+    const rows = filteredLeads.map((l) => [
+      l.name ?? '', l.phone, l.source, l.status, l.saleStage ?? '', l.assignedTo ?? '',
+      fmtDateShort(l.createdAt), fmtDate(l.lastContactAt), l.followUpAt ? fmtDateShort(l.followUpAt) : '',
+    ]);
+    downloadCsv(`crm-leads-${new Date().toISOString().slice(0, 10)}.csv`, [headers, ...rows]);
+  }
+
   const selectedLead = leads.find((l) => l.id === selectedLeadId) ?? null;
 
   const inputStyle: React.CSSProperties = { border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 13, boxSizing: 'border-box' };
@@ -463,6 +678,52 @@ export default function CrmPage() {
             ➕ ליד חדש
           </button>
         </div>
+
+        {/* המשימות שלי להיום */}
+        {tasksDue.length > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 800, color: '#b91c1c', margin: '0 0 10px' }}>
+              🔔 המשימות שלי להיום ({tasksDue.length})
+            </h2>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {tasksDue.map((l) => {
+                const overdueDays = Math.floor((Date.now() - (l.followUpAt as number)) / DAY_MS);
+                return (
+                  <div key={l.id} style={{ background: '#fff', border: '1px solid #fecaca', borderRight: '4px solid #e11d48', borderRadius: 10, padding: '12px 16px', minWidth: 240, boxShadow: '0 2px 6px rgba(0,0,0,.05)' }}>
+                    <div style={{ fontWeight: 700, color: navy, fontSize: 14 }}>{l.name || l.phone}</div>
+                    <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>{l.phone}</div>
+                    <div style={{ fontSize: 11, color: '#e11d48', fontWeight: 700, marginBottom: 8 }}>
+                      {overdueDays > 0 ? `⏰ באיחור ${overdueDays} ימים` : '⏰ להיום'}
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      <a href={`/admin/whatsapp?phone=${encodeURIComponent(l.id)}`} style={{ ...quickBtnStyle, background: '#25D366', color: '#fff', textDecoration: 'none' }}>💬 וואטסאפ</a>
+                      <a href={`tel:${l.phone}`} style={{ ...quickBtnStyle, background: '#eda100', color: '#fff', textDecoration: 'none' }}>📞 התקשר</a>
+                      <button onClick={() => markTaskDone(l.id)} style={{ ...quickBtnStyle, background: '#008300', color: '#fff' }}>✔ בוצע</button>
+                      <button onClick={() => postponeTaskTomorrow(l.id)} style={quickBtnStyle}>⏭ דחה למחר</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Page tabs */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
+          <button onClick={() => setPageTab('leads')}
+            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer', background: pageTab === 'leads' ? navy : '#fff', color: pageTab === 'leads' ? '#fff' : '#666' }}>
+            📋 ניהול לידים
+          </button>
+          <button onClick={() => setPageTab('reports')}
+            style={{ padding: '8px 18px', borderRadius: 8, border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer', background: pageTab === 'reports' ? navy : '#fff', color: pageTab === 'reports' ? '#fff' : '#666' }}>
+            📊 דוחות
+          </button>
+        </div>
+
+        {pageTab === 'reports' ? (
+          <ReportsTab leadsByWeek={leadsByWeek} conversionBySource={conversionBySource} botAvgResponseMs={botAvgResponseMs} />
+        ) : (
+        <>
 
         {/* Dashboard */}
         <div style={{ display: 'flex', gap: 14, marginBottom: 18, flexWrap: 'wrap' }}>
@@ -507,6 +768,14 @@ export default function CrmPage() {
           </div>
         </div>
 
+        {/* Export */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+          <button onClick={exportFilteredCsv}
+            style={{ background: '#fff', color: navy, border: `1px solid ${navy}`, borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+            ⬇ ייצוא CSV ({filteredLeads.length})
+          </button>
+        </div>
+
         {/* Table */}
         <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,.06)', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
@@ -527,9 +796,19 @@ export default function CrmPage() {
               ) : filteredLeads.length === 0 ? (
                 <tr><td colSpan={7} style={{ padding: 20, textAlign: 'center', color: '#999' }}>לא נמצאו לידים</td></tr>
               ) : (
-                filteredLeads.map((l) => (
-                  <tr key={l.id} style={{ borderTop: '1px solid #f0f0f0' }}>
-                    <td style={{ padding: '8px 14px', fontWeight: 600, color: navy }}>{l.name || '—'}</td>
+                filteredLeads.map((l) => {
+                  const createdDate = toDate(l.createdAt);
+                  const isStale = l.status === 'חדש' && createdDate !== null && Date.now() - createdDate.getTime() > STALE_NEW_MS;
+                  return (
+                  <tr key={l.id} style={{ borderTop: '1px solid #f0f0f0', background: isStale ? '#fffbeb' : undefined }}>
+                    <td style={{ padding: '8px 14px', fontWeight: 600, color: navy }}>
+                      {l.name || '—'}
+                      {isStale && (
+                        <span style={{ marginRight: 8, fontSize: 10, fontWeight: 700, color: '#b45309', background: '#fef3c7', borderRadius: 5, padding: '2px 6px' }}>
+                          ⏳ ממתין זמן רב
+                        </span>
+                      )}
+                    </td>
                     <td style={{ padding: '8px 14px' }}>{l.phone}</td>
                     <td style={{ padding: '8px 14px' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -559,11 +838,14 @@ export default function CrmPage() {
                       </button>
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
+        </>
+        )}
       </div>
 
       {selectedLead && (

@@ -5,6 +5,7 @@ import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
 import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
 import { isBulkEventKippotLine } from '@/app/lib/kippot';
+import { closeLeadForOrder } from '@/lib/crm';
 
 // ── מימוש נקודות מועדון ──────────────────────────────────────────────────────
 // נקודה = ₪1 הנחה. ניתן לממש עד 50% מסכום המוצרים בעגלה (אחרי הנחות, לפני משלוח).
@@ -596,6 +597,13 @@ export async function POST(req: NextRequest) {
         await accruePoints(adminDb, orderRef.id, uid || null, customer.email, chargedTotal, shippingCost || 0, cartItems);
       } catch (loyaltyErr) {
         console.error('[payment] loyalty accrual failed (non-fatal):', loyaltyErr);
+      }
+
+      // ── CRM: auto-close a matching lead now that this phone has ordered ──────
+      try {
+        await closeLeadForOrder(adminDb, customer.phone, orderNumber);
+      } catch (crmErr) {
+        console.error('[payment] CRM lead close failed (non-fatal):', crmErr);
       }
     } catch (adminErr) {
       console.error('[payment] order creation failed after successful charge:', adminErr);

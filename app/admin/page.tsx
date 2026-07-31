@@ -2939,6 +2939,7 @@ export default function AdminPage() {
   const [editRequests, setEditRequests] = useState<SoferEditRequest[]>([]);
   const [editRequestsLoading, setEditRequestsLoading] = useState(true);
   const [rejectNoteMap, setRejectNoteMap] = useState<Record<string, string>>({});
+  const [crmFollowUpsDue, setCrmFollowUpsDue] = useState(0);
   const [abandonedCarts, setAbandonedCarts] = useState<AbandonedCart[]>([]);
   const [abandonedCartsLoading, setAbandonedCartsLoading] = useState(true);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -2958,8 +2959,16 @@ export default function AdminPage() {
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
       loadReviews(); loadShluchimApplications(); loadTestimonials(); loadEditRequests();
       loadAbandonedCarts(); loadCustomers(); loadLeads(); loadRabbiRequests(); loadCoupons(); loadOutOfStockProducts();
+      loadCrmFollowUpsDue();
     }
   }, [user]);
+
+  async function loadCrmFollowUpsDue() {
+    try {
+      const snap = await getCountFromServer(query(collection(db, 'crmLeads'), where('followUpAt', '<=', Date.now())));
+      setCrmFollowUpsDue(snap.data().count);
+    } catch (e) { console.error(e); }
+  }
 
   async function loadReviews() {
     try {
@@ -4037,8 +4046,11 @@ export default function AdminPage() {
         <a href="/admin/whatsapp" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-green-700 hover:text-white" style={{ textDecoration: 'none' }}>
           💬 שיחות WhatsApp
         </a>
-        <a href="/admin/crm" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-blue-700 hover:text-white" style={{ textDecoration: 'none' }}>
+        <a href="/admin/crm" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-blue-700 hover:text-white relative" style={{ textDecoration: 'none' }}>
           📇 CRM לקוחות
+          {crmFollowUpsDue > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{crmFollowUpsDue}</span>
+          )}
         </a>
       </div>
 
