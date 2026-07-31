@@ -87,7 +87,7 @@ function buildSystemPrompt(
 // ── Conversation types ────────────────────────────────────────────────────────
 
 interface ConvMessage {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'admin';
   content: string;
   ts: number;
 }
@@ -103,17 +103,43 @@ export async function handleIncomingMessage(
   const db = getAdminDb();
   const convRef = db.collection('whatsappConversations').doc(senderId);
 
-  // 1. Load conversation history
+  // 1. Load conversation history + mute state
   let history: ConvMessage[] = [];
+  let botMuted = false;
+  let botMutedUntil: number | null = null;
   try {
     const snap = await convRef.get();
     if (snap.exists) {
-      history = (snap.data()?.messages as ConvMessage[] | undefined) ?? [];
+      const data = snap.data();
+      history = (data?.messages as ConvMessage[] | undefined) ?? [];
+      botMuted = data?.botMuted === true;
+      botMutedUntil = typeof data?.botMutedUntil === 'number' ? data.botMutedUntil : null;
     }
     console.error(`[whatsapp handler] history loaded: ${history.length} messages`);
   } catch (err) {
     console.error('[whatsapp handler] load history error:', err);
     await logEvent(db, 'load_history_error', senderId, String(err));
+  }
+
+  // An admin can silence the bot permanently (botMuted) or temporarily after
+  // sending a manual reply (botMutedUntil) — in either case, just log the
+  // customer's message and let the admin answer from /admin/whatsapp.
+  const isMuted = botMuted || (botMutedUntil !== null && Date.now() < botMutedUntil);
+  if (isMuted) {
+    console.error(`[whatsapp handler] bot muted for from=${senderId}, skipping auto-reply`);
+    const updated: ConvMessage[] = [
+      ...history,
+      { role: 'user' as const, content: messageText, ts: Date.now() },
+    ].slice(-30);
+
+    await convRef
+      .set({ messages: updated, phone: senderId, updatedAt: new Date() }, { merge: true })
+      .catch((err) => {
+        console.error('[whatsapp handler] save muted history error:', err);
+        return logEvent(db, 'save_history_error', senderId, String(err));
+      });
+
+    return null;
   }
 
   // 2. Detect intent from recent context + current message
@@ -138,7 +164,7 @@ export async function handleIncomingMessage(
   // 4. Build Claude messages (last 12 from history + current user message)
   const claudeMessages = history
     .slice(-12)
-    .map((m) => ({ role: m.role, content: m.content }))
+    .map((m) => ({ role: (m.role === 'admin' ? 'assistant' : m.role) as 'user' | 'assistant', content: m.content }))
     .concat({ role: 'user' as const, content: messageText });
 
   const systemPrompt = buildSystemPrompt(products, event, isLargeOrder);

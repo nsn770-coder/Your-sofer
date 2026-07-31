@@ -4034,6 +4034,9 @@ export default function AdminPage() {
         <a href="/admin/klafim" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-amber-700 hover:text-white" style={{ textDecoration: 'none' }}>
           📜 ניהול קלפים
         </a>
+        <a href="/admin/whatsapp" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-green-700 hover:text-white" style={{ textDecoration: 'none' }}>
+          💬 שיחות WhatsApp
+        </a>
       </div>
 
       {/* ── תוכן טאבים ── */}

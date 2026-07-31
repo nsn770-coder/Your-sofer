@@ -310,5 +310,10 @@ service cloud.firestore {
     match /finance_settings/{id} {
       allow read, write: if isAdmin();
     }
+
+    // ── WhatsApp conversations (admin chat viewer at /admin/whatsapp) ───────
+    match /whatsappConversations/{id} {
+      allow read, write: if isAdmin();
+    }
   }
 }
