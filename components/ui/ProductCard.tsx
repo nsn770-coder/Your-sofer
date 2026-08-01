@@ -269,19 +269,6 @@ export default function ProductCard({
           <ProductBadge isBestSeller={isBestSeller} priority={priority} badge={badge} bundlePromo={bundlePromo} />
         </div>
 
-        {/* Bottom-left: kippot discount badge */}
-        {cat === 'כיפות' && (
-          <div className="absolute bottom-0 left-0" style={{
-            background: 'linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)',
-            padding: '8px 12px 8px 16px',
-            borderRadius: '0 8px 0 0'
-          }}>
-            <span style={{ color: '#1a1a1a', fontSize: 10, fontWeight: 700, whiteSpace: 'nowrap' }}>
-              מוצר 2: 10% | 3+: 15%
-            </span>
-          </div>
-        )}
-
         {/* Top-left: clearance / sale / new / klaf-selection badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {comingSoon && (
