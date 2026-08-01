@@ -22,6 +22,7 @@ interface Props {
   was?: number | null;
   createdAt?: { seconds: number } | null;
   hidden?: boolean;
+  eventsOnly?: boolean;
   aboveFold?: boolean;
   hasKlafSelection?: boolean;
   cat?: string;
@@ -109,7 +110,7 @@ function IconCheck({ size = 10 }: { size?: number }) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProductCard({
-  id, name, price, images, aiLifestyleImage, priority, isBestSeller, badge, bundlePromo, was, createdAt, hidden, aboveFold, hasKlafSelection, cat,
+  id, name, price, images, aiLifestyleImage, priority, isBestSeller, badge, bundlePromo, was, createdAt, hidden, eventsOnly, aboveFold, hasKlafSelection, cat,
   soferId, soferName, soferPhoto, horizontal, outOfStock, clearanceDiscount, clearanceSalePrice, originalPrice,
   comingSoon, expectedArrivalDate, productDoc, isBundle,
 }: Props) {
@@ -118,7 +119,8 @@ export default function ProductCard({
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
 
-  const [localHidden, setLocalHidden]     = useState(hidden ?? false);
+  const [localHidden, setLocalHidden]         = useState(hidden ?? false);
+  const [localEventsOnly, setLocalEventsOnly] = useState(eventsOnly ?? false);
   const [localPriority, setLocalPriority] = useState(priority ?? 50);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [prioritySaved, setPrioritySaved] = useState(false);
@@ -132,6 +134,14 @@ export default function ProductCard({
     setLocalHidden(newHidden);
     await updateDoc(doc(db, 'products', id), { hidden: newHidden });
     if (newHidden) { setRemoving(true); setTimeout(() => setRemoved(true), 300); }
+  }
+
+  async function handleToggleEventsOnly(e: React.MouseEvent) {
+    e.stopPropagation();
+    const newEventsOnly = !localEventsOnly;
+    setLocalEventsOnly(newEventsOnly);
+    await updateDoc(doc(db, 'products', id), { eventsOnly: newEventsOnly });
+    if (newEventsOnly) { setRemoving(true); setTimeout(() => setRemoved(true), 300); }
   }
 
   function handlePriorityChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -215,6 +225,16 @@ export default function ProductCard({
             {localHidden ? <><IconEye /> הצג</> : <><IconEyeOff /> הסתר</>}
           </button>
 
+          <button
+            onClick={handleToggleEventsOnly}
+            title={localEventsOnly ? 'הצג בכל מקום' : 'הצג רק בדף כיפות ומזכרות לאירועים'}
+            className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors ${
+              localEventsOnly ? 'bg-purple-500 text-white hover:bg-purple-600' : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            🎉 רק לאירועים
+          </button>
+
           <input
             type="number" min={1} max={99} value={localPriority}
             onChange={handlePriorityChange}
@@ -271,6 +291,11 @@ export default function ProductCard({
 
         {/* Top-left: clearance / sale / new / klaf-selection badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {localEventsOnly && (
+            <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#7C3AED' }}>
+              🎉 רק אירועים
+            </span>
+          )}
           {comingSoon && (
             <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#111111' }}>
               מגיע בקרוב{expectedArrivalDate ? ` ${formatArrivalDate(expectedArrivalDate)}` : ''}

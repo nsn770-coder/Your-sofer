@@ -76,6 +76,8 @@ export async function GET(req: Request) {
 
       // Skip hidden products
       if (d.hidden === true) return skip('hidden');
+      // Skip products shown only on the events page
+      if (d.eventsOnly === true) return skip('eventsOnly');
       // Whitelist statuses: only 'active' or legacy products with no status
       // (previously a blacklist — 'rejected'/'pending' products leaked into the feed)
       if (d.status && d.status !== 'active') return skip(`status_${d.status}`);

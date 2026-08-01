@@ -45,7 +45,7 @@ function ProductScrollRow({ title, products }: { title: string; products: Produc
               id={p.id} name={p.name} price={p.price}
               images={[p.imgUrl, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
               was={p.was} productDoc={p} badge={p.badge} isBestSeller={p.isBestSeller}
-              outOfStock={p.outOfStock} cat={p.cat}
+              outOfStock={p.outOfStock} cat={p.cat} eventsOnly={p.eventsOnly}
             />
           </div>
         ))}
@@ -169,13 +169,14 @@ export default function EventKippotClient() {
   }, []);
 
   useEffect(() => {
-    // שתי שאילתות: מוצרי אירועים + מוצרים המשויכים לסקרולים (גם אם אינם מסומנים כמוצר אירוע)
+    // שלוש שאילתות: מוצרי אירועים + מוצרים המשויכים לסקרולים + מוצרים המסומנים "רק לאירועים"
     Promise.all([
       getDocs(query(collection(db, 'products'), where('isEventProduct', '==', true))),
       getDocs(query(collection(db, 'products'), where('eventScrollSection', 'in', EVENT_SCROLL_SECTION_IDS))),
-    ]).then(([eventSnap, scrollSnap]) => {
+      getDocs(query(collection(db, 'products'), where('eventsOnly', '==', true))),
+    ]).then(([eventSnap, scrollSnap, eventsOnlySnap]) => {
       const byId = new Map<string, Product>();
-      [...eventSnap.docs, ...scrollSnap.docs].forEach(d => byId.set(d.id, { id: d.id, ...d.data() } as Product));
+      [...eventSnap.docs, ...scrollSnap.docs, ...eventsOnlySnap.docs].forEach(d => byId.set(d.id, { id: d.id, ...d.data() } as Product));
       setEventProducts(
         Array.from(byId.values()).filter(p => !p.hidden && !p.outOfStock && p.status !== 'inactive')
       );
@@ -187,7 +188,7 @@ export default function EventKippotClient() {
   const customSections = EVENT_SCROLL_SECTIONS.filter(s => s.id !== 'bundles');
   const hasCustomSections = customSections.some(s => scrollProducts(s.id).length > 0);
   // רשת "מוצרים נוספים לאירוע" — רק מוצרים שלא שויכו לסקרול
-  const gridProducts = eventProducts.filter(p => p.isEventProduct && !p.eventScrollSection);
+  const gridProducts = eventProducts.filter(p => (p.isEventProduct || p.eventsOnly) && !p.eventScrollSection);
 
   const embroideryExtra = printType === 'embroidery' ? 5 : 0;
   const bothSidesExtra  = printType === 'print-both' ? KIPA_EXTRA_SIDE_PRICE : 0;
@@ -496,7 +497,7 @@ export default function EventKippotClient() {
                 key={p.id} id={p.id} name={p.name} price={p.price}
                 images={[p.imgUrl, p.imgUrl2, p.imgUrl3].filter(Boolean) as string[]}
                 was={p.was} productDoc={p} badge={p.badge} isBestSeller={p.isBestSeller}
-                outOfStock={p.outOfStock} cat={p.cat}
+                outOfStock={p.outOfStock} cat={p.cat} eventsOnly={p.eventsOnly}
               />
             ))}
           </div>

@@ -45,6 +45,7 @@ interface Product {
   was?: number | null;
   createdAt?: { seconds: number } | null;
   hidden?: boolean;
+  eventsOnly?: boolean;
   status?: string;
   cat?: string;
   subCategory?: string;
@@ -232,7 +233,7 @@ export default function AllProductsClient() {
 
           const prods = snap.docs
             .map(d => ({ id: d.id, ...d.data() } as Product))
-            .filter(p => p.status === 'active' && p.hidden !== true);
+            .filter(p => p.status === 'active' && p.hidden !== true && !p.eventsOnly);
 
           setAllProducts(prev => isFirst ? prods : [...prev, ...prods]);
           if (isFirst) { setLoading(false); isFirst = false; }

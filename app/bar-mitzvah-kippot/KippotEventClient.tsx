@@ -52,6 +52,7 @@ interface Product {
   imgUrl2?: string;
   imgUrl3?: string;
   hidden?: boolean;
+  eventsOnly?: boolean;
   priority?: number;
   subCategory?: string;
   fontStyle?: string;
@@ -236,7 +237,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
         );
         const prods = snap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
-          .filter(p => p.hidden !== true);
+          .filter(p => p.hidden !== true && !p.eventsOnly);
         setAllProducts(prods);
       } catch (e) {
         console.error('[KippotEventClient] fetch error:', e);

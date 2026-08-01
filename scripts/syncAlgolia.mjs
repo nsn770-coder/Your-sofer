@@ -64,7 +64,7 @@ async function syncProducts() {
   let skipped = 0;
   for (const doc of snap.docs) {
     const d = doc.data();
-    if (d.status !== 'active' || d.hidden === true) { skipped++; continue; }
+    if (d.status !== 'active' || d.hidden === true || d.eventsOnly === true) { skipped++; continue; }
 
     // inStock: treat as boolean (true if inStock > 0 or explicitly true, and not outOfStock)
     const inStockRaw = d.inStock;

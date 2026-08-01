@@ -36,6 +36,7 @@ interface Product {
   badge?: string | null;
   was?: number | null;
   hidden?: boolean;
+  eventsOnly?: boolean;
   status?: string;
   cat?: string;
   subCategory?: string;
@@ -74,7 +75,7 @@ export default function ShabbatHolidaysClient() {
         );
         catSnap.forEach(d => {
           const p = { id: d.id, ...d.data() } as Product;
-          if (!p.hidden && p.status !== 'inactive' && !seen.has(p.id) && matchesShabbat(p)) {
+          if (!p.hidden && !p.eventsOnly && p.status !== 'inactive' && !seen.has(p.id) && matchesShabbat(p)) {
             seen.add(p.id);
             all.push(p);
           }
@@ -87,7 +88,7 @@ export default function ShabbatHolidaysClient() {
           );
           tagSnap.forEach(d => {
             const p = { id: d.id, ...d.data() } as Product;
-            if (!p.hidden && p.status !== 'inactive' && !seen.has(p.id) && matchesShabbat(p)) {
+            if (!p.hidden && !p.eventsOnly && p.status !== 'inactive' && !seen.has(p.id) && matchesShabbat(p)) {
               seen.add(p.id);
               all.push(p);
             }
@@ -163,6 +164,7 @@ export default function ShabbatHolidaysClient() {
                 was={p.was} productDoc={p}
                 createdAt={p.createdAt}
                 hidden={p.hidden}
+                eventsOnly={p.eventsOnly}
               />
             ))}
           </div>

@@ -114,6 +114,7 @@ interface Product {
   was?: number | null;
   createdAt?: { seconds: number } | null;
   hidden?: boolean;
+  eventsOnly?: boolean;
   cat?: string;
   videoUrl?: string;
 }
@@ -507,6 +508,7 @@ export default function HomePageClient({ productCount }: { productCount: number 
         const BLOCKED_NAMES = /מלחי|מלחית|מלחיות/;
         const isShowable = (p: Product) =>
           p.hidden !== true &&
+          !p.eventsOnly &&
           (p as any).status !== 'inactive' &&
           !KLAF_CATS.has(p.cat ?? '') &&
           !BLOCKED_NAMES.test(p.name ?? '') &&
@@ -562,7 +564,7 @@ export default function HomePageClient({ productCount }: { productCount: number 
         const snap = await getDocs(
           query(collection(db, 'products'), where('promoPlan', '==', '2+1'), orderBy('price'), limit(8))
         );
-        setPromoProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => !p.hidden && (p.imgUrl || p.image_url)));
+        setPromoProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => !p.hidden && !p.eventsOnly && (p.imgUrl || p.image_url)));
       } catch { /* non-fatal */ }
       finally { setPromoLoaded(true); }
     }
@@ -770,7 +772,7 @@ export default function HomePageClient({ productCount }: { productCount: number 
         )
       );
       const candidates: Product[] = [];
-      snap.forEach(d => { const p = { id: d.id, ...d.data() } as Product; if (p.hidden !== true) candidates.push(p); });
+      snap.forEach(d => { const p = { id: d.id, ...d.data() } as Product; if (p.hidden !== true && !p.eventsOnly) candidates.push(p); });
       const scored = candidates.map(p => {
         const text = `${p.name ?? ''} ${(p as any).badge ?? ''} ${(p as any).kashrut ?? ''}`.toLowerCase();
         const score = keywords.reduce((s, kw) => s + (text.includes(kw.toLowerCase()) ? 1 : 0), 0);

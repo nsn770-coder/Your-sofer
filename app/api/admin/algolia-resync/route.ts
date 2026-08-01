@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     const records: Record<string, unknown>[] = [];
     for (const doc of snap.docs) {
       const d = doc.data();
-      if (d.status !== 'active' || d.hidden === true) continue;
+      if (d.status !== 'active' || d.hidden === true || d.eventsOnly === true) continue;
 
       const inStockRaw = d.inStock;
       const outOfStock = d.outOfStock === true;

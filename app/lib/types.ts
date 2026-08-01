@@ -24,6 +24,7 @@ export interface Product {
   status?: string;
   days?: string;
   hidden?: boolean;
+  eventsOnly?: boolean; // מוצג רק בדף "כיפות ומזכרות לאירועים" — מוסתר מקטגוריות/חיפוש/פיד/דף הבית
 
   // Sofer / Vendor
   sofer?: string;

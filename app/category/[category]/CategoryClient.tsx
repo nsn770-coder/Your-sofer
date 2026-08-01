@@ -42,6 +42,7 @@ interface Product {
   vendor?: string;
   createdAt?: { seconds: number };
   hidden?: boolean;
+  eventsOnly?: boolean;
   cat?: string;
   subCategory?: string;
   nusach?: string;
@@ -1249,7 +1250,7 @@ export default function CategoryClient({ category }: { category: string }) {
           }
         }
       }
-      setAllLoaded(merged.filter(p => p.hidden !== true));
+      setAllLoaded(merged.filter(p => p.hidden !== true && !p.eventsOnly));
       return;
     }
 
@@ -1258,13 +1259,13 @@ export default function CategoryClient({ category }: { category: string }) {
       const snap = await getDocs(
         query(collection(db, 'products'), where('subCategory', '==', subcatOverrideForFetch), limit(500))
       );
-      setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true));
+      setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true && !p.eventsOnly));
       return;
     }
 
     if (category === 'הכל') {
       const snap = await getDocs(query(collection(db, 'products'), orderBy('priority', 'desc'), limit(2000)));
-      setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true));
+      setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true && !p.eventsOnly));
       return;
     }
 
@@ -1273,7 +1274,7 @@ export default function CategoryClient({ category }: { category: string }) {
       setAllLoaded(
         snap.docs
           .map(d => ({ id: d.id, ...d.data() } as Product))
-          .filter(p => p.hidden !== true && (typeof p.inStock === 'number' ? p.inStock > 0 : true))
+          .filter(p => p.hidden !== true && !p.eventsOnly && (typeof p.inStock === 'number' ? p.inStock > 0 : true))
       );
       return;
     }
@@ -1290,7 +1291,7 @@ export default function CategoryClient({ category }: { category: string }) {
           if (!seen.has(d.id)) { seen.add(d.id); merged.push({ id: d.id, ...d.data() } as Product); }
         }
       }
-      setAllLoaded(merged.filter(p => p.hidden !== true));
+      setAllLoaded(merged.filter(p => p.hidden !== true && !p.eventsOnly));
       return;
     }
 
@@ -1312,7 +1313,7 @@ export default function CategoryClient({ category }: { category: string }) {
         }
       }
       const excluded = mergedDef.excludeSubCats ?? [];
-      setAllLoaded(merged.filter(p => p.hidden !== true && !excluded.includes(p.subCategory ?? '')));
+      setAllLoaded(merged.filter(p => p.hidden !== true && !p.eventsOnly && !excluded.includes(p.subCategory ?? '')));
       return;
     }
 
@@ -1330,14 +1331,14 @@ export default function CategoryClient({ category }: { category: string }) {
           if (!seenIds.has(d.id)) { seenIds.add(d.id); mergedDocs.push({ id: d.id, ...d.data() } as Product); }
         }
       }
-      setAllLoaded(mergedDocs.filter(p => p.hidden !== true));
+      setAllLoaded(mergedDocs.filter(p => p.hidden !== true && !p.eventsOnly));
       return;
     } else if (SUBCATEGORY_PAGES.includes(category)) {
       snap = await getDocs(query(collection(db, 'products'), where('subCategory', '==', category), limit(500)));
     } else {
       snap = await getDocs(query(collection(db, 'products'), where('cat', '==', category), orderBy('priority', 'desc'), limit(1000)));
     }
-    setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true));
+    setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true && !p.eventsOnly));
   }
 
   useEffect(() => {
