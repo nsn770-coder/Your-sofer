@@ -472,7 +472,7 @@ export default function CartPage() {
                       onChange={e => setCouponInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && applyCoupon()}
                       placeholder="הזן קוד קופון"
-                      style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }}
+                      style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit', background: '#fff', color: '#1a1a1a' }}
                     />
                     <button
                       onClick={applyCoupon}

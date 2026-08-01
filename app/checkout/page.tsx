@@ -63,7 +63,7 @@ function Input({ label, name, value, onChange, onBlur: onBlurProp, placeholder, 
         name={name} value={value} onChange={onChange} placeholder={placeholder} type={type}
         autoComplete={autoComplete} inputMode={inputMode} required={required}
         onFocus={() => setFocused(true)} onBlur={(e) => { setFocused(false); onBlurProp?.(e); }}
-        style={{ width: '100%', border: `1.5px solid ${focused ? '#C5A028' : '#e0e0e0'}`, borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.15s', background: '#fafafa' }}
+        style={{ width: '100%', border: `1.5px solid ${focused ? '#C5A028' : '#e0e0e0'}`, borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.15s', background: '#fafafa', color: '#1a1a1a' }}
       />
     </div>
   );
@@ -200,7 +200,7 @@ function OrderSummary({
           </>
         ) : (
           <div style={{ display: 'flex', gap: 6 }}>
-            <input value={couponInput} onChange={e => setCouponInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" aria-label="קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit' }} />
+            <input value={couponInput} onChange={e => setCouponInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" aria-label="קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit', background: '#fff', color: '#1a1a1a' }} />
             <button onClick={applyCoupon} disabled={couponLoading} style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: couponLoading ? 0.5 : 1, whiteSpace: 'nowrap' }}>
               {couponLoading ? '...' : 'החל'}
             </button>
@@ -237,7 +237,7 @@ function OrderSummary({
                   onKeyDown={e => { if (e.key === 'Enter') { const n = Math.min(parseInt(pointsInput) || 0, maxRedeemablePoints); if (n > 0) setPointsToUse(n); } }}
                   placeholder={`עד ${maxRedeemablePoints} נק'`}
                   inputMode="numeric"
-                  style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                  style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fff', color: '#1a1a1a' }}
                 />
                 <button
                   onClick={() => { const n = Math.min(parseInt(pointsInput) || 0, maxRedeemablePoints); if (n > 0) setPointsToUse(n); }}
@@ -829,7 +829,7 @@ export default function CheckoutPage() {
             <div style={{ marginBottom: 24 }}>
               <label htmlFor="checkout-notes" style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>הערות למשלוח</label>
               <textarea id="checkout-notes" name="notes" value={form.notes} onChange={handleChange} placeholder="הוראות מיוחדות, קומה, דירה..." rows={2}
-                style={{ width: '100%', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', resize: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa', transition: 'border-color 0.15s' }}
+                style={{ width: '100%', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', resize: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa', color: '#1a1a1a', transition: 'border-color 0.15s' }}
                 onFocus={e => (e.currentTarget.style.borderColor = '#C5A028')}
                 onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; savePartialAbandonedCart(); }} />
             </div>

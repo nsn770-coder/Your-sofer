@@ -43,6 +43,32 @@ html, body {
   max-width: 100%;
 }
 
+/* האתר מעוצב ל-light mode בלבד. בלי זה, מובייל עם Dark Mode במכשיר
+   מחיל צבעי טופס אוטומטיים (טקסט לבן) על שדות עם רקע בהיר מפורש —
+   באג "טקסט לבן על רקע לבן" בצ'קאוט/תשלום. */
+html {
+  color-scheme: light only;
+}
+
+/* אוטופיל של הדפדפן (בעיקר Chrome/Safari) לפעמים מזריק רקע צהבהב
+   וצבע טקסט לבן על שדות שמולאו אוטומטית — עוקפים לצבעי הטופס הרגילים. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+select:-webkit-autofill,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: #1a1a1a;
+  -webkit-box-shadow: 0 0 0px 1000px #fafafa inset;
+  box-shadow: 0 0 0px 1000px #fafafa inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -89,7 +89,7 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
 
   const fieldStyle: React.CSSProperties = {
     width: '100%', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '11px 14px',
-    fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa',
+    fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa', color: '#1a1a1a',
   };
   const labelStyle: React.CSSProperties = { display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 };
 

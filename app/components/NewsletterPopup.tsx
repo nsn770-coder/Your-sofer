@@ -47,7 +47,7 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
                 onChange={e => { setEmail(e.target.value); setStatus('idle'); }}
                 placeholder="כתובת המייל שלכם"
                 required
-                style={{ border: '2px solid #e0e0e0', borderRadius: 0, padding: '12px 16px', fontSize: 14, outline: 'none', direction: 'rtl', width: '100%', boxSizing: 'border-box' }}
+                style={{ border: '2px solid #e0e0e0', borderRadius: 0, padding: '12px 16px', fontSize: 14, outline: 'none', direction: 'rtl', width: '100%', boxSizing: 'border-box', background: '#fff', color: '#1a1a1a' }}
               />
               {status === 'duplicate' && <div style={{ fontSize: 12, color: '#C5A028', fontWeight: 600 }}>כתובת המייל הזו כבר רשומה 😊</div>}
               {status === 'error' && <div style={{ fontSize: 12, color: '#e74c3c', fontWeight: 600 }}>שגיאה בהרשמה, נסו שוב.</div>}
