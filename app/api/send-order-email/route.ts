@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     const itemsHtml = items?.map((item: any) =>
       `<tr>
-        <td style="padding:8px;border-bottom:1px solid #eee;">${item.name}${item.threadColor ? `<br><span style="font-size:12px;color:#92400e;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${item.threadColor.hex};border:1px solid #ccc;vertical-align:middle;margin-left:5px;"></span>צבע חוט לרקמה: ${item.threadColor.id} - ${item.threadColor.name}</span>` : ''}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;">${item.name}${item.threadColor ? `<br><span style="font-size:12px;color:#92400e;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${item.threadColor.hex};border:1px solid #ccc;vertical-align:middle;margin-left:5px;"></span>צבע חוט לרקמה: ${item.threadColor.id} - ${item.threadColor.name}</span>` : ''}${item.customDesign ? `<br><span style="font-size:12px;color:#5b21b6;">🎨 עיצוב מותאם אישית: „${String(item.customDesign.text || '').replace(/</g, '&lt;')}"</span>` : ''}</td>
         <td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${item.quantity}</td>
         <td style="padding:8px;border-bottom:1px solid #eee;text-align:left;">₪${item.price}</td>
       </tr>`

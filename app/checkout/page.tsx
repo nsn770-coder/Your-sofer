@@ -469,6 +469,7 @@ export default function CheckoutPage() {
       id: i.id, name: i.name, price: i.price, quantity: i.quantity,
       imgUrl: i.imgUrl ?? null,
       printCustomization: cleanForFirestore(i.printCustomization),
+      customDesign: cleanForFirestore(i.customDesign),
     }));
 
     setDoc(doc(db, 'abandoned_carts', sessionId), {
@@ -529,6 +530,7 @@ export default function CheckoutPage() {
           id: i.id, name: i.name, price: i.price, quantity: i.quantity,
           imgUrl: i.imgUrl ?? null,
           printCustomization: cleanForFirestore(i.printCustomization),
+          customDesign: cleanForFirestore(i.customDesign),
         })),
         cartTotal: total,
         updatedAt: serverTimestamp(),

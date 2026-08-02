@@ -1,7 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart, SHIPPING_REGULAR, FREE_SHIPPING_THRESHOLD } from '../contexts/CartContext';
+import { useCart, SHIPPING_REGULAR, FREE_SHIPPING_THRESHOLD, getEventKippahPricePerUnit, type CartItem } from '../contexts/CartContext';
+import dynamic from 'next/dynamic';
+import type { KippaDesign } from '../designer/utils/types';
+// עורך כיפה — נטען רק כשעורכים עיצוב קיים (ssr:false — canvas)
+const KippaDesignModal = dynamic(() => import('../designer/components/KippaDesignModal'), { ssr: false });
 import { useAuth } from '../contexts/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -24,7 +28,30 @@ export default function CartPage() {
     discountAmount, simchaResult,
   } = useCart();
   const { user } = useAuth();
+  const { addItem } = useCart();
   const [isMobile, setIsMobile] = useState(false);
+  // עריכת עיצוב כיפה קיים מהסל (תוספת אדיטיבית)
+  const [editingDesignItem, setEditingDesignItem] = useState<CartItem | null>(null);
+
+  function saveEditedDesign(design: KippaDesign) {
+    const item = editingDesignItem;
+    if (!item) return;
+    removeItem(item.id);
+    removeItem(`print-${item.id}`);
+    const material = /סאטן|סטאן|סטן/.test(item.name || '') ? 'satin' as const : 'linen' as const;
+    const unitPrice = getEventKippahPricePerUnit(item.price, design.quantity, material);
+    addItem({ ...item, price: unitPrice, quantity: design.quantity, customDesign: design });
+    addItem({
+      id: `print-${item.id}`, name: 'הדפסה לכיפות — עיצוב מהעורך (כלול במחיר)', price: 0,
+      quantity: design.quantity, cat: 'הדפסה', imgUrl: design.previewImageUrl,
+      printCustomization: {
+        uploadedImageUrl: design.previewImageUrl, originalImageUrl: design.previewImageUrl,
+        productType: 'כיפות', side: 'front', bgRemoved: false,
+        designText: design.text, mockupUrl: design.previewImageUrl,
+      },
+    });
+    setEditingDesignItem(null);
+  }
   // PERF (CLS ~4.3 on /cart): on a hard load the SSR HTML painted the
   // "empty cart" state in a desktop 2-column grid, then flipped to the real
   // items + mobile 1-column layout after hydration. Gate the cart body behind
@@ -198,6 +225,18 @@ export default function CartPage() {
                           {item.embroideryText && (
                             <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ ריקמה: {item.embroideryText}</div>
                           )}
+                          {item.customDesign && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 8, padding: '5px 8px', marginBottom: 4 }}>
+                              <img src={optimizeCloudinaryUrl(item.customDesign.previewImageUrl, 60)} alt="עיצוב הכיפה" style={{ width: 34, height: 34, borderRadius: 6, objectFit: 'cover', border: '1px solid #c4b5fd', background: '#fff' }} />
+                              <div style={{ fontSize: 11, color: '#5b21b6', fontWeight: 700, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                🎨 עיצוב אישי: „{item.customDesign.text}"
+                              </div>
+                              <button onClick={() => setEditingDesignItem(item)}
+                                style={{ background: 'none', border: '1px solid #8b5cf6', color: '#6d28d9', fontSize: 11, fontWeight: 700, borderRadius: 6, padding: '3px 8px', cursor: 'pointer', flexShrink: 0 }}>
+                                ערוך עיצוב
+                              </button>
+                            </div>
+                          )}
                           {item.threadColor && (
                             <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
                               <span style={{ width: 12, height: 12, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} />
@@ -298,6 +337,18 @@ export default function CartPage() {
                           )}
                           {item.embroideryText && (
                             <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6 }}>✍️ ריקמה: {item.embroideryText}</div>
+                          )}
+                          {item.customDesign && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 8, padding: '6px 10px', marginBottom: 6, maxWidth: 420 }}>
+                              <img src={optimizeCloudinaryUrl(item.customDesign.previewImageUrl, 80)} alt="עיצוב הכיפה" style={{ width: 44, height: 44, borderRadius: 6, objectFit: 'cover', border: '1px solid #c4b5fd', background: '#fff' }} />
+                              <div style={{ fontSize: 12, color: '#5b21b6', fontWeight: 700, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                🎨 עיצוב אישי: „{item.customDesign.text}"
+                              </div>
+                              <button onClick={() => setEditingDesignItem(item)}
+                                style={{ background: 'none', border: '1px solid #8b5cf6', color: '#6d28d9', fontSize: 12, fontWeight: 700, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', flexShrink: 0 }}>
+                                ערוך עיצוב
+                              </button>
+                            </div>
                           )}
                           {item.threadColor && (
                             <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -635,6 +686,17 @@ export default function CartPage() {
 
       {/* FAQ ממוקד לעגלה — מבצעים, קופונים, נקודות ומשלוח (מקור: data/faq.ts) */}
       <PageFaqSection pageKey="cart" title="שאלות נפוצות לפני התשלום" max={6} showWhatsAppCta={false} />
+
+      {/* עורך כיפה — עריכת עיצוב קיים מהסל (תוספת אדיטיבית) */}
+      {editingDesignItem?.customDesign && (
+        <KippaDesignModal
+          open={!!editingDesignItem}
+          material={/סאטן|סטאן|סטן/.test(editingDesignItem.name || '') ? 'satin' : 'linen'}
+          initialDesign={editingDesignItem.customDesign}
+          onSave={saveEditedDesign}
+          onClose={() => setEditingDesignItem(null)}
+        />
+      )}
     </div>
   );
 }

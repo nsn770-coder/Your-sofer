@@ -20,6 +20,9 @@ import PaymentMethodsRow from '@/app/components/trust/PaymentMethodsRow';
 import type { ThreadColor } from '@/app/data/threadColors';
 import dynamic from 'next/dynamic';
 const MezuzahUpsellPopup = dynamic(() => import('@/components/MezuzahUpsellPopup'), { ssr: false });
+// עורך כיפה מותאמת אישית — Modal, נטען רק בלחיצה (ssr:false — משתמש ב-canvas)
+const KippaDesignModal = dynamic(() => import('@/app/designer/components/KippaDesignModal'), { ssr: false });
+import type { KippaDesign } from '@/app/designer/utils/types';
 
 /** 'YYYY-MM-DD' → 'DD/MM/YYYY' — תאריך צפי הגעה ("מגיע בקרוב") */
 function formatArrivalDate(iso?: string | null): string {
@@ -1564,6 +1567,9 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   const { addItem, removeItem, updateQty, total: cartTotal } = useCart();
   const { user } = useAuth();
 
+  // עורך כיפה מותאמת אישית — Modal (תוספת אדיטיבית)
+  const [designerOpen, setDesignerOpen] = useState(false);
+
   // PERF: initialProduct is the server-fetched product (same data as the SSR
   // shell in page.tsx). It lets the full page render at hydration instead of
   // after a client-side Firestore roundtrip. The Firestore fetch below still
@@ -1984,6 +1990,38 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     router.push('/cart');
   }
 
+  // ── עורך כיפה מותאמת אישית (Modal) — תוספת אדיטיבית ─────────────────────────
+  // שומר את העיצוב על שורת הכיפות (customDesign) ומוסיף שורת הדפסה עם קובץ
+  // ה-preview — באותו flow קיים של הזמנת כיפות לאירועים (תמחור מדרגות קיים).
+  function handleDesignerSave(design: KippaDesign) {
+    if (!product) return;
+    removeItem(product.id);
+    removeItem(`print-${product.id}`);
+    const material = /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' as const : 'linen' as const;
+    const unitPrice = getEventKippahPricePerUnit(product.price, design.quantity, material);
+    addItem({
+      id: product.id, name: product.name, price: unitPrice,
+      imgUrl: product.imgUrl || product.image_url,
+      quantity: design.quantity, cat: 'כיפות',
+      customDesign: design,
+    });
+    // קובץ ההדפסה זורם בצינור הקיים (מופיע באדמין בתצוגת ההדפסות)
+    addItem({
+      id: `print-${product.id}`, name: 'הדפסה לכיפות — עיצוב מהעורך (כלול במחיר)', price: 0,
+      quantity: design.quantity, cat: 'הדפסה', imgUrl: design.previewImageUrl,
+      printCustomization: {
+        uploadedImageUrl: design.previewImageUrl, originalImageUrl: design.previewImageUrl,
+        productType: 'כיפות', side: 'front', bgRemoved: false,
+        designText: design.text, mockupUrl: design.previewImageUrl,
+      },
+    });
+    setCartQty(design.quantity);
+    window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: unitPrice * design.quantity, items: [{ item_id: product.id, item_name: product.name, price: unitPrice, quantity: design.quantity }] });
+    pixel.addToCart({ id: product.id, name: product.name, price: unitPrice, quantity: design.quantity });
+    setDesignerOpen(false);
+    router.push('/cart');
+  }
+
   function handleAddToCart() {
     if (product?.outOfStock) return;
     // קריאת ערכים עדכניים מהשדות (uncontrolled) כדי שלחיצה אחת תספיק
@@ -2113,6 +2151,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             </div>
           )}
           <EventKippotCalculator product={product} onAddToCart={handleEventKippotAddToCart} />
+          <button
+            type="button"
+            onClick={() => setDesignerOpen(true)}
+            style={{ width: '100%', height: 52, background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: '#fff', border: 'none', borderRadius: 14, fontSize: compact ? 14 : 15, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em', boxShadow: '0 2px 10px rgba(124,58,237,0.25)' }}>
+            ✨ עיצוב כיפה מותאמת אישית
+          </button>
           {customDesignCTA}
           <a href={`https://wa.me/972587479933?text=${encodeURIComponent('שלום, אני מתעניין בהזמנת כיפות: ' + (product.name || ''))}`} target="_blank" rel="noopener noreferrer"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#25D366', fontSize: 13, fontWeight: 600, textDecoration: 'none', marginTop: 10 }}>
@@ -3247,6 +3291,16 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       <AdminPanel product={product} onSave={handleSave} onSaveGlobal={handleSaveGlobal} pageDefaults={pageDefaults} isMobile={isMobile} onClose={() => setAdminOpen(false)} open={adminOpen} />
 
       {product.cat === 'קלפי מזוזה' && <MezuzahUpsellPopup />}
+
+      {/* עורך כיפה מותאמת אישית — Modal (תוספת אדיטיבית) */}
+      {designerOpen && (
+        <KippaDesignModal
+          open={designerOpen}
+          material={/סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen'}
+          onSave={handleDesignerSave}
+          onClose={() => setDesignerOpen(false)}
+        />
+      )}
 
       {/* Cover selector modal */}
       {showCoverModal && (

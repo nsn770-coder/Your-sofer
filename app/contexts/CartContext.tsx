@@ -97,6 +97,19 @@ export interface CartItem {
     kippahLabel?: string;
     printType?: string;
   };
+  /** עיצוב כיפה מותאמת אישית מהעורך (app/designer) — אופציונלי, אדיטיבי בלבד */
+  customDesign?: {
+    designId: string;
+    baseColor: string;
+    text: string;
+    textColor: string;
+    fontSize: number;
+    fontFamily: string;
+    position: 'top' | 'center' | 'bottom';
+    quantity: number;
+    previewImageUrl: string;
+    createdAt: string;
+  };
 }
 
 interface CartContextType {

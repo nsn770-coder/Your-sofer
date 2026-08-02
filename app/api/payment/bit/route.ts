@@ -348,6 +348,7 @@ export async function POST(req: NextRequest) {
           embossingText: i.embossingText || null, embossingColor: i.embossingColor || null, embossingSurcharge: i.embossingSurcharge || null,
           selectedCover: i.selectedCover || null,
           printCustomization: i.printCustomization || null,
+          customDesign: i.customDesign || null,
         })),
         ...(giftLine ? [{ id: giftLine.productId || giftLine.id, name: `מתנה: ${giftLine.name}`, price: 0, quantity: 1, isGift: true, giftSourceId: giftLine.id }] : []),
       ],

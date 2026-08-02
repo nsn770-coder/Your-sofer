@@ -54,6 +54,19 @@ interface OrderItem {
     logoWidthPct?: number;
     mockupUrl?: string;
   } | null;
+  /** עיצוב כיפה מהעורך (app/designer) — אופציונלי */
+  customDesign?: {
+    designId: string;
+    baseColor: string;
+    text: string;
+    textColor: string;
+    fontSize: number;
+    fontFamily: string;
+    position: 'top' | 'center' | 'bottom';
+    quantity: number;
+    previewImageUrl: string;
+    createdAt: string;
+  } | null;
 }
 
 interface Order {
@@ -381,6 +394,18 @@ interface AbandonedCartItem {
     imageRotation?: number;
     logoWidthPct?: number;
     mockupUrl?: string;
+  } | null;
+  customDesign?: {
+    designId: string;
+    baseColor: string;
+    text: string;
+    textColor: string;
+    fontSize: number;
+    fontFamily: string;
+    position: 'top' | 'center' | 'bottom';
+    quantity: number;
+    previewImageUrl: string;
+    createdAt: string;
   } | null;
 }
 
@@ -1887,6 +1912,56 @@ function PrintCustomizationView({ pc }: { pc: PrintCustomizationData }) {
   );
 }
 
+// ── עיצוב כיפה מהעורך — תצוגה בהזמנה + הורדת קובץ הדפסה ──────────────────────
+type KippaDesignData = NonNullable<OrderItem['customDesign']>;
+
+const KIPPA_DESIGN_LABELS: Record<string, string> = {
+  top: 'למעלה', center: 'מרכז', bottom: 'למטה',
+  Rubik: 'רוביק', Miriam: 'מרים', Arial: 'אריאל',
+};
+
+function KippaDesignView({ cd }: { cd: KippaDesignData }) {
+  const downloadUrl = cd.previewImageUrl.includes('/upload/')
+    ? cd.previewImageUrl.replace('/upload/', '/upload/fl_attachment/')
+    : cd.previewImageUrl;
+  return (
+    <div className="mt-1 flex flex-col gap-1.5 rounded-lg border border-purple-200 bg-purple-50/50 p-2">
+      <span className="text-xs font-bold text-purple-800">🎨 עיצוב מותאם אישית</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={cd.previewImageUrl}
+        alt="עיצוב הכיפה"
+        style={{ maxWidth: 180, display: 'block', border: '1px solid #ddd6fe', borderRadius: 6, background: '#fff' }}
+      />
+      <span className="text-xs text-gray-700">
+        טקסט: <strong>„{cd.text}"</strong> · כמות: <strong>{cd.quantity}</strong>
+      </span>
+      <span className="inline-flex flex-wrap items-center gap-1.5 text-[11px] text-gray-600">
+        <span className="inline-flex items-center gap-1">
+          צבע בסיס: <span style={{ width: 12, height: 12, borderRadius: '50%', background: cd.baseColor, border: '1px solid #d1d5db', display: 'inline-block' }} /> {cd.baseColor}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          צבע טקסט: <span style={{ width: 12, height: 12, borderRadius: '50%', background: cd.textColor, border: '1px solid #d1d5db', display: 'inline-block' }} /> {cd.textColor}
+        </span>
+        <span>פונט: {KIPPA_DESIGN_LABELS[cd.fontFamily] ?? cd.fontFamily}</span>
+        <span>גודל: {cd.fontSize}</span>
+        <span>מיקום: {KIPPA_DESIGN_LABELS[cd.position] ?? cd.position}</span>
+      </span>
+      <span>
+        <a
+          href={downloadUrl}
+          download
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-purple-700 bg-white border border-purple-300 rounded-full px-2.5 py-1 hover:underline text-xs font-bold"
+        >
+          ⬇️ הורד קובץ להדפסה
+        </a>
+      </span>
+    </div>
+  );
+}
+
 function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>>; ordersError?: string | null; }) {
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -2090,6 +2165,7 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         ...(it.selectedKlafName != null && { selectedKlafName: it.selectedKlafName }),
         ...(it.selectedCover != null && { selectedCover: it.selectedCover }),
         ...(it.printCustomization != null && { printCustomization: it.printCustomization }),
+        ...(it.customDesign != null && { customDesign: it.customDesign }),
         ...(it.finalPrice != null && { finalPrice: it.finalPrice }),
       }));
 
@@ -2221,6 +2297,9 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         if (it.printCustomization) {
           const pc = it.printCustomization;
           extras.push(`הדפסה אישית (${pc.side === 'bottom' ? 'למטה' : 'למעלה'})${pc.mockupUrl ? ' — יש הדמיה בהזמנה' : ''}`);
+        }
+        if (it.customDesign) {
+          extras.push(`🎨 עיצוב מותאם אישית: "${esc(it.customDesign.text)}" (${it.customDesign.quantity} יח׳)`);
         }
         return `<tr>
           <td class="qty">×${it.quantity}</td>
@@ -2418,6 +2497,9 @@ ${visibleOrders.map(orderBlock).join('\n')}
                   >
                     <td className="p-3 font-mono text-xs">
                       {o.orderNumber}
+                      {(o.items ?? []).some(it => it.customDesign) && (
+                        <span className="mr-1" title="הזמנה עם עיצוב כיפה מותאם אישית">🎨</span>
+                      )}
                       {isCancelled && (
                         <span className="mr-2 inline-block bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">בוטל</span>
                       )}
@@ -2793,6 +2875,9 @@ ${visibleOrders.map(orderBlock).join('\n')}
                                         </div>
                                         {item.printCustomization && (
                                           <PrintCustomizationView pc={item.printCustomization} />
+                                        )}
+                                        {item.customDesign && (
+                                          <KippaDesignView cd={item.customDesign} />
                                         )}
                                       </div>
                                     </div>
@@ -5078,6 +5163,9 @@ export default function AdminPage() {
                                 <span className="text-gray-500"> ×{item.quantity} — {formatPrice(item.price)}</span>
                                 {item.printCustomization && (
                                   <PrintCustomizationView pc={item.printCustomization} />
+                                )}
+                                {item.customDesign && (
+                                  <KippaDesignView cd={item.customDesign} />
                                 )}
                               </div>
                             ))}
