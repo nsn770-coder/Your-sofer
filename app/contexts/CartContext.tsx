@@ -101,6 +101,7 @@ export interface CartItem {
   customDesign?: {
     designId: string;
     baseColor: string;
+    productImageUrl?: string;
     text: string;
     textColor: string;
     fontSize: number;

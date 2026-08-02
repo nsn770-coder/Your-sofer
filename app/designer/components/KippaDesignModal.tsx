@@ -9,12 +9,15 @@ import type { KipaMaterial } from '../../lib/kippot';
 export default function KippaDesignModal({
   open,
   material,
+  productImageUrl,
   initialDesign,
   onSave,
   onClose,
 }: {
   open: boolean;
   material: KipaMaterial;
+  /** תמונת המוצר שנבחר — משמשת כרקע העיצוב */
+  productImageUrl?: string;
   initialDesign?: KippaDesign | null;
   onSave: (design: KippaDesign) => Promise<void> | void;
   onClose: () => void;
@@ -63,6 +66,7 @@ export default function KippaDesignModal({
         </div>
         <KippaDesigner
           material={material}
+          productImageUrl={productImageUrl}
           initialDesign={initialDesign}
           onSave={onSave}
           onCancel={onClose}

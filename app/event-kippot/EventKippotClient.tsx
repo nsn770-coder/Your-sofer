@@ -595,6 +595,7 @@ export default function EventKippotClient() {
         <KippaDesignModal
           open={designerOpen}
           material={material}
+          productImageUrl={styleProducts[selectedStyleId]?.imgUrl || KIPPOT_STYLES.find(s => s.id === selectedStyleId)?.img}
           onSave={handleDesignerSave}
           onClose={() => setDesignerOpen(false)}
         />

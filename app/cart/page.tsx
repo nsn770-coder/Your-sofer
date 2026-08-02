@@ -692,6 +692,7 @@ export default function CartPage() {
         <KippaDesignModal
           open={!!editingDesignItem}
           material={/סאטן|סטאן|סטן/.test(editingDesignItem.name || '') ? 'satin' : 'linen'}
+          productImageUrl={editingDesignItem.customDesign.productImageUrl || editingDesignItem.imgUrl}
           initialDesign={editingDesignItem.customDesign}
           onSave={saveEditedDesign}
           onClose={() => setEditingDesignItem(null)}

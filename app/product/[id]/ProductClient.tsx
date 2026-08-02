@@ -3297,6 +3297,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         <KippaDesignModal
           open={designerOpen}
           material={/סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen'}
+          productImageUrl={product.imgUrl || product.image_url}
           onSave={handleDesignerSave}
           onClose={() => setDesignerOpen(false)}
         />

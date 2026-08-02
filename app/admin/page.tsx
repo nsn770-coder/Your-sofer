@@ -58,6 +58,7 @@ interface OrderItem {
   customDesign?: {
     designId: string;
     baseColor: string;
+    productImageUrl?: string;
     text: string;
     textColor: string;
     fontSize: number;
@@ -398,6 +399,7 @@ interface AbandonedCartItem {
   customDesign?: {
     designId: string;
     baseColor: string;
+    productImageUrl?: string;
     text: string;
     textColor: string;
     fontSize: number;
@@ -1937,9 +1939,11 @@ function KippaDesignView({ cd }: { cd: KippaDesignData }) {
         טקסט: <strong>„{cd.text}"</strong> · כמות: <strong>{cd.quantity}</strong>
       </span>
       <span className="inline-flex flex-wrap items-center gap-1.5 text-[11px] text-gray-600">
-        <span className="inline-flex items-center gap-1">
-          צבע בסיס: <span style={{ width: 12, height: 12, borderRadius: '50%', background: cd.baseColor, border: '1px solid #d1d5db', display: 'inline-block' }} /> {cd.baseColor}
-        </span>
+        {cd.baseColor && (
+          <span className="inline-flex items-center gap-1">
+            צבע בסיס: <span style={{ width: 12, height: 12, borderRadius: '50%', background: cd.baseColor, border: '1px solid #d1d5db', display: 'inline-block' }} /> {cd.baseColor}
+          </span>
+        )}
         <span className="inline-flex items-center gap-1">
           צבע טקסט: <span style={{ width: 12, height: 12, borderRadius: '50%', background: cd.textColor, border: '1px solid #d1d5db', display: 'inline-block' }} /> {cd.textColor}
         </span>

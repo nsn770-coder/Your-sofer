@@ -1,17 +1,18 @@
 'use client';
 // עורך הכיפה — state + layout. עטוף ב-KippaDesignModal.
+// הלקוח כבר בחר את המוצר (צבע/סוג) — לכן אין בורר צבע כיפה:
+// התמונה האמיתית של המוצר משמשת רקע, והעורך שולט בטקסט בלבד.
 
 import { useEffect, useState } from 'react';
 import KippaCanvas, { exportKippaPng } from './KippaCanvas';
 import ColorPicker from './ColorPicker';
 import TextPanel from './TextPanel';
 import ControlsBar from './ControlsBar';
-import { KIPPA_BASE_COLORS, KIPPA_TEXT_COLORS, type KippaDesign } from '../utils/types';
+import { KIPPA_TEXT_COLORS, KIPPA_FONTS_GOOGLE_URL, type KippaDesign } from '../utils/types';
 import { uploadDesignToCloudinary, generateDesignId } from '../utils/kippaDesignService';
 import { KIPA_MIN_QTY, type KipaMaterial } from '../../lib/kippot';
 
 const DEFAULTS = {
-  baseColor: '#1E40AF',
   text: '',
   textColor: '#FFFFFF',
   fontSize: 26,
@@ -21,17 +22,19 @@ const DEFAULTS = {
 
 export default function KippaDesigner({
   material,
+  productImageUrl,
   initialDesign,
   onSave,
   onCancel,
 }: {
   material: KipaMaterial;
+  /** תמונת המוצר שנבחר — הרקע של העיצוב */
+  productImageUrl?: string;
   /** עריכת עיצוב קיים מהעגלה */
   initialDesign?: KippaDesign | null;
   onSave: (design: KippaDesign) => Promise<void> | void;
   onCancel: () => void;
 }) {
-  const [baseColor, setBaseColor]   = useState(initialDesign?.baseColor  ?? DEFAULTS.baseColor);
   const [text, setText]             = useState(initialDesign?.text       ?? DEFAULTS.text);
   const [textColor, setTextColor]   = useState(initialDesign?.textColor  ?? DEFAULTS.textColor);
   const [fontSize, setFontSize]     = useState(initialDesign?.fontSize   ?? DEFAULTS.fontSize);
@@ -40,6 +43,19 @@ export default function KippaDesigner({
   const [quantity, setQuantity]     = useState(Math.max(initialDesign?.quantity ?? KIPA_MIN_QTY, KIPA_MIN_QTY));
   const [saving, setSaving]         = useState(false);
   const [error, setError]           = useState('');
+
+  const bgImage = productImageUrl || initialDesign?.productImageUrl;
+
+  // טעינת מבחר הפונטים מ-Google Fonts (פעם אחת)
+  useEffect(() => {
+    const id = 'kippa-designer-fonts';
+    if (document.getElementById(id)) return;
+    const link = document.createElement('link');
+    link.id = id;
+    link.rel = 'stylesheet';
+    link.href = KIPPA_FONTS_GOOGLE_URL;
+    document.head.appendChild(link);
+  }, []);
 
   // responsive: 400px דסקטופ / 300px מובייל
   const [canvasSize, setCanvasSize] = useState(400);
@@ -50,10 +66,9 @@ export default function KippaDesigner({
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  const spec = { baseColor, text, textColor, fontSize, fontFamily, position };
+  const spec = { baseColor: '', productImageUrl: bgImage, text, textColor, fontSize, fontFamily, position };
 
   function reset() {
-    setBaseColor(DEFAULTS.baseColor);
     setText(DEFAULTS.text);
     setTextColor(DEFAULTS.textColor);
     setFontSize(DEFAULTS.fontSize);
@@ -71,7 +86,9 @@ export default function KippaDesigner({
       const previewImageUrl = await uploadDesignToCloudinary(png);
       const design: KippaDesign = {
         designId: initialDesign?.designId ?? generateDesignId(),
-        baseColor, text: text.trim(), textColor, fontSize, fontFamily, position,
+        baseColor: '',
+        productImageUrl: bgImage,
+        text: text.trim(), textColor, fontSize, fontFamily, position,
         quantity: Math.max(quantity, KIPA_MIN_QTY),
         previewImageUrl,
         createdAt: initialDesign?.createdAt ?? new Date().toISOString(),
@@ -92,7 +109,6 @@ export default function KippaDesigner({
         <KippaCanvas spec={spec} size={canvasSize} />
       </div>
 
-      <ColorPicker label="צבע הכיפה" colors={KIPPA_BASE_COLORS} value={baseColor} onChange={setBaseColor} />
       <TextPanel
         text={text} onText={setText}
         fontFamily={fontFamily} onFont={setFontFamily}
