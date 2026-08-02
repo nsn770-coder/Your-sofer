@@ -22,15 +22,21 @@ export default function TextPanel({
   return (
     <div>
       <div style={{ marginBottom: 14 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 6 }}>טקסט על הכיפה</div>
-        <input
-          type="text"
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 6 }}>
+          טקסט על הכיפה <span style={{ fontWeight: 400, color: '#9ca3af' }}>(Enter — שורה חדשה, עד 3 שורות)</span>
+        </div>
+        <textarea
           value={text}
-          onChange={e => onText(e.target.value)}
-          placeholder="לדוגמה: הבר מצווה של דניאל"
-          maxLength={40}
+          onChange={e => {
+            // עד 3 שורות — שורות נוספות מתאחדות לשורה השלישית
+            const lines = e.target.value.split('\n');
+            onText(lines.length > 3 ? [...lines.slice(0, 2), lines.slice(2).join(' ')].join('\n') : e.target.value);
+          }}
+          placeholder={'לדוגמה: הבר מצווה של דניאל\nכ"ג אדר תשפ"ו'}
+          maxLength={90}
+          rows={2}
           dir="rtl"
-          style={{ ...selStyle }}
+          style={{ ...selStyle, resize: 'vertical', minHeight: 44, fontFamily: 'inherit', lineHeight: 1.5 }}
         />
       </div>
 

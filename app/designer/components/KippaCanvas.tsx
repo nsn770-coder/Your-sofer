@@ -43,14 +43,15 @@ export function loadDesignImage(url: string): Promise<HTMLImageElement> {
 }
 
 function drawText(ctx: CanvasRenderingContext2D, size: number, spec: KippaDrawSpec, area: { x: number; y: number; w: number; h: number }) {
-  const text = spec.text.trim();
-  if (!text) return;
+  const lines = spec.text.split('\n').map(l => l.trim()).filter(Boolean).slice(0, 3);
+  if (lines.length === 0) return;
   const yByPosition: Record<KippaDesign['position'], number> = {
     top:    area.y + area.h * 0.22,
     center: area.y + area.h * 0.50,
     bottom: area.y + area.h * 0.80,
   };
   const scaledFont = (spec.fontSize / 400) * size;
+  const lineHeight = scaledFont * 1.18;
   ctx.save();
   ctx.font = `700 ${scaledFont}px ${fontCss(spec.fontFamily)}`;
   ctx.fillStyle = spec.textColor;
@@ -61,11 +62,19 @@ function drawText(ctx: CanvasRenderingContext2D, size: number, spec: KippaDrawSp
   ctx.shadowColor = 'rgba(0,0,0,0.25)';
   ctx.shadowBlur = scaledFont * 0.06;
   const maxW = area.w * 0.86;
-  let display = text;
-  while (display.length > 1 && ctx.measureText(display).width > maxW) {
-    display = display.slice(0, -1);
+  // מרכוז אנכי של בלוק השורות סביב נקודת המיקום
+  const blockH = (lines.length - 1) * lineHeight;
+  let y = yByPosition[spec.position] - blockH / 2;
+  // לא לגלוש מחוץ לאזור
+  y = Math.max(area.y + scaledFont * 0.6, Math.min(y, area.y + area.h - blockH - scaledFont * 0.4));
+  for (const line of lines) {
+    let display = line;
+    while (display.length > 1 && ctx.measureText(display).width > maxW) {
+      display = display.slice(0, -1);
+    }
+    ctx.fillText(display, area.x + area.w / 2, y);
+    y += lineHeight;
   }
-  ctx.fillText(display, area.x + area.w / 2, yByPosition[spec.position]);
   ctx.restore();
 }
 
