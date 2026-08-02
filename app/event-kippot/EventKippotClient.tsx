@@ -5,7 +5,13 @@ import { collection, getDocs, query, where, doc, getDoc, setDoc } from 'firebase
 import { db } from '@/app/firebase';
 import { getKipaUnitPrice, getKipaMaterial, KIPA_MATERIAL_LABELS, KIPA_EXTRA_SIDE_PRICE, DEFAULT_STYLE_PRODUCT_MAP } from '@/app/lib/kippot';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useCart } from '@/app/contexts/CartContext';
+import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import type { KippaDesign } from '@/app/designer/utils/types';
 import { Product } from '@/app/lib/types';
+// עורך כיפה מותאמת אישית — נטען רק בלחיצה (ssr:false — canvas)
+const KippaDesignModal = dynamic(() => import('@/app/designer/components/KippaDesignModal'), { ssr: false });
 import ProductCard from '@/components/ui/ProductCard';
 import { EVENT_SCROLL_SECTIONS, EVENT_SCROLL_SECTION_IDS } from '@/app/constants/eventScrollSections';
 import { PROMO_ACTIVE, MIN_KIPPOT_QTY, MIN_ADDON_QTY } from '@/app/lib/promoRules';
@@ -61,6 +67,10 @@ export default function EventKippotClient() {
   const { user } = useAuth();
   const [eventProducts, setEventProducts] = useState<Product[]>([]);
   const isAdmin = user?.role === 'admin';
+  const router = useRouter();
+  const { addItem, removeItem } = useCart();
+  // עורך כיפה מותאמת אישית (Modal) — תוספת אדיטיבית
+  const [designerOpen, setDesignerOpen] = useState(false);
 
   // ── שיוך דגם ← מוצר בחנות (settings/eventKippotStyles) — מלאי ורווחיות ──
   const [styleMap, setStyleMap] = useState<Record<string, { productId: string; sku: string; name: string }>>({});
@@ -197,6 +207,37 @@ export default function EventKippotClient() {
   const material  = getKipaMaterial(selectedStyleId);
   const unitPrice = getKipaUnitPrice(qty, material) + embroideryExtra + bothSidesExtra;
   const total = qty * unitPrice;
+
+  // ── עורך כיפה מותאמת אישית — שמירה מוסיפה לסל עם תמחור המדרגות הקיים ──────
+  function handleDesignerSave(design: KippaDesign) {
+    const styleLabel = KIPPOT_STYLES.find(s => s.id === selectedStyleId)?.label ?? '';
+    const sp = styleProducts[selectedStyleId];
+    const lineId = sp?.id ?? `event-designer-${selectedStyleId}`;
+    const unit = getKipaUnitPrice(design.quantity, material);
+    removeItem(lineId);
+    removeItem(`print-${lineId}`);
+    addItem({
+      id: lineId,
+      productId: sp?.id,
+      name: sp?.name ?? `כיפות ${styleLabel} — עיצוב אישי`,
+      price: unit,
+      imgUrl: sp?.imgUrl || KIPPOT_STYLES.find(s => s.id === selectedStyleId)?.img,
+      quantity: design.quantity,
+      cat: 'כיפות',
+      customDesign: design,
+    });
+    addItem({
+      id: `print-${lineId}`, name: 'הדפסה לכיפות — עיצוב מהעורך (כלול במחיר)', price: 0,
+      quantity: design.quantity, cat: 'הדפסה', imgUrl: design.previewImageUrl,
+      printCustomization: {
+        uploadedImageUrl: design.previewImageUrl, originalImageUrl: design.previewImageUrl,
+        productType: 'כיפות', side: 'front', bgRemoved: false,
+        designText: design.text, mockupUrl: design.previewImageUrl,
+      },
+    });
+    setDesignerOpen(false);
+    router.push('/cart');
+  }
 
   return (
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", maxWidth: 860, margin: '0 auto', padding: 'clamp(16px, 3vw, 40px) 16px 60px' }}>
@@ -466,6 +507,22 @@ export default function EventKippotClient() {
         ✨ בשלב הבא: מעלים לוגו ומקבלים הדמיית AI של הכיפה שלכם — חינם
       </div>
 
+      {/* ── עורך כיפה עצמאי — למי שאין לוגו (תוספת אדיטיבית) ── */}
+      <button
+        type="button"
+        onClick={() => setDesignerOpen(true)}
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          width: '100%', marginTop: 14,
+          background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: '#fff',
+          fontWeight: 900, fontSize: 15.5, padding: '15px 24px',
+          border: 'none', borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit',
+          boxShadow: '0 2px 12px rgba(124,58,237,0.3)',
+        }}
+      >
+        🎨 אין לכם לוגו? עצבו כיפה בעצמכם — עורך חינם
+      </button>
+
       {/* ── מארזים מוכנים ── */}
       {bundleProducts.length > 0 && (
         <div style={{ marginTop: 48, borderTop: '1px solid #E5E0D5', paddingTop: 32 }}>
@@ -531,6 +588,16 @@ export default function EventKippotClient() {
         >
           + הוסף כיפה
         </a>
+      )}
+
+      {/* עורך כיפה מותאמת אישית — Modal */}
+      {designerOpen && (
+        <KippaDesignModal
+          open={designerOpen}
+          material={material}
+          onSave={handleDesignerSave}
+          onClose={() => setDesignerOpen(false)}
+        />
       )}
     </div>
   );
