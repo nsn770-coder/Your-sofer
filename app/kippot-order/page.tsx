@@ -6,6 +6,10 @@ import { db } from '@/app/firebase';
 import { useCart } from '@/app/contexts/CartContext';
 import PageFaqSection from '@/app/components/faq/PageFaqSection';
 import { getKipaUnitPrice, getKipaMaterial, KIPA_MATERIAL_LABELS, KIPA_EXTRA_SIDE_PRICE, DEFAULT_STYLE_PRODUCT_MAP } from '@/app/lib/kippot';
+import dynamic from 'next/dynamic';
+import type { KippaDesign } from '@/app/designer/utils/types';
+// עורך כיפה מותאמת אישית — נטען רק בלחיצה (ssr:false — canvas)
+const KippaDesignModal = dynamic(() => import('@/app/designer/components/KippaDesignModal'), { ssr: false });
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -108,6 +112,7 @@ function KippotOrderInner() {
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [designText, setDesignText] = useState('');
+  const [designerOpen, setDesignerOpen] = useState(false); // עורך חי (Modal)
   // 'print-both' — הדפסה משני הצדדים כלולה מראש
   const [addSide, setAddSide]       = useState(type === 'print-both');
   const [addSideText, setAddSideText] = useState('');
@@ -273,6 +278,34 @@ function KippotOrderInner() {
   }
 
   // ── Add to cart ─────────────────────────────────────────────────────────────
+  // ── עורך חי — שמירת עיצוב טקסט מוסיפה לסל עם customDesign ──────────────────
+  function handleDesignerSave(design: KippaDesign) {
+    addItem({
+      id: `kippot-bulk-${Date.now()}`,
+      ...(styleProductId ? { productId: styleProductId } : {}),
+      name: `כיפות ${kippah.label} × ${design.quantity} — עיצוב אישי מהעורך`,
+      price: getKipaUnitPrice(design.quantity, getKipaMaterial(style)),
+      quantity: design.quantity,
+      imgUrl: kippah.img,
+      cat: 'כיפות',
+      customDesign: design,
+      printCustomization: {
+        productType: 'kipa',
+        side: 'top',
+        uploadedImageUrl: design.previewImageUrl,
+        originalImageUrl: design.previewImageUrl,
+        bgRemoved: false,
+        mockupUrl: design.previewImageUrl,
+        designText: design.text,
+        kippahStyle: style,
+        kippahLabel: kippah.label,
+        printType: type,
+      },
+    });
+    setDesignerOpen(false);
+    router.push('/cart');
+  }
+
   function handleAddToCart() {
     const logoUrl    = uploadedUrl || localUrl || '';
     const mockupUrl  = buildMockupUrl();
@@ -347,6 +380,22 @@ function KippotOrderInner() {
           <div style={{ fontSize: 13, color: '#C5A028', fontWeight: 700, marginTop: 6 }}>₪{unitPrice} × {qty} = ₪{totalPrice.toLocaleString('he-IL')}</div>
         </div>
       </div>
+
+      {/* ── עורך חי — עיצוב טקסט ישירות על הכיפה (תוספת אדיטיבית) ── */}
+      <button
+        type="button"
+        onClick={() => setDesignerOpen(true)}
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          width: '100%', marginBottom: 24,
+          background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: '#fff',
+          fontWeight: 900, fontSize: 15, padding: '14px 20px',
+          border: 'none', borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit',
+          boxShadow: '0 2px 12px rgba(124,58,237,0.3)',
+        }}
+      >
+        ✨ עיצוב חי על הכיפה — כתבו טקסט וראו תצוגה מיידית (בלי לוגו)
+      </button>
 
       {/* העלאת לוגו */}
       <div style={{ marginBottom: 24 }}>
@@ -743,6 +792,17 @@ function KippotOrderInner() {
       <div style={{ fontSize: 11, color: '#9C7B3F', textAlign: 'center', marginTop: 8 }}>
         ניתן להשלים את התשלום בשלב הבא
       </div>
+
+      {/* עורך כיפה מותאמת אישית — Modal */}
+      {designerOpen && (
+        <KippaDesignModal
+          open={designerOpen}
+          material={getKipaMaterial(style)}
+          productImageUrl={kippah.img}
+          onSave={handleDesignerSave}
+          onClose={() => setDesignerOpen(false)}
+        />
+      )}
     </div>
   );
 }
