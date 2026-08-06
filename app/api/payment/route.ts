@@ -198,7 +198,7 @@ export async function POST(req: NextRequest) {
     const {
       items, total, customer, couponCode,
       singleUseToken, paymentsCount,
-      cartItems, address, city, notes, selectedGift, giftLine,
+      cartItems, address, city, street, houseNumber, apartment, zipCode, notes, selectedGift, giftLine,
       shippingCost, shippingType,
       sessionId, refCode, shaliachId, shaliachName, commissionPercent,
       uid, pointsUsed, idToken, attribution,
@@ -212,6 +212,10 @@ export async function POST(req: NextRequest) {
       cartItems:      CartItem[];
       address:        string;
       city?:          string;
+      street?:        string;
+      houseNumber?:   string;
+      apartment?:     string;
+      zipCode?:       string;
       notes?:         string;
       selectedGift?:  string | null;
       giftLine?:      { id: string; name: string; productId?: string } | null;
@@ -535,6 +539,8 @@ export async function POST(req: NextRequest) {
         orderNumber,
         customerName: customer.name, email: customer.email, phone: customer.phone,
         address: address || '', city: city || '', notes: notes || '',
+        // שדות כתובת מפוצלים — נדרשים ליצירת משלוח ב-LionWheel
+        street: street || '', houseNumber: houseNumber || '', apartment: apartment || '', zipCode: zipCode || '',
         items: [
           ...cartItems.map(i => ({
             id: i.id, productId: i.productId || i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity,

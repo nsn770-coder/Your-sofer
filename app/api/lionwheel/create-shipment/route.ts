@@ -35,27 +35,43 @@ export async function POST(request: NextRequest) {
     const order = orderSnap.data() as any;
     console.log('✅ [Firestore] Order loaded:', { id: orderId, name: order.customerName });
 
-    // Use city field (new in orders from payment route)
-    let destinationCity = order.city || '';
-    let destinationStreet = order.address || '';
-    let destinationNumber = order.addressNumber || '1';
-    let destinationApartment = order.apartment || '';
-    let destinationZipCode = order.zipCode || '';
+    // הזמנות חדשות שומרות את שדות הכתובת מפוצלים (city/street/houseNumber/apartment/zipCode).
+    // הזמנות ישנות שמרו רק מחרוזת address אחת — נפרק אותה כ-fallback.
+    let destinationCity      = (order.city || '').trim();
+    let destinationStreet    = (order.street || '').trim();
+    let destinationNumber    = (order.houseNumber || order.addressNumber || '').trim();
+    const destinationApartment = (order.apartment || '').trim();
+    const destinationZipCode   = (order.zipCode || '').trim();
 
-    // Ensure city is set (LionWheel requires it)
-    if (!destinationCity || destinationCity.trim() === '') {
-      // Fallback: try to extract from address if no city field
-      if (order.address && typeof order.address === 'string') {
-        const parts = order.address.split(',').map((p: string) => p.trim());
-        if (parts.length === 2) {
-          destinationCity = parts[1];
+    // Fallback להזמנות ישנות: "רחוב הרצל 5, תל אביב"
+    if ((!destinationCity || !destinationStreet) && typeof order.address === 'string' && order.address.trim()) {
+      const parts = order.address.split(',').map((p: string) => p.trim()).filter(Boolean);
+      if (!destinationCity && parts.length >= 2) destinationCity = parts[parts.length - 1];
+      if (!destinationStreet) {
+        const line1 = parts[0] || '';
+        const m = line1.match(/^(.*?)\s+(\d+\S*)$/);
+        if (m) {
+          destinationStreet = m[1];
+          if (!destinationNumber) destinationNumber = m[2];
+        } else {
+          destinationStreet = line1;
         }
       }
+    }
 
-      // Last resort fallback
-      if (!destinationCity || destinationCity.trim() === '') {
-        destinationCity = 'Israel';
-      }
+    if (!destinationNumber) destinationNumber = '1';
+
+    // LionWheel דורש עיר ורחוב — נחזיר שגיאה ברורה במקום לשלוח בקשה שתיכשל
+    if (!destinationCity || !destinationStreet) {
+      console.error('❌ [LionWheel] Missing address fields:', { destinationCity, destinationStreet, raw: order.address });
+      return NextResponse.json(
+        {
+          error: 'חסרים פרטי כתובת בהזמנה',
+          message: `לא ניתן ליצור משלוח: ${!destinationCity ? 'חסרה עיר. ' : ''}${!destinationStreet ? 'חסר רחוב. ' : ''}יש להשלים את הפרטים בהזמנה.`,
+          address: order.address || null,
+        },
+        { status: 400 }
+      );
     }
 
     console.log('📍 [Address Info]:', { destinationStreet, destinationNumber, destinationCity });

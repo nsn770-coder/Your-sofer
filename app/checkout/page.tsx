@@ -74,6 +74,19 @@ interface SiteSettings {
   checkoutDisabledMessage: string;
 }
 
+/** בונה מחרוזת כתובת קריאה אחת מהשדות המפוצלים (לתצוגה בחשבונית/מייל/אדמין) */
+function buildAddressString(f: {
+  street?: string; houseNumber?: string; apartment?: string; city?: string; zipCode?: string;
+}): string {
+  const line1 = [f.street, f.houseNumber].filter(Boolean).join(' ').trim();
+  return [
+    line1,
+    f.apartment ? `דירה ${f.apartment}` : '',
+    f.city,
+    f.zipCode ? `מיקוד ${f.zipCode}` : '',
+  ].filter(Boolean).join(', ');
+}
+
 interface OrderSummaryProps {
   isSticky: boolean;
   /** false — ללא מסגרת (כשהרכיב מקונן בתוך MobileOrderSummary) */
@@ -360,7 +373,13 @@ export default function CheckoutPage() {
     if (pointsToUse > maxRedeemablePoints) setPointsToUse(maxRedeemablePoints);
   }, [pointsToUse, maxRedeemablePoints]);
   const [isMobile, setIsMobile] = useState(true);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', notes: '' });
+  // שדות הכתובת מפוצלים בדיוק כמו בטופס של חברת המשלוחים (LionWheel):
+  // עיר*, רחוב*, מספר בית*, דירה, מיקוד
+  const [form, setForm] = useState({
+    name: '', email: '', phone: '',
+    city: '', street: '', houseNumber: '', apartment: '', zipCode: '',
+    notes: '',
+  });
   // ── אופן קבלת ההזמנה: משלוח עד הבית / איסוף עצמי (האורן 18, ללא דמי משלוח) ──
   const [deliveryMethod, setDeliveryMethod] = useState<'shipping' | 'pickup'>('shipping');
 
@@ -477,7 +496,7 @@ export default function CheckoutPage() {
       name: f.name || null,
       phone: f.phone || null,
       email: f.email || null,
-      address: f.address ? `${f.address}${f.city ? ', ' + f.city : ''}` : null,
+      address: buildAddressString(f) || null,
       cartItems: cartItemsSnap,
       cartTotal: total,
       updatedAt: serverTimestamp(),
@@ -525,7 +544,7 @@ export default function CheckoutPage() {
       setDoc(doc(db, 'abandoned_carts', sessionId), {
         sessionId,
         name: f.name || null, phone: f.phone || null, email: f.email || null,
-        address: `${f.address}, ${f.city}`,
+        address: buildAddressString(f),
         cartItems: items.map(i => ({
           id: i.id, name: i.name, price: i.price, quantity: i.quantity,
           imgUrl: i.imgUrl ?? null,
@@ -599,7 +618,13 @@ export default function CheckoutPage() {
               },
             };
           }),
-          address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : `${form.address}, ${form.city}`,
+          address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : buildAddressString(form),
+          // שדות כתובת מפוצלים — נדרשים ע"י חברת המשלוחים (LionWheel)
+          city:        deliveryMethod === 'pickup' ? '' : form.city.trim(),
+          street:      deliveryMethod === 'pickup' ? '' : form.street.trim(),
+          houseNumber: deliveryMethod === 'pickup' ? '' : form.houseNumber.trim(),
+          apartment:   deliveryMethod === 'pickup' ? '' : form.apartment.trim(),
+          zipCode:     deliveryMethod === 'pickup' ? '' : form.zipCode.trim(),
           notes: form.notes || '',
           selectedGift: selectedGift || null,
           giftLine: gift ? { id: gift.id, name: gift.name, productId: gift.productId } : null,
@@ -700,7 +725,13 @@ export default function CheckoutPage() {
             }
             return filtered;
           }),
-          address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : `${form.address}, ${form.city}`,
+          address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : buildAddressString(form),
+          // שדות כתובת מפוצלים — נדרשים ע"י חברת המשלוחים (LionWheel)
+          city:        deliveryMethod === 'pickup' ? '' : form.city.trim(),
+          street:      deliveryMethod === 'pickup' ? '' : form.street.trim(),
+          houseNumber: deliveryMethod === 'pickup' ? '' : form.houseNumber.trim(),
+          apartment:   deliveryMethod === 'pickup' ? '' : form.apartment.trim(),
+          zipCode:     deliveryMethod === 'pickup' ? '' : form.zipCode.trim(),
           notes: form.notes || '',
           selectedGift: selectedGift || null,
           giftLine: gift ? { id: gift.id, name: gift.name, productId: gift.productId } : null,
@@ -729,7 +760,11 @@ export default function CheckoutPage() {
     }
   }
 
-  const isFormValid = !!(form.name && form.email && form.phone && (deliveryMethod === 'pickup' || (form.address && form.city)));
+  // חובה בדיוק כמו בטופס חברת המשלוחים: עיר, רחוב, מספר בית
+  const isFormValid = !!(
+    form.name && form.email && form.phone &&
+    (deliveryMethod === 'pickup' || (form.city.trim() && form.street.trim() && form.houseNumber.trim()))
+  );
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', overflowX: 'hidden', maxWidth: '100vw' }}>
@@ -823,10 +858,17 @@ export default function CheckoutPage() {
               </div>
             )}
             {deliveryMethod === 'shipping' && (
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: 14, marginBottom: 14 }}>
-                <Input label="רחוב ומספר בית" name="address" value={form.address} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ address: e.target.value })} placeholder="רחוב הרצל 5" autoComplete="street-address" required />
-                <Input label="עיר" name="city" value={form.city} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ city: e.target.value })} placeholder="תל אביב" autoComplete="address-level2" required />
-              </div>
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
+                  <Input label="עיר" name="city" value={form.city} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ city: e.target.value })} placeholder="תל אביב" autoComplete="address-level2" required />
+                  <Input label="רחוב" name="street" value={form.street} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ street: e.target.value })} placeholder="הרצל" autoComplete="address-line1" required />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
+                  <Input label="מספר בית" name="houseNumber" value={form.houseNumber} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="5" inputMode="numeric" autoComplete="address-line2" required />
+                  <Input label="דירה" name="apartment" value={form.apartment} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="12" inputMode="numeric" />
+                  <Input label="מיקוד" name="zipCode" value={form.zipCode} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="6789012" inputMode="numeric" autoComplete="postal-code" />
+                </div>
+              </>
             )}
             <div style={{ marginBottom: 24 }}>
               <label htmlFor="checkout-notes" style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>הערות למשלוח</label>

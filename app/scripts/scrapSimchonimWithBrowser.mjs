@@ -13,7 +13,8 @@ import { readFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { createInterface } from 'readline';
-import fetch from 'node-fetch';
+import { initializeApp, cert, getApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -41,10 +42,49 @@ function loadEnv() {
 }
 
 const env = loadEnv();
-const projectId = env['NEXT_PUBLIC_FIREBASE_PROJECT_ID'] || 'your-sofer';
-const apiKey = env['NEXT_PUBLIC_FIREBASE_API_KEY'];
+const projectId = env['FIREBASE_PROJECT_ID'] || 'your-sofer';
+const clientEmail = env['FIREBASE_CLIENT_EMAIL'];
+let privateKey = env['FIREBASE_PRIVATE_KEY'];
 
-const FIRESTORE_API = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
+// Normalize private key - remove quotes and fix newlines
+if (privateKey) {
+  privateKey = privateKey.trim();
+  if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+    privateKey = privateKey.slice(1, -1);
+  }
+  privateKey = privateKey.replace(/\\n/g, '\n');
+}
+
+// Initialize Firebase Admin SDK
+let db = null;
+try {
+  const app = getApp();
+  db = getFirestore(app);
+} catch {
+  if (projectId && clientEmail && privateKey) {
+    try {
+      initializeApp({
+        credential: cert({
+          projectId,
+          clientEmail,
+          privateKey,
+        }),
+      });
+      db = getFirestore();
+      console.log('✅ Firebase Admin SDK initialized');
+    } catch (err) {
+      console.error('❌ Firebase init error:', err.message);
+      process.exit(1);
+    }
+  } else {
+    console.error('❌ Firebase credentials missing from .env.local');
+    console.error(`   projectId: ${projectId ? '✓' : '✗'}`);
+    console.error(`   clientEmail: ${clientEmail ? '✓' : '✗'}`);
+    console.error(`   privateKey: ${privateKey ? '✓' : '✗'}`);
+    process.exit(1);
+  }
+}
+
 const PRICE_MARKUP = 1.15;
 
 const CATEGORY_MAP = {
@@ -269,46 +309,52 @@ async function main() {
     process.exit(0);
   }
 
-  console.log(`\n💾 Importing to Firestore...\n`);
+  console.log(`\n💾 Importing to Firestore (via Admin SDK)...\n`);
 
-  let imported = 0;
-  for (let i = 0; i < allProducts.length; i++) {
-    const product = allProducts[i];
-    try {
-      const docId = `simchonim_${product.supplier_sku}`;
-
-      // Debug: show first product being sent
-      if (i === 0) {
-        console.log('   📋 First product being sent:');
-        console.log(`      name: ${product.name}`);
-        console.log(`      price: ${product.price}`);
-        console.log(`      category: ${product.category}`);
-      }
-
-      await firestoreSet('products', docId, {
-        name: product.name,
-        price: product.price,
-        original_price: product.original_price,
-        cat: product.category,
-        subCategory: 'imported',
-        supplier: product.supplier,
-        supplier_sku: product.supplier_sku,
-        supplier_url: product.supplier_url,
-        active: product.active,
-      });
-      imported++;
-      if (imported % 5 === 0) console.log(`   ✓ ${imported}/${allProducts.length}`);
-    } catch (err) {
-      if (i === 0) {
-        console.error(`   ❌ Debug - First product failed: ${err.message}`);
-      } else {
-        console.error(`   ❌ ${product.name}: ${err.message}`);
-      }
-    }
-    await sleep(100);
+  if (!db) {
+    console.error('   ❌ Firebase not initialized - missing credentials in .env.local');
+    process.exit(1);
   }
 
-  console.log(`\n✅ Done! Imported ${imported}/${allProducts.length} products`);
+  let imported = 0;
+  const batch = db.batch();
+
+  for (const product of allProducts) {
+    try {
+      const docId = `simchonim_${product.supplier_sku}`;
+      const docRef = db.collection('products').doc(docId);
+
+      batch.set(
+        docRef,
+        {
+          name: product.name,
+          price: product.price,
+          original_price: product.original_price,
+          cat: product.category,
+          subCategory: 'imported',
+          supplier: 'simchonim',
+          supplier_sku: product.supplier_sku,
+          supplier_url: product.supplier_url,
+          active: product.active,
+          createdAt: new Date(),
+          supplier_imported_at: new Date(),
+        },
+        { merge: true }
+      );
+
+      imported++;
+      if (imported % 25 === 0) console.log(`   ✓ ${imported}/${allProducts.length}`);
+    } catch (err) {
+      console.error(`   ❌ ${product.name}: ${err.message}`);
+    }
+  }
+
+  try {
+    await batch.commit();
+    console.log(`\n✅ Done! Imported ${imported}/${allProducts.length} products`);
+  } catch (err) {
+    console.error(`\n❌ Batch commit failed: ${err.message}`);
+  }
 }
 
 main().catch(err => {

@@ -1,0 +1,1220 @@
+{
+  "date": "2026-08-06",
+  "ok": 173,
+  "failed": 0,
+  "skippedOOS": 4,
+  "errors": [],
+  "log": [
+    {
+      "id": "CkuxdvVaXR6xjVea5OyF",
+      "sku": "MSN-823-232",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש בעיצוב אישי עם כריכה רכה בצבע לבן",
+      "price": 34.9
+    },
+    {
+      "id": "7wuUuMjsKnrGOZa9vmrW",
+      "sku": "MSN-2f458ef30b46",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה כריכה רכה – לבן",
+      "price": 10.9
+    },
+    {
+      "id": "OjaEFy8mcQDy7oktOLyK",
+      "sku": "MSN-970ff30ea15c",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה כריכה רכה – אפור כהה",
+      "price": 10.9
+    },
+    {
+      "id": "QvjmBOooPufURQT747xX",
+      "sku": "MSN-529bcf489da3",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה כריכה קשה – שמנת",
+      "price": 24.9
+    },
+    {
+      "id": "zEw2jzDUtaWTukR5QFuL",
+      "sku": "MSN-3725ca632443",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה כריכה קשה – אפור כהה",
+      "price": 24.9
+    },
+    {
+      "id": "qVlS04h1QyC0YSG1gGpT",
+      "sku": "MSN-ccc5a81c8605",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה כריכה רכה – שמנת",
+      "price": 10.9
+    },
+    {
+      "id": "0IjQBTMEwEc5Eg6yBOeC",
+      "sku": "MSN-e2c86eb44065",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה כריכה קשה – לבן",
+      "price": 24.9
+    },
+    {
+      "id": "josvU9IhRyxsB0ltqpqF",
+      "sku": "MSN-154",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נר חנוכה אקרילי כסף",
+      "price": 79
+    },
+    {
+      "id": "1xY8gdFjhiiWZMgJ6d14",
+      "sku": "MSN-5da48b85f5de",
+      "holiday": "חנוכה",
+      "name": "ברכון חנוכה דגם תלת מימד",
+      "price": 7.9
+    },
+    {
+      "id": "RGubkr1E6ze5Ptv5vePV",
+      "sku": "MSN-9207",
+      "holiday": "חנוכה",
+      "name": "ספרון חנוכה דמוי עור כריכה קשה גדול",
+      "price": 41.9
+    },
+    {
+      "id": "8giymOD4S2iV3YkFYSaD",
+      "sku": "MSN-9204",
+      "holiday": "חנוכה",
+      "name": "ספרון חנוכה דמוי עור קשה דגם חלון",
+      "price": 39.9
+    },
+    {
+      "id": "cgxWhjPeAUpYG4pq4OLr",
+      "sku": "MSN-9202",
+      "holiday": "חנוכה",
+      "name": "ספרון חנוכה דגם מכבים",
+      "price": 11.9
+    },
+    {
+      "id": "9r4NXAy9VIAqKgnAX1JA",
+      "sku": "MSN-9200",
+      "holiday": "חנוכה",
+      "name": "ספרון חנוכה דגם מדליה",
+      "price": 11.9
+    },
+    {
+      "id": "EOb8W3s6dCTplSrZy6dJ",
+      "sku": "MSN-9198",
+      "holiday": "חנוכה",
+      "name": "ברכון חנוכה דגם מעוז – כחול",
+      "price": 7.9
+    },
+    {
+      "id": "X5gQtKQtqjS6g9J4OUM0",
+      "sku": "MSN-8261",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש כריכה קשה – לבן כסף",
+      "price": 38.9
+    },
+    {
+      "id": "y8xFiefO2nBCBMRt7vFV",
+      "sku": "MSN-8269",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש דמוי עור כריכה קשה צבע לבן זהב",
+      "price": 43.9
+    },
+    {
+      "id": "dY83S5b9b8F4HKlGcu5F",
+      "sku": "MSN-8266",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש דמוי עור כריכה קשה צבע לבן כסף",
+      "price": 43.9
+    },
+    {
+      "id": "4zl0AfCyQca6aznxkITs",
+      "sku": "MSN-8267",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש דמוי עור כריכה קשה צבע שחור",
+      "price": 43.9
+    },
+    {
+      "id": "x3VZjFzkXzwJ8JmLUFop",
+      "sku": "MSN-8268",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש דמוי עור כריכה קשה צבע אפור",
+      "price": 43.9
+    },
+    {
+      "id": "2VfPY6r83neMOc2iQJuH",
+      "sku": "MSN-8270",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש דמוי עור כריכה קשה צבע אבן",
+      "price": 43.9
+    },
+    {
+      "id": "kD5MqpwKBjZiFe1OApSN",
+      "sku": "MSN-b25072548a70",
+      "holiday": "חנוכה",
+      "name": "ספרון חנוכה דגם כד השמן – שמנת",
+      "price": 44.9
+    },
+    {
+      "id": "B7ubbrYGu2d9LpLzFrTr",
+      "sku": "MSN-0c3d6e7b07e4",
+      "holiday": "חנוכה",
+      "name": "ספרון חנוכה דגם כד השמן – רוז גולד",
+      "price": 44.9
+    },
+    {
+      "id": "lBRQ4BNCbqLaMOsyBnMB",
+      "sku": "MSN-72ad02eb0149",
+      "holiday": "חנוכה",
+      "name": "ספרון חנוכה דגם כד השמן – לבן",
+      "price": 44.9
+    },
+    {
+      "id": "PzSNW5CJSsD8suZ7PPx1",
+      "sku": "MSN-592916f39e67",
+      "holiday": "חנוכה",
+      "name": "ספרון חנוכה דגם כד השמן – חום",
+      "price": 44.9
+    },
+    {
+      "id": "l3dX1rT4wNuBVwLsqEB9",
+      "sku": "MSN-824",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש כריכה רכה – שמנת",
+      "price": 26.9
+    },
+    {
+      "id": "wKxjwrCed8FgIl4uptWv",
+      "sku": "MSN-825",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש כריכה רכה – שחור",
+      "price": 26.9
+    },
+    {
+      "id": "unPU0LgqzRyQTiNHXGv0",
+      "sku": "MSN-823",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש כריכה רכה – לבן",
+      "price": 26.9
+    },
+    {
+      "id": "ps4kAGxOqutmskBbL155",
+      "sku": "MSN-827",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש כריכה קשה – שמנת",
+      "price": 38.9
+    },
+    {
+      "id": "w8a5T5DobU7JS6B6MHHI",
+      "sku": "MSN-828",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש כריכה קשה – שחור",
+      "price": 38.9
+    },
+    {
+      "id": "hQgX48zEWDfru6fws86k",
+      "sku": "MSN-826",
+      "holiday": "חנוכה",
+      "name": "ספר הקידוש כריכה קשה – לבן",
+      "price": 38.9
+    },
+    {
+      "id": "aRL3RpuCaWsZqgV1oUr2",
+      "sku": "MSN-c7af3b52767e",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה עם מזמורים",
+      "price": 11.9
+    },
+    {
+      "id": "85EB3ZRek8qi068EgNW2",
+      "sku": "MSN-1028",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה יוקרתי זהב",
+      "price": 7.9
+    },
+    {
+      "id": "SS61LVf1P6952DZ8J1jf",
+      "sku": "MSN-1029",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה יוקרתי – כסף",
+      "price": 7.9
+    },
+    {
+      "id": "Ejg147sn1xfQm5He9Zb8",
+      "sku": "MSN-1fb8d1f6474d",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה בעיצוב אישי",
+      "price": 17.9
+    },
+    {
+      "id": "WLI3to3mUcEui6moMPmI",
+      "sku": "MSN-1032",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה – דמוי עור שחור זהב",
+      "price": 28.9
+    },
+    {
+      "id": "jacCo2ya8QXH6EMcKVfH",
+      "sku": "MSN-1031",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה – דמוי עור לבן זהב",
+      "price": 28.9
+    },
+    {
+      "id": "28tIyldHh1L2v2HaXDxI",
+      "sku": "MSN-1033",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה – דמוי עור זהב",
+      "price": 28.9
+    },
+    {
+      "id": "ZdSv5VGmNrawLmT2D2zA",
+      "sku": "MSN-693218e7afa1",
+      "holiday": "חנוכה",
+      "name": "סדר הדלקת נרות חנוכה",
+      "price": 9.9
+    },
+    {
+      "id": "ZKRSI3xSqYtIsfvKn1rA",
+      "sku": "MSN-b777a2ca0a26",
+      "holiday": "חנוכה",
+      "name": "מארז סדר הדלקת נרות חנוכה ושוקולדים – שחור",
+      "price": 99
+    },
+    {
+      "id": "K5nXwDYvzvqxmVxsJwks",
+      "sku": "MSN-ad182c717a40",
+      "holiday": "חנוכה",
+      "name": "מארז סדר הדלקת נרות חנוכה ושוקולדים – לבן",
+      "price": 99
+    },
+    {
+      "id": "o2EEV1ISjvV7o9LUpEHv",
+      "sku": "MSN-60d0288911b6",
+      "holiday": "חנוכה",
+      "name": "מארז סדר הדלקת נרות חנוכה ושוקולדים – זהב",
+      "price": 99
+    },
+    {
+      "id": "nhokwBqySzXxYTKqoaPK",
+      "sku": "MSN-52b36260f48b",
+      "holiday": "חנוכה",
+      "name": "מארז סדר הדלקת נרות חנוכה ושוקולדים – אפור",
+      "price": 99
+    },
+    {
+      "id": "EDyNktGRKi5wEjDVmntk",
+      "sku": "MSN-1dc2554c5511",
+      "holiday": "חנוכה",
+      "name": "הדלקת נרות חנוכה ומזמורים – ירוק וינטאג'",
+      "price": 8.9
+    },
+    {
+      "id": "vaUkZ9ToHgGFAIvDnnWh",
+      "sku": "MSN-885f860fe90d",
+      "holiday": "חנוכה",
+      "name": "הדלקת נרות חנוכה ומזמורים – אדום",
+      "price": 8.9
+    },
+    {
+      "id": "YEuje1BNaFCwtdhb6OUH",
+      "sku": "MSN-1093",
+      "holiday": "חנוכה",
+      "name": "הדלקת נרות חנוכה דגם שלוש",
+      "price": 8.9
+    },
+    {
+      "id": "KUfZ3j2HBO7YqngAA9oL",
+      "sku": "MSN-1092",
+      "holiday": "חנוכה",
+      "name": "הדלקת נרות חנוכה דגם אור",
+      "price": 29.9
+    },
+    {
+      "id": "Ew8Yy1IEEBHMwvP9WdjE",
+      "sku": "MSN-f6349d366b95",
+      "holiday": "חנוכה",
+      "name": "ברכון חנוכה שחור זהב",
+      "price": 8
+    },
+    {
+      "id": "E4h7oWl8W2PeBMI00Ijp",
+      "sku": "MSN-e6817d097576",
+      "holiday": "חנוכה",
+      "name": "ברכון חנוכה כסוף",
+      "price": 7.9
+    },
+    {
+      "id": "uliTm1jLsLxaFYWnBpjG",
+      "sku": "MSN-216a279db63c",
+      "holiday": "חנוכה",
+      "name": "ברכון חנוכה זהב",
+      "price": 5.9
+    },
+    {
+      "id": "Zw8wYxCjOqRZCdg2pR2X",
+      "sku": "MSN-1a9075866afd",
+      "holiday": "ראש השנה",
+      "name": "ברכון ראש השנה דגם רימונים לבן כסף",
+      "price": 7.9
+    },
+    {
+      "id": "eWmPaYjUU5hSE0BD0I1w",
+      "sku": "MSN-dbae01e97068",
+      "holiday": "ראש השנה",
+      "name": "ברכון ראש השנה דגם רימונים לבן זהב",
+      "price": 7.9
+    },
+    {
+      "id": "SwwZRlWoeoNc1ag83RrU",
+      "sku": "MSN-05ac0c138707",
+      "holiday": "ראש השנה",
+      "name": "ברכון סדר סימני ראש השנה חדש עלינו – שחור",
+      "price": 6.9
+    },
+    {
+      "id": "ek6Bokt6s34ktReXPC9v",
+      "sku": "MSN-7f47331aea44",
+      "holiday": "ראש השנה",
+      "name": "ברכון סדר סימני ראש השנה חדש עלינו – לבן",
+      "price": 6.9
+    },
+    {
+      "id": "TI1Xmoc0VOg8H1wkOurQ",
+      "sku": "MSN-223",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה ניוד זהב עברית אנגלית",
+      "price": 10.9
+    },
+    {
+      "id": "SdVCa8fHOVA6acYeQtwE",
+      "sku": "MSN-1525",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה ניוד זהב",
+      "price": 9.5
+    },
+    {
+      "id": "SsdTld5QX9orHmTE0veL",
+      "sku": "MSN-949",
+      "holiday": "ראש השנה",
+      "name": "סדר תשליך לבן כסף בכריכה רכה",
+      "price": 7.9
+    },
+    {
+      "id": "Kf5HIYmuMRGkBDIrjNh2",
+      "sku": "MSN-10152",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר אנגלית כריכה קשה דמוי עור- חום",
+      "price": 34.9
+    },
+    {
+      "id": "NQOy9RuGKdToXfuTBe4p",
+      "sku": "MSN-10151",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר אנגלית כריכה קשה דמוי עור- ורוד עתיק",
+      "price": 34.9
+    },
+    {
+      "id": "RAX6x7ZyOpimKGYAOW3r",
+      "sku": "MSN-10150",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר אנגלית כריכה קשה דמוי עור- לבן",
+      "price": 34.9
+    },
+    {
+      "id": "NH3JwmQCNldOpeuEzjGb",
+      "sku": "MSN-10149",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר אנגלית כריכה קשה דמוי עור- אבן",
+      "price": 34.9
+    },
+    {
+      "id": "dxpjFF97tFJvPCT0wKpl",
+      "sku": "MSN-10148",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר כריכה רכה דמוי עור- חום",
+      "price": 23.9
+    },
+    {
+      "id": "0DifwyXgA7jn0P4NxJjG",
+      "sku": "MSN-10147",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר כריכה רכה דמוי עור- ורוד עתיק",
+      "price": 23.9
+    },
+    {
+      "id": "FGrZe79EAfLVUSxJiUDF",
+      "sku": "MSN-10146",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר כריכה רכה דמוי עור- לבן",
+      "price": 23.9
+    },
+    {
+      "id": "5HPtY4Xez8284KeYCzKg",
+      "sku": "MSN-10145",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר כריכה רכה דמוי עור- אבן",
+      "price": 23.9
+    },
+    {
+      "id": "gbHndDDWAJUmYHEQItfP",
+      "sku": "MSN-10144",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר כריכה קשה דמוי עור- חום",
+      "price": 33.9
+    },
+    {
+      "id": "FjsO0EDD8HElTSLyrX5Q",
+      "sku": "MSN-10143",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר כריכה קשה דמוי עור- ורוד עתיק",
+      "price": 33.9
+    },
+    {
+      "id": "MQHUt17U6zTMDN3AuEll",
+      "sku": "MSN-10142",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר כריכה קשה דמוי עור- לבן",
+      "price": 33.9
+    },
+    {
+      "id": "5L2aJ5lW7zU6mBGw5qbg",
+      "sku": "MSN-10141",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה דגם אושר כריכה קשה דמוי עור- אבן",
+      "price": 33.9
+    },
+    {
+      "id": "Vp3NfDqTgEpWu4qhMUxB",
+      "sku": "MSN-ae1b94a5f504",
+      "holiday": "ראש השנה",
+      "name": "ספרון יחדש עלינו – ראש השנה – צבע רוז גולד – רכה",
+      "price": 11.9
+    },
+    {
+      "id": "vDnPHuqObc35Wq5RRs1B",
+      "sku": "MSN-64fc4a6ed093",
+      "holiday": "ראש השנה",
+      "name": "ספרון יחדש עלינו – ראש השנה – צבע לבן – קשה",
+      "price": 26.9
+    },
+    {
+      "id": "xxiBJCCf3pF7uoBstCHz",
+      "sku": "MSN-152",
+      "holiday": "ראש השנה",
+      "name": "סדר ראש השנה סימנים אקרילי כסף",
+      "price": 79
+    },
+    {
+      "id": "pg2bd3o460pPaIinSgx8",
+      "sku": "MSN-1501",
+      "holiday": "ראש השנה",
+      "name": "סדר סימנים וברכת המזון",
+      "price": 6.5
+    },
+    {
+      "id": "EhErAYBGl6CzxfNZq2MC",
+      "sku": "MSN-1500",
+      "holiday": "ראש השנה",
+      "name": "סדר סימנים דמוי עור דגם אפל",
+      "price": 43.9
+    },
+    {
+      "id": "VnY5qIWX7cU2fkZwYQnt",
+      "sku": "MSN-795d59d988da",
+      "holiday": "ראש השנה",
+      "name": "סדר סימני ראש השנה דמוי עור – לבן זהב",
+      "price": 69
+    },
+    {
+      "id": "j7pHouO27gkLaeiDWPCH",
+      "sku": "MSN-6e57fc1aa69e",
+      "holiday": "ראש השנה",
+      "name": "סדר סימני ראש השנה דמוי עור – חום זהב",
+      "price": 69
+    },
+    {
+      "id": "IMefA35vNoeNAddcxOoZ",
+      "sku": "MSN-e74e083118d0",
+      "holiday": "ראש השנה",
+      "name": "סדר סימני ראש השנה דמוי עור – זהב",
+      "price": 69
+    },
+    {
+      "id": "SW45REswLCIMkKtmVltI",
+      "sku": "MSN-19eda52f96ac",
+      "holiday": "ראש השנה",
+      "name": "סדר סימני ראש השנה דמוי עור – ורוד כסף",
+      "price": 69
+    },
+    {
+      "id": "35rs9ym4xOcKSdqW9IhQ",
+      "sku": "MSN-1491",
+      "holiday": "ראש השנה",
+      "name": "סדר סימני ראש השנה דמוי עור",
+      "price": 69
+    },
+    {
+      "id": "HwVX7TcQSD1nFX44AYb9",
+      "sku": "MSN-1490",
+      "holiday": "ראש השנה",
+      "name": "סדר סימני ראש השנה – דמוי עור יוקרתי דגם דוד",
+      "price": 29.9
+    },
+    {
+      "id": "i9MRrKi9DnHz55ah9YlX",
+      "sku": "MSN-1475",
+      "holiday": "ראש השנה",
+      "name": "סדר הסימנים וברכת המזון לראש השנה",
+      "price": 7.49
+    },
+    {
+      "id": "vkcVZMlyDrSnQUi5OqgR",
+      "sku": "MSN-1474",
+      "holiday": "ראש השנה",
+      "name": "סדר הסימנים וברכת המזון דמוי עור",
+      "price": 41.9
+    },
+    {
+      "id": "toICs2MWgGbmc4AE3Ne3",
+      "sku": "MSN-411769c29090",
+      "holiday": "ראש השנה",
+      "name": "מארז שנה מתוקה",
+      "price": 18.9
+    },
+    {
+      "id": "adqR1cIrrxyCVLomHbiV",
+      "sku": "MSN-1311",
+      "holiday": "ראש השנה",
+      "name": "מארז סדר סימנים מאויר עם דבש",
+      "price": 38.9
+    },
+    {
+      "id": "9eBc4X8D2QJuSi6cQA4O",
+      "sku": "MSN-1310",
+      "holiday": "ראש השנה",
+      "name": "מארז סדר סימני ראש השנה חדש עלינו ושוקולדים – שחור",
+      "price": 89
+    },
+    {
+      "id": "pUlWHMx81BF9sNeUHYs1",
+      "sku": "MSN-fc4312c50a27",
+      "holiday": "ראש השנה",
+      "name": "מארז סדר סימני ראש השנה ושוקולדים – לבן",
+      "price": 99
+    },
+    {
+      "id": "z1rBSacA38EosONoBbg1",
+      "sku": "MSN-692b95126371",
+      "holiday": "ראש השנה",
+      "name": "מארז סדר סימני ראש השנה ושוקולדים – חום",
+      "price": 99
+    },
+    {
+      "id": "hj8B0MNuQAnT4Sfa4JDO",
+      "sku": "MSN-103335dec964",
+      "holiday": "ראש השנה",
+      "name": "מארז סדר סימני ראש השנה ושוקולדים – זהב",
+      "price": 99
+    },
+    {
+      "id": "gTloVIGyba0XL5kqdrQf",
+      "sku": "MSN-f141b3e7ffe8",
+      "holiday": "ראש השנה",
+      "name": "מארז סדר סימני ראש השנה ושוקולדים – ורוד",
+      "price": 99
+    },
+    {
+      "id": "uu3PYg1RpY79T5IPtqGk",
+      "sku": "MSN-1556",
+      "holiday": "ראש השנה",
+      "name": "סט משפחתי ספרון יחדש עלינו כריכה רכה",
+      "price": 149
+    },
+    {
+      "id": "UmXX0mzwsDq12Jr866iN",
+      "sku": "MSN-96d23fde04c9",
+      "holiday": "ראש השנה",
+      "name": "סט משפחתי ספרון יחדש עלינו כריכה קשה",
+      "price": 239
+    },
+    {
+      "id": "YN5p8M8iHgZ2Fzu4w7M9",
+      "sku": "MSN-1554",
+      "holiday": "ראש השנה",
+      "name": "סט משפחתי סדר סימני ראש השנה דמוי עור",
+      "price": 249
+    },
+    {
+      "id": "ujGkQ3f66LgWnr6Z3mOE",
+      "sku": "MSN-fb4bd97bdf85",
+      "holiday": "ראש השנה",
+      "name": "ברכון שנה טובה ומתוקה",
+      "price": 7.9
+    },
+    {
+      "id": "uRxt9jUANapC4sbw68cm",
+      "sku": "MSN-10062",
+      "holiday": "פורים",
+      "name": "מארז יין עם מגילת אסתר לפורים (יחידה)",
+      "price": 129
+    },
+    {
+      "id": "AlkSYtDhNiKVvIcdTMDT",
+      "sku": "MSN-10056",
+      "holiday": "פורים",
+      "name": "מארז יין עם מגילת אסתר לפורים",
+      "price": 94.9
+    },
+    {
+      "id": "zsfhfnst44euNRHxrEJc",
+      "sku": "MSN-de015e0db4c4",
+      "holiday": "פורים",
+      "name": "מארז לפורים – מגילת אסתר לצד פרלינים שוויצרים – שחור",
+      "price": 64.9
+    },
+    {
+      "id": "R6yZg6J32XoJRi5VzgNV",
+      "sku": "MSN-1285",
+      "holiday": "פורים",
+      "name": "מארז לפורים – מגילת אסתר \"אורה ושמחה\" לצד פרלינים שוויצרים",
+      "price": 99
+    },
+    {
+      "id": "985a2v4x3S5YPtk6itIm",
+      "sku": "MSN-065ff946a406",
+      "holiday": "פורים",
+      "name": "מארז יוקרתי לפורים – מגילת אסתר \"אורה ושמחה\", יין ושוקולדים",
+      "price": 169
+    },
+    {
+      "id": "3vHVTOtbkOWa2TFCvi8k",
+      "sku": "MSN-5012",
+      "holiday": "פסח",
+      "name": "סט מחזורים מעוצב קרטיה בצבע חום",
+      "price": 399
+    },
+    {
+      "id": "4BD67ivwq95vCOhv2W3x",
+      "sku": "MSN-5010",
+      "holiday": "פסח",
+      "name": "סט מחזורים מעוצב קרטיה בצבע אפור",
+      "price": 399
+    },
+    {
+      "id": "PKNmYZfRLPu9zd1Ov6T5",
+      "sku": "MSN-5011",
+      "holiday": "פסח",
+      "name": "סט מחזורים מעוצב קרטיה בצבע ורוד בייבי",
+      "price": 399
+    },
+    {
+      "id": "XDpGBlPpdnHHEWgWjRDW",
+      "sku": "MSN-5013",
+      "holiday": "פסח",
+      "name": "סט מחזורים מעוצב קרטיה בצבע לבן",
+      "price": 399
+    },
+    {
+      "id": "AknNJFnyi3Xjz1k2j0te",
+      "sku": "MSN-5009",
+      "holiday": "פסח",
+      "name": "סט מחזורים מעוצב קרטיה בצבע שחור",
+      "price": 399
+    },
+    {
+      "id": "BpQ51ubMQvan3euHkyVL",
+      "sku": "MSN-5008",
+      "holiday": "פסח",
+      "name": "סט מחזורים מעוצב כותל בצבע שחור כסף",
+      "price": 399
+    },
+    {
+      "id": "MUcjQy8yMM7WZNYWtSyf",
+      "sku": "MSN-5007",
+      "holiday": "פסח",
+      "name": "סט מחזורים מעוצב כותל בצבע ורוד עתיק",
+      "price": 399
+    },
+    {
+      "id": "Yqv4ayDCYXiEP9brhweh",
+      "sku": "MSN-5006",
+      "holiday": "פסח",
+      "name": "סט מחזורים מעוצב כותל בצבע אבן",
+      "price": 399
+    },
+    {
+      "id": "RWQAncI8mS0MYSnM9jPG",
+      "sku": "MSN-5005",
+      "holiday": "פסח",
+      "name": "סט מחזורים כותל בצבע לבן זהב",
+      "price": 399
+    },
+    {
+      "id": "SssHR7KQXXMVXelvdO3Q",
+      "sku": "MSN-5004",
+      "holiday": "פסח",
+      "name": "סט מחזורים כותל בצבע לבן כסף",
+      "price": 399
+    },
+    {
+      "id": "gXyGbSArikxgbIbUBtrx",
+      "sku": "MSN-5003",
+      "holiday": "פסח",
+      "name": "סט מחזורים קורדורוי בצבע חום חמרה",
+      "price": 399
+    },
+    {
+      "id": "FFJapJ40Ht9h7oYdb2sR",
+      "sku": "MSN-5001",
+      "holiday": "פסח",
+      "name": "סט מחזורים קורדורוי בצבע לבן",
+      "price": 399
+    },
+    {
+      "id": "R6qXOGfvSDb3x2HezQSh",
+      "sku": "MSN-5000",
+      "holiday": "פסח",
+      "name": "סט מחזורים קורדורוי בצבע ורוד",
+      "price": 399
+    },
+    {
+      "id": "Uaz6KE8pSsFGA1xIPzHX",
+      "sku": "MSN-5002",
+      "holiday": "פסח",
+      "name": "סט מחזורים קורדורוי בצבע אבן סהרה",
+      "price": 399
+    },
+    {
+      "id": "D7RSZIcGTq2NwvnOkOW6",
+      "sku": "MSN-10102",
+      "holiday": "פסח",
+      "name": "מארז יין עם הגדה של פסח עם איורים בטכנולוגיית AI דמוי עור יוקרתי (יחידה)",
+      "price": 179
+    },
+    {
+      "id": "M8TlkjcJueKDetlYtztY",
+      "sku": "MSN-10090",
+      "holiday": "פסח",
+      "name": "מארז יין עם הגדה של פסח עם איורים בטכנולוגיית AI דמוי עור יוקרתי",
+      "price": 114.9
+    },
+    {
+      "id": "uv0jgiDANN2iqHCLFxB2",
+      "sku": "MSN-10078",
+      "holiday": "פסח",
+      "name": "מארז יין עם הגדה של פסח דגם יציאת מצרים בכריכה קשה",
+      "price": 94.9
+    },
+    {
+      "id": "1pxnJZBIC8kyk1saPq1U",
+      "sku": "MSN-10066",
+      "holiday": "פסח",
+      "name": "מארז יין עם הגדה של פסח דגם סימנים",
+      "price": 94.9
+    },
+    {
+      "id": "Rp8xMhhsSM31YAxMwazk",
+      "sku": "MSN-347889de23c3",
+      "holiday": "פסח",
+      "name": "מארז הגדה לצד פרלינים שוויצרים בכשרות מהודרת – דגם סימנים",
+      "price": 64.9
+    },
+    {
+      "id": "Xux14Samfoy6oGmsL6Au",
+      "sku": "MSN-7519",
+      "holiday": "פסח",
+      "name": "סט משפחתי של הגדות אביב לפסח",
+      "price": 149
+    },
+    {
+      "id": "BmLabRJgERc7bllp9Dum",
+      "sku": "MSN-1558",
+      "holiday": "פסח",
+      "name": "סט משפחתי של הגדות יוקרתיות לפסח – כסף",
+      "price": 149
+    },
+    {
+      "id": "o2CMjAI3geOT5wljLNLD",
+      "sku": "MSN-1557",
+      "holiday": "פסח",
+      "name": "סט משפחתי של הגדות יוקרתיות לפסח – זהב",
+      "price": 149
+    },
+    {
+      "id": "GTuvM0nL42akpqmpOIu6",
+      "sku": "MSN-1543",
+      "holiday": "פסח",
+      "name": "סט לפסח דגם מתארחים",
+      "price": 199
+    },
+    {
+      "id": "xXkWh4mp0gBzCvyjkKtT",
+      "sku": "MSN-1531",
+      "holiday": "פסח",
+      "name": "סט הגדות משפחתי לפסח עם איורים בטכנולוגיית AI דמוי עור",
+      "price": 479
+    },
+    {
+      "id": "oAkGUxiq8aNtTBCkNFOg",
+      "sku": "MSN-7665",
+      "holiday": "פסח",
+      "name": "מארז הגדות כריכה קשה עם יין",
+      "price": 299
+    },
+    {
+      "id": "eqGIaRO7XjdVXCs5vKBf",
+      "sku": "MSN-7660",
+      "holiday": "פסח",
+      "name": "מארז מעבדות לחירות הגדה AI וקופסא למצות – זהב",
+      "price": 219
+    },
+    {
+      "id": "eACo7aUqz2JEAr4lzyA8",
+      "sku": "MSN-7656",
+      "holiday": "פסח",
+      "name": "מארז מעבדות לחירות הגדה AI וקופסא למצות – כסף",
+      "price": 219
+    },
+    {
+      "id": "5sNuefDKtXMPVJSFROrb",
+      "sku": "MSN-7556",
+      "holiday": "פסח",
+      "name": "סט משפחתי הגדה לפסח דגם יציאת מצרים כריכה קשה – ירוק",
+      "price": 279
+    },
+    {
+      "id": "KwE4L772WYaJ271f7w38",
+      "sku": "MSN-7552",
+      "holiday": "פסח",
+      "name": "סט משפחתי הגדה לפסח דגם יציאת מצרים כריכה רכה – שחור",
+      "price": 179
+    },
+    {
+      "id": "GUofKTH71C58Z9qfGHHZ",
+      "sku": "MSN-7548",
+      "holiday": "פסח",
+      "name": "סט משפחתי הגדה לפסח דגם יציאת מצרים כריכה רכה – לבן",
+      "price": 179
+    },
+    {
+      "id": "6Tr2rPlKr1JB3TXU6gpN",
+      "sku": "MSN-7617",
+      "holiday": "פסח",
+      "name": "סט פסח מלא 6 הגדות, קופסא למצות וכיסוי סאטן",
+      "price": 319
+    },
+    {
+      "id": "6UeoXCYD1zLgqXfMH0zu",
+      "sku": "MSN-7612",
+      "holiday": "פסח",
+      "name": "סט שולחן פסח 6 הגדות וקופסא למצות",
+      "price": 269
+    },
+    {
+      "id": "qyysiRFQ7JC6MG89inKf",
+      "sku": "MSN-7523",
+      "holiday": "פסח",
+      "name": "סט משפחתי של הגדות דגם ליין",
+      "price": 149
+    },
+    {
+      "id": "UXhXTEVyeOlJmIu9Bex9",
+      "sku": "MSN-7607",
+      "holiday": "פסח",
+      "name": "סט משפחתי הגדה לפסח דגם יציאת מצרים כריכה רכה – שמנת",
+      "price": 179
+    },
+    {
+      "id": "hMd9rvBPKe9HzVkB631s",
+      "sku": "MSN-854ad825089f",
+      "holiday": "פסח",
+      "name": "מארז משפחתי לפסח – הגדות לחג ויין",
+      "price": 229
+    },
+    {
+      "id": "8yTnHQhAnyj2KUSYAxXG",
+      "sku": "MSN-d013f1a356da",
+      "holiday": "פסח",
+      "name": "מארז משפחתי לפסח",
+      "price": 169
+    },
+    {
+      "id": "yUOSWLProDVHT4C8qmPl",
+      "sku": "MSN-1299",
+      "holiday": "פסח",
+      "name": "מארז משפחתי הגדה קלאסית כריכה קשה- כסף",
+      "price": 209
+    },
+    {
+      "id": "HzAaOdT1VzxVaYgLkCWV",
+      "sku": "MSN-1298",
+      "holiday": "פסח",
+      "name": "מארז משפחתי הגדה קלאסית כריכה קשה- זהב",
+      "price": 209
+    },
+    {
+      "id": "WD1iF1dtGkYrXdVnPUEp",
+      "sku": "MSN-1296",
+      "holiday": "פסח",
+      "name": "מארז משפחתי דגם קריעת ים סוף כריכה רכה",
+      "price": 149
+    },
+    {
+      "id": "fWXzIuhgPUl8rmEPP36N",
+      "sku": "MSN-1293",
+      "holiday": "פסח",
+      "name": "מארז לפסח למתנה לועדי עובדים",
+      "price": 179
+    },
+    {
+      "id": "oa7sLvFf4Ig7OqsOJyLF",
+      "sku": "MSN-1292",
+      "holiday": "פסח",
+      "name": "מארז לפסח למתנה – הגדה לפסח, יין, כיסוי מצה ושוקולדים",
+      "price": 219
+    },
+    {
+      "id": "JUbYT4dW68L014Are8Tj",
+      "sku": "MSN-ed476c9ea443",
+      "holiday": "פסח",
+      "name": "מארז לפסח יוקרתי – הגדות של פסח, יין, כוס קידוש ושוקולדים",
+      "price": 349
+    },
+    {
+      "id": "gfIm0sDMXmuDh9z927r7",
+      "sku": "MSN-1290",
+      "holiday": "פסח",
+      "name": "מארז לפסח דגם מזוודה – שוקולד ויין",
+      "price": 169
+    },
+    {
+      "id": "j4EOGGLrUWEI2RVrMpyg",
+      "sku": "MSN-90fa374570df",
+      "holiday": "פסח",
+      "name": "מארז לפסח – הגדה של פסח, יין ושוקולדים",
+      "price": 139
+    },
+    {
+      "id": "l6xbLFxEr1k389wl4PyZ",
+      "sku": "MSN-e9467820d813",
+      "holiday": "פסח",
+      "name": "מארז לפסח – הגדה של פסח לצד פרלינים שוויצרים – שמנת",
+      "price": 99
+    },
+    {
+      "id": "BwEDW8jgkjGvM9xNbXxR",
+      "sku": "MSN-c432ee58ed33",
+      "holiday": "פסח",
+      "name": "מארז הגדה לצד פרלינים שוויצרים בכשרות מהודרת – כסף",
+      "price": 64.9
+    },
+    {
+      "id": "A42T1KNC4KW8305mFFTy",
+      "sku": "MSN-5f74a1775c6b",
+      "holiday": "פסח",
+      "name": "מארז 4 הגדות לצד פרלינים שוויצרים בכשרות מהדורת",
+      "price": 99
+    },
+    {
+      "id": "BkpWXuriJ9wG5wUwg9K3",
+      "sku": "MSN-7379",
+      "holiday": "פסח",
+      "name": "מעמד הגדות דגם קריסטל – כסף",
+      "price": 549
+    },
+    {
+      "id": "5C5kwwpbLmG7n6XcxWgI",
+      "sku": "MSN-7378",
+      "holiday": "פסח",
+      "name": "מעמד הגדות דגם קריסטל – לבן",
+      "price": 549
+    },
+    {
+      "id": "tIKqAjZDskmqKnDKqwe6",
+      "sku": "MSN-7374",
+      "holiday": "פסח",
+      "name": "מעמד הגדות דגם קריסטל – שמנת",
+      "price": 549
+    },
+    {
+      "id": "oO6QVqqzozAD6ROMGscN",
+      "sku": "MSN-7372",
+      "holiday": "פסח",
+      "name": "מעמד הגדות דגם קריסטל – שחור",
+      "price": 549
+    },
+    {
+      "id": "FrCCmMnt0wkj4Cyawb8S",
+      "sku": "MSN-9fd209ecff08",
+      "holiday": "פסח",
+      "name": "מארז לפסח סופר יוקרתי – הגדות של פסח, יין, כוס קידוש, כיסוי מצה ושוקולדים",
+      "price": 379
+    },
+    {
+      "id": "N90aXXethj7SOF6XvAYx",
+      "sku": "MSN-1081",
+      "holiday": "פסח",
+      "name": "הגדות לפסח דמוי עור – מארז מפואר",
+      "price": 309
+    },
+    {
+      "id": "MiPS2nrQY0TIlfjNW4si",
+      "sku": "MSN-1065",
+      "holiday": "פסח",
+      "name": "הגדה של פסח דמוי עור דגם סימנים סט משפחתי – מגוון צבעים",
+      "price": 249
+    },
+    {
+      "id": "kRkREtI8VN0YHVKTevCc",
+      "sku": "MSN-8847",
+      "holiday": "ראש השנה",
+      "name": "מארז יין שנה טובה בכריכה קשה",
+      "price": 94.9
+    },
+    {
+      "id": "sNDVCPp9uElsiJw1YFq2",
+      "sku": "MSN-8845",
+      "holiday": "ראש השנה",
+      "name": "מארז יין שנה טובה דמוי עור",
+      "price": 149
+    },
+    {
+      "id": "4qECC9IpGubzmb9okCZi",
+      "sku": "SIM-9184",
+      "holiday": "פורים",
+      "name": "מארז מעטפת ושוקולד לפורים אומנותי",
+      "price": 58
+    },
+    {
+      "id": "aAmOJxrspIu3Lzd3VJg0",
+      "sku": "SIM-99193",
+      "holiday": "פורים",
+      "name": "מארז מעטפת ושוקולד לפורים שחור",
+      "price": 58
+    },
+    {
+      "id": "uG3Qi2pZhE1jciy7QsjK",
+      "sku": "SIM-36609",
+      "holiday": "פורים",
+      "name": "מארז הרמוניה צבעוני לפורים",
+      "price": 98
+    },
+    {
+      "id": "jeHK1qFl2LLIZTWv7BXX",
+      "sku": "SIM-4312",
+      "holiday": "פורים",
+      "name": "מארז הרמוניה שחור לפורים",
+      "price": 98
+    },
+    {
+      "id": "paAkG13FYSpfRtRbHYCo",
+      "sku": "SIM-4309",
+      "holiday": "פורים",
+      "name": "מארז ריחני אורה ושמחה לפורים",
+      "price": 89
+    },
+    {
+      "id": "ymUHkhWevNsirYoFfk1s",
+      "sku": "SIM-4311",
+      "holiday": "פורים",
+      "name": "מארז ברכונים מגנטי עם ליקר",
+      "price": 72
+    },
+    {
+      "id": "oQTgyOjXkskTZjLeVChq",
+      "sku": "SIM-4310",
+      "holiday": "פורים",
+      "name": "מארז ליהודים היתה לפורים",
+      "price": 136
+    },
+    {
+      "id": "5g4KrIaeJyYm3RvhXiAa",
+      "sku": "SIM-99196",
+      "holiday": "פורים",
+      "name": "מארז פורים יוקרתי",
+      "price": 155
+    },
+    {
+      "id": "hTGdhHFqW7CbZRnaXZf1",
+      "sku": "SIM-99195",
+      "holiday": "פורים",
+      "name": "מארז אישי מגילת אסתר",
+      "price": 98
+    },
+    {
+      "id": "AfAIQtwXRtCV9VEhcxfR",
+      "sku": "SIM-4319",
+      "holiday": "פורים",
+      "name": "מארז ברכונים מגנטי לוסייט",
+      "price": 325
+    },
+    {
+      "id": "ehJi5LzRnwXB1WvFM45p",
+      "sku": "SIM-4320",
+      "holiday": "פורים",
+      "name": "מארז זמירות דגם תחרה",
+      "price": 380
+    },
+    {
+      "id": "y3XTwyKwRO2ZSqmkzLen",
+      "sku": "SIM-99824",
+      "holiday": "ראש השנה",
+      "name": "מארז הרמוניה אומנותי",
+      "price": 98
+    },
+    {
+      "id": "NGCvYX93NnuWBi8LJGXf",
+      "sku": "SIM-998141",
+      "holiday": "ראש השנה",
+      "name": "מארז הרמוניה דגם תפוח",
+      "price": 98
+    },
+    {
+      "id": "D9ymgUlHvpV9XFbHAXKR",
+      "sku": "SIM-810003",
+      "holiday": "ראש השנה",
+      "name": "מארז פסיפס רכה",
+      "price": 79
+    },
+    {
+      "id": "xxzFjoaBV7QzajJ8q0ZV",
+      "sku": "SIM-9954",
+      "holiday": "ראש השנה",
+      "name": "מארז מעטפת דבש",
+      "price": 58
+    },
+    {
+      "id": "lvoDiGLrWZVOeGFPOGEC",
+      "sku": "SIM-999141",
+      "holiday": "ראש השנה",
+      "name": "מארז מעטפת פסיפס ושוקולד",
+      "price": 58
+    },
+    {
+      "id": "6ZV2jxnvTzujQEHVjtPq",
+      "sku": "SIM-954",
+      "holiday": "ראש השנה",
+      "name": "מארז דבש",
+      "price": 78
+    },
+    {
+      "id": "El8SkkQwVuty2YgTfMgq",
+      "sku": "SIM-810002",
+      "holiday": "ראש השנה",
+      "name": "מארז פסיפס קשה",
+      "price": 78
+    },
+    {
+      "id": "Lrn6xcZkFq5euiaDsCUI",
+      "sku": "SIM-810001",
+      "holiday": "ראש השנה",
+      "name": "מארז כרטיס אומנותי",
+      "price": 138
+    },
+    {
+      "id": "15BCC044U6EhfIbIdpIK",
+      "sku": "SIM-99833201",
+      "holiday": "ראש השנה",
+      "name": "מארז אישי הדלקת נרות",
+      "price": 98
+    }
+  ]
+}
