@@ -26,6 +26,56 @@
   --font-heebo: Arial, 'Segoe UI', sans-serif;
   --font-frank: Arial, 'Segoe UI', sans-serif;
   --font-cormorant: Arial, 'Segoe UI', sans-serif;
+
+  /* ── טוקני פריסה ─────────────────────────────────────────────────────
+     נמדדו מ-notonthehighstreet (08/2026). ראה docs/noths-design-spec.md.
+     העיקרון: הרבה אוויר בין רצועות, צפיפות בתוך רצועה — מרווח השורות
+     גדול פי כמעט 3 ממרווח העמודות. זה מה שיוצר את התחושה האוצרת. */
+  --ys-container: 1280px;      /* 1440 אצלם; 1280 מתאים לקטלוג שלנו */
+  --ys-section-gap: 48px;      /* בין סקשנים */
+  --ys-row-gap: 40px;          /* בין שורות בגריד (64 אצלם) */
+  --ys-col-gap: 20px;          /* בין עמודות (24 אצלם) */
+
+  /* יחסי תמונה — חמישה בלבד, בעקביות מלאה */
+  --ys-tile-ratio: 1 / 1;      /* אריחי קטגוריה ואירוע */
+  --ys-seasonal-ratio: 4 / 3;  /* רצועה עונתית */
+  --ys-banner-ratio: 16 / 9;   /* באנר עם טקסט לצד תמונה */
+}
+
+/* ── כותרת סקשן אחידה ──────────────────────────────────────────────────
+   אצלם הכותרות רק 24px במשקל 500 — הפער הקטן מול הגוף (17px) הוא מה
+   שמייצר שקט במקום צעקנות. בעברית אין רישיות, ולכן 24-26 שקול ל-22
+   בלטינית ואסור לרדת מתחת. letter-spacing שלילי מתון: מינוס 4% מתאים
+   ללטינית, בעברית האותיות מתחילות להידבק אחרי מינוס 3%. */
+.ys-section-title {
+  font-size: clamp(22px, 2.2vw, 26px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.35;
+  color: #1F2937;
+  margin: 0 0 8px;
+}
+.ys-section-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #9C7B3F;
+  margin: 0 0 10px;
+}
+.ys-section-sub {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: #9CA3AF;
+  margin: 0;
+}
+
+/* מעטפת סקשן — מכולה ומרווח אנכי אחידים במקום ערכים שונים בכל בלוק */
+.ys-section {
+  max-width: var(--ys-container);
+  margin-inline: auto;
+  padding-inline: 20px;
 }
 
 .brand-story {

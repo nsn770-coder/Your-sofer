@@ -1138,19 +1138,13 @@ export default function HomePageClient({ productCount }: { productCount: number 
         <section aria-labelledby="seasonal-title" className="px-5 py-10 md:px-8 md:py-14" style={{ background: '#FAF8F3', direction: 'rtl', borderBottom: '1px solid #F0EDE8' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
-              {seasonal.eyebrow && (
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
-                  {seasonal.eyebrow}
-                </p>
-              )}
-              <h2 id="seasonal-title" className="text-[26px] md:text-[34px]" style={{ fontWeight: 300, color: '#1F2937', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
-                {seasonal.title}
-              </h2>
-              {seasonal.subtitle && (
-                <p style={{ fontSize: 15, color: '#9CA3AF', margin: 0, fontWeight: 400 }}>{seasonal.subtitle}</p>
-              )}
+              {seasonal.eyebrow && <p className="ys-section-eyebrow">{seasonal.eyebrow}</p>}
+              <h2 id="seasonal-title" className="ys-section-title">{seasonal.title}</h2>
+              {seasonal.subtitle && <p className="ys-section-sub">{seasonal.subtitle}</p>}
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+            {/* מרווח עמודות/שורות מהטוקנים — אווירי אנכית, צפוף אופקית */}
+            <div className="grid grid-cols-2 md:grid-cols-4"
+              style={{ columnGap: 'var(--ys-col-gap)', rowGap: 'var(--ys-row-gap)' }}>
               {seasonal.tiles.map((t, i) => (
                 <a
                   key={`${t.href}-${i}`}
@@ -1159,7 +1153,7 @@ export default function HomePageClient({ productCount }: { productCount: number 
                   onMouseEnter={e => { e.currentTarget.style.borderColor = '#C5A028'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
                 >
-                  <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', flexShrink: 0 }}>
+                  <div style={{ width: '100%', aspectRatio: 'var(--ys-seasonal-ratio)', overflow: 'hidden', flexShrink: 0 }}>
                     <img
                       src={optimizeCloudinaryUrl(t.imgUrl, 400)}
                       alt={t.label}
@@ -1168,7 +1162,7 @@ export default function HomePageClient({ productCount }: { productCount: number 
                     />
                   </div>
                   <div style={{ padding: '12px 16px 16px' }}>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', margin: 0, lineHeight: 1.4 }}>{t.label}</p>
+                    <p style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', margin: 0, lineHeight: 1.4, letterSpacing: '-0.01em' }}>{t.label}</p>
                     <span style={{ fontSize: 11, color: '#888', display: 'block', marginTop: 4 }}>לצפייה ←</span>
                   </div>
                 </a>
@@ -1238,22 +1232,17 @@ export default function HomePageClient({ productCount }: { productCount: number 
         style={{ background: '#FFFFFF', direction: 'rtl' }}
       >
         <div className="mb-6 md:mb-9" style={{ textAlign: 'center', padding: '0 20px' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
-            רגעי חיים
-          </p>
+          <p className="ys-section-eyebrow">רגעי חיים</p>
           {/* לקוחות לא מחפשים "בתי מזוזה" — הם עוברים דירה. הכותרת ממסגרת
               את הקטלוג לפי הסיבה שבגללה מגיעים, לא לפי סוג המוצר. */}
-          <h2 className="text-[26px] md:text-[34px]" style={{ fontWeight: 300, color: '#1F2937', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
-            מה מביא אתכם אלינו?
-          </h2>
-          <p style={{ fontSize: 15, color: '#9CA3AF', margin: 0, fontWeight: 400 }}>
-            כל רגע בבית היהודי — וכל מה שצריך אליו
-          </p>
+          <h2 className="ys-section-title">מה מביא אתכם אלינו?</h2>
+          <p className="ys-section-sub">כל רגע בבית היהודי — וכל מה שצריך אליו</p>
         </div>
 
         {/* גריד במקום גלילה אופקית (08/2026): הרצועה הסתירה 4 מתוך 7 האירועים
             מתחת לקצה המסך, ורגעי החיים הם הבידול המרכזי של האתר. */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
+        <div className="ys-section grid grid-cols-2 md:grid-cols-4"
+          style={{ columnGap: 'var(--ys-col-gap)', rowGap: 'var(--ys-row-gap)' }}>
           {lifeEvents.map((ev, evIdx) => (
             <a
               key={ev.id}
@@ -1273,7 +1262,9 @@ export default function HomePageClient({ productCount }: { productCount: number 
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
             >
               {ev.image && (
-                <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', flexShrink: 0 }}>
+                /* ריבוע — 58 מתוך 69 התמונות אצלם הן 1:1, וזה הדפוס שמייצר
+                   את האחידות. 4:3 שמור אצלם לרצועה העונתית בלבד. */
+                <div style={{ width: '100%', aspectRatio: 'var(--ys-tile-ratio)', overflow: 'hidden', flexShrink: 0 }}>
                   <img
                     src={optimizeCloudinaryUrl(ev.image, 400)}
                     alt={ev.title}
