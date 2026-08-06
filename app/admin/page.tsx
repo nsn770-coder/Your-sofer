@@ -26,6 +26,7 @@ import { getTier } from '@/app/lib/loyalty';
 import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
 import EraToggle from '@/app/components/EraToggle';
 import { SendToLionWheelButton } from '@/components/admin/SendToLionWheelButton';
+import { CRAFTS } from '@/app/lib/crafts';
 
 interface OrderItem {
   id: string;
@@ -272,6 +273,8 @@ interface SoferFull {
   imageUrl?: string;
   writingSamples?: (string | WritingSample)[];
   status?: string;
+  /** מקצוע היוצר — ראה app/lib/crafts.ts. ריק = סופר סת"ם */
+  craft?: string;
 }
 
 interface SoferEditRequest {
@@ -1352,12 +1355,16 @@ function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () =>
   const [form, setForm] = useState({
     name: '', city: '', phone: '', whatsapp: '', email: '',
     description: '', style: '', imageUrl: '',
+    craft: 'stam',
   });
   const [categories, setCategories] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
 
-  const SOFER_CATS = ['בתי מזוזה', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
+  // סת"ם עובד מול קטגוריות הקודש; אמנים ויוצרים מוכרים על פני קטלוג היודאיקה הרחב
+  const STAM_CATS   = ['בתי מזוזה', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
+  const ARTIST_CATS = ['בתי מזוזה', 'יודאיקה', 'שבת', 'חגים', 'תכשיטים', 'טליתות וציציות', 'תיקי טלית ותפילין', 'כיפות', 'מוצרי בית כנסת', 'מתנות'];
+  const SOFER_CATS  = form.craft === 'stam' ? STAM_CATS : ARTIST_CATS;
 
   function toggleCat(cat: string) {
     setCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
@@ -1412,7 +1419,21 @@ function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () =>
             <div><label style={labelStyle}>וואטסאפ</label><input value={form.whatsapp} onChange={e => setForm(p => ({...p, whatsapp: e.target.value}))} placeholder="050-0000000" style={inputStyle} /></div>
           </div>
           <div><label style={labelStyle}>אימייל</label><input value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} placeholder="sofer@example.com" type="email" style={inputStyle} /></div>
-          <div><label style={labelStyle}>סגנון כתיבה</label><input value={form.style} onChange={e => setForm(p => ({...p, style: e.target.value}))} placeholder='חב"ד / אשכנז / ספרד' style={inputStyle} /></div>
+          {/* מקצוע — קובע אילו שדות היוצר יראה בטופס העלאת מוצר */}
+          <div>
+            <label style={labelStyle}>מקצוע</label>
+            <select value={form.craft} onChange={e => setForm(p => ({ ...p, craft: e.target.value }))} style={{ ...inputStyle, background: '#fff' }}>
+              {CRAFTS.map(c => <option key={c.id} value={c.id}>{c.title} — {c.label}</option>)}
+            </select>
+            <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
+              קובע אילו שדות מוצגים ליוצר בהעלאת מוצר — נוסח וכשרות לסת&quot;ם, חומר וטכניקה לאמנים
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>{form.craft === 'stam' ? 'סגנון כתיבה' : 'סגנון / התמחות'}</label>
+            <input value={form.style} onChange={e => setForm(p => ({...p, style: e.target.value}))}
+              placeholder={form.craft === 'stam' ? 'חב"ד / אשכנז / ספרד' : 'עבודת יד, מודרני, מסורתי...'} style={inputStyle} />
+          </div>
           <div>
             <label style={labelStyle}>תיאור</label>
             <textarea value={form.description} onChange={e => setForm(p => ({...p, description: e.target.value}))} rows={3}
@@ -1475,12 +1496,17 @@ function EditSoferModal({ sofer, onClose, onSave }: {
     description: sofer.description ?? '',
     style: sofer.style ?? '',
     imageUrl: sofer.imageUrl ?? '',
+    // מקצוע היוצר — ריק נשמר כ-'stam' כדי לא לשנות התנהגות של סופרים ותיקים
+    craft: sofer.craft ?? 'stam',
   });
   const [categories, setCategories] = useState<string[]>(sofer.categories ?? []);
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
 
-  const SOFER_CATS = ['בתי מזוזה', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
+  // סת"ם עובד מול קטגוריות הקודש; אמנים ויוצרים מוכרים על פני קטלוג היודאיקה הרחב
+  const STAM_CATS   = ['בתי מזוזה', 'תפילין', 'מגילות', 'ספרי תורה', 'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
+  const ARTIST_CATS = ['בתי מזוזה', 'יודאיקה', 'שבת', 'חגים', 'תכשיטים', 'טליתות וציציות', 'תיקי טלית ותפילין', 'כיפות', 'מוצרי בית כנסת', 'מתנות'];
+  const SOFER_CATS  = form.craft === 'stam' ? STAM_CATS : ARTIST_CATS;
 
   function toggleCat(cat: string) {
     setCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
@@ -1533,7 +1559,21 @@ function EditSoferModal({ sofer, onClose, onSave }: {
             <div><label style={labelStyle}>וואטסאפ</label><input value={form.whatsapp} onChange={e => setForm(p => ({...p, whatsapp: e.target.value}))} placeholder="050-0000000" style={inputStyle} /></div>
           </div>
           <div><label style={labelStyle}>אימייל</label><input value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} placeholder="sofer@example.com" type="email" style={inputStyle} /></div>
-          <div><label style={labelStyle}>סגנון כתיבה</label><input value={form.style} onChange={e => setForm(p => ({...p, style: e.target.value}))} placeholder='חב"ד / אשכנז / ספרד' style={inputStyle} /></div>
+          {/* מקצוע — קובע אילו שדות היוצר יראה בטופס העלאת מוצר */}
+          <div>
+            <label style={labelStyle}>מקצוע</label>
+            <select value={form.craft} onChange={e => setForm(p => ({ ...p, craft: e.target.value }))} style={{ ...inputStyle, background: '#fff' }}>
+              {CRAFTS.map(c => <option key={c.id} value={c.id}>{c.title} — {c.label}</option>)}
+            </select>
+            <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
+              קובע אילו שדות מוצגים ליוצר בהעלאת מוצר — נוסח וכשרות לסת&quot;ם, חומר וטכניקה לאמנים
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>{form.craft === 'stam' ? 'סגנון כתיבה' : 'סגנון / התמחות'}</label>
+            <input value={form.style} onChange={e => setForm(p => ({...p, style: e.target.value}))}
+              placeholder={form.craft === 'stam' ? 'חב"ד / אשכנז / ספרד' : 'עבודת יד, מודרני, מסורתי...'} style={inputStyle} />
+          </div>
           <div>
             <label style={labelStyle}>תיאור</label>
             <textarea value={form.description} onChange={e => setForm(p => ({...p, description: e.target.value}))} rows={3}

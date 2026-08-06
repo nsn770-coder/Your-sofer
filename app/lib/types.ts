@@ -233,6 +233,12 @@ export interface Sofer {
   specialty?: string;
   rating?: number;
   productsCount?: number;
+  /**
+   * מקצוע היוצר — 'stam' | 'wood' | 'embroidery' | 'silver' | 'ceramic' | 'paper' | 'other'.
+   * ריק/חסר = סופר סת"ם (תאימות לאחור ליוצרים שנוצרו לפני הכללת הפלטפורמה).
+   * ההגדרות המלאות ב-app/lib/crafts.ts
+   */
+  craft?: string;
 }
 
 export interface Shaliach {

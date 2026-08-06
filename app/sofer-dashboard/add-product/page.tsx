@@ -1,10 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { CATEGORY_OPTIONS, parseCatValue } from '@/app/constants/categories';
+import { getCraft, MATERIAL_SUGGESTIONS, TECHNIQUE_SUGGESTIONS } from '@/app/lib/crafts';
 
 const CLOUDINARY_CLOUD  = 'dyxzq3ucy';
 const CLOUDINARY_PRESET = 'yoursofer_upload';
@@ -29,12 +30,25 @@ export default function AddProductPage() {
   const [nusach, setNusach]           = useState('');
   const [level, setLevel]             = useState('');
   const [size, setSize]               = useState('');
+  const [material, setMaterial]       = useState('');
+  const [technique, setTechnique]     = useState('');
   const [deliveryDays, setDeliveryDays] = useState('');
   const [images, setImages]           = useState<string[]>([]);
   const [uploading, setUploading]     = useState<number | null>(null);
   const [saving, setSaving]           = useState(false);
   const [saved, setSaved]             = useState(false);
   const [error, setError]             = useState('');
+
+  // מקצוע היוצר — קובע אילו שדות מוצגים בטופס.
+  // ריק = סת"ם, כך שיוצרים ותיקים שנשמרו לפני הכללת הפלטפורמה ממשיכים כרגיל.
+  const [craftId, setCraftId] = useState<string>('');
+  useEffect(() => {
+    if (!user?.soferId) return;
+    getDoc(doc(db, 'soferim', user.soferId))
+      .then(snap => { if (snap.exists()) setCraftId((snap.data() as { craft?: string }).craft ?? ''); })
+      .catch(e => console.error('[add-product] failed to load craft:', e));
+  }, [user?.soferId]);
+  const craft = getCraft(craftId);
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: 'Heebo, Arial, sans-serif' }}>
@@ -92,9 +106,14 @@ export default function AddProductPage() {
         cat,
         category: cat,
         subCategory: subCategory || '',
-        nusach,
-        level,
+        // שדות סת"ם — נשמרים ריקים ליוצרים שאינם סופרים
+        nusach: craft.fields.nusach ? nusach : '',
+        level:  craft.fields.kashrutLevel ? level : '',
         size,
+        // שדות מלאכת יד — רלוונטיים ליוצרים חומריים
+        material:  craft.fields.material  ? material  : '',
+        technique: craft.fields.technique ? technique : '',
+        craft: craft.id,
         deliveryDays,
         days: deliveryDays,
         soferId: user?.soferId ?? '',
@@ -238,37 +257,67 @@ export default function AddProductPage() {
             </select>
           </div>
 
-          {/* Nusach + Level */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div>
-              <label style={labelStyle}>נוסח</label>
-              <select style={{ ...inputStyle, background: '#fff' }} value={nusach} onChange={e => setNusach(e.target.value)}>
-                <option value="">-- בחר --</option>
-                <option value="אשכנזי">אשכנזי</option>
-                <option value="ספרדי">ספרדי</option>
-                <option value={'אר"י'}>{'אר"י'}</option>
-              </select>
+          {/* ── שדות סת"ם — נוסח ורמת כשרות ── */}
+          {(craft.fields.nusach || craft.fields.kashrutLevel) && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              {craft.fields.nusach && (
+                <div>
+                  <label style={labelStyle}>נוסח</label>
+                  <select style={{ ...inputStyle, background: '#fff' }} value={nusach} onChange={e => setNusach(e.target.value)}>
+                    <option value="">-- בחר --</option>
+                    <option value="אשכנזי">אשכנזי</option>
+                    <option value="ספרדי">ספרדי</option>
+                    <option value={'אר"י'}>{'אר"י'}</option>
+                  </select>
+                </div>
+              )}
+              {craft.fields.kashrutLevel && (
+                <div>
+                  <label style={labelStyle}>רמת כשרות</label>
+                  <select style={{ ...inputStyle, background: '#fff' }} value={level} onChange={e => setLevel(e.target.value)}>
+                    <option value="">-- בחר --</option>
+                    <option value="פשוט">פשוט</option>
+                    <option value="מהודר">מהודר</option>
+                    <option value="מהודר בתכלית">מהודר בתכלית</option>
+                  </select>
+                </div>
+              )}
             </div>
-            <div>
-              <label style={labelStyle}>רמת כשרות</label>
-              <select style={{ ...inputStyle, background: '#fff' }} value={level} onChange={e => setLevel(e.target.value)}>
-                <option value="">-- בחר --</option>
-                <option value="פשוט">פשוט</option>
-                <option value="מהודר">מהודר</option>
-                <option value="מהודר בתכלית">מהודר בתכלית</option>
-              </select>
-            </div>
-          </div>
+          )}
 
-          {/* Delivery days + Size */}
+          {/* ── שדות מלאכת יד — חומר וטכניקה ── */}
+          {(craft.fields.material || craft.fields.technique) && (
+            <div style={{ display: 'grid', gridTemplateColumns: craft.fields.technique ? '1fr 1fr' : '1fr', gap: 16 }}>
+              {craft.fields.material && (
+                <div>
+                  <label style={labelStyle}>חומר</label>
+                  <input style={inputStyle} value={material} onChange={e => setMaterial(e.target.value)} list="ys-materials" placeholder="עץ זית, כסף 925..." />
+                  <datalist id="ys-materials">
+                    {MATERIAL_SUGGESTIONS.map(m => <option key={m} value={m} />)}
+                  </datalist>
+                </div>
+              )}
+              {craft.fields.technique && (
+                <div>
+                  <label style={labelStyle}>טכניקה</label>
+                  <input style={inputStyle} value={technique} onChange={e => setTechnique(e.target.value)} list="ys-techniques" placeholder="עבודת יד, חריטת לייזר..." />
+                  <datalist id="ys-techniques">
+                    {TECHNIQUE_SUGGESTIONS.map(t => <option key={t} value={t} />)}
+                  </datalist>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Delivery days + Size — תווית המידה משתנה לפי המקצוע */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
               <label style={labelStyle}>זמן אספקה (ימים)</label>
               <input style={inputStyle} value={deliveryDays} onChange={e => setDeliveryDays(e.target.value)} placeholder="7-10" />
             </div>
             <div>
-              <label style={labelStyle}>גודל / מידה</label>
-              <input style={inputStyle} value={size} onChange={e => setSize(e.target.value)} placeholder="12 שורות, גס..." />
+              <label style={labelStyle}>{craft.sizeLabel}</label>
+              <input style={inputStyle} value={size} onChange={e => setSize(e.target.value)} placeholder={craft.sizePlaceholder} />
             </div>
           </div>
 
