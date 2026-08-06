@@ -1105,24 +1105,6 @@ export default function HomePageClient({ productCount }: { productCount: number 
         <AlgoliaSearch />
       </div>
 
-      {/* ── Trust row ── */}
-      {/* CLS FIX: responsive grid via Tailwind classes — stable on first paint */}
-      <div dir="rtl" className="px-4 py-3.5 md:px-8 md:py-[18px]" style={{ background: '#FFFFFF', borderBottom: '1px solid #F0F0F2' }}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-4" style={{ maxWidth: 1280, margin: '0 auto' }}>
-          {[
-            'משלוחים לכל הארץ',
-            'מבחר ענק של מוצרי יודאיקה',
-            'קנייה מאובטחת',
-            'שירות אישי בוואטסאפ',
-          ].map(item => (
-            <div key={item} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-              <span aria-hidden="true" style={{ color: '#C5A028', fontSize: 12, lineHeight: 1 }}>✓</span>
-              <span className="ys-trust-txt" style={{ fontWeight: 500, color: '#222222', whiteSpace: 'nowrap' }}>{item}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ── Promo 2+1 section ── */}
       {/* CLS FIX: space is reserved while Firestore loads so content below doesn't
           jump when the dark section appears; collapses only if there are no promos. */}
@@ -1176,34 +1158,37 @@ export default function HomePageClient({ productCount }: { productCount: number 
       )}
       </div>
 
-      {/* ── Life events horizontal scroll ── */}
+      {/* ── Life events grid ── */}
       <section
         id="life-events"
         className="pt-10 pb-9 md:pt-16 md:pb-12"
         style={{ background: '#FFFFFF', direction: 'rtl' }}
       >
-        <div className="mb-5 md:mb-7" style={{ textAlign: 'center', padding: '0 20px' }}>
-          {/* כותרת המשנה "מה מביא אתכם אלינו?" הוסרה (07/2026) — הכרטיסים
-              מסבירים את עצמם, והכותרת רק דחפה אותם מטה במובייל. */}
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 0, marginTop: 0 }}>
+        <div className="mb-6 md:mb-9" style={{ textAlign: 'center', padding: '0 20px' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
             רגעי חיים
+          </p>
+          {/* לקוחות לא מחפשים "בתי מזוזה" — הם עוברים דירה. הכותרת ממסגרת
+              את הקטלוג לפי הסיבה שבגללה מגיעים, לא לפי סוג המוצר. */}
+          <h2 className="text-[26px] md:text-[34px]" style={{ fontWeight: 300, color: '#1F2937', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
+            מה מביא אתכם אלינו?
+          </h2>
+          <p style={{ fontSize: 15, color: '#9CA3AF', margin: 0, fontWeight: 400 }}>
+            כל רגע בבית היהודי — וכל מה שצריך אליו
           </p>
         </div>
 
-        <div
-          className="ys-hscroll"
-          style={{ display: 'flex', overflowX: 'auto', gap: 14, padding: '4px 20px 16px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
-        >
+        {/* גריד במקום גלילה אופקית (08/2026): הרצועה הסתירה 4 מתוך 7 האירועים
+            מתחת לקצה המסך, ורגעי החיים הם הבידול המרכזי של האתר. */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
           {lifeEvents.map((ev, evIdx) => (
             <a
               key={ev.id}
               href={`/moment/${ev.id}`}
-              className="w-[200px] md:w-[240px]"
               style={{
                 textDecoration: 'none',
                 display: 'flex',
                 flexDirection: 'column',
-                flexShrink: 0,
                 background: '#FFFFFF',
                 border: '1px solid #EDEDEF',
                 borderRadius: 0,
@@ -1219,132 +1204,25 @@ export default function HomePageClient({ productCount }: { productCount: number 
                   <img
                     src={optimizeCloudinaryUrl(ev.image, 400)}
                     alt={ev.title}
-                    fetchPriority={evIdx === 0 ? 'high' : 'auto'}
-                    loading={evIdx === 0 ? 'eager' : 'lazy'}
+                    loading={evIdx < 2 ? 'eager' : 'lazy'}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   />
                 </div>
               )}
-              <div style={{ padding: '12px 18px 16px' }}>
+              <div style={{ padding: '12px 16px 16px' }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#9C7B3F', letterSpacing: 1.5, textTransform: 'uppercase', margin: 0 }}>
                   {ev.title}
                 </p>
-                <span style={{ fontSize: 11, color: '#888', display: 'block', marginTop: 2 }}>לכל המוצרים ←</span>
+                {/* הכותרת הרגשית היא הסיבה שהמשתמש מזהה את עצמו בכרטיס */}
+                <p style={{ fontSize: 13, color: '#4B5563', margin: '4px 0 0', lineHeight: 1.5 }}>
+                  {ev.emotionalTitle}
+                </p>
+                <span style={{ fontSize: 11, color: '#888', display: 'block', marginTop: 6 }}>לכל המוצרים ←</span>
               </div>
             </a>
           ))}
         </div>
       </section>
-
-      {/* ── שורת הבידול, עם מונה עולה ──
-          החליפה את פס ארבעת המונים (משפחות / סופרים / מוצרים / דירוג), 07/2026.
-          נשאר רק המונה שהוא הבידול בפועל — מספר המוצרים. */}
-      <div ref={countRowRef} className="px-4 pt-2 pb-9 md:px-8 md:pt-4 md:pb-14" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4', direction: 'rtl' }}>
-        <p
-          className="text-xl md:text-[26px]"
-          style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center', fontWeight: 300, color: '#373A5A', lineHeight: 1.4, letterSpacing: '-0.01em' }}
-        >
-          {/* קורא מסך מקבל את המשפט השלם פעם אחת, בלי הקראה של כל שלב בספירה */}
-          <span className="sr-only">
-            האתר הכי גדול בישראל עם {productCount.toLocaleString('he-IL')} מוצרים לבית היהודי
-          </span>
-          <span aria-hidden="true">
-            האתר הכי גדול בישראל עם{' '}
-            <span
-              ref={countValueRef}
-              style={{
-                display: 'inline-block',
-                // רוחב מינימלי + ספרות ברוחב אחיד: המספר גדל מ-0 ל-5,000
-                // בלי שהמשפט סביבו יזוז. בלי זה השורה רוטטת לאורך כל האנימציה.
-                minWidth: '3.4em',
-                textAlign: 'center',
-                fontVariantNumeric: 'tabular-nums',
-                fontWeight: 700,
-                color: '#C5A028',
-              }}
-            >
-              0
-            </span>
-            {' '}מוצרים לבית היהודי
-          </span>
-        </p>
-      </div>
-
-      {/* ── 4. Category grid ── */}
-      {/* CLS FIX: grid/padding/heading via responsive classes — no 2↔3-column jump */}
-      <div id="categories" className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
-          {/* Admin-controlled via דשבורד ← קטגוריות ← תצוגת קטגוריות בדף הבית */}
-          <div className="grid grid-cols-2 gap-4 md:gap-7">
-            {catSections.top.map(item => (
-              <HomeCategoryTile
-                key={item.id}
-                item={item}
-                img={item.imageUrl || catImages[item.subCategory ?? ''] || catImages[item.cat] || catImages[item.label] || ''}
-                isMobile={isMobile}
-                onNav={href => router.push(href)}
-              />
-            ))}
-          </div>
-          <div style={{ textAlign: 'center', marginTop: 40 }}>
-            <button
-              onClick={() => window.dispatchEvent(new Event("openMobileMenu"))}
-              className="ys-outline-btn"
-            >
-              לכל הקטגוריות ←
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Bar-Mitzvah Kippot CTA ── */}
-      <div className="px-5 pb-12 md:px-8 md:pb-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <a
-            href="/event-kippot"
-            className="ys-cta-banner"
-            style={{
-              display: 'block',
-              position: 'relative',
-              overflow: 'hidden',
-              borderRadius: 0,
-              border: '1px solid #EDEDEF',
-              textDecoration: 'none',
-              transition: 'border-color 0.2s ease',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#373A5A'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
-          >
-            {/* Designed banner — text is baked into the image, no overlay needed */}
-            <Image
-              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1783054967/%D7%91%D7%90%D7%A0%D7%A8_%D7%9B%D7%99%D7%A4%D7%95%D7%AA_%D7%95%D7%9E%D7%96%D7%9B%D7%A8%D7%95%D7%AA_%D7%9C%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D_%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D_rrjg06.png"
-              alt="כיפות ומזכרות לאירועים"
-              fill
-              unoptimized
-              loading="lazy"
-              style={{ objectFit: 'cover' }}
-              sizes="(max-width: 768px) 100vw, 1280px"
-            />
-            {/* CTA button — bottom-right (RTL start), whole banner is the link */}
-            <div style={{
-              position: 'absolute',
-              bottom: isMobile ? 10 : 18,
-              right: isMobile ? 12 : 28,
-              background: '#373A5A',
-              color: '#FFFFFF',
-              fontWeight: 600,
-              fontSize: isMobile ? 12.5 : 15,
-              padding: isMobile ? '8px 14px' : '12px 26px',
-              borderRadius: 0,
-              whiteSpace: 'nowrap',
-            }}>
-              כנסו לכיפות ומזכרות ←
-            </div>
-          </a>
-        </div>
-      </div>
 
       {/* ── 5. Featured products ── */}
       {/* CLS FIX: while Firestore loads, a skeleton grid with the exact card layout
@@ -1434,6 +1312,85 @@ export default function HomePageClient({ productCount }: { productCount: number 
           </div>
         </div>
       )}
+      </div>
+
+      {/* ── Category grid ──
+          הועבר לכאן מתחת ל"הכי נמכרים" (08/2026). קודם הוא ישב לפני המוצרים,
+          כך שהמשתמש עבר שמונה סקשנים לפני שראה פריט אחד למכירה. */}
+      <div id="categories" className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
+          {/* Admin-controlled via דשבורד ← קטגוריות ← תצוגת קטגוריות בדף הבית */}
+          <div className="grid grid-cols-2 gap-4 md:gap-7">
+            {catSections.top.map(item => (
+              <HomeCategoryTile
+                key={item.id}
+                item={item}
+                img={item.imageUrl || catImages[item.subCategory ?? ''] || catImages[item.cat] || catImages[item.label] || ''}
+                isMobile={isMobile}
+                onNav={href => router.push(href)}
+              />
+            ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <button
+              onClick={() => window.dispatchEvent(new Event("openMobileMenu"))}
+              className="ys-outline-btn"
+            >
+              לכל הקטגוריות ←
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Bar-Mitzvah Kippot CTA ──
+          הועבר אל מתחת למוצרים ולקטגוריות (08/2026): באנר ליעד יחיד חסם
+          את הדרך אל הקטלוג עוד לפני שהוצג מוצר אחד. */}
+      <div className="px-5 pb-12 md:px-8 md:pb-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <a
+            href="/event-kippot"
+            className="ys-cta-banner"
+            style={{
+              display: 'block',
+              position: 'relative',
+              overflow: 'hidden',
+              borderRadius: 0,
+              border: '1px solid #EDEDEF',
+              textDecoration: 'none',
+              transition: 'border-color 0.2s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#373A5A'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
+          >
+            {/* Designed banner — text is baked into the image, no overlay needed */}
+            <Image
+              src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1783054967/%D7%91%D7%90%D7%A0%D7%A8_%D7%9B%D7%99%D7%A4%D7%95%D7%AA_%D7%95%D7%9E%D7%96%D7%9B%D7%A8%D7%95%D7%AA_%D7%9C%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D_%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D_rrjg06.png"
+              alt="כיפות ומזכרות לאירועים"
+              fill
+              unoptimized
+              loading="lazy"
+              style={{ objectFit: 'cover' }}
+              sizes="(max-width: 768px) 100vw, 1280px"
+            />
+            {/* CTA button — bottom-right (RTL start), whole banner is the link */}
+            <div style={{
+              position: 'absolute',
+              bottom: isMobile ? 10 : 18,
+              right: isMobile ? 12 : 28,
+              background: '#373A5A',
+              color: '#FFFFFF',
+              fontWeight: 600,
+              fontSize: isMobile ? 12.5 : 15,
+              padding: isMobile ? '8px 14px' : '12px 26px',
+              borderRadius: 0,
+              whiteSpace: 'nowrap',
+            }}>
+              כנסו לכיפות ומזכרות ←
+            </div>
+          </a>
+        </div>
       </div>
 
       {/* ── 6. More categories horizontal scroll ── */}
@@ -1538,11 +1495,24 @@ export default function HomePageClient({ productCount }: { productCount: number 
         </div>
       </section>
 
-      {/* ── Soferim horizontal row ── */}
+      {/* ── הסופרים והיוצרים שלנו ──
+          איחוד של שלושה סקשנים נפרדים שהיו במקומות 12–14 (08/2026): שורת
+          אווטרים, גריד קטגוריות סת"ם, וכפתור CTA. שלושתם דיברו על אותו נושא
+          וכל אחד לבדו היה חלש. היוצרים הם הבידול שרשת גדולה לא יכולה להעתיק,
+          ולכן הם מקבלים סקשן אחד עם כותרת, הסבר וקריאה לפעולה. */}
       {soferimList.length > 0 && (
         <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 0 24px' : '56px 0 32px', direction: 'rtl' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 20 }}>
-            <h2 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הסופרים שלנו</h2>
+          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24, textAlign: 'center' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
+              מי עומד מאחורי המוצרים
+            </p>
+            <h2 className="text-[26px] md:text-[34px]" style={{ fontWeight: 300, color: '#1F2937', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
+              הסופרים והיוצרים שלנו
+            </h2>
+            <p style={{ fontSize: 15, color: '#9CA3AF', margin: 0, fontWeight: 400, maxWidth: 620, marginInline: 'auto', lineHeight: 1.7 }}>
+              כל סופר וכל יוצר עבר בדיקה ואימות. לחצו על שם כדי לראות את הסיפור,
+              את דוגמאות העבודה ואת המוצרים שלו.
+            </p>
           </div>
           <div
             className="ys-hscroll"
@@ -1576,7 +1546,16 @@ export default function HomePageClient({ productCount }: { productCount: number 
         </div>
       )}
 
-      {/* ── Sofer STaM categories grid ── */}
+      {/* ── CTA למאגר היוצרים — צמוד לשורת היוצרים שמעליו ── */}
+      <div className="pb-10 md:pb-14" style={{ background: '#FFFFFF', paddingLeft: 16, paddingRight: 16, direction: 'rtl', textAlign: 'center' }}>
+        <button onClick={() => router.push('/soferim')} className="ys-hero-btn-primary">
+          לצפייה במאגר הסופרים והיוצרים ←
+        </button>
+      </div>
+
+      {/* ── קטגוריות סת"ם ──
+          הופרד מסקשן היוצרים (08/2026): קודם הוא ישב באמצע שלושת סקשני
+          הסופרים וניתק את שורת האווטרים מכפתור ה-CTA שלה. */}
       <div className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>עוד קטגוריות נבחרות</h2>
@@ -1596,12 +1575,76 @@ export default function HomePageClient({ productCount }: { productCount: number 
         </div>
       </div>
 
-      {/* ── Soferim CTA ── */}
-      <div className="py-10 md:py-14" style={{ background: '#FFFFFF', paddingLeft: 16, paddingRight: 16, direction: 'rtl', textAlign: 'center' }}>
-        <button onClick={() => router.push('/soferim')} className="ys-hero-btn-primary">
-          לצפייה במאגר הסופרים שלנו ←
-        </button>
+      {/* ── שורת הבידול, עם מונה עולה ──
+          החליפה את פס ארבעת המונים (משפחות / סופרים / מוצרים / דירוג), 07/2026.
+          הועברה לכאן (08/2026) — קודם ישבה בין רגעי החיים למוצרים וחצצה ביניהם. */}
+      <div ref={countRowRef} className="px-4 pt-2 pb-9 md:px-8 md:pt-4 md:pb-14" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4', direction: 'rtl' }}>
+        <p
+          className="text-xl md:text-[26px]"
+          style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center', fontWeight: 300, color: '#373A5A', lineHeight: 1.4, letterSpacing: '-0.01em' }}
+        >
+          {/* קורא מסך מקבל את המשפט השלם פעם אחת, בלי הקראה של כל שלב בספירה */}
+          <span className="sr-only">
+            האתר הכי גדול בישראל עם {productCount.toLocaleString('he-IL')} מוצרים לבית היהודי
+          </span>
+          <span aria-hidden="true">
+            האתר הכי גדול בישראל עם{' '}
+            <span
+              ref={countValueRef}
+              style={{
+                display: 'inline-block',
+                // רוחב מינימלי + ספרות ברוחב אחיד: המספר גדל מ-0 ל-5,000
+                // בלי שהמשפט סביבו יזוז. בלי זה השורה רוטטת לאורך כל האנימציה.
+                minWidth: '3.4em',
+                textAlign: 'center',
+                fontVariantNumeric: 'tabular-nums',
+                fontWeight: 700,
+                color: '#C5A028',
+              }}
+            >
+              0
+            </span>
+            {' '}מוצרים לבית היהודי
+          </span>
+        </p>
       </div>
+
+      {/* ── למה לקנות אצלנו ──
+          הועבר לכאן ממקום 3 (07/2026). בראש העמוד השורה הגיעה לפני שלמשתמש
+          היה על מה להחליט; כאן היא נוחתת בדיוק בשלב ההערכה, אחרי שראה מוצרים
+          ואת היוצרים. הורחבה משורת ✓ דקה לסקשן שנושא את טענת הכשרות בפועל. */}
+      <section aria-labelledby="why-us-title" className="px-5 py-12 md:px-8 md:py-16" style={{ background: '#FAF8F3', direction: 'rtl', borderTop: '1px solid #F0EDE8' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <h2 id="why-us-title" className="text-[24px] md:text-[32px]" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 8, letterSpacing: '-0.01em' }}>
+            למה לקנות אצלנו
+          </h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 36, fontWeight: 400 }}>
+            כל מוצר עובר דרכנו לפני שהוא מגיע אליכם
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+            {[
+              {
+                t: 'סופרים ויוצרים מאומתים',
+                d: 'כל סופר וכל יוצר עובר בדיקה ואימות לפני שהוא מעלה מוצר. אתם יודעים מי יצר את מה שקניתם — ויכולים לראות את הפרופיל שלו.',
+              },
+              {
+                t: 'כשרות ובדיקה',
+                d: 'מוצרי סת"ם נכתבים בכתב יד על קלף כשר ועוברים הגהה. רמת הכשרות והנוסח מופיעים על כל מוצר.',
+              },
+              {
+                t: 'משלוח לכל הארץ ושירות אישי',
+                d: 'משלוח עד הבית לכל הארץ, איסוף עצמי ללא עלות, ומענה אישי בוואטסאפ לכל שאלה לפני ואחרי הקנייה.',
+              },
+            ].map(item => (
+              <div key={item.t} style={{ textAlign: 'center' }}>
+                <div aria-hidden="true" style={{ width: 34, height: 34, margin: '0 auto 14px', border: '1px solid #C5A028', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C5A028', fontSize: 15 }}>✓</div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>{item.t}</h3>
+                <p style={{ fontSize: 14, lineHeight: 1.75, color: '#6B7280', margin: 0 }}>{item.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ── Live Reviews Carousel ── */}
       {liveReviews.length > 0 && (
