@@ -25,6 +25,7 @@ import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES, openPrintWindow } fro
 import { getTier } from '@/app/lib/loyalty';
 import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
 import EraToggle from '@/app/components/EraToggle';
+import { SendToLionWheelButton } from '@/components/admin/SendToLionWheelButton';
 
 interface OrderItem {
   id: string;
@@ -2566,6 +2567,16 @@ ${visibleOrders.map(orderBlock).join('\n')}
                           >
                             👑 הזמן למועדון
                           </a>
+                        )}
+                        {!isCancelled && (
+                          <SendToLionWheelButton
+                            orderId={o.id}
+                            orderNumber={o.orderNumber}
+                            onSuccess={(shipment) => {
+                              console.log('Shipment created:', shipment);
+                              // Optional: show notification with tracking link
+                            }}
+                          />
                         )}
                         {!isCancelled && (
                           <button
