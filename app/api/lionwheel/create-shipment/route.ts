@@ -35,22 +35,30 @@ export async function POST(request: NextRequest) {
     const order = orderSnap.data() as any;
     console.log('✅ [Firestore] Order loaded:', { id: orderId, name: order.customerName });
 
-    // Parse address — support various formats
+    // Use city field (new in orders from payment route)
     let destinationCity = order.city || '';
     let destinationStreet = order.address || '';
-    let destinationNumber = order.addressNumber || '';
+    let destinationNumber = order.addressNumber || '1';
     let destinationApartment = order.apartment || '';
     let destinationZipCode = order.zipCode || '';
 
-    // If we have raw address string, try to parse it
-    if (!destinationCity && order.address && typeof order.address === 'string') {
-      const parts = order.address.split(',').map((p: string) => p.trim());
-      if (parts.length >= 2) {
-        destinationStreet = parts[0];
-        destinationNumber = parts[1];
-        if (parts.length >= 3) destinationCity = parts[2];
+    // Ensure city is set (LionWheel requires it)
+    if (!destinationCity || destinationCity.trim() === '') {
+      // Fallback: try to extract from address if no city field
+      if (order.address && typeof order.address === 'string') {
+        const parts = order.address.split(',').map((p: string) => p.trim());
+        if (parts.length === 2) {
+          destinationCity = parts[1];
+        }
+      }
+
+      // Last resort fallback
+      if (!destinationCity || destinationCity.trim() === '') {
+        destinationCity = 'Israel';
       }
     }
+
+    console.log('📍 [Address Info]:', { destinationStreet, destinationNumber, destinationCity });
 
     // Format line items
     const lineItems = (order.items || []).map((item: any) => ({

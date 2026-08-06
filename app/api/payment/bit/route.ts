@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     const {
       items, total, customer, couponCode,
-      cartItems, address, notes, selectedGift, giftLine,
+      cartItems, address, city, notes, selectedGift, giftLine,
       shippingCost, shippingType,
       sessionId, refCode, shaliachId, shaliachName, commissionPercent,
       uid, pointsUsed, idToken, attribution,
@@ -108,6 +108,7 @@ export async function POST(req: NextRequest) {
       couponCode?:    string;
       cartItems:      CartItem[];
       address:        string;
+      city?:          string;
       notes?:         string;
       selectedGift?:  string | null;
       giftLine?:      { id: string; name: string; productId?: string } | null;
@@ -337,7 +338,7 @@ export async function POST(req: NextRequest) {
     const orderRef = await adminDb.collection('orders').add({
       orderNumber,
       customerName: customer.name, email: customer.email, phone: customer.phone,
-      address: address || '', notes: notes || '',
+      address: address || '', city: city || '', notes: notes || '',
       items: [
         ...cartItems.map(i => ({
           id: i.id, productId: i.productId || i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity,
