@@ -3,26 +3,37 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 
-const LIONWHEEL_API_KEY = process.env.LIONWHEEL_API_KEY || 'c_key_b4adcibc-baa2-43ed-aq25-e648ba9c5693';
-const LIONWHEEL_API_URL = 'https://members.lionwheel.com/api/v1/tasks/create';
-
 export async function POST(request: NextRequest) {
   try {
     const { orderId } = await request.json();
+
+    console.log('📦 [LionWheel] Request received:', { orderId });
 
     if (!orderId) {
       return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
+    const LIONWHEEL_API_KEY = process.env.LIONWHEEL_API_KEY;
+    console.log('🔑 [LionWheel] API Key configured:', !!LIONWHEEL_API_KEY);
+
+    if (!LIONWHEEL_API_KEY) {
+      console.error('❌ [LionWheel] LIONWHEEL_API_KEY is not set in .env.local');
+      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+    }
+
     // Get order from Firestore
     const orderRef = doc(db, 'orders', orderId);
+    console.log('📂 [Firestore] Fetching order:', orderId);
+
     const orderSnap = await getDoc(orderRef);
 
     if (!orderSnap.exists()) {
+      console.error('❌ [Firestore] Order not found:', orderId);
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     const order = orderSnap.data() as any;
+    console.log('✅ [Firestore] Order loaded:', { id: orderId, name: order.customerName });
 
     // Parse address — support various formats
     let destinationCity = order.city || '';
@@ -70,8 +81,10 @@ export async function POST(request: NextRequest) {
     };
 
     // Call LionWheel API
+    console.log('📤 [LionWheel] Sending request with payload:', lionWheelPayload);
+
     const lionWheelResponse = await fetch(
-      `${LIONWHEEL_API_URL}?key=${LIONWHEEL_API_KEY}`,
+      `https://members.lionwheel.com/api/v1/tasks/create?key=${LIONWHEEL_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -79,10 +92,14 @@ export async function POST(request: NextRequest) {
       }
     );
 
+    console.log('📥 [LionWheel] Response status:', lionWheelResponse.status);
+
     const shipmentData = await lionWheelResponse.json();
 
+    console.log('📥 [LionWheel] Response data:', shipmentData);
+
     if (!lionWheelResponse.ok) {
-      console.error('LionWheel API error:', shipmentData);
+      console.error('❌ [LionWheel] API error:', shipmentData);
       return NextResponse.json(
         {
           error: 'Failed to create shipment in LionWheel',
@@ -91,6 +108,8 @@ export async function POST(request: NextRequest) {
         { status: lionWheelResponse.status }
       );
     }
+
+    console.log('✅ [LionWheel] Shipment created successfully:', shipmentData);
 
     return NextResponse.json(
       {
