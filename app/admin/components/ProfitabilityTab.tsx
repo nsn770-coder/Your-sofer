@@ -703,6 +703,28 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
     });
   }
 
+  // ── עריכה ידנית של עלות למוצר ──
+  async function editProductCost(product: Product) {
+    const currentCost = product.supplierCost ?? 0;
+    const v = window.prompt(
+      `עריכת עלות עבור: ${product.name}\nעלות נוכחית: ₪${currentCost}\nעלות חדשה (₪):`,
+      String(currentCost)
+    );
+    if (v == null) return;
+    const newCost = parseFloat(v);
+    if (isNaN(newCost) || newCost < 0) { alert('עלות לא תקינה'); return; }
+
+    try {
+      await updateDoc(doc(db, 'products', product.id), { supplierCost: newCost });
+      // עדכון בממיכרון המוצרים המקומי — אנחנו לא יכולים לשנות את המערך products ישירות,
+      // אבל ניתן להשקיע בהטעון מחדש או במודל סטט. לעת עתה יספיק לרענן את הדף.
+      alert(`✅ עלות עודכנה ל-₪${newCost}`);
+      // כדי לראות את השינוי בטבלה, המשתמש צריך לרענן את הדף (F5 / Ctrl+R)
+    } catch (e) {
+      alert('שגיאה בעדכון העלות'); console.error(e);
+    }
+  }
+
   // ── סטיילים חוזרים ──
   const btnStyle = (bg: string, color = '#fff'): React.CSSProperties => ({
     background: bg, color, border: 'none', borderRadius: 6, padding: '8px 16px',
@@ -1201,35 +1223,59 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
               <th style={{ padding: 10, textAlign: 'center' }}>רווח תזרימי</th>
               <th style={{ padding: 10, textAlign: 'center' }}>רווח אחרי מע״מ</th>
               <th style={{ padding: 10, textAlign: 'center' }}>%</th>
+              <th style={{ padding: 10, textAlign: 'center' }}>פעולות</th>
             </tr>
           </thead>
           <tbody>
             {profitData.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ padding: 20, textAlign: 'center', color: '#999' }}>
+                <td colSpan={8} style={{ padding: 20, textAlign: 'center', color: '#999' }}>
                   אין נתונים לתקופה שנבחרה
                 </td>
               </tr>
-            ) : profitData.map((p, idx) => (
-              <tr key={idx} style={{ borderBottom: '1px solid #eee', opacity: p.noCost ? 0.6 : 1 }}>
-                <td style={{ padding: 10 }}>
-                  {p.name.slice(0, 40)}
-                  {p.noCost && <span style={{ fontSize: 10, color: '#999', marginRight: 4 }}>(אין עלות)</span>}
-                </td>
-                <td style={{ padding: 10, textAlign: 'center', fontWeight: 700 }}>{p.sold}</td>
-                <td style={{ padding: 10, textAlign: 'center' }}>₪{p.revenue.toFixed(0)}</td>
-                <td style={{ padding: 10, textAlign: 'center' }}>₪{p.cost.toFixed(0)}</td>
-                <td style={{ padding: 10, textAlign: 'center', fontWeight: 700, color: p.profit >= 0 ? '#059669' : '#dc2626' }}>
-                  ₪{p.profit.toFixed(0)}
-                </td>
-                <td style={{ padding: 10, textAlign: 'center', fontWeight: 700, color: p.profitAfterVat >= 0 ? '#16a34a' : '#dc2626' }}>
-                  ₪{p.profitAfterVat.toFixed(0)}
-                </td>
-                <td style={{ padding: 10, textAlign: 'center' }}>
-                  {p.revenue > 0 ? ((p.profit / p.revenue) * 100).toFixed(1) : '0'}%
-                </td>
-              </tr>
-            ))}
+            ) : profitData.map((p, idx) => {
+              const product = products.find(pr => pr.name === p.name || pr.id.startsWith(p.name.slice(0, 5)));
+              return (
+                <tr key={idx} style={{ borderBottom: '1px solid #eee', opacity: p.noCost ? 0.6 : 1 }}>
+                  <td style={{ padding: 10 }}>
+                    {p.name.slice(0, 40)}
+                    {p.noCost && <span style={{ fontSize: 10, color: '#dc2626', marginRight: 4, fontWeight: 700 }}>(⚠️ אין עלות)</span>}
+                  </td>
+                  <td style={{ padding: 10, textAlign: 'center', fontWeight: 700 }}>{p.sold}</td>
+                  <td style={{ padding: 10, textAlign: 'center' }}>₪{p.revenue.toFixed(0)}</td>
+                  <td style={{ padding: 10, textAlign: 'center' }}>₪{p.cost.toFixed(0)}</td>
+                  <td style={{ padding: 10, textAlign: 'center', fontWeight: 700, color: p.profit >= 0 ? '#059669' : '#dc2626' }}>
+                    ₪{p.profit.toFixed(0)}
+                  </td>
+                  <td style={{ padding: 10, textAlign: 'center', fontWeight: 700, color: p.profitAfterVat >= 0 ? '#16a34a' : '#dc2626' }}>
+                    ₪{p.profitAfterVat.toFixed(0)}
+                  </td>
+                  <td style={{ padding: 10, textAlign: 'center' }}>
+                    {p.revenue > 0 ? ((p.profit / p.revenue) * 100).toFixed(1) : '0'}%
+                  </td>
+                  <td style={{ padding: 10, textAlign: 'center' }}>
+                    {product && (
+                      <button
+                        onClick={() => editProductCost(product)}
+                        title={`עריכת עלות: ₪${product.supplierCost ?? 0}`}
+                        style={{
+                          background: p.noCost ? '#fef3c7' : '#eff6ff',
+                          color: p.noCost ? '#d97706' : '#0369a1',
+                          border: p.noCost ? '1px solid #f59e0b' : '1px solid #93c5fd',
+                          borderRadius: 4,
+                          padding: '4px 10px',
+                          fontSize: 12,
+                          cursor: 'pointer',
+                          fontWeight: 700,
+                        }}
+                      >
+                        ✏️ עריכה
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
