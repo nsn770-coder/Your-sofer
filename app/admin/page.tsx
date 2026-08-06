@@ -311,7 +311,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions' | 'best_sellers';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions' | 'best_sellers' | 'seasonal';
 
 interface Coupon {
   id: string;
@@ -4182,6 +4182,7 @@ export default function AdminPage() {
           { key: 'coupons',        label: '🏷️ קופונים',          color: 'bg-rose-700' },
           { key: 'out_of_stock',   label: '🔴 אזל מלאי',         color: 'bg-red-700',    badge: outOfStockProducts.length },
           { key: 'gifts',          label: '🎁 מתנות VIP',         color: 'bg-pink-600' },
+          { key: 'seasonal',       label: '🍂 עכשיו בעונה',        color: 'bg-amber-600' },
           { key: 'inventory',      label: '📦 מלאי',               color: 'bg-teal-600' },
           { key: 'prints',         label: '🖨️ הדפסות',             color: 'bg-amber-600' },
           { key: 'stickers',       label: '🏷️ מדבקות QR',          color: 'bg-indigo-600' },
@@ -5587,6 +5588,8 @@ export default function AdminPage() {
 
       {activeTab === 'gifts' && <GiftsTab />}
 
+      {activeTab === 'seasonal' && <SeasonalTab />}
+
       {activeTab === 'inventory' && <InventoryTab products={products} orders={orders} onSave={async (productId, data) => {
         await updateDoc(doc(db, 'products', productId), data as Record<string, unknown>);
       }} onEditProduct={(p) => setEditingProduct(p as unknown as Product)} />}
@@ -5885,6 +5888,146 @@ function CurationsTab() {
           </table>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Seasonal tab — manage siteConfig/seasonal in Firestore ───────────────────
+// רצועת "עכשיו בעונה" בראש עמוד הבית. מנוהלת ידנית: אלול וראש השנה בסתיו,
+// חנוכה בחורף, פסח באביב. כשהיא מכובה הסקשן נעלם לגמרי מהעמוד.
+interface SeasonalTile { label: string; imgUrl: string; href: string; }
+
+const EMPTY_TILE: SeasonalTile = { label: '', imgUrl: '', href: '' };
+
+function SeasonalTab() {
+  const [enabled,  setEnabled]  = useState(false);
+  const [eyebrow,  setEyebrow]  = useState('עכשיו בעונה');
+  const [title,    setTitle]    = useState('');
+  const [subtitle, setSubtitle] = useState('');
+  const [tiles,    setTiles]    = useState<SeasonalTile[]>([{ ...EMPTY_TILE }]);
+  const [loading,  setLoading]  = useState(true);
+  const [saving,   setSaving]   = useState(false);
+  const [saved,    setSaved]    = useState(false);
+  const [error,    setError]    = useState('');
+
+  useEffect(() => {
+    getDoc(doc(db, 'siteConfig', 'seasonal'))
+      .then(snap => {
+        if (snap.exists()) {
+          const d = snap.data();
+          setEnabled(d.enabled ?? false);
+          setEyebrow(d.eyebrow ?? 'עכשיו בעונה');
+          setTitle(d.title ?? '');
+          setSubtitle(d.subtitle ?? '');
+          const raw: Record<string, string>[] = d.tiles ?? [];
+          const t: SeasonalTile[] = raw.map(x => ({
+            label: x.label ?? '', imgUrl: x.imgUrl ?? '', href: x.href ?? '',
+          }));
+          setTiles(t.length > 0 ? t : [{ ...EMPTY_TILE }]);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  function updateTile(idx: number, field: keyof SeasonalTile, value: string) {
+    setTiles(prev => { const next = [...prev]; next[idx] = { ...next[idx], [field]: value }; return next; });
+    setSaved(false); setError('');
+  }
+  function addTile()          { setTiles(prev => [...prev, { ...EMPTY_TILE }]); setSaved(false); }
+  function removeTile(i: number) { setTiles(prev => prev.filter((_, x) => x !== i)); setSaved(false); }
+
+  async function save() {
+    const clean = tiles.filter(t => t.label.trim() || t.imgUrl.trim() || t.href.trim());
+    // ולידציה רק כשהסקשן פעיל — אחרת אי אפשר לכבות ולשמור טיוטה חלקית
+    if (enabled) {
+      if (!title.trim()) { setError('כותרת היא שדה חובה כשהסקשן פעיל'); return; }
+      if (clean.length === 0) { setError('צריך לפחות אריח אחד כשהסקשן פעיל'); return; }
+      const bad = clean.find(t => !t.label.trim() || !t.imgUrl.trim() || !t.href.trim());
+      if (bad) { setError('בכל אריח צריך למלא כותרת, תמונה וקישור'); return; }
+    }
+    setError(''); setSaving(true);
+    try {
+      await setDoc(doc(db, 'siteConfig', 'seasonal'), {
+        enabled,
+        eyebrow:  eyebrow.trim(),
+        title:    title.trim(),
+        subtitle: subtitle.trim(),
+        tiles: clean.map(t => ({ label: t.label.trim(), imgUrl: t.imgUrl.trim(), href: t.href.trim() })),
+        updatedAt: new Date().toISOString(),
+      });
+      setSaved(true);
+    } catch (e) {
+      console.error('SeasonalTab save error:', e);
+      setError('שגיאה בשמירה — בדוק את החיבור ונסה שנית');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) return <div className="p-10 text-center text-gray-400">טוען...</div>;
+
+  const inp = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm';
+
+  return (
+    <div className="grid gap-6 max-w-3xl">
+      <div className="bg-white rounded-xl shadow p-6">
+        <h2 className="text-lg font-black text-amber-700 mb-1">🍂 עכשיו בעונה</h2>
+        <p className="text-sm text-gray-500 mb-6">
+          רצועה בראש עמוד הבית לחג או לעונה הנוכחית. כשהיא כבויה — לא מוצגת כלל.
+        </p>
+
+        <label className="flex items-center gap-3 mb-6 cursor-pointer">
+          <input type="checkbox" checked={enabled} onChange={e => { setEnabled(e.target.checked); setSaved(false); }} className="w-5 h-5 accent-amber-600" />
+          <span className="text-sm font-bold">{enabled ? 'מוצג באתר' : 'מוסתר'}</span>
+        </label>
+
+        <div className="grid gap-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-600 mb-1">תווית עליונה</label>
+            <input className={inp} value={eyebrow} onChange={e => { setEyebrow(e.target.value); setSaved(false); }} placeholder="עכשיו בעונה" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-600 mb-1">כותרת *</label>
+            <input className={inp} value={title} onChange={e => { setTitle(e.target.value); setSaved(false); }} placeholder="מתכוננים לראש השנה" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-600 mb-1">תיאור</label>
+            <input className={inp} value={subtitle} onChange={e => { setSubtitle(e.target.value); setSaved(false); }} placeholder="כל מה שצריך לחגי תשרי" />
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-bold text-gray-700">אריחים</span>
+            <button onClick={addTile} className="text-xs font-bold text-amber-700 border border-amber-300 rounded px-3 py-1">+ הוסף אריח</button>
+          </div>
+          <div className="grid gap-3">
+            {tiles.map((t, i) => (
+              <div key={i} className="border border-gray-200 rounded-lg p-3 grid gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-400">אריח {i + 1}</span>
+                  {tiles.length > 1 && (
+                    <button onClick={() => removeTile(i)} className="text-xs text-red-600">הסר</button>
+                  )}
+                </div>
+                <input className={inp} value={t.label}  onChange={e => updateTile(i, 'label', e.target.value)}  placeholder="כותרת — למשל: דבשיות" />
+                <input className={inp} value={t.imgUrl} onChange={e => updateTile(i, 'imgUrl', e.target.value)} placeholder="קישור לתמונה (Cloudinary)" dir="ltr" />
+                <input className={inp} value={t.href}   onChange={e => updateTile(i, 'href', e.target.value)}   placeholder="/category/חגים?filter=ראש השנה" dir="ltr" />
+                {t.imgUrl && <img src={t.imgUrl} alt="" className="w-20 h-20 object-cover rounded border" />}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {error && <p className="text-sm text-red-600 mt-4">{error}</p>}
+        {saved && <p className="text-sm text-green-600 mt-4">נשמר ✓</p>}
+
+        <button onClick={save} disabled={saving}
+          className="mt-6 bg-amber-600 text-white font-bold rounded-lg px-6 py-2.5 text-sm disabled:opacity-50">
+          {saving ? 'שומר...' : 'שמירה'}
+        </button>
+      </div>
     </div>
   );
 }

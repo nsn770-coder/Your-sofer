@@ -386,6 +386,12 @@ export default function HomePageClient({ productCount }: { productCount: number 
   const [newsletterEmail, setNewsletterEmail]   = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle');
   const [newsletterPopupOpen, setNewsletterPopupOpen] = useState(false);
+  // רצועת "עכשיו בעונה" — מנוהלת ידנית מהאדמין (דשבורד ← 🍂 עכשיו בעונה).
+  // null = טרם נטען או כבוי; הסקשן פשוט לא מרונדר ואין שריון מקום.
+  const [seasonal, setSeasonal] = useState<{
+    eyebrow: string; title: string; subtitle: string;
+    tiles: { label: string; imgUrl: string; href: string }[];
+  } | null>(null);
   // PERF (homepage lab LCP ~14.6s): the hero <video autoPlay> started downloading
   // several MB immediately, hogging bandwidth during the LCP window — and its
   // first rendered frame registered as the LCP element. Until armed, we show the
@@ -655,6 +661,25 @@ export default function HomePageClient({ productCount }: { productCount: number 
       }
     }
     fetchSoferim();
+  }, []);
+
+  // רצועת "עכשיו בעונה" — נטענת רק אם האדמין הדליק אותה ויש בה אריחים.
+  // כשל טעינה אינו קריטי: הסקשן פשוט לא יוצג.
+  useEffect(() => {
+    getDoc(doc(db, 'siteConfig', 'seasonal'))
+      .then(snap => {
+        if (!snap.exists()) return;
+        const d = snap.data();
+        const tiles = (d.tiles ?? []) as { label: string; imgUrl: string; href: string }[];
+        if (!d.enabled || tiles.length === 0) return;
+        setSeasonal({
+          eyebrow:  d.eyebrow  ?? 'עכשיו בעונה',
+          title:    d.title    ?? '',
+          subtitle: d.subtitle ?? '',
+          tiles,
+        });
+      })
+      .catch(e => console.error('[seasonal] fetch error:', e));
   }, []);
 
   useEffect(() => {
@@ -1104,6 +1129,54 @@ export default function HomePageClient({ productCount }: { productCount: number 
       <div className="md:hidden" style={{ background: '#FFFFFF', padding: '20px 16px', borderBottom: '1px solid #E7E2D8', minHeight: 84 }}>
         <AlgoliaSearch />
       </div>
+
+      {/* ── עכשיו בעונה ──
+          רצועה ידנית לחג או לעונה הנוכחית (דשבורד ← 🍂 עכשיו בעונה).
+          היהדות עונתית בעוצמה — אלול, חנוכה, פסח, פורים — ולא הייתה לזה
+          שום נוכחות בעמוד הבית. אין שריון מקום: כשכבוי הסקשן פשוט לא קיים. */}
+      {seasonal && (
+        <section aria-labelledby="seasonal-title" className="px-5 py-10 md:px-8 md:py-14" style={{ background: '#FAF8F3', direction: 'rtl', borderBottom: '1px solid #F0EDE8' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 28 }}>
+              {seasonal.eyebrow && (
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
+                  {seasonal.eyebrow}
+                </p>
+              )}
+              <h2 id="seasonal-title" className="text-[26px] md:text-[34px]" style={{ fontWeight: 300, color: '#1F2937', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
+                {seasonal.title}
+              </h2>
+              {seasonal.subtitle && (
+                <p style={{ fontSize: 15, color: '#9CA3AF', margin: 0, fontWeight: 400 }}>{seasonal.subtitle}</p>
+              )}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+              {seasonal.tiles.map((t, i) => (
+                <a
+                  key={`${t.href}-${i}`}
+                  href={t.href}
+                  style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', background: '#FFFFFF', border: '1px solid #EDEDEF', overflow: 'hidden', transition: 'border-color 0.2s ease' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#C5A028'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
+                >
+                  <div style={{ width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', flexShrink: 0 }}>
+                    <img
+                      src={optimizeCloudinaryUrl(t.imgUrl, 400)}
+                      alt={t.label}
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
+                  <div style={{ padding: '12px 16px 16px' }}>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', margin: 0, lineHeight: 1.4 }}>{t.label}</p>
+                    <span style={{ fontSize: 11, color: '#888', display: 'block', marginTop: 4 }}>לצפייה ←</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Promo 2+1 section ── */}
       {/* CLS FIX: space is reserved while Firestore loads so content below doesn't
