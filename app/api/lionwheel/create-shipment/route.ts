@@ -1,13 +1,31 @@
 // app/api/lionwheel/create-shipment/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getDoc, doc } from 'firebase/firestore';
-import { db } from '@/app/firebase';
+import { getAdminDb } from '@/lib/firebaseAdmin';
+import { FieldValue } from 'firebase-admin/firestore';
+
+// ── כתובת מוצא קבועה (נקודת האיסוף של YourSofer) ────────────────────────────
+// LionWheel לא ממלא את המוצא אוטומטית בקריאות API — בלי השדות האלה
+// המשלוח נוצר עם מוצא ריק ומסומן "חשד לאי דיוק בכתובת מוצא".
+// ניתן לדרוס דרך משתני סביבה בלי לשנות קוד.
+// האיות של הרחוב תואם במדויק למיקום השמור אצל LionWheel ("פרופסור", לא "פרופ'"),
+// כדי שהגיאוקוד יזהה אותו ולא יסמן "חשד לאי דיוק בכתובת מוצא".
+const SOURCE = {
+  city:          process.env.LIONWHEEL_SOURCE_CITY      || 'דימונה',
+  street:        process.env.LIONWHEEL_SOURCE_STREET    || 'פרופסור עדה יונת',
+  number:        process.env.LIONWHEEL_SOURCE_NUMBER    || '19',
+  apartment:     process.env.LIONWHEEL_SOURCE_APARTMENT || '',
+  floor:         process.env.LIONWHEEL_SOURCE_FLOOR     || '',
+  zipCode:       process.env.LIONWHEEL_SOURCE_ZIP       || '',
+  recipientName: process.env.LIONWHEEL_SOURCE_NAME      || 'ניסים בואהרון — YourSofer',
+  phone:         process.env.LIONWHEEL_SOURCE_PHONE     || '058-487-7770',
+  email:         process.env.LIONWHEEL_SOURCE_EMAIL     || '',
+};
 
 export async function POST(request: NextRequest) {
   try {
-    const { orderId } = await request.json();
+    const { orderId, force } = await request.json();
 
-    console.log('📦 [LionWheel] Request received:', { orderId });
+    console.log('📦 [LionWheel] Request received:', { orderId, force: !!force });
 
     if (!orderId) {
       return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
@@ -21,19 +39,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
     }
 
-    // Get order from Firestore
-    const orderRef = doc(db, 'orders', orderId);
+    const adminDb = getAdminDb();
+    const orderRef = adminDb.collection('orders').doc(orderId);
     console.log('📂 [Firestore] Fetching order:', orderId);
 
-    const orderSnap = await getDoc(orderRef);
+    const orderSnap = await orderRef.get();
 
-    if (!orderSnap.exists()) {
+    if (!orderSnap.exists) {
       console.error('❌ [Firestore] Order not found:', orderId);
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     const order = orderSnap.data() as any;
     console.log('✅ [Firestore] Order loaded:', { id: orderId, name: order.customerName });
+
+    // הגנה מפני משלוח כפול — אם כבר נוצר משלוח, מחזירים אותו במקום ליצור חדש
+    if (order.lionwheel?.publicId && !force) {
+      console.log('ℹ️ [LionWheel] Shipment already exists:', order.lionwheel.publicId);
+      return NextResponse.json({
+        success: true,
+        alreadyExists: true,
+        shipment: order.lionwheel,
+      });
+    }
 
     // הזמנות חדשות שומרות את שדות הכתובת מפוצלים (city/street/houseNumber/apartment/zipCode).
     // הזמנות ישנות שמרו רק מחרוזת address אחת — נפרק אותה כ-fallback.
@@ -92,6 +120,19 @@ export async function POST(request: NextRequest) {
     const lionWheelPayload = {
       pickup_at: pickupDate,
       original_order_id: orderId,
+
+      // ── מוצא: נקודת האיסוף הקבועה של YourSofer ──
+      source_city:           SOURCE.city,
+      source_street:         SOURCE.street,
+      source_number:         SOURCE.number,
+      source_apartment:      SOURCE.apartment,
+      source_floor:          SOURCE.floor,
+      source_zip_code:       SOURCE.zipCode,
+      source_recipient_name: SOURCE.recipientName,
+      source_phone:          SOURCE.phone,
+      source_email:          SOURCE.email,
+
+      // ── יעד: כתובת הלקוח ──
       destination_city: destinationCity,
       destination_street: destinationStreet,
       destination_number: destinationNumber || '1',
@@ -135,19 +176,27 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ [LionWheel] Shipment created successfully:', shipmentData);
 
-    return NextResponse.json(
-      {
-        success: true,
-        shipment: {
-          taskId: shipmentData.task_id,
-          publicId: shipmentData.public_id,
-          trackingLink: shipmentData.tracking_link,
-          label: shipmentData.label,
-          barcode: shipmentData.barcode,
-        },
-      },
-      { status: 200 }
-    );
+    const shipment = {
+      taskId:       shipmentData.task_id      ?? null,
+      publicId:     shipmentData.public_id    ?? null,
+      trackingLink: shipmentData.tracking_link ?? null,
+      label:        shipmentData.label        ?? null,
+      barcode:      shipmentData.barcode      ?? null,
+    };
+
+    // שמירה בהזמנה — כדי שהמזהה ישרוד רענון דף וימנע יצירת משלוח כפול.
+    // כישלון כאן אינו קריטי (המשלוח כבר נוצר) — לכן רק נרשם ביומן.
+    try {
+      await orderRef.update({
+        lionwheel: { ...shipment, createdAt: new Date().toISOString() },
+        lionwheelSentAt: FieldValue.serverTimestamp(),
+      });
+      console.log('💾 [Firestore] Shipment saved to order:', orderId);
+    } catch (e) {
+      console.error('⚠️ [Firestore] Failed to save shipment to order (non-fatal):', e);
+    }
+
+    return NextResponse.json({ success: true, shipment }, { status: 200 });
   } catch (error) {
     console.error('Error creating shipment:', error);
     return NextResponse.json(

@@ -88,6 +88,14 @@ interface Order {
   commissionAmount?: number;
   createdAt?: { seconds: number };
   items?: OrderItem[];
+  /** משלוח שנוצר ב-LionWheel — נשמר בהזמנה כדי לשרוד רענון ולמנוע כפילות */
+  lionwheel?: {
+    taskId?: string | null;
+    publicId?: string | null;
+    trackingLink?: string | null;
+    barcode?: string | null;
+    createdAt?: string;
+  } | null;
 }
 
 // ── בקשת ביקורת גוגל בוואטסאפ ────────────────────────────────────────────────
@@ -2572,10 +2580,7 @@ ${visibleOrders.map(orderBlock).join('\n')}
                           <SendToLionWheelButton
                             orderId={o.id}
                             orderNumber={o.orderNumber}
-                            onSuccess={(shipment) => {
-                              console.log('Shipment created:', shipment);
-                              // Optional: show notification with tracking link
-                            }}
+                            existingShipment={o.lionwheel ?? null}
                           />
                         )}
                         {!isCancelled && (

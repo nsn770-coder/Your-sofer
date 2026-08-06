@@ -2,92 +2,106 @@
 
 import { useState } from 'react';
 
+interface Shipment {
+  taskId?: string | null;
+  publicId?: string | null;
+  trackingLink?: string | null;
+  barcode?: string | null;
+  createdAt?: string;
+}
+
 interface SendToLionWheelButtonProps {
   orderId: string;
   orderNumber: string;
-  onSuccess?: (shipmentData: any) => void;
+  /** משלוח קיים שנשמר בהזמנה — מוצג מיד בטעינת הדף */
+  existingShipment?: Shipment | null;
+  onSuccess?: (shipmentData: Shipment) => void;
 }
 
 export function SendToLionWheelButton({
   orderId,
   orderNumber,
+  existingShipment,
   onSuccess,
 }: SendToLionWheelButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [message, setMessage] = useState('');
+  const [shipment, setShipment] = useState<Shipment | null>(existingShipment ?? null);
+  const [error, setError] = useState('');
+
+  const sent = !!shipment?.publicId;
 
   const handleSend = async () => {
+    // משלוח כבר קיים — דורש אישור מפורש כדי לא ליצור כפילות בטעות
+    if (sent) {
+      const ok = window.confirm(
+        `להזמנה ${orderNumber} כבר קיים משלוח (${shipment!.publicId}).\n\nליצור משלוח נוסף?`
+      );
+      if (!ok) return;
+    }
+
     setIsLoading(true);
-    setStatus('idle');
-    setMessage('');
+    setError('');
 
     try {
       const response = await fetch('/api/lionwheel/create-shipment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId }),
+        body: JSON.stringify({ orderId, force: sent }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || data.details?.error || 'שגיאה בשליחה ל-LionWheel');
+        throw new Error(data.message || data.error || data.details?.error || 'שגיאה בשליחה ל-LionWheel');
       }
 
-      setStatus('success');
-      setMessage(`✓ משלוח נוצר: ${data.shipment.publicId}`);
-
-      if (onSuccess) {
-        onSuccess(data.shipment);
-      }
-
-      setTimeout(() => setStatus('idle'), 4000);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'שגיאה לא ידועה';
-      setStatus('error');
-      setMessage(errorMessage);
-      setTimeout(() => setStatus('idle'), 4000);
+      setShipment(data.shipment);
+      onSuccess?.(data.shipment);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'שגיאה לא ידועה');
+      setTimeout(() => setError(''), 8000);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 flex-wrap">
       <button
         onClick={handleSend}
-        disabled={isLoading || status !== 'idle'}
-        className={`
-          text-xs font-bold px-2 py-1 rounded border whitespace-nowrap transition-all
-          ${
-            status === 'success'
-              ? 'border-green-300 text-green-700 bg-green-50'
-              : status === 'error'
-                ? 'border-red-300 text-red-700 bg-red-50'
-                : 'border-indigo-300 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed'
-          }
-        `}
+        disabled={isLoading}
+        className={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+          error
+            ? 'border-red-300 text-red-700 bg-red-50'
+            : sent
+              ? 'border-green-300 text-green-700 bg-green-50 hover:bg-green-100'
+              : 'border-indigo-300 text-indigo-700 bg-indigo-50 hover:bg-indigo-100'
+        }`}
         title={
-          status === 'success'
-            ? 'משלוח נוצר בהצלחה'
-            : status === 'error'
-              ? 'שגיאה בשליחה'
-              : 'שלח הזמנה ל-LionWheel'
+          sent
+            ? `משלוח קיים: ${shipment!.publicId} — לחיצה תיצור משלוח נוסף`
+            : 'שלח הזמנה ל-LionWheel'
         }
       >
-        {isLoading ? '...שולח' : status === 'success' ? '✓ שנשלח' : status === 'error' ? '✕ שגיאה' : '🚚 LionWheel'}
+        {isLoading ? 'שולח...' : error ? '✕ שגיאה' : sent ? '✓ נשלח' : '🚚 LionWheel'}
       </button>
 
-      {message && (
-        <span
-          className={`text-xs font-medium ${
-            status === 'success' ? 'text-green-600' : 'text-red-600'
-          }`}
-        >
-          {message}
-        </span>
+      {sent && !error && (
+        shipment!.trackingLink ? (
+          <a
+            href={shipment!.trackingLink!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-medium text-green-700 underline underline-offset-2 hover:text-green-800"
+          >
+            {shipment!.publicId}
+          </a>
+        ) : (
+          <span className="text-xs font-medium text-green-600">{shipment!.publicId}</span>
+        )
       )}
+
+      {error && <span className="text-xs font-medium text-red-600">{error}</span>}
     </div>
   );
 }
