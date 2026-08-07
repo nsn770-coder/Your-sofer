@@ -26,7 +26,7 @@ interface Order {
 
 const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
   paid:       { label: 'ממתין לטיפול', color: '#92400e', bg: '#FEF3C7' },
-  processing: { label: 'בטיפול',        color: '#1e3a8a', bg: '#DBEAFE' },
+  processing: { label: 'בטיפול',        color: '#3B3B41', bg: '#DBEAFE' },
   shipped:    { label: 'במשלוח',        color: '#065f46', bg: '#D1FAE5' },
   delivered:  { label: 'נמסר',          color: '#166534', bg: '#DCFCE7' },
   cancelled:  { label: 'בוטל',          color: '#991b1b', bg: '#FEE2E2' },

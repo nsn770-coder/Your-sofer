@@ -77,7 +77,7 @@ function IconActivityShield() {
 // (אייקוני המונים הוסרו יחד עם פס המונים — 07/2026)
 
 /** כחול המותג — רקע גיבוי לבאנר "בנה מארז משלך" */
-const NAVY_BUILD = '#373A5A';
+const NAVY_BUILD = '#3B3B41';
 
 /** תמונת הרקע של באנר בניית המארז (Cloudinary) */
 const BUILD_BANNER_IMG =
@@ -268,7 +268,7 @@ function HomeCategoryTile({ item, img, isMobile, onNav }: {
         )}
       </div>
       <div style={{ marginTop: 12, textAlign: 'center' }}>
-        <h3 style={{ fontSize: isEventTile ? 21 : 16, fontWeight: isEventTile ? 700 : 500, color: '#373A5A', margin: 0 }}>{displayLabel}</h3>
+        <h3 style={{ fontSize: isEventTile ? 21 : 16, fontWeight: isEventTile ? 700 : 500, color: '#3B3B41', margin: 0 }}>{displayLabel}</h3>
         <span className="underline underline-offset-4" style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: '#111111' }}>לצפייה</span>
       </div>
     </div>
@@ -854,8 +854,8 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       <style>{`
         .ys-hero-btn-primary {
           display: inline-flex; align-items: center; justify-content: center;
-          background: #373A5A; color: #FFFFFF;
-          border: 1px solid #373A5A;
+          background: #3B3B41; color: #FFFFFF;
+          border: 1px solid #3B3B41;
           height: 54px; padding: 0 40px; border-radius: 0;
           font-weight: 600; font-size: 16px; text-decoration: none;
           white-space: nowrap; transition: all 0.2s ease; cursor: pointer;
@@ -867,13 +867,13 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         .ys-hscroll::-webkit-scrollbar { display: none; }
         .ys-outline-btn {
           display: inline-flex; align-items: center; justify-content: center;
-          background: #FFFFFF; color: #373A5A;
-          border: 1px solid #373A5A; border-radius: 0;
+          background: #FFFFFF; color: #3B3B41;
+          border: 1px solid #3B3B41; border-radius: 0;
           height: 50px; padding: 0 36px;
           font-weight: 500; font-size: 14px; text-decoration: none;
           transition: all 0.2s ease; cursor: pointer; font-family: inherit;
         }
-        .ys-outline-btn:hover { background: #373A5A; color: #fff; }
+        .ys-outline-btn:hover { background: #3B3B41; color: #fff; }
         .ys-outline-btn:active { background: #282B43; border-color: #282B43; color: #fff; }
         .ys-outline-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(55,58,90,0.35); }
         /* CLS FIX: layout-critical responsive values live in CSS media queries, NOT in
@@ -945,7 +945,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             </div>
             {wizardStep < 3 && (
               <div style={{ height: 3, background: '#f0f0f0' }}>
-                <div style={{ height: '100%', width: `${((wizardStep + 1) / 3) * 100}%`, background: '#373A5A', transition: 'width 0.4s ease' }} />
+                <div style={{ height: '100%', width: `${((wizardStep + 1) / 3) * 100}%`, background: '#3B3B41', transition: 'width 0.4s ease' }} />
               </div>
             )}
             <div style={{ padding: 24 }}>
@@ -956,7 +956,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                     {[{ val: 'self' as const, label: '👤 לי עצמי' }, { val: 'gift' as const, label: '🎁 מתנה לאחר' }].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardFor(opt.val); setWizardStep(1); }}
                         style={{ padding: '18px 12px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#3B3B41'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         {opt.label}
                       </button>
@@ -975,7 +975,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardBudget(opt.val); setWizardStep(2); }}
                         style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#3B3B41'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
                         <span style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>{opt.sub}</span>
@@ -995,7 +995,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardKashrut(opt.val); setWizardStep(3); fetchWizardResults(wizardBudget, opt.val); }}
                         style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#3B3B41'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
                         <span style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>{opt.sub}</span>
@@ -1012,7 +1012,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                     <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
                     לא נמצאו מוצרים מתאימים לפי הסינון.
                     <br />
-                    <button onClick={() => router.push('/category/הכל')} style={{ marginTop: 16, background: '#373A5A', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
+                    <button onClick={() => router.push('/category/הכל')} style={{ marginTop: 16, background: '#3B3B41', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
                   </div>
                 ) : (
                   <>
@@ -1020,20 +1020,20 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                       {wizardResults.map(p => (
                         <div key={p.id} onClick={() => { closeWizard(); router.push(`/product/${p.id}`); }}
                           style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 14px', borderRadius: 0, border: '1px solid #eee', cursor: 'pointer', background: '#fafafa', transition: 'all 0.15s' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLDivElement).style.background = '#F3F4F9'; }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#3B3B41'; (e.currentTarget as HTMLDivElement).style.background = '#F3F4F9'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#eee'; (e.currentTarget as HTMLDivElement).style.background = '#fafafa'; }}>
                           {(p.imgUrl || p.image_url) && (
                             <img src={optimizeCloudinaryUrl(p.imgUrl || p.image_url || '', 100)} alt={p.name} loading="lazy" style={{ width: 60, height: 60, borderRadius: 0, objectFit: 'cover', flexShrink: 0 }} />
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                            <div style={{ fontSize: 15, fontWeight: 900, color: '#373A5A' }}>{formatPrice(p.price)}</div>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: '#3B3B41' }}>{formatPrice(p.price)}</div>
                           </div>
-                          <span style={{ color: '#373A5A', fontSize: 18, flexShrink: 0 }}>←</span>
+                          <span style={{ color: '#3B3B41', fontSize: 18, flexShrink: 0 }}>←</span>
                         </div>
                       ))}
                     </div>
-                    <button onClick={closeWizard} style={{ width: '100%', background: '#373A5A', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                    <button onClick={closeWizard} style={{ width: '100%', background: '#3B3B41', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                       המשך לגלישה
                     </button>
                   </>
@@ -1157,7 +1157,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           היהדות עונתית בעוצמה — אלול, חנוכה, פסח, פורים — ולא הייתה לזה
           שום נוכחות בעמוד הבית. אין שריון מקום: כשכבוי הסקשן פשוט לא קיים. */}
       {seasonal && (
-        <section aria-labelledby="seasonal-title" className="px-5 py-10 md:px-8 md:py-14" style={{ background: '#FAF8F3', direction: 'rtl', borderBottom: '1px solid #F0EDE8' }}>
+        <section aria-labelledby="seasonal-title" className="px-5 py-10 md:px-8 md:py-14" style={{ background: '#FEFBF7', direction: 'rtl', borderBottom: '1px solid #F0EDE8' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
               {seasonal.eyebrow && <p className="ys-section-eyebrow">{seasonal.eyebrow}</p>}
@@ -1280,7 +1280,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                 transition: 'border-color 0.2s ease',
                 cursor: 'pointer',
               }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#373A5A'; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#3B3B41'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
             >
               {ev.image && (
@@ -1362,18 +1362,18 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                 >
                   <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
                     {p.isBestSeller && (
-                      <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 1, background: '#373A5A', borderRadius: 0, fontSize: 11, fontWeight: 600, color: '#FFFFFF', padding: '3px 8px', letterSpacing: '0.01em' }}>
+                      <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 1, background: '#3B3B41', borderRadius: 0, fontSize: 11, fontWeight: 600, color: '#FFFFFF', padding: '3px 8px', letterSpacing: '0.01em' }}>
                         הכי נמכר
                       </div>
                     )}
                     {hasSale && (
-                      <span style={{ position: 'absolute', top: 8, left: 8, zIndex: 1, background: '#373A5A', color: '#FFFFFF', fontSize: 11, fontWeight: 600, padding: '4px 8px', lineHeight: 1.2, borderRadius: 0 }}>
+                      <span style={{ position: 'absolute', top: 8, left: 8, zIndex: 1, background: '#3B3B41', color: '#FFFFFF', fontSize: 11, fontWeight: 600, padding: '4px 8px', lineHeight: 1.2, borderRadius: 0 }}>
                         {savePct}% הנחה
                       </span>
                     )}
                   </ProductCardVideo>
                   <div style={{ padding: '8px 2px 2px' }}>
-                    <p style={{ fontSize: 14, fontWeight: 500, color: '#373A5A', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 40, marginBottom: 5, textAlign: 'right' } as React.CSSProperties}>{p.name}</p>
+                    <p style={{ fontSize: 14, fontWeight: 500, color: '#3B3B41', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 40, marginBottom: 5, textAlign: 'right' } as React.CSSProperties}>{p.name}</p>
                     <p style={{ fontSize: 17, fontWeight: 700, color: '#111111', marginBottom: 8, display: 'flex', alignItems: 'baseline', gap: 6 }}>
                       {formatPrice(p.price)}
                       {hasSale && (
@@ -1386,7 +1386,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                         addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl, image_url: p.image_url, quantity: 1, cat: p.cat || undefined });
                       }}
                       style={{ background: 'none', border: 'none', padding: 0, color: '#111111', fontSize: 13, fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: 4, cursor: 'pointer', fontFamily: 'inherit', transition: 'color 0.2s' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#3B3B41'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}
                     >
                       הוספה לסל
@@ -1405,7 +1405,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           כך שהמשתמש עבר שמונה סקשנים לפני שראה פריט אחד למכירה. */}
       <div id="categories" className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
+          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#3B3B41', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
           {/* Admin-controlled via דשבורד ← קטגוריות ← תצוגת קטגוריות בדף הבית */}
           <div className="grid grid-cols-2 gap-4 md:gap-7">
@@ -1447,7 +1447,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               textDecoration: 'none',
               transition: 'border-color 0.2s ease',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#373A5A'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#3B3B41'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
           >
             {/* Designed banner — text is baked into the image, no overlay needed */}
@@ -1465,7 +1465,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               position: 'absolute',
               bottom: isMobile ? 10 : 18,
               right: isMobile ? 12 : 28,
-              background: '#373A5A',
+              background: '#3B3B41',
               color: '#FFFFFF',
               fontWeight: 600,
               fontSize: isMobile ? 12.5 : 15,
@@ -1592,7 +1592,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
               מי עומד מאחורי המוצרים
             </p>
-            <h2 className="text-[26px] md:text-[34px]" style={{ fontWeight: 300, color: '#1F2937', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
+            <h2 className="text-[26px] md:text-[34px]" style={{ fontWeight: 300, color: '#3B3B41', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
               הסופרים והיוצרים שלנו
             </h2>
             <p style={{ fontSize: 15, color: '#9CA3AF', margin: 0, fontWeight: 400, maxWidth: 620, marginInline: 'auto', lineHeight: 1.7 }}>
@@ -1644,7 +1644,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           הסופרים וניתק את שורת האווטרים מכפתור ה-CTA שלה. */}
       <div className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>עוד קטגוריות נבחרות</h2>
+          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#3B3B41', marginBottom: 10, letterSpacing: '-0.01em' }}>עוד קטגוריות נבחרות</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>גלו עוד ממגוון המוצרים באתר</p>
           {/* Admin-controlled via דשבורד ← קטגוריות ← תצוגת קטגוריות בדף הבית */}
           <div className="grid grid-cols-2 gap-4 md:gap-7">
@@ -1667,7 +1667,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       <div ref={countRowRef} className="px-4 pt-2 pb-9 md:px-8 md:pt-4 md:pb-14" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4', direction: 'rtl' }}>
         <p
           className="text-xl md:text-[26px]"
-          style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center', fontWeight: 300, color: '#373A5A', lineHeight: 1.4, letterSpacing: '-0.01em' }}
+          style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center', fontWeight: 300, color: '#3B3B41', lineHeight: 1.4, letterSpacing: '-0.01em' }}
         >
           {/* קורא מסך מקבל את המשפט השלם פעם אחת, בלי הקראה של כל שלב בספירה */}
           <span className="sr-only">
@@ -1699,9 +1699,9 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           הועבר לכאן ממקום 3 (07/2026). בראש העמוד השורה הגיעה לפני שלמשתמש
           היה על מה להחליט; כאן היא נוחתת בדיוק בשלב ההערכה, אחרי שראה מוצרים
           ואת היוצרים. הורחבה משורת ✓ דקה לסקשן שנושא את טענת הכשרות בפועל. */}
-      <section aria-labelledby="why-us-title" className="px-5 py-12 md:px-8 md:py-16" style={{ background: '#FAF8F3', direction: 'rtl', borderTop: '1px solid #F0EDE8' }}>
+      <section aria-labelledby="why-us-title" className="px-5 py-12 md:px-8 md:py-16" style={{ background: '#FEFBF7', direction: 'rtl', borderTop: '1px solid #F0EDE8' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 id="why-us-title" className="text-[24px] md:text-[32px]" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 8, letterSpacing: '-0.01em' }}>
+          <h2 id="why-us-title" className="text-[24px] md:text-[32px]" style={{ textAlign: 'center', fontWeight: 300, color: '#3B3B41', marginBottom: 8, letterSpacing: '-0.01em' }}>
             למה לקנות אצלנו
           </h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 36, fontWeight: 400 }}>
@@ -1736,7 +1736,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       {liveReviews.length > 0 && (
         <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 0 32px' : '64px 0 56px', direction: 'rtl' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
-            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 8, letterSpacing: '-0.01em' }}>
+            <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 36, fontWeight: 300, color: '#3B3B41', marginBottom: 8, letterSpacing: '-0.01em' }}>
               מה הלקוחות אומרים
             </h2>
             <p style={{ textAlign: 'center', fontSize: isMobile ? 13 : 15, color: '#9CA3AF', marginBottom: isMobile ? 20 : 28, fontWeight: 400 }}>
@@ -1763,7 +1763,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                   overflow: 'hidden',
                   transition: 'border-color 0.2s ease',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#373A5A'; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#3B3B41'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
               >
                 <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden' }}>
@@ -1790,7 +1790,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                     &ldquo;{r.text}&rdquo;
                   </p>
                   <div style={{ marginTop: isMobile ? 2 : 4 }}>
-                    <div style={{ fontSize: isMobile ? 12 : 13, fontWeight: 600, color: '#1F2937' }}>{formatReviewerName(r.reviewerName)}</div>
+                    <div style={{ fontSize: isMobile ? 12 : 13, fontWeight: 600, color: '#3B3B41' }}>{formatReviewerName(r.reviewerName)}</div>
                     {r.createdAt && (
                       <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{formatHeDate(r.createdAt.seconds)}</div>
                     )}
@@ -1812,7 +1812,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           למטה, אחרי המוצרים, עם קישור "קראו עוד" לעמוד אודות. */}
       <section
         aria-labelledby="our-story-title"
-        style={{ background: '#FAF8F3', borderTop: '1px solid #EDEDEF', direction: 'rtl' }}
+        style={{ background: '#FEFBF7', borderTop: '1px solid #EDEDEF', direction: 'rtl' }}
         className="px-5 py-12 md:px-8 md:py-16"
       >
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
@@ -1823,7 +1823,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           <h2
             id="our-story-title"
             className="text-2xl md:text-[32px]"
-            style={{ fontWeight: 300, color: '#373A5A', letterSpacing: '-0.01em', margin: '0 0 18px', lineHeight: 1.3 }}
+            style={{ fontWeight: 300, color: '#3B3B41', letterSpacing: '-0.01em', margin: '0 0 18px', lineHeight: 1.3 }}
           >
             הסיפור של YourSofer
           </h2>

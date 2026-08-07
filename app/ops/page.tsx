@@ -19,7 +19,7 @@ export default function OpsRootPage() {
   }, [opsUser, loading, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#1E3A8A' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#3B3B41' }}>
       <div className="text-white text-lg">מעביר לדשבורד...</div>
     </div>
   );

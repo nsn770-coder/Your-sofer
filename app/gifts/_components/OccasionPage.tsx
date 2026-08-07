@@ -14,9 +14,9 @@ import OccasionGrid from './OccasionGrid';
  * מבנה: Hero → פס יתרונות → גריד מוצרים (עוגן #collection) → FAQ.
  */
 
-const NAVY = '#373A5A';
+const NAVY = '#3B3B41';
 const GOLD = '#C5A028';
-const CREAM = '#FAF8F3';
+const CREAM = '#FEFBF7';
 
 // כל שורה כאן מגובה בקוד או במדיניות בפועל — אין להוסיף טענה שלא ניתן לאמת.
 // המשלוח והתשלום מאומתים ב-siteTrust.ts; החריטה ב-personalization.ts.

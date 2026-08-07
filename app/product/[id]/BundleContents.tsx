@@ -18,7 +18,7 @@ const FIREBASE_PROJECT = 'your-sofer';
 const FIREBASE_API_KEY = 'AIzaSyAcIDIn7VkGlXIeVoyDFgk1v_jhvW9tK0I';
 const REVALIDATE = 3600;
 
-const NAVY = '#373A5A';
+const NAVY = '#3B3B41';
 const GOLD = '#C5A028';
 
 interface Component {
@@ -150,7 +150,7 @@ export default async function BundleContents({ codes }: { codes?: string[] | nul
               >
                 <span
                   style={{
-                    width: 62, height: 62, flexShrink: 0, background: '#FAF8F3',
+                    width: 62, height: 62, flexShrink: 0, background: '#FEFBF7',
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                     overflow: 'hidden',
                   }}

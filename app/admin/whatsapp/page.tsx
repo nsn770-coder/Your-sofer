@@ -158,8 +158,8 @@ export default function WhatsAppAdminPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <a href="/admin" style={{ color: '#1E3A8A', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>← חזרה לניהול</a>
-            <h1 style={{ fontSize: 24, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>💬 שיחות WhatsApp</h1>
+            <a href="/admin" style={{ color: '#3B3B41', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>← חזרה לניהול</a>
+            <h1 style={{ fontSize: 24, fontWeight: 900, color: '#3B3B41', margin: 0 }}>💬 שיחות WhatsApp</h1>
           </div>
           {!followupLoading && (
             <button
@@ -201,7 +201,7 @@ export default function WhatsAppAdminPage() {
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 700, fontSize: 14, color: '#1E3A8A' }}>{c.phone || c.id}</span>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: '#3B3B41' }}>{c.phone || c.id}</span>
                       <span style={{ fontSize: 11, color: '#999' }}>{fmtDate(c.updatedAt)}</span>
                     </div>
                     <div style={{ fontSize: 12.5, color: '#666', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -227,7 +227,7 @@ export default function WhatsAppAdminPage() {
               <>
                 {/* Chat header */}
                 <div style={{ padding: '14px 18px', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                  <div style={{ fontWeight: 800, fontSize: 15, color: '#1E3A8A' }}>{selected.phone || selected.id}</div>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: '#3B3B41' }}>{selected.phone || selected.id}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     {!selected.botMuted && selected.botMutedUntil && selected.botMutedUntil > Date.now() && (
                       <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 600 }}>
@@ -300,7 +300,7 @@ export default function WhatsAppAdminPage() {
                     onClick={handleSend}
                     disabled={sending || !replyText.trim()}
                     style={{
-                      background: sending || !replyText.trim() ? '#ccc' : '#1E3A8A',
+                      background: sending || !replyText.trim() ? '#ccc' : '#3B3B41',
                       color: '#fff', border: 'none', borderRadius: 8, padding: '10px 22px',
                       fontSize: 14, fontWeight: 700, cursor: sending || !replyText.trim() ? 'default' : 'pointer',
                     }}

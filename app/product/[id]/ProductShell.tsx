@@ -179,7 +179,7 @@ export default function ProductShell({ product }: { product: ShellProduct }) {
 
             {/* ── Column 2: Details (above-the-fold part only) ── */}
             <div className="ps-details" style={{ background: '#fff' }}>
-              <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1F2937', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
+              <h1 style={{ fontSize: 22, fontWeight: 800, color: '#3B3B41', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f0f0f0', flexWrap: 'wrap' }}>
                 <span style={{ display: 'inline-flex', gap: 1 }}>

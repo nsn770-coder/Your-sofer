@@ -31,7 +31,7 @@ interface Props {
   defaultOpenFirst?: boolean;
 }
 
-const NAVY = '#373A5A';
+const NAVY = '#3B3B41';
 const GOLD = '#C5A028';
 
 export default function FaqSection({

@@ -13,7 +13,7 @@ import {
   type CrmStatus, type CrmSource, type CrmNote, type AiTemp,
 } from '@/lib/crm';
 
-const navy = '#1E3A8A';
+const navy = '#3B3B41';
 const gold = '#C5A028';
 
 const quickBtnStyle: React.CSSProperties = {

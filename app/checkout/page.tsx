@@ -132,8 +132,8 @@ function OrderSummary({
   const [pointsInput, setPointsInput] = useState('');
   return (
     <div style={{ background: '#fff', borderRadius: framed ? 16 : 0, border: framed ? '1px solid #e8e2d8' : 'none', padding: 16, position: isSticky ? 'sticky' : 'static', top: 20, width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
-      <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
-        <IconCart size={15} color="#1E3A8A" /> סיכום הזמנה
+      <h3 style={{ fontSize: 15, fontWeight: 800, color: '#3B3B41', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <IconCart size={15} color="#3B3B41" /> סיכום הזמנה
       </h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
         {items.map(item => (
@@ -142,12 +142,12 @@ function OrderSummary({
               {item.imgUrl ? <img src={optimizeCloudinaryUrl(item.imgUrl, 100)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCart size={18} color="#ccc" /></div>}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#1E3A8A', lineHeight: 1.4, overflowWrap: 'break-word' }}>{item.name}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#3B3B41', lineHeight: 1.4, overflowWrap: 'break-word' }}>{item.name}</div>
               <div style={{ fontSize: 11, color: '#999' }}>כמות: {item.quantity}</div>
               {item.selectedKlafName && <div style={{ fontSize: 10, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 3 }}><IconCheck size={9} color="#1a6b3c" /> {item.selectedKlafName}</div>}
               {item.threadColor && <div style={{ fontSize: 10, color: '#92400e', display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 11, height: 11, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} /> צבע חוט: {item.threadColor.id} - {item.threadColor.name}</div>}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', flexShrink: 1, minWidth: 0 }}>{formatPrice(item.price * item.quantity)}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#3B3B41', flexShrink: 1, minWidth: 0 }}>{formatPrice(item.price * item.quantity)}</div>
           </div>
         ))}
       </div>
@@ -171,7 +171,7 @@ function OrderSummary({
               <span style={{ fontWeight: 700, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>🏠 איסוף עצמי · חינם</span>
             )
           ) : (
-            <span style={{ fontWeight: 600, color: '#1E3A8A', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}><IconTruck size={12} color="#1E3A8A" /> עד הבית · {formatPrice(shippingCost)}</span>
+            <span style={{ fontWeight: 600, color: '#3B3B41', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}><IconTruck size={12} color="#3B3B41" /> עד הבית · {formatPrice(shippingCost)}</span>
           )}
         </div>
         {appliedCoupon && discountAmount > 0 && (
@@ -192,7 +192,7 @@ function OrderSummary({
             <span style={{ paddingLeft: 4 }}>חינם</span>
           </div>
         )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 17, fontWeight: 900, color: '#1E3A8A', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 17, fontWeight: 900, color: '#3B3B41', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
           <span style={{ minWidth: 0 }}>סה"כ לתשלום</span><span style={{ paddingLeft: 4 }}>{formatPrice(finalTotal)}</span>
         </div>
         <div style={{ fontSize: 11, color: '#aaa' }}>כולל מע"מ</div>
@@ -336,12 +336,12 @@ function MobileOrderSummary({ itemCount, finalTotal, children }: {
           padding: '14px 16px', direction: 'rtl',
         }}
       >
-        <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 800, color: '#1E3A8A' }}>
-          <IconCart size={15} color="#1E3A8A" />
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 800, color: '#3B3B41' }}>
+          <IconCart size={15} color="#3B3B41" />
           סיכום ההזמנה
           <span style={{ fontSize: 12, fontWeight: 600, color: '#888' }}>({itemCount} {itemCount === 1 ? 'פריט' : 'פריטים'})</span>
         </span>
-        <span style={{ fontSize: 16, fontWeight: 900, color: '#1E3A8A' }}>{formatPrice(finalTotal)}</span>
+        <span style={{ fontSize: 16, fontWeight: 900, color: '#3B3B41' }}>{formatPrice(finalTotal)}</span>
       </div>
       <div id="mobile-order-summary-panel" style={{ borderTop: '1px solid #f0ebe0' }}>
         {children}
@@ -769,7 +769,7 @@ export default function CheckoutPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8f6f2', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', overflowX: 'hidden', maxWidth: '100vw' }}>
       {/* Header */}
-      <div style={{ background: '#1E3A8A', padding: '12px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ background: '#3B3B41', padding: '12px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', width: '100%', boxSizing: 'border-box' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -0.5 }}>Your Sofer</div>
           <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700, letterSpacing: 1 }}>ישראל ✡</div>
@@ -782,7 +782,7 @@ export default function CheckoutPage() {
       </div>
 
       {shaliach && (
-        <div style={{ background: 'linear-gradient(135deg, #1E3A8A, #2563EB)', borderBottom: '2px solid #C5A028', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ background: 'linear-gradient(135deg, #3B3B41, #2563EB)', borderBottom: '2px solid #C5A028', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box' }}>
           <IconHandshake size={16} color="#C5A028" />
           <div style={{ fontSize: 13, color: '#a8c0d8' }}>
             הזמנה זו מיוחסת לרב הקהילה: <strong style={{ color: '#fff' }}>{shaliach.chabadName || shaliach.name}</strong>
@@ -814,9 +814,9 @@ export default function CheckoutPage() {
         <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', width: '100%', maxWidth: '100%', boxSizing: 'border-box', minWidth: 0 }}>
           {/* Form header with call-to-action subtitle */}
           <div style={{ background: '#f8f6f2', borderBottom: '1px solid #e8e2d8', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#C5A028', color: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>📦</div>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#C5A028', color: '#3B3B41', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>📦</div>
             <div>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>פרטי משלוח</h2>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: '#3B3B41', margin: 0 }}>פרטי משלוח</h2>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#C5A028', marginTop: 3 }}>למלא פרטים ולהתקדם לרכישה</div>
             </div>
           </div>
@@ -832,11 +832,11 @@ export default function CheckoutPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
               <button type="button" onClick={() => setDeliveryMethod('shipping')}
                 style={{
-                  border: deliveryMethod === 'shipping' ? '2px solid #1E3A8A' : '1.5px solid #e0e0e0',
+                  border: deliveryMethod === 'shipping' ? '2px solid #3B3B41' : '1.5px solid #e0e0e0',
                   background: deliveryMethod === 'shipping' ? '#f4f7ff' : '#fafafa',
                   borderRadius: 12, padding: '12px 10px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center',
                 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: '#1E3A8A' }}>🚚 משלוח עד הבית</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#3B3B41' }}>🚚 משלוח עד הבית</div>
                 <div style={{ fontSize: 12, color: freeShippingEligible ? '#1a6b3c' : '#777', fontWeight: freeShippingEligible ? 700 : 400, marginTop: 3 }}>
                   {/* הסף נקרא מהקבוע — היה כאן ₪600 קשיח שנשאר מאחור בכל שינוי מדיניות */}
                   {freeShippingEligible ? `חינם! 🎉 (הזמנה מעל ${formatPrice(FREE_SHIPPING_THRESHOLD)})` : formatPrice(SHIPPING_REGULAR)}
@@ -930,8 +930,8 @@ export default function CheckoutPage() {
             {/* Call-to-action heading above card form */}
             {siteSettings.checkoutEnabled && (
               <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', textAlign: 'center', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <IconCreditCard size={16} color="#1E3A8A" /> פרטי תשלום
+                <div style={{ fontSize: 15, fontWeight: 800, color: '#3B3B41', textAlign: 'center', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <IconCreditCard size={16} color="#3B3B41" /> פרטי תשלום
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <PaymentMethodsRow size="sm" />

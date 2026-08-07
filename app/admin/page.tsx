@@ -588,7 +588,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
       <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
         onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A' }}>➕ הוספת מוצר חדש</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#3B3B41' }}>➕ הוספת מוצר חדש</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
         </div>
         <div style={{ display: 'grid', gap: 14 }}>
@@ -703,7 +703,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
                   <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>{label}</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     {currentUrl && <img src={currentUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
-                    <label style={{ background: field === 'main' ? '#1E3A8A' : '#555', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                    <label style={{ background: field === 'main' ? '#3B3B41' : '#555', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                       {uploadingImg === field ? '⏳...' : '📷 העלה'}
                       <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(e, field)} />
                     </label>
@@ -717,7 +717,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ flex: 1, background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             {saving ? '⏳ שומר...' : '✅ הוסף מוצר'}
           </button>
           <button onClick={onClose}
@@ -939,7 +939,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         <style>{PRODUCT_LABEL_PRINT_STYLES}</style>
         {printArea}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A' }}>✏️ עריכת מוצר</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#3B3B41' }}>✏️ עריכת מוצר</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
               type="button"
@@ -974,7 +974,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
             return orig ? (
               <div style={{ background: '#f8f6f0', border: '1px solid #e8dfc8', padding: '8px 12px' }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#888' }}>שם מקורי מהספק: </span>
-                <span style={{ fontSize: 13, color: '#1E3A8A', fontWeight: 600 }}>{orig}</span>
+                <span style={{ fontSize: 13, color: '#3B3B41', fontWeight: 600 }}>{orig}</span>
               </div>
             ) : null;
           })()}
@@ -1116,9 +1116,9 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
                 type="checkbox"
                 checked={isExpertRecommended}
                 onChange={e => setIsExpertRecommended(e.target.checked)}
-                style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#1E3A8A' }}
+                style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#3B3B41' }}
               />
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A' }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#3B3B41' }}>
                 ⭐ המוצר הכי מומלץ על ידי המומחים שלנו
               </span>
             </label>
@@ -1155,7 +1155,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
                   <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>{lbl}</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     {currentUrl && <img src={currentUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
-                    <label style={{ background: field === 'main' ? '#1E3A8A' : '#555', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                    <label style={{ background: field === 'main' ? '#3B3B41' : '#555', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                       {uploadingImg === field ? '⏳...' : '📷 העלה'}
                       <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(e, field)} />
                     </label>
@@ -1170,7 +1170,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
 
         {/* ── מלאי ── */}
         <div style={{ marginTop: 14, background: '#f8f6f2', border: '1px solid #e8e0d0', borderRadius: 8, padding: '12px 14px' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', marginBottom: 10 }}>מלאי</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#3B3B41', marginBottom: 10 }}>מלאי</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: outOfStock ? '#dc2626' : '#333', fontWeight: outOfStock ? 700 : 400 }}>
               <input
@@ -1300,7 +1300,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         {/* ── מידע ספק ── */}
         {product.source && (
           <div style={{ marginTop: 14, background: '#f0f4ff', border: '1px solid #c5d8ff', borderRadius: 8, padding: '12px 14px' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', marginBottom: 10 }}>מידע ספק</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#3B3B41', marginBottom: 10 }}>מידע ספק</div>
             <div style={{ display: 'grid', gap: 7, fontSize: 13, color: '#333' }}>
               <div>
                 <span style={{ fontWeight: 700, color: '#555', marginLeft: 6 }}>ספק:</span>
@@ -1325,7 +1325,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: '#1E3A8A', textDecoration: 'underline', fontSize: 12, wordBreak: 'break-all' }}
+                      style={{ color: '#3B3B41', textDecoration: 'underline', fontSize: 12, wordBreak: 'break-all' }}
                     >
                       {url}
                     </a>
@@ -1338,7 +1338,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
 
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ flex: 1, background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             {saving ? '⏳ שומר...' : '✅ שמור שינויים'}
           </button>
           <button onClick={onClose}
@@ -1406,7 +1406,7 @@ function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () =>
       <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
         onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A' }}>➕ הוספת סופר חדש</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#3B3B41' }}>➕ הוספת סופר חדש</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
         </div>
         <div style={{ display: 'grid', gap: 14 }}>
@@ -1444,7 +1444,7 @@ function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () =>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {SOFER_CATS.map(cat => (
                 <button key={cat} type="button" onClick={() => toggleCat(cat)}
-                  style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer', background: categories.includes(cat) ? '#1E3A8A' : '#f5f5f5', color: categories.includes(cat) ? '#fff' : '#333', border: categories.includes(cat) ? '1px solid #1E3A8A' : '1px solid #ddd', fontWeight: categories.includes(cat) ? 700 : 400 }}>
+                  style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer', background: categories.includes(cat) ? '#3B3B41' : '#f5f5f5', color: categories.includes(cat) ? '#fff' : '#333', border: categories.includes(cat) ? '1px solid #3B3B41' : '1px solid #ddd', fontWeight: categories.includes(cat) ? 700 : 400 }}>
                   {cat}
                 </button>
               ))}
@@ -1454,7 +1454,7 @@ function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () =>
             <label style={labelStyle}>תמונה</label>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
               {form.imageUrl && <img src={form.imageUrl} alt="" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ddd' }} />}
-              <label style={{ background: '#1E3A8A', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+              <label style={{ background: '#3B3B41', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                 {uploadingImg ? '⏳ מעלה...' : '📷 העלה תמונה'}
                 <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async e => {
                   const file = e.target.files?.[0];
@@ -1472,7 +1472,7 @@ function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () =>
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ flex: 1, background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             {saving ? '⏳ שומר...' : '✅ הוסף סופר'}
           </button>
           <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
@@ -1546,7 +1546,7 @@ function EditSoferModal({ sofer, onClose, onSave }: {
       <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
         onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A' }}>✏️ עריכת סופר - {sofer.name}</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#3B3B41' }}>✏️ עריכת סופר - {sofer.name}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
         </div>
         <div style={{ display: 'grid', gap: 14 }}>
@@ -1584,7 +1584,7 @@ function EditSoferModal({ sofer, onClose, onSave }: {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {SOFER_CATS.map(cat => (
                 <button key={cat} type="button" onClick={() => toggleCat(cat)}
-                  style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer', background: categories.includes(cat) ? '#1E3A8A' : '#f5f5f5', color: categories.includes(cat) ? '#fff' : '#333', border: categories.includes(cat) ? '1px solid #1E3A8A' : '1px solid #ddd', fontWeight: categories.includes(cat) ? 700 : 400 }}>
+                  style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer', background: categories.includes(cat) ? '#3B3B41' : '#f5f5f5', color: categories.includes(cat) ? '#fff' : '#333', border: categories.includes(cat) ? '1px solid #3B3B41' : '1px solid #ddd', fontWeight: categories.includes(cat) ? 700 : 400 }}>
                   {cat}
                 </button>
               ))}
@@ -1594,7 +1594,7 @@ function EditSoferModal({ sofer, onClose, onSave }: {
             <label style={labelStyle}>תמונת פרופיל</label>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
               {form.imageUrl && <img src={form.imageUrl} alt="" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ddd' }} />}
-              <label style={{ background: '#1E3A8A', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+              <label style={{ background: '#3B3B41', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
                 {uploadingImg ? '⏳ מעלה...' : '📷 החלף תמונה'}
                 <input type="file" accept="image/*" style={{ display: 'none' }} onChange={async e => {
                   const file = e.target.files?.[0];
@@ -1612,7 +1612,7 @@ function EditSoferModal({ sofer, onClose, onSave }: {
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ flex: 1, background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             {saving ? '⏳ שומר...' : '💾 שמור שינויים'}
           </button>
           <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
@@ -1675,13 +1675,13 @@ function AddShliachModal({ onClose, onSave }: { onClose: () => void; onSave: () 
       <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24, direction: 'rtl' }}
         onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A' }}>➕ הוספת שליח ידנית</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#3B3B41' }}>➕ הוספת שליח ידנית</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
         </div>
         {createdLink ? (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
-            <h3 style={{ fontSize: 17, fontWeight: 900, color: '#1E3A8A', marginBottom: 8 }}>השליח נוצר בהצלחה!</h3>
+            <h3 style={{ fontSize: 17, fontWeight: 900, color: '#3B3B41', marginBottom: 8 }}>השליח נוצר בהצלחה!</h3>
             <p style={{ fontSize: 13, color: '#555', marginBottom: 16 }}>קישור ההפניה האישי:</p>
             <div style={{ background: '#f0f4ff', border: '1px solid #c8d4f0', borderRadius: 8, padding: '12px 16px', fontFamily: 'monospace', fontSize: 13, wordBreak: 'break-all', marginBottom: 16 }}>
               {createdLink}
@@ -2992,7 +2992,7 @@ function CouponCreateForm({ onCreated }: { onCreated: () => void }) {
 
   return (
     <div className="bg-white rounded-xl shadow p-6">
-      <h2 className="text-xl font-black mb-4" style={{ color: '#1E3A8A' }}>🏷️ יצירת קופון חדש</h2>
+      <h2 className="text-xl font-black mb-4" style={{ color: '#3B3B41' }}>🏷️ יצירת קופון חדש</h2>
       <div className="flex flex-wrap gap-3 items-end">
         <div className="flex flex-col gap-1">
           <label className="text-xs font-bold text-gray-500">קוד קופון</label>
@@ -3017,7 +3017,7 @@ function CouponCreateForm({ onCreated }: { onCreated: () => void }) {
           <label className="text-xs font-bold text-gray-500">תפוגה</label>
           <input ref={expiresAtRef} type="date" defaultValue="" className="border border-gray-200 rounded-xl px-3 py-2 text-sm" />
         </div>
-        <button onClick={createCoupon} disabled={couponSaving} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: couponSaving ? 0.5 : 1 }}>
+        <button onClick={createCoupon} disabled={couponSaving} style={{ background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: couponSaving ? 0.5 : 1 }}>
           {couponSaving ? '...' : '➕ צור קופון'}
         </button>
       </div>
@@ -4152,7 +4152,7 @@ export default function AdminPage() {
       </div>
 
       <div className="flex justify-end mb-4">
-        <button onClick={() => setShowAddProduct(true)} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר חדש</button>
+        <button onClick={() => setShowAddProduct(true)} style={{ background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר חדש</button>
       </div>
 
       {/* ── טאבים ── */}
@@ -4233,7 +4233,7 @@ export default function AdminPage() {
             </div>
             <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
             {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
-            <button onClick={() => setShowAddProduct(true)} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר</button>
+            <button onClick={() => setShowAddProduct(true)} style={{ background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר</button>
             <button onClick={exportToExcel} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📥 ייצוא ל-Excel</button>
             <button onClick={downloadTemplate} style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📋 הורד תבנית</button>
             <label style={{ background: '#0284c7', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
@@ -4403,7 +4403,7 @@ export default function AdminPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-black">✍️ סופרים פעילים ({soferimFull.length})</h2>
-            <button onClick={() => setShowAddSofer(true)} style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף סופר</button>
+            <button onClick={() => setShowAddSofer(true)} style={{ background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף סופר</button>
           </div>
           {soferimLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
           : soferimFull.length === 0 ? <div className="p-10 text-center text-gray-400">אין סופרים עדיין</div>
@@ -5011,7 +5011,7 @@ export default function AdminPage() {
       {activeTab === 'edit_requests' && (
         <div style={{ direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>✏️ בקשות עריכת פרופיל סופר</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#3B3B41', margin: 0 }}>✏️ בקשות עריכת פרופיל סופר</h2>
             <button onClick={loadEditRequests} style={{ background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, padding: '7px 14px', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>🔄 רענן</button>
           </div>
           {editRequestsLoading ? (
@@ -5038,7 +5038,7 @@ export default function AdminPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ fontSize: 26 }}>✍️</div>
                         <div>
-                          <div style={{ fontWeight: 900, fontSize: 16, color: '#1E3A8A' }}>{req.soferName}</div>
+                          <div style={{ fontWeight: 900, fontSize: 16, color: '#3B3B41' }}>{req.soferName}</div>
                           <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>soferId: {req.soferId} · {date}</div>
                         </div>
                       </div>
@@ -5450,7 +5450,7 @@ export default function AdminPage() {
           {/* Coupons table */}
           <div className="bg-white rounded-xl shadow overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-black" style={{ color: '#1E3A8A' }}>קופונים קיימים</h2>
+              <h2 className="text-lg font-black" style={{ color: '#3B3B41' }}>קופונים קיימים</h2>
               <span className="text-sm text-gray-500">{coupons.length} קופונים</span>
             </div>
             {couponsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div> : (
@@ -5513,7 +5513,7 @@ export default function AdminPage() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setDeleteConfirm(null)}>
           <div style={{ background: '#fff', borderRadius: 14, padding: 28, maxWidth: 380, width: '100%', textAlign: 'center', direction: 'rtl' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🗑️</div>
-            <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 8, color: '#1E3A8A' }}>מחיקת סופר</h3>
+            <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 8, color: '#3B3B41' }}>מחיקת סופר</h3>
             <p style={{ fontSize: 14, color: '#666', marginBottom: 24 }}>
               האם אתה בטוח שברצונך למחוק את <strong>{soferimFull.find(s => s.id === deleteConfirm)?.name}</strong>?<br />
               <span style={{ color: '#c0392b' }}>פעולה זו בלתי הפיכה.</span>
@@ -5759,7 +5759,7 @@ function CurationRow({ curation, onDelete, lookTagCounts }: { curation: Curation
           onChange={e => setCategory(e.target.value)}
           placeholder="שם קטגוריה (כגון: נטילת ידיים)"
           disabled={!isNew}
-          style={{ width: 180, border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl', background: isNew ? '#fff' : '#f9fafb', color: '#1E3A8A', fontWeight: 600 }}
+          style={{ width: 180, border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl', background: isNew ? '#fff' : '#f9fafb', color: '#3B3B41', fontWeight: 600 }}
         />
       </td>
       <td style={{ padding: '10px 8px' }}>
@@ -5767,7 +5767,7 @@ function CurationRow({ curation, onDelete, lookTagCounts }: { curation: Curation
           value={activeTag}
           onChange={e => setActiveTag(e.target.value)}
           placeholder="כגון: שחור וזהב / Modern"
-          style={{ width: 170, border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl', background: '#fff', color: '#1E3A8A' }}
+          style={{ width: 170, border: '1px solid #e5e7eb', borderRadius: 6, padding: '6px 10px', fontSize: 13, direction: 'rtl', background: '#fff', color: '#3B3B41' }}
         />
         <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 3 }}>הקלד את שם הלוק המדויק כפי שמופיע בפיירסטור</div>
         {activeTag && lookTagCounts && (
@@ -5802,7 +5802,7 @@ function CurationRow({ curation, onDelete, lookTagCounts }: { curation: Curation
           <button
             onClick={handleSave}
             disabled={saving || uploading}
-            style={{ background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
+            style={{ background: '#3B3B41', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
           >
             {saving ? '⏳' : '💾 שמור'}
           </button>
@@ -5854,10 +5854,10 @@ function CurationsTab() {
   return (
     <div dir="rtl">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 900, color: '#1E3A8A' }}>✨ סלקציות (Curations)</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 900, color: '#3B3B41' }}>✨ סלקציות (Curations)</h2>
         <button
           onClick={() => setNewRows(n => n + 1)}
-          style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+          style={{ background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
         >
           + הוסף סלקציה
         </button>

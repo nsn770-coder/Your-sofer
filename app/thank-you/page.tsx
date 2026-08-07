@@ -648,7 +648,7 @@ function ThankYouContent() {
 
       {/* ── Gematria blessing card ── */}
       {blessing && (
-        <div style={{ background: 'linear-gradient(135deg, #1a2744, #1e3a8a)', borderRadius: 20, boxShadow: '0 8px 40px rgba(30,58,138,0.25)', padding: '32px 28px', marginTop: 20, textAlign: 'center', color: '#fff' }}>
+        <div style={{ background: 'linear-gradient(135deg, #1a2744, #3B3B41)', borderRadius: 20, boxShadow: '0 8px 40px rgba(30,58,138,0.25)', padding: '32px 28px', marginTop: 20, textAlign: 'center', color: '#fff' }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 14 }}>
             ✦ ברכה אישית לך ✦
           </div>

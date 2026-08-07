@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
     const DEFAULT_TEMPLATES: Record<string, { subject: string; bodyHtml: string; isActive: boolean }> = {
       order_confirmation: {
         subject: 'אישור הזמנה מ-YourSofer',
-        bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1E3A8A">
+        bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#3B3B41">
   <h2 style="color:#C5A028">תודה על הזמנתך! ✡️</h2>
   <p>שלום {{name}},</p>
   <p>קיבלנו את הזמנתך מספר <strong>{{orderNumber}}</strong> בהצלחה.</p>
@@ -138,13 +138,13 @@ export async function GET(req: NextRequest) {
       },
       cart_abandonment: {
         subject: 'שכחת משהו בעגלה 🛒',
-        bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1E3A8A">
+        bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#3B3B41">
   <h2 style="color:#C5A028">שכחת משהו... 🛒</h2>
   <p>שלום {{name}},</p>
   <p>ראינו שהשארת פריטים בעגלה שלך. אנחנו שמרנו אותם בשבילך!</p>
   <p>חזור/י עכשיו ולהשלים את הרכישה לפני שהמלאי אוזל.</p>
   <div style="text-align:center;margin:30px 0">
-    <a href="https://your-sofer.com/cart" style="background:#C5A028;color:#1E3A8A;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px">
+    <a href="https://your-sofer.com/cart" style="background:#C5A028;color:#3B3B41;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px">
       המשך לעגלה שלי →
     </a>
   </div>
@@ -155,7 +155,7 @@ export async function GET(req: NextRequest) {
       },
       newsletter_welcome: {
         subject: 'ברוך הבא ל-YourSofer! 🎉',
-        bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1E3A8A">
+        bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#3B3B41">
   <h2 style="color:#C5A028">ברוך הבא ל-YourSofer! 🎉</h2>
   <p>שלום {{name}},</p>
   <p>אנחנו שמחים שהצטרפת אלינו! ב-YourSofer תמצא/י את מיטב הסופרים הסת"ם עם מגוון מוצרי יודאיקה איכותיים.</p>
@@ -166,7 +166,7 @@ export async function GET(req: NextRequest) {
     <li>משלוח מהיר לכל הארץ</li>
   </ul>
   <div style="text-align:center;margin:30px 0">
-    <a href="https://your-sofer.com" style="background:#1E3A8A;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px">
+    <a href="https://your-sofer.com" style="background:#3B3B41;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px">
       לחנות שלנו →
     </a>
   </div>
@@ -177,12 +177,12 @@ export async function GET(req: NextRequest) {
       },
       custom_update: {
         subject: 'עדכון מ-YourSofer',
-        bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1E3A8A">
+        bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#3B3B41">
   <h2 style="color:#C5A028">עדכון חשוב מ-YourSofer</h2>
   <p>שלום {{name}},</p>
   <p>{{message}}</p>
   <div style="text-align:center;margin:30px 0">
-    <a href="https://your-sofer.com" style="background:#C5A028;color:#1E3A8A;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px">
+    <a href="https://your-sofer.com" style="background:#C5A028;color:#3B3B41;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px">
       לאתר שלנו →
     </a>
   </div>

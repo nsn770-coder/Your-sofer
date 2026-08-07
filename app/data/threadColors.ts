@@ -52,7 +52,7 @@ export const THREAD_COLORS: ThreadColor[] = [
 ];
 
 // צבע מותג — מסגרת צבע נבחר + כפתורים.
-export const BRAND_COLOR = "#373A5A";
+export const BRAND_COLOR = "#3B3B41";
 
 // עוזר: מחזיר צבע לפי id.
 export function getThreadColorById(id?: string | null): ThreadColor | undefined {

@@ -27,7 +27,7 @@ function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundleProm
   if (typeof priority === 'number' && priority >= 80) {
     return {
       label: 'מומלץ',
-      className: 'bg-[#373A5A] text-white border-[#373A5A]',
+      className: 'bg-[#3B3B41] text-white border-[#3B3B41]',
     };
   }
   if (badge === 'מהודר') {
@@ -39,7 +39,7 @@ function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundleProm
   if (badge === 'מתנה') {
     return {
       label: 'מתאים כמתנה',
-      className: 'bg-white text-[#373A5A] border-[#373A5A]',
+      className: 'bg-white text-[#3B3B41] border-[#3B3B41]',
     };
   }
   if (badge === 'בטוח') {
@@ -51,7 +51,7 @@ function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundleProm
   if (badge === 'מהדרין') {
     return {
       label: 'מהדרין',
-      className: 'bg-[#373A5A] text-white border-[#373A5A]',
+      className: 'bg-[#3B3B41] text-white border-[#3B3B41]',
     };
   }
   return null;

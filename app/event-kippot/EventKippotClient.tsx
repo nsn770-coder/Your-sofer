@@ -353,7 +353,7 @@ export default function EventKippotClient() {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 20 }}>
-          <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 80 }}>
+          <div style={{ background: '#FEFBF7', padding: '12px 20px', minWidth: 80 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>כמות — לחצו לעריכה</div>
             {/* קלט ישיר: לחיצה על המספר מאפשרת הקלדת כמות מדויקת */}
             <input
@@ -379,12 +379,12 @@ export default function EventKippotClient() {
               }}
             />
           </div>
-          <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 110 }}>
+          <div style={{ background: '#FEFBF7', padding: '12px 20px', minWidth: 110 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>מחיר ליחידה</div>
             <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: GOLD }}>₪{unitPrice}</div>
             {embroideryExtra > 0 && <div style={{ fontSize: 10, color: '#9C7B3F' }}>כולל +₪{embroideryExtra} רקמה</div>}
           </div>
-          <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 130 }}>
+          <div style={{ background: '#FEFBF7', padding: '12px 20px', minWidth: 130 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>סה&quot;כ משוער</div>
             <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: NAVY }}>
               ₪{total.toLocaleString('he-IL')}

@@ -386,7 +386,7 @@ function SoferCard({ soferId }: { soferId?: string }) {
           : <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', fontSize: 22, flexShrink: 0 }}>✍️</div>
         }
         <div>
-          <div style={{ fontWeight: 800, fontSize: 15, color: '#1F2937' }}>{sofer.name}</div>
+          <div style={{ fontWeight: 800, fontSize: 15, color: '#3B3B41' }}>{sofer.name}</div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 3 }}>
             {sofer.yearsOfExperience != null && (
               <span style={{ fontSize: 11, color: '#6B7280' }}>{sofer.yearsOfExperience} שנות ניסיון</span>
@@ -2513,7 +2513,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               <path d={item.icon}/>
             </svg>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 800, color: '#1F2937' }}>{item.title}</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: '#3B3B41' }}>{item.title}</div>
               <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>
                 {item.href ? (
                   <a href={item.href} style={{ color: '#6B7280', textDecorationLine: 'underline', textDecorationColor: '#ccc', textUnderlineOffset: 2 }}>{item.sub}</a>
@@ -2795,7 +2795,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
           {/* ── Column 2: Details ── */}
           <div style={{ background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', marginTop: isMobile ? 8 : 0 }}>
-            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1F2937', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#3B3B41', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
 
             {/* הבאדג' "ניתן להוסיף רקמת שם אישית" הוסר (07/2026) — אפשרויות
                 הרקמה/ההטבעה/ההקדשה מוצגות ממילא בתוך ה-BuyBox ליד כפתור

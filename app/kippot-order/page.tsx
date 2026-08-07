@@ -371,7 +371,7 @@ function KippotOrderInner() {
       </p>
 
       {/* כיפה נבחרת */}
-      <div style={{ display: 'flex', gap: 16, alignItems: 'center', background: '#FAF8F3', border: '1px solid #E5E0D5', padding: 16, marginBottom: 28 }}>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center', background: '#FEFBF7', border: '1px solid #E5E0D5', padding: 16, marginBottom: 28 }}>
         <img src={kippah.img} alt={kippah.label} style={{ width: 80, height: 80, objectFit: 'cover', flexShrink: 0, border: '2px solid #C5A028' }} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 900 }}>{kippah.label}</div>
@@ -729,7 +729,7 @@ function KippotOrderInner() {
       )}
 
       {/* סיכום */}
-      <div style={{ background: '#FAF8F3', border: '1px solid #E5E0D5', padding: 20, marginBottom: 24 }}>
+      <div style={{ background: '#FEFBF7', border: '1px solid #E5E0D5', padding: 20, marginBottom: 24 }}>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>סיכום מחיר</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#6B7280' }}>

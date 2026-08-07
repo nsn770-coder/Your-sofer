@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   <div style="max-width:580px;margin:32px auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
 
     <!-- Header -->
-    <div style="background:#1E3A8A;padding:28px 32px;text-align:center;">
+    <div style="background:#3B3B41;padding:28px 32px;text-align:center;">
       <div style="font-size:13px;color:rgba(255,255,255,0.65);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">מועדון לקוחות</div>
       <h1 style="margin:0;color:#C5A028;font-size:26px;font-weight:900;">✡ Your Sofer</h1>
       <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:13px;">סת״מ ישירות מהסופר</p>
@@ -28,14 +28,14 @@ export async function POST(req: NextRequest) {
 
     <!-- Body -->
     <div style="padding:32px 32px 28px;">
-      <h2 style="color:#1E3A8A;font-size:21px;margin:0 0 10px;">ברוכים הבאים למועדון YourSofer! 🎉</h2>
+      <h2 style="color:#3B3B41;font-size:21px;margin:0 0 10px;">ברוכים הבאים למועדון YourSofer! 🎉</h2>
       <p style="color:#444;font-size:14px;line-height:1.75;margin:0 0 24px;">
         שמחים שהצטרפתם אלינו. כחברי המועדון תקבלו:
       </p>
 
       <!-- Benefits -->
       <div style="background:#EFF6FF;border-right:4px solid #2563EB;border-radius:10px;padding:18px 20px;margin-bottom:24px;">
-        <div style="color:#1E3A8A;font-size:14px;font-weight:700;margin-bottom:8px;">ההטבות שלכם:</div>
+        <div style="color:#3B3B41;font-size:14px;font-weight:700;margin-bottom:8px;">ההטבות שלכם:</div>
         <div style="color:#333;font-size:13px;line-height:2;">
           ✅ 5% הנחה על הרכישה הראשונה (קוד למטה)<br/>
           ✅ צבירת 10% מסכום הרכישה בנקודות — כל נקודה שווה 1 ₪ וניתן לממש מהקנייה הבאה<br/>
@@ -47,14 +47,14 @@ export async function POST(req: NextRequest) {
       <!-- Coupon -->
       <p style="color:#444;font-size:14px;margin:0 0 12px;">הנה קוד ההנחה שלכם ל-5% על הרכישה הראשונה:</p>
       <div style="border:2px dashed #2563EB;border-radius:10px;padding:16px;text-align:center;margin-bottom:24px;background:#F8FAFF;">
-        <div style="font-size:24px;font-weight:900;color:#1E3A8A;letter-spacing:3px;">ברכה5</div>
+        <div style="font-size:24px;font-weight:900;color:#3B3B41;letter-spacing:3px;">ברכה5</div>
         <div style="font-size:12px;color:#666;margin-top:6px;">הכניסו את הקוד בשדה ״קוד קופון״ בעמוד הקופה</div>
       </div>
 
       <!-- CTA -->
       <div style="text-align:center;margin-bottom:28px;">
         <a href="https://your-sofer.com"
-           style="background:#1E3A8A;color:#fff;text-decoration:none;border-radius:10px;padding:14px 36px;font-size:15px;font-weight:800;display:inline-block;">
+           style="background:#3B3B41;color:#fff;text-decoration:none;border-radius:10px;padding:14px 36px;font-size:15px;font-weight:800;display:inline-block;">
           לקנייה עכשיו ←
         </a>
       </div>

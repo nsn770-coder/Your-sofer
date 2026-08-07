@@ -65,7 +65,7 @@ function ProfileCard({
         <InitialsAvatar initials={initials} size={avatarSize} />
       )}
       <div>
-        <div style={{ fontSize: isMobile ? 16 : 17, fontWeight: 700, color: '#1F2937', marginBottom: 3 }}>{name}</div>
+        <div style={{ fontSize: isMobile ? 16 : 17, fontWeight: 700, color: '#3B3B41', marginBottom: 3 }}>{name}</div>
         <div style={{ fontSize: 13, color: GOLD, fontWeight: 700 }}>{title}</div>
       </div>
       <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, maxWidth: 260, margin: 0 }}>
@@ -104,7 +104,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
 
           <h2 style={{
             fontSize: isMobile ? 28 : 36,
-            fontWeight: 300, color: '#1F2937',
+            fontWeight: 300, color: '#3B3B41',
             lineHeight: 1.4, margin: '0 0 14px',
             letterSpacing: '-0.01em',
           }}>

@@ -288,7 +288,7 @@ export default function AllProductsClient() {
       {/* ── Page header ─────────────────────────────────────────────────────── */}
       <div style={{ background: '#FFFFFF', padding: '32px 20px 16px' }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
-          <h1 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 400, color: '#1F2937', margin: '0 0 4px', letterSpacing: '-0.01em' }}>
+          <h1 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 400, color: '#3B3B41', margin: '0 0 4px', letterSpacing: '-0.01em' }}>
             כל המוצרים
           </h1>
           <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>

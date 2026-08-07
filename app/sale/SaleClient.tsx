@@ -84,7 +84,7 @@ export default function SaleClient() {
       </div>
 
       {/* Badge strip */}
-      <div style={{ background: '#373A5A', padding: '10px 24px', textAlign: 'center', fontSize: 13, fontWeight: 500, color: '#fff' }}>
+      <div style={{ background: '#3B3B41', padding: '10px 24px', textAlign: 'center', fontSize: 13, fontWeight: 500, color: '#fff' }}>
         המחירים המוזלים מוצגים ישירות על המוצר &nbsp;·&nbsp; ההנחה מחושבת אוטומטית בעגלה
       </div>
 

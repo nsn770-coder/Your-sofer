@@ -10,7 +10,7 @@ interface DayStat {
   revenue: number;
 }
 
-const navy = '#1E3A8A';
+const navy = '#3B3B41';
 const gold = '#C5A028';
 
 export default function AnalyticsLineChart({ data, title }: { data: DayStat[]; title?: string }) {
