@@ -111,6 +111,7 @@ export interface HeroSlide {
   subtitle?: string;
   ctaLabel?: string;
   ctaHref?: string;
+  scrim?: string;
 }
 
 /**
@@ -142,6 +143,7 @@ async function fetchHeroSlides(): Promise<HeroSlide[]> {
           subtitle:     str('subtitle'),
           ctaLabel:     str('ctaLabel'),
           ctaHref:      str('ctaHref'),
+          scrim:        str('scrim') || 'none',
         } as HeroSlide;
       })
       .filter((s: HeroSlide) => s.imgUrl && s.title);

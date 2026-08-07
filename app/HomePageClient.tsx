@@ -894,6 +894,9 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         .ys-hero-content { padding: 0 72px; }
         .ys-hero-title { font-size: 48px; max-width: 70%; }
         .ys-hero-sub { font-size: 18px; margin-bottom: 32px; max-width: 60%; }
+        /* בקרוסלה הכותרת יושבת למעלה־בצד ולא במרכז — ב-RTL זה הצד הימני.
+           padding-top ביחס לגובה הבאנר כדי שהמיקום יישמר בכל רוחב מסך. */
+        .ys-hero-carousel .ys-hero-content { padding: 7% 72px 0; }
         .ys-trust-txt { font-size: 13px; }
         @media (max-width: 767px) {
           .ys-hero-box { padding-top: 56.25%; }
@@ -903,6 +906,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           .ys-hero-content { padding: 40px 24px 36px; }
           .ys-hero-title { font-size: 28px; max-width: 92%; }
           .ys-hero-sub { font-size: 15px; margin-bottom: 24px; max-width: 88%; }
+          .ys-hero-carousel .ys-hero-content { padding: 32px 24px 0; }
           .ys-trust-txt { font-size: 12px; }
         }
       `}</style>

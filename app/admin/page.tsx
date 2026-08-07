@@ -5901,11 +5901,12 @@ function CurationsTab() {
 interface HeroSlideCfg {
   imgUrl: string; imgUrlMobile: string;
   eyebrow: string; title: string; subtitle: string;
-  ctaLabel: string; ctaHref: string;
+  ctaLabel: string; ctaHref: string; scrim: string;
 }
 
 const EMPTY_SLIDE: HeroSlideCfg = {
   imgUrl: '', imgUrlMobile: '', eyebrow: '', title: '', subtitle: '', ctaLabel: '', ctaHref: '',
+  scrim: 'none',
 };
 
 function HeroTab() {
@@ -5927,6 +5928,7 @@ function HeroTab() {
             imgUrl: x.imgUrl ?? '', imgUrlMobile: x.imgUrlMobile ?? '',
             eyebrow: x.eyebrow ?? '', title: x.title ?? '', subtitle: x.subtitle ?? '',
             ctaLabel: x.ctaLabel ?? '', ctaHref: x.ctaHref ?? '',
+            scrim: x.scrim ?? 'none',
           }));
           setSlides(s.length > 0 ? s : [{ ...EMPTY_SLIDE }]);
         }
@@ -5969,6 +5971,7 @@ function HeroTab() {
           imgUrl: s.imgUrl.trim(), imgUrlMobile: s.imgUrlMobile.trim(),
           eyebrow: s.eyebrow.trim(), title: s.title.trim(), subtitle: s.subtitle.trim(),
           ctaLabel: s.ctaLabel.trim(), ctaHref: s.ctaHref.trim(),
+          scrim: s.scrim || 'none',
         })),
         updatedAt: new Date().toISOString(),
       });
@@ -6027,6 +6030,17 @@ function HeroTab() {
               <p className="text-xs text-gray-400 -mt-1">
                 כשיש יעד — <b>כל שטח הבאנר לחיץ</b>. טקסט הכפתור רק מוסיף כפתור גלוי מעל.
               </p>
+              <div>
+                <label className="block text-xs font-bold text-gray-600 mb-1">הכהיה מאחורי הטקסט</label>
+                <select className={inp} value={s.scrim} onChange={e => upd(i, 'scrim', e.target.value)}>
+                  <option value="none">ללא (ברירת מחדל) — לתמונה עם שטח ריק לטקסט</option>
+                  <option value="light">עדינה</option>
+                  <option value="medium">חזקה — לתמונה עמוסה</option>
+                </select>
+                <p className="text-xs text-gray-400 mt-1">
+                  גרדיאנט מצד הטקסט בלבד, לא הכהיה על כל התמונה. אם הטקסט לא נקרא — העלה רמה.
+                </p>
+              </div>
               {s.imgUrl && <img src={s.imgUrl} alt="" className="w-full max-w-sm object-cover rounded border" style={{ aspectRatio: '3 / 1' }} />}
             </div>
           ))}
