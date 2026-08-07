@@ -110,7 +110,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
     <div ref={wrapperRef} style={{ position: 'relative', ...style }}>
 
       {/* ── Input row ──────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', borderRadius: 12, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', borderRadius: 'var(--ys-radius-input)', overflow: 'hidden', border: '1px solid var(--ys-border)' }}>
         <input
           ref={inputRef}
           value={query}
@@ -126,7 +126,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
             padding:    '10px 12px',
             fontSize:   14,
             color:      '#111',
-            background: '#f3f4f6',
+            background: 'var(--ys-surface)',
             outline:    'none',
             minWidth:   0,
             textAlign:  'right',
@@ -143,7 +143,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
           style={{ background: '#373A5A', border: 'none', padding: '0 14px', cursor: 'pointer', flexShrink: 0 }}
           aria-label="חפש"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FEFBF7" strokeWidth="2.5">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
@@ -158,7 +158,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
           right:      0,
           left:       0,
           background: '#fff',
-          border:     '1px solid #E7E2D8',
+          border:     '1px solid #E9E4DC',
           borderTop:  'none',
           boxShadow:  '0 8px 32px rgba(0,0,0,0.12)',
           zIndex:     300,
@@ -183,19 +183,19 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
               {/* Categories */}
               {categories.length > 0 && (
                 <div>
-                  <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 700, color: '#C5A028', letterSpacing: 1.5, textAlign: 'right', borderBottom: '1px solid #F0EDE8' }}>
+                  <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 700, color: 'var(--ys-purple)', letterSpacing: 1.5, textAlign: 'right', borderBottom: '1px solid #F0EDE8' }}>
                     קטגוריות
                   </div>
                   {categories.map(cat => (
                     <button
                       key={cat.objectID}
                       onClick={() => navigate(`/category/${encodeURIComponent(cat.name)}`)}
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '9px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#1a1a1a', fontFamily: 'inherit', borderBottom: '1px solid #F7F5F0' }}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '9px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--ys-ink)', fontFamily: 'inherit', borderBottom: '1px solid #F7F5F0' }}
                       onMouseEnter={e => { e.currentTarget.style.background = '#FBF9F4'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
                     >
                       <span style={{ fontWeight: 600, fontSize: 13 }}>{cat.displayName || cat.name}</span>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#51285F" strokeWidth="2.5" style={{ flexShrink: 0 }}>
                         <polyline points="9 18 3 12 9 6" />
                       </svg>
                     </button>
@@ -206,7 +206,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
               {/* Products */}
               {products.length > 0 && (
                 <div>
-                  <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 700, color: '#C5A028', letterSpacing: 1.5, textAlign: 'right', borderBottom: '1px solid #F0EDE8' }}>
+                  <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 700, color: 'var(--ys-purple)', letterSpacing: 1.5, textAlign: 'right', borderBottom: '1px solid #F0EDE8' }}>
                     מוצרים
                   </div>
                   {products.map(p => (
@@ -230,7 +230,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
                         )}
                       </div>
                       <div style={{ flex: 1, textAlign: 'right', minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ys-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {p.name}
                         </div>
                         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 2 }}>
