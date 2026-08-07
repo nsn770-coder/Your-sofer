@@ -8,6 +8,7 @@ import {
 import { db } from '../../firebase';
 import Link from 'next/link';
 import ProductCard from '@/components/ui/ProductCard';
+import SubcategoryTiles from '@/app/components/SubcategoryTiles';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import { useCart } from '@/app/contexts/CartContext';
@@ -2147,8 +2148,12 @@ export default function CategoryClient({ category }: { category: string }) {
                     ))}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7">
-                    {paginated.map((p, idx) => (
+                  /* הגריד מפוצל אחרי השורה הראשונה (5 מוצרים) כדי לשלב בין
+                     השורות רצועת אריחי תת-קטגוריה — הדפוס של NOTHS. הלקוח
+                     רואה קודם סחורה, ורק אז מוצע לו לצמצם. */
+                  (() => {
+                    const ROW = 5;
+                    const renderCard = (p: typeof paginated[number], idx: number) => (
                       <div key={p.id} className="ys-fade-card">
                         <ProductCard
                           id={p.id}
@@ -2172,8 +2177,22 @@ export default function CategoryClient({ category }: { category: string }) {
                           clearanceDiscount={p.clearanceDiscount} clearanceSalePrice={p.clearanceSalePrice} originalPrice={p.originalPrice}
                         />
                       </div>
-                    ))}
-                  </div>
+                    );
+                    const gridCls = "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7";
+                    return (
+                      <>
+                        <div className={gridCls}>
+                          {paginated.slice(0, ROW).map(renderCard)}
+                        </div>
+                        <SubcategoryTiles category={category} activeFilter={subCategoryFilter} />
+                        {paginated.length > ROW && (
+                          <div className={gridCls}>
+                            {paginated.slice(ROW).map((p, i) => renderCard(p, i + ROW))}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()
                 )
               ) : (
                 <>
