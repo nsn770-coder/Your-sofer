@@ -2260,6 +2260,19 @@ export default function CategoryClient({ category }: { category: string }) {
                           ))}
                         </div>
                       );
+                      // אריחי תת-קטגוריה — אחרי הקבוצה הראשונה, ושוב בהמשך
+                      // בעמודים ארוכים. הדפוס של NOTHS: קודם סחורה, ואז
+                      // הצעה לצמצם. מוצג רק כשלא סוננה כבר תת-קטגוריה.
+                      if (!isStamCat && start === 0) {
+                        result.push(
+                          <SubcategoryTiles key="subcat-tiles-1" category={category} activeFilter={subCategoryFilter} />
+                        );
+                      }
+                      if (!isStamCat && start === BANNER_EVERY * 2) {
+                        result.push(
+                          <SubcategoryTiles key="subcat-tiles-2" category={category} activeFilter={subCategoryFilter} variant="compact" />
+                        );
+                      }
                       if (!isStamCat && start + BANNER_EVERY < paginated.length && bannerPool.length > 0) {
                         const col = bannerPool[bannerIdx % bannerPool.length];
                         bannerIdx++;

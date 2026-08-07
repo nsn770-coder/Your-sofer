@@ -41,10 +41,10 @@ export default function SubcategoryTiles({ category, activeFilter, variant = 'fu
         const list = snap.docs
           .map(d => {
             const r = d.data() as Subcat & { name?: string; imgUrl?: string };
-            // ה-slug הוא מזהה המסמך ולא תמיד קיים כשדה בתוכו — בדיוק כמו
-            // שהאדמין גוזר אותו. בלי הנפילה ל-d.id כל האריחים סוננו החוצה.
+            // שדה slug קודם למזהה המסמך: המזהה הוא מחרוזת אקראית
+            // (2OuGWdU07…) בעוד ה-slug מחזיק את הערך העברי שאליו מסננים.
             return {
-              slug:        d.id || r.slug || '',
+              slug:        r.slug || d.id || '',
               displayName: r.displayName || r.name || '',
               imageUrl:    r.imageUrl || r.imgUrl || '',
               priority:    r.priority,
