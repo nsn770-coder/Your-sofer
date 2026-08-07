@@ -19,7 +19,8 @@ import { SHIPPING } from '@/app/config/siteTrust';
 /** KEEP IN SYNC with components/ClubPopup.tsx + ClubPopupWrapper.tsx */
 const OPEN_CLUB_EVENT = 'ys:open-club';
 
-const BAR_BG = '#373A5A'; // כחול כהה — צבע מותג
+const BAR_BG = 'var(--ys-plum)'; // שזיף המותג
+const COUPON_CODE = 'ברכה5';
 const BAR_H = 36;
 const ROTATE_MS = 4000;
 const FADE_MS = 400;
@@ -29,6 +30,15 @@ type Msg = { text: string; action?: () => void; ariaLabel?: string };
 export default function AnnouncementBar() {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  async function copyCoupon() {
+    try {
+      await navigator.clipboard.writeText(COUPON_CODE);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    } catch { /* clipboard לא זמין — נכשל בשקט */ }
+  }
 
   const messages: Msg[] = [
     {
@@ -39,7 +49,17 @@ export default function AnnouncementBar() {
       ariaLabel: 'הצטרפות למועדון הלקוחות — פתיחת טופס ההרשמה',
       action: () => window.dispatchEvent(new Event(OPEN_CLUB_EVENT)),
     },
+    {
+      // אוחד לכאן מ-CouponStrip (08/2026): שתי רצועות פרסום זו מעל זו תפסו
+      // 72px בראש כל עמוד. לחיצה מעתיקה את הקוד, במקום כפתור "העתק" נפרד.
+      text: copied
+        ? `✓ הקוד ${COUPON_CODE} הועתק!`
+        : `🏷️ קוד קופון ${COUPON_CODE} — 5% הנחה, לחצו להעתקה`,
+      ariaLabel: `העתקת קוד הקופון ${COUPON_CODE}`,
+      action: copyCoupon,
+    },
   ];
+  const MSG_COUNT = messages.length;
 
   useEffect(() => {
     // נגישות: מכבדים prefers-reduced-motion — בלי החלפה אוטומטית ובלי fade.
@@ -49,7 +69,7 @@ export default function AnnouncementBar() {
     const id = window.setInterval(() => {
       setVisible(false);
       window.setTimeout(() => {
-        setIndex(i => (i + 1) % 2);
+        setIndex(i => (i + 1) % MSG_COUNT);
         setVisible(true);
       }, FADE_MS);
     }, ROTATE_MS);
@@ -96,7 +116,7 @@ export default function AnnouncementBar() {
     >
       {/* קוראי מסך: מקבלים את שני המסרים פעם אחת, בלי הכרזה חוזרת כל 4 שניות */}
       <span className="sr-only">
-        משלוח חינם בהזמנה מעל ₪{SHIPPING.freeShippingThreshold}. 5% הנחה ו-10% בנקודות למצטרפים למועדון.
+        משלוח חינם בהזמנה מעל ₪{SHIPPING.freeShippingThreshold}. 5% הנחה ו-10% בנקודות למצטרפים למועדון. קוד קופון {COUPON_CODE} להנחה של 5%.
       </span>
 
       <span aria-hidden="true" style={{ display: 'flex', alignItems: 'center', maxWidth: '100%' }}>

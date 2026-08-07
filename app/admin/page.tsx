@@ -309,6 +309,8 @@ interface Category {
   imgUrl?: string;
   sub?: string;
   order?: number;
+  /** קטגוריית האב — כשמוגדרת, הרשומה מוצגת כאריח תת-קטגוריה בעמוד אותה קטגוריה */
+  parentCategory?: string;
 }
 
 type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions' | 'best_sellers' | 'seasonal' | 'hero';
@@ -3671,7 +3673,7 @@ export default function AdminPage() {
     finally { setContentSaving(false); }
   }
 
-  async function saveCategory(catId: string, data: { displayName: string; imageUrl: string; priority: number }) {
+  async function saveCategory(catId: string, data: { displayName: string; imageUrl: string; priority: number; parentCategory: string }) {
     setCatSaving(catId);
     try {
       console.log('[saveCategory] writing:', catId, data);
@@ -5621,11 +5623,12 @@ export default function AdminPage() {
 
 function CategoryCard({ cat, saving, saved, onSave }: {
   cat: Category; saving: boolean; saved: boolean;
-  onSave: (data: { displayName: string; imageUrl: string; priority: number }) => void;
+  onSave: (data: { displayName: string; imageUrl: string; priority: number; parentCategory: string }) => void;
 }) {
   const [displayName, setDisplayName] = useState(cat.displayName || cat.name || '');
   const [imageUrl, setImageUrl]       = useState(cat.imageUrl || cat.imgUrl || '');
   const [priority, setPriority]       = useState(cat.priority ?? cat.order ?? 0);
+  const [parentCategory, setParentCategory] = useState(cat.parentCategory ?? '');
   const [uploading, setUploading]     = useState(false);
   const [imgSaved, setImgSaved]       = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -5647,7 +5650,7 @@ function CategoryCard({ cat, saving, saved, onSave }: {
       const url = data.secure_url as string;
       setImageUrl(url);
       console.log('saving to firestore:', cat.id, url);
-      onSave({ displayName, imageUrl: url, priority });
+      onSave({ displayName, imageUrl: url, priority, parentCategory });
       console.log('saved!');
       setImgSaved(true);
       setTimeout(() => setImgSaved(false), 3000);
@@ -5692,8 +5695,21 @@ function CategoryCard({ cat, saving, saved, onSave }: {
           <label className="block text-xs font-bold text-gray-500 mb-1">עדיפות (מספר נמוך = ראשון)</label>
           <input type="number" value={priority} onChange={e => setPriority(Number(e.target.value))} className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm" />
         </div>
+        <div>
+          <label className="block text-xs font-bold text-gray-500 mb-1">קטגוריית אב</label>
+          <input
+            value={parentCategory}
+            onChange={e => setParentCategory(e.target.value)}
+            placeholder="למשל: כיפות"
+            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
+          />
+          <p className="text-[11px] text-gray-400 mt-1 leading-snug">
+            כשממלאים כאן שם של קטגוריה, הרשומה מופיעה כ<b>אריח תת-קטגוריה</b> בעמוד
+            אותה קטגוריה — עם התמונה שלמעלה. חובה שתהיה תמונה, אחרת האריח לא יוצג.
+          </p>
+        </div>
         <div className="flex items-center gap-3 mt-auto">
-          <button onClick={() => onSave({ displayName, imageUrl, priority })} disabled={saving || uploading}
+          <button onClick={() => onSave({ displayName, imageUrl, priority, parentCategory })} disabled={saving || uploading}
             className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50">
             {saving ? '⏳ שומר...' : '💾 שמור'}
           </button>

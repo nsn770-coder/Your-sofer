@@ -13,7 +13,7 @@ import { getTier, getNextTierInfo } from "@/app/lib/loyalty";
 import MobileDrawerMenu from "./MobileDrawerMenu";
 import lifeEvents from "@/data/lifeEvents";
 import AlgoliaSearch from "@/app/components/search/AlgoliaSearch";
-import CouponStrip from "@/app/components/CouponStrip";
+// CouponStrip אוחד לתוך AnnouncementBar (08/2026)
 import { MEGA_MENU_DATA, type NavMenuItem, type NavSubItem } from "@/data/categoriesMenu";
 
 const SIMPLE_NAV = [
@@ -236,7 +236,7 @@ function NavBarContent() {
       )}
 
       <header style={{ background: "var(--ys-page)", color: "var(--ys-ink)", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E9E4DC" }}>
-        <CouponStrip />
+        {/* CouponStrip הוסר — הקופון הוא כעת המסר השלישי ב-AnnouncementBar */}
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center", gap: isMobile ? 6 : 12 }}>
           <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "var(--ys-ink)", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
             <div style={{ width: 20, height: 2, background: "var(--ys-plum)", borderRadius: 0 }} />
@@ -410,26 +410,9 @@ function NavBarContent() {
           </div>
         </div>
 
-        {!isMobile && (
-          <div style={{ background: "var(--ys-plum)", borderBottom: "2px solid var(--ys-purple)" }}>
-            <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ys-on-dark)", letterSpacing: 1.5, padding: "8px 14px 8px 0", borderLeft: "1px solid rgba(255,255,255,0.15)", marginLeft: 6, whiteSpace: "nowrap", flexShrink: 0 }}>
-                רגעי חיים
-              </span>
-              {lifeEvents.map(ev => (
-                <button
-                  key={ev.id}
-                  onClick={() => handleMoment(ev.id)}
-                  style={{ background: "none", border: "none", borderBottom: "2px solid transparent", color: "rgba(255,255,255,0.82)", padding: "8px 13px", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", transition: "color 0.15s, border-bottom-color 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderBottomColor = "var(--ys-on-dark)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.82)"; e.currentTarget.style.borderBottomColor = "transparent"; }}
-                >
-                  {ev.title}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* רצועת "רגעי חיים" הוסרה מהכותרת (08/2026) — היא הוסיפה 37px מעל
+            הקיפול וכפלה תוכן שכבר קיים כרצועת באנרים בעמוד הבית.
+            הניווט לאירועים נשאר דרך /moment/[id] ודרך התפריט במובייל. */}
 
         {!isMobile && (
           <div style={{ background: "var(--ys-page)", borderTop: "1px solid #E9E4DC", position: "relative" }}>

@@ -1259,18 +1259,27 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           <p className="ys-section-sub">כל רגע בבית היהודי — וכל מה שצריך אליו</p>
         </div>
 
-        {/* גריד במקום גלילה אופקית (08/2026): הרצועה הסתירה 4 מתוך 7 האירועים
-            מתחת לקצה המסך, ורגעי החיים הם הבידול המרכזי של האתר. */}
-        <div className="ys-section grid grid-cols-2 md:grid-cols-4"
-          style={{ columnGap: 'var(--ys-col-gap)', rowGap: 'var(--ys-row-gap)' }}>
+        {/* חזרה לגלילה אופקית (08/2026) — שורה אחת. הגריד תפס גובה רב מדי
+            ודחף את המוצרים מתחת לקיפול, וזה בדיוק מה שניסינו לתקן.
+            scroll-snap גורם לכל כרטיס לעצור במקומו במקום לרחף באמצע. */}
+        <div
+          className="ys-hscroll"
+          style={{
+            display: 'flex', overflowX: 'auto', gap: 'var(--ys-col-gap)',
+            padding: '4px 20px 16px', scrollbarWidth: 'none',
+            direction: 'rtl', scrollSnapType: 'x mandatory',
+          } as React.CSSProperties}>
           {lifeEvents.map((ev, evIdx) => (
             <a
               key={ev.id}
               href={`/moment/${ev.id}`}
+              className="w-[210px] md:w-[240px]"
               style={{
                 textDecoration: 'none',
                 display: 'flex',
                 flexDirection: 'column',
+                flexShrink: 0,
+                scrollSnapAlign: 'start',
                 background: '#FFFFFF',
                 border: '1px solid #EDEDEF',
                 borderRadius: 0,
