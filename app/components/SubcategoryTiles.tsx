@@ -39,9 +39,20 @@ export default function SubcategoryTiles({ category, activeFilter, variant = 'fu
       .then(snap => {
         if (cancelled) return;
         const list = snap.docs
-          .map(d => d.data() as Subcat)
+          .map(d => {
+            const r = d.data() as Subcat & { name?: string; imgUrl?: string };
+            // ה-slug הוא מזהה המסמך ולא תמיד קיים כשדה בתוכו — בדיוק כמו
+            // שהאדמין גוזר אותו. בלי הנפילה ל-d.id כל האריחים סוננו החוצה.
+            return {
+              slug:        d.id || r.slug || '',
+              displayName: r.displayName || r.name || '',
+              imageUrl:    r.imageUrl || r.imgUrl || '',
+              priority:    r.priority,
+              filterValue: r.filterValue,
+            } as Subcat;
+          })
           // בלי תמונה האריח חסר משמעות — נופלים חזרה לפילטר בסרגל הצד
-          .filter(s => s.slug && s.displayName && s.imageUrl)
+          .filter(s => s.displayName && s.imageUrl)
           .sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
         setSubcats(list);
       })
