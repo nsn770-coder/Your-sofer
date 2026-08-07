@@ -9,6 +9,7 @@ import { db } from '../../firebase';
 import Link from 'next/link';
 import ProductCard from '@/components/ui/ProductCard';
 import SubcategoryTiles from '@/app/components/SubcategoryTiles';
+import CategoryHero from '@/app/components/CategoryHero';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import { useCart } from '@/app/contexts/CartContext';
@@ -1685,6 +1686,11 @@ export default function CategoryClient({ category }: { category: string }) {
         </div>
       )}
 
+      {/* ── רצועת פתיחה — כותרת, תיאור ותמונה ──
+          מוצגת רק כשלקטגוריה יש תמונה או תיאור באדמין. מעבר לעיצוב, זה
+          הטקסט התיאורי היחיד בעמוד — עד עכשיו זחלני חיפוש ראו רק רשת מוצרים. */}
+      <CategoryHero category={category} />
+
       {/* ── Mobile toolbar ── */}
       <div className="lg:hidden sticky top-0 z-20" style={{ background: '#FFFFFF', borderBottom: '1px solid #EDEDEF', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
         {!loading && (
@@ -2179,6 +2185,10 @@ export default function CategoryClient({ category }: { category: string }) {
                       </div>
                     );
                     const gridCls = "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7";
+                    // חזרה שנייה על האריחים בעמודים ארוכים — מי שגלל 30 מוצרים
+                    // כבר לא רואה את הרצועה הראשונה, וזו נקודת ההחלטה הטבעית
+                    // לצמצם. אצלם הדפוס חוזר לאורך כל עמוד המחלקה.
+                    const REPEAT_AT = 30;
                     return (
                       <>
                         <div className={gridCls}>
@@ -2187,8 +2197,16 @@ export default function CategoryClient({ category }: { category: string }) {
                         <SubcategoryTiles category={category} activeFilter={subCategoryFilter} />
                         {paginated.length > ROW && (
                           <div className={gridCls}>
-                            {paginated.slice(ROW).map((p, i) => renderCard(p, i + ROW))}
+                            {paginated.slice(ROW, REPEAT_AT).map((p, i) => renderCard(p, i + ROW))}
                           </div>
+                        )}
+                        {paginated.length > REPEAT_AT && (
+                          <>
+                            <SubcategoryTiles category={category} activeFilter={subCategoryFilter} variant="compact" />
+                            <div className={gridCls}>
+                              {paginated.slice(REPEAT_AT).map((p, i) => renderCard(p, i + REPEAT_AT))}
+                            </div>
+                          </>
                         )}
                       </>
                     );

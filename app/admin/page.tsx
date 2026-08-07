@@ -194,6 +194,7 @@ interface Product {
   name: string;
   price: number;
   cat?: string;
+  subCategory?: string;
   category?: string;
   status?: string;
   soferId?: string;
@@ -311,6 +312,10 @@ interface Category {
   order?: number;
   /** קטגוריית האב — כשמוגדרת, הרשומה מוצגת כאריח תת-קטגוריה בעמוד אותה קטגוריה */
   parentCategory?: string;
+  /** ערך ה-subCategory שאליו האריח מסנן. ריק = משתמשים ב-slug (התנהגות ישנה) */
+  filterValue?: string;
+  /** תיאור קצר — מוצג ברצועת הפתיחה של עמוד הקטגוריה, וגם טוב ל-SEO */
+  description?: string;
 }
 
 type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions' | 'best_sellers' | 'seasonal' | 'hero';
@@ -3673,7 +3678,7 @@ export default function AdminPage() {
     finally { setContentSaving(false); }
   }
 
-  async function saveCategory(catId: string, data: { displayName: string; imageUrl: string; priority: number; parentCategory: string }) {
+  async function saveCategory(catId: string, data: { displayName: string; imageUrl: string; priority: number; parentCategory: string; filterValue: string; description: string }) {
     setCatSaving(catId);
     try {
       console.log('[saveCategory] writing:', catId, data);
@@ -4335,9 +4340,28 @@ export default function AdminPage() {
               <span className="font-mono text-xs text-gray-400">slug</span> = מזהה הקטגוריה - לא ניתן לשינוי מכאן.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {categories.map(cat => (
-                <CategoryCard key={cat.id} cat={cat} saving={catSaving === cat.id} saved={catSaved === cat.id} onSave={data => saveCategory(cat.id, data)} />
-              ))}
+              {(() => {
+                // ערכי subCategory שקיימים בפועל על מוצרים, מקובצים לפי קטגוריה.
+                // זה המקור לרשימת "מסנן אל" — כך אי אפשר לבחור ערך שלא יסנן כלום.
+                const subcatsByCat = products.reduce<Record<string, string[]>>((acc, p) => {
+                  const c = p.cat || p.category;
+                  const s = p.subCategory;
+                  if (!c || !s) return acc;
+                  (acc[c] ??= []);
+                  if (!acc[c].includes(s)) acc[c].push(s);
+                  return acc;
+                }, {});
+                Object.values(subcatsByCat).forEach(v => v.sort((a, b) => a.localeCompare(b, 'he')));
+                return categories.map(cat => (
+                  <CategoryCard
+                    key={cat.id} cat={cat}
+                    saving={catSaving === cat.id} saved={catSaved === cat.id}
+                    onSave={data => saveCategory(cat.id, data)}
+                    allCategories={categories}
+                    subcatsByCat={subcatsByCat}
+                  />
+                ));
+              })()}
             </div>
           </div>
         </div>
@@ -5621,14 +5645,20 @@ export default function AdminPage() {
   );
 }
 
-function CategoryCard({ cat, saving, saved, onSave }: {
+function CategoryCard({ cat, saving, saved, onSave, allCategories, subcatsByCat }: {
   cat: Category; saving: boolean; saved: boolean;
-  onSave: (data: { displayName: string; imageUrl: string; priority: number; parentCategory: string }) => void;
+  onSave: (data: { displayName: string; imageUrl: string; priority: number; parentCategory: string; filterValue: string; description: string }) => void;
+  /** כל הקטגוריות — לרשימת קטגוריית האב */
+  allCategories: Category[];
+  /** מפה: קטגוריה → ערכי subCategory שקיימים בפועל על מוצרים */
+  subcatsByCat: Record<string, string[]>;
 }) {
   const [displayName, setDisplayName] = useState(cat.displayName || cat.name || '');
   const [imageUrl, setImageUrl]       = useState(cat.imageUrl || cat.imgUrl || '');
   const [priority, setPriority]       = useState(cat.priority ?? cat.order ?? 0);
   const [parentCategory, setParentCategory] = useState(cat.parentCategory ?? '');
+  const [filterValue, setFilterValue]       = useState(cat.filterValue ?? '');
+  const [description, setDescription]       = useState(cat.description ?? '');
   const [uploading, setUploading]     = useState(false);
   const [imgSaved, setImgSaved]       = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -5650,7 +5680,7 @@ function CategoryCard({ cat, saving, saved, onSave }: {
       const url = data.secure_url as string;
       setImageUrl(url);
       console.log('saving to firestore:', cat.id, url);
-      onSave({ displayName, imageUrl: url, priority, parentCategory });
+      onSave({ displayName, imageUrl: url, priority, parentCategory, filterValue, description });
       console.log('saved!');
       setImgSaved(true);
       setTimeout(() => setImgSaved(false), 3000);
@@ -5696,20 +5726,70 @@ function CategoryCard({ cat, saving, saved, onSave }: {
           <input type="number" value={priority} onChange={e => setPriority(Number(e.target.value))} className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm" />
         </div>
         <div>
-          <label className="block text-xs font-bold text-gray-500 mb-1">קטגוריית אב</label>
-          <input
-            value={parentCategory}
-            onChange={e => setParentCategory(e.target.value)}
-            placeholder="למשל: כיפות"
-            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
+          <label className="block text-xs font-bold text-gray-500 mb-1">תיאור הקטגוריה</label>
+          <textarea
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            rows={3}
+            placeholder="משפט או שניים על הקטגוריה — למשל: כיפות בעבודת יד ממגוון בדים, בהתאמה אישית ובמשלוח לכל הארץ."
+            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm resize-y"
           />
           <p className="text-[11px] text-gray-400 mt-1 leading-snug">
-            כשממלאים כאן שם של קטגוריה, הרשומה מופיעה כ<b>אריח תת-קטגוריה</b> בעמוד
-            אותה קטגוריה — עם התמונה שלמעלה. חובה שתהיה תמונה, אחרת האריח לא יוצג.
+            מוצג ברצועת הפתיחה של עמוד הקטגוריה, לצד התמונה. זה גם הטקסט
+            היחיד שמנועי חיפוש רואים בעמוד — כדאי לכתוב אותו.
           </p>
         </div>
+        {/* ── אריח תת-קטגוריה ──
+            שתי רשימות נפתחות במקום טקסט חופשי. קטגוריית האב נבחרת מהקטגוריות
+            הקיימות, וערך הסינון מהערכים שקיימים בפועל על המוצרים — כך אי אפשר
+            ליצור אריח שנראה תקין אבל לא מסנן כלום. */}
+        <div className="border-t border-gray-100 pt-3 mt-1">
+          <label className="block text-xs font-bold text-gray-500 mb-1">
+            אריח תת-קטגוריה — קטגוריית אב
+          </label>
+          <select
+            value={parentCategory}
+            onChange={e => { setParentCategory(e.target.value); setFilterValue(''); }}
+            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white"
+          >
+            <option value="">— לא אריח תת-קטגוריה —</option>
+            {[...new Set(allCategories.map(c => c.displayName || c.name || c.slug).filter(Boolean))]
+              .sort((a, b) => String(a).localeCompare(String(b), 'he'))
+              .map(name => <option key={String(name)} value={String(name)}>{String(name)}</option>)}
+          </select>
+
+          {parentCategory && (() => {
+            const opts = subcatsByCat[parentCategory] ?? [];
+            return (
+              <div className="mt-2">
+                <label className="block text-xs font-bold text-gray-500 mb-1">מסנן אל</label>
+                {opts.length === 0 ? (
+                  <p className="text-[11px] text-red-600 leading-snug">
+                    לא נמצאו ערכי תת-קטגוריה על מוצרים בקטגוריה <b>{parentCategory}</b>.
+                    האריח יוצג אבל הלחיצה לא תסנן — כדאי לבחור קטגוריית אב אחרת.
+                  </p>
+                ) : (
+                  <>
+                    <select
+                      value={filterValue}
+                      onChange={e => setFilterValue(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white"
+                    >
+                      <option value="">— בחר תת-קטגוריה —</option>
+                      {opts.map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                    <p className="text-[11px] text-gray-400 mt-1 leading-snug">
+                      {opts.length} ערכים נמצאו על מוצרים בפועל. חובה גם תמונה למעלה,
+                      אחרת האריח לא יוצג.
+                    </p>
+                  </>
+                )}
+              </div>
+            );
+          })()}
+        </div>
         <div className="flex items-center gap-3 mt-auto">
-          <button onClick={() => onSave({ displayName, imageUrl, priority, parentCategory })} disabled={saving || uploading}
+          <button onClick={() => onSave({ displayName, imageUrl, priority, parentCategory, filterValue, description })} disabled={saving || uploading}
             className="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50">
             {saving ? '⏳ שומר...' : '💾 שמור'}
           </button>

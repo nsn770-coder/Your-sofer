@@ -10,6 +10,8 @@ interface Subcat {
   displayName: string;
   imageUrl?: string;
   priority?: number;
+  /** ערך ה-subCategory שאליו מסננים. ריק = נופלים ל-slug (רשומות ישנות) */
+  filterValue?: string;
 }
 
 /**
@@ -22,10 +24,12 @@ interface Subcat {
  * זה עובד הרבה יותר טוב מפילטר בסרגל הצד, כי הלקוח לא תמיד יודע איך
  * תת-הקטגוריה נקראת, אבל הוא מזהה אותה בתמונה.
  */
-export default function SubcategoryTiles({ category, activeFilter }: {
+export default function SubcategoryTiles({ category, activeFilter, variant = 'full' }: {
   category: string;
   /** תת-הקטגוריה שכבר נבחרה — אם יש, לא מציגים את הרצועה */
   activeFilter?: string;
+  /** 'compact' — החזרה השנייה בעמוד ארוך: בלי כותרת, אריחים קטנים יותר */
+  variant?: 'full' | 'compact';
 }) {
   const [subcats, setSubcats] = useState<Subcat[]>([]);
 
@@ -54,18 +58,24 @@ export default function SubcategoryTiles({ category, activeFilter }: {
       aria-labelledby="subcat-tiles-title"
       style={{ margin: '40px 0' }}
     >
-      <h2 id="subcat-tiles-title" className="ys-section-title" style={{ marginBottom: 20 }}>
-        לפי סוג
+      <h2
+        id="subcat-tiles-title"
+        className="ys-section-title"
+        style={{ marginBottom: 20, ...(variant === 'compact' ? { fontSize: 18 } : {}) }}
+      >
+        {variant === 'compact' ? 'עדיין מחפשים? צמצמו לפי סוג' : 'לפי סוג'}
       </h2>
 
       <div
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
+        className={variant === 'compact'
+          ? 'grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6'
+          : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5'}
         style={{ columnGap: 'var(--ys-col-gap)', rowGap: 28 }}
       >
         {subcats.map(s => (
           <a
             key={s.slug}
-            href={`/category/${encodeURIComponent(category)}?filter=${encodeURIComponent(s.slug)}`}
+            href={`/category/${encodeURIComponent(category)}?filter=${encodeURIComponent(s.filterValue || s.slug)}`}
             style={{ textDecoration: 'none', display: 'block' }}
           >
             {/* פינות מעוגלות למעלה בלבד — התווית יושבת צמוד מתחת ונקראת

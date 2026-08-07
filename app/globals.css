@@ -204,6 +204,13 @@
 }
 .ys-input:focus { border-color: var(--ys-purple); }
 
+/* רצועת פתיחה לעמוד קטגוריה — טקסט מעל תמונה במובייל, זה לצד זה בדסקטופ.
+   אצלם היחס הוא בערך חצי-חצי, עם התמונה בצד אחד. */
+.ys-cat-hero { grid-template-columns: 1fr; }
+@media (min-width: 768px) {
+  .ys-cat-hero { grid-template-columns: 1fr 1fr; gap: 40px; padding: 36px 20px; }
+}
+
 .brand-story {
   font-family: var(--font-frank), sans-serif !important;
 }
