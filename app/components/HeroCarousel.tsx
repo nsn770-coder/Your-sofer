@@ -14,8 +14,13 @@ export interface HeroSlide {
   scrim?: string;
 }
 
-const INTERVAL_MS = 6000;
+// 5 שניות — נמדד מ-NOTHS (האנימציה שלהם היא 5s linear forwards)
+const INTERVAL_MS = 5000;
 const SWIPE_THRESHOLD = 50; // פיקסלים לפני שנחשב החלקה ולא נגיעה
+
+// טבעת ההתקדמות: רדיוס 23.5 והיקף 2πr — בדיוק המספרים שלהם (147.65)
+const RING_R = 23.5;
+const RING_LEN = +(2 * Math.PI * RING_R).toFixed(2);
 
 /** גרדיאנט עדין מכיוון הטקסט. ברירת המחדל היא ללא — הבאנרים אמורים
  *  להיות מצולמים עם שטח נקי לכותרת, כמו ב-NOTHS. */
@@ -176,6 +181,17 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         })}
       </div>
 
+      {/* ── חצי ניווט עגולים ──
+          ב-RTL השקופית הבאה יושבת משמאל, ולכן החץ ה"קדימה" הוא זה שבצד שמאל.
+          טבעת ההתקדמות עוטפת אותו בלבד — כמו אצלם. */}
+      {count > 1 && (
+        <>
+          <ArrowButton side="right" label="הבאנר הקודם" onClick={() => go(index - 1)} />
+          <ArrowButton side="left"  label="הבאנר הבא"   onClick={() => go(index + 1)}
+            ring={{ active: !paused, cycleKey: index }} />
+        </>
+      )}
+
       {/* ── נקודות ניווט ── */}
       {count > 1 && (
         <div style={{
@@ -199,5 +215,66 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         </div>
       )}
     </section>
+  );
+}
+
+/**
+ * כפתור חץ עגול, אופציונלית עם טבעת התקדמות.
+ *
+ * הטבעת היא מעגל SVG שהיקפו RING_LEN, עם stroke-dasharray באורך ההיקף
+ * ו-stroke-dashoffset שנע מההיקף המלא (ריק) לאפס (מלא). זו הטכניקה
+ * הסטנדרטית ל"קו שמתמלא", והיא בדיוק מה ש-NOTHS משתמשים בו.
+ *
+ * ה-key על ה-<circle> הוא מספר השקופית — כך האנימציה מתאפסת ומתחילה
+ * מחדש בכל מעבר, במקום להמשיך מאיפה שהייתה.
+ */
+function ArrowButton({ side, label, onClick, ring }: {
+  side: 'left' | 'right';
+  label: string;
+  onClick: () => void;
+  ring?: { active: boolean; cycleKey: number };
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className="ys-hero-arrow"
+      style={{
+        position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+        [side]: 'var(--ys-hero-arrow-inset, 4%)',
+        width: 44, height: 44, borderRadius: 9999,
+        background: '#FFFFFF', border: 'none', padding: 0,
+        cursor: 'pointer', zIndex: 4,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      } as React.CSSProperties}
+    >
+      {ring && (
+        <svg width="50" height="50" viewBox="0 0 50 50" aria-hidden="true"
+          style={{ position: 'absolute', inset: -3, transform: 'rotate(-90deg)' }}>
+          {/* מסלול — קבוע, שקוף למחצה */}
+          <circle cx="25" cy="25" r={RING_R} fill="none" stroke="rgba(59,59,65,0.18)" strokeWidth="3" />
+          {/* ההתקדמות עצמה */}
+          <circle
+            key={ring.cycleKey}
+            cx="25" cy="25" r={RING_R} fill="none"
+            stroke="var(--ys-plum, #31153C)" strokeWidth="3" strokeLinecap="round"
+            strokeDasharray={RING_LEN}
+            strokeDashoffset={RING_LEN}
+            style={{
+              animation: `ysHeroRing ${INTERVAL_MS}ms linear forwards`,
+              animationPlayState: ring.active ? 'running' : 'paused',
+            }}
+          />
+        </svg>
+      )}
+      {/* ב-RTL "קדימה" הוא שמאלה, ולכן החץ מצביע לכיוון הכפתור */}
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="#3B3B41" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+        style={{ position: 'relative' }} aria-hidden="true">
+        {side === 'left'
+          ? <polyline points="15 18 9 12 15 6" />
+          : <polyline points="9 18 15 12 9 6" />}
+      </svg>
+    </button>
   );
 }

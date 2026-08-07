@@ -865,6 +865,24 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
            במובייל 4:3, אחרת ברצועה של 3:1 לא נשאר מקום לכותרת ולכפתור.
            aspect-ratio על התמונה עצמה מונע CLS בלי padding-top hack. */
         .ys-hero-img { aspect-ratio: 3 / 1; }
+        /* הבאנר שלהם מוגבל למכולה וממורכז, לא נוגע בקצוות המסך.
+           זה מה שמקטין אותו בפועל ומאפשר למוצרים להציץ מלמטה: באותו יחס
+           3:1, רוחב 1280 נותן גובה 427px במקום 640 במסך מלא. */
+        .ys-hero-carousel {
+          max-width: var(--ys-container);
+          margin-inline: auto;
+        }
+        /* טבעת ההתקדמות סביב חץ ה"הבא" — stroke-dashoffset נע מההיקף לאפס */
+        @keyframes ysHeroRing { from { stroke-dashoffset: 147.65; } to { stroke-dashoffset: 0; } }
+        .ys-hero-arrow { --ys-hero-arrow-inset: 3%; box-shadow: 0 2px 10px rgba(59,59,65,0.18); }
+        .ys-hero-arrow:hover { background: var(--ys-page) !important; }
+        @media (max-width: 767px) {
+          /* במובייל החצים מתחרים על מקום עם הכותרת — ההחלקה באצבע מספיקה */
+          .ys-hero-arrow { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ys-hero-arrow svg circle { animation: none !important; }
+        }
         .ys-cta-banner { aspect-ratio: 8 / 1.8; }
         .ys-promo-reserve { min-height: 560px; }
         /* CLS FIX 2: the hero overlay text + trust row previously used isMobile
