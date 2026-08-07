@@ -1062,7 +1062,7 @@ function StamCard({
             </span>
           )}
           {hasSale && (
-            <span style={{ background: '#373A5A', color: '#fff', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 8px' }}>מבצע</span>
+            <span style={{ background: 'var(--ys-accent)', color: '#FEFBF7', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 8px' }}>מבצע</span>
           )}
         </div>
 

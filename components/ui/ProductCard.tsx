@@ -297,22 +297,22 @@ export default function ProductCard({
             </span>
           )}
           {comingSoon && (
-            <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#111111' }}>
+            <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: 'var(--ys-dark-surface)' }}>
               מגיע בקרוב{expectedArrivalDate ? ` ${formatArrivalDate(expectedArrivalDate)}` : ''}
             </span>
           )}
           {hasClearance && (
-            <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#111111' }}>
+            <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: 'var(--ys-dark-surface)' }}>
               10% הנחת מלאי
             </span>
           )}
           {hasSale && !hasClearance && (
-            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: 'var(--ys-accent)', color: '#111111' }}>
+            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: 'var(--ys-accent)', color: '#FEFBF7' }}>
               מבצע {savePct}%-
             </span>
           )}
           {isBundle && (
-            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: '#373A5A', color: 'var(--ys-accent)' }}>
+            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: '#FEFBF7', color: 'var(--ys-accent)', border: '1px solid var(--ys-accent)' }}>
               ✦ מארז מהודר
             </span>
           )}
@@ -320,12 +320,12 @@ export default function ProductCard({
               "חדש"/"מבצע"/"מארז" והסתירה את המוצר. ההתאמה האישית מוצגת בעמוד
               המוצר, ליד כפתור ההוספה לסל. */}
           {isNew && (
-            <span className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#FFFFFF', color: '#373A5A', border: '1px solid #373A5A' }}>
+            <span className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#FEFBF7', color: 'var(--ys-accent)', border: '1px solid var(--ys-accent)' }}>
               חדש
             </span>
           )}
           {hasKlafSelection && (
-            <span style={{ background: '#111111', color: 'var(--ys-accent)', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+            <span style={{ background: '#FEFBF7', color: 'var(--ys-accent)', border: '1px solid var(--ys-accent)', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
               ✦ בחר את הקלף שלך
             </span>
           )}

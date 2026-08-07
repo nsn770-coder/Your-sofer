@@ -21,25 +21,25 @@ function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundleProm
   if (isBestSeller) {
     return {
       label: 'הכי נמכר',
-      className: 'bg-[#111111] text-[var(--ys-accent)] border-[#111111]',
+      className: 'bg-[#FEFBF7] text-[var(--ys-accent)] border-[var(--ys-accent)]',
     };
   }
   if (typeof priority === 'number' && priority >= 80) {
     return {
       label: 'מומלץ',
-      className: 'bg-[#373A5A] text-white border-[#373A5A]',
+      className: 'bg-[var(--ys-accent)] text-[#FEFBF7] border-[var(--ys-accent)]',
     };
   }
   if (badge === 'מהודר') {
     return {
       label: 'מהודר',
-      className: 'bg-[#111111] text-[var(--ys-accent)] border-[#111111]',
+      className: 'bg-[#FEFBF7] text-[var(--ys-accent)] border-[var(--ys-accent)]',
     };
   }
   if (badge === 'מתנה') {
     return {
       label: 'מתאים כמתנה',
-      className: 'bg-white text-[#373A5A] border-[#373A5A]',
+      className: 'bg-[#FEFBF7] text-[var(--ys-accent)] border-[var(--ys-accent)]',
     };
   }
   if (badge === 'בטוח') {
@@ -51,7 +51,7 @@ function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundleProm
   if (badge === 'מהדרין') {
     return {
       label: 'מהדרין',
-      className: 'bg-[#373A5A] text-white border-[#373A5A]',
+      className: 'bg-[var(--ys-accent)] text-[#FEFBF7] border-[var(--ys-accent)]',
     };
   }
   return null;
@@ -73,7 +73,7 @@ export default function ProductBadge({ isBestSeller, priority, badge, bundleProm
       {bundleLabel && (
         <span
           className="inline-flex items-center whitespace-nowrap"
-          style={{ background: 'var(--ys-dark-surface)', color: 'var(--ys-accent)', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 0, letterSpacing: '0.01em' }}
+          style={{ background: 'var(--ys-accent)', color: '#FEFBF7', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 0, letterSpacing: '0.01em' }}
         >
           ✦ {bundleLabel}
         </span>
