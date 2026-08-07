@@ -103,18 +103,73 @@ async function fetchProductCount(): Promise<number> {
   }
 }
 
+export interface HeroSlide {
+  imgUrl: string;
+  imgUrlMobile?: string;
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+
+/**
+ * שקופיות ה-Hero — נקראות בשרת ולא בדפדפן, משתי סיבות:
+ * 1. תמונת השקופית הראשונה היא ה-LCP, וצריך להיות אפשר לעשות לה preload
+ *    ב-<head> של ה-HTML הראשוני. קריאה מהלקוח הייתה דוחה אותה בשנייה+.
+ * 2. הטקסט של השקופית הראשונה יושב ב-HTML לזחלנים.
+ */
+async function fetchHeroSlides(): Promise<HeroSlide[]> {
+  try {
+    const res = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/siteConfig/hero?key=${FIREBASE_API_KEY}`,
+      { next: { revalidate: 300 }, signal: AbortSignal.timeout(6000) },
+    );
+    if (!res.ok) return [];
+    const doc = await res.json();
+    const f = doc?.fields;
+    if (!f || f.enabled?.booleanValue === false) return [];
+    const arr = f.slides?.arrayValue?.values ?? [];
+    return arr
+      .map((v: Record<string, any>) => {
+        const s = v.mapValue?.fields ?? {};
+        const str = (k: string) => s[k]?.stringValue ?? '';
+        return {
+          imgUrl:       str('imgUrl'),
+          imgUrlMobile: str('imgUrlMobile'),
+          eyebrow:      str('eyebrow'),
+          title:        str('title'),
+          subtitle:     str('subtitle'),
+          ctaLabel:     str('ctaLabel'),
+          ctaHref:      str('ctaHref'),
+        } as HeroSlide;
+      })
+      .filter((s: HeroSlide) => s.imgUrl && s.title);
+  } catch {
+    return []; // כשל רשת — HomePageClient נופל חזרה ל-Hero הווידאו הקיים
+  }
+}
+
 export default async function HomePage() {
-  const productCount = await fetchProductCount();
+  const [productCount, heroSlides] = await Promise.all([
+    fetchProductCount(),
+    fetchHeroSlides(),
+  ]);
+
+  // ה-LCP הוא השקופית הראשונה אם הוגדרה קרוסלה, אחרת פוסטר הווידאו הישן
+  const lcpImage = heroSlides[0]
+    ? (heroSlides[0].imgUrlMobile || heroSlides[0].imgUrl)
+    : HERO_POSTER;
 
   return (
     <>
       {/* React hoists this into <head> of the prerendered HTML */}
-      <link rel="preload" as="image" href={HERO_POSTER} fetchPriority="high" />
+      <link rel="preload" as="image" href={lcpImage} fetchPriority="high" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
-      <HomePageClient productCount={productCount} />
+      <HomePageClient productCount={productCount} heroSlides={heroSlides} />
       <PageFaqSection
         pageKey="home"
         ids={HOME_FAQ_IDS}

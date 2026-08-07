@@ -13,6 +13,8 @@ import { db } from './firebase';
 // PERF: HeroSwiper import removed — it was imported but never rendered,
 // yet still pulled its module graph into the homepage bundle.
 import ProductCard from '@/components/ui/ProductCard';
+// הקרוסלה נטענת רגילה (לא dynamic): היא מכילה את ה-LCP וחייבת להיות ב-HTML הראשוני
+import HeroCarousel, { type HeroSlide as HeroSlideType } from './components/HeroCarousel';
 
 const NewsletterPopup   = dynamic(() => import('./components/NewsletterPopup'),       { ssr: false, loading: () => <div className="hidden" /> });
 const TestimonialsCarousel = dynamic(() => import('./components/TestimonialsCarousel'), { ssr: false, loading: () => <div style={{ height: 450 }} /> });
@@ -360,7 +362,11 @@ const ActivityBar = memo(function ActivityBar({
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function HomePageClient({ productCount }: { productCount: number }) {
+export default function HomePageClient({ productCount, heroSlides = [] }: {
+  productCount: number;
+  /** נטען בשרת ב-page.tsx כדי שתמונת השקופית הראשונה תקבל preload ותישאר ה-LCP */
+  heroSlides?: HeroSlideType[];
+}) {
   const [isMobile, setIsMobile]       = useState(false);
   const [catImages, setCatImages]     = useState<Record<string, string>>({});
   const [catSections, setCatSections] = useState<HomepageCategorySections>(DEFAULT_SECTIONS);
@@ -875,6 +881,10 @@ export default function HomePageClient({ productCount }: { productCount: number 
            isMobile-driven width/height/grid painted desktop-first on phones and then
            jumped after hydration. CSS is correct on the very first paint. */
         .ys-hero-box { padding-top: 40%; }
+        /* קרוסלת ה-Hero: 3:1 בדסקטופ כמו אצלם — רחב ונמוך, לא מסך מלא.
+           במובייל 4:3, אחרת ברצועה של 3:1 לא נשאר מקום לכותרת ולכפתור.
+           aspect-ratio על התמונה עצמה מונע CLS בלי padding-top hack. */
+        .ys-hero-img { aspect-ratio: 3 / 1; }
         .ys-cta-banner { aspect-ratio: 8 / 1.8; }
         .ys-promo-reserve { min-height: 560px; }
         /* CLS FIX 2: the hero overlay text + trust row previously used isMobile
@@ -887,6 +897,7 @@ export default function HomePageClient({ productCount }: { productCount: number 
         .ys-trust-txt { font-size: 13px; }
         @media (max-width: 767px) {
           .ys-hero-box { padding-top: 56.25%; }
+          .ys-hero-img { aspect-ratio: 4 / 3; }
           .ys-cta-banner { aspect-ratio: 5 / 2; min-height: 120px; }
           .ys-promo-reserve { min-height: 600px; }
           .ys-hero-content { padding: 40px 24px 36px; }
@@ -1034,9 +1045,20 @@ export default function HomePageClient({ productCount }: { productCount: number 
         </div>
       )}
 
-      {/* ── 1. Hero ── */}
-      {/* CLS FIX: height comes from the .ys-hero-box media query (correct at first
-          paint) instead of isMobile, which flipped 40%→56.25% after hydration. */}
+      {/* ── 1. Hero ──
+          קרוסלת באנרים כשהוגדרו שקופיות באדמין (דשבורד ← 🖼️ באנר ראשי),
+          אחרת נופל חזרה ל-Hero הווידאו הישן. הווידאו נשמר כדי שהעמוד לעולם
+          לא יישאר בלי Hero — אבל הוא הסיבה ל-LCP של ~14.6 שניות, ולכן
+          ברגע שיש שקופיות, הן עדיפות. */}
+      {/* h1 — נשאר מחוץ לתנאי כדי שיתקיים בשני המצבים. קודם הוא ישב בתוך
+          בלוק הווידאו, וברגע שהקרוסלה מחליפה אותו העמוד היה נשאר בלי h1. */}
+      <h1 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
+        אתר היודאיקה הגדול בישראל - כיפות, מתנות ומזכרות לאירועים
+      </h1>
+
+      {heroSlides.length > 0 ? (
+        <HeroCarousel slides={heroSlides} />
+      ) : (
       <div
         dir="rtl"
         className="ys-hero-box"
@@ -1105,11 +1127,6 @@ export default function HomePageClient({ productCount }: { productCount: number 
             כל עולם היודאיקה במקום אחד
           </p>
 
-          {/* h1 — preserved for SEO, visually hidden */}
-          <h1 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
-            אתר היודאיקה הגדול בישראל - כיפות, מתנות ומזכרות לאירועים
-          </h1>
-
           <p className="ys-hero-sub" style={{
             fontWeight: 400,
             color: 'rgba(255,255,255,0.88)',
@@ -1121,6 +1138,7 @@ export default function HomePageClient({ productCount }: { productCount: number 
 
         </div>
       </div>
+      )}
 
       {/* ── Mobile search band ── */}
       {/* CLS FIX: always rendered, hidden on desktop via CSS (md:hidden) instead of

@@ -311,7 +311,7 @@ interface Category {
   order?: number;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions' | 'best_sellers' | 'seasonal';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions' | 'best_sellers' | 'seasonal' | 'hero';
 
 interface Coupon {
   id: string;
@@ -4183,6 +4183,7 @@ export default function AdminPage() {
           { key: 'out_of_stock',   label: '🔴 אזל מלאי',         color: 'bg-red-700',    badge: outOfStockProducts.length },
           { key: 'gifts',          label: '🎁 מתנות VIP',         color: 'bg-pink-600' },
           { key: 'seasonal',       label: '🍂 עכשיו בעונה',        color: 'bg-amber-600' },
+          { key: 'hero',           label: '🖼️ באנר ראשי',          color: 'bg-violet-600' },
           { key: 'inventory',      label: '📦 מלאי',               color: 'bg-teal-600' },
           { key: 'prints',         label: '🖨️ הדפסות',             color: 'bg-amber-600' },
           { key: 'stickers',       label: '🏷️ מדבקות QR',          color: 'bg-indigo-600' },
@@ -5590,6 +5591,8 @@ export default function AdminPage() {
 
       {activeTab === 'seasonal' && <SeasonalTab />}
 
+      {activeTab === 'hero' && <HeroTab />}
+
       {activeTab === 'inventory' && <InventoryTab products={products} orders={orders} onSave={async (productId, data) => {
         await updateDoc(doc(db, 'products', productId), data as Record<string, unknown>);
       }} onEditProduct={(p) => setEditingProduct(p as unknown as Product)} />}
@@ -5888,6 +5891,150 @@ function CurationsTab() {
           </table>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Hero tab — manage siteConfig/hero in Firestore ───────────────────────────
+// באנרים מתחלפים בראש עמוד הבית. כשאין שקופיות, העמוד נופל חזרה ל-Hero
+// הווידאו הישן — ולכן אפשר לכבות בלי לשבור כלום.
+interface HeroSlideCfg {
+  imgUrl: string; imgUrlMobile: string;
+  eyebrow: string; title: string; subtitle: string;
+  ctaLabel: string; ctaHref: string;
+}
+
+const EMPTY_SLIDE: HeroSlideCfg = {
+  imgUrl: '', imgUrlMobile: '', eyebrow: '', title: '', subtitle: '', ctaLabel: '', ctaHref: '',
+};
+
+function HeroTab() {
+  const [enabled, setEnabled] = useState(false);
+  const [slides,  setSlides]  = useState<HeroSlideCfg[]>([{ ...EMPTY_SLIDE }]);
+  const [loading, setLoading] = useState(true);
+  const [saving,  setSaving]  = useState(false);
+  const [saved,   setSaved]   = useState(false);
+  const [error,   setError]   = useState('');
+
+  useEffect(() => {
+    getDoc(doc(db, 'siteConfig', 'hero'))
+      .then(snap => {
+        if (snap.exists()) {
+          const d = snap.data();
+          setEnabled(d.enabled ?? false);
+          const raw: Record<string, string>[] = d.slides ?? [];
+          const s = raw.map(x => ({
+            imgUrl: x.imgUrl ?? '', imgUrlMobile: x.imgUrlMobile ?? '',
+            eyebrow: x.eyebrow ?? '', title: x.title ?? '', subtitle: x.subtitle ?? '',
+            ctaLabel: x.ctaLabel ?? '', ctaHref: x.ctaHref ?? '',
+          }));
+          setSlides(s.length > 0 ? s : [{ ...EMPTY_SLIDE }]);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  function upd(i: number, k: keyof HeroSlideCfg, v: string) {
+    setSlides(p => { const n = [...p]; n[i] = { ...n[i], [k]: v }; return n; });
+    setSaved(false); setError('');
+  }
+  function add() { setSlides(p => [...p, { ...EMPTY_SLIDE }]); setSaved(false); }
+  function del(i: number) { setSlides(p => p.filter((_, x) => x !== i)); setSaved(false); }
+  function move(i: number, dir: -1 | 1) {
+    setSlides(p => {
+      const n = [...p]; const j = i + dir;
+      if (j < 0 || j >= n.length) return p;
+      [n[i], n[j]] = [n[j], n[i]]; return n;
+    });
+    setSaved(false);
+  }
+
+  async function save() {
+    const clean = slides.filter(s => s.imgUrl.trim() || s.title.trim());
+    if (enabled) {
+      if (clean.length === 0) { setError('צריך לפחות באנר אחד כשהקרוסלה פעילה'); return; }
+      const bad = clean.find(s => !s.imgUrl.trim() || !s.title.trim());
+      if (bad) { setError('בכל באנר צריך תמונה וכותרת'); return; }
+      const halfCta = clean.find(s => (!!s.ctaLabel.trim()) !== (!!s.ctaHref.trim()));
+      if (halfCta) { setError('בכפתור צריך למלא גם טקסט וגם קישור, או להשאיר את שניהם ריקים'); return; }
+    }
+    setError(''); setSaving(true);
+    try {
+      await setDoc(doc(db, 'siteConfig', 'hero'), {
+        enabled,
+        slides: clean.map(s => ({
+          imgUrl: s.imgUrl.trim(), imgUrlMobile: s.imgUrlMobile.trim(),
+          eyebrow: s.eyebrow.trim(), title: s.title.trim(), subtitle: s.subtitle.trim(),
+          ctaLabel: s.ctaLabel.trim(), ctaHref: s.ctaHref.trim(),
+        })),
+        updatedAt: new Date().toISOString(),
+      });
+      setSaved(true);
+    } catch (e) {
+      console.error('HeroTab save error:', e);
+      setError('שגיאה בשמירה — בדוק את החיבור ונסה שנית');
+    } finally { setSaving(false); }
+  }
+
+  if (loading) return <div className="p-10 text-center text-gray-400">טוען...</div>;
+  const inp = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm';
+
+  return (
+    <div className="grid gap-6 max-w-3xl">
+      <div className="bg-white rounded-xl shadow p-6">
+        <h2 className="text-lg font-black text-violet-700 mb-1">🖼️ באנר ראשי</h2>
+        <p className="text-sm text-gray-500 mb-2">
+          באנרים מתחלפים בראש עמוד הבית, כל 6 שניות. כשכבוי — מוצג סרטון הרקע הישן.
+        </p>
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2 mb-6">
+          מידות מומלצות: <b>1440×480</b> לדסקטופ (יחס 3:1) ו־<b>1080×810</b> למובייל (4:3).
+          הבאנר הראשון הוא התמונה שנטענת ראשונה בעמוד — כדאי שיהיה קל.
+        </p>
+
+        <label className="flex items-center gap-3 mb-6 cursor-pointer">
+          <input type="checkbox" checked={enabled} onChange={e => { setEnabled(e.target.checked); setSaved(false); }} className="w-5 h-5 accent-violet-600" />
+          <span className="text-sm font-bold">{enabled ? 'קרוסלה פעילה' : 'כבוי — מוצג הווידאו'}</span>
+        </label>
+
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-bold text-gray-700">באנרים ({slides.length})</span>
+          <button onClick={add} className="text-xs font-bold text-violet-700 border border-violet-300 rounded px-3 py-1">+ הוסף באנר</button>
+        </div>
+
+        <div className="grid gap-4">
+          {slides.map((s, i) => (
+            <div key={i} className="border border-gray-200 rounded-lg p-3 grid gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-gray-500">באנר {i + 1}</span>
+                <div className="flex gap-2">
+                  <button onClick={() => move(i, -1)} disabled={i === 0} className="text-xs px-2 disabled:opacity-30">↑</button>
+                  <button onClick={() => move(i, 1)} disabled={i === slides.length - 1} className="text-xs px-2 disabled:opacity-30">↓</button>
+                  {slides.length > 1 && <button onClick={() => del(i)} className="text-xs text-red-600">הסר</button>}
+                </div>
+              </div>
+              <input className={inp} value={s.imgUrl}       onChange={e => upd(i, 'imgUrl', e.target.value)}       placeholder="תמונה — דסקטופ 1440×480 *" dir="ltr" />
+              <input className={inp} value={s.imgUrlMobile} onChange={e => upd(i, 'imgUrlMobile', e.target.value)} placeholder="תמונה — מובייל 1080×810 (רשות)" dir="ltr" />
+              <input className={inp} value={s.eyebrow}      onChange={e => upd(i, 'eyebrow', e.target.value)}      placeholder="תווית עליונה — למשל: חדש" />
+              <input className={inp} value={s.title}        onChange={e => upd(i, 'title', e.target.value)}        placeholder="כותרת *" />
+              <input className={inp} value={s.subtitle}     onChange={e => upd(i, 'subtitle', e.target.value)}     placeholder="תיאור" />
+              <div className="grid grid-cols-2 gap-2">
+                <input className={inp} value={s.ctaLabel} onChange={e => upd(i, 'ctaLabel', e.target.value)} placeholder="טקסט כפתור" />
+                <input className={inp} value={s.ctaHref}  onChange={e => upd(i, 'ctaHref', e.target.value)}  placeholder="/moment/bar-mitzvah" dir="ltr" />
+              </div>
+              {s.imgUrl && <img src={s.imgUrl} alt="" className="w-full max-w-sm object-cover rounded border" style={{ aspectRatio: '3 / 1' }} />}
+            </div>
+          ))}
+        </div>
+
+        {error && <p className="text-sm text-red-600 mt-4">{error}</p>}
+        {saved && <p className="text-sm text-green-600 mt-4">נשמר ✓ — ייתכן עיכוב של עד 5 דקות עד שיתעדכן באתר</p>}
+
+        <button onClick={save} disabled={saving}
+          className="mt-6 bg-violet-600 text-white font-bold rounded-lg px-6 py-2.5 text-sm disabled:opacity-50">
+          {saving ? 'שומר...' : 'שמירה'}
+        </button>
+      </div>
     </div>
   );
 }
