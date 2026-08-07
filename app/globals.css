@@ -48,6 +48,11 @@
   --ys-teal: #135A72;          /* קישורים */
   --ys-radius-pill: 9999px;
   --ys-radius-md: 8px;
+  --ys-radius-input: 10px;
+  /* טקסט מעל משטח כהה — אצלם תמיד הלבן החמים ולא הסגול,
+     כי סגול על רקע כהה לא עובר סף ניגודיות */
+  --ys-on-dark: #FEFBF7;
+  --ys-border: #58585F;
 
   /* יחסי תמונה — חמישה בלבד, בעקביות מלאה */
   --ys-tile-ratio: 1 / 1;      /* אריחי קטגוריה ואירוע */
@@ -90,6 +95,77 @@
   margin-inline: auto;
   padding-inline: 20px;
 }
+
+/* ── מערכת כפתורים ──────────────────────────────────────────────────────
+   נמדדה מ-NOTHS: גובה 41px, גלולה מעוגלת לגמרי, ריפוד 12/16,
+   טקסט 15px במשקל 700. שתי וריאציות בלבד — מלא והפוך.
+   בעברית הוספתי 4px גובה: אותיות עבריות גבוהות מלטיניות,
+   ובגובה 41 בדיוק הטקסט נראה דחוק. */
+.ys-btn,
+.ys-hero-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 45px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: var(--ys-radius-pill);
+  background: var(--ys-plum);
+  color: var(--ys-on-dark);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ys-btn:hover,
+.ys-hero-btn-primary:hover { background: var(--ys-purple); }
+
+/* וריאציה הפוכה — רקע בהיר, מסגרת וטקסט כהים */
+.ys-btn-secondary,
+.ys-outline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 45px;
+  padding: 0 22px;
+  border: 1px solid var(--ys-plum);
+  border-radius: var(--ys-radius-pill);
+  background: var(--ys-page);
+  color: var(--ys-plum);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ys-btn-secondary:hover,
+.ys-outline-btn:hover { background: var(--ys-plum); color: var(--ys-on-dark); }
+
+.ys-btn-sm { height: 38px; padding: 0 16px; font-size: 14px; }
+
+/* ── שדות קלט ───────────────────────────────────────────────────────────
+   שדה החיפוש שלהם אינו גלולה אלא radius 10px — ניגוד מכוון מול
+   הכפתורים, כדי שלא יתבלבל איתם. */
+.ys-input {
+  width: 100%;
+  height: 45px;
+  padding: 0 16px;
+  border: 1px solid var(--ys-border);
+  border-radius: var(--ys-radius-input);
+  background: var(--ys-surface);
+  color: var(--ys-ink);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+.ys-input:focus { border-color: var(--ys-purple); }
 
 .brand-story {
   font-family: var(--font-frank), sans-serif !important;
@@ -137,7 +213,9 @@ textarea::placeholder {
 }
 
 :root {
-  --background: #FFFFFF;
+  /* רקע העמוד — לבן חמים במקום לבן טהור. השינוי הבודד שאחראי
+     לחלק הגדול מהתחושה הרכה של NOTHS. */
+  --background: #FEFBF7;
   --foreground: #171717;
   --bg-page: #F5F2EC;
 }
@@ -156,12 +234,8 @@ textarea::placeholder {
   --radius-3xl: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* אין מצב כהה — האתר מוגדר light only (color-scheme למעלה). הבלוק
+   שהיה כאן דרס את הרקע החמים במכשירים עם Dark Mode מופעל. */
 
 body {
   background: var(--background);
