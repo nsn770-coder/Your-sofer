@@ -90,7 +90,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         style={{ fontFamily: 'inherit' }}
       >
         <span className="text-[15px] font-semibold text-[#1a1a1a] flex-1 text-right">{q}</span>
-        <span className="text-[#C5A028] font-bold text-base shrink-0 leading-none">
+        <span className="text-[var(--ys-accent)] font-bold text-base shrink-0 leading-none">
           {open ? '▴' : '▾'}
         </span>
       </button>
@@ -111,7 +111,7 @@ export default function BarMitzvahPage() {
 
       {/* ── 1. Hero ─────────────────────────────────────────────────────── */}
       <section className="bg-[#1a1a1a] py-16 sm:py-24 px-4 text-center">
-        <p className="text-[#C5A028] text-xs sm:text-sm font-bold tracking-widest mb-4 uppercase">
+        <p className="text-[var(--ys-accent)] text-xs sm:text-sm font-bold tracking-widest mb-4 uppercase">
           Your Sofer — סת״מ בשקיפות מלאה
         </p>
         <h1 className="text-white text-3xl sm:text-4xl md:text-5xl font-black leading-tight mb-5 max-w-2xl mx-auto">
@@ -122,7 +122,7 @@ export default function BarMitzvahPage() {
         </p>
         <a
           href={CATEGORY_URL}
-          className="inline-block bg-[#C5A028] text-[#1a1a1a] font-black text-base px-10 py-4 rounded-lg no-underline"
+          className="inline-block bg-[var(--ys-accent)] text-[#1a1a1a] font-black text-base px-10 py-4 rounded-lg no-underline"
         >
           בחר את הסט שלך ←
         </a>
@@ -137,7 +137,7 @@ export default function BarMitzvahPage() {
             { icon: '✓', text: 'משלוח מהיר עם אחריות' },
           ].map(item => (
             <div key={item.text} className="flex items-center gap-2">
-              <span className="text-[#C5A028] font-black text-lg leading-none">{item.icon}</span>
+              <span className="text-[var(--ys-accent)] font-black text-lg leading-none">{item.icon}</span>
               <span className="text-[#1a1a1a] text-sm font-bold">{item.text}</span>
             </div>
           ))}
@@ -151,7 +151,7 @@ export default function BarMitzvahPage() {
           <p className="text-gray-500 text-sm leading-relaxed mb-6 max-w-sm">
             כתיבה ברמה גבוהה על קלף מעובד, בדיקת מחשב מוסמכת, תיק תפילין איכותי — סט מלא ומוכן.
           </p>
-          <div className="bg-[#FEF9EC] border border-[#C5A028]/40 rounded-lg px-4 py-2 mb-4">
+          <div className="bg-[#FEF9EC] border border-[var(--ys-accent)]/40 rounded-lg px-4 py-2 mb-4">
             <span className="text-[#9A7B1A] text-xs font-bold">המחיר כולל הכל — אין הפתעות</span>
           </div>
           <div className="text-[#1a1a1a] text-3xl font-black mb-8">₪2,800 – ₪3,700</div>
@@ -179,7 +179,7 @@ export default function BarMitzvahPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {STEPS.map(step => (
             <div key={step.num} className="bg-white rounded-2xl border border-[#E0D8CC] p-6 flex flex-col items-center text-center shadow-sm">
-              <div className="w-12 h-12 rounded-full bg-[#1a1a1a] flex items-center justify-center text-[#C5A028] font-black text-xl mb-4 shrink-0">
+              <div className="w-12 h-12 rounded-full bg-[#1a1a1a] flex items-center justify-center text-[var(--ys-accent)] font-black text-xl mb-4 shrink-0">
                 {step.num}
               </div>
               <h4 className="text-[#1a1a1a] font-black text-base mb-2">{step.title}</h4>
@@ -197,7 +197,7 @@ export default function BarMitzvahPage() {
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
           {TESTIMONIALS.map(t => (
             <div key={t.name} className="bg-white rounded-2xl p-6 flex flex-col shadow-md">
-              <div className="text-[#C5A028] text-base mb-3 tracking-wide">★★★★★</div>
+              <div className="text-[var(--ys-accent)] text-base mb-3 tracking-wide">★★★★★</div>
               <p className="text-gray-700 text-sm leading-relaxed italic mb-4 flex-1">"{t.text}"</p>
               <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
                 <div className="w-9 h-9 rounded-full bg-[#1a1a1a] flex items-center justify-center text-white font-bold text-xs shrink-0">
@@ -232,7 +232,7 @@ export default function BarMitzvahPage() {
         </h2>
         <a
           href={CATEGORY_URL}
-          className="inline-block bg-[#C5A028] text-[#1a1a1a] font-black text-base px-10 py-4 rounded-lg no-underline mb-5"
+          className="inline-block bg-[var(--ys-accent)] text-[#1a1a1a] font-black text-base px-10 py-4 rounded-lg no-underline mb-5"
         >
           לצפייה בסטים ←
         </a>

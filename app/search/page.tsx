@@ -348,7 +348,7 @@ export default function SearchPage() {
           </div>
           סינון
           {hasActiveFilters && (
-            <span className="w-2 h-2 rounded-full bg-[#C5A028]" />
+            <span className="w-2 h-2 rounded-full bg-[var(--ys-accent)]" />
           )}
         </button>
       )}
@@ -380,7 +380,7 @@ export default function SearchPage() {
       {/* Spinner */}
       {loading && (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C5A028]" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--ys-accent)]" />
         </div>
       )}
 

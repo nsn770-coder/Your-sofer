@@ -9,7 +9,7 @@ export default function ClubDealsPage() {
 
   return (
     <div>
-      <h2 style={{ fontSize: 22, fontWeight: 300, color: '#1a1a1a', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
+      <h2 style={{ fontSize: 22, fontWeight: 300, color: 'var(--ys-text)', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
         מבצעי מועדון
       </h2>
       <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 24px', fontWeight: 300 }}>

@@ -72,7 +72,7 @@ export default function PageFaqSection({
         />
       )}
 
-      <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1a1a1a', margin: '0 0 16px', textAlign: 'center' }}>
+      <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--ys-text)', margin: '0 0 16px', textAlign: 'center' }}>
         {title}
       </h2>
 
@@ -84,7 +84,7 @@ export default function PageFaqSection({
             href={startDesignHref}
             onClick={() => trackFaqEvent('faq_start_design_click', { page: pathname ?? undefined })}
             style={{
-              background: '#C5A028', color: '#1a1a1a', padding: '11px 22px', borderRadius: 10,
+              background: 'var(--ys-accent)', color: 'var(--ys-text)', padding: '11px 22px', borderRadius: 10,
               fontSize: 14, fontWeight: 800, textDecoration: 'none',
             }}
           >

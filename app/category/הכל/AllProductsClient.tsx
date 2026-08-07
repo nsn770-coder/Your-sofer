@@ -320,7 +320,7 @@ export default function AllProductsClient() {
                 background: '#fff', boxSizing: 'border-box', fontFamily: 'inherit',
                 transition: 'border-color 0.15s',
               }}
-              onFocus={e => (e.currentTarget.style.borderColor = '#C5A028')}
+              onFocus={e => (e.currentTarget.style.borderColor = 'var(--ys-accent)')}
               onBlur={e  => (e.currentTarget.style.borderColor = '#E7E2D8')}
             />
             <svg
@@ -368,7 +368,7 @@ export default function AllProductsClient() {
               </svg>
               סינון
               {anyFilterActive && (
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#C5A028', display: 'inline-block' }} />
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ys-accent)', display: 'inline-block' }} />
               )}
             </button>
           )}
@@ -412,7 +412,7 @@ export default function AllProductsClient() {
                 padding: '18px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
               }}>
                 <div style={{
-                  fontWeight: 700, fontSize: 14, color: '#1a1a1a', marginBottom: 18,
+                  fontWeight: 700, fontSize: 14, color: 'var(--ys-text)', marginBottom: 18,
                   paddingBottom: 12, borderBottom: '1px solid #F0EDE8',
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }}>
@@ -455,7 +455,7 @@ export default function AllProductsClient() {
                   <button
                     onClick={clearAll}
                     style={{
-                      background: '#1a1a1a', color: '#fff', border: 'none',
+                      background: 'var(--ys-dark-surface)', color: '#fff', border: 'none',
                       borderRadius: 10, padding: '10px 28px', fontSize: 14,
                       fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
                     }}
@@ -515,7 +515,7 @@ export default function AllProductsClient() {
                     <button
                       onClick={() => setDisplayCount(d => d + PAGE_SIZE)}
                       style={{
-                        background: '#fff', color: '#1a1a1a',
+                        background: '#fff', color: 'var(--ys-text)',
                         border: '2px solid #1a1a1a', borderRadius: 12,
                         padding: isMobile ? '16px 36px' : '14px 48px',
                         fontSize: 15, fontWeight: 700, cursor: 'pointer',
@@ -529,7 +529,7 @@ export default function AllProductsClient() {
                       טען עוד {nextCount} מוצרים
                     </button>
                   ) : (
-                    <p style={{ fontSize: 12, color: '#C5A028', fontWeight: 700 }}>
+                    <p style={{ fontSize: 12, color: 'var(--ys-accent)', fontWeight: 700 }}>
                       ✓ הצגת את כל {filtered.length.toLocaleString('he-IL')} המוצרים
                     </p>
                   )}

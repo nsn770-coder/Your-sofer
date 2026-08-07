@@ -130,10 +130,10 @@ export default function CartPage() {
     }}>
 
       {/* Header */}
-      <div style={{ background: '#1a1a1a', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ background: 'var(--ys-dark-surface)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 16 }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -1 }}>Your Sofer</div>
-          <div style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>ישראל ✡</div>
+          <div style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>ישראל ✡</div>
         </div>
         <h1 style={{ fontSize: 20, fontWeight: 700, color: '#fff', marginRight: 16 }}>🛒 סל הקניות</h1>
       </div>
@@ -162,7 +162,7 @@ export default function CartPage() {
             <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>הסל שלך ריק</div>
             <div style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>הוסף מוצרים מהחנות כדי להתחיל</div>
             <button onClick={() => router.push('/')}
-              style={{ background: '#FFFFFF', color: '#1a1a1a', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 32px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+              style={{ background: '#FFFFFF', color: 'var(--ys-text)', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 32px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
               המשך בקנייה
             </button>
           </div>
@@ -271,7 +271,7 @@ export default function CartPage() {
                               ✨ {a.label}{a.text ? `: „${a.text}"` : ''} — {a.pricing === 'perUnit' ? `+₪${a.price} ליחידה` : `+₪${a.price} חד־פעמי`}
                             </div>
                           ))}
-                            <div style={{ fontSize: 17, fontWeight: 900, color: '#1a1a1a' }}>
+                            <div style={{ fontSize: 17, fontWeight: 900, color: 'var(--ys-text)' }}>
                               {formatPrice(item.price * item.quantity + (item.addonsFlatSurcharge ?? 0))}
                             </div>
                             {item.quantity > 1 && (
@@ -410,7 +410,7 @@ export default function CartPage() {
 
                         {/* Price */}
                         <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                          <div style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a' }}>{formatPrice(item.price * item.quantity + (item.addonsFlatSurcharge ?? 0))}</div>
+                          <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)' }}>{formatPrice(item.price * item.quantity + (item.addonsFlatSurcharge ?? 0))}</div>
                           {item.quantity > 1 && (
                             <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{formatPrice(item.price)} × {item.quantity}{(item.addonsFlatSurcharge ?? 0) > 0 ? ` + ₪${item.addonsFlatSurcharge} חד־פעמי` : ''}</div>
                           )}
@@ -455,7 +455,7 @@ export default function CartPage() {
                   {freeShipping ? (
                     <span style={{ fontWeight: 700, color: '#15803d' }}>חינם! 🎉</span>
                   ) : (
-                    <span style={{ fontWeight: 700, color: '#1a1a1a' }}>{formatPrice(SHIPPING_REGULAR)}</span>
+                    <span style={{ fontWeight: 700, color: 'var(--ys-text)' }}>{formatPrice(SHIPPING_REGULAR)}</span>
                   )}
                 </div>
                 {!freeShipping && (
@@ -472,7 +472,7 @@ export default function CartPage() {
                 <div style={{ borderTop: '1px solid #eee', paddingTop: 12, marginTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 900 }}>
                     <span>סה"כ לתשלום:</span>
-                    <span style={{ color: '#1a1a1a' }}>{formatPrice(cartFinalTotal)}</span>
+                    <span style={{ color: 'var(--ys-text)' }}>{formatPrice(cartFinalTotal)}</span>
                   </div>
                   <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע״מ</div>
                 </div>
@@ -523,7 +523,7 @@ export default function CartPage() {
                       onChange={e => setCouponInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && applyCoupon()}
                       placeholder="הזן קוד קופון"
-                      style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit', background: '#fff', color: '#1a1a1a' }}
+                      style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit', background: '#fff', color: 'var(--ys-text)' }}
                     />
                     <button
                       onClick={applyCoupon}
@@ -561,7 +561,7 @@ export default function CartPage() {
                           {giftOptions[0].imgUrl && (
                             <img src={optimizeCloudinaryUrl(giftOptions[0].imgUrl, 100)} alt={giftOptions[0].name} style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />
                           )}
-                          <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a' }}>{giftOptions[0].name}</span>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ys-text)' }}>{giftOptions[0].name}</span>
                           <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>חינם</span>
                         </div>
                       ) : (
@@ -570,7 +570,7 @@ export default function CartPage() {
                             <label key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', background: selectedGift === g.id ? '#f0fdf4' : '#fafafa', border: `1px solid ${selectedGift === g.id ? '#86efac' : '#e0e0e0'}`, borderRadius: 8, padding: '8px 10px' }}>
                               <input type="radio" name="gift" value={g.id} checked={selectedGift === g.id} onChange={() => setSelectedGift(g.id)} style={{ accentColor: '#1a6b3c', flexShrink: 0 }} />
                               {g.imgUrl && <img src={optimizeCloudinaryUrl(g.imgUrl, 100)} alt={g.name} style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />}
-                              <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a' }}>{g.name}</span>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ys-text)' }}>{g.name}</span>
                               <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>חינם</span>
                             </label>
                           ))}
@@ -580,7 +580,7 @@ export default function CartPage() {
                   ) : !giftEligible ? (
                     <div dir="rtl" style={{
                       borderRadius: 9999,
-                      background:   '#1a1a1a',
+                      background:   'var(--ys-dark-surface)',
                       padding:      '9px 12px 9px 10px',
                       display:      'flex',
                       alignItems:   'center',
@@ -646,14 +646,14 @@ export default function CartPage() {
               </button>
 
               <button onClick={() => router.push('/')}
-                style={{ width: '100%', background: '#FFFFFF', color: '#1a1a1a', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                style={{ width: '100%', background: '#FFFFFF', color: 'var(--ys-text)', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                 המשך בקנייה
               </button>
 
               {user?.role === 'admin' && (
                 <div style={{ marginTop: 12 }}>
                   {!shareUrl ? (
-                    <button onClick={shareCart} disabled={shareLoading} style={{ width: '100%', background: '#f8f4ec', color: '#1a1a1a', border: '1.5px solid #C5A028', borderRadius: 12, height: 44, fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: shareLoading ? 0.6 : 1 }}>
+                    <button onClick={shareCart} disabled={shareLoading} style={{ width: '100%', background: '#f8f4ec', color: 'var(--ys-text)', border: '1.5px solid var(--ys-accent)', borderRadius: 12, height: 44, fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: shareLoading ? 0.6 : 1 }}>
                       {shareLoading ? '...' : '🔗 שתף עגלה'}
                     </button>
                   ) : (

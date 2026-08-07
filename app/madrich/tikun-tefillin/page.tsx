@@ -50,7 +50,7 @@ export default function TikunTefillinPage() {
 
           <QuoteBlock text='תמיד יש לבדוק את הקלף לפני שמחליטים על גורל הבתים. לעיתים קלף מושלם מסתתר בתוך בית בלוי.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             תיקון בתים לעומת תיקון קלף
           </h2>
 
@@ -84,14 +84,14 @@ export default function TikunTefillinPage() {
             הצבע השחור של התפילין נוטה לדהות בגלל זיעה ולחות. אם הצבע דהה עד שרואים עור לבן/חום, חובה לצבוע מיד ב"טוש תפילין" כשר. אם ריבוע הבית נפגע ממכה, חייבים לתת לאיש מקצוע שישתמש במכבש מיוחד ליישור מחדש.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='כמה עולה שיפוץ של בתי תפילין ישנים?' a='שיפוץ יסודי של בהמה גסה (צביעה, יישור, פתיחה וסגירה) עולה לרוב כמה מאות שקלים – משתלם בהרבה מקניית בתים חדשים (בתנאי שהפרשיות כשרות).' />
           <FAQItem q='מתי אי אפשר לשפץ בתים?' a='אם מדובר בתפילין "בהמה דקה" שהתעוותו, או בעור שנקרע לגמרי ומים חדרו אליו – לרוב לא ניתן להציל את המבנה ויש להזמין בתים חדשים.' />
           <FAQItem q='האם כדאי לרשת תפילין ישנות של סבא?' a='בהחלט כדאי לבדוק לפני שמשליכים. לעיתים הקלף הפנימי מצוין ורק הבית צריך שיפוץ. פנו לאיש מקצוע לאבחון לפני כל החלטה.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🐂' title='בהמה גסה' desc='למה לא להתפשר על סוג העור' href='/madrich/behema-gasa' />
             <RelatedCard emoji='🔍' title='בדיקת מזוזות' desc='מתי לבדוק ושיטות הבדיקה' href='/madrich/bdika-mezuzot' />

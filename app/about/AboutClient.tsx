@@ -52,7 +52,7 @@ export default function AboutClient() {
 
         {/* Section 1 — Origin */}
         <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
-          <h2 style={{ color: '#1a1a1a', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>Your Sofer נולד מתוך שליחות</h2>
+          <h2 style={{ color: 'var(--ys-text)', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>Your Sofer נולד מתוך שליחות</h2>
           <p style={{ color: '#444', fontSize: 15, lineHeight: 1.9, margin: 0 }}>
             במהלך פעילות חב"ד לנוער בדימונה, לצד עבודה יומיומית עם משפחות, בני נוער וקהילות, פגשנו שוב ושוב אנשים שחיפשו מוצרי יהדות איכותיים — ולא תמיד ידעו היכן למצוא אותם. מצד אחד היו חנויות קטנות עם מבחר מוגבל. מצד שני היו אתרים גדולים, שבהם קשה לדעת מי עומד מאחורי המוצר, מה רמת האיכות שלו והאם אפשר באמת לסמוך עליו. מתוך הצורך הזה נולד הרעיון להקים מקום אחד שיחבר בין איכות, אמינות, מגוון רחב וערכים יהודיים. כך נולד Your Sofer.
           </p>
@@ -60,7 +60,7 @@ export default function AboutClient() {
 
         {/* Section 2 — Vision */}
         <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
-          <h2 style={{ color: '#1a1a1a', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>החזון שלנו</h2>
+          <h2 style={{ color: 'var(--ys-text)', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>החזון שלנו</h2>
           <p style={{ color: '#444', fontSize: 15, lineHeight: 1.9, margin: '0 0 16px' }}>
             אנחנו מאמינים שלכל אדם מגיעה גישה פשוטה ונוחה לעולם היהדות. החזון שלנו הוא ליצור מקום אחד שמרכז עולם שלם של מוצרים יהודיים — מעין "אמזון לעולם היהודי". מקום שבו אפשר למצוא בקלות ובנוחות:
           </p>
@@ -75,11 +75,11 @@ export default function AboutClient() {
         </div>
 
         {/* Section 3 — Values (3 cards) */}
-        <h2 style={{ color: '#1a1a1a', fontSize: 20, fontWeight: 800, margin: '0 0 18px' }}>מה שחשוב לנו</h2>
+        <h2 style={{ color: 'var(--ys-text)', fontSize: 20, fontWeight: 800, margin: '0 0 18px' }}>מה שחשוב לנו</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16, marginBottom: 40 }}>
           {VALUES.map(v => (
             <div key={v.title} style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '24px 20px', textAlign: 'center' }}>
-              <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 10 }}>{v.title}</div>
+              <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-text)', marginBottom: 10 }}>{v.title}</div>
               <div style={{ fontSize: 13.5, color: '#555', lineHeight: 1.75 }}>{v.desc}</div>
             </div>
           ))}
@@ -90,7 +90,7 @@ export default function AboutClient() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 24 }}>
             {STATS.map(s => (
               <div key={s.value} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 26, fontWeight: 900, color: '#C5A028', marginBottom: 6 }}>{s.value}</div>
+                <div style={{ fontSize: 26, fontWeight: 900, color: 'var(--ys-accent)', marginBottom: 6 }}>{s.value}</div>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>{s.label}</div>
               </div>
             ))}
@@ -99,7 +99,7 @@ export default function AboutClient() {
 
         {/* Section 5 — Mission */}
         <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
-          <h2 style={{ color: '#1a1a1a', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>עסק עם מטרה</h2>
+          <h2 style={{ color: 'var(--ys-text)', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>עסק עם מטרה</h2>
           <p style={{ color: '#444', fontSize: 15, lineHeight: 1.9, margin: 0 }}>
             Your Sofer הוקם כעסק, אך הוא נולד מתוך שליחות. הפעילות המסחרית של האתר מסייעת לנו להמשיך ולהרחיב את פעילות חב"ד לנוער בדימונה. באמצעות כל רכישה אנו יכולים להמשיך לקיים שיעורים, פעילויות חינוכיות, ליווי אישי לבני נוער, יוזמות קהילתיות ופרויקטים נוספים למען הדור הצעיר. כך שכל לקוח אינו רק רוכש מוצר — הוא הופך לשותף בעשייה רחבה יותר וביצירת השפעה חיובית על חייהם של אחרים.
           </p>
@@ -107,7 +107,7 @@ export default function AboutClient() {
 
         {/* Section 6 — Why we're here */}
         <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
-          <h2 style={{ color: '#1a1a1a', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>למה אנחנו כאן</h2>
+          <h2 style={{ color: 'var(--ys-text)', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>למה אנחנו כאן</h2>
           <p style={{ color: '#444', fontSize: 15, lineHeight: 1.9, margin: 0 }}>
             אנחנו כאן כדי להפוך את עולם היהדות לנגיש יותר. כדי לחבר בין מסורת לאיכות. כדי להעניק מקום שאפשר לסמוך עליו. וכדי לאפשר לכל אדם למצוא את הפריטים שילוו אותו ברגעים החשובים ביותר בחיים.
           </p>
@@ -115,7 +115,7 @@ export default function AboutClient() {
 
         {/* Section 7 — Closing statement */}
         <div style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #1a1a1a 100%)', borderRadius: 14, padding: '36px 32px', marginBottom: 32, textAlign: 'center' }}>
-          <h2 style={{ color: '#C5A028', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>Your Sofer — הבית היהודי שלכם מתחיל כאן</h2>
+          <h2 style={{ color: 'var(--ys-accent)', fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>Your Sofer — הבית היהודי שלכם מתחיל כאן</h2>
           <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 15, lineHeight: 1.9, margin: 0 }}>
             מתוך אהבה ליהדות, מתוך מחויבות לאיכות ולאמינות, ומתוך אמונה שמוצרים יהודיים אינם רק חפצים — אלא דרך להתחבר למסורת, למשפחה ולערכים שעוברים מדור לדור.
           </p>
@@ -123,20 +123,20 @@ export default function AboutClient() {
 
         {/* Section 8 — Contact */}
         <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '32px', marginBottom: 28 }}>
-          <h2 style={{ color: '#1a1a1a', fontSize: 20, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
+          <h2 style={{ color: 'var(--ys-text)', fontSize: 20, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 15, color: '#444' }}>
             <div><strong>שם העסק:</strong> Your Sofer — חנות אונליין לרכישת מוצרי סת״מ ויודאיקה, בבעלות ובניהול <strong>בואהרון ניסן נסים</strong> (עוסק מורשה 304803810)</div>
             <div>
               <strong>טלפון ראשי: </strong>
-              <a href="tel:0584877770" style={{ color: '#1a1a1a', fontWeight: 700, textDecoration: 'none' }}>058-4877-770</a>
+              <a href="tel:0584877770" style={{ color: 'var(--ys-text)', fontWeight: 700, textDecoration: 'none' }}>058-4877-770</a>
             </div>
             <div>
               <strong>וואטסאפ שירות לקוחות: </strong>
-              <a href="https://wa.me/972587479933" style={{ color: '#1a1a1a', fontWeight: 700, textDecoration: 'none' }}>058-747-9933</a>
+              <a href="https://wa.me/972587479933" style={{ color: 'var(--ys-text)', fontWeight: 700, textDecoration: 'none' }}>058-747-9933</a>
             </div>
             <div>
               <strong>מייל: </strong>
-              <a href="mailto:support@your-sofer.com" style={{ color: '#1a1a1a', fontWeight: 700, textDecoration: 'none' }}>support@your-sofer.com</a>
+              <a href="mailto:support@your-sofer.com" style={{ color: 'var(--ys-text)', fontWeight: 700, textDecoration: 'none' }}>support@your-sofer.com</a>
             </div>
             <div><strong>כתובת:</strong> רחוב האורן 18, דימונה, ישראל (בית חב״ד לנוער דימונה)</div>
             <div><strong>שעות פעילות:</strong> א׳–ה׳, 09:00–18:00</div>
@@ -147,7 +147,7 @@ export default function AboutClient() {
         <div style={{ textAlign: 'center' }}>
           <button
             onClick={() => router.push('/')}
-            style={{ background: '#C5A028', color: '#1a1a1a', border: 'none', padding: '14px 32px', fontSize: 16, fontWeight: 800, cursor: 'pointer', borderRadius: 8, fontFamily: 'inherit' }}
+            style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', padding: '14px 32px', fontSize: 16, fontWeight: 800, cursor: 'pointer', borderRadius: 8, fontFamily: 'inherit' }}
           >
             לחנות המלאה ←
           </button>

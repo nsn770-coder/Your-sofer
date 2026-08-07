@@ -14,12 +14,12 @@ export default function LoyaltyPage() {
 
   return (
     <div>
-      <h2 style={{ fontSize: 22, fontWeight: 300, color: '#1a1a1a', margin: '0 0 24px', letterSpacing: '-0.01em' }}>
+      <h2 style={{ fontSize: 22, fontWeight: 300, color: 'var(--ys-text)', margin: '0 0 24px', letterSpacing: '-0.01em' }}>
         הנקודות שלי
       </h2>
 
       {/* ── כרטיס דרגה ראשי ──────────────────────────────────────────── */}
-      <div style={{ background: '#1a1a1a', color: '#fff', padding: '28px 28px 24px', marginBottom: 20 }}>
+      <div style={{ background: 'var(--ys-dark-surface)', color: '#fff', padding: '28px 28px 24px', marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, flexWrap: 'wrap' }}>
 
           {/* בלוק שמאלי — דרגה */}
@@ -81,7 +81,7 @@ export default function LoyaltyPage() {
       {/* ── טבלת 3 הדרגות ────────────────────────────────────────────── */}
       <div style={{ background: '#fff', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', marginBottom: 20, overflow: 'hidden' }}>
         <div style={{ padding: '16px 20px', borderBottom: '1px solid #F0EDE8' }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a', margin: 0 }}>דרגות חברות</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', margin: 0 }}>דרגות חברות</h3>
         </div>
 
         {/* כותרות טבלה */}
@@ -162,7 +162,7 @@ export default function LoyaltyPage() {
 
       {/* ── הסבר קצר ─────────────────────────────────────────────────── */}
       <div style={{ background: '#fff', padding: '20px', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', fontSize: 13, color: '#555', lineHeight: 1.8 }}>
-        <div style={{ fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>איך עובד המועדון?</div>
+        <div style={{ fontWeight: 700, color: 'var(--ys-text)', marginBottom: 8 }}>איך עובד המועדון?</div>
         <ul style={{ margin: 0, paddingRight: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
           <li>על כל קנייה תצבור נקודות לפי אחוז צבירת הדרגה שלך.</li>
           <li>ניתן לממש נקודות בקנייה הבאה (נקודה = ₪1).</li>

@@ -124,7 +124,7 @@ export default function ShabbatHolidaysClient() {
     <div dir="rtl" style={{ minHeight: '100vh', background: '#FFFFFF', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
       {/* Page header */}
-      <div style={{ background: '#1a1a1a', padding: isMobile ? '32px 20px 28px' : '48px 24px 40px', textAlign: 'center' }}>
+      <div style={{ background: 'var(--ys-dark-surface)', padding: isMobile ? '32px 20px 28px' : '48px 24px 40px', textAlign: 'center' }}>
         <h1 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 900, color: '#ffffff', marginBottom: 10, lineHeight: 1.3 }}>
           שבתות וחגים
         </h1>
@@ -132,7 +132,7 @@ export default function ShabbatHolidaysClient() {
           מוצרים נבחרים לשבת, חג ואירוח יהודי
         </p>
         {products.length > 0 && (
-          <p style={{ fontSize: 13, color: '#C5A028', marginTop: 12, fontWeight: 600 }}>
+          <p style={{ fontSize: 13, color: 'var(--ys-accent)', marginTop: 12, fontWeight: 600 }}>
             נמצאו {products.length} מוצרים
           </p>
         )}

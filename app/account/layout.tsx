@@ -39,12 +39,12 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#F8F6F1', minHeight: '100vh' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        .ys-spinner { width:32px; height:32px; border:3px solid #E7E2D8; border-top-color:#C5A028; border-radius:50%; animation:spin 0.8s linear infinite; }
+        .ys-spinner { width:32px; height:32px; border:3px solid #E7E2D8; border-top-color:var(--ys-accent); border-radius:50%; animation:spin 0.8s linear infinite; }
         .ys-account-sidebar { display:none; }
         @media(min-width:768px){ .ys-account-sidebar { display:block; width:200px; flex-shrink:0; } }
         .ys-account-nav-link { display:flex; align-items:center; gap:8px; padding:11px 16px; font-size:13px; text-decoration:none; transition:all 0.12s; border-right:3px solid transparent; }
         .ys-account-nav-link:hover { background:#F8F6F1; }
-        .ys-account-nav-link.active { font-weight:700; color:#1a1a1a !important; background:#F8F6F1; border-right-color:#C5A028; }
+        .ys-account-nav-link.active { font-weight:700; color:#1a1a1a !important; background:#F8F6F1; border-right-color:var(--ys-accent); }
       `}</style>
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 16px', display: 'flex', gap: 32, alignItems: 'flex-start' }}>
@@ -53,8 +53,8 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
         <aside className="ys-account-sidebar">
           <div style={{ background: '#fff', boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
             <div style={{ padding: '18px 16px', borderBottom: '1px solid #F0EDE8' }}>
-              <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, letterSpacing: 1 }}>החשבון שלי</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a', marginTop: 2 }}>
+              <div style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 700, letterSpacing: 1 }}>החשבון שלי</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', marginTop: 2 }}>
                 {user.firstName || user.displayName?.split(' ')[0] || 'לקוח'}
               </div>
             </div>
@@ -72,7 +72,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                     <span>{link.icon}</span>
                     {link.label}
                     {link.soon && (
-                      <span style={{ marginRight: 'auto', fontSize: 10, color: '#C5A028', border: '1px solid #C5A028', padding: '1px 4px' }}>בקרוב</span>
+                      <span style={{ marginRight: 'auto', fontSize: 10, color: 'var(--ys-accent)', border: '1px solid var(--ys-accent)', padding: '1px 4px' }}>בקרוב</span>
                     )}
                   </Link>
                 );

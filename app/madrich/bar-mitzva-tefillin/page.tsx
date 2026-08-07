@@ -50,7 +50,7 @@ export default function BarMitzvaTefillinPage() {
 
           <QuoteBlock text="תפילין טובות לבר מצווה הן לא בזבוז – הן השקעה שמלווה את הבן לכל החיים." />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             מתי לקנות תפילין?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -60,7 +60,7 @@ export default function BarMitzvaTefillinPage() {
             חסידי חב"ד נוהגים להתחיל להניח תפילין כבר חצי שנה לפני הבר מצווה – לכן יש צורך בתפילין עוד מוקדם יותר.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             עור בהמה גסה מול עור בהמה דקה
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -105,7 +105,7 @@ export default function BarMitzvaTefillinPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             רמות האיכות – מה ההבדל?
           </h2>
 
@@ -141,7 +141,7 @@ export default function BarMitzvaTefillinPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             מה כלול ברכישת תפילין?
           </h2>
 
@@ -150,7 +150,7 @@ export default function BarMitzvaTefillinPage() {
           <Step num={3} title="הרצועות" desc="רצועות עור שחורות. יש לוודא שהן כשרות (צבועות בצד הנכון) ועשויות מעור עליון מושחר משני הצדדים." />
           <Step num={4} title="אביזרי הגנה" desc="כיסויים קשיחים לבתים ונרתיק טרמי לנסיעות. חשובים במיוחד לנערים שיתגייסו לצבא – חום קיצוני עלול לעוות את ריבוע הבתים." />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             אשכנזי או ספרדי?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -162,7 +162,7 @@ export default function BarMitzvaTefillinPage() {
 
           <QuoteBlock text='תפילין הן מצווה יומיומית לכל החיים – שווה להשקיע בהן כראוי.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='מה כוללת חבילת תפילין איכותית לבר מצווה?' a='חבילה מהודרת כוללת: בתי תפילין מבהמה גסה, פרשיות כשרות ומהודרות, רצועות עור עליון מושחרות משני הצדדים, כיסויים קשיחים מגנים, ונרתיק נשיאה מכובד.' />
@@ -172,7 +172,7 @@ export default function BarMitzvaTefillinPage() {
           <FAQItem q='האם אפשר לתת תפילין ירושה?' a='כן, תפילין ישנות כשרות הן מתנה יקרת ערך. חשוב לבדוק אותן אצל סופר מוסמך לפני השימוש – פעמים רבות נמצאות בהן בעיות כשרות שלא ניכרות לעין.' />
           <FAQItem q='מה ההבדל בין "גסות" ל"דקות" בתפילין?' a='"גסות" מתייחס לגודל הבתים – גדולות יותר. "דקות" קטנות יותר. ברוב המסורות משתמשים בגסות.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='📜' title='נוסחי הסת"ם' desc='אשכנזי, ספרדי, האר"י – מה ההבדל?' href='/madrich/nosachim' />
             <RelatedCard emoji='🖐️' title='קלף עבודת יד מול מכונה' desc='למה זה משנה?' href='/madrich/klaf-ivduat-yad' />

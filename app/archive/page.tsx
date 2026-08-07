@@ -50,11 +50,11 @@ export default function ArchivePage() {
       {/* Header */}
       <div style={{
         background: 'linear-gradient(135deg, #1a1a1a 0%, #1a1a1a 100%)',
-        borderBottom: '3px solid #C5A028',
+        borderBottom: '3px solid var(--ys-accent)',
         padding: '36px 24px 28px',
         textAlign: 'center',
       }}>
-        <div style={{ fontSize: 26, color: '#C5A028', marginBottom: 8 }}>✡</div>
+        <div style={{ fontSize: 26, color: 'var(--ys-accent)', marginBottom: 8 }}>✡</div>
         <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: '0 0 6px' }}>
           קלפים שנמכרו לאחרונה
         </h1>
@@ -117,7 +117,7 @@ export default function ArchivePage() {
 
                 {/* Info */}
                 <div style={{ padding: '14px 16px' }}>
-                  <div style={{ fontWeight: 800, fontSize: 14, color: '#1a1a1a', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--ys-text)', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {klaf.name ?? klaf.productName ?? 'קלף סת״מ'}
                   </div>
                   {klaf.serialNumber && (
@@ -137,7 +137,7 @@ export default function ArchivePage() {
         <div style={{ marginTop: 40, textAlign: 'center' }}>
           <Link
             href="/"
-            style={{ fontSize: 13, color: '#1a1a1a', textDecoration: 'underline', opacity: 0.6 }}
+            style={{ fontSize: 13, color: 'var(--ys-text)', textDecoration: 'underline', opacity: 0.6 }}
           >
             חזרה לדף הראשי
           </Link>

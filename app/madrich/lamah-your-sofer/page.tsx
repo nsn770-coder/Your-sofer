@@ -50,7 +50,7 @@ export default function LamahYourSoferPage() {
 
           <QuoteBlock text='לא צריך לסמוך על מילים. בפלטפורמה דיגיטלית – רואים בדיוק מה קונים, מי כתב, ומה הבדיקות שעבר.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             חנות מסורתית מול פלטפורמה דיגיטלית
           </h2>
 
@@ -80,7 +80,7 @@ export default function LamahYourSoferPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שרשרת האחריות המלאה
           </h2>
 
@@ -91,22 +91,22 @@ export default function LamahYourSoferPage() {
             { title: 'המשלוח והאחריות', desc: 'הקלף נאטם בוואקום, נארז הרמטית ונשלח עם תעודת אחריות עולמית לכל החיים על כשרות הקלף הכתוב, כל עוד נשמר בתנאים סבירים.' },
           ].map(item => (
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
+              <span style={{ color: 'var(--ys-accent)', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-text)', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='מה קורה אם רב אחר בודק את הקלף ומחליט שהוא פסול?' a='פלטפורמות מובילות עומדות מאחורי המוצרים ב-100%. אם סמכות הלכתית מוסמכת מצאה פגם שמקורו בסופר – הקלף יוחלף מיידית בחדש, ללא עלות, במסגרת האחריות.' />
           <FAQItem q='כיצד ניתן להיות בטוח שהמזוזה לא נמכרה כבר למישהו אחר?' a='מערכת המלאי החי (Live Inventory) מעדכנת בזמן אמת. ברגע שלקוח מוסיף קלף ייחודי לסל ומשלם – הקלף יורד מהאוויר ואינו זמין לאחרים. כל קלף הוא "אחד ויחידה".' />
           <FAQItem q='האם ניתן לפגוש את הסופר לפני הרכישה?' a='ברוב הפלטפורמות הדיגיטליות ניתן לשאול שאלות ישירות לסופר דרך המערכת. חלק מהסופרים מרשים גם ביקורים ואפילו צפייה בתהליך הכתיבה עצמו.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='✍️' title='סופר ברוח טובה' desc='כלכלה הוגנת ואיכות כתיבה' href='/madrich/sofer-ruach' />
             <RelatedCard emoji='🔍' title='בדיקת מזוזות' desc='תהליך הבדיקה הדיגיטלית' href='/madrich/bdika-mezuzot' />

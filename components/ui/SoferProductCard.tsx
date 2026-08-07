@@ -127,7 +127,7 @@ export default function SoferProductCard({ id, name, price, imgUrl, badge, was, 
           {hasKlafSelection && (
             <span style={{
               background: 'linear-gradient(90deg, #b8972a, #d4a832)',
-              color: '#1a1a1a',
+              color: 'var(--ys-text)',
               borderRadius: 6,
               fontSize: 11,
               fontWeight: 800,

@@ -66,7 +66,7 @@ export default function CouponStrip() {
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
           font-weight: 700;
           font-size: 14px;
-          color: #C5A028;
+          color: var(--ys-accent);
           letter-spacing: 1.2px;
           white-space: nowrap;
           user-select: none;
@@ -88,11 +88,11 @@ export default function CouponStrip() {
           line-height: 1.6;
         }
         .coupon-btn:hover {
-          color: #C5A028;
+          color: var(--ys-accent);
           border-color: rgba(197, 160, 40, 0.8);
         }
         .coupon-btn--copied {
-          color: #C5A028;
+          color: var(--ys-accent);
           border-color: rgba(197, 160, 40, 0.8);
         }
         @media (max-width: 640px) {

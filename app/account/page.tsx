@@ -24,7 +24,7 @@ export default function AccountPage() {
     <div>
       {/* כותרת */}
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 300, color: '#1a1a1a', margin: 0, letterSpacing: '-0.01em' }}>
+        <h1 style={{ fontSize: 26, fontWeight: 300, color: 'var(--ys-text)', margin: 0, letterSpacing: '-0.01em' }}>
           שלום, {displayName} 👋
         </h1>
         <p style={{ fontSize: 14, color: '#9CA3AF', marginTop: 6, fontWeight: 300 }}>
@@ -40,7 +40,7 @@ export default function AccountPage() {
         const next  = getNextTierInfo(spent);
         return (
           <Link href="/account/loyalty" style={{ textDecoration: 'none', display: 'block', marginBottom: 28 }}>
-            <div style={{ background: '#1a1a1a', color: '#fff', padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap', cursor: 'pointer' }}>
+            <div style={{ background: 'var(--ys-dark-surface)', color: '#fff', padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap', cursor: 'pointer' }}>
               {/* שמאל — דרגה ונקודות */}
               <div style={{ minWidth: 140 }}>
                 <div style={{ fontSize: 11, color: tier.color, fontWeight: 700, letterSpacing: 1, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -86,17 +86,17 @@ export default function AccountPage() {
               opacity: link.soon ? 0.65 : 1,
               cursor: link.soon ? 'default' : 'pointer',
             }}
-            onMouseEnter={e => { if (!link.soon) (e.currentTarget as HTMLDivElement).style.borderRightColor = '#C5A028'; }}
+            onMouseEnter={e => { if (!link.soon) (e.currentTarget as HTMLDivElement).style.borderRightColor = 'var(--ys-accent)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderRightColor = 'transparent'; }}
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                 <div>
                   <div style={{ fontSize: 22, marginBottom: 8 }}>{link.icon}</div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a', marginBottom: 4 }}>{link.title}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', marginBottom: 4 }}>{link.title}</div>
                   <div style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 300, lineHeight: 1.5 }}>{link.desc}</div>
                 </div>
                 {link.soon && (
-                  <span style={{ fontSize: 10, color: '#C5A028', border: '1px solid #C5A028', padding: '2px 6px', whiteSpace: 'nowrap', marginTop: 2 }}>בקרוב</span>
+                  <span style={{ fontSize: 10, color: 'var(--ys-accent)', border: '1px solid var(--ys-accent)', padding: '2px 6px', whiteSpace: 'nowrap', marginTop: 2 }}>בקרוב</span>
                 )}
               </div>
             </div>

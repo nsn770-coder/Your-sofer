@@ -50,7 +50,7 @@ export default function SeferTorahPage() {
 
           <QuoteBlock text="ספר תורה אינו רק ספר – הוא מצווה שמלווה את הקהילה לדורות." />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             כמה זמן לוקח לכתוב ספר תורה?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -60,7 +60,7 @@ export default function SeferTorahPage() {
             רכישת ספר תורה היא למעשה ניהול פרויקט – התהליך כולל חתימה על חוזה, מעקב קבוע אחר התקדמות כתיבת היריעות, ביצוע הגהות מרובות, ושיאו באירוע "הכנסת ספר תורה" החגיגי.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             מה עולה ספר תורה?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -73,15 +73,15 @@ export default function SeferTorahPage() {
             { title: 'בדיקות ואישורים', desc: 'ספר תורה מהודר עובר לפחות שתי הגהות ממוחשבות ואחת אנושית. ביטוח יריעות במהלך הכתיבה וסריקות מחשב רב-פעמיות נכללים בעלות הכוללת.' },
           ].map(item => (
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
+              <span style={{ color: 'var(--ys-accent)', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-text)', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             תהליך הזמנת ספר תורה
           </h2>
           <Step num={1} title="פגישה עם הסופר" desc="הכירו את הסופר – ראו דוגמאות מכתבו, שאלו על ניסיונו, ובדקו שיש לו הסמכה מוכרת מגוף רבני מוכר." />
@@ -91,7 +91,7 @@ export default function SeferTorahPage() {
           <Step num={5} title="הגהה סופית" desc="לפני קבלת הספר, שלחו אותו לבדיקה מקיפה אצל מגיה שאינו הסופר עצמו. הגהה צולבת על ידי מספר מגיהים מומחים חיונית לספר מהודר." />
           <Step num={6} title="חגיגת סיום התורה" desc="המנהג הנפוץ הוא לערוך חגיגה שבה חברי הקהילה מחזיקים את יד הסופר וכותבים את האותיות האחרונות בעצמם – חוויה רוחנית עוצמתית." />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שיפוץ ספר תורה ישן
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -100,7 +100,7 @@ export default function SeferTorahPage() {
 
           <QuoteBlock text='ספר תורה ישן ששופץ כראוי כשר ויפה לא פחות מחדש.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם תורמים יכולים להשתתף בכתיבת האותיות האחרונות?' a='כן, בהחלט. מקובל להשאיר את הפסוקים האחרונים ללא כתיבה (רק בקו קל). בחגיגת הסיום, תורמים ובני משפחה מחזיקים את יד הסופר וכותבים אות – קיום המצווה באופן אישי.' />
@@ -109,7 +109,7 @@ export default function SeferTorahPage() {
           <FAQItem q='מהו ספר תורה "ממוחשב"?' a='ספר תורה שנכתב על ידי מכונות דפוס – פסול לחלוטין. ספר תורה חייב להיכתב בידי אדם, אות אחר אות, בכוונה.' />
           <FAQItem q='האם ניתן לתת ספר תורה במתנה לבית כנסת?' a='כן, ומדובר במצווה גדולה. כדאי לתאם מראש עם הנהלת בית הכנסת ולוודא שהספר מתאים לנוסח המתפללים.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='✍️' title='מי הסופרים' desc='קריטריונים לבחירת סופר מוסמך' href='/madrich/soferim' />
             <RelatedCard emoji='🖐️' title='קלף עבודת יד מול מכונה' desc='ההבדל בחומר הגלם' href='/madrich/klaf-ivduat-yad' />

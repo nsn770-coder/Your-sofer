@@ -6,7 +6,7 @@ import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { getKipaUnitPrice, KIPA_MIN_QTY } from '@/app/lib/kippot';
 
 const NAVY = '#1a1a1a';
-const GOLD = '#C5A028';
+const GOLD = 'var(--ys-accent)';
 
 // ── Cloudinary helper ─────────────────────────────────────────────────────────
 function extractCloudinaryPublicId(url: string): string {

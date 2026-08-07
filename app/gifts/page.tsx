@@ -4,8 +4,8 @@ import { OCCASIONS } from '@/data/occasions';
 
 const BASE_URL = 'https://your-sofer.com';
 const NAVY = '#373A5A';
-const GOLD = '#C5A028';
-const CREAM = '#FAF8F3';
+const GOLD = 'var(--ys-accent)';
+const CREAM = 'var(--ys-bg-warm)';
 
 const TITLE = 'מתנות לאירועים | תכשיטים בחריטה אישית ומזכרות מהודרות | YourSofer';
 const DESCRIPTION =

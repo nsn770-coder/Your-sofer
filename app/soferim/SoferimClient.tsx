@@ -62,7 +62,7 @@ export default function SoferimClient() {
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="חפש סופר לפי שם, עיר או סגנון..."
               style={{ flex: 1, border: 'none', padding: '12px 16px', fontSize: 14, outline: 'none', color: '#333' }} />
-            <button style={{ background: '#C5A028', border: 'none', padding: '0 20px', cursor: 'pointer' }}>
+            <button style={{ background: 'var(--ys-accent)', border: 'none', padding: '0 20px', cursor: 'pointer' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
@@ -70,7 +70,7 @@ export default function SoferimClient() {
           </div>
 
           <button onClick={() => router.push('/soferim/apply')}
-            style={{ background: '#C5A028', color: '#1a1a1a', border: 'none', borderRadius: 8, padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 8, padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             ✍️ הצטרף כסופר לפלטפורמה
           </button>
         </div>
@@ -150,7 +150,7 @@ export default function SoferimClient() {
                 {/* תוכן */}
                 <div style={{ padding: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                    <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: 0 }}>{s.name}</h2>
+                    <h2 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: 0 }}>{s.name}</h2>
                     <div style={{ display: 'flex', gap: 2 }}>
                       {'★★★★★'.split('').map((star, i) => (
                         <span key={i} style={{ color: '#e6a817', fontSize: 13 }}>{star}</span>
@@ -182,7 +182,7 @@ export default function SoferimClient() {
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button
                       onClick={e => { e.stopPropagation(); router.push(`/soferim/${s.id}`); }}
-                      style={{ flex: 1, background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                      style={{ flex: 1, background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                       📜 לפרופיל הסופר
                     </button>
                   </div>
@@ -194,7 +194,7 @@ export default function SoferimClient() {
       </div>
 
       <footer style={{ background: '#0f1111', color: '#fff', padding: '20px', textAlign: 'center' }}>
-        <div style={{ fontSize: 18, fontWeight: 900, color: '#C5A028', marginBottom: 4 }}>✡ Your Sofer</div>
+        <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-accent)', marginBottom: 4 }}>✡ Your Sofer</div>
         <div style={{ fontSize: 12, color: '#666' }}>© 2025 Your Sofer - סת"מ מסופרים מוסמכים</div>
       </footer>
     </div>

@@ -752,7 +752,7 @@ export default function ShiraChat() {
         /* Typing dots */
         .shira-typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; }
         .shira-typing span {
-          width: 7px; height: 7px; background: #C5A028; border-radius: 50%;
+          width: 7px; height: 7px; background: var(--ys-accent); border-radius: 50%;
           animation: shiraBounce 1.2s infinite;
         }
         .shira-typing span:nth-child(2) { animation-delay: 0.2s; }
@@ -778,7 +778,7 @@ export default function ShiraChat() {
         }
         .shira-quick-btn:hover:not(:disabled) {
           background: rgba(197,160,40,0.12);
-          border-color: #C5A028;
+          border-color: var(--ys-accent);
         }
         .shira-quick-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -797,7 +797,7 @@ export default function ShiraChat() {
         }
         .shira-product-card:hover {
           box-shadow: 0 3px 12px rgba(197,160,40,0.2);
-          border-color: #C5A028;
+          border-color: var(--ys-accent);
         }
         .shira-product-img {
           width: 56px; height: 56px; border-radius: 8px;
@@ -811,7 +811,7 @@ export default function ShiraChat() {
           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
           overflow: hidden;
         }
-        .shira-product-cat { font-size: 10px; color: #C5A028; font-weight: 600; margin-top: 2px; }
+        .shira-product-cat { font-size: 10px; color: var(--ys-accent); font-weight: 600; margin-top: 2px; }
         .shira-product-price-col {
           flex-shrink: 0; text-align: left;
           display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
@@ -836,7 +836,7 @@ export default function ShiraChat() {
           direction: rtl; background: #faf9f7;
           transition: border-color 0.2s; font-family: inherit;
         }
-        .shira-input:focus { border-color: #C5A028; background: white; }
+        .shira-input:focus { border-color: var(--ys-accent); background: white; }
         .shira-send {
           width: 38px; height: 38px; border-radius: 50%;
           background: linear-gradient(135deg, #111d3a, #1a2d5a);

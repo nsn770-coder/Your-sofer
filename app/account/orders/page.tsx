@@ -48,14 +48,14 @@ function OrderCard({ order }: { order: Order }) {
         style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'right', flexWrap: 'wrap' }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a' }}>{order.orderNumber}</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ys-text)' }}>{order.orderNumber}</div>
           <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{dateStr}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <span style={{ fontSize: 12, padding: '3px 10px', background: status.bg, color: status.color, fontWeight: 700 }}>
             {status.label}
           </span>
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ys-text)' }}>
             ₪{order.total?.toFixed(2) ?? '—'}
           </div>
           <span style={{ fontSize: 11, color: '#888', transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
@@ -69,7 +69,7 @@ function OrderCard({ order }: { order: Order }) {
           {order.items?.map((item, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#555', marginBottom: 6 }}>
               <span>{item.name} × {item.quantity}</span>
-              <span style={{ fontWeight: 600, color: '#1a1a1a' }}>₪{(item.price * item.quantity).toFixed(2)}</span>
+              <span style={{ fontWeight: 600, color: 'var(--ys-text)' }}>₪{(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
           {order.address && (
@@ -140,13 +140,13 @@ export default function OrdersPage() {
 
   return (
     <div>
-      <h2 style={{ fontSize: 22, fontWeight: 300, color: '#1a1a1a', margin: '0 0 24px', letterSpacing: '-0.01em' }}>
+      <h2 style={{ fontSize: 22, fontWeight: 300, color: 'var(--ys-text)', margin: '0 0 24px', letterSpacing: '-0.01em' }}>
         ההזמנות שלי
       </h2>
 
       {loading && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60 }}>
-          <div style={{ width: 32, height: 32, border: '3px solid #E7E2D8', borderTopColor: '#C5A028', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <div style={{ width: 32, height: 32, border: '3px solid #E7E2D8', borderTopColor: 'var(--ys-accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
           <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
         </div>
       )}
@@ -161,7 +161,7 @@ export default function OrdersPage() {
           <div style={{ fontSize: 12.5, color: '#9CA3AF', marginBottom: 24, lineHeight: 1.6, maxWidth: 420, margin: '0 auto 24px' }}>
             לא מופיעה הזמנה? ודאו שהתחברתם עם אותו חשבון Google שכתובת המייל שלו זהה לכתובת ששימשה בהזמנה.
           </div>
-          <a href="/" style={{ background: '#1a1a1a', color: '#fff', padding: '11px 28px', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-block' }}>
+          <a href="/" style={{ background: 'var(--ys-dark-surface)', color: '#fff', padding: '11px 28px', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-block' }}>
             לחנות
           </a>
         </div>

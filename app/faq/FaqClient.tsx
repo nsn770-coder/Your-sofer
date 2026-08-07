@@ -20,7 +20,7 @@ import { buildWhatsAppLink, WA_PREFILL } from '@/lib/whatsapp';
 import { trackFaqEvent } from '@/lib/faqAnalytics';
 import FaqAccordion from '@/app/components/faq/FaqAccordion';
 
-const GOLD = '#C5A028';
+const GOLD = 'var(--ys-accent)';
 
 export default function FaqClient() {
   const [query, setQuery] = useState('');
@@ -65,7 +65,7 @@ export default function FaqClient() {
     <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif", background: '#F5F2EC', minHeight: '100vh' }}>
 
       {/* ── Hero ── */}
-      <div style={{ background: '#1a1a1a', padding: '48px 20px 40px', textAlign: 'center' }}>
+      <div style={{ background: 'var(--ys-dark-surface)', padding: '48px 20px 40px', textAlign: 'center' }}>
         <h1 style={{ color: '#fff', fontSize: 'clamp(26px, 5vw, 34px)', fontWeight: 900, margin: '0 0 10px' }}>
           שאלות נפוצות
         </h1>
@@ -119,7 +119,7 @@ export default function FaqClient() {
               fontFamily: 'inherit',
               outline: 'none',
               background: '#fff',
-              color: '#1a1a1a',
+              color: 'var(--ys-text)',
             }}
           />
         </div>
@@ -178,7 +178,7 @@ export default function FaqClient() {
               <FaqAccordion items={searchResults} />
             ) : (
               <div style={{ background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '28px 24px', textAlign: 'center' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', marginBottom: 8 }}>
                   לא מצאנו תשובה מתאימה
                 </div>
                 <div style={{ fontSize: 13.5, color: '#666', marginBottom: 16 }}>
@@ -203,7 +203,7 @@ export default function FaqClient() {
             if (items.length === 0) return null;
             return (
               <section key={cat.id} id={`faq-cat-${cat.id}`} aria-label={cat.label} style={{ marginBottom: 30, scrollMarginTop: 90 }}>
-                <h2 style={{ fontSize: 19, fontWeight: 800, color: '#1a1a1a', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <h2 style={{ fontSize: 19, fontWeight: 800, color: 'var(--ys-text)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span aria-hidden="true" style={{ fontSize: 17 }}>{cat.icon}</span>
                   {cat.label}
                 </h2>
@@ -215,7 +215,7 @@ export default function FaqClient() {
 
         {/* ── לא מצאתם תשובה ── */}
         <div style={{ marginTop: 40, textAlign: 'center', background: '#fff', border: '1px solid #E0D8CC', borderRadius: 14, padding: '28px 24px' }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>לא מצאתם תשובה?</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ys-text)', marginBottom: 8 }}>לא מצאתם תשובה?</div>
           <div style={{ fontSize: 14, color: '#666', marginBottom: 16 }}>
             צרו איתנו קשר בוואטסאפ — בשעות הפעילות עונים בדרך כלל בתוך כדקה.
           </div>

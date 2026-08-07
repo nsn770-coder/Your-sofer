@@ -50,7 +50,7 @@ export default function ProyectBinyanPage() {
 
           <QuoteBlock text='כל קלף בהזמנה גדולה מגיע עם מספר סידורי, דוח סריקה וחשבונית מס – לא שק אנונימי.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             אסטרטגיית הרכש לפרויקט
           </h2>
 
@@ -58,7 +58,7 @@ export default function ProyectBinyanPage() {
             {[
               {
                 title: 'דלתות כניסה ושערים',
-                color: '#1a1a1a',
+                color: 'var(--ys-text)',
                 bg: '#f0f4ff',
                 items: ['מזוזות גדולות 12-15 ס"מ', 'רמת הידור גבוהה', 'בתי מזוזה מרשימים', 'תעודת כשרות נפרדת'],
               },
@@ -80,14 +80,14 @@ export default function ProyectBinyanPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם אפשר להזמין גם בתי מזוזה בהתאמה לקו העיצובי של הפרויקט?' a='כן. ניתן לבצע הזמנה מרוכזת של בתי מזוזה ממותגים מאלומיניום או פרספקס, שיותאמו ספציפית לצבע הדלתות של הפרויקט.' />
           <FAQItem q='מהו זמן האספקה להזמנה של 50 קלפים ומעלה?' a='תלוי במלאי הקיים. בפרויקטים גדולים שמוזמנים עם תיאום מוקדם, ניתן לספק בתוך שבועות ספורים בסיוע מספר סופרים.' />
           <FAQItem q='כיצד מנהלים מעקב אחר תקינות כל קלף בהזמנה גדולה?' a='כל קלף מקבל מספר סידורי אישי, תמונה ייחודית ודוח בדיקת מחשב. מנהל הפרויקט מקבל קובץ Excel מרוכז עם כל הפרטים.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='📏' title='גודל המזוזה' desc='10, 12, 15 ס"מ – מה ההבדל?' href='/madrich/godel-mezuza' />
             <RelatedCard emoji='🏠' title='סוגי בתי מזוזה' desc='חומרים ועיצובים לכל דלת' href='/madrich/batei-mezuza' />

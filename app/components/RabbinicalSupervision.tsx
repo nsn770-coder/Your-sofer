@@ -25,7 +25,7 @@ function BadgePill({ children }: { children: React.ReactNode }) {
       display: 'inline-flex', alignItems: 'center', gap: 5,
       background: '#EEF3FF',
       borderRadius: 999, padding: '5px 14px',
-      fontSize: 12, fontWeight: 600, color: '#1a1a1a',
+      fontSize: 12, fontWeight: 600, color: 'var(--ys-text)',
       letterSpacing: 0.4,
     }}>
       {children}
@@ -183,7 +183,7 @@ export default function RabbinicalSupervision({ isMobile }: { isMobile: boolean 
               display: 'flex', alignItems: 'center', gap: 7,
               background: '#FFFFFF',
               borderRadius: 999, padding: '7px 16px',
-              fontSize: 12, color: '#1a1a1a', fontWeight: 600,
+              fontSize: 12, color: 'var(--ys-text)', fontWeight: 600,
             }}>
               <span style={{ color: GOLD, fontSize: 13 }}>✓</span> {item}
             </div>

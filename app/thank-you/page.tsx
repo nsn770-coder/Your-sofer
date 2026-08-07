@@ -444,7 +444,7 @@ function ThankYouContent() {
         <h1 style={{ fontSize: 24, fontWeight: 900, color: '#166534', marginBottom: 8 }}>ההזמנה התקבלה!</h1>
         {orderNumber && (
           <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>
-            מספר הזמנה: <span style={{ fontWeight: 700, color: '#1a1a1a' }}>{orderNumber}</span>
+            מספר הזמנה: <span style={{ fontWeight: 700, color: 'var(--ys-text)' }}>{orderNumber}</span>
           </div>
         )}
         <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.7, marginBottom: 28 }}>
@@ -483,10 +483,10 @@ function ThankYouContent() {
           {/* ── State: idle (before sign-in) — premium club offer + points hint ── */}
           {claimState === 'idle' && !user && (
             <>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ys-accent)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
                 מועדון לקוחות פרימיום
               </div>
-              <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '0 0 10px', lineHeight: 1.4 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '0 0 10px', lineHeight: 1.4 }}>
                 🎉 הצטרפו למועדון ותתחילו להרוויח כבר מהקנייה הזו!
               </h2>
 
@@ -494,12 +494,12 @@ function ThankYouContent() {
               {pointsHint > 0 && (
                 <div style={{
                   background: 'linear-gradient(135deg, #fdf8ec, #faf3e0)',
-                  border: '1.5px solid #C5A028',
+                  border: '1.5px solid var(--ys-accent)',
                   borderRadius: 12,
                   padding: '14px 18px',
                   marginBottom: 14,
                   fontSize: 14,
-                  color: '#1a1a1a',
+                  color: 'var(--ys-text)',
                   lineHeight: 1.8,
                 }}>
                   סכום הרכישה שלך: <strong>₪{orderTotal.toLocaleString('he-IL')}</strong><br />
@@ -559,7 +559,7 @@ function ThankYouContent() {
           {/* ── State: claiming — spinner while endpoint runs ── */}
           {claimState === 'claiming' && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '8px 0' }}>
-              <div style={{ width: 32, height: 32, border: '3px solid #E7E2D8', borderTopColor: '#C5A028', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+              <div style={{ width: 32, height: 32, border: '3px solid #E7E2D8', borderTopColor: 'var(--ys-accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
               <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>מזכה נקודות על הקנייה...</p>
             </div>
           )}
@@ -606,12 +606,12 @@ function ThankYouContent() {
           boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
           padding: '28px 32px', marginTop: 20, textAlign: 'center',
         }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ys-accent)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
             מועדון לקוחות פרימיום
           </div>
           <div style={{ fontSize: 36, marginBottom: 10 }}>⭐</div>
           {(orderPointsEarned ?? pointsHint) > 0 && (
-            <p style={{ fontSize: 15, color: '#1a1a1a', lineHeight: 1.7, margin: '0 0 12px' }}>
+            <p style={{ fontSize: 15, color: 'var(--ys-text)', lineHeight: 1.7, margin: '0 0 12px' }}>
               זוכו לך{' '}
               <strong style={{ color: '#166534' }}>
                 {orderPointsEarned !== null ? orderPointsEarned : `~${pointsHint}`} נקודות
@@ -621,12 +621,12 @@ function ThankYouContent() {
           )}
           <div style={{
             background: 'linear-gradient(135deg, #fdf8ec, #faf3e0)',
-            border: '1.5px solid #C5A028',
+            border: '1.5px solid var(--ys-accent)',
             borderRadius: 12,
             padding: '14px 18px',
             marginBottom: 14,
             fontSize: 14,
-            color: '#1a1a1a',
+            color: 'var(--ys-text)',
             lineHeight: 1.8,
           }}>
             יתרת הנקודות שלך:{' '}
@@ -649,10 +649,10 @@ function ThankYouContent() {
       {/* ── Gematria blessing card ── */}
       {blessing && (
         <div style={{ background: 'linear-gradient(135deg, #1a2744, #1e3a8a)', borderRadius: 20, boxShadow: '0 8px 40px rgba(30,58,138,0.25)', padding: '32px 28px', marginTop: 20, textAlign: 'center', color: '#fff' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ys-accent)', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 14 }}>
             ✦ ברכה אישית לך ✦
           </div>
-          <div style={{ fontSize: 52, fontWeight: 900, color: '#C5A028', letterSpacing: '0.05em', marginBottom: 6, fontFamily: "'Frank Ruhl Libre', serif" }}>
+          <div style={{ fontSize: 52, fontWeight: 900, color: 'var(--ys-accent)', letterSpacing: '0.05em', marginBottom: 6, fontFamily: "'Frank Ruhl Libre', serif" }}>
             {blessing.word}
           </div>
           <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginBottom: 16 }}>

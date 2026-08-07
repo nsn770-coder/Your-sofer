@@ -22,10 +22,10 @@ function OpsLayoutContent({ children }: { children: React.ReactNode }) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
-        style={{ background: '#1E3A8A' }}
+        style={{ background: 'var(--ys-heading)' }}
       >
         <div className="text-center text-white">
-          <div className="text-3xl font-black mb-3" style={{ color: '#C5A028' }}>✡ Your Sofer</div>
+          <div className="text-3xl font-black mb-3" style={{ color: 'var(--ys-accent)' }}>✡ Your Sofer</div>
           <div className="text-sm opacity-60">טוען מערכת...</div>
         </div>
       </div>

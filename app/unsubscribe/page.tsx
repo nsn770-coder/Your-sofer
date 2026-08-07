@@ -62,7 +62,7 @@ function UnsubscribeContent() {
       icon: '🎉',
       title: 'ברוך שובך!',
       body: 'הצטרפת מחדש לרשימת הדיוור של YourSofer. תשמח/י לשמוע על מבצעים ועדכונים.',
-      color: '#1E3A8A',
+      color: 'var(--ys-heading)',
     },
     not_found: {
       icon: '🔍',
@@ -110,11 +110,11 @@ function UnsubscribeContent() {
         }}
       >
         {/* Header */}
-        <div style={{ background: '#1E3A8A', padding: '24px 32px', textAlign: 'center' }}>
+        <div style={{ background: 'var(--ys-heading)', padding: '24px 32px', textAlign: 'center' }}>
           <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', letterSpacing: 2, marginBottom: 6 }}>
             YOUR SOFER
           </div>
-          <div style={{ fontSize: 28, color: '#C5A028' }}>✡</div>
+          <div style={{ fontSize: 28, color: 'var(--ys-accent)' }}>✡</div>
           <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 4 }}>
             סת״מ ישירות מהסופר
           </div>
@@ -161,7 +161,7 @@ function UnsubscribeContent() {
           <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 20, marginTop: 4 }}>
             <a
               href="https://your-sofer.com"
-              style={{ color: '#1E3A8A', fontSize: 13, textDecoration: 'none', fontWeight: 700 }}
+              style={{ color: 'var(--ys-heading)', fontSize: 13, textDecoration: 'none', fontWeight: 700 }}
             >
               ← חזרה לחנות
             </a>

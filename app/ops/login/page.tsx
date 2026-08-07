@@ -18,7 +18,7 @@ export default function OpsLoginPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#1E3A8A' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--ys-heading)' }}>
         <div className="text-white text-lg">טוען...</div>
       </div>
     );
@@ -27,13 +27,13 @@ export default function OpsLoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center"
-      style={{ background: '#1E3A8A' }}
+      style={{ background: 'var(--ys-heading)' }}
       dir="rtl"
     >
       <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-sm text-center">
         {/* Logo */}
         <div className="mb-6">
-          <div style={{ color: '#C5A028' }} className="text-4xl font-black mb-1">✡ Your Sofer</div>
+          <div style={{ color: 'var(--ys-accent)' }} className="text-4xl font-black mb-1">✡ Your Sofer</div>
           <div className="text-gray-500 text-sm">מערכת ניהול פנימית</div>
         </div>
 

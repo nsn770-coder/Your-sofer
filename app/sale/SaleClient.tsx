@@ -70,7 +70,7 @@ export default function SaleClient() {
     <main dir="rtl" style={{ background: '#FFFFFF', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
       {/* Hero */}
-      <div style={{ background: '#1a1a1a', color: '#fff', padding: '48px 24px 40px', textAlign: 'center' }}>
+      <div style={{ background: 'var(--ys-dark-surface)', color: '#fff', padding: '48px 24px 40px', textAlign: 'center' }}>
         <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A227', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 10 }}>
           מחירים מוזלים לזמן מוגבל
         </p>
@@ -100,13 +100,13 @@ export default function SaleClient() {
         {!loading && products.length === 0 && (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>🏷️</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--ys-text)', marginBottom: 8 }}>
               אין מבצעים פעילים כרגע
             </div>
             <div style={{ fontSize: 15, color: '#888', marginBottom: 28 }}>
               חזרו בקרוב — מבצעים חדשים מתחלפים מדי שבוע
             </div>
-            <a href="/" style={{ background: '#1a1a1a', color: '#fff', padding: '12px 28px', fontSize: 14, fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>
+            <a href="/" style={{ background: 'var(--ys-dark-surface)', color: '#fff', padding: '12px 28px', fontSize: 14, fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>
               לחנות הראשית ←
             </a>
           </div>

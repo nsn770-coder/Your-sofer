@@ -16,7 +16,7 @@ import ProductCard from '@/components/ui/ProductCard';
 import { EVENT_SCROLL_SECTIONS, EVENT_SCROLL_SECTION_IDS } from '@/app/constants/eventScrollSections';
 import { PROMO_ACTIVE, MIN_KIPPOT_QTY, MIN_ADDON_QTY } from '@/app/lib/promoRules';
 
-const GOLD = '#C5A028';
+const GOLD = 'var(--ys-accent)';
 const NAVY = '#111d3a';
 
 const KIPPOT_STYLES = [
@@ -247,16 +247,16 @@ export default function EventKippotClient() {
         .ys-ekip-range::-moz-range-thumb { width: 26px; height: 26px; background: ${GOLD}; cursor: pointer; border-radius: 50%; border: none; box-shadow: 0 2px 8px rgba(197,160,40,0.4); }
         .ys-ekip-card { transition: all 0.2s; }
         .ys-ekip-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-        .ys-ekip-scroll { scrollbar-width: thin; scrollbar-color: #C5A028 #F3EFE6; }
+        .ys-ekip-scroll { scrollbar-width: thin; scrollbar-color: var(--ys-accent) #F3EFE6; }
         .ys-ekip-scroll::-webkit-scrollbar { height: 6px; }
         .ys-ekip-scroll::-webkit-scrollbar-track { background: #F3EFE6; }
-        .ys-ekip-scroll::-webkit-scrollbar-thumb { background: #C5A028; border-radius: 3px; }
+        .ys-ekip-scroll::-webkit-scrollbar-thumb { background: var(--ys-accent); border-radius: 3px; }
         .ys-ekip-styles { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
         @media (max-width: 640px) {
-          .ys-ekip-styles { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #C5A028 #F3EFE6; }
+          .ys-ekip-styles { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--ys-accent) #F3EFE6; }
           .ys-ekip-styles::-webkit-scrollbar { height: 6px; }
           .ys-ekip-styles::-webkit-scrollbar-track { background: #F3EFE6; }
-          .ys-ekip-styles::-webkit-scrollbar-thumb { background: #C5A028; border-radius: 3px; }
+          .ys-ekip-styles::-webkit-scrollbar-thumb { background: var(--ys-accent); border-radius: 3px; }
           .ys-ekip-styles .ys-ekip-card { flex: 0 0 132px; width: 132px; }
         }
       `}</style>
@@ -326,7 +326,7 @@ export default function EventKippotClient() {
             >
               <img src={opt.img} alt={opt.label} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} />
               <div style={{ padding: '10px 12px' }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a' }}>{opt.label}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ys-text)' }}>{opt.label}</div>
                 <div style={{ fontSize: 11, color: '#9C7B3F', marginTop: 2 }}>{opt.desc}</div>
               </div>
             </button>
@@ -353,7 +353,7 @@ export default function EventKippotClient() {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 20 }}>
-          <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 80 }}>
+          <div style={{ background: 'var(--ys-bg-warm)', padding: '12px 20px', minWidth: 80 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>כמות — לחצו לעריכה</div>
             {/* קלט ישיר: לחיצה על המספר מאפשרת הקלדת כמות מדויקת */}
             <input
@@ -379,12 +379,12 @@ export default function EventKippotClient() {
               }}
             />
           </div>
-          <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 110 }}>
+          <div style={{ background: 'var(--ys-bg-warm)', padding: '12px 20px', minWidth: 110 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>מחיר ליחידה</div>
             <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: GOLD }}>₪{unitPrice}</div>
             {embroideryExtra > 0 && <div style={{ fontSize: 10, color: '#9C7B3F' }}>כולל +₪{embroideryExtra} רקמה</div>}
           </div>
-          <div style={{ background: '#FAF8F3', padding: '12px 20px', minWidth: 130 }}>
+          <div style={{ background: 'var(--ys-bg-warm)', padding: '12px 20px', minWidth: 130 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>סה&quot;כ משוער</div>
             <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: NAVY }}>
               ₪{total.toLocaleString('he-IL')}
@@ -438,7 +438,7 @@ export default function EventKippotClient() {
                     <div style={{ position: 'absolute', top: 6, left: 6, background: GOLD, color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>✓</div>
                   )}
                   <img src={s.img} alt={`${s.label} — ${KIPA_MATERIAL_LABELS[getKipaMaterial(s.id)]}`} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-                  <div style={{ padding: '8px 10px 2px', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{s.label}</div>
+                  <div style={{ padding: '8px 10px 2px', fontSize: 13, fontWeight: 600, color: 'var(--ys-text)' }}>{s.label}</div>
                   {/* סוג הכיפה — מוצג מתחת לכל דגם */}
                   <div style={{ padding: '0 10px 8px', fontSize: 11, fontWeight: 600, color: '#9C7B3F' }}>
                     {KIPA_MATERIAL_LABELS[getKipaMaterial(s.id)]}
@@ -484,7 +484,7 @@ export default function EventKippotClient() {
           justifyContent: 'center',
           gap: 10,
           background: GOLD,
-          color: '#1a1a1a',
+          color: 'var(--ys-text)',
           fontWeight: 900,
           fontSize: 17,
           padding: '18px 32px',
@@ -580,7 +580,7 @@ export default function EventKippotClient() {
           href={`/admin/new-product?cat=${encodeURIComponent('כיפות')}&isEventKippot=true`}
           style={{
             position: 'fixed', bottom: 90, right: 20, zIndex: 9999,
-            background: '#C5A028', color: '#fff', fontWeight: 700, fontSize: 13,
+            background: 'var(--ys-accent)', color: '#fff', fontWeight: 700, fontSize: 13,
             padding: '10px 16px', textDecoration: 'none',
             boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
             fontFamily: 'Heebo, Arial, sans-serif',

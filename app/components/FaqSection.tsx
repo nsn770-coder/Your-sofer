@@ -32,7 +32,7 @@ interface Props {
 }
 
 const NAVY = '#373A5A';
-const GOLD = '#C5A028';
+const GOLD = 'var(--ys-accent)';
 
 export default function FaqSection({
   items,

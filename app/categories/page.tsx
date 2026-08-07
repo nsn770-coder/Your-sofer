@@ -57,7 +57,7 @@ export default function CategoriesPage() {
   }, []);
 
   return (
-    <div dir="rtl" style={{ background: '#FAF8F3', minHeight: '100vh', padding: isMobile ? '28px 16px 48px' : '48px 32px 64px' }}>
+    <div dir="rtl" style={{ background: 'var(--ys-bg-warm)', minHeight: '100vh', padding: isMobile ? '28px 16px 48px' : '48px 32px 64px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <h1 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 800, color: '#1F2937', textAlign: 'center', marginBottom: 8 }}>
           כל הקטגוריות

@@ -8,7 +8,7 @@ import PageFaqSection from '@/app/components/faq/PageFaqSection';
 
 type JoinState = 'idle' | 'signing' | 'joining' | 'success' | 'already' | 'error';
 
-const GOLD = '#C5A028';
+const GOLD = 'var(--ys-accent)';
 
 export default function ClubJoinPage() {
   const { user, loading, signInWithGoogle } = useAuth();
@@ -69,7 +69,7 @@ export default function ClubJoinPage() {
         {/* כותרת */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{ fontSize: 13, letterSpacing: 2, color: GOLD, fontWeight: 700, marginBottom: 8 }}>YOUR SOFER</div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1a1a1a', margin: 0 }}>מועדון הלקוחות שלנו 🎉</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--ys-text)', margin: 0 }}>מועדון הלקוחות שלנו 🎉</h1>
           <p style={{ fontSize: 14, color: '#6b7280', marginTop: 10, lineHeight: 1.7 }}>
             הצטרפות בחינם בלחיצה אחת — ומתחילים להרוויח
           </p>
@@ -92,10 +92,10 @@ export default function ClubJoinPage() {
               <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.8, margin: '0 0 20px' }}>
                 מעכשיו כל רכישה צוברת נקודות (נקודה = ₪1 הנחה), ותקבלו גישה למבצעי מועדון בלעדיים.
               </p>
-              <a href="/account/loyalty" style={{ display: 'inline-block', background: '#1a1a1a', color: '#fff', padding: '12px 28px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none', marginLeft: 8 }}>
+              <a href="/account/loyalty" style={{ display: 'inline-block', background: 'var(--ys-dark-surface)', color: '#fff', padding: '12px 28px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none', marginLeft: 8 }}>
                 לנקודות שלי
               </a>
-              <a href="/" style={{ display: 'inline-block', background: GOLD, color: '#1a1a1a', padding: '12px 28px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
+              <a href="/" style={{ display: 'inline-block', background: GOLD, color: 'var(--ys-text)', padding: '12px 28px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
                 לחנות ←
               </a>
             </div>
@@ -106,12 +106,12 @@ export default function ClubJoinPage() {
               <div style={{ display: 'grid', gap: 10, marginBottom: 18 }}>
                 <div style={{ background: '#FDF8EE', border: `1px solid ${GOLD}55`, borderRadius: 12, padding: '14px 16px' }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#9C7B3F', marginBottom: 3 }}>ההטבה הראשונה</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a' }}>5% הנחה על ההזמנה הראשונה</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--ys-text)' }}>5% הנחה על ההזמנה הראשונה</div>
                   <div style={{ fontSize: 12.5, color: '#6b7280', marginTop: 3 }}>הקוד מופיע באתר ונשלח למייל מיד לאחר ההצטרפות.</div>
                 </div>
                 <div style={{ background: '#FDF8EE', border: `1px solid ${GOLD}55`, borderRadius: 12, padding: '14px 16px' }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#9C7B3F', marginBottom: 3 }}>ההטבה הקבועה</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a' }}>10% מסכום המוצרים חוזר כיתרה לרכישה הבאה</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--ys-text)' }}>10% מסכום המוצרים חוזר כיתרה לרכישה הבאה</div>
                   <div style={{ fontSize: 12.5, color: '#6b7280', marginTop: 3 }}>נקודה = ₪1 הנחה. הצבירה על המוצרים בלבד, לא על המשלוח.</div>
                 </div>
               </div>

@@ -80,12 +80,12 @@ export default function ShaliachApplyPage() {
       <div style={{ minHeight: '100vh', background: '#f3f4f4', display: 'flex', alignItems: 'center', justifyContent: 'center', direction: 'rtl' }}>
         <div style={{ background: '#fff', borderRadius: 16, padding: 48, maxWidth: 480, textAlign: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
           <div style={{ fontSize: 64, marginBottom: 16 }}>✅</div>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#1a1a1a', marginBottom: 12 }}>הבקשה נשלחה!</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--ys-text)', marginBottom: 12 }}>הבקשה נשלחה!</h2>
           <p style={{ color: '#555', fontSize: 15, lineHeight: 1.6, marginBottom: 24 }}>
             קיבלנו את פרטיך. צוות YourSofer יבדוק ויחזור אליך בהקדם.
           </p>
           <button onClick={() => router.push('/')}
-            style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
             חזרה לדף הבית
           </button>
         </div>
@@ -97,7 +97,7 @@ export default function ShaliachApplyPage() {
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
 
       {/* Header */}
-      <div style={{ background: '#1a1a1a', padding: '24px 20px', textAlign: 'center' }}>
+      <div style={{ background: 'var(--ys-dark-surface)', padding: '24px 20px', textAlign: 'center' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer', display: 'inline-block', marginBottom: 12 }}>
           <span style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>Your Sofer</span>
         </div>
@@ -231,7 +231,7 @@ export default function ShaliachApplyPage() {
                 </div>
               )}
               <div>
-                <label style={{ display: 'inline-block', background: '#1a1a1a', color: '#fff', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                <label style={{ display: 'inline-block', background: 'var(--ys-dark-surface)', color: '#fff', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                   {uploadingLogo ? '⏳ מעלה...' : '📷 העלה לוגו'}
                   <input type="file" accept="image/*" style={{ display: 'none' }}
                     onChange={handleLogoUpload} />
@@ -249,7 +249,7 @@ export default function ShaliachApplyPage() {
 
           {/* מידע על תנאים */}
           <div style={{ background: applicationType === 'community' ? '#f0f4ff' : '#f0fff4', border: `1px solid ${applicationType === 'community' ? '#c8d4f0' : '#c8e6c9'}`, borderRadius: 12, padding: 20, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1a1a1a', marginBottom: 10 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 800, color: 'var(--ys-text)', marginBottom: 10 }}>
               {applicationType === 'community' ? '💰 מידע על תרומות' : '💼 מידע על שותפות'}
             </h3>
             <div style={{ fontSize: 14, color: '#333', lineHeight: 1.8 }}>
@@ -295,7 +295,7 @@ const cardStyle: React.CSSProperties = {
 };
 
 const sectionTitle: React.CSSProperties = {
-  fontSize: 17, fontWeight: 800, color: '#1a1a1a', marginBottom: 20,
+  fontSize: 17, fontWeight: 800, color: 'var(--ys-text)', marginBottom: 20,
   borderBottom: '2px solid #f0f0f0', paddingBottom: 10,
 };
 

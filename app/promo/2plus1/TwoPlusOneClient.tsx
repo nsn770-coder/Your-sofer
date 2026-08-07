@@ -79,20 +79,20 @@ export default function TwoPlusOneClient() {
   return (
     <main dir="rtl" style={{ background: '#F8F6F1', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
       {/* Hero banner */}
-      <div style={{ background: '#1a1a1a', color: '#fff', padding: '48px 24px 40px', textAlign: 'center' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 10 }}>
+      <div style={{ background: 'var(--ys-dark-surface)', color: '#fff', padding: '48px 24px 40px', textAlign: 'center' }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ys-accent)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 10 }}>
           מבצע מיוחד
         </p>
         <h1 style={{ fontSize: 38, fontWeight: 300, margin: '0 0 12px', letterSpacing: '-0.01em' }}>
           קנו 3, שלמו על 2
         </h1>
         <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.65)', maxWidth: 520, margin: '0 auto 0' }}>
-          הוסיפו 3 מוצרים מהרשימה לעגלה — המוצר הזול ביותר יחושב <strong style={{ color: '#C5A028' }}>חינם</strong> אוטומטית.
+          הוסיפו 3 מוצרים מהרשימה לעגלה — המוצר הזול ביותר יחושב <strong style={{ color: 'var(--ys-accent)' }}>חינם</strong> אוטומטית.
         </p>
       </div>
 
       {/* Badge strip */}
-      <div style={{ background: '#C5A028', padding: '10px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#1a1a1a' }}>
+      <div style={{ background: 'var(--ys-accent)', padding: '10px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: 'var(--ys-text)' }}>
         🎁 המבצע תקף לכל המוצרים המסומנים &nbsp;·&nbsp; ניתן לשלב גדלים וצבעים שונים
       </div>
 
@@ -120,10 +120,10 @@ export default function TwoPlusOneClient() {
                   </div>
                 </Link>
                 <div style={{ padding: '14px 14px 16px', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <Link href={`/product/${p.id}`} style={{ textDecoration: 'none', color: '#1a1a1a', fontSize: 13, fontWeight: 600, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <Link href={`/product/${p.id}`} style={{ textDecoration: 'none', color: 'var(--ys-text)', fontSize: 13, fontWeight: 600, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {p.name}
                   </Link>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>{formatPrice(p.price)}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ys-text)' }}>{formatPrice(p.price)}</div>
                   <div style={{ fontSize: 11, color: '#10b981', fontWeight: 600 }}>קנו 3, שלמו על 2</div>
                   <button
                     onClick={() => handleAdd(p)}

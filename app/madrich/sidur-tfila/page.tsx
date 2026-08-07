@@ -81,7 +81,7 @@ export default function SidurTfilaPage() {
 
           <QuoteBlock text="קהילות ישראל שמרו כל אחת על נוסח אבותיה – רוב התפילות דומות, אבל הניסוח, הסדר והפיוטים שונים." />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             חמשת הנוסחים המרכזיים
           </h2>
 
@@ -100,35 +100,35 @@ export default function SidurTfilaPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             הבלבול הנפוץ: נוסח ספרד ≠ עדות המזרח
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             זו הטעות מספר אחת בקניית סידורים. "נוסח ספרד" הוא נוסח שהתפתח בקרב חסידים באירופה – לא הנוסח של יהדות ספרד. מתפלל בבית כנסת ספרדי (מרוקאי, עיראקי, טוניסאי) צריך כמעט תמיד סידור <strong>עדות המזרח</strong>. אם אתם קונים מתנה ולא בטוחים – בדקו איזה סידור נמצא בבית הכנסת של המקבל, או שאלו אותנו בוואטסאפ.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             איך יודעים איזה נוסח לבחור?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             לפי מסורת המשפחה ובית הכנסת הקבוע. אפשר לשאול את ההורים או הסבים, את רב הקהילה או את הגבאי. לילד שמתכונן לבר מצווה יש כלל זהב: לבחור את הסידור שבו הוא לומד בבית הספר או עם המלמד – כך הוא מכיר את סדר התפילה ולא צריך להתרגל למהדורה חדשה ביום הגדול.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             סידור או מחזור?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             סידור מיועד לתפילות יום-יום, שבת וראש חודש. מחזור מיועד לחגים ולימים הנוראים – ראש השנה, יום כיפור, פסח, שבועות וסוכות – וכולל את הפיוטים והתוספות של החג. שימו לב: לא כל סידור כולל את תפילות החגים, אז אם אתם רוצים ספר אחד לכל השנה – בדקו את התוכן לפני הקנייה.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             גודל, כריכה ותוספות
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             <strong>גודל:</strong> סידור כיס לנשיאה יומיומית ולנסיעות; בינוני – הסטנדרט הנוח לבית הכנסת; גדול עם אותיות מוגדלות – למבוגרים ולשימוש על סטנדר. <strong>כריכה:</strong> עור – יוקרתית ומתאימה למתנה חשובה; דמוי עור – מראה מהודר במחיר נגיש; קשה – עמידה לשימוש יומיומי ולתלמידים; רכה – קלה ודקה לתיק. <strong>תוספות:</strong> למתחילים, לילדים ולמתחזקים כדאי סידור מנוקד במלואו עם הסברים קצרים (מתי עומדים, מה אומר החזן ומה הציבור); ליהודים בחו"ל ולעולים – סידור עם תרגום לאנגלית, צרפתית או רוסית.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             סידור כמתנה – בר מצווה, חתן וכלה
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -138,7 +138,7 @@ export default function SidurTfilaPage() {
             לפני אישור הטבעה אישית בדקו: איות מדויק של השם, תאריך עברי ולועזי, צבע ההטבעה ומיקומה על הכריכה, ושההקדשה קצרה וברורה.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q="מה ההבדל בין נוסח ספרד לעדות המזרח?" a='נוסח ספרד התפתח בקרב חסידים באירופה (בסיס אשכנזי + כוונות האר"י). עדות המזרח הוא נוסח הקהילות הספרדיות. מתפלל בבית כנסת ספרדי צריך בדרך כלל סידור עדות המזרח.' />
@@ -148,7 +148,7 @@ export default function SidurTfilaPage() {
           <FAQItem q="איזה סידור מתאים ליוצאי תימן?" a="תלוי במנהג המשפחתי: בלדי (המסורת הקדומה) או שאמי (עם השפעה ספרדית). ההבדל משמעותי, אז כדאי לברר לפני הקנייה." />
           <FAQItem q="האם אפשר להוסיף שם על הסידור?" a="בדגמים רבים כן – הטבעת שם, תאריך, ראשי תיבות או הקדשה על הכריכה. האפשרויות משתנות לפי סוג הכריכה." />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji="🧢" title="סוגי כיפות" desc="המדריך המלא לכל הסוגים" href="/madrich/sugei-kipot" />
             <RelatedCard emoji="📜" title="נוסחי הסת״ם" desc="אשכנזי, ספרדי והאר״י בכתב" href="/madrich/nosachim" />

@@ -28,7 +28,7 @@ export default function CertificatesSection({ certificates, heading = 'תעוד�
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
           <span style={{ fontSize: 18 }}>📜</span>
-          <h3 style={{ fontSize: 15, fontWeight: 800, color: '#1a1a1a', margin: 0 }}>{heading}</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 800, color: 'var(--ys-text)', margin: 0 }}>{heading}</h3>
         </div>
 
         <div style={{
@@ -101,7 +101,7 @@ export default function CertificatesSection({ certificates, heading = 'תעוד�
 
               {/* Text */}
               <div style={{ padding: '10px 12px 12px' }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a', marginBottom: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ys-text)', marginBottom: 4 }}>
                   {cert.title}
                 </div>
                 <div style={{ fontSize: 11, color: '#666', lineHeight: 1.6 }}>

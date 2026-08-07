@@ -12,13 +12,13 @@ export default function EraToggle({ era, setEra }: { era: AccountEra; setEra: (e
       boxShadow: '0 2px 8px rgba(0,0,0,0.06)', display: 'flex', flexWrap: 'wrap',
       gap: 10, alignItems: 'center',
     }}>
-      <span style={{ fontSize: 13, fontWeight: 800, color: '#1E3A8A' }}>חשבון:</span>
+      <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--ys-heading)' }}>חשבון:</span>
       {ERA_OPTIONS.map(opt => (
         <button
           key={opt.value}
           onClick={() => setEra(opt.value)}
           style={{
-            background: era === opt.value ? (opt.value === 'business' ? '#166534' : '#1E3A8A') : '#f3f4f6',
+            background: era === opt.value ? (opt.value === 'business' ? '#166534' : 'var(--ys-heading)') : '#f3f4f6',
             color: era === opt.value ? '#fff' : '#444',
             border: 'none', borderRadius: 999, padding: '7px 16px',
             fontSize: 13, fontWeight: 700, cursor: 'pointer',

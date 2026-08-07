@@ -50,7 +50,7 @@ export default function YiratShamayimPage() {
 
           <QuoteBlock text='כתב יפה יכול להטעות. יראת השמיים של הסופר היא מה שקובע את קדושת הקלף.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             מה זה "כתיבה לשמה"?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -60,7 +60,7 @@ export default function YiratShamayimPage() {
             מכיוון שאף אחד אינו עומד מעל ראשו של הסופר בכל רגע, הכשרות תלויה לחלוטין ביושרתו הפנימית ובמחויבותו הרוחנית.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             חובות הסופר במהלך הכתיבה
           </h2>
 
@@ -71,15 +71,15 @@ export default function YiratShamayimPage() {
             { title: 'טבילה לפני הכתיבה', desc: 'סופרים יראי שמיים טובלים במקווה לפני כתיבה כדי לכתוב בטהרה. לא חובה הלכתית, אך מנהג קדוש.' },
           ].map(item => (
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
+              <span style={{ color: 'var(--ys-accent)', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-text)', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             איך לוודא שהסופר ירא שמיים?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -88,14 +88,14 @@ export default function YiratShamayimPage() {
 
           <QuoteBlock text='בדיקת מחשב מגלה פגמים גרפיים – אבל אינה יכולה לגלות מה היה בלב הסופר.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם בדיקת מחשב יכולה לגלות אם המזוזה נכתבה לשמה?' a='לא. מחשב יודע לזהות רק את הצורה הגרפית של האותיות. הוא אינו יכול לדעת מה הייתה כוונת הסופר בלב. לכן הפיקוח על אישיות הסופר הוא החלק החשוב ביותר.' />
           <FAQItem q='מה קורה אם סופר כתב מזוזה בלי כוונה?' a='המזוזה פסולה לחלוטין – גם אם האותיות מושלמות. אין אפשרות לתקן בדיעבד. לכן בחירת סופר מוסמך ויראת שמיים חשובה יותר מכל פרמטר אחר.' />
           <FAQItem q='האם ניתן לסמוך על תעודת הסמכה לבדה?' a='תעודה היא תנאי הכרחי אך לא מספיק. יש לבדוק גם את הרקע הקהילתי של הסופר ואת אורח חייו. סופר שאינו שומר מצוות – גם אם יש לו תעודה – כותב קלפים פסולים.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='✍️' title='מי הסופרים' desc='קריטריונים לבחירת סופר' href='/madrich/soferim' />
             <RelatedCard emoji='🔍' title='תהליך הבדיקה' desc='איך נבדקת כל מזוזה' href='/madrich/bedika' />

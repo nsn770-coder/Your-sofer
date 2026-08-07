@@ -135,7 +135,7 @@ export default function PrintsTab({ orders }: PrintsTabProps) {
                 {/* ── Header ── */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, gap: 8 }}>
                   <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, fontSize: 14, color: '#1E3A8A' }}>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--ys-heading)' }}>
                       {row.orderNumber}
                     </span>
                     <span style={{ fontSize: 13 }}>{row.customerName}</span>
@@ -253,7 +253,7 @@ export default function PrintsTab({ orders }: PrintsTabProps) {
                     <button
                       onClick={() => openForPrint(row)}
                       style={{
-                        background: '#1E3A8A', color: '#fff',
+                        background: 'var(--ys-heading)', color: '#fff',
                         border: 'none', borderRadius: 6,
                         padding: '7px 16px', fontSize: 13,
                         fontWeight: 700, cursor: 'pointer',

@@ -8,7 +8,7 @@ import ProductCard from '@/components/ui/ProductCard';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const GOLD = '#C5A028';
+const GOLD = 'var(--ys-accent)';
 const NAVY = '#111d3a';
 const PAGE_SIZE = 16;
 
@@ -702,7 +702,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             בהשוואה לכיפות רגילות, כיפות מודפסות מוסיפות ערך מוסף ניכר בעלות נמוכה יחסית. ההדפסה על כיפה עולה בדרך כלל החל מ־₪4.5 ליחידה בהזמנת 100 יחידות ומעלה — פחות מ-₪500 לכל סט הכיפות של אירוע של 100 אורחים.
           </p>
 
-          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: '#1a1a1a', marginTop: 28, marginBottom: 12 }}>
+          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: 'var(--ys-text)', marginTop: 28, marginBottom: 12 }}>
             מה אפשר להדפיס על כיפות?
           </h3>
           <p>
@@ -716,7 +716,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             כיפות מגיעות בחומרים, גדלים וסגנונות שונים מאוד — ולכל אחד מהם יש יתרונות ייחודיים. הבחירה הנכונה תלויה בסגנון האירוע ובהעדפות האישיות.
           </p>
 
-          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: '#1a1a1a', marginTop: 28, marginBottom: 12 }}>
+          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: 'var(--ys-text)', marginTop: 28, marginBottom: 12 }}>
             בחירת חומר הכיפה
           </h3>
           <p>
@@ -732,14 +732,14 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             <strong>כיפות סרוגות</strong> — הכיפה הישראלית הקלאסית, מתאימה לאירועים שבהם חלק מהאורחים מגיע עם כיפה משלו.
           </p>
 
-          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: '#1a1a1a', marginTop: 28, marginBottom: 12 }}>
+          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: 'var(--ys-text)', marginTop: 28, marginBottom: 12 }}>
             בחירת הגודל
           </h3>
           <p>
             כיפות מגיעות בדרך כלל בקוטר 17, 18, 19 ו-20 ס"מ. עבור כיפות בר מצווה שכולם יוכלו לחבוש בנוחות, מידה 18-19 ס"מ היא הבחירה הנפוצה ביותר. אם מזמינים לקהל מגוון (כולל ילדים), אפשר לחלק בין גדלים שונים.
           </p>
 
-          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: '#1a1a1a', marginTop: 28, marginBottom: 12 }}>
+          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: 'var(--ys-text)', marginTop: 28, marginBottom: 12 }}>
             בחירת צבעים
           </h3>
           <p>
@@ -753,7 +753,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             הזמנה של כיפות בכמות גדולה מביאה ליתרונות כפולים: מחיר נמוך יותר ליחידה, וקבלת כמות מספקת לכל האורחים בלי דאגה. לאירועים גדולים — פנו אלינו לקבלת הצעת מחיר מיוחדת.
           </p>
 
-          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: '#1a1a1a', marginTop: 28, marginBottom: 12 }}>
+          <h3 style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: 'var(--ys-text)', marginTop: 28, marginBottom: 12 }}>
             כמה כיפות להזמין?
           </h3>
           <p>
@@ -792,7 +792,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
       </section>
 
       {/* ── 6. FAQ Accordion ────────────────────────────────────────────────── */}
-      <section style={{ background: '#FAF8F3', padding: isMobile ? '48px 20px 56px' : '72px 24px 80px' }}>
+      <section style={{ background: 'var(--ys-bg-warm)', padding: isMobile ? '48px 20px 56px' : '72px 24px 80px' }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: NAVY, marginBottom: 32, textAlign: 'center' }}>
             שאלות נפוצות
@@ -811,7 +811,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
                   }}
                   aria-expanded={openFaq === i}
                 >
-                  <span style={{ fontSize: isMobile ? 14 : 15, fontWeight: 700, color: '#1a1a1a', flex: 1, textAlign: 'right' }}>
+                  <span style={{ fontSize: isMobile ? 14 : 15, fontWeight: 700, color: 'var(--ys-text)', flex: 1, textAlign: 'right' }}>
                     {item.q}
                   </span>
                   <span style={{

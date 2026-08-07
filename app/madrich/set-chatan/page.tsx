@@ -50,7 +50,7 @@ export default function SetChatanPage() {
 
           <QuoteBlock text='חובה לברר את מנהג משפחת החתן לפני הרכישה: כתב ספרדי, אשכנזי, או האר"י?' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             רכיבי סט החתן האידיאלי
           </h2>
 
@@ -60,15 +60,15 @@ export default function SetChatanPage() {
             { title: 'תפילין ברמת הידור רב', desc: 'אם משפחת הכלה קונה תפילין, חובה שיהיו ברמת "הידור הרב" – עור בהמה גסה עם פרשיות שנכתבו בסגנון הכתיבה התואם לעדת החתן.' },
           ].map(item => (
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
+              <span style={{ color: 'var(--ys-accent)', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-text)', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='מתי מקובל להעניק את הסט לחתן?' a='ברוב העדות הסט מוענק במסיבת האירוסין או סמוך לחתונה – בשבת חתן או כמתנה אישית מהכלה ביום חופתם.' />
@@ -76,7 +76,7 @@ export default function SetChatanPage() {
           <FAQItem q='האם חובה לקנות תפילין חדשות לחתן?' a='לא חובה. אם לחתן יש תפילין כשרות ומהודרות ממשפחתו, אפשר להסתפק בטלית ונרתיקים מפוארים. התייעצו עם החתן עצמו.' />
           <FAQItem q='כמה זמן לפני החתונה להזמין?' a='מומלץ לפחות חודש-חודשיים מראש, כדי לאפשר רקמה אישית בזמן ומשלוח נוח.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🎁' title='מתנה לחנוכת בית' desc='מדריך לבחירת מזוזה כמתנה' href='/madrich/matana-chanuka-bayit' />
             <RelatedCard emoji='🏷️' title='מחירי סת"ם' desc='מה מרכיב מחיר הוגן' href='/madrich/michrei-soferim' />

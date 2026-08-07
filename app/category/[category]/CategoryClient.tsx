@@ -283,7 +283,7 @@ function IconSearch({ size = 40 }: { size?: number }) {
 
 function IconStar({ size = 12, filled = true }: { size?: number; filled?: boolean }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#C5A028' : 'none'} stroke="#C5A028" strokeWidth="1.5">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? 'var(--ys-accent)' : 'none'} stroke="var(--ys-accent)" strokeWidth="1.5">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
     </svg>
   );
@@ -493,7 +493,7 @@ function SetTabBar({ active, onChange }: { active: SetTab; onChange: (t: SetTab)
                 color: isActive ? '#1a1a1a' : '#6B7280',
                 background: 'transparent',
                 border: 'none',
-                borderBottom: isActive ? '2.5px solid #C5A028' : '2.5px solid transparent',
+                borderBottom: isActive ? '2.5px solid var(--ys-accent)' : '2.5px solid transparent',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 fontFamily: 'inherit',
@@ -543,7 +543,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
               flexShrink: 0, width: 88, height: 114, borderRadius: 0, overflow: 'hidden',
               position: 'relative', display: 'block', textDecoration: 'none',
               background: img ? '#000' : 'linear-gradient(135deg, #1a1a1a, #1a1a1a)',
-              boxShadow: isActive ? '0 0 0 2px #C5A028' : 'none',
+              boxShadow: isActive ? '0 0 0 2px var(--ys-accent)' : 'none',
               transition: 'transform 0.18s ease, box-shadow 0.18s ease',
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; }}
@@ -552,7 +552,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
             {img && <img src={optimizeCloudinaryUrl(img, 200)} alt={label} width={88} height={114} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
             {isActive && (
-              <div style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: '50%', background: '#C5A028', boxShadow: '0 0 0 2px rgba(255,255,255,0.6)' }} />
+              <div style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: '50%', background: 'var(--ys-accent)', boxShadow: '0 0 0 2px rgba(255,255,255,0.6)' }} />
             )}
             <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '8px 4px 7px', textAlign: 'center' }}>
               <span style={{ color: '#fff', fontSize: 10, fontWeight: 800, lineHeight: 1.3, display: 'block', textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>
@@ -582,11 +582,11 @@ function SizeRangeSlider({ sizeMin, sizeMax, onChange }: { sizeMin: number; size
       </div>
       <div className="relative h-6 flex items-center mx-1" style={{ direction: 'ltr' }}>
         <div className="absolute w-full h-1.5 rounded-full bg-gray-200" />
-        <div className="absolute h-1.5 rounded-full pointer-events-none" style={{ background: '#1a1a1a', left: `${leftPct}%`, right: `${100 - rightPct}%` }} />
+        <div className="absolute h-1.5 rounded-full pointer-events-none" style={{ background: 'var(--ys-dark-surface)', left: `${leftPct}%`, right: `${100 - rightPct}%` }} />
         <input type="range" min={MIN} max={MAX} step={1} value={sizeMin} onChange={e => onChange(Math.min(Number(e.target.value), sizeMax - 1), sizeMax)} className="size-range" style={{ zIndex: sizeMin > MAX - 10 ? 5 : 3 }} />
         <input type="range" min={MIN} max={MAX} step={1} value={sizeMax} onChange={e => onChange(sizeMin, Math.max(Number(e.target.value), sizeMin + 1))} className="size-range" style={{ zIndex: 4 }} />
-        <div className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none" style={{ background: '#1a1a1a', left: `calc(${leftPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }} />
-        <div className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none" style={{ background: '#1a1a1a', left: `calc(${rightPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }} />
+        <div className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none" style={{ background: 'var(--ys-dark-surface)', left: `calc(${leftPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }} />
+        <div className="absolute w-4 h-4 rounded-full border-2 border-white shadow pointer-events-none" style={{ background: 'var(--ys-dark-surface)', left: `calc(${rightPct}% - 8px)`, zIndex: 6, top: '50%', transform: 'translateY(-50%)' }} />
       </div>
       <div className="flex justify-between text-[9px] text-gray-400 mt-1 mx-1" style={{ direction: 'ltr' }}>
         {[0, 25, 50, 75, 100].map(v => <span key={v}>{v}</span>)}
@@ -1091,7 +1091,7 @@ function StamCard({
 
         {/* Price */}
         <div>
-          <span style={{ fontSize: 20, fontWeight: 800, color: '#1a1a1a', lineHeight: 1, display: 'block' }}>
+          <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--ys-text)', lineHeight: 1, display: 'block' }}>
             {formatPrice(product.price)}
           </span>
           {hasSale && (
@@ -1610,15 +1610,15 @@ export default function CategoryClient({ category }: { category: string }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
                 <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', backdropFilter: 'blur(10px)' }}>
                   <div style={{ fontSize: 11, color: '#666', marginBottom: 4, fontWeight: 600 }}>מוצר 1</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>מחיר מלא</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>מחיר מלא</div>
                 </div>
-                <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', border: '2px solid #C5A028', backdropFilter: 'blur(10px)' }}>
-                  <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, marginBottom: 4 }}>מוצר 2</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>10% הנחה</div>
+                <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', border: '2px solid var(--ys-accent)', backdropFilter: 'blur(10px)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 700, marginBottom: 4 }}>מוצר 2</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>10% הנחה</div>
                 </div>
-                <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', border: '2px solid #C5A028', backdropFilter: 'blur(10px)' }}>
-                  <div style={{ fontSize: 11, color: '#C5A028', fontWeight: 700, marginBottom: 4 }}>מוצר 3+</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>15% הנחה</div>
+                <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', border: '2px solid var(--ys-accent)', backdropFilter: 'blur(10px)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 700, marginBottom: 4 }}>מוצר 3+</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>15% הנחה</div>
                 </div>
               </div>
               <p style={{ margin: '0', color: '#FFF', fontSize: 13, fontStyle: 'italic', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
@@ -1669,7 +1669,7 @@ export default function CategoryClient({ category }: { category: string }) {
           display: 'flex', alignItems: 'center', gap: 10,
           flexWrap: 'wrap',
         }}>
-          <span style={{ fontSize: 14, color: '#C5A028', fontWeight: 700, flexShrink: 0 }}>✓</span>
+          <span style={{ fontSize: 14, color: 'var(--ys-accent)', fontWeight: 700, flexShrink: 0 }}>✓</span>
           <span style={{ fontSize: 13, color: '#111111', fontWeight: 500 }}>
             כל המוצרים בקטגוריה זו עברו בדיקת מגיה רבנית
           </span>
@@ -1767,11 +1767,11 @@ export default function CategoryClient({ category }: { category: string }) {
                             </div>
                             {/* Content */}
                             <div style={{ padding: '14px 16px', direction: 'rtl' }}>
-                              <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a', margin: '0 0 10px', lineHeight: 1.4, textAlign: 'right' }}>
+                              <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ys-text)', margin: '0 0 10px', lineHeight: 1.4, textAlign: 'right' }}>
                                 {p.name}
                               </h3>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-                                <span style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a' }}>₪{p.price?.toLocaleString()}</span>
+                                <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)' }}>₪{p.price?.toLocaleString()}</span>
                                 {p.was && p.was > p.price && (
                                   <>
                                     <span style={{ fontSize: 13, color: '#999', textDecoration: 'line-through' }}>₪{p.was?.toLocaleString()}</span>
@@ -1781,7 +1781,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                   </>
                                 )}
                               </div>
-                              <div style={{ fontSize: 12, color: '#1a1a1a', background: '#FFFFFF', border: '1px solid #EDEDEF', borderRadius: 0, padding: '6px 10px', marginBottom: 10, textAlign: 'right' }}>
+                              <div style={{ fontSize: 12, color: 'var(--ys-text)', background: '#FFFFFF', border: '1px solid #EDEDEF', borderRadius: 0, padding: '6px 10px', marginBottom: 10, textAlign: 'right' }}>
                                 ניתן לבחור כיסוי תפילין בדף המוצר
                               </div>
                               <button
@@ -2260,7 +2260,7 @@ export default function CategoryClient({ category }: { category: string }) {
           href={`/admin/new-product?cat=${encodeURIComponent(adminParams.cat)}${adminParams.subCategory ? `&subCategory=${encodeURIComponent(adminParams.subCategory)}` : ''}`}
           style={{
             position: 'fixed', bottom: 90, right: 20, zIndex: 9999,
-            background: '#C5A028', color: '#fff', fontWeight: 700, fontSize: 13,
+            background: 'var(--ys-accent)', color: '#fff', fontWeight: 700, fontSize: 13,
             padding: '10px 16px', textDecoration: 'none',
             boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
             fontFamily: 'Heebo, Arial, sans-serif',

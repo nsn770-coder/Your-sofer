@@ -50,7 +50,7 @@ export default function GodelMezuzaPage() {
 
           <QuoteBlock text='הפוסקים ממליצים תמיד לבחור בכתב גדול וברור – "גדול אותיותיה".' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             השוואת הגדלים
           </h2>
 
@@ -58,7 +58,7 @@ export default function GodelMezuzaPage() {
             {[
               { title: '10 ס"מ', color: '#6b7280', bg: '#f9fafb', desc: 'כשר בדיעבד. אותיות צפופות שעלולות להידבק עם השנים. מתאים לדלתות פנים קטנות בלבד.' },
               { title: '12 ס"מ', color: '#1a5c3a', bg: '#f0fff5', desc: 'הסטנדרט הזהב. מרווח לכתיבה מהודרת. מתאים לרובם המוחלט של בתי המזוזה.' },
-              { title: '15 ס"מ', color: '#1a1a1a', bg: '#f0f4ff', desc: 'מהודר מאוד. מומלץ לדלתות כניסה ראשיות. נוכחות יוקרתית ויפה.' },
+              { title: '15 ס"מ', color: 'var(--ys-text)', bg: '#f0f4ff', desc: 'מהודר מאוד. מומלץ לדלתות כניסה ראשיות. נוכחות יוקרתית ויפה.' },
             ].map(c => (
               <div key={c.title} style={{ background: c.bg, border: `1px solid ${c.color}33`, borderRadius: 10, padding: '20px', textAlign: 'center' }}>
                 <div style={{ fontWeight: 900, fontSize: 24, color: c.color, marginBottom: 8 }}>{c.title}</div>
@@ -67,21 +67,21 @@ export default function GodelMezuzaPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             מדוע גדול יותר עדיף?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             במזוזה של 10 ס"מ, המקום שיש לסופר לכתוב קטן וצפוף מאוד. אותיות זעירות עלולות עם השנים (בגלל שינויי מזג אוויר) "לנזול" ולהידבק זו לזו. לעומת זאת, במזוזות של 12 ס"מ ו-15 ס"מ השורות מרווחות יותר, האותיות גדולות וברורות, ולסופר קל יותר לצייר את התגים בדיוק מושלם.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='קניתי בית מזוזה מעוצב, איזה קלף לקנות לו?' a='תמיד מדדו את "החלל הפנימי" של בית המזוזה. אם החלל הפנימי הוא 13 ס"מ, קנו קלף 12 ס"מ, כדי שיישאר מרווח והקלף לא יימחץ.' />
           <FAQItem q='האם מזוזה קטנה זולה יותר ממזוזה גדולה?' a='לא בהכרח. לעיתים כתיבה מיקרוסקופית של 10 ס"מ דורשת מאמץ עיניים עצום מהסופר ולכן תומחרה גבוה, בעוד 12 ס"מ מאפשרת עבודה זורמת.' />
           <FAQItem q='לאיזה גודל מוצרים קיימות תעודות כשרות מוגברת?' a='הגדל אינו משפיע על הכשרות עצמה, אלא רק על ההידור. תעודות כשרות ניתנות לפי איכות כתיבת הסופר, לא לפי הגודל.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🏠' title='בתי מזוזה' desc='איך לבחור בית מזוזה מתאים' href='/madrich/batei-mezuza' />
             <RelatedCard emoji='⭐' title='מזוזה מהודרת' desc='ההבדל בין כשר למהודר' href='/madrich/mehudar' />

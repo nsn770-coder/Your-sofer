@@ -40,7 +40,7 @@ export default function ContactPage() {
   const input: React.CSSProperties = {
     width: '100%', padding: '11px 14px', fontSize: 14, border: '1.5px solid #ddd',
     borderRadius: 0, fontFamily: 'inherit', direction: 'rtl', outline: 'none',
-    boxSizing: 'border-box', background: '#fff', color: '#1a1a1a',
+    boxSizing: 'border-box', background: '#fff', color: 'var(--ys-text)',
   };
 
   return (
@@ -59,8 +59,8 @@ export default function ContactPage() {
 
         {/* Contact details */}
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '28px', marginBottom: 24 }}>
-          <h2 style={{ color: '#1a1a1a', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
-          <div style={{ background: 'rgba(30,58,138,0.05)', border: '1px solid rgba(30,58,138,0.15)', borderRadius: 6, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#1a1a1a' }}>
+          <h2 style={{ color: 'var(--ys-text)', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>פרטי התקשרות</h2>
+          <div style={{ background: 'rgba(30,58,138,0.05)', border: '1px solid rgba(30,58,138,0.15)', borderRadius: 6, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: 'var(--ys-text)' }}>
             Your Sofer הוא אתר היודאיקה הגדול בישראל — כיפות, מתנות ומזכרות לאירועים, בבעלות ובניהול <strong>בואהרון ניסן נסים</strong> — עוסק מורשה 304803810.
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -76,9 +76,9 @@ export default function ContactPage() {
                 <div>
                   <div style={{ fontSize: 12, color: '#888', fontWeight: 600 }}>{label}</div>
                   {href ? (
-                    <a href={href} style={{ fontSize: 15, color: '#1a1a1a', fontWeight: 700, textDecoration: 'none' }}>{value}</a>
+                    <a href={href} style={{ fontSize: 15, color: 'var(--ys-text)', fontWeight: 700, textDecoration: 'none' }}>{value}</a>
                   ) : (
-                    <div style={{ fontSize: 15, color: '#1a1a1a', fontWeight: 500 }}>{value}</div>
+                    <div style={{ fontSize: 15, color: 'var(--ys-text)', fontWeight: 500 }}>{value}</div>
                   )}
                 </div>
               </div>
@@ -88,7 +88,7 @@ export default function ContactPage() {
 
         {/* WhatsApp section */}
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '28px', marginBottom: 24 }}>
-          <h2 style={{ color: '#1a1a1a', fontSize: 18, fontWeight: 800, margin: '0 0 12px' }}>
+          <h2 style={{ color: 'var(--ys-text)', fontSize: 18, fontWeight: 800, margin: '0 0 12px' }}>
             💬 שירות לקוחות מהיר בוואטסאפ
           </h2>
           <p style={{ color: '#555', fontSize: 14, lineHeight: 1.7, margin: '0 0 20px' }}>
@@ -115,7 +115,7 @@ export default function ContactPage() {
 
         {/* Contact form */}
         <div style={{ background: '#fff', border: '1px solid #e8e0d0', padding: '28px' }}>
-          <h2 style={{ color: '#1a1a1a', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>שלחו לנו הודעה</h2>
+          <h2 style={{ color: 'var(--ys-text)', fontSize: 18, fontWeight: 800, margin: '0 0 20px' }}>שלחו לנו הודעה</h2>
 
           {status === 'sent' ? (
             <div style={{ background: '#f0fdf4', border: '1px solid #86efac', padding: '20px', textAlign: 'center', color: '#166534', fontSize: 15, fontWeight: 600 }}>
@@ -162,7 +162,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                style={{ background: '#1a1a1a', color: '#fff', border: 'none', padding: '13px 28px', fontSize: 15, fontWeight: 700, cursor: status === 'sending' ? 'not-allowed' : 'pointer', opacity: status === 'sending' ? 0.7 : 1, alignSelf: 'flex-start', borderRadius: 0, fontFamily: 'inherit' }}
+                style={{ background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', padding: '13px 28px', fontSize: 15, fontWeight: 700, cursor: status === 'sending' ? 'not-allowed' : 'pointer', opacity: status === 'sending' ? 0.7 : 1, alignSelf: 'flex-start', borderRadius: 0, fontFamily: 'inherit' }}
               >
                 {status === 'sending' ? 'שולח...' : 'שלח הודעה ←'}
               </button>

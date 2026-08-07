@@ -50,12 +50,12 @@ export default function TiyugStamPage() {
 
           <QuoteBlock text='שבע אותיות שעטנ"ז ג"ץ חייבות שלושה תגים כל אחת. זוהי הלכה למשה מסיני.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             אותיות שעטנ"ז ג"ץ – ומה חייב בשלושה תגים
           </h2>
 
           <div style={{ background: '#f0f4ff', border: '1px solid #1a1a1a33', borderRadius: 10, padding: '24px', margin: '16px 0 32px' }}>
-            <div style={{ fontWeight: 900, fontSize: 20, color: '#1a1a1a', marginBottom: 16, textAlign: 'center' }}>ש ע ט נ ז ג ץ</div>
+            <div style={{ fontWeight: 900, fontSize: 20, color: 'var(--ys-text)', marginBottom: 16, textAlign: 'center' }}>ש ע ט נ ז ג ץ</div>
             <p style={{ fontSize: 14, color: '#555', lineHeight: 1.7, textAlign: 'center' }}>
               שבע אותיות אלו חייבות כל אחת שלושה תגים (כתרים) מעל ראשן. אותיות אחרות מקבלות תג אחד בלבד לפי המנהג.
             </p>
@@ -67,22 +67,22 @@ export default function TiyugStamPage() {
             { title: 'ממד קבלי', desc: 'על פי סודות הקבלה, התגים מושכים השפעות רוחניות עליונות שאינן קיימות באות עצמה. סופר חסיד מייחס לתגים חשיבות רוחנית מיוחדת.' },
           ].map(item => (
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
+              <span style={{ color: 'var(--ys-accent)', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-text)', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם אפשר לקנות מזוזה בלי תגים כדי לחסוך?' a='לא. מזוזה ללא תגי שעטנ"ז ג"ץ פסולה לכתחילה. יש אותיות אחרות שתיוגן הוא הידור בלבד, אך שעטנ"ז ג"ץ הם חובה מוחלטת.' />
           <FAQItem q='האם יש מקצוע נפרד של "מתייג"?' a='כן, בספרי תורה ארוכים לעיתים יש מתייג ייעודי. אך במזוזה ובתפילין לרוב הסופר מתייג בעצמו תוך כדי כתיבה.' />
           <FAQItem q='מה קורה אם תג אחד נוגע בתג של האות שלידו?' a='נגיעה בין תגים פוסלת את המזוזה מיד. בחלק מהמקרים מגיה מוסמך יכול להפריד בעדינות, בתנאי שלא עוברים על "חק תוכות".' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🔤' title='אותיות ותגים' desc='סודות האותיות בסת"ם' href='/madrich/otiyot-vetaguim' />
             <RelatedCard emoji='🪶' title='הקולמוס' desc='הכלים שבהם נכתבת הקדושה' href='/madrich/kulmus' />

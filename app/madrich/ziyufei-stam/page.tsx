@@ -50,7 +50,7 @@ export default function ZiyufeiStamPage() {
 
           <QuoteBlock text='אתר סת"ם מהימן מציג תמונה ייחודית לכל קלף – לא תמונה גנרית אחת ל-100 מוצרים.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שלושת סוגי הזיוף הנפוצים
           </h2>
 
@@ -62,13 +62,13 @@ export default function ZiyufeiStamPage() {
             <div key={item.num} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
               <div style={{ background: '#b91c1c', color: '#fff', fontWeight: 900, fontSize: 18, minWidth: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.num}</div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-text)', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             כיצד לזהות הדפסה עם קבלת הקלף
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -77,7 +77,7 @@ export default function ZiyufeiStamPage() {
 
           <QuoteBlock text='מוצר אמיתי מגיע עם שם הסופר, תעודת בדיקה, ותמונת הקלף הספציפי – לא תמונות גנריות.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='איך מזהים הדפסה כשהמזוזה מגיעה לידיים?' a='הדפסה תהיה מושלמת ושטוחה לחלוטין. כתיבה אמיתית מותירה מרקם של דיו מתנוסס, סימני קולמוס קלים, ולאורך גב הקלף ניתן לעיתים להרגיש את בלטות האותיות.' />
@@ -85,7 +85,7 @@ export default function ZiyufeiStamPage() {
           <FAQItem q='מה עושים אם קיבלתי מוצר שנראה מזויף?' a='פנו מיד לאתר ממנו קניתם ובקשו הסבר. אם לא מגיבים – פנו לרב מוסמך לבדיקה עצמאית ושקלו הגשת תלונה לצרכנות.' />
           <FAQItem q='מחיר זול מאוד הוא בהכרח סימן אזהרה?' a='כן. סופר שמשקיע 3-4 שעות בכתיבת מזוזה לא יכול למכור אותה ב-100 ש"ח ולהתפרנס. מחיר מתחת לרף מינימלי הגיוני הוא אות אזהרה ברורה.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🛡️' title='קניית סת"ם באינטרנט' desc='4 סימני אמינות שיש לבדוק' href='/madrich/knia-online' />
             <RelatedCard emoji='💰' title='מחירי סופרי סת"ם' desc='מה מרכיב מחיר הוגן' href='/madrich/michrei-soferim' />

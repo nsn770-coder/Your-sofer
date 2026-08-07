@@ -50,7 +50,7 @@ export default function BechiraPage() {
 
         <QuoteBlock text="לא קונים מזוזה בעיניים עצומות. שאלו שאלות. בקשו לראות. ודאו שאתם יודעים בדיוק מה אתם מקבלים." />
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 20px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 20px' }}>
           6 שלבים לבחירה נכונה
         </h2>
 
@@ -61,7 +61,7 @@ export default function BechiraPage() {
         <Step num={5} title="הכירו את רמות האיכות" desc='יש הבדל בין "כשר" ל"מהודר". כשר פירושו עמידה בדרישות המינימליות. מהודר פירושו כתיבה בסטנדרט גבוה יותר עם קפידה מיוחדת.' />
         <Step num={6} title="קנו ממקום שאפשר לסמוך עליו" desc="שקיפות, גלוי לב, ומוכנות לענות על שאלות - אלה הסימנים הטובים ביותר לספק אמין." />
 
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>
           שאלות שכדאי לשאול לפני הקנייה
         </h2>
 
@@ -75,7 +75,7 @@ export default function BechiraPage() {
             'מה עושים אם מתגלה בעיה?',
           ].map(q => (
             <div key={q} style={{ display: 'flex', gap: 10, marginBottom: 12, alignItems: 'flex-start' }}>
-              <span style={{ color: '#C5A028', fontWeight: 900, fontSize: 16, flexShrink: 0 }}>✓</span>
+              <span style={{ color: 'var(--ys-accent)', fontWeight: 900, fontSize: 16, flexShrink: 0 }}>✓</span>
               <span style={{ fontSize: 15, color: '#333' }}>{q}</span>
             </div>
           ))}
@@ -83,7 +83,7 @@ export default function BechiraPage() {
 
         <QuoteBlock text="אתם לא צריכים להבין בכל הפרטים הטכניים. אתם צריכים מקור שמוכן לענות על כל שאלה - ואם הוא לא רוצה לענות, זה כבר אומר משהו." />
 
-        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+        <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <RelatedCard emoji="💸" title="למה לא לקנות מזוזה זולה" desc="מה ההבדל האמיתי בין מחירים" href="/madrich/mezuza-zola" />
           <RelatedCard emoji="⭐" title="מה זה מהודר באמת" desc="ההבדל בין כשר למהודר" href="/madrich/mehudar" />

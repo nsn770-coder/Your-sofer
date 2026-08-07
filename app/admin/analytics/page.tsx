@@ -251,8 +251,8 @@ export default function AnalyticsDashboard() {
   if (loading || (!user && !loading)) return null;
   if (user?.role !== 'admin') return null;
 
-  const navy = '#1E3A8A';
-  const gold = '#C5A028';
+  const navy = 'var(--ys-heading)';
+  const gold = 'var(--ys-accent)';
 
   return (
     <div dir="rtl" style={{ minHeight: '100vh', background: '#f3f4f6', fontFamily: 'Heebo, Arial, sans-serif', paddingBottom: 'calc(40px + env(safe-area-inset-bottom, 0px))' }}>
@@ -357,7 +357,7 @@ function DateRangeBar({ preset, setPreset, customFrom, customTo, setCustomFrom, 
       {RANGE_OPTIONS.map(opt => (
         <button key={opt.value} onClick={() => setPreset(opt.value)}
           style={{
-            background: preset === opt.value ? '#1E3A8A' : '#f3f4f6',
+            background: preset === opt.value ? 'var(--ys-heading)' : '#f3f4f6',
             color: preset === opt.value ? '#fff' : '#444',
             border: 'none', borderRadius: 999, padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
           }}>
@@ -381,7 +381,7 @@ function DateRangeBar({ preset, setPreset, customFrom, customTo, setCustomFrom, 
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h2 style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A', margin: '0 0 14px' }}>{children}</h2>;
+  return <h2 style={{ fontSize: 15, fontWeight: 800, color: 'var(--ys-heading)', margin: '0 0 14px' }}>{children}</h2>;
 }
 
 function Card({ icon, label, value, color, small }: { icon: string; label: string; value: number | string; color: string; small?: boolean }) {
@@ -422,8 +422,8 @@ function formatDateTime(d: Date | null): string {
 }
 
 function PaidOrdersTable({ rows, onOpen }: { rows: Order[]; onOpen: (o: Order) => void }) {
-  const navy = '#1E3A8A';
-  const gold = '#C5A028';
+  const navy = 'var(--ys-heading)';
+  const gold = 'var(--ys-accent)';
   return (
     <div style={{ background: '#fff', borderRadius: 14, padding: '24px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflowX: 'auto', marginBottom: 28 }}>
       <h2 style={{ fontSize: 16, fontWeight: 800, color: navy, margin: '0 0 16px' }}>✅ הזמנות ששולמו ({rows.length})</h2>
@@ -471,7 +471,7 @@ function stageLabel(o: Order): string {
 }
 
 function AbandonmentTable({ rows, onOpen }: { rows: Order[]; onOpen: (o: Order) => void }) {
-  const navy = '#1E3A8A';
+  const navy = 'var(--ys-heading)';
   return (
     <div style={{ background: '#fff', borderRadius: 14, padding: '24px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflowX: 'auto', marginBottom: 28 }}>
       <h2 style={{ fontSize: 16, fontWeight: 800, color: navy, margin: '0 0 16px' }}>🛒 נטישות עגלה / צ׳קאאוט ({rows.length})</h2>
@@ -521,7 +521,7 @@ function AbandonmentTable({ rows, onOpen }: { rows: Order[]; onOpen: (o: Order) 
 }
 
 function BestSellersTable({ rows }: { rows: { name: string; quantity: number; revenue: number }[] }) {
-  const navy = '#1E3A8A';
+  const navy = 'var(--ys-heading)';
   return (
     <div style={{ background: '#fff', borderRadius: 14, padding: '24px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflowX: 'auto', marginBottom: 28 }}>
       <h2 style={{ fontSize: 16, fontWeight: 800, color: navy, margin: '0 0 16px' }}>🏆 המוצרים הנמכרים ביותר בטווח (מתוך הזמנות ששולמו)</h2>
@@ -541,7 +541,7 @@ function BestSellersTable({ rows }: { rows: { name: string; quantity: number; re
               <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
                 <td style={{ padding: '8px 10px', fontWeight: 600, color: navy }}>{r.name}</td>
                 <td style={{ padding: '8px 10px' }}>{r.quantity}</td>
-                <td style={{ padding: '8px 10px', fontWeight: 700, color: '#C5A028' }}>{formatPrice(r.revenue)}</td>
+                <td style={{ padding: '8px 10px', fontWeight: 700, color: 'var(--ys-accent)' }}>{formatPrice(r.revenue)}</td>
               </tr>
             ))}
           </tbody>
@@ -552,7 +552,7 @@ function BestSellersTable({ rows }: { rows: { name: string; quantity: number; re
 }
 
 function OrderDetailModal({ order, onClose }: { order: Order; onClose: () => void }) {
-  const navy = '#1E3A8A';
+  const navy = 'var(--ys-heading)';
   const d = getOrderDate(order);
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}

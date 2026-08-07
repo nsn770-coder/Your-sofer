@@ -145,11 +145,11 @@ export default function ShaliachDashboard() {
     <div style={{ minHeight: '100vh', background: '#f3f4f4', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
 
       {/* Header */}
-      <div style={{ background: '#1a1a1a', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: 'var(--ys-dark-surface)', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           {profile?.logoUrl && (
             <img src={profile.logoUrl} alt="לוגו"
-              style={{ width: 48, height: 48, borderRadius: 10, objectFit: 'cover', border: '2px solid #C5A028' }} />
+              style={{ width: 48, height: 48, borderRadius: 10, objectFit: 'cover', border: '2px solid var(--ys-accent)' }} />
           )}
           <div>
             <div style={{ fontSize: 13, color: '#8899aa', marginBottom: 2 }}>פורטל שליח</div>
@@ -168,14 +168,14 @@ export default function ShaliachDashboard() {
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 16px' }}>
 
         {/* לינק אישי */}
-        <div style={{ background: '#fff', borderRadius: 12, padding: 20, marginBottom: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: '2px solid #C5A028' }}>
+        <div style={{ background: '#fff', borderRadius: 12, padding: 20, marginBottom: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: '2px solid var(--ys-accent)' }}>
           <div style={{ fontSize: 14, fontWeight: 800, color: '#1a3a2a', marginBottom: 10 }}>🔗 הלינק האישי שלך</div>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{ flex: 1, background: '#f8f9fa', border: '1px solid #ddd', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#555', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {refLink}
             </div>
             <button onClick={copyLink}
-              style={{ background: '#C5A028', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              style={{ background: 'var(--ys-accent)', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
               📋 העתק
             </button>
           </div>
@@ -185,9 +185,9 @@ export default function ShaliachDashboard() {
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
           {[
-            { value: orders.length, label: 'סה"כ הזמנות', color: '#1a1a1a' },
+            { value: orders.length, label: 'סה"כ הזמנות', color: 'var(--ys-text)' },
             { value: formatPrice(totalRevenue), label: 'סה"כ מכירות', color: '#27ae60' },
-            { value: formatPrice(totalCommissions), label: 'עמלות שלך', color: '#C5A028' },
+            { value: formatPrice(totalCommissions), label: 'עמלות שלך', color: 'var(--ys-accent)' },
             { value: deliveredOrders, label: 'הזמנות שנמסרו', color: '#8e44ad' },
           ].map((s, i) => (
             <div key={i} style={{ background: '#fff', borderRadius: 12, padding: 20, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
@@ -225,7 +225,7 @@ export default function ShaliachDashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28, padding: 20, background: '#f8f9fa', borderRadius: 12 }}>
               {profile?.logoUrl ? (
                 <img src={profile.logoUrl} alt="לוגו נוכחי"
-                  style={{ width: 100, height: 100, borderRadius: 12, objectFit: 'cover', border: '2px solid #C5A028' }} />
+                  style={{ width: 100, height: 100, borderRadius: 12, objectFit: 'cover', border: '2px solid var(--ys-accent)' }} />
               ) : (
                 <div style={{ width: 100, height: 100, borderRadius: 12, background: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>
                   🟦
@@ -304,7 +304,7 @@ export default function ShaliachDashboard() {
                 <div style={{ fontSize: 18, marginBottom: 8 }}>אין הזמנות עדיין</div>
                 <div style={{ fontSize: 14, marginBottom: 24 }}>שתף את הלינק שלך כדי להתחיל</div>
                 <button onClick={copyLink}
-                  style={{ background: '#C5A028', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                  style={{ background: 'var(--ys-accent)', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                   📋 העתק לינק
                 </button>
               </div>
@@ -325,7 +325,7 @@ export default function ShaliachDashboard() {
                       <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontSize: 12, color: '#555' }}>{o.orderNumber}</td>
                       <td style={{ padding: '12px 16px', fontWeight: 700 }}>{o.customerName}</td>
                       <td style={{ padding: '12px 16px', color: '#27ae60', fontWeight: 700 }}>{formatPrice(o.total)}</td>
-                      <td style={{ padding: '12px 16px', color: '#C5A028', fontWeight: 700 }}>
+                      <td style={{ padding: '12px 16px', color: 'var(--ys-accent)', fontWeight: 700 }}>
                         {o.commissionAmount != null ? formatPrice(o.commissionAmount) : '-'}
                         {o.commissionPercent && <span style={{ fontSize: 11, color: '#aaa', marginRight: 4 }}>({o.commissionPercent}%)</span>}
                       </td>

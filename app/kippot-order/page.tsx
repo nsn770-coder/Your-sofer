@@ -361,23 +361,23 @@ function KippotOrderInner() {
     <div dir="rtl" style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(16px,3vw,40px) 16px', fontFamily: "'Heebo', Arial, sans-serif" }}>
 
       {/* חזרה */}
-      <a href="/category/כיפות" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#C5A028', fontWeight: 700, fontSize: 13, textDecoration: 'none', marginBottom: 24 }}>
+      <a href="/category/כיפות" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--ys-accent)', fontWeight: 700, fontSize: 13, textDecoration: 'none', marginBottom: 24 }}>
         → חזרה לבחירת כיפה
       </a>
 
-      <h1 style={{ fontSize: 'clamp(20px,3vw,28px)', fontWeight: 900, color: '#1a1a1a', marginBottom: 4 }}>עיצוב ופרטי הזמנה</h1>
+      <h1 style={{ fontSize: 'clamp(20px,3vw,28px)', fontWeight: 900, color: 'var(--ys-text)', marginBottom: 4 }}>עיצוב ופרטי הזמנה</h1>
       <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 28 }}>
         {kippah.label} · {TYPE_LABELS[type]} · {qty} יחידות · ₪{unitPrice} ליחידה
       </p>
 
       {/* כיפה נבחרת */}
-      <div style={{ display: 'flex', gap: 16, alignItems: 'center', background: '#FAF8F3', border: '1px solid #E5E0D5', padding: 16, marginBottom: 28 }}>
-        <img src={kippah.img} alt={kippah.label} style={{ width: 80, height: 80, objectFit: 'cover', flexShrink: 0, border: '2px solid #C5A028' }} />
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center', background: 'var(--ys-bg-warm)', border: '1px solid #E5E0D5', padding: 16, marginBottom: 28 }}>
+        <img src={kippah.img} alt={kippah.label} style={{ width: 80, height: 80, objectFit: 'cover', flexShrink: 0, border: '2px solid var(--ys-accent)' }} />
         <div>
           <div style={{ fontSize: 15, fontWeight: 900 }}>{kippah.label}</div>
           <div style={{ fontSize: 12, color: '#9C7B3F', fontWeight: 700, marginTop: 2 }}>{KIPA_MATERIAL_LABELS[getKipaMaterial(style)]}</div>
           <div style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>{TYPE_LABELS[type]}</div>
-          <div style={{ fontSize: 13, color: '#C5A028', fontWeight: 700, marginTop: 6 }}>₪{unitPrice} × {qty} = ₪{totalPrice.toLocaleString('he-IL')}</div>
+          <div style={{ fontSize: 13, color: 'var(--ys-accent)', fontWeight: 700, marginTop: 6 }}>₪{unitPrice} × {qty} = ₪{totalPrice.toLocaleString('he-IL')}</div>
         </div>
       </div>
 
@@ -405,7 +405,7 @@ function KippotOrderInner() {
         </div>
 
         <div onClick={() => fileInputRef.current?.click()}
-          style={{ border: `2px dashed ${hasLogo ? '#C5A028' : '#D1CCC3'}`, padding: '24px 16px', textAlign: 'center', cursor: 'pointer', background: hasLogo ? 'rgba(197,160,40,0.05)' : '#fff', transition: 'all 0.2s', marginBottom: 12 }}>
+          style={{ border: `2px dashed ${hasLogo ? 'var(--ys-accent)' : '#D1CCC3'}`, padding: '24px 16px', textAlign: 'center', cursor: 'pointer', background: hasLogo ? 'rgba(197,160,40,0.05)' : '#fff', transition: 'all 0.2s', marginBottom: 12 }}>
           <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" style={{ display: 'none' }} onChange={handleFileChange} />
           {uploading ? (
             <div style={{ fontSize: 14, color: '#9C7B3F' }}>מעלה לקלודינרי...</div>
@@ -478,7 +478,7 @@ function KippotOrderInner() {
             <button
               onClick={generateAiMockup}
               disabled={!logoDataUrl}
-              style={{ background: '#C5A028', color: '#1a1a1a', fontWeight: 900, fontSize: 14, padding: '12px 24px', border: 'none', cursor: logoDataUrl ? 'pointer' : 'not-allowed', opacity: logoDataUrl ? 1 : 0.6, fontFamily: 'inherit', width: '100%' }}
+              style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', fontWeight: 900, fontSize: 14, padding: '12px 24px', border: 'none', cursor: logoDataUrl ? 'pointer' : 'not-allowed', opacity: logoDataUrl ? 1 : 0.6, fontFamily: 'inherit', width: '100%' }}
             >
               ✨ צרו לי הדמיה
             </button>
@@ -486,7 +486,7 @@ function KippotOrderInner() {
 
           {aiLoading && (
             <div style={{ textAlign: 'center', padding: '18px 0', fontSize: 13.5, color: '#9C7B3F' }}>
-              <div style={{ display: 'inline-block', width: 22, height: 22, border: '3px solid #E5D9B8', borderTopColor: '#C5A028', borderRadius: '50%', animation: 'kip-ai-spin 0.8s linear infinite', verticalAlign: 'middle', marginLeft: 8 }} />
+              <div style={{ display: 'inline-block', width: 22, height: 22, border: '3px solid #E5D9B8', borderTopColor: 'var(--ys-accent)', borderRadius: '50%', animation: 'kip-ai-spin 0.8s linear infinite', verticalAlign: 'middle', marginLeft: 8 }} />
               מייצרים הדמיה... זה לוקח בערך 15 שניות
               <style>{`@keyframes kip-ai-spin { to { transform: rotate(360deg); } }`}</style>
             </div>
@@ -495,7 +495,7 @@ function KippotOrderInner() {
           {aiError === 'service_disabled' && (
             <div style={{ fontSize: 13, color: '#9C7B3F', lineHeight: 1.6 }}>
               ⚠️ ההדמיה זמנית לא זמינה — אפשר להמשיך להזמין כרגיל, ונשמח לעזור עם עיצוב מותאם{' '}
-              <a href="https://wa.me/972587479933" target="_blank" rel="noopener noreferrer" style={{ color: '#C5A028', fontWeight: 700 }}>בוואטסאפ</a>.
+              <a href="https://wa.me/972587479933" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--ys-accent)', fontWeight: 700 }}>בוואטסאפ</a>.
             </div>
           )}
           {aiError === 'rate_limited' && (
@@ -503,7 +503,7 @@ function KippotOrderInner() {
           )}
           {aiError === 'general' && (
             <div style={{ fontSize: 13, color: '#dc2626' }}>
-              משהו השתבש — <button onClick={generateAiMockup} style={{ background: 'none', border: 'none', color: '#C5A028', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, padding: 0 }}>נסו שוב</button>
+              משהו השתבש — <button onClick={generateAiMockup} style={{ background: 'none', border: 'none', color: 'var(--ys-accent)', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, padding: 0 }}>נסו שוב</button>
             </div>
           )}
 
@@ -518,7 +518,7 @@ function KippotOrderInner() {
                 <a
                   href={`data:${aiResult.mimeType};base64,${aiResult.imageBase64}`}
                   download="hadmaya-yoursofer.png"
-                  style={{ flex: 1, textAlign: 'center', background: '#fff', border: '1px solid #C5A028', color: '#9C7B3F', fontWeight: 700, fontSize: 13, padding: '10px 16px', textDecoration: 'none' }}
+                  style={{ flex: 1, textAlign: 'center', background: '#fff', border: '1px solid var(--ys-accent)', color: '#9C7B3F', fontWeight: 700, fontSize: 13, padding: '10px 16px', textDecoration: 'none' }}
                 >
                   ⬇ הורדת ההדמיה
                 </a>
@@ -559,7 +559,7 @@ function KippotOrderInner() {
         </div>
         <button
           onClick={() => setShowCatalog(true)}
-          style={{ display: 'block', width: '100%', marginBottom: 10, padding: '12px 0', background: '#1a1a1a', color: '#C5A028', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
+          style={{ display: 'block', width: '100%', marginBottom: 10, padding: '12px 0', background: 'var(--ys-dark-surface)', color: 'var(--ys-accent)', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
         >
           לחץ לצפיה בקטלוג העיצובים שלנו
         </button>
@@ -569,13 +569,13 @@ function KippotOrderInner() {
               key={d.id}
               style={{
                 flex: '0 0 128px', width: 128,
-                border: designExample === d.id ? '2px solid #C5A028' : '2px solid #E5E0D5',
+                border: designExample === d.id ? '2px solid var(--ys-accent)' : '2px solid #E5E0D5',
                 background: designExample === d.id ? 'rgba(197,160,40,0.06)' : '#fff',
                 position: 'relative', overflow: 'hidden',
               }}
             >
               {designExample === d.id && (
-                <div style={{ position: 'absolute', top: 6, left: 6, background: '#C5A028', color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, zIndex: 2 }}>✓</div>
+                <div style={{ position: 'absolute', top: 6, left: 6, background: 'var(--ys-accent)', color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, zIndex: 2 }}>✓</div>
               )}
               {/* כפתור הגדלה */}
               <button
@@ -588,7 +588,7 @@ function KippotOrderInner() {
                 style={{ padding: 0, border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit', width: '100%', textAlign: 'center' }}
               >
                 <img src={d.img} alt={d.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-                <div style={{ padding: '7px 8px', fontSize: 12, fontWeight: designExample === d.id ? 800 : 600, color: '#1a1a1a' }}>{d.label}</div>
+                <div style={{ padding: '7px 8px', fontSize: 12, fontWeight: designExample === d.id ? 800 : 600, color: 'var(--ys-text)' }}>{d.label}</div>
               </button>
             </div>
           ))}
@@ -610,7 +610,7 @@ function KippotOrderInner() {
         </div>
         <button
           onClick={() => setShowFontModal(true)}
-          style={{ display: 'block', width: '100%', marginBottom: 10, padding: '12px 0', background: '#1a1a1a', color: '#C5A028', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
+          style={{ display: 'block', width: '100%', marginBottom: 10, padding: '12px 0', background: 'var(--ys-dark-surface)', color: 'var(--ys-accent)', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }}
         >
           לחץ לבחיר גופן
         </button>
@@ -633,7 +633,7 @@ function KippotOrderInner() {
                 style={{ padding: 0, border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit', width: '100%', textAlign: 'center' }}
               >
                 <img src={f.url} alt={f.label} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-                <div style={{ padding: '7px 6px', fontSize: 11, fontWeight: selectedFont === f.id ? 800 : 600, color: '#1a1a1a' }}>גופן {f.id.replace('font', '')}</div>
+                <div style={{ padding: '7px 6px', fontSize: 11, fontWeight: selectedFont === f.id ? 800 : 600, color: 'var(--ys-text)' }}>גופן {f.id.replace('font', '')}</div>
               </button>
             </div>
           ))}
@@ -658,7 +658,7 @@ function KippotOrderInner() {
               <div style={{ fontSize: 15, fontWeight: 900 }}>{DESIGN_EXAMPLES[zoomExample].label}</div>
               <button
                 onClick={() => { setDesignExample(DESIGN_EXAMPLES[zoomExample].id); setZoomExample(null); }}
-                style={{ background: '#C5A028', color: '#1a1a1a', border: 'none', padding: '10px 24px', fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}
+                style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', padding: '10px 24px', fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}
               >✓ בחרו דוגמה זו</button>
             </div>
           </div>
@@ -672,7 +672,7 @@ function KippotOrderInner() {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 16, overflowY: 'auto' }}
         >
           <div onClick={e => e.stopPropagation()} style={{ background: '#FAF7F0', maxWidth: 900, width: '100%', position: 'relative', padding: '20px 16px 28px' }}>
-            <button onClick={() => setShowCatalog(false)} style={{ position: 'sticky', top: 0, float: 'left', background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 17, cursor: 'pointer', zIndex: 2 }}>✕</button>
+            <button onClick={() => setShowCatalog(false)} style={{ position: 'sticky', top: 0, float: 'left', background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 17, cursor: 'pointer', zIndex: 2 }}>✕</button>
             <div style={{ textAlign: 'center', fontSize: 20, fontWeight: 900, color: '#1a2a5e', marginBottom: 4 }}>קטלוג דוגמאות לעיצוב על כיפה</div>
             <div style={{ textAlign: 'center', fontSize: 12.5, color: '#6B7280', marginBottom: 18, lineHeight: 1.6 }}>
               לחצו על דוגמה לבחירה · אפשר לבקש שינויים ועיצוב שונה — ההדמיות יישלחו אליכם לוואטסאפ/מייל לאישור אחרי ההזמנה
@@ -683,12 +683,12 @@ function KippotOrderInner() {
                   key={d.id}
                   onClick={() => { setDesignExample(d.id); setShowCatalog(false); }}
                   style={{
-                    padding: 0, border: designExample === d.id ? '3px solid #C5A028' : '1px solid #E5E0D5',
+                    padding: 0, border: designExample === d.id ? '3px solid var(--ys-accent)' : '1px solid #E5E0D5',
                     background: '#fff', cursor: 'pointer', fontFamily: 'inherit', overflow: 'hidden',
                   }}
                 >
                   <img src={d.img} alt={d.label} loading="lazy" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-                  <div style={{ padding: '9px 8px', fontSize: 14, fontWeight: 800, color: '#1a1a1a' }}>{d.label}</div>
+                  <div style={{ padding: '9px 8px', fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>{d.label}</div>
                 </button>
               ))}
             </div>
@@ -698,9 +698,9 @@ function KippotOrderInner() {
 
       {/* הדפסה משני הצדדים — כלולה בסוג 'למעלה ולמטה' */}
       {type === 'print-both' && (
-        <div style={{ marginBottom: 20, border: '1px solid #C5A028', background: 'rgba(197,160,40,0.05)', padding: 16 }}>
+        <div style={{ marginBottom: 20, border: '1px solid var(--ys-accent)', background: 'rgba(197,160,40,0.05)', padding: 16 }}>
           <div style={{ fontSize: 14, fontWeight: 700 }}>
-            ✓ הדפסה למעלה ולמטה <span style={{ color: '#C5A028', fontWeight: 700 }}>(+₪{KIPA_EXTRA_SIDE_PRICE} ליחידה — כלול במחיר)</span>
+            ✓ הדפסה למעלה ולמטה <span style={{ color: 'var(--ys-accent)', fontWeight: 700 }}>(+₪{KIPA_EXTRA_SIDE_PRICE} ליחידה — כלול במחיר)</span>
           </div>
           <textarea value={addSideText} onChange={e => setAddSideText(e.target.value)}
             placeholder="טקסט / עיצוב לצד השני (למטה)..." rows={2}
@@ -712,12 +712,12 @@ function KippotOrderInner() {
       {type !== 'print-both' && (
         <div style={{ marginBottom: 20, border: '1px solid #E5E0D5', padding: 16 }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-            <input type="checkbox" checked={addSide} onChange={e => setAddSide(e.target.checked)} style={{ width: 18, height: 18, accentColor: '#C5A028' }} />
+            <input type="checkbox" checked={addSide} onChange={e => setAddSide(e.target.checked)} style={{ width: 18, height: 18, accentColor: 'var(--ys-accent)' }} />
             <div>
               <span style={{ fontSize: 14, fontWeight: 700 }}>
                 {type === 'embroidery' ? 'הוספת הדפס בצד התחתון הפנימי של הכיפה' : type === 'print-top' ? 'הדפסה גם למטה' : 'הדפסה גם למעלה'}
               </span>
-              <span style={{ color: '#C5A028', fontWeight: 700 }}> +₪{KIPA_EXTRA_SIDE_PRICE} ליחידה</span>
+              <span style={{ color: 'var(--ys-accent)', fontWeight: 700 }}> +₪{KIPA_EXTRA_SIDE_PRICE} ליחידה</span>
             </div>
           </label>
           {addSide && (
@@ -729,7 +729,7 @@ function KippotOrderInner() {
       )}
 
       {/* סיכום */}
-      <div style={{ background: '#FAF8F3', border: '1px solid #E5E0D5', padding: 20, marginBottom: 24 }}>
+      <div style={{ background: 'var(--ys-bg-warm)', border: '1px solid #E5E0D5', padding: 20, marginBottom: 24 }}>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>סיכום מחיר</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#6B7280' }}>
@@ -758,7 +758,7 @@ function KippotOrderInner() {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 16, overflowY: 'auto' }}
         >
           <div onClick={e => e.stopPropagation()} style={{ background: '#FAF7F0', maxWidth: 900, width: '100%', position: 'relative', padding: '20px 16px 28px' }}>
-            <button onClick={() => setShowFontModal(false)} style={{ position: 'sticky', top: 0, float: 'left', background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 17, cursor: 'pointer', zIndex: 2 }}>✕</button>
+            <button onClick={() => setShowFontModal(false)} style={{ position: 'sticky', top: 0, float: 'left', background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 17, cursor: 'pointer', zIndex: 2 }}>✕</button>
             <div style={{ textAlign: 'center', fontSize: 20, fontWeight: 900, color: '#1a2a5e', marginBottom: 4 }}>בחרו גופן להדפסה</div>
             <div style={{ textAlign: 'center', fontSize: 12.5, color: '#6B7280', marginBottom: 18, lineHeight: 1.6 }}>
               לחצו על גופן לבחירה · הגופן שנבחר יישמר בהזמנה שלכם
@@ -774,7 +774,7 @@ function KippotOrderInner() {
                   }}
                 >
                   <img src={f.url} alt={f.label} loading="lazy" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
-                  <div style={{ padding: '12px 10px', fontSize: 15, fontWeight: 800, color: '#1a1a1a', textAlign: 'center' }}>גופן {f.id.replace('font', '')}</div>
+                  <div style={{ padding: '12px 10px', fontSize: 15, fontWeight: 800, color: 'var(--ys-text)', textAlign: 'center' }}>גופן {f.id.replace('font', '')}</div>
                 </button>
               ))}
             </div>
@@ -785,7 +785,7 @@ function KippotOrderInner() {
       {/* הוסף לעגלה */}
       <button
         onClick={handleAddToCart}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#1a1a1a', color: '#fff', fontWeight: 900, fontSize: 16, padding: '18px 32px', border: 'none', cursor: 'pointer', width: '100%', boxSizing: 'border-box', fontFamily: 'inherit' }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: 'var(--ys-dark-surface)', color: '#fff', fontWeight: 900, fontSize: 16, padding: '18px 32px', border: 'none', cursor: 'pointer', width: '100%', boxSizing: 'border-box', fontFamily: 'inherit' }}
       >
         🛒 הוסף לעגלה וסיים הזמנה
       </button>

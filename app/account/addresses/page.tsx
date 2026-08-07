@@ -23,16 +23,16 @@ function AddressCard({
   onSetBilling: () => void;
 }) {
   return (
-    <div style={{ background: '#fff', padding: '20px', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', position: 'relative', borderRight: isDefaultShipping ? '3px solid #C5A028' : '3px solid transparent' }}>
+    <div style={{ background: '#fff', padding: '20px', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', position: 'relative', borderRight: isDefaultShipping ? '3px solid var(--ys-accent)' : '3px solid transparent' }}>
       {/* תגיות */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
         <span style={{ fontSize: 11, fontWeight: 700, background: '#F8F6F1', color: '#555', padding: '2px 8px' }}>{address.label}</span>
-        {isDefaultShipping && <span style={{ fontSize: 11, background: '#C5A028', color: '#fff', padding: '2px 8px', fontWeight: 700 }}>ברירת מחדל למשלוח</span>}
-        {isDefaultBilling && <span style={{ fontSize: 11, background: '#1a1a1a', color: '#fff', padding: '2px 8px', fontWeight: 700 }}>ברירת מחדל לחיוב</span>}
+        {isDefaultShipping && <span style={{ fontSize: 11, background: 'var(--ys-accent)', color: '#fff', padding: '2px 8px', fontWeight: 700 }}>ברירת מחדל למשלוח</span>}
+        {isDefaultBilling && <span style={{ fontSize: 11, background: 'var(--ys-dark-surface)', color: '#fff', padding: '2px 8px', fontWeight: 700 }}>ברירת מחדל לחיוב</span>}
       </div>
 
       {/* פרטי כתובת */}
-      <div style={{ fontSize: 14, color: '#1a1a1a', fontWeight: 600, marginBottom: 2 }}>
+      <div style={{ fontSize: 14, color: 'var(--ys-text)', fontWeight: 600, marginBottom: 2 }}>
         {address.firstName} {address.lastName}
       </div>
       <div style={{ fontSize: 13, color: '#555', lineHeight: 1.7 }}>
@@ -44,11 +44,11 @@ function AddressCard({
 
       {/* פעולות */}
       <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
-        <button onClick={onEdit} style={{ fontSize: 12, color: '#1a1a1a', background: 'none', border: '1px solid #E7E2D8', padding: '5px 12px', cursor: 'pointer', fontFamily: 'inherit' }}>
+        <button onClick={onEdit} style={{ fontSize: 12, color: 'var(--ys-text)', background: 'none', border: '1px solid #E7E2D8', padding: '5px 12px', cursor: 'pointer', fontFamily: 'inherit' }}>
           ✏️ ערוך
         </button>
         {!isDefaultShipping && (
-          <button onClick={onSetShipping} style={{ fontSize: 12, color: '#C5A028', background: 'none', border: '1px solid #C5A028', padding: '5px 12px', cursor: 'pointer', fontFamily: 'inherit' }}>
+          <button onClick={onSetShipping} style={{ fontSize: 12, color: 'var(--ys-accent)', background: 'none', border: '1px solid var(--ys-accent)', padding: '5px 12px', cursor: 'pointer', fontFamily: 'inherit' }}>
             הגדר למשלוח
           </button>
         )}
@@ -84,7 +84,7 @@ function AddressForm({
           type={type} value={form[fieldKey] as string} placeholder={placeholder}
           onChange={e => f(fieldKey)(e.target.value)}
           onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
-          style={{ width: '100%', boxSizing: 'border-box', border: `1.5px solid ${focused ? '#C5A028' : '#E7E2D8'}`, padding: '10px 12px', fontSize: 13, outline: 'none', fontFamily: 'inherit', background: '#fafaf9', borderRadius: 0 }}
+          style={{ width: '100%', boxSizing: 'border-box', border: `1.5px solid ${focused ? 'var(--ys-accent)' : '#E7E2D8'}`, padding: '10px 12px', fontSize: 13, outline: 'none', fontFamily: 'inherit', background: '#fafaf9', borderRadius: 0 }}
         />
       </div>
     );
@@ -92,7 +92,7 @@ function AddressForm({
 
   return (
     <div style={{ background: '#fff', padding: '24px', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', marginBottom: 20 }}>
-      <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 20px', color: '#1a1a1a' }}>
+      <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 20px', color: 'var(--ys-text)' }}>
         {initial.street ? 'עריכת כתובת' : 'הוספת כתובת חדשה'}
       </h3>
 
@@ -102,7 +102,7 @@ function AddressForm({
         <div style={{ display: 'flex', gap: 8 }}>
           {['בית', 'עבודה', 'אחר'].map(opt => (
             <button key={opt} type="button" onClick={() => f('label')(opt)}
-              style={{ padding: '6px 14px', fontSize: 12, border: `1.5px solid ${form.label === opt ? '#C5A028' : '#E7E2D8'}`, background: form.label === opt ? '#FDF8EE' : '#fff', cursor: 'pointer', fontFamily: 'inherit', fontWeight: form.label === opt ? 700 : 400 }}>
+              style={{ padding: '6px 14px', fontSize: 12, border: `1.5px solid ${form.label === opt ? 'var(--ys-accent)' : '#E7E2D8'}`, background: form.label === opt ? '#FDF8EE' : '#fff', cursor: 'pointer', fontFamily: 'inherit', fontWeight: form.label === opt ? 700 : 400 }}>
               {opt}
             </button>
           ))}
@@ -127,7 +127,7 @@ function AddressForm({
 
       <div style={{ display: 'flex', gap: 10 }}>
         <button type="button" onClick={() => onSave(form)}
-          style={{ background: '#1a1a1a', color: '#fff', border: 'none', padding: '11px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+          style={{ background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', padding: '11px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
           שמור כתובת
         </button>
         <button type="button" onClick={onCancel}
@@ -211,11 +211,11 @@ export default function AddressesPage() {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 300, color: '#1a1a1a', margin: 0, letterSpacing: '-0.01em' }}>הכתובות שלי</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 300, color: 'var(--ys-text)', margin: 0, letterSpacing: '-0.01em' }}>הכתובות שלי</h2>
         {!addingNew && !editingAddress && (
           <button
             onClick={() => setAddingNew(true)}
-            style={{ background: '#1a1a1a', color: '#fff', border: 'none', padding: '10px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', padding: '10px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
           >
             + הוסף כתובת
           </button>
@@ -246,7 +246,7 @@ export default function AddressesPage() {
           <div style={{ fontSize: 32, marginBottom: 12 }}>📍</div>
           <div style={{ fontSize: 15, color: '#555', marginBottom: 16 }}>עוד אין כתובות שמורות</div>
           <button onClick={() => setAddingNew(true)}
-            style={{ background: '#1a1a1a', color: '#fff', border: 'none', padding: '11px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+            style={{ background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', padding: '11px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
             הוסף כתובת ראשונה
           </button>
         </div>

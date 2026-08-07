@@ -330,7 +330,7 @@ export default function BestSellersTab({
                           style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
                         />
                       )}
-                      <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: 'var(--ys-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {p.name}
                       </span>
                       <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
@@ -460,7 +460,7 @@ export default function BestSellersTab({
                           style={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }}
                         />
                       )}
-                      <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: 'var(--ys-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {p.name}
                       </span>
                       <span style={{ fontSize: 11, color: '#aaa', fontFamily: 'monospace', flexShrink: 0 }}>

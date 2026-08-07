@@ -229,9 +229,9 @@ export default function KlafimProductPage() {
   return (
     <div dir="rtl" style={{ minHeight: '100vh', background: '#f5f5f5', fontFamily: 'Heebo, Arial, sans-serif' }}>
       {/* Header */}
-      <div style={{ background: '#1E3A8A', borderBottom: '3px solid #C5A028', padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+      <div style={{ background: 'var(--ys-heading)', borderBottom: '3px solid var(--ys-accent)', padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 900, color: '#C5A028' }}>📜 ניהול קלפים — {product?.name ?? productId}</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--ys-accent)' }}>📜 ניהול קלפים — {product?.name ?? productId}</div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
             {availableCount} זמינים · {reservedCount} שמורים · {soldCount} נמכרו
           </div>
@@ -245,7 +245,7 @@ export default function KlafimProductPage() {
 
         {/* ── Upload section ── */}
         <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #e8e0d0', padding: '22px 24px', marginBottom: 28 }}>
-          <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 14 }}>העלאת קלפים חדשים</div>
+          <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-heading)', marginBottom: 14 }}>העלאת קלפים חדשים</div>
 
           {/* Drop zone */}
           <div
@@ -254,7 +254,7 @@ export default function KlafimProductPage() {
             onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
             style={{
-              border: `2px dashed ${isDragOver ? '#C5A028' : '#d0c8b8'}`,
+              border: `2px dashed ${isDragOver ? 'var(--ys-accent)' : '#d0c8b8'}`,
               borderRadius: 10, padding: '28px 20px',
               textAlign: 'center', cursor: 'pointer',
               background: isDragOver ? '#fffbf0' : '#faf9f7',
@@ -263,7 +263,7 @@ export default function KlafimProductPage() {
             }}
           >
             <div style={{ fontSize: 28, marginBottom: 6 }}>📁</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#1E3A8A', marginBottom: 4 }}>גרור תמונות לכאן</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ys-heading)', marginBottom: 4 }}>גרור תמונות לכאן</div>
             <div style={{ fontSize: 12, color: '#888' }}>או לחץ לבחירת קבצים · ניתן לבחור מספר תמונות</div>
             <input
               ref={fileInputRef}
@@ -297,7 +297,7 @@ export default function KlafimProductPage() {
                       disabled={p.uploading}
                       style={{
                         border: '1.5px solid #d0c8b8', borderRadius: 7, padding: '6px 10px',
-                        fontSize: 13, fontFamily: 'monospace', fontWeight: 700, color: '#1E3A8A',
+                        fontSize: 13, fontFamily: 'monospace', fontWeight: 700, color: 'var(--ys-heading)',
                         width: '100%', maxWidth: 160, background: '#faf9f7',
                       }}
                     />
@@ -307,7 +307,7 @@ export default function KlafimProductPage() {
                     {p.file.name}
                   </div>
                   {p.uploading ? (
-                    <div style={{ fontSize: 12, color: '#C5A028', fontWeight: 700, flexShrink: 0 }}>מעלה...</div>
+                    <div style={{ fontSize: 12, color: 'var(--ys-accent)', fontWeight: 700, flexShrink: 0 }}>מעלה...</div>
                   ) : (
                     <button
                       onClick={() => removePending(i)}
@@ -325,7 +325,7 @@ export default function KlafimProductPage() {
                   onClick={handleSave}
                   disabled={saving}
                   style={{
-                    background: saving ? '#888' : '#C5A028', color: '#1E3A8A',
+                    background: saving ? '#888' : 'var(--ys-accent)', color: 'var(--ys-heading)',
                     border: 'none', borderRadius: 9, padding: '10px 28px',
                     fontWeight: 800, fontSize: 14, cursor: saving ? 'default' : 'pointer',
                     opacity: saving ? 0.7 : 1,
@@ -344,7 +344,7 @@ export default function KlafimProductPage() {
 
         {/* ── Existing klafim ── */}
         <div>
-          <div style={{ fontWeight: 800, fontSize: 16, color: '#1E3A8A', marginBottom: 14 }}>
+          <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-heading)', marginBottom: 14 }}>
             קלפים קיימים ({klafim.length})
           </div>
           {klafim.length === 0 ? (
@@ -380,7 +380,7 @@ export default function KlafimProductPage() {
                   </div>
                   {/* Info */}
                   <div style={{ padding: '8px 10px' }}>
-                    <div style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, color: '#1E3A8A', marginBottom: 4 }}>
+                    <div style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, color: 'var(--ys-heading)', marginBottom: 4 }}>
                       {klaf.name}
                     </div>
                     {klaf.status === 'available' && (

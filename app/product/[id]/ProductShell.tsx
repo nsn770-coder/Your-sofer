@@ -125,12 +125,12 @@ export default function ProductShell({ product }: { product: ShellProduct }) {
         <div className="ps-crumb" style={{ background: '#fff', borderBottom: '1px solid #e8e8e8' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#888', flexWrap: 'wrap' }}>
-              <span style={{ color: '#1a1a1a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
+              <span style={{ color: 'var(--ys-text)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
                 <IconHome /> דף הבית
               </span>
               <IconChevron />
               {product.cat && (
-                <><span style={{ color: '#1a1a1a', fontWeight: 500 }}>{product.cat}</span><IconChevron /></>
+                <><span style={{ color: 'var(--ys-text)', fontWeight: 500 }}>{product.cat}</span><IconChevron /></>
               )}
               <span style={{ color: '#555', fontWeight: 500 }}>
                 <span className="ps-name-short">{nameShort}</span>
@@ -157,14 +157,14 @@ export default function ProductShell({ product }: { product: ShellProduct }) {
               </div>
               {product.cat === 'כיפות' && (
                 <div style={{ position: 'absolute', bottom: 12, left: 12, background: 'linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)', padding: '8px 12px 8px 16px', borderRadius: '0 8px 0 0', zIndex: 10 }}>
-                  <span style={{ color: '#1a1a1a', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                  <span style={{ color: 'var(--ys-text)', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>
                     מוצר 2: 10% | 3+: 15%
                   </span>
                 </div>
               )}
               <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', scrollbarWidth: 'none', borderTop: '1px solid #f0f0f0' }}>
                 {allMedia.map((_, i) => (
-                  <span key={i} className="ps-thumb" style={{ flexShrink: 0, borderRadius: 8, overflow: 'hidden', border: `2px solid ${i === 0 ? '#C5A028' : '#e0e0e0'}`, background: '#fff', padding: 2, display: 'inline-block', boxSizing: 'border-box' }}>
+                  <span key={i} className="ps-thumb" style={{ flexShrink: 0, borderRadius: 8, overflow: 'hidden', border: `2px solid ${i === 0 ? 'var(--ys-accent)' : '#e0e0e0'}`, background: '#fff', padding: 2, display: 'inline-block', boxSizing: 'border-box' }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={thumbs[i]} alt={`תמונה ${i + 1}`} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   </span>
@@ -214,13 +214,13 @@ export default function ProductShell({ product }: { product: ShellProduct }) {
                   {effectivePct === 0 && discount > 0 && <span style={{ background: '#c0392b', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 700 }}>-{discount}%</span>}
                 </div>
                 {bundleLabel && (
-                  <div style={{ display: 'inline-flex', alignItems: 'center', background: '#1a1a1a', color: '#C5A028', fontSize: 13, fontWeight: 800, padding: '5px 12px', borderRadius: 8, marginBottom: 8, letterSpacing: '0.01em' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--ys-dark-surface)', color: 'var(--ys-accent)', fontSize: 13, fontWeight: 800, padding: '5px 12px', borderRadius: 8, marginBottom: 8, letterSpacing: '0.01em' }}>
                     ✦ מבצע חבילה: {bundleLabel}
                   </div>
                 )}
                 <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><IconTruck /> כולל מע״מ · משלוח לכל הארץ</div>
                 {effectivePrice > 99 && (
-                  <div style={{ background: '#f0f7ff', border: '1px solid #bde0ff', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#1a1a1a', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ background: '#f0f7ff', border: '1px solid #bde0ff', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: 'var(--ys-text)', display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ color: '#0e6ba8', flexShrink: 0 }}><IconCreditCard /></span>
                     <span><strong>3 תשלומים של {formatPrice(monthly3)}</strong> ללא ריבית</span>
                     {effectivePrice >= 400 && <span style={{ color: '#888', fontSize: 11, marginRight: 'auto' }}>· עד 12 תשלומים בתוספת ריבית</span>}

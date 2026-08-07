@@ -41,7 +41,7 @@ export default function GiftProgressBar() {
           maxWidth:     560,
           zIndex:       9990,
           borderRadius: 9999,
-          background:   '#1a1a1a',
+          background:   'var(--ys-dark-surface)',
           boxShadow:    '0 6px 28px rgba(0,0,0,0.38)',
           display:      'flex',
           alignItems:   'center',
@@ -115,7 +115,7 @@ export default function GiftProgressBar() {
           style={{
             flexShrink:     0,
             background:     '#fff',
-            color:          '#1a1a1a',
+            color:          'var(--ys-text)',
             border:         'none',
             borderRadius:   9999,
             padding:        '5px 11px',

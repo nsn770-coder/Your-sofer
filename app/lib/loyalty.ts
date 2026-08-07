@@ -54,7 +54,7 @@ export const TIER_CONFIG: Record<Tier, TierDefinition> = {
     labelEn: 'Gold',
     minSpent: 3600,
     maxSpent: null,
-    color: '#C5A028',
+    color: 'var(--ys-accent)',
     colorLight: '#FDF8EE',
     accrualRate: 12,
     benefits: [

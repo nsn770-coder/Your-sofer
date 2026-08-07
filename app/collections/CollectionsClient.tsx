@@ -162,7 +162,7 @@ function CollectionCard({ col }: { col: Collection }) {
           padding: '18px 22px 20px',
           display: 'flex', flexDirection: 'column', gap: 10, flexGrow: 1,
         }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--ys-text)', margin: 0, lineHeight: 1.4 }}>
             {col.tagline}
           </p>
 
@@ -171,7 +171,7 @@ function CollectionCard({ col }: { col: Collection }) {
           </p>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#C5A028', letterSpacing: '0.01em' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ys-accent)', letterSpacing: '0.01em' }}>
               לצפייה בקולקציה ←
             </span>
           </div>
@@ -191,7 +191,7 @@ export default function CollectionsPage() {
         padding: '52px 20px 44px',
         textAlign: 'center',
       }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: '#C5A028', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 10 }}>
+        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--ys-accent)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 10 }}>
           YOUR SOFER
         </p>
         <h1 style={{ fontSize: 'clamp(26px,5vw,42px)', fontWeight: 900, color: '#fff', marginBottom: 12, lineHeight: 1.2 }}>

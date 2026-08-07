@@ -15,8 +15,8 @@ import OccasionGrid from './OccasionGrid';
  */
 
 const NAVY = '#373A5A';
-const GOLD = '#C5A028';
-const CREAM = '#FAF8F3';
+const GOLD = 'var(--ys-accent)';
+const CREAM = 'var(--ys-bg-warm)';
 
 // כל שורה כאן מגובה בקוד או במדיניות בפועל — אין להוסיף טענה שלא ניתן לאמת.
 // המשלוח והתשלום מאומתים ב-siteTrust.ts; החריטה ב-personalization.ts.

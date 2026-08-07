@@ -21,10 +21,10 @@ function Field({ label, value, onChange, type = 'text', placeholder, hint }: {
         onBlur={() => setFocused(false)}
         style={{
           width: '100%', boxSizing: 'border-box',
-          border: `1.5px solid ${focused ? '#C5A028' : '#E7E2D8'}`,
+          border: `1.5px solid ${focused ? 'var(--ys-accent)' : '#E7E2D8'}`,
           borderRadius: 0, padding: '11px 14px', fontSize: 14,
           outline: 'none', fontFamily: 'inherit', background: '#fafaf9',
-          transition: 'border-color 0.15s', color: '#1a1a1a',
+          transition: 'border-color 0.15s', color: 'var(--ys-text)',
         }}
       />
       {hint && <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 5, lineHeight: 1.5 }}>{hint}</div>}
@@ -87,25 +87,25 @@ export default function ProfilePage() {
 
   return (
     <div>
-      <h2 style={{ fontSize: 22, fontWeight: 300, color: '#1a1a1a', margin: '0 0 24px', letterSpacing: '-0.01em' }}>
+      <h2 style={{ fontSize: 22, fontWeight: 300, color: 'var(--ys-text)', margin: '0 0 24px', letterSpacing: '-0.01em' }}>
         הפרטים שלי
       </h2>
 
       {/* כרטיס פרטי חשבון Google */}
       <div style={{ background: '#fff', padding: '16px 20px', marginBottom: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 14 }}>
         {user.photoURL && (
-          <img src={user.photoURL} alt="" style={{ width: 44, height: 44, borderRadius: '50%', border: '2px solid #C5A028', flexShrink: 0 }} />
+          <img src={user.photoURL} alt="" style={{ width: 44, height: 44, borderRadius: '50%', border: '2px solid var(--ys-accent)', flexShrink: 0 }} />
         )}
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a' }}>{user.displayName || '—'}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ys-text)' }}>{user.displayName || '—'}</div>
           <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{user.email}</div>
-          <div style={{ fontSize: 11, color: '#C5A028', marginTop: 2 }}>מחובר עם Google</div>
+          <div style={{ fontSize: 11, color: 'var(--ys-accent)', marginTop: 2 }}>מחובר עם Google</div>
         </div>
       </div>
 
       <form onSubmit={handleSave}>
         <div style={{ background: '#fff', padding: '28px 24px', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', marginBottom: 20 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a', margin: '0 0 20px' }}>פרטים אישיים</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', margin: '0 0 20px' }}>פרטים אישיים</h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <Field label="שם פרטי" value={form.firstName} onChange={v => setForm(p => ({ ...p, firstName: v }))} placeholder="ישראל" />

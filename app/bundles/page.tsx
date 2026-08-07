@@ -85,7 +85,7 @@ export default function BundlesPage() {
               key={bundle.title}
               style={{
                 background: '#fff',
-                border: bundle.featured ? '2px solid #C5A028' : '1px solid #E0D8CC',
+                border: bundle.featured ? '2px solid var(--ys-accent)' : '1px solid #E0D8CC',
                 borderRadius: 14,
                 padding: 24,
                 position: 'relative',
@@ -98,8 +98,8 @@ export default function BundlesPage() {
                 position: 'absolute',
                 top: 16,
                 left: 16,
-                background: '#C5A028',
-                color: '#1a1a1a',
+                background: 'var(--ys-accent)',
+                color: 'var(--ys-text)',
                 fontSize: 11,
                 fontWeight: 800,
                 padding: '4px 10px',
@@ -108,7 +108,7 @@ export default function BundlesPage() {
                 {bundle.badge}
               </div>
 
-              <h2 style={{ color: '#1a1a1a', fontSize: 17, fontWeight: 800, margin: '28px 0 12px', lineHeight: 1.4 }}>
+              <h2 style={{ color: 'var(--ys-text)', fontSize: 17, fontWeight: 800, margin: '28px 0 12px', lineHeight: 1.4 }}>
                 {bundle.title}
               </h2>
               <p style={{ fontSize: 14, color: '#555', lineHeight: 1.8, margin: '0 0 18px', flex: 1 }}>
@@ -119,7 +119,7 @@ export default function BundlesPage() {
               <ul style={{ listStyle: 'none', margin: '0 0 22px', padding: 0 }}>
                 {bundle.items.map(item => (
                   <li key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7, fontSize: 13.5, color: '#333' }}>
-                    <span style={{ color: '#C5A028', fontWeight: 900, fontSize: 14, flexShrink: 0, lineHeight: 1.5 }}>✓</span>
+                    <span style={{ color: 'var(--ys-accent)', fontWeight: 900, fontSize: 14, flexShrink: 0, lineHeight: 1.5 }}>✓</span>
                     {item}
                   </li>
                 ))}
@@ -130,8 +130,8 @@ export default function BundlesPage() {
                 style={{
                   display: 'block',
                   textAlign: 'center',
-                  background: '#C5A028',
-                  color: '#1a1a1a',
+                  background: 'var(--ys-accent)',
+                  color: 'var(--ys-text)',
                   padding: '12px 20px',
                   borderRadius: 8,
                   fontSize: 15,

@@ -7,7 +7,7 @@ import { useCart } from '@/app/contexts/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
 
-const GOLD = '#C5A028';
+const GOLD = 'var(--ys-accent)';
 const NAVY = '#111d3a';
 const WA = 'https://wa.me/972587479933';
 
@@ -153,14 +153,14 @@ export default function BarMitzvaPage() {
                   <div style={{ padding: '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <div style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: '#111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{p.name}</div>
                     <div style={{ marginTop: 'auto' }}>
-                      <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 900, color: '#1a1a1a' }}>{formatPrice(p.price)}</div>
+                      <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 900, color: 'var(--ys-text)' }}>{formatPrice(p.price)}</div>
                       {p.was && p.was > p.price && (
                         <div style={{ fontSize: 11, color: '#999', textDecoration: 'line-through' }}>{formatPrice(p.was)}</div>
                       )}
                     </div>
                     <button
                       onClick={e => { e.stopPropagation(); addItem({ id: p.id, name: p.name, price: p.price, imgUrl: img || undefined, quantity: 1, cat: p.cat || undefined }); }}
-                      style={{ width: '100%', padding: '8px 0', borderRadius: 10, background: GOLD, color: '#1a1a1a', border: 'none', fontWeight: 800, fontSize: isMobile ? 12 : 13, cursor: 'pointer' }}>
+                      style={{ width: '100%', padding: '8px 0', borderRadius: 10, background: GOLD, color: 'var(--ys-text)', border: 'none', fontWeight: 800, fontSize: isMobile ? 12 : 13, cursor: 'pointer' }}>
                       הוסף לסל
                     </button>
                   </div>

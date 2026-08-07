@@ -154,7 +154,7 @@ export default function AddProductPage() {
         </div>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
           <button onClick={() => { setSaved(false); setName(''); setDesc(''); setPrice(''); setCategory(''); setNusach(''); setLevel(''); setSize(''); setDeliveryDays(''); setImages([]); }}
-            style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             ➕ הוסף מוצר נוסף
           </button>
           <button onClick={() => router.push('/sofer-dashboard')}
@@ -169,7 +169,7 @@ export default function AddProductPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f0f4ff', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif' }}>
       {/* Header */}
-      <div style={{ background: '#1a1a1a', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: 'var(--ys-dark-surface)', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginBottom: 3 }}>פורטל סופר</div>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>➕ הוספת מוצר חדש</div>

@@ -108,7 +108,7 @@ export default function FaqAccordion({
                 <span style={{
                   fontSize: compact ? 14 : 15,
                   fontWeight: 600,
-                  color: '#1a1a1a',
+                  color: 'var(--ys-text)',
                   flex: 1,
                   lineHeight: 1.5,
                 }}>
@@ -116,7 +116,7 @@ export default function FaqAccordion({
                 </span>
                 <svg
                   width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"
-                  stroke="#C5A028" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  stroke="var(--ys-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                   style={{ flexShrink: 0, transition: 'transform 0.25s', transform: open ? 'rotate(180deg)' : 'none' }}
                 >
                   <polyline points="6 9 12 15 18 9" />

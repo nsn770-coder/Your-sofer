@@ -458,7 +458,7 @@ export default function StickersTab() {
                           style={{
                             width: 40, height: 40, borderRadius: 4, cursor: 'pointer',
                             background: newRows[i]?.imgUrl ? 'transparent' : '#f3f4f6',
-                            border: newRows[i]?.imgUrl ? '1px solid #C5A028' : '1px dashed #9ca3af',
+                            border: newRows[i]?.imgUrl ? '1px solid var(--ys-accent)' : '1px dashed #9ca3af',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             fontSize: newRows[i]?.imgUrl ? 0 : 14, color: '#6b7280', overflow: 'hidden',
                           }}

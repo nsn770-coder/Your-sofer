@@ -154,8 +154,8 @@ export default function AdminNewProductPage() {
     }
   }
 
-  const iS: React.CSSProperties = { width: '100%', border: '1px solid #243a62', borderRadius: 6, padding: '6px 9px', fontSize: 12, boxSizing: 'border-box', fontFamily: 'inherit', background: '#1a1a1a', color: '#ddd5c0', outline: 'none' };
-  const lS: React.CSSProperties = { fontSize: 9, fontWeight: 800, color: '#C5A028', display: 'block', marginBottom: 2, letterSpacing: '0.1em', textTransform: 'uppercase' as const };
+  const iS: React.CSSProperties = { width: '100%', border: '1px solid #243a62', borderRadius: 6, padding: '6px 9px', fontSize: 12, boxSizing: 'border-box', fontFamily: 'inherit', background: 'var(--ys-dark-surface)', color: '#ddd5c0', outline: 'none' };
+  const lS: React.CSSProperties = { fontSize: 9, fontWeight: 800, color: 'var(--ys-accent)', display: 'block', marginBottom: 2, letterSpacing: '0.1em', textTransform: 'uppercase' as const };
   const secS: React.CSSProperties = { borderBottom: '1px solid #243a62', paddingBottom: 14, marginBottom: 14 };
   const secTitleS: React.CSSProperties = { fontSize: 9, fontWeight: 900, color: 'rgba(184,151,42,0.65)', letterSpacing: '0.14em', textTransform: 'uppercase' as const, marginBottom: 8 };
 
@@ -171,11 +171,11 @@ export default function AdminNewProductPage() {
     <div style={{ minHeight: '100vh', background: '#111', direction: 'rtl', fontFamily: 'Heebo, Arial, sans-serif', paddingBottom: 60 }}>
 
       {/* Header */}
-      <div style={{ background: '#1a1a1a', borderBottom: '2px solid #C5A028', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
+      <div style={{ background: 'var(--ys-dark-surface)', borderBottom: '2px solid var(--ys-accent)', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 16 }}>➕</span>
           <span style={{ fontSize: 15, fontWeight: 900, color: '#e8e0d0' }}>הוספת מוצר חדש</span>
-          <span style={{ fontSize: 9, fontWeight: 800, color: '#C5A028', background: 'rgba(184,151,42,0.12)', border: '1px solid rgba(184,151,42,0.25)', padding: '1px 5px', borderRadius: 8 }}>ADMIN</span>
+          <span style={{ fontSize: 9, fontWeight: 800, color: 'var(--ys-accent)', background: 'rgba(184,151,42,0.12)', border: '1px solid rgba(184,151,42,0.25)', padding: '1px 5px', borderRadius: 8 }}>ADMIN</span>
         </div>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: 22, lineHeight: 1, padding: 4 }}>✕</button>
       </div>
@@ -194,7 +194,7 @@ export default function AdminNewProductPage() {
             <div><label style={lS}>priority</label><input type="number" value={priority} onChange={e => setPriority(e.target.value)} style={iS} /></div>
             <div>
               <label style={lS}>קטגוריה *</label>
-              <select value={cat} onChange={e => { setCat(e.target.value); setSubCategory(''); }} style={{ ...iS, background: '#1a1a1a' }}>
+              <select value={cat} onChange={e => { setCat(e.target.value); setSubCategory(''); }} style={{ ...iS, background: 'var(--ys-dark-surface)' }}>
                 <option value="">-- בחר קטגוריה --</option>
                 {cat && !CATS.includes(cat) && <option value={cat}>{cat} (legacy)</option>}
                 {CATS.filter(c => c !== 'הכל').map(c => <option key={c} value={c}>{c}</option>)}
@@ -203,7 +203,7 @@ export default function AdminNewProductPage() {
             {getSubCats(cat).length > 0 && (
               <div>
                 <label style={lS}>תת-קטגוריה <span style={{ fontWeight: 300, opacity: 0.7 }}>(אופציונלי)</span></label>
-                <select value={subCategory} onChange={e => setSubCategory(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
+                <select value={subCategory} onChange={e => setSubCategory(e.target.value)} style={{ ...iS, background: 'var(--ys-dark-surface)' }}>
                   <option value="">-- ללא תת-קטגוריה --</option>
                   {getSubCats(cat).map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -213,7 +213,7 @@ export default function AdminNewProductPage() {
               <div><label style={lS}>זמן אספקה</label><input value={days} onChange={e => setDays(e.target.value)} placeholder="7-10" style={iS} /></div>
               <div>
                 <label style={lS}>תווית</label>
-                <select value={badge} onChange={e => setBadge(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
+                <select value={badge} onChange={e => setBadge(e.target.value)} style={{ ...iS, background: 'var(--ys-dark-surface)' }}>
                   <option value="">ללא</option>
                   <option value="חדש">חדש</option>
                   <option value="מבצע">מבצע</option>
@@ -230,7 +230,7 @@ export default function AdminNewProductPage() {
         {showSize && (
           <div style={secS}>
             <div style={secTitleS}>§ גודל</div>
-            <select value={size} onChange={e => setSize(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
+            <select value={size} onChange={e => setSize(e.target.value)} style={{ ...iS, background: 'var(--ys-dark-surface)' }}>
               <option value="">— בחר גודל —</option>
               {['6','7','10','12','15','20','25','30'].map(s => <option key={s} value={s}>{s} ס"מ</option>)}
             </select>
@@ -252,7 +252,7 @@ export default function AdminNewProductPage() {
           {imgFields.map(({ field, cur, setter }, idx) => (
             <div key={field} style={{ display: 'flex', gap: 5, alignItems: 'center', marginBottom: 5 }}>
               {cur && <img src={cur} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 3, border: '1px solid #243a62', flexShrink: 0 }} />}
-              <label style={{ border: '1px solid #C5A028', color: '#C5A028', borderRadius: 4, padding: '3px 6px', fontSize: 10, fontWeight: 800, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <label style={{ border: '1px solid var(--ys-accent)', color: 'var(--ys-accent)', borderRadius: 4, padding: '3px 6px', fontSize: 10, fontWeight: 800, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
                 {uploadingImg === field ? '…' : '📷'}{idx + 1}
                 <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleUpload(e, field)} />
               </label>
@@ -276,7 +276,7 @@ export default function AdminNewProductPage() {
             <div style={{ display: 'grid', gap: 7 }}>
               <div>
                 <label style={lS}>רמת כשרות</label>
-                <select value={level} onChange={e => setLevel(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
+                <select value={level} onChange={e => setLevel(e.target.value)} style={{ ...iS, background: 'var(--ys-dark-surface)' }}>
                   <option value="">לא מוגדר</option>
                   <option value="כשר לכתחילה">כשר לכתחילה</option>
                   <option value="מהודר">מהודר</option>
@@ -285,7 +285,7 @@ export default function AdminNewProductPage() {
               </div>
               <div>
                 <label style={lS}>נוסח</label>
-                <select value={nusach} onChange={e => setNusach(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
+                <select value={nusach} onChange={e => setNusach(e.target.value)} style={{ ...iS, background: 'var(--ys-dark-surface)' }}>
                   <option value="">לא מוגדר</option>
                   <option value="אשכנזי">אשכנזי</option>
                   <option value="ספרדי">ספרדי</option>
@@ -296,7 +296,7 @@ export default function AdminNewProductPage() {
                 <label style={lS}>תמונת מקרוב</label>
                 <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
                   {closeupImageUrl && <img src={closeupImageUrl} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 3, border: '1px solid #243a62', flexShrink: 0 }} />}
-                  <label style={{ border: '1px solid #C5A028', color: '#C5A028', borderRadius: 4, padding: '3px 6px', fontSize: 10, fontWeight: 800, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <label style={{ border: '1px solid var(--ys-accent)', color: 'var(--ys-accent)', borderRadius: 4, padding: '3px 6px', fontSize: 10, fontWeight: 800, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
                     {uploadingImg === 'closeup' ? '…' : '📷'} העלה
                     <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleUpload(e, 'closeup')} />
                   </label>
@@ -321,27 +321,27 @@ export default function AdminNewProductPage() {
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
               <input type="checkbox" checked={hasKlafSelection} onChange={e => setHasKlafSelection(e.target.checked)} />
               אפשר בחירת קלף אישית
-              <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>hasKlafSelection</span>
+              <span style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>hasKlafSelection</span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
               <input type="checkbox" checked={isExpertRecommended} onChange={e => setIsExpertRecommended(e.target.checked)} />
               ⭐ מומלץ על ידי המומחים שלנו
-              <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>isExpertRecommended</span>
+              <span style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>isExpertRecommended</span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
               <input type="checkbox" checked={isEventKippot} onChange={e => setIsEventKippot(e.target.checked)} />
               🎩 מחשבון כיפות אירועים
-              <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>isEventKippot</span>
+              <span style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>isEventKippot</span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
               <input type="checkbox" checked={isEventProduct} onChange={e => setIsEventProduct(e.target.checked)} />
               🎪 מוצר לאירועים
-              <span style={{ fontSize: 9, color: '#C5A028', fontWeight: 700 }}>isEventProduct</span>
+              <span style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>isEventProduct</span>
             </label>
             {showSofer && (
               <div>
                 <label style={lS}>סופר</label>
-                <select value={soferId} onChange={e => setSoferId(e.target.value)} style={{ ...iS, background: '#1a1a1a' }}>
+                <select value={soferId} onChange={e => setSoferId(e.target.value)} style={{ ...iS, background: 'var(--ys-dark-surface)' }}>
                   <option value="">ללא סופר</option>
                   {soferOptions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
@@ -368,7 +368,7 @@ export default function AdminNewProductPage() {
                   <button type="button" onClick={() => setWhoIsItForList(whoIsItForList.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 12, padding: 2, flexShrink: 0, lineHeight: 1 }}>✕</button>
                 </div>
               ))}
-              <button type="button" onClick={() => setWhoIsItForList([...whoIsItForList, { emoji: '', text: '' }])} style={{ fontSize: 10, color: '#C5A028', background: 'none', border: '1px solid rgba(184,151,42,0.35)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}>+ הוסף</button>
+              <button type="button" onClick={() => setWhoIsItForList([...whoIsItForList, { emoji: '', text: '' }])} style={{ fontSize: 10, color: 'var(--ys-accent)', background: 'none', border: '1px solid rgba(184,151,42,0.35)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}>+ הוסף</button>
             </div>
             <div>
               <label style={lS}>למה Your Sofer</label>
@@ -378,7 +378,7 @@ export default function AdminNewProductPage() {
                   <button type="button" onClick={() => setWhyUsList(whyUsList.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 12, padding: 2, flexShrink: 0, lineHeight: 1 }}>✕</button>
                 </div>
               ))}
-              <button type="button" onClick={() => setWhyUsList([...whyUsList, ''])} style={{ fontSize: 10, color: '#C5A028', background: 'none', border: '1px solid rgba(184,151,42,0.35)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}>+ הוסף</button>
+              <button type="button" onClick={() => setWhyUsList([...whyUsList, ''])} style={{ fontSize: 10, color: 'var(--ys-accent)', background: 'none', border: '1px solid rgba(184,151,42,0.35)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}>+ הוסף</button>
             </div>
             <div>
               <label style={lS}>מה מקבלים</label>
@@ -388,7 +388,7 @@ export default function AdminNewProductPage() {
                   <button type="button" onClick={() => setWhatYouGetList(whatYouGetList.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: 12, padding: 2, flexShrink: 0, lineHeight: 1 }}>✕</button>
                 </div>
               ))}
-              <button type="button" onClick={() => setWhatYouGetList([...whatYouGetList, ''])} style={{ fontSize: 10, color: '#C5A028', background: 'none', border: '1px solid rgba(184,151,42,0.35)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}>+ הוסף</button>
+              <button type="button" onClick={() => setWhatYouGetList([...whatYouGetList, ''])} style={{ fontSize: 10, color: 'var(--ys-accent)', background: 'none', border: '1px solid rgba(184,151,42,0.35)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', marginTop: 2 }}>+ הוסף</button>
             </div>
           </div>
         </div>
@@ -397,7 +397,7 @@ export default function AdminNewProductPage() {
         <button
           onClick={handleCreate}
           disabled={saving}
-          style={{ width: '100%', padding: '13px', background: saving ? '#5a4a18' : '#C5A028', color: '#1a1a1a', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 900, cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+          style={{ width: '100%', padding: '13px', background: saving ? '#5a4a18' : 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 900, cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
         >
           {saving ? 'שומר...' : '✅ צור מוצר'}
         </button>

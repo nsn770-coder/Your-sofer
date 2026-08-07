@@ -65,7 +65,7 @@ const guidanceStyle: React.CSSProperties = {
 };
 
 const tipStyle: React.CSSProperties = {
-  fontSize: 12, color: '#C5A028', marginTop: 5, lineHeight: 1.5,
+  fontSize: 12, color: 'var(--ys-accent)', marginTop: 5, lineHeight: 1.5,
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -379,19 +379,19 @@ export default function SoferApplyPage() {
                 { value: 'salary',       label: '📄 אני מעדיף תלוש שכר' },
               ].map(opt => (
                 <label key={opt.value} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
-                  <input type="radio" name="taxStatus" value={opt.value} checked={taxStatus === opt.value} onChange={() => setTaxStatus(opt.value)} style={{ marginTop: 3, flexShrink: 0, accentColor: '#C5A028' }} />
-                  <span style={{ fontSize: 14, color: '#1a1a1a', fontWeight: taxStatus === opt.value ? 700 : 400 }}>{opt.label}</span>
+                  <input type="radio" name="taxStatus" value={opt.value} checked={taxStatus === opt.value} onChange={() => setTaxStatus(opt.value)} style={{ marginTop: 3, flexShrink: 0, accentColor: 'var(--ys-accent)' }} />
+                  <span style={{ fontSize: 14, color: 'var(--ys-text)', fontWeight: taxStatus === opt.value ? 700 : 400 }}>{opt.label}</span>
                 </label>
               ))}
             </div>
 
             {taxStatus === 'no_osek' && (
-              <div style={{ background: 'rgba(197,160,40,0.1)', border: '1.5px solid #C5A028', borderRadius: 10, padding: '14px 16px' }}>
+              <div style={{ background: 'rgba(197,160,40,0.1)', border: '1.5px solid var(--ys-accent)', borderRadius: 10, padding: '14px 16px' }}>
                 <div style={{ fontSize: 13, color: '#888', textDecoration: 'line-through', marginBottom: 4 }}>עלות רגילה: ₪499</div>
-                <div style={{ fontSize: 15, fontWeight: 900, color: '#1a1a1a', marginBottom: 6 }}>🎉 לרגל ההשקה — הצטרפות חינם!</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--ys-text)', marginBottom: 6 }}>🎉 לרגל ההשקה — הצטרפות חינם!</div>
                 <div style={{ fontSize: 13, color: '#555', marginBottom: 12 }}>פתיחת עוסק פטור דרכנו עם 10% הנחה על השירות</div>
                 <a href="https://mycount.co.il/הסופר-שלך/" target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'inline-block', background: '#C5A028', color: '#1a1a1a', fontWeight: 900, fontSize: 14, padding: '10px 20px', borderRadius: 8, textDecoration: 'none' }}>
+                  style={{ display: 'inline-block', background: 'var(--ys-accent)', color: 'var(--ys-text)', fontWeight: 900, fontSize: 14, padding: '10px 20px', borderRadius: 8, textDecoration: 'none' }}>
                   פתחו לי עוסק פטור ←
                 </a>
               </div>
@@ -419,7 +419,7 @@ export default function SoferApplyPage() {
                   <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#5a4a18', flexWrap: 'wrap' }}>
                     <span>+ עמלה (15%): {formatPrice(calcData.commission)}</span>
                     <span>+ מע"מ (18%): {formatPrice(calcData.vat)}</span>
-                    <span style={{ fontWeight: 900, fontSize: 13, color: '#1a1a1a' }}>= {formatPrice(calcData.total)} ללקוח</span>
+                    <span style={{ fontWeight: 900, fontSize: 13, color: 'var(--ys-text)' }}>= {formatPrice(calcData.total)} ללקוח</span>
                   </div>
                 )}
               </div>
@@ -529,7 +529,7 @@ export default function SoferApplyPage() {
                           <div style={{ display: 'flex', justifyContent: 'space-between', color: '#666', marginBottom: 8 }}>
                             <span>+ מע"מ (18%)</span><span>{formatPrice(prices.vat)}</span>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, color: '#1a1a1a', fontSize: 14, borderTop: '1px solid #e0d9c8', paddingTop: 8 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, color: 'var(--ys-text)', fontSize: 14, borderTop: '1px solid #e0d9c8', paddingTop: 8 }}>
                             <span>מחיר ללקוח</span><span>{formatPrice(prices.total)}</span>
                           </div>
                           {LARGE_CATS.has(product.type) && (
@@ -579,7 +579,7 @@ export default function SoferApplyPage() {
 
             {products.length < 4 && (
               <button type="button" onClick={addProduct}
-                style={{ width: '100%', border: '2px dashed #C5A028', borderRadius: 10, padding: '12px', fontSize: 14, fontWeight: 700, color: '#C5A028', background: '#fffbf0', cursor: 'pointer' }}>
+                style={{ width: '100%', border: '2px dashed var(--ys-accent)', borderRadius: 10, padding: '12px', fontSize: 14, fontWeight: 700, color: 'var(--ys-accent)', background: '#fffbf0', cursor: 'pointer' }}>
                 ➕ הוסף מוצר ({products.length}/4)
               </button>
             )}
@@ -588,8 +588,8 @@ export default function SoferApplyPage() {
           {/* ── Submit ── */}
           <button type="submit" disabled={loading}
             style={{
-              width: '100%', background: loading ? '#888' : '#C5A028',
-              color: '#1a1a1a', border: 'none', borderRadius: 10,
+              width: '100%', background: loading ? '#888' : 'var(--ys-accent)',
+              color: 'var(--ys-text)', border: 'none', borderRadius: 10,
               padding: '16px 0', fontSize: 17, fontWeight: 900,
               cursor: loading ? 'not-allowed' : 'pointer',
               marginBottom: 32,

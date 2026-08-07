@@ -50,7 +50,7 @@ export default function KulmusPage() {
 
           <QuoteBlock text='חז"ל לא הגבילו את חומר הקולמוס – הלכתית כשר אפילו קולמוס זהב. רק ברזל מוחרג.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             סוגי הקולמוסים
           </h2>
 
@@ -82,21 +82,21 @@ export default function KulmusPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             ברזל – החומר האסור
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             המסורת מרחיקה שימוש בברזל או פלדה למגע ישיר עם הקלף, בדומה למזבח שאינו נבנה עם כלי ברזל ("כי חרבך הנפת עליה ותחללה"). כל שאר החומרים – כולל פלסטיק וקרמיקה – כשרים לחלוטין.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='איך הקולמוס שומר דיו בתוכו?' a='הסופר מחדיר לחריץ הקולמוס סיבים של קפיץ קטן שעוזר לדיו "לשבת" שם מבלי לטפטף. כך יכול לכתוב מספר מילים בכל טבילה בדיו.' />
           <FAQItem q='האם שימוש בקולמוס קרמי פוגע באותנטיות?' a='לא מבחינה הלכתית. הקולמוס הקרמי מאפשר לסופר לשמור על ריכוז רוחני ברצף מבלי לעצור לחדד, ומה שנקבע בקלף הוא הכתב – לא הכלי.' />
           <FAQItem q='האם ניתן לבקש קלף שנכתב דווקא בנוצה?' a='כן. חלק מהסופרים מציינים את הכלי שלהם מתוך שקיפות. אם חשוב לכם מסורת מוחלטת של נוצת תרנגול, ניתן לבקש סופר ספציפי.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🖋️' title='דיו סת"ם' desc='ממה עשוי הדיו הכשר' href='/madrich/dio-stam' />
             <RelatedCard emoji='✍️' title='תהליך הכתיבה' desc='מאחורי הקלעים אצל הסופר' href='/madrich/tehlich-ktiva' />

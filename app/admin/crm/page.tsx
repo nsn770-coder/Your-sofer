@@ -13,8 +13,8 @@ import {
   type CrmStatus, type CrmSource, type CrmNote, type AiTemp,
 } from '@/lib/crm';
 
-const navy = '#1E3A8A';
-const gold = '#C5A028';
+const navy = 'var(--ys-heading)';
+const gold = 'var(--ys-accent)';
 
 const quickBtnStyle: React.CSSProperties = {
   background: '#eef2f7', color: navy, border: 'none', borderRadius: 6,

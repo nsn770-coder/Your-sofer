@@ -50,7 +50,7 @@ export default function NosachimPage() {
 
           <QuoteBlock text='הנוסח שבו נכתבו התפילין שלך קשור למסורת המשפחה שלך – לא רק לאסתטיקה.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             כתב אשכנזי (בית יוסף)
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -60,7 +60,7 @@ export default function NosachimPage() {
             מאפיינים: האות בי"ת שטוחה יותר בתחתיתה, האות שי"ן עם שלושה ראשים ישרים, וקווים אנכיים בולטים ומרובעים. כתב זה דורש דיוק זוויתי גבוה מאוד בראשי האותיות, ולכן סופרים מיומנים במיוחד נחשבים כמומחים לכתב בית יוסף.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             כתב ספרדי (וולאש)
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -70,7 +70,7 @@ export default function NosachimPage() {
             מאפיינים: האות בי"ת עגולה יותר, הקווים האנכיים נוטים לכיפוף קל, וגמישות רבה יותר בצורות האותיות.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             כתב האר"י (חב"ד)
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -80,14 +80,14 @@ export default function NosachimPage() {
             מאפיינים: שינוי בצורת הדל"ת, הרי"ש, הצד"י, האל"ף וכמה אותיות נוספות בהשוואה לכתב האשכנזי הרגיל. רוב חסידי חב"ד מקפידים על כתב זה דווקא.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             הרקע ההיסטורי וההלכתי
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             ההבדלים בין נוסחי הכתב נקבעו לאורך מאות שנים על ידי גדולי הפוסקים. כתב בית יוסף נקרא על שם רבי יוסף קארו (מחבר השולחן ערוך), אך התקבל דווקא אצל האשכנזים בהתאם לפסיקות הרמ"א. כתב האר"י מבוסס על תורת הקבלה ומשלב כוונות רוחניות בכל אות. כל הנוסחים כשרים לחלוטין מבחינה הלכתית – ההבדל הוא מסורתי, לא עניין של כשרות.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             איזה נוסח לבחור?
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -101,9 +101,9 @@ export default function NosachimPage() {
             { title: 'תימנים', desc: 'כתב תימני – מסורת ייחודית עם שינויים משמעותיים – יש לשאול דעת רב' },
           ].map(item => (
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
+              <span style={{ color: 'var(--ys-accent)', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-text)', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
@@ -111,7 +111,7 @@ export default function NosachimPage() {
 
           <QuoteBlock text='לא בטוחים? שאלו רב מוסמך – הנוסח עשוי להשפיע על קיום המצווה לכמה שיטות.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם מותר לשנות נוסח מאב לבן?' a='לדעות רבות, עדיף שלא לשנות ממסורת האבות ללא סיבה מיוחדת. עם זאת, אדם שעבר לזרם שונה (למשל, הפך לחסיד) יכול לנהוג כמסורת הזרם שאליו הצטרף. כדאי להתייעץ עם רב.' />
@@ -120,7 +120,7 @@ export default function NosachimPage() {
           <FAQItem q='האם אפשר לרכוש מזוזה בכתב שונה מהתפילין שלי?' a='כן. בדרך כלל, גם מי שמניח תפילין בכתב אשכנזי יכול לקנות מזוזה בכל כתב כשר. אמנם יש מחמירים – כדאי לשאול רב.' />
           <FAQItem q='מה ההבדל המעשי בין הנוסחים?' a='ההבדל הוא בצורת כמה אותיות בלבד – לא בתוכן ולא במשמעות ההלכתית. כל הנוסחים כשרים לכל שיטה, אם נכתבו כהלכה.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='⭐' title='מה זה מזוזה מהודרת' desc='ההבדל בין כשר למהודר' href='/madrich/mehudar' />
             <RelatedCard emoji='✍️' title='מי הסופרים' desc='קריטריונים לבחירת סופר' href='/madrich/soferim' />

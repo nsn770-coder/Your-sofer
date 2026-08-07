@@ -54,7 +54,7 @@ export default function VerifyPage() {
     }}>
       {/* Brand */}
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <div style={{ fontSize: 28, color: '#C5A028', marginBottom: 4 }}>✡</div>
+        <div style={{ fontSize: 28, color: 'var(--ys-accent)', marginBottom: 4 }}>✡</div>
         <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.2em', color: '#fff', textTransform: 'uppercase' }}>
           Your Sofer
         </div>
@@ -145,13 +145,13 @@ export default function VerifyPage() {
               }}>
                 <div>
                   <div style={{ fontSize: 10, color: '#888', marginBottom: 2 }}>מספר תעודה</div>
-                  <div style={{ fontSize: 15, fontWeight: 900, fontFamily: 'monospace', color: '#1a1a1a', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: 15, fontWeight: 900, fontFamily: 'monospace', color: 'var(--ys-text)', letterSpacing: '0.04em' }}>
                     {cert.certId}
                   </div>
                 </div>
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ fontSize: 10, color: '#888', marginBottom: 2 }}>תאריך הנפקה</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a' }}>{formatDate(cert.issuedAt)}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ys-text)' }}>{formatDate(cert.issuedAt)}</div>
                 </div>
               </div>
 
@@ -160,7 +160,7 @@ export default function VerifyPage() {
                 <div style={{ fontSize: 10, color: '#888', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                   שם הלקוח
                 </div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: '#1a1a1a' }}>{cert.customerName}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--ys-text)' }}>{cert.customerName}</div>
               </div>
 
               {/* Items */}
@@ -198,7 +198,7 @@ export default function VerifyPage() {
                       {/* Item details */}
                       <div style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 700, color: '#1a1a1a', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <div style={{ fontWeight: 700, color: 'var(--ys-text)', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {item.productName}
                           </div>
                           <div style={{ fontSize: 11, color: '#666', marginTop: 3 }}>
@@ -221,7 +221,7 @@ export default function VerifyPage() {
                           )}
                         </div>
                         <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                          <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#1a1a1a', fontWeight: 700 }}>
+                          <div style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--ys-text)', fontWeight: 700 }}>
                             {item.serialNumber}
                           </div>
                           <div style={{ fontSize: 10, color: '#15803d', fontWeight: 600, marginTop: 2 }}>
@@ -245,11 +245,11 @@ export default function VerifyPage() {
                   width: 28, height: 28, borderRadius: '50%',
                   background: 'rgba(197,160,40,0.18)', border: '1.5px solid rgba(197,160,40,0.6)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 13, color: '#C5A028', fontWeight: 900, flexShrink: 0,
+                  fontSize: 13, color: 'var(--ys-accent)', fontWeight: 900, flexShrink: 0,
                 }}>✓</span>
                 <div>
                   <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>נבדק ואושר על ידי</div>
-                  <div style={{ fontSize: 14, color: '#C5A028', fontWeight: 800 }}>{cert.magiaName}</div>
+                  <div style={{ fontSize: 14, color: 'var(--ys-accent)', fontWeight: 800 }}>{cert.magiaName}</div>
                 </div>
               </div>
 
@@ -258,7 +258,7 @@ export default function VerifyPage() {
                 href={`/certificate/${cert.certId}`}
                 style={{
                   display: 'block', textAlign: 'center',
-                  background: '#1a1a1a', color: '#C5A028',
+                  background: 'var(--ys-dark-surface)', color: 'var(--ys-accent)',
                   borderRadius: 10, padding: '12px', fontWeight: 700, fontSize: 14,
                   textDecoration: 'none',
                 }}

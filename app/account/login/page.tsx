@@ -31,7 +31,7 @@ function LoginContent() {
   if (loading) {
     return (
       <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8F6F1' }}>
-        <div style={{ width: 32, height: 32, border: '3px solid #E7E2D8', borderTopColor: '#C5A028', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <div style={{ width: 32, height: 32, border: '3px solid #E7E2D8', borderTopColor: 'var(--ys-accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>
     );
@@ -43,8 +43,8 @@ function LoginContent() {
 
         {/* לוגו / כותרת */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ fontSize: 13, letterSpacing: 2, color: '#C5A028', fontWeight: 700, marginBottom: 8 }}>YOUR SOFER</div>
-          <h1 style={{ fontSize: 28, fontWeight: 300, color: '#1a1a1a', margin: 0, letterSpacing: '-0.02em' }}>כניסה לחשבון</h1>
+          <div style={{ fontSize: 13, letterSpacing: 2, color: 'var(--ys-accent)', fontWeight: 700, marginBottom: 8 }}>YOUR SOFER</div>
+          <h1 style={{ fontSize: 28, fontWeight: 300, color: 'var(--ys-text)', margin: 0, letterSpacing: '-0.02em' }}>כניסה לחשבון</h1>
           <p style={{ fontSize: 14, color: '#9CA3AF', marginTop: 8, fontWeight: 300 }}>עקוב אחרי הזמנות, נהל כתובות, וצבור נקודות</p>
         </div>
 

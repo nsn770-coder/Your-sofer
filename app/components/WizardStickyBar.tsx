@@ -36,9 +36,9 @@ export default function WizardStickyBar() {
     <div
       dir="rtl"
       style={{
-        background: '#1a1a1a',
+        background: 'var(--ys-dark-surface)',
         borderRadius: 12,
-        border: '2px solid #C5A028',
+        border: '2px solid var(--ys-accent)',
         padding: '12px 16px',
         display: 'flex',
         alignItems: 'center',
@@ -54,7 +54,7 @@ export default function WizardStickyBar() {
             <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="3" />
             <circle
               cx="22" cy="22" r="18" fill="none"
-              stroke="#C5A028" strokeWidth="3"
+              stroke="var(--ys-accent)" strokeWidth="3"
               strokeDasharray={circumference}
               strokeDashoffset={circumference * (1 - pct / 100)}
               strokeLinecap="round"
@@ -64,7 +64,7 @@ export default function WizardStickyBar() {
           <span style={{
             position: 'absolute', inset: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 11, fontWeight: 700, color: '#C5A028',
+            fontSize: 11, fontWeight: 700, color: 'var(--ys-accent)',
           }}>
             {step}/{BAR_MITZVA_TOTAL}
           </span>
@@ -84,8 +84,8 @@ export default function WizardStickyBar() {
         onClick={() => router.push('/?wizard=bar-mitzva#bar-mitzva-wizard')}
         style={{
           flexShrink: 0,
-          background: '#C5A028',
-          color: '#1a1a1a',
+          background: 'var(--ys-accent)',
+          color: 'var(--ys-text)',
           border: 'none',
           borderRadius: 8,
           padding: '10px 18px',

@@ -50,7 +50,7 @@ export default function TehlichKtivaPage() {
 
           <QuoteBlock text='כשרוכשים סת"ם, אתם מקבלים לא רק מוצר כשר – אלא חתיכת היסטוריה בעבודת יד.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שלבי הכתיבה
           </h2>
 
@@ -63,7 +63,7 @@ export default function TehlichKtivaPage() {
             <Step key={item.num} num={item.num} title={item.title} desc={item.desc} />
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='כמה זמן לוקח לכתוב מזוזה אחת?' a='מזוזה ברמת כשרות בסיסית – כשעתיים. מזוזה ברמת הידור עם תיוג מלא וקלף איכותי – בין 3 ל-5 שעות עבודה רצופות.' />
@@ -71,7 +71,7 @@ export default function TehlichKtivaPage() {
           <FAQItem q='מדוע הסופר אינו כותב מתוך זיכרון?' a='ההלכה אוסרת על הסופר לכתוב מהזיכרון. כל מילה חייבת להיות מועתקת מ"תיקון סופרים" כדי למנוע החסרת אותיות.' />
           <FAQItem q='מה קורה אם הסופר שוכח לומר כוונה לפני שם השם?' a='אם לא כיוון לפני כתיבת שם ה&#39; - המזוזה פסולה לחלוטין ואין דרך לתקן בדיעבד. זו אחת הסיבות לבחירת סופר ירא שמיים בלבד.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='✍️' title='סופר ירא שמיים' desc='למה הממד הרוחני קריטי' href='/madrich/yirat-shamayim' />
             <RelatedCard emoji='🪶' title='הקולמוס' desc='נוצה מול קולמוס מודרני' href='/madrich/kulmus' />

@@ -21,7 +21,7 @@ function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundleProm
   if (isBestSeller) {
     return {
       label: 'הכי נמכר',
-      className: 'bg-[#111111] text-[#C5A028] border-[#111111]',
+      className: 'bg-[#111111] text-[var(--ys-accent)] border-[#111111]',
     };
   }
   if (typeof priority === 'number' && priority >= 80) {
@@ -33,7 +33,7 @@ function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundleProm
   if (badge === 'מהודר') {
     return {
       label: 'מהודר',
-      className: 'bg-[#111111] text-[#C5A028] border-[#111111]',
+      className: 'bg-[#111111] text-[var(--ys-accent)] border-[#111111]',
     };
   }
   if (badge === 'מתנה') {
@@ -73,7 +73,7 @@ export default function ProductBadge({ isBestSeller, priority, badge, bundleProm
       {bundleLabel && (
         <span
           className="inline-flex items-center whitespace-nowrap"
-          style={{ background: '#1a1a1a', color: '#C5A028', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 0, letterSpacing: '0.01em' }}
+          style={{ background: 'var(--ys-dark-surface)', color: 'var(--ys-accent)', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 0, letterSpacing: '0.01em' }}
         >
           ✦ {bundleLabel}
         </span>

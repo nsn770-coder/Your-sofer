@@ -58,7 +58,7 @@ export default function ReviewsClient() {
 
   return (
     <div dir="rtl" style={{ backgroundColor: '#F5F2EC', minHeight: '100vh', fontFamily: "'Heebo', Arial, sans-serif" }}>
-      <section style={{ background: '#1a1a1a', padding: '52px 20px 44px', textAlign: 'center' }}>
+      <section style={{ background: 'var(--ys-dark-surface)', padding: '52px 20px 44px', textAlign: 'center' }}>
         <h1 style={{ color: '#fff', fontSize: 32, fontWeight: 900, margin: '0 0 10px' }}>מה הלקוחות אומרים</h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, margin: '0 0 32px' }}>
           אלפי לקוחות מרוצים ברחבי הארץ שקונים סת״מ בראש שקט
@@ -66,7 +66,7 @@ export default function ReviewsClient() {
         <div style={{ display: 'flex', justifyContent: 'center', gap: 40, flexWrap: 'wrap' }}>
           {stats.map(s => (
             <div key={s.label} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 26, fontWeight: 900, color: '#C5A028' }}>{s.value}</div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: 'var(--ys-accent)' }}>{s.value}</div>
               <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>{s.label}</div>
             </div>
           ))}
@@ -110,7 +110,7 @@ export default function ReviewsClient() {
                   </p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f0f0f0', paddingTop: 10 }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#1a1a1a' }}>{formatReviewerName(r.reviewerName)}</div>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ys-text)' }}>{formatReviewerName(r.reviewerName)}</div>
                       {r.productName && <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{r.productName}</div>}
                     </div>
                     {r.createdAt && (

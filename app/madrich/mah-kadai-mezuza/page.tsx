@@ -2,7 +2,7 @@
 import { ArticleLayout, PageHero, QuoteBlock, CTAStrip, RelatedCard, Step } from '../InfoComponents';
 
 const BASE_URL = 'https://your-sofer.com';
-const C = { navy: '#1a1a1a', gold: '#C5A028', border: '#e0e0e0', white: '#fff' };
+const C = { navy: '#1a1a1a', gold: 'var(--ys-accent)', border: '#e0e0e0', white: '#fff' };
 
 export const metadata: Metadata = {
   title: 'מה כדאי לדעת לפני שקונים מזוזה? | המדריך המלא | YourSofer',

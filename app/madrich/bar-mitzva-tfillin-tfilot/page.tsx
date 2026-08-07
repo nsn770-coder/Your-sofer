@@ -50,7 +50,7 @@ export default function BarMitzvaChulPage() {
 
           <QuoteBlock text='מתנת תפילין מהודרת מישראל – עם שם הנער רקום על הנרתיק – היא מתנת בר מצווה שתישמר לכל החיים.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             מה כוללת חבילת בר מצווה שלמה
           </h2>
 
@@ -58,7 +58,7 @@ export default function BarMitzvaChulPage() {
             {[
               {
                 title: 'מתנה לנכד או אחיין',
-                color: '#1a1a1a',
+                color: 'var(--ys-text)',
                 bg: '#f0f4ff',
                 items: ['תפילין מהודרות (בהמה גסה)', 'טלית צמר רחלים', 'נרתיק עם שם רקום אישית', 'אריזת מתנה חגיגית', 'תעודת כשרות ומספר סידורי'],
               },
@@ -80,7 +80,7 @@ export default function BarMitzvaChulPage() {
             ))}
           </div>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             הערך ההלכתי של תרומת תפילין
           </h2>
 
@@ -89,22 +89,22 @@ export default function BarMitzvaChulPage() {
             { title: 'מצווה מן המובחר בתרומה', desc: 'ההלכה קובעת ש"מצווה מן המובחר" מקבלת משנה תוקף כשהיא מוענקת בחסד לאחר. פלטפורמות סת"ם מובילות מוודאות שתפילין של תרומה יהיו ברמת כשרות לכתחילה מוקפדת, לא איכות מוזלת.' },
           ].map(item => (
             <div key={item.title} style={{ display: 'flex', gap: 16, marginBottom: 20, padding: '16px', background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0' }}>
-              <span style={{ color: '#C5A028', fontSize: 20, flexShrink: 0 }}>✦</span>
+              <span style={{ color: 'var(--ys-accent)', fontSize: 20, flexShrink: 0 }}>✦</span>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', marginBottom: 4 }}>{item.title}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--ys-text)', marginBottom: 4 }}>{item.title}</div>
                 <div style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם ניתן לחסות סט לנער נזקק שאינו מוכר לי?' a='כן. פלטפורמות סת"ם מתמחות משתפות פעולה עם ארגונים סוציאליים מוסמכים בישראל. ניתן לרכוש סט כתרומה ולקבל תעודת תרומה דיגיטלית מכובדת.' />
           <FAQItem q='האם ניתן לשלם באשראי אמריקאי ולהשתמש באתר באנגלית?' a='כן. פלטפורמות מובילות מציעות ממשק מלא באנגלית ותשלום בינלאומי מאובטח (SSL/PayPal) ללקוחות מחו"ל.' />
           <FAQItem q='כמה זמן לוקח המשלוח מישראל לארה"ב?' a='שליחות בינלאומיות מישראל לארה"ב לוקחות בדרך כלל 5-10 ימי עסקים. ניתן לבחור שליחות מהירה (EMS) לאירוע ספציפי.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🎓' title='חבילות בר מצווה' desc='כל מה שצריך בסט אחד' href='/madrich/chavilot-bar-mitzva' />
             <RelatedCard emoji='🌍' title='הזמנה לחו"ל' desc='משלוח בינלאומי של סת"ם' href='/madrich/mishloach-lachul' />

@@ -295,7 +295,7 @@ export default function MomentClient({
               {hasActiveFilter && (
                 <button
                   onClick={() => { setCatFilter('הכל'); setAttrFilters({}); }}
-                  style={{ background: 'none', border: 'none', color: '#C5A028', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+                  style={{ background: 'none', border: 'none', color: 'var(--ys-accent)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
                 >
                   נקה סינון ✕
                 </button>
@@ -361,7 +361,7 @@ export default function MomentClient({
                 href={link.href}
                 style={{
                   display: 'inline-block',
-                  color: '#1a1a1a',
+                  color: 'var(--ys-text)',
                   border: '1.5px solid #1a1a1a',
                   padding: '12px 28px',
                   fontWeight: 700,
@@ -399,7 +399,7 @@ export default function MomentClient({
                     fontFamily: 'inherit',
                     transition: 'border-color 0.15s, color 0.15s',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#C5A028'; e.currentTarget.style.color = '#C5A028'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--ys-accent)'; e.currentTarget.style.color = 'var(--ys-accent)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = '#D5CEC0'; e.currentTarget.style.color = '#6B5E4A'; }}
                 >
                   כל {cat} ←

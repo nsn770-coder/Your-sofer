@@ -61,7 +61,7 @@ export default function SharedCartPage() {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16 }} dir="rtl">
       <div style={{ fontSize: 48 }}>⚠️</div>
       <div style={{ fontSize: 18, fontWeight: 700, color: '#333' }}>{error}</div>
-      <button onClick={() => router.push('/')} style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
+      <button onClick={() => router.push('/')} style={{ background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
     </div>
   );
 
@@ -69,7 +69,7 @@ export default function SharedCartPage() {
     <div style={{ maxWidth: 600, margin: '0 auto', padding: '32px 16px', fontFamily: 'inherit' }} dir="rtl">
       <div style={{ marginBottom: 24, textAlign: 'center' }}>
         <div style={{ fontSize: 32, marginBottom: 8 }}>🛒</div>
-        <h1 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: 0 }}>עגלת קניות משותפת</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: 0 }}>עגלת קניות משותפת</h1>
         <p style={{ fontSize: 13, color: '#888', marginTop: 6 }}>{items.length} מוצרים · {formatPrice(total)}</p>
       </div>
 
@@ -87,7 +87,7 @@ export default function SharedCartPage() {
                 {item.selectedKlafName && <div style={{ fontSize: 11, color: '#666' }}>קלף: {item.selectedKlafName}</div>}
               </div>
               <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                <div style={{ fontWeight: 900, color: '#1a1a1a', fontSize: 14 }}>{formatPrice(item.price)}</div>
+                <div style={{ fontWeight: 900, color: 'var(--ys-text)', fontSize: 14 }}>{formatPrice(item.price)}</div>
                 <div style={{ fontSize: 11, color: '#aaa' }}>כמות: {item.quantity}</div>
               </div>
             </div>
@@ -99,7 +99,7 @@ export default function SharedCartPage() {
         {added ? '✓ נוסף לעגלה — מעביר...' : `הוסף לעגלה שלי (${formatPrice(total)})`}
       </button>
 
-      <button onClick={() => router.push('/')} style={{ width: '100%', marginTop: 10, background: '#fff', color: '#1a1a1a', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 44, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+      <button onClick={() => router.push('/')} style={{ width: '100%', marginTop: 10, background: '#fff', color: 'var(--ys-text)', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 44, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
         המשך לקנות
       </button>
     </div>

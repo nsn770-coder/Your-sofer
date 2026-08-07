@@ -89,7 +89,7 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
 
   const fieldStyle: React.CSSProperties = {
     width: '100%', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '11px 14px',
-    fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa', color: '#1a1a1a',
+    fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa', color: 'var(--ys-text)',
   };
   const labelStyle: React.CSSProperties = { display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 };
 
@@ -132,14 +132,14 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
             overflow: 'auto',
             boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
           }}>
-            <div style={{ position: 'sticky', top: 0, background: '#1a1a1a', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10000 }}>
+            <div style={{ position: 'sticky', top: 0, background: 'var(--ys-dark-surface)', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10000 }}>
               <span style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>תקנון התשלום</span>
               <button
                 onClick={() => setTermsModalOpen(false)}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#C5A028',
+                  color: 'var(--ys-accent)',
                   fontSize: 28,
                   cursor: 'pointer',
                   padding: 0,
@@ -329,7 +329,7 @@ function TermsContent() {
 function TermsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 24 }}>
-      <h2 style={{ fontSize: 16, fontWeight: 800, color: '#1a1a1a', marginBottom: 8, borderRight: '3px solid #C5A028', paddingRight: 10 }}>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--ys-text)', marginBottom: 8, borderRight: '3px solid var(--ys-accent)', paddingRight: 10 }}>
         {title}
       </h2>
       <p style={{ fontSize: 14, color: '#444', lineHeight: 1.8, margin: 0 }}>

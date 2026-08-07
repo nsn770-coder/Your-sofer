@@ -50,7 +50,7 @@ export default function KlafMeshurtatPage() {
 
           <QuoteBlock text='הלכה למשה מסיני: "מזוזה צריכה שרטוט". אם לא שורטט – הקלף פסול.' />
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             מהו השרטוט ולמה הוא הכרחי
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
@@ -60,21 +60,21 @@ export default function KlafMeshurtatPage() {
             השרטוט גם תוחם גבולות ושוליים ימניים ושמאליים לקלף, מבטיח שהפסוקים מסודרים במרכז ומוקפים בשוליים חלקים המכבדים את הקדושה (קרויים "גוילים").
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שרטוט כאמצעי לזיהוי קלף אמיתי
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#444', marginBottom: 16 }}>
             בתמונות מקרו איכותיות של קלפים אמיתיים ניתן לראות ממש את הצל שיוצרת התעלה הדקה של השרטוט לאורך שורות הדיו. אם קונים מזוזה אונליין ואין בה שום סימני שרטוט – מדובר כנראה בהדפסה או זיוף, שכן קלף כשר לעולם לא יגיע בלי שרטוט פיזי מורגש.
           </p>
 
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#1a1a1a', margin: '36px 0 16px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--ys-text)', margin: '36px 0 16px' }}>
             שאלות נפוצות
           </h2>
           <FAQItem q='האם אפשר לשרטט עם עיפרון או עט במקום מרצע?' a='בשום אופן. השרטוט חייב להיות חריטה חסרת צבע שנוצרת מלחץ פיזי על העור. שימוש בעופרת או דיו לסימון פוסל את הכתיבה.' />
           <FAQItem q='האם שרטוט קיים גם בספר תורה?' a='כן, ספר תורה גם צריך שרטוט. בספר תורה הגיליון ארוך מאוד ולכן הסופר משרטט בכלים מיוחדים לשמירת ישרות השורות לאורך מטרים.' />
           <FAQItem q='האם ניתן להרגיש את השרטוט בידיים?' a='כן. על קלף אמיתי ניתן להרגיש בעדינות את החריצים הדקים על פני העור, בייחוד בצד האחורי של הקלף.' />
 
-          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', margin: '40px 0 16px' }}>קריאה נוספת</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: '40px 0 16px' }}>קריאה נוספת</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <RelatedCard emoji='🖐️' title='קלף עבודת יד' desc='למה קלף ידני עדיף על מכונה' href='/madrich/klaf-ivduat-yad' />
             <RelatedCard emoji='⚠️' title='זיופי סת"ם' desc='כיצד לזהות הדפסה וזיוף' href='/madrich/ziyufei-stam' />

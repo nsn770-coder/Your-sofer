@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 
 const C = {
   navy: '#1a1a1a',
-  gold: '#C5A028',
+  gold: 'var(--ys-accent)',
   bg: '#f3f4f4',
   white: '#fff',
   border: '#e0e0e0',
