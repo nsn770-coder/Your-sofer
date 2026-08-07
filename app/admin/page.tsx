@@ -194,7 +194,6 @@ interface Product {
   name: string;
   price: number;
   cat?: string;
-  subCategory?: string;
   category?: string;
   status?: string;
   soferId?: string;
