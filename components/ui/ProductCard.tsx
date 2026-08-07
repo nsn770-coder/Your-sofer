@@ -312,7 +312,7 @@ export default function ProductCard({
             </span>
           )}
           {isBundle && (
-            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: '#3B3B41', color: '#C5A028' }}>
+            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: '#373A5A', color: '#C5A028' }}>
               ✦ מארז מהודר
             </span>
           )}
@@ -320,7 +320,7 @@ export default function ProductCard({
               "חדש"/"מבצע"/"מארז" והסתירה את המוצר. ההתאמה האישית מוצגת בעמוד
               המוצר, ליד כפתור ההוספה לסל. */}
           {isNew && (
-            <span className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#FFFFFF', color: '#3B3B41', border: '1px solid #3B3B41' }}>
+            <span className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#FFFFFF', color: '#373A5A', border: '1px solid #373A5A' }}>
               חדש
             </span>
           )}
@@ -334,7 +334,7 @@ export default function ProductCard({
 
       {/* ── Content ── */}
       <div className={horizontal ? 'pc-content' : ''} style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '8px 2px 2px', gap: 2 }}>
-        <h3 className="mt-1 text-right text-[14px] font-medium leading-snug text-[#3B3B41]" style={{
+        <h3 className="mt-1 text-right text-[14px] font-medium leading-snug text-[#373A5A]" style={{
           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
           overflow: 'hidden', minHeight: '40px',
         } as React.CSSProperties}>
@@ -394,7 +394,7 @@ export default function ProductCard({
                   textDecoration: 'underline', textUnderlineOffset: 4,
                   cursor: 'pointer', transition: 'color 0.2s',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#3B3B41'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#373A5A'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#111111'; }}
               >
                 ➕ הוסף כיסוי מתאים
@@ -427,16 +427,16 @@ export default function ProductCard({
                 cursor: 'pointer', fontFamily: 'inherit',
                 transition: 'color 0.2s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#3B3B41'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}
             >
               הוספה לסל
             </button>
           ) : (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 0, height: 30 }}>
-              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#3B3B41', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>−</button>
-              <span style={{ color: '#3B3B41', fontWeight: 600, fontSize: 13, minWidth: 16, textAlign: 'center' }}>{qty}</span>
-              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#3B3B41', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>+</button>
+              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>−</button>
+              <span style={{ color: '#373A5A', fontWeight: 600, fontSize: 13, minWidth: 16, textAlign: 'center' }}>{qty}</span>
+              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>+</button>
             </div>
           )}
         </div>

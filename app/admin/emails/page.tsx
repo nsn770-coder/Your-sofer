@@ -73,7 +73,7 @@ const CLUB_INVITATION_TEMPLATE = {
 const DEFAULT_TEMPLATES: Record<string, { subject: string; bodyHtml: string; isActive: boolean }> = {
   order_confirmation: {
     subject: 'אישור הזמנה מ-YourSofer',
-    bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#3B3B41">
+    bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1E3A8A">
 <h2 style="color:#C5A028">תודה על הזמנתך! ✡️</h2>
 <p>שלום {{name}},</p>
 <p>קיבלנו את הזמנתך מספר <strong>{{orderNumber}}</strong> בהצלחה.</p>
@@ -86,12 +86,12 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; bodyHtml: string; isA
   },
   cart_abandonment: {
     subject: 'שכחת משהו בעגלה 🛒',
-    bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#3B3B41">
+    bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1E3A8A">
 <h2 style="color:#C5A028">שכחת משהו... 🛒</h2>
 <p>שלום {{name}},</p>
 <p>ראינו שהשארת פריטים בעגלה שלך. חזור/י להשלים את הרכישה!</p>
 <div style="text-align:center;margin:30px 0">
-  <a href="https://your-sofer.com/cart" style="background:#C5A028;color:#3B3B41;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold">המשך לעגלה →</a>
+  <a href="https://your-sofer.com/cart" style="background:#C5A028;color:#1E3A8A;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold">המשך לעגלה →</a>
 </div>
 <hr style="border:none;border-top:1px solid #eee;margin:20px 0"/>
 <p style="font-size:12px;color:#888">YourSofer — יודאיקה בסטנדרט הגבוה ביותר</p>
@@ -100,12 +100,12 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; bodyHtml: string; isA
   },
   newsletter_welcome: {
     subject: 'ברוך הבא ל-YourSofer! 🎉',
-    bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#3B3B41">
+    bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1E3A8A">
 <h2 style="color:#C5A028">ברוך הבא ל-YourSofer! 🎉</h2>
 <p>שלום {{name}},</p>
 <p>אנחנו שמחים שהצטרפת! ב-YourSofer תמצא/י את מיטב הסופרים הסת"ם.</p>
 <div style="text-align:center;margin:30px 0">
-  <a href="https://your-sofer.com" style="background:#3B3B41;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold">לחנות שלנו →</a>
+  <a href="https://your-sofer.com" style="background:#1E3A8A;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold">לחנות שלנו →</a>
 </div>
 <hr style="border:none;border-top:1px solid #eee;margin:20px 0"/>
 <p style="font-size:12px;color:#888">YourSofer — יודאיקה בסטנדרט הגבוה ביותר</p>
@@ -114,12 +114,12 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; bodyHtml: string; isA
   },
   custom_update: {
     subject: 'עדכון מ-YourSofer',
-    bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#3B3B41">
+    bodyHtml: `<div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1E3A8A">
 <h2 style="color:#C5A028">עדכון חשוב מ-YourSofer</h2>
 <p>שלום {{name}},</p>
 <p>{{message}}</p>
 <div style="text-align:center;margin:30px 0">
-  <a href="https://your-sofer.com" style="background:#C5A028;color:#3B3B41;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold">לאתר שלנו →</a>
+  <a href="https://your-sofer.com" style="background:#C5A028;color:#1E3A8A;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold">לאתר שלנו →</a>
 </div>
 <hr style="border:none;border-top:1px solid #eee;margin:20px 0"/>
 <p style="font-size:12px;color:#888">YourSofer — יודאיקה בסטנדרט הגבוה ביותר</p>
@@ -205,7 +205,7 @@ function SendModal({
       <div style={{ background: '#fff', borderRadius: 12, width: '100%', maxWidth: 620, maxHeight: '90vh', overflowY: 'auto', padding: 28, direction: 'rtl' }}
         onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#3B3B41' }}>📧 שלח מייל לנבחרים</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1E3A8A' }}>📧 שלח מייל לנבחרים</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>✕</button>
         </div>
 
@@ -213,7 +213,7 @@ function SendModal({
           <strong>נמענים ({recipients.length}):</strong>{' '}
           {recipients.length === 0
             ? <span style={{ color: '#e53e3e' }}>אין נמענים זכאים נבחרים</span>
-            : <span style={{ color: '#3B3B41' }}>{recipients.map(c => c.email).join(', ')}</span>}
+            : <span style={{ color: '#1E3A8A' }}>{recipients.map(c => c.email).join(', ')}</span>}
         </div>
 
         <div style={{ display: 'grid', gap: 14 }}>
@@ -248,7 +248,7 @@ function SendModal({
 
         <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
           <button onClick={handleSend} disabled={sending || recipients.length === 0}
-            style={{ flex: 1, background: recipients.length === 0 ? '#ccc' : '#3B3B41', color: '#fff', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: recipients.length === 0 ? 'not-allowed' : 'pointer' }}>
+            style={{ flex: 1, background: recipients.length === 0 ? '#ccc' : '#1E3A8A', color: '#fff', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: recipients.length === 0 ? 'not-allowed' : 'pointer' }}>
             {sending ? '⏳ שולח...' : `📤 שלח ל-${recipients.length} נמענים`}
           </button>
           <button onClick={onClose}
@@ -420,8 +420,8 @@ export default function EmailsPage() {
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-          <a href="/admin" style={{ color: '#3B3B41', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>← חזרה לניהול</a>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#3B3B41', margin: 0 }}>📧 ניהול מיילים</h1>
+          <a href="/admin" style={{ color: '#1E3A8A', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>← חזרה לניהול</a>
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#1E3A8A', margin: 0 }}>📧 ניהול מיילים</h1>
         </div>
 
         {/* Section tabs */}
@@ -434,7 +434,7 @@ export default function EmailsPage() {
             <button key={s.key} onClick={() => setSection(s.key)}
               style={{
                 padding: '9px 20px', borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: 'pointer', border: 'none', transition: 'all 0.15s',
-                background: section === s.key ? '#3B3B41' : '#fff',
+                background: section === s.key ? '#1E3A8A' : '#fff',
                 color: section === s.key ? '#fff' : '#555',
                 boxShadow: section === s.key ? '0 2px 8px rgba(30,58,138,0.2)' : '0 1px 3px rgba(0,0,0,0.08)',
               }}>
@@ -462,7 +462,7 @@ export default function EmailsPage() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                           <div style={{ width: 10, height: 10, borderRadius: '50%', background: edits.isActive ? '#16a34a' : '#9ca3af' }} />
                           <div>
-                            <div style={{ fontWeight: 700, color: '#3B3B41', fontSize: 15 }}>{TEMPLATE_META[t.id]?.label || t.id}</div>
+                            <div style={{ fontWeight: 700, color: '#1E3A8A', fontSize: 15 }}>{TEMPLATE_META[t.id]?.label || t.id}</div>
                             <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
                               <span style={{ fontFamily: 'monospace', marginLeft: 8, background: '#f3f4f6', padding: '1px 6px', borderRadius: 4 }}>{t.id}</span>
                               {updatedAt && typeof updatedAt !== 'undefined' && 'seconds' in (updatedAt as object)
@@ -503,7 +503,7 @@ export default function EmailsPage() {
                           </div>
                           <div style={{ display: 'flex', gap: 10 }}>
                             <button onClick={() => saveTemplate(t.id)} disabled={savingTemplate === t.id}
-                              style={{ background: '#C5A028', color: '#3B3B41', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                              style={{ background: '#C5A028', color: '#1E3A8A', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                               {savingTemplate === t.id ? '⏳ שומר...' : '💾 שמור תבנית'}
                             </button>
                             <button onClick={() => setExpandedTemplate(null)}
@@ -528,7 +528,7 @@ export default function EmailsPage() {
             <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
               {[
                 { label: 'זכאים לשליחה', value: contacts.length, color: '#15803d' },
-                { label: 'נבחרו כעת',    value: selected.size,   color: '#3B3B41' },
+                { label: 'נבחרו כעת',    value: selected.size,   color: '#1E3A8A' },
               ].map(s => (
                 <div key={s.label} style={{ background: '#fff', borderRadius: 10, padding: '10px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.07)', minWidth: 110 }}>
                   <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{s.value}</div>
@@ -557,14 +557,14 @@ export default function EmailsPage() {
                 🔄
               </button>
               {selected.size > 0 && (
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#3B3B41', background: '#EFF4FF', padding: '6px 14px', borderRadius: 8 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#1E3A8A', background: '#EFF4FF', padding: '6px 14px', borderRadius: 8 }}>
                   נבחרו {selected.size}
                 </span>
               )}
               <button
                 onClick={() => setShowSendModal(true)}
                 disabled={selected.size === 0}
-                style={{ background: selected.size === 0 ? '#e0e0e0' : '#3B3B41', color: selected.size === 0 ? '#999' : '#fff', border: 'none', borderRadius: 8, padding: '9px 20px', fontSize: 14, fontWeight: 700, cursor: selected.size === 0 ? 'not-allowed' : 'pointer' }}>
+                style={{ background: selected.size === 0 ? '#e0e0e0' : '#1E3A8A', color: selected.size === 0 ? '#999' : '#fff', border: 'none', borderRadius: 8, padding: '9px 20px', fontSize: 14, fontWeight: 700, cursor: selected.size === 0 ? 'not-allowed' : 'pointer' }}>
                 📤 שלח לנבחרים
               </button>
             </div>
@@ -576,7 +576,7 @@ export default function EmailsPage() {
               ) : contactsError ? (
                 <div style={{ padding: 40, textAlign: 'center' }}>
                   <div style={{ color: '#dc2626', fontWeight: 700, marginBottom: 12 }}>⚠️ {contactsError}</div>
-                  <button onClick={loadContacts} style={{ background: '#3B3B41', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 13, cursor: 'pointer' }}>נסה שוב</button>
+                  <button onClick={loadContacts} style={{ background: '#1E3A8A', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 13, cursor: 'pointer' }}>נסה שוב</button>
                 </div>
               ) : filteredContacts.length === 0 ? (
                 <div style={{ padding: 40, textAlign: 'center', color: '#888' }}>
@@ -605,10 +605,10 @@ export default function EmailsPage() {
                               type="checkbox"
                               checked={selected.has(c.id)}
                               onChange={() => toggleOne(c.id)}
-                              style={{ cursor: 'pointer', accentColor: '#3B3B41' }}
+                              style={{ cursor: 'pointer', accentColor: '#1E3A8A' }}
                             />
                           </td>
-                          <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: 12, color: '#3B3B41' }}>
+                          <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: 12, color: '#1E3A8A' }}>
                             {c.email}
                           </td>
                           <td style={{ padding: '10px 14px', fontWeight: 600, color: '#333' }}>{c.name || '—'}</td>
@@ -673,7 +673,7 @@ export default function EmailsPage() {
                           <td style={{ padding: '11px 14px', color: '#555' }}>
                             {e.to?.length === 1 ? e.to[0] : `${e.to?.length ?? 0} נמענים`}
                           </td>
-                          <td style={{ padding: '11px 14px', fontWeight: 600, color: '#3B3B41', maxWidth: 200 }}>
+                          <td style={{ padding: '11px 14px', fontWeight: 600, color: '#1E3A8A', maxWidth: 200 }}>
                             <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.subject}</div>
                           </td>
                           <td style={{ padding: '11px 14px', color: '#888', fontSize: 11 }}>

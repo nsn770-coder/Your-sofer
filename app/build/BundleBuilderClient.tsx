@@ -24,9 +24,9 @@ import {
  * ב-ProductClient), ולכן אין כאן שינוי בזרימת התשלום.
  */
 
-const NAVY = '#3B3B41';
+const NAVY = '#373A5A';
 const GOLD = '#C5A028';
-const CREAM = '#FEFBF7';
+const CREAM = '#FAF8F3';
 
 type PersonalizationChoice = 'none' | 'print' | 'embroidery';
 

@@ -672,8 +672,8 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                 onClick={() => onSubCategoryFilter(opt === 'הכל' ? '' : opt)}
                 className={`text-xs px-2.5 py-1 rounded-none font-medium transition-all border ${
                   (subCategoryFilter || '') === (opt === 'הכל' ? '' : opt)
-                    ? 'bg-[#3B3B41] text-white border-[#3B3B41]'
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-[#3B3B41] hover:text-[#3B3B41]'
+                    ? 'bg-[#373A5A] text-white border-[#373A5A]'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-[#373A5A] hover:text-[#373A5A]'
                 }`}
               >
                 {opt}
@@ -696,7 +696,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                   onClick={() => onCollectionFilter(opt === 'הכל' ? '' : opt)}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 0,
-                    border: isActive ? '1px solid #3B3B41' : '1px solid #d1d5db',
+                    border: isActive ? '1px solid #373A5A' : '1px solid #d1d5db',
                     borderRadius: 0, overflow: 'hidden', cursor: 'pointer',
                     background: '#fff',
                     transition: 'border-color 0.15s, background 0.15s',
@@ -1062,13 +1062,13 @@ function StamCard({
             </span>
           )}
           {hasSale && (
-            <span style={{ background: '#3B3B41', color: '#fff', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 8px' }}>מבצע</span>
+            <span style={{ background: '#373A5A', color: '#fff', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 8px' }}>מבצע</span>
           )}
         </div>
 
         {/* Title */}
         <p style={{
-          fontSize: 16, fontWeight: 700, color: '#3B3B41', lineHeight: 1.4, margin: 0,
+          fontSize: 16, fontWeight: 700, color: '#1F2937', lineHeight: 1.4, margin: 0,
           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
         } as React.CSSProperties}>
           {product.name}
@@ -1113,16 +1113,16 @@ function StamCard({
                 textDecoration: 'underline', textUnderlineOffset: 4,
                 cursor: 'pointer', fontFamily: 'inherit', transition: 'color 0.2s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#3B3B41'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}
             >
               הוספה לסל
             </button>
           ) : (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 0, height: 30, marginTop: 8 }}>
-              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#3B3B41', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>−</button>
-              <span style={{ color: '#3B3B41', fontWeight: 600, fontSize: 13, minWidth: 16, textAlign: 'center' }}>{qty}</span>
-              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#3B3B41', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>+</button>
+              <button onClick={handleDecrement} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>−</button>
+              <span style={{ color: '#373A5A', fontWeight: 600, fontSize: 13, minWidth: 16, textAlign: 'center' }}>{qty}</span>
+              <button onClick={handleAdd} style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 17, fontWeight: 700, cursor: 'pointer', padding: '0 10px', height: '100%', lineHeight: 1 }}>+</button>
             </div>
           )}
         </div>
@@ -1674,7 +1674,7 @@ export default function CategoryClient({ category }: { category: string }) {
             כל המוצרים בקטגוריה זו עברו בדיקת מגיה רבנית
           </span>
           <span style={{
-            fontSize: 11, color: '#3B3B41', fontWeight: 600,
+            fontSize: 11, color: '#373A5A', fontWeight: 600,
             background: '#fff',
             border: '1px solid #E5E7EB',
             borderRadius: 0, padding: '3px 10px',
@@ -1695,7 +1695,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as SortBy)}
-            style={{ background: 'transparent', border: 'none', fontSize: 13, color: '#3B3B41', cursor: 'pointer', direction: 'rtl', outline: 'none', fontFamily: 'inherit' }}
+            style={{ background: 'transparent', border: 'none', fontSize: 13, color: '#1F2937', cursor: 'pointer', direction: 'rtl', outline: 'none', fontFamily: 'inherit' }}
           >
             {Object.entries(SORT_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select>
@@ -1703,7 +1703,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
         <button
           onClick={() => setDrawerOpen(true)}
-          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 0, padding: '8px 14px', fontSize: 13, color: '#3B3B41', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
+          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 0, padding: '8px 14px', fontSize: 13, color: '#1F2937', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
         >
           <IconFilter size={14} />
           סינון
@@ -1718,7 +1718,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <div className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 pb-8 shadow-2xl">
             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
             <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} availableCollections={availableCollections} />
-            <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#3B3B41] text-white rounded-none font-medium text-sm hover:bg-[#2F324D] transition-colors">
+            <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#373A5A] text-white rounded-none font-medium text-sm hover:bg-[#2F324D] transition-colors">
               הצג {filtered.length} תוצאות
             </button>
           </div>
@@ -1742,12 +1742,12 @@ export default function CategoryClient({ category }: { category: string }) {
               {recommendedByLevel.map(({ level: lvl, products: recs }) => (
                 <div key={lvl} style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <h2 style={{ fontSize: 16, fontWeight: 600, color: '#3B3B41', margin: 0 }}>מומלץ לרמת {lvl}</h2>
+                    <h2 style={{ fontSize: 16, fontWeight: 600, color: '#373A5A', margin: 0 }}>מומלץ לרמת {lvl}</h2>
                   </div>
                   <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7'}>
                     {recs.map((p, idx) => (
                       <div key={p.id}
-                        style={{ border: '1px solid #3B3B41', borderRadius: 0, overflow: 'hidden', background: '#fff', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
+                        style={{ border: '1px solid #373A5A', borderRadius: 0, overflow: 'hidden', background: '#fff', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
                         onClick={() => { if (category.includes('מצווה') || category.includes('מצוה')) window.location.href = `/product/${p.id}`; }}>
 
                         {(category.includes('מצווה') || category.includes('מצוה')) ? (
@@ -1762,7 +1762,7 @@ export default function CategoryClient({ category }: { category: string }) {
                               />
                             </div>
                             {/* Recommended banner */}
-                            <div style={{ background: '#3B3B41', color: '#fff', fontSize: 12, fontWeight: 600, padding: '6px 14px', textAlign: 'right' }}>
+                            <div style={{ background: '#373A5A', color: '#fff', fontSize: 12, fontWeight: 600, padding: '6px 14px', textAlign: 'right' }}>
                               מומלץ לרמת {lvl}
                             </div>
                             {/* Content */}
@@ -1790,7 +1790,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                   addItem({ id: p.id, name: p.name, price: p.price, imgUrl: p.imgUrl || p.image_url, quantity: 1, cat: p.cat || undefined });
                                 }}
                                 style={{ background: 'none', border: 'none', padding: 0, color: '#111111', fontSize: 13, fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: 4, cursor: 'pointer', fontFamily: 'inherit', transition: 'color 0.2s' }}
-                                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#3B3B41'; }}
+                                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
                                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}>
                                 הוספה לסל
                               </button>
@@ -1798,7 +1798,7 @@ export default function CategoryClient({ category }: { category: string }) {
                           </>
                         ) : (
                           <>
-                            <div style={{ background: '#3B3B41', color: '#fff', fontSize: 12, fontWeight: 600, padding: '6px 14px', textAlign: 'right' }}>
+                            <div style={{ background: '#373A5A', color: '#fff', fontSize: 12, fontWeight: 600, padding: '6px 14px', textAlign: 'right' }}>
                               מומלץ לרמת {lvl}
                             </div>
                             {isStamCat ? (
@@ -1834,9 +1834,9 @@ export default function CategoryClient({ category }: { category: string }) {
                 <button
                   onClick={() => setShowAllProducts(v => !v)}
                   style={{
-                    background: showAllProducts ? '#3B3B41' : '#fff',
-                    color: showAllProducts ? '#fff' : '#3B3B41',
-                    border: '1px solid #3B3B41',
+                    background: showAllProducts ? '#373A5A' : '#fff',
+                    color: showAllProducts ? '#fff' : '#373A5A',
+                    border: '1px solid #373A5A',
                     borderRadius: 0, padding: '10px 28px',
                     fontSize: 14, fontWeight: 500, cursor: 'pointer',
                     fontFamily: 'inherit', direction: 'rtl', transition: 'all 0.2s',
@@ -1996,7 +1996,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     onClick={() => setCollectionFilter(isActive ? '' : col)}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 0,
-                      border: isActive ? '1px solid #3B3B41' : '1px solid #e5e7eb',
+                      border: isActive ? '1px solid #373A5A' : '1px solid #e5e7eb',
                       borderRadius: 0, overflow: 'hidden', cursor: 'pointer',
                       background: '#fff',
                       transition: 'border-color 0.15s, background 0.15s',
@@ -2110,8 +2110,8 @@ export default function CategoryClient({ category }: { category: string }) {
                         return (
                           <div key={g.key} style={{ marginBottom: 40 }}>
                             <div style={{ background: '#FFFFFF', border: '1px solid #EDEDEF', borderRadius: 0, padding: '16px 20px', marginBottom: 16 }}>
-                              <span style={{ background: '#3B3B41', color: '#FFFFFF', borderRadius: 0, fontSize: 12, fontWeight: 600, padding: '4px 12px', display: 'inline-block', marginBottom: 8 }}>{g.key}</span>
-                              <h2 style={{ fontSize: 17, fontWeight: 600, color: '#3B3B41', margin: '0 0 6px', lineHeight: 1.3 }}>{g.title}</h2>
+                              <span style={{ background: '#373A5A', color: '#FFFFFF', borderRadius: 0, fontSize: 12, fontWeight: 600, padding: '4px 12px', display: 'inline-block', marginBottom: 8 }}>{g.key}</span>
+                              <h2 style={{ fontSize: 17, fontWeight: 600, color: '#1F2937', margin: '0 0 6px', lineHeight: 1.3 }}>{g.title}</h2>
                               <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>{g.desc}</p>
                             </div>
                             <div className={isStamCat ? '' : gridCls}>

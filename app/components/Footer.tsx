@@ -167,7 +167,7 @@ export default function Footer() {
         @media (max-width: 1023px) { .ys-footer-cats { columns: 4 150px; } }
       `}</style>
 
-      <footer dir="rtl" style={{ background: '#3B3B41', color: '#F9FAFB' }}>
+      <footer dir="rtl" style={{ background: '#1F2937', color: '#F9FAFB' }}>
 
         {/* Top section */}
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '32px 20px 24px' : '48px 24px 32px' }}>

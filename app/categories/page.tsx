@@ -57,9 +57,9 @@ export default function CategoriesPage() {
   }, []);
 
   return (
-    <div dir="rtl" style={{ background: '#FEFBF7', minHeight: '100vh', padding: isMobile ? '28px 16px 48px' : '48px 32px 64px' }}>
+    <div dir="rtl" style={{ background: '#FAF8F3', minHeight: '100vh', padding: isMobile ? '28px 16px 48px' : '48px 32px 64px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <h1 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 800, color: '#3B3B41', textAlign: 'center', marginBottom: 8 }}>
+        <h1 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 800, color: '#1F2937', textAlign: 'center', marginBottom: 8 }}>
           כל הקטגוריות
         </h1>
         <p style={{ fontSize: 15, color: '#6B7280', textAlign: 'center', marginBottom: 36 }}>
@@ -111,7 +111,7 @@ export default function CategoriesPage() {
                   )}
                 </div>
                 <div style={{ padding: '14px 16px' }}>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: '#3B3B41' }}>{cat.name}</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}>{cat.name}</div>
                 </div>
               </div>
             );

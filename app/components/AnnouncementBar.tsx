@@ -19,7 +19,7 @@ import { SHIPPING } from '@/app/config/siteTrust';
 /** KEEP IN SYNC with components/ClubPopup.tsx + ClubPopupWrapper.tsx */
 const OPEN_CLUB_EVENT = 'ys:open-club';
 
-const BAR_BG = '#3B3B41'; // כחול כהה — צבע מותג
+const BAR_BG = '#373A5A'; // כחול כהה — צבע מותג
 const BAR_H = 36;
 const ROTATE_MS = 4000;
 const FADE_MS = 400;

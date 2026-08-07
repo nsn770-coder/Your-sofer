@@ -792,7 +792,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
       </section>
 
       {/* ── 6. FAQ Accordion ────────────────────────────────────────────────── */}
-      <section style={{ background: '#FEFBF7', padding: isMobile ? '48px 20px 56px' : '72px 24px 80px' }}>
+      <section style={{ background: '#FAF8F3', padding: isMobile ? '48px 20px 56px' : '72px 24px 80px' }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, color: NAVY, marginBottom: 32, textAlign: 'center' }}>
             שאלות נפוצות

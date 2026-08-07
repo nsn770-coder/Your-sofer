@@ -18,7 +18,7 @@ export default function AnnouncementTicker() {
           width: 100%;
           max-width: 100vw;
           height: 40px;
-          background-color: #3B3B41;
+          background-color: #373a5a;
           color: #ffffff;
           position: relative;
           z-index: 101;

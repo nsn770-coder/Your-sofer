@@ -40,10 +40,10 @@ export async function POST(req: NextRequest) {
       </table>
 
       ${Array.isArray(cartItems) && cartItems.length > 0 ? `
-      <h3 style="color:#3B3B41;margin:0 0 12px;font-size:16px;">מוצרים בעגלה</h3>
+      <h3 style="color:#1E3A8A;margin:0 0 12px;font-size:16px;">מוצרים בעגלה</h3>
       <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
         <thead>
-          <tr style="background:#3B3B41;color:#fff;">
+          <tr style="background:#1E3A8A;color:#fff;">
             <th style="padding:8px 12px;text-align:right;">שם מוצר</th>
             <th style="padding:8px 12px;text-align:center;">כמות</th>
             <th style="padding:8px 12px;text-align:right;">מחיר</th>
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       </table>` : ''}
 
       <div style="text-align:center;margin-top:24px;">
-        <a href="https://your-sofer.com/admin" style="background:#3B3B41;color:#C5A028;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
+        <a href="https://your-sofer.com/admin" style="background:#1E3A8A;color:#C5A028;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
           פתח לוח ניהול
         </a>
       </div>

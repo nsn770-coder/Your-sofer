@@ -10,7 +10,7 @@ import type { MomentProduct } from '@/app/moment/[id]/fetchMomentProducts';
  */
 
 const PAGE_SIZE = 24;
-const NAVY = '#3B3B41';
+const NAVY = '#373A5A';
 
 export default function OccasionGrid({ products }: { products: MomentProduct[] }) {
   const [shown, setShown] = useState(PAGE_SIZE);

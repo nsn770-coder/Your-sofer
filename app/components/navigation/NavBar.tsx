@@ -34,8 +34,8 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
         style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 520, maxWidth: 860, animation: "navMegaIn 0.2s ease-out" }}
         onMouseDown={e => e.preventDefault()}
       >
-        <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "var(--ys-plum)", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
-        <div style={{ background: "var(--ys-plum)", borderRadius: 0, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(184,151,42,0.12)", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: -5, right: "50%", transform: "translateX(50%) rotate(45deg)", width: 10, height: 10, background: "#1a1a1a", borderTop: "1px solid rgba(255,255,255,0.1)", borderRight: "1px solid rgba(255,255,255,0.1)" }} />
+        <div style={{ background: "#1a1a1a", borderRadius: 0, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(184,151,42,0.12)", overflow: "hidden" }}>
           <div style={{ display: "flex", flexDirection: "row", padding: "24px 24px 16px" }}>
             {item.columns.map((col, ci) => (
               <div key={ci} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
@@ -48,7 +48,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(184,151,42,0.12)"; e.currentTarget.style.color = "#fff"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}
                       >
-                        <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--ys-purple)", flexShrink: 0, opacity: 0.6 }} />
+                        <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#C5A028", flexShrink: 0, opacity: 0.6 }} />
                         {sub.label}
                       </button>
                     </li>
@@ -58,7 +58,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
             ))}
           </div>
           <div style={{ padding: "10px 24px", background: "rgba(0,0,0,0.2)", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "flex-end" }}>
-            <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "var(--ys-on-dark)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>הכל {item.label} ←</button>
+            <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "#C5A028", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>הכל {item.label} ←</button>
           </div>
         </div>
       </div>
@@ -214,11 +214,11 @@ function NavBarContent() {
       `}</style>
 
       {shaliach && (
-        <div style={{ background: "var(--ys-plum)", borderBottom: "3px solid var(--ys-purple)", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ background: "#1a1a1a", borderBottom: "3px solid #C5A028", padding: isMobile ? "8px 12px" : "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {shaliach.logoUrl
-              ? <img src={shaliach.logoUrl} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "2px solid var(--ys-purple)", flexShrink: 0 }} />
-              : <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--ys-purple)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>✡</div>
+              ? <img src={shaliach.logoUrl} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A028", flexShrink: 0 }} />
+              : <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#C5A028", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>✡</div>
             }
             <div>
               <div style={{ fontSize: isMobile ? 15 : 18, fontWeight: 900, color: "#fff" }}>
@@ -235,20 +235,20 @@ function NavBarContent() {
         </div>
       )}
 
-      <header style={{ background: "var(--ys-page)", color: "var(--ys-ink)", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E9E4DC" }}>
+      <header style={{ background: "#FAF8F3", color: "#1a1a1a", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E7E2D8" }}>
         <CouponStrip />
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center", gap: isMobile ? 6 : 12 }}>
-          <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "var(--ys-ink)", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
-            <div style={{ width: 20, height: 2, background: "var(--ys-plum)", borderRadius: 0 }} />
-            <div style={{ width: 20, height: 2, background: "var(--ys-plum)", borderRadius: 0 }} />
-            <div style={{ width: 20, height: 2, background: "var(--ys-plum)", borderRadius: 0 }} />
+          <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "#1a1a1a", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
+            <div style={{ width: 20, height: 2, background: "#1a1a1a", borderRadius: 0 }} />
+            <div style={{ width: 20, height: 2, background: "#1a1a1a", borderRadius: 0 }} />
+            <div style={{ width: 20, height: 2, background: "#1a1a1a", borderRadius: 0 }} />
           </button>
 
           {/* הלוגו צמוד להמבורגר: e_trim חותך את השוליים השקופים של ה-PNG,
               כך שהקופסה מתכווצת לרוחב הסמל האמיתי ולא "צפה" לכיוון מרכז המסך */}
           <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
             <Image src="https://res.cloudinary.com/dyxzq3ucy/image/upload/e_trim/v1778746370/%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_L_ecatchila_1_hrlkhj.png" alt="logo" width={200} height={48} className="ys-nav-logo" style={{ height: 48, width: "auto", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
-            <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "var(--ys-ink)", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
+            <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "#1a1a1a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 
           {/* ── Search area (desktop only) ───────────────────────────── */}
@@ -267,14 +267,14 @@ function NavBarContent() {
               <button
                 onClick={() => setUserMenuOpen(v => !v)}
                 aria-label="חשבון משתמש"
-                style={{ background: "none", border: userMenuOpen ? "1px solid var(--ys-purple)" : "1px solid transparent", borderRadius: 0, padding: "5px 7px", color: "var(--ys-ink)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "border-color 0.15s" }}
+                style={{ background: "none", border: userMenuOpen ? "1px solid #C5A028" : "1px solid transparent", borderRadius: 0, padding: "5px 7px", color: "#1a1a1a", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "border-color 0.15s" }}
               >
                 {/* אייקון דמות */}
-                <svg width={isMobile ? 22 : 22} height={isMobile ? 22 : 22} viewBox="0 0 24 24" fill="none" stroke="#3B3B41" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width={isMobile ? 22 : 22} height={isMobile ? 22 : 22} viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
-                {!isMobile && <span style={{ fontSize: 11, fontWeight: user ? 600 : 400, color: "var(--ys-ink)" }}>
+                {!isMobile && <span style={{ fontSize: 11, fontWeight: user ? 600 : 400, color: "#1a1a1a" }}>
                   {user ? (user.firstName || user.displayName?.split(" ")[0] || "חשבון") : "כניסה"}
                 </span>}
               </button>
@@ -287,7 +287,7 @@ function NavBarContent() {
                     <>
                       {/* כותרת — שלום + נקודות */}
                       <div style={{ padding: "14px 16px 10px", borderBottom: "1px solid #F0EDE8" }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ys-ink)", marginBottom: 8 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", marginBottom: 8 }}>
                           שלום, {user.firstName || user.displayName?.split(" ")[0] || "אורח"} 👋
                         </div>
                         {/* פס דרגה — מחובר ל-totalSpent אמיתי */}
@@ -331,7 +331,7 @@ function NavBarContent() {
                         </button>
                         <button className="ys-user-menu-item ys-user-menu-item-coming" disabled>
                           <span style={{ fontSize: 15 }}>🔔</span> ההודעות שלי
-                          <span style={{ marginRight: "auto", fontSize: 10, color: "var(--ys-on-dark)", border: "1px solid var(--ys-purple)", padding: "1px 5px" }}>בקרוב</span>
+                          <span style={{ marginRight: "auto", fontSize: 10, color: "#C5A028", border: "1px solid #C5A028", padding: "1px 5px" }}>בקרוב</span>
                         </button>
                       </div>
 
@@ -380,11 +380,11 @@ function NavBarContent() {
                   ) : (
                     /* לא מחובר */
                     <div style={{ padding: "20px 16px" }}>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ys-ink)", marginBottom: 4, textAlign: "center" }}>כניסה לחשבון</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a", marginBottom: 4, textAlign: "center" }}>כניסה לחשבון</div>
                       <div style={{ fontSize: 12, color: "#888", marginBottom: 16, textAlign: "center" }}>עקוב אחרי הזמנות, צבור נקודות</div>
                       <button
                         onClick={() => { setUserMenuOpen(false); signingInFromDropdown.current = true; signInWithGoogle(); }}
-                        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 16px", background: "var(--ys-plum)", color: "#fff", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}
+                        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 16px", background: "#1a1a1a", color: "#fff", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}
                       >
                         <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
                         המשך עם Google
@@ -402,18 +402,18 @@ function NavBarContent() {
             <button onClick={() => router.push("/cart")} aria-label={`סל קניות, ${count} פריטים`}
               style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", gap: 3, background: "none", border: "none", padding: 0, fontFamily: "inherit" }}>
               <div style={{ position: "relative" }}>
-                <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#3B3B41" strokeWidth="1.8" aria-hidden="true" focusable="false"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                {count > 0 && <span aria-hidden="true" style={{ position: "absolute", top: -4, left: -4, background: "var(--ys-purple)", color: "var(--ys-on-dark)", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
+                <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="1.8" aria-hidden="true" focusable="false"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                {count > 0 && <span aria-hidden="true" style={{ position: "absolute", top: -4, left: -4, background: "#C5A028", color: "#1a1a1a", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
               </div>
-              <div style={{ fontSize: 11, color: "var(--ys-ink)", fontWeight: 700 }}>סל ({count})</div>
+              <div style={{ fontSize: 11, color: "#1a1a1a", fontWeight: 700 }}>סל ({count})</div>
             </button>
           </div>
         </div>
 
         {!isMobile && (
-          <div style={{ background: "var(--ys-plum)", borderBottom: "2px solid var(--ys-purple)" }}>
+          <div style={{ background: "#1a1a1a", borderBottom: "2px solid #C5A028" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ys-on-dark)", letterSpacing: 1.5, padding: "8px 14px 8px 0", borderLeft: "1px solid rgba(255,255,255,0.15)", marginLeft: 6, whiteSpace: "nowrap", flexShrink: 0 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#C5A028", letterSpacing: 1.5, padding: "8px 14px 8px 0", borderLeft: "1px solid rgba(255,255,255,0.15)", marginLeft: 6, whiteSpace: "nowrap", flexShrink: 0 }}>
                 רגעי חיים
               </span>
               {lifeEvents.map(ev => (
@@ -421,7 +421,7 @@ function NavBarContent() {
                   key={ev.id}
                   onClick={() => handleMoment(ev.id)}
                   style={{ background: "none", border: "none", borderBottom: "2px solid transparent", color: "rgba(255,255,255,0.82)", padding: "8px 13px", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", transition: "color 0.15s, border-bottom-color 0.15s" }}
-                  onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderBottomColor = "var(--ys-on-dark)"; }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderBottomColor = "#C5A028"; }}
                   onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.82)"; e.currentTarget.style.borderBottomColor = "transparent"; }}
                 >
                   {ev.title}
@@ -432,7 +432,7 @@ function NavBarContent() {
         )}
 
         {!isMobile && (
-          <div style={{ background: "var(--ys-page)", borderTop: "1px solid #E7E2D8", position: "relative" }}>
+          <div style={{ background: "#FAF8F3", borderTop: "1px solid #E7E2D8", position: "relative" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
               <button
                 onClick={() => router.push('/sale')}
@@ -449,9 +449,9 @@ function NavBarContent() {
                 >
                   <button onClick={() => handleSelect(item.cat)} onFocus={() => handleEnter(item.id)}
                     aria-expanded={activeId === item.id} aria-haspopup="true"
-                    style={{ background: "none", border: "none", color: activeId === item.id ? "var(--ys-purple)" : "var(--ys-ink)", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 500, borderBottom: activeId === item.id ? "2px solid var(--ys-purple)" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
+                    style={{ background: "none", border: "none", color: activeId === item.id ? "#C5A028" : "#1a1a1a", padding: "9px 13px", fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", fontWeight: activeId === item.id ? 700 : 500, borderBottom: activeId === item.id ? "2px solid #C5A028" : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", gap: 4 }}>
                     {item.label}
-                    <span aria-hidden="true" style={{ fontSize: 9, color: "var(--ys-on-dark)", display: "inline-block", transition: "transform 0.2s ease", transform: activeId === item.id ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
+                    <span aria-hidden="true" style={{ fontSize: 9, color: "#C5A028", display: "inline-block", transition: "transform 0.2s ease", transform: activeId === item.id ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
                   </button>
                   {activeId === item.id && <MegaPanel item={item} onSelect={handleSelect} />}
                 </div>
@@ -465,7 +465,7 @@ function NavBarContent() {
                 return (
                   <button key={nav.action} onClick={() => handleAction(nav.action)}
                     style={{ background: "none", border: "none", color: base, padding: "9px 11px", fontSize: promoted ? 13 : 12.5, fontWeight: promoted ? 700 : 400, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit", borderBottom: "2px solid transparent", transition: "all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.color = promoted ? "var(--ys-purple)" : "var(--ys-ink)"; if (promoted) e.currentTarget.style.borderBottomColor = "var(--ys-on-dark)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.color = promoted ? "#C5A028" : "#1a1a1a"; if (promoted) e.currentTarget.style.borderBottomColor = "#C5A028"; }}
                     onMouseLeave={e => { e.currentTarget.style.color = base; e.currentTarget.style.borderBottomColor = "transparent"; }}
                   >
                     {nav.label}

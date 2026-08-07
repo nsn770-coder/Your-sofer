@@ -1,11 +1,11 @@
 export const DEFAULT_THEME = {
-  colorPrimary: '#3B3B41',
+  colorPrimary: '#1E3A8A',
   colorSecondary: '#b8860b',
   colorBackground: '#f9f7f4',
   colorSurface: '#ffffff',
   colorText: '#1a1a1a',
   colorTextMuted: '#6b7280',
-  btnAddToCartBg: '#3B3B41',
+  btnAddToCartBg: '#1E3A8A',
   btnAddToCartText: '#ffffff',
   btnCheckoutBg: '#b8860b',
   btnCheckoutText: '#ffffff',

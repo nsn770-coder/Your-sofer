@@ -25,7 +25,7 @@ function getDeliveryEstimate(): { dayName: string; dateStr: string } {
   };
 }
 
-function IconTruckSmall({ size = 18, color = '#3B3B41' }: { size?: number; color?: string }) {
+function IconTruckSmall({ size = 18, color = '#1E3A8A' }: { size?: number; color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="1" y="3" width="15" height="13" rx="1" />
@@ -76,7 +76,7 @@ export default function DeliveryEstimate({ compact = false, daysRange, customMad
         <IconTruckSmall size={compact ? 15 : 17} />
       </div>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: compact ? 12 : 13, fontWeight: 800, color: '#3B3B41' }}>
+        <div style={{ fontSize: compact ? 12 : 13, fontWeight: 800, color: '#1E3A8A' }}>
           {daysRange
             ? `זמן אספקה משוער: ${daysRange} ימי עסקים`
             : `צפי משלוח: יום ${est.dayName}, ${est.dateStr} בשעות הצהריים`}
@@ -92,7 +92,7 @@ export default function DeliveryEstimate({ compact = false, daysRange, customMad
         <div style={{ fontSize: compact ? 10.5 : 11, color: '#555', marginTop: 2 }}>
           ההזמנה תישלח עם חברת המשלוחים {SHIPPING.carrierName} עד הבית — יישלח עדכון ומספר מעקב כשההזמנה תצא.
           {' '}
-          <Link href={POLICY_URLS.shipping} style={{ color: '#3B3B41', textDecorationLine: 'underline', textDecorationColor: '#93b8e8', textUnderlineOffset: 2 }}>
+          <Link href={POLICY_URLS.shipping} style={{ color: '#1E3A8A', textDecorationLine: 'underline', textDecorationColor: '#93b8e8', textUnderlineOffset: 2 }}>
             מידע על משלוחים
           </Link>
         </div>

@@ -37,7 +37,7 @@ export default function ReviewProof({ compact = false }: { compact?: boolean }) 
       }}
     >
       <Stars size={compact ? 12 : 14} />
-      <span style={{ fontWeight: 700, color: '#3B3B41' }}>
+      <span style={{ fontWeight: 700, color: '#1F2937' }}>
         {REVIEWS.rating} מתוך 5
       </span>
       <span style={{ color: '#888' }}>על בסיס {REVIEWS.count}+ ביקורות</span>

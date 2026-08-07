@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { OCCASIONS } from '@/data/occasions';
 
 const BASE_URL = 'https://your-sofer.com';
-const NAVY = '#3B3B41';
+const NAVY = '#373A5A';
 const GOLD = '#C5A028';
-const CREAM = '#FEFBF7';
+const CREAM = '#FAF8F3';
 
 const TITLE = 'מתנות לאירועים | תכשיטים בחריטה אישית ומזכרות מהודרות | YourSofer';
 const DESCRIPTION =
