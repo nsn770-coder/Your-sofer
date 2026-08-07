@@ -148,6 +148,14 @@
 
 .ys-btn-sm { height: 38px; padding: 0 16px; font-size: 14px; }
 
+.ys-btn:focus-visible,
+.ys-btn-secondary:focus-visible,
+.ys-hero-btn-primary:focus-visible,
+.ys-outline-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(81, 40, 95, 0.35);
+}
+
 /* ── שדות קלט ───────────────────────────────────────────────────────────
    שדה החיפוש שלהם אינו גלולה אלא radius 10px — ניגוד מכוון מול
    הכפתורים, כדי שלא יתבלבל איתם. */

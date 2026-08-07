@@ -852,30 +852,10 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       }}
     >
       <style>{`
-        .ys-hero-btn-primary {
-          display: inline-flex; align-items: center; justify-content: center;
-          background: #373A5A; color: #FFFFFF;
-          border: 1px solid #373A5A;
-          height: 54px; padding: 0 40px; border-radius: 0;
-          font-weight: 600; font-size: 16px; text-decoration: none;
-          white-space: nowrap; transition: all 0.2s ease; cursor: pointer;
-          font-family: inherit;
-        }
-        .ys-hero-btn-primary:hover { background: #2F324D; border-color: #2F324D; }
-        .ys-hero-btn-primary:active { background: #282B43; border-color: #282B43; }
-        .ys-hero-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(55,58,90,0.35); }
+        /* הגדרות הכפתורים הועברו ל-globals.css (08/2026).
+           הן היו כאן בכפילות, ובלוק <style> מקומי נטען אחרי הגיליון הגלובלי
+           ולכן דרס אותו — הכפתורים נשארו מרובעים למרות השינוי הגלובלי. */
         .ys-hscroll::-webkit-scrollbar { display: none; }
-        .ys-outline-btn {
-          display: inline-flex; align-items: center; justify-content: center;
-          background: #FFFFFF; color: #373A5A;
-          border: 1px solid #373A5A; border-radius: 0;
-          height: 50px; padding: 0 36px;
-          font-weight: 500; font-size: 14px; text-decoration: none;
-          transition: all 0.2s ease; cursor: pointer; font-family: inherit;
-        }
-        .ys-outline-btn:hover { background: #373A5A; color: #fff; }
-        .ys-outline-btn:active { background: #282B43; border-color: #282B43; color: #fff; }
-        .ys-outline-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(55,58,90,0.35); }
         /* CLS FIX: layout-critical responsive values live in CSS media queries, NOT in
            the isMobile JS state. isMobile is false during SSR/prerender, so any
            isMobile-driven width/height/grid painted desktop-first on phones and then
