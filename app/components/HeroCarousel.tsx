@@ -15,6 +15,65 @@ export interface HeroSlide {
 const INTERVAL_MS = 6000;
 
 /**
+ * גוף השקופית — נהיה <a> כשהוגדר יעד, אחרת <div>.
+ * הכפתור בפנים הוא <span> מעוצב ולא קישור אמיתי, כדי לא לקנן קישורים.
+ */
+function SlideBody({ as, href, active, slide }: {
+  as: 'a' | 'div';
+  href?: string;
+  active: boolean;
+  slide: HeroSlide;
+}) {
+  const Tag = as as 'a';
+  return (
+    <Tag
+      {...(as === 'a'
+        ? {
+            href,
+            // שקופית שאינה פעילה יוצאת מסדר הטאב כדי לא ללכוד מקלדת
+            tabIndex: active ? 0 : -1,
+            'aria-hidden': !active,
+          }
+        : {})}
+      className="ys-hero-content"
+      style={{
+        position: 'absolute', inset: 0, zIndex: 2,
+        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        textDecoration: 'none',
+        cursor: as === 'a' ? 'pointer' : 'default',
+      }}
+    >
+      {slide.eyebrow && (
+        <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 12px' }}>
+          {slide.eyebrow}
+        </p>
+      )}
+      <p className="ys-hero-title" style={{
+        fontWeight: 300, fontFamily: 'var(--font-cormorant), serif', color: '#FFFFFF',
+        lineHeight: 1.2, textShadow: '0 2px 16px rgba(0,0,0,0.4)',
+        margin: '0 0 14px', letterSpacing: '-0.02em',
+      }}>
+        {slide.title}
+      </p>
+      {slide.subtitle && (
+        <p className="ys-hero-sub" style={{ fontWeight: 400, color: 'rgba(255,255,255,0.88)', marginTop: 0, marginBottom: slide.ctaLabel ? 22 : 0, lineHeight: 1.7 }}>
+          {slide.subtitle}
+        </p>
+      )}
+      {slide.ctaLabel && href && (
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          alignSelf: 'flex-start', background: '#C5A028', color: '#1a1a1a',
+          height: 48, padding: '0 32px', fontSize: 15, fontWeight: 700,
+        }}>
+          {slide.ctaLabel}
+        </span>
+      )}
+    </Tag>
+  );
+}
+
+/**
  * קרוסלת Hero — החליפה את הווידאו (08/2026).
  *
  * הווידאו גרם ל-LCP של ~14.6 שניות: הוא התחיל להוריד מגה-בייטים מיד וחסם
@@ -93,43 +152,16 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             {/* שכבת הכהיה — בגוון המותג ולא שחור נייטרלי */}
             <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'rgba(26,26,26,0.48)' }} />
 
-            <div className="ys-hero-content" style={{
-              position: 'absolute', inset: 0, zIndex: 2,
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
-            }}>
-              {s.eyebrow && (
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#C5A028', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 12px' }}>
-                  {s.eyebrow}
-                </p>
-              )}
-              <p className="ys-hero-title" style={{
-                fontWeight: 300, fontFamily: 'var(--font-cormorant), serif', color: '#FFFFFF',
-                lineHeight: 1.2, textShadow: '0 2px 16px rgba(0,0,0,0.4)',
-                margin: '0 0 14px', letterSpacing: '-0.02em',
-              }}>
-                {s.title}
-              </p>
-              {s.subtitle && (
-                <p className="ys-hero-sub" style={{ fontWeight: 400, color: 'rgba(255,255,255,0.88)', marginTop: 0, marginBottom: s.ctaLabel ? 22 : 0, lineHeight: 1.7 }}>
-                  {s.subtitle}
-                </p>
-              )}
-              {s.ctaLabel && s.ctaHref && (
-                <a
-                  href={s.ctaHref}
-                  // שקופית לא פעילה מוסתרת מקוראי מסך וגם מהטאב
-                  tabIndex={active ? 0 : -1}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    alignSelf: 'flex-start', background: '#C5A028', color: '#1a1a1a',
-                    textDecoration: 'none', height: 48, padding: '0 32px',
-                    fontSize: 15, fontWeight: 700,
-                  }}
-                >
-                  {s.ctaLabel}
-                </a>
-              )}
-            </div>
+            {/* כל שטח הבאנר הוא הקישור — לא רק הכפתור.
+                לכן ה"כפתור" הוא <span> ולא <a>: קישור בתוך קישור הוא HTML
+                לא תקין וקוראי מסך מכריזים עליו פעמיים. כשאין ctaHref
+                השקופית נשארת <div> רגיל ולא לחיצה. */}
+            <SlideBody
+              as={s.ctaHref ? 'a' : 'div'}
+              href={s.ctaHref}
+              active={active}
+              slide={s}
+            />
           </div>
         );
       })}

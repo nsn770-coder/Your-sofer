@@ -5956,8 +5956,10 @@ function HeroTab() {
       if (clean.length === 0) { setError('צריך לפחות באנר אחד כשהקרוסלה פעילה'); return; }
       const bad = clean.find(s => !s.imgUrl.trim() || !s.title.trim());
       if (bad) { setError('בכל באנר צריך תמונה וכותרת'); return; }
-      const halfCta = clean.find(s => (!!s.ctaLabel.trim()) !== (!!s.ctaHref.trim()));
-      if (halfCta) { setError('בכפתור צריך למלא גם טקסט וגם קישור, או להשאיר את שניהם ריקים'); return; }
+      // קישור בלי טקסט כפתור תקין לגמרי — הבאנר כולו לחיץ.
+      // טקסט כפתור בלי קישור הוא כפתור מת.
+      const orphanLabel = clean.find(s => s.ctaLabel.trim() && !s.ctaHref.trim());
+      if (orphanLabel) { setError('יש טקסט כפתור בלי קישור — הוסף יעד או מחק את הטקסט'); return; }
     }
     setError(''); setSaving(true);
     try {
@@ -6019,9 +6021,12 @@ function HeroTab() {
               <input className={inp} value={s.title}        onChange={e => upd(i, 'title', e.target.value)}        placeholder="כותרת *" />
               <input className={inp} value={s.subtitle}     onChange={e => upd(i, 'subtitle', e.target.value)}     placeholder="תיאור" />
               <div className="grid grid-cols-2 gap-2">
-                <input className={inp} value={s.ctaLabel} onChange={e => upd(i, 'ctaLabel', e.target.value)} placeholder="טקסט כפתור" />
-                <input className={inp} value={s.ctaHref}  onChange={e => upd(i, 'ctaHref', e.target.value)}  placeholder="/moment/bar-mitzvah" dir="ltr" />
+                <input className={inp} value={s.ctaHref}  onChange={e => upd(i, 'ctaHref', e.target.value)}  placeholder="יעד — /event-kippot" dir="ltr" />
+                <input className={inp} value={s.ctaLabel} onChange={e => upd(i, 'ctaLabel', e.target.value)} placeholder="טקסט כפתור (רשות)" />
               </div>
+              <p className="text-xs text-gray-400 -mt-1">
+                כשיש יעד — <b>כל שטח הבאנר לחיץ</b>. טקסט הכפתור רק מוסיף כפתור גלוי מעל.
+              </p>
               {s.imgUrl && <img src={s.imgUrl} alt="" className="w-full max-w-sm object-cover rounded border" style={{ aspectRatio: '3 / 1' }} />}
             </div>
           ))}
