@@ -814,7 +814,7 @@ export default function CheckoutPage() {
         <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', width: '100%', maxWidth: '100%', boxSizing: 'border-box', minWidth: 0 }}>
           {/* Form header with call-to-action subtitle */}
           <div style={{ background: '#f8f6f2', borderBottom: '1px solid #e8e2d8', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--ys-accent)', color: 'var(--ys-heading)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>📦</div>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--ys-accent)', color: '#FEFBF7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>📦</div>
             <div>
               <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--ys-heading)', margin: 0 }}>פרטי משלוח</h2>
               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ys-accent)', marginTop: 3 }}>למלא פרטים ולהתקדם לרכישה</div>

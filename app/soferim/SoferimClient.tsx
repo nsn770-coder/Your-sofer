@@ -70,7 +70,7 @@ export default function SoferimClient() {
           </div>
 
           <button onClick={() => router.push('/soferim/apply')}
-            style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 8, padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 8, padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             ✍️ הצטרף כסופר לפלטפורמה
           </button>
         </div>

@@ -29,7 +29,7 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
           <div style={{ fontSize: 36, marginBottom: 8 }}>🏆</div>
           <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--ys-accent)', marginBottom: 4 }}>קבל חינם: מדריך הקנייה המלא</div>
           <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>5 שאלות שכל אחד חייב לשאול לפני שקונה סת״מ</div>
-          <div style={{ marginTop: 10, background: 'var(--ys-accent)', color: 'var(--ys-text)', borderRadius: 0, padding: '5px 16px', fontSize: 13, fontWeight: 900, display: 'inline-block' }}>קבל 5% הנחה על ההזמנה הראשונה</div>
+          <div style={{ marginTop: 10, background: 'var(--ys-accent)', color: '#FEFBF7', borderRadius: 0, padding: '5px 16px', fontSize: 13, fontWeight: 900, display: 'inline-block' }}>קבל 5% הנחה על ההזמנה הראשונה</div>
         </div>
         <div style={{ padding: '24px 24px 28px' }}>
           {status === 'success' ? (
@@ -37,7 +37,7 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
               <div style={{ fontSize: 40, marginBottom: 10 }}>🎉</div>
               <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--ys-text)', marginBottom: 6 }}>נרשמתם בהצלחה!</div>
               <div style={{ fontSize: 13, color: '#666' }}>נעדכן אתכם ראשונים על מוצרים חדשים ומבצעים.</div>
-              <button onClick={onClose} style={{ marginTop: 18, background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 0, padding: '10px 28px', fontSize: 14, fontWeight: 900, cursor: 'pointer' }}>סגור</button>
+              <button onClick={onClose} style={{ marginTop: 18, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 0, padding: '10px 28px', fontSize: 14, fontWeight: 900, cursor: 'pointer' }}>סגור</button>
             </div>
           ) : (
             <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -54,7 +54,7 @@ export default function NewsletterPopup({ email, setEmail, status, setStatus, on
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 0, padding: '13px', fontSize: 15, fontWeight: 900, cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.7 : 1 }}
+                style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 0, padding: '13px', fontSize: 15, fontWeight: 900, cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.7 : 1 }}
               >
                 {status === 'loading' ? '⏳ שולח...' : 'שלח לי את המדריך'}
               </button>

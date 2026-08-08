@@ -134,7 +134,7 @@ export default function CertificatePage() {
           <button
             onClick={() => window.print()}
             style={{
-              background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none',
+              background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none',
               borderRadius: 8, padding: '8px 22px', fontWeight: 800,
               fontSize: 14, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif',
               whiteSpace: 'nowrap',

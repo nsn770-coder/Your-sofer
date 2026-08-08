@@ -1579,7 +1579,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             href="/build"
             style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              background: 'var(--ys-accent)', color: 'var(--ys-text)', textDecoration: 'none',
+              background: 'var(--ys-accent)', color: '#FEFBF7', textDecoration: 'none',
               height: 50, padding: '0 38px', fontSize: 15, fontWeight: 700,
             }}
           >

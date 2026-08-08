@@ -85,7 +85,7 @@ export default function WizardStickyBar() {
         style={{
           flexShrink: 0,
           background: 'var(--ys-accent)',
-          color: 'var(--ys-text)',
+          color: '#FEFBF7',
           border: 'none',
           borderRadius: 8,
           padding: '10px 18px',

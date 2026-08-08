@@ -294,7 +294,7 @@ function FinishedBanner({ onYes, onNo }: { onYes: () => void; onNo: () => void }
       <span style={{ fontSize: 15, fontWeight: 700 }}>סיימת לבחור קלפים?</span>
       <button
         onClick={onYes}
-        style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 0, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
+        style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 0, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
       >כן, סיימתי ✓</button>
       <button
         onClick={onNo}
@@ -320,7 +320,7 @@ function FinishedCasesBanner({ onYes, onNo }: { onYes: () => void; onNo: () => v
       <span style={{ fontSize: 15, fontWeight: 700 }}>סיימת לבחור בתי מזוזה?</span>
       <button
         onClick={onYes}
-        style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 0, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
+        style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 0, padding: '8px 18px', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}
       >כן, לסל</button>
       <button
         onClick={onNo}
@@ -365,7 +365,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
             </div>
           </div>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 10 }}>נוסף לסל! עכשיו בחר גם בית מזוזה</div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--ys-accent)', color: 'var(--ys-text)', borderRadius: 0, padding: '7px 20px', fontSize: 14, fontWeight: 900 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--ys-accent)', color: '#FEFBF7', borderRadius: 0, padding: '7px 20px', fontSize: 14, fontWeight: 900 }}>
             <IconGift size={16} color="#1a1a1a" /> 5% הנחה על בתי מזוזה עכשיו
           </div>
         </div>
@@ -393,7 +393,7 @@ function UpsellModal({ isMobile, onClose, onViewCart }: { isMobile: boolean; onC
                       <span style={{ fontSize: 15, fontWeight: 900, color: 'var(--ys-accent)' }}>{formatPrice(p.price * 0.85)}</span>
                       <span style={{ fontSize: 11, color: '#bbb', textDecoration: 'line-through' }}>{formatPrice(p.price)}</span>
                     </div>
-                    <button style={{ width: '100%', background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 0, padding: '8px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>+ הוסף לסל</button>
+                    <button style={{ width: '100%', background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 0, padding: '8px', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>+ הוסף לסל</button>
                   </div>
                 </div>
               ))}

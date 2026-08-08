@@ -147,7 +147,7 @@ export default function AboutClient() {
         <div style={{ textAlign: 'center' }}>
           <button
             onClick={() => router.push('/')}
-            style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', padding: '14px 32px', fontSize: 16, fontWeight: 800, cursor: 'pointer', borderRadius: 8, fontFamily: 'inherit' }}
+            style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', padding: '14px 32px', fontSize: 16, fontWeight: 800, cursor: 'pointer', borderRadius: 8, fontFamily: 'inherit' }}
           >
             לחנות המלאה ←
           </button>

@@ -122,7 +122,7 @@ export default function BarMitzvahPage() {
         </p>
         <a
           href={CATEGORY_URL}
-          className="inline-block bg-[var(--ys-accent)] text-[#1a1a1a] font-black text-base px-10 py-4 rounded-lg no-underline"
+          className="inline-block bg-[var(--ys-accent)] text-[#FEFBF7] font-black text-base px-10 py-4 rounded-lg no-underline"
         >
           בחר את הסט שלך ←
         </a>
@@ -232,7 +232,7 @@ export default function BarMitzvahPage() {
         </h2>
         <a
           href={CATEGORY_URL}
-          className="inline-block bg-[var(--ys-accent)] text-[#1a1a1a] font-black text-base px-10 py-4 rounded-lg no-underline mb-5"
+          className="inline-block bg-[var(--ys-accent)] text-[#FEFBF7] font-black text-base px-10 py-4 rounded-lg no-underline mb-5"
         >
           לצפייה בסטים ←
         </a>

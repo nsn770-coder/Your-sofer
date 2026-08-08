@@ -391,7 +391,7 @@ export default function SoferApplyPage() {
                 <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--ys-text)', marginBottom: 6 }}>🎉 לרגל ההשקה — הצטרפות חינם!</div>
                 <div style={{ fontSize: 13, color: '#555', marginBottom: 12 }}>פתיחת עוסק פטור דרכנו עם 10% הנחה על השירות</div>
                 <a href="https://mycount.co.il/הסופר-שלך/" target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'inline-block', background: 'var(--ys-accent)', color: 'var(--ys-text)', fontWeight: 900, fontSize: 14, padding: '10px 20px', borderRadius: 8, textDecoration: 'none' }}>
+                  style={{ display: 'inline-block', background: 'var(--ys-accent)', color: '#FEFBF7', fontWeight: 900, fontSize: 14, padding: '10px 20px', borderRadius: 8, textDecoration: 'none' }}>
                   פתחו לי עוסק פטור ←
                 </a>
               </div>

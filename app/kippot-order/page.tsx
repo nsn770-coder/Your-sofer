@@ -478,7 +478,7 @@ function KippotOrderInner() {
             <button
               onClick={generateAiMockup}
               disabled={!logoDataUrl}
-              style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', fontWeight: 900, fontSize: 14, padding: '12px 24px', border: 'none', cursor: logoDataUrl ? 'pointer' : 'not-allowed', opacity: logoDataUrl ? 1 : 0.6, fontFamily: 'inherit', width: '100%' }}
+              style={{ background: 'var(--ys-accent)', color: '#FEFBF7', fontWeight: 900, fontSize: 14, padding: '12px 24px', border: 'none', cursor: logoDataUrl ? 'pointer' : 'not-allowed', opacity: logoDataUrl ? 1 : 0.6, fontFamily: 'inherit', width: '100%' }}
             >
               ✨ צרו לי הדמיה
             </button>
@@ -658,7 +658,7 @@ function KippotOrderInner() {
               <div style={{ fontSize: 15, fontWeight: 900 }}>{DESIGN_EXAMPLES[zoomExample].label}</div>
               <button
                 onClick={() => { setDesignExample(DESIGN_EXAMPLES[zoomExample].id); setZoomExample(null); }}
-                style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', padding: '10px 24px', fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}
+                style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', padding: '10px 24px', fontSize: 14, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}
               >✓ בחרו דוגמה זו</button>
             </div>
           </div>

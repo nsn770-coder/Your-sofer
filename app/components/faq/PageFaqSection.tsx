@@ -84,7 +84,7 @@ export default function PageFaqSection({
             href={startDesignHref}
             onClick={() => trackFaqEvent('faq_start_design_click', { page: pathname ?? undefined })}
             style={{
-              background: 'var(--ys-accent)', color: 'var(--ys-text)', padding: '11px 22px', borderRadius: 10,
+              background: 'var(--ys-accent)', color: '#FEFBF7', padding: '11px 22px', borderRadius: 10,
               fontSize: 14, fontWeight: 800, textDecoration: 'none',
             }}
           >

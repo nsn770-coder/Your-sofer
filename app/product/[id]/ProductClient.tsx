@@ -1847,7 +1847,7 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16, fontFamily: 'Heebo, Arial, sans-serif' }}>
       <Icon.Sad />
       <div style={{ fontSize: 20, fontWeight: 700, color: '#333' }}>מוצר לא נמצא</div>
-      <button onClick={() => router.push('/')} style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
+      <button onClick={() => router.push('/')} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
     </div>
   );
 
@@ -2708,7 +2708,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           <span style={{ fontSize: 13, fontWeight: 600 }}>אתה במדריך בר מצווה</span>
           <button
             onClick={() => router.back()}
-            style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 0, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+            style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 0, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
           >
             חזור למדריך ←
           </button>
@@ -3010,7 +3010,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                       <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: 'var(--ys-text)' }}>{formatPrice(cp.price)}</div>
                       <button
                         onClick={e => { e.stopPropagation(); addItem({ id: cp.id, name: cp.name, price: cp.price, imgUrl: cpImg ?? undefined, quantity: 1, cat: cp.cat || undefined }); }}
-                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
+                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
                       >
                         הוסף לסל
                       </button>
@@ -3032,7 +3032,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                 </h2>
                 <button
                   onClick={() => router.push('/event-kippot')}
-                  style={{ width: isMobile ? '100%' : 'auto', background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 24, padding: '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(197,160,40,0.35)' }}
+                  style={{ width: isMobile ? '100%' : 'auto', background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 24, padding: '10px 22px', fontSize: isMobile ? 13 : 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(197,160,40,0.35)' }}
                 >
                   כנס לעמוד כיפות ומזכרות — מחירים ומבצעים מיוחדים ←
                 </button>
@@ -3077,7 +3077,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                         )}
                       </div>
                       <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1, cat: r.cat || undefined }); }}
-                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', fontWeight: 700, fontSize: 11, cursor: 'pointer', whiteSpace: 'nowrap', boxSizing: 'border-box' as const, overflow: 'hidden' }}>
+                        style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', fontWeight: 700, fontSize: 11, cursor: 'pointer', whiteSpace: 'nowrap', boxSizing: 'border-box' as const, overflow: 'hidden' }}>
                         הוסף לסל
                       </button>
                     </div>
@@ -3122,7 +3122,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: 'var(--ys-text)' }}>{formatPrice(lp.price)}</div>
                     <button
                       onClick={e => { e.stopPropagation(); addItem({ id: lp.id, name: lp.name, price: lp.price, imgUrl: lpImg ?? undefined, quantity: 1, cat: lp.cat || undefined }); }}
-                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
+                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}
                     >
                       הוסף לסל
                     </button>
@@ -3159,7 +3159,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     <Stars n={r.stars || 4.5} size={11} />
                     <div style={{ fontSize: isMobile ? 15 : 16, fontWeight: 900, color: 'var(--ys-text)' }}>{formatPrice(r.price)}</div>
                     <button onClick={e => { e.stopPropagation(); addItem({ id: r.id, name: r.name, price: r.price, imgUrl: rImg ?? undefined, quantity: 1, cat: r.cat || undefined }); }}
-                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
+                      style={{ marginTop: 'auto', width: '100%', padding: isMobile ? '5px 0' : '6px 0', borderRadius: 20, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 12, cursor: 'pointer' }}>
                       הוסף לסל
                     </button>
                   </div>
@@ -3280,7 +3280,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {user?.role === 'admin' && isMobile && !adminOpen && (
         <button
           onClick={() => setAdminOpen(true)}
-          style={{ position: 'fixed', bottom: 20, left: 16, zIndex: 1040, background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: '50%', width: 48, height: 48, fontSize: 18, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'fixed', bottom: 20, left: 16, zIndex: 1040, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: '50%', width: 48, height: 48, fontSize: 18, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           title="עריכת מוצר"
         >
           ✏️

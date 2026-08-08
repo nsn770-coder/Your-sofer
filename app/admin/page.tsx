@@ -723,7 +723,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: 'var(--ys-accent)', color: 'var(--ys-heading)', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ flex: 1, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             {saving ? '⏳ שומר...' : '✅ הוסף מוצר'}
           </button>
           <button onClick={onClose}
@@ -1344,7 +1344,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
 
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: 'var(--ys-accent)', color: 'var(--ys-heading)', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ flex: 1, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             {saving ? '⏳ שומר...' : '✅ שמור שינויים'}
           </button>
           <button onClick={onClose}
@@ -1478,7 +1478,7 @@ function AddSoferModal({ onClose, onSave }: { onClose: () => void; onSave: () =>
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: 'var(--ys-accent)', color: 'var(--ys-heading)', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ flex: 1, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             {saving ? '⏳ שומר...' : '✅ הוסף סופר'}
           </button>
           <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
@@ -1618,7 +1618,7 @@ function EditSoferModal({ sofer, onClose, onSave }: {
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={handleSave} disabled={saving}
-            style={{ flex: 1, background: 'var(--ys-accent)', color: 'var(--ys-heading)', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            style={{ flex: 1, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             {saving ? '⏳ שומר...' : '💾 שמור שינויים'}
           </button>
           <button onClick={onClose} style={{ background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 8, padding: '12px 20px', fontSize: 14, cursor: 'pointer' }}>ביטול</button>
@@ -3023,7 +3023,7 @@ function CouponCreateForm({ onCreated }: { onCreated: () => void }) {
           <label className="text-xs font-bold text-gray-500">תפוגה</label>
           <input ref={expiresAtRef} type="date" defaultValue="" className="border border-gray-200 rounded-xl px-3 py-2 text-sm" />
         </div>
-        <button onClick={createCoupon} disabled={couponSaving} style={{ background: 'var(--ys-accent)', color: 'var(--ys-heading)', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: couponSaving ? 0.5 : 1 }}>
+        <button onClick={createCoupon} disabled={couponSaving} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: couponSaving ? 0.5 : 1 }}>
           {couponSaving ? '...' : '➕ צור קופון'}
         </button>
       </div>
@@ -4158,7 +4158,7 @@ export default function AdminPage() {
       </div>
 
       <div className="flex justify-end mb-4">
-        <button onClick={() => setShowAddProduct(true)} style={{ background: 'var(--ys-accent)', color: 'var(--ys-heading)', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר חדש</button>
+        <button onClick={() => setShowAddProduct(true)} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר חדש</button>
       </div>
 
       {/* ── טאבים ── */}
@@ -4239,7 +4239,7 @@ export default function AdminPage() {
             </div>
             <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
             {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
-            <button onClick={() => setShowAddProduct(true)} style={{ background: 'var(--ys-accent)', color: 'var(--ys-heading)', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר</button>
+            <button onClick={() => setShowAddProduct(true)} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר</button>
             <button onClick={exportToExcel} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📥 ייצוא ל-Excel</button>
             <button onClick={downloadTemplate} style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📋 הורד תבנית</button>
             <label style={{ background: '#0284c7', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
@@ -4428,7 +4428,7 @@ export default function AdminPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-black">✍️ סופרים פעילים ({soferimFull.length})</h2>
-            <button onClick={() => setShowAddSofer(true)} style={{ background: 'var(--ys-accent)', color: 'var(--ys-heading)', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף סופר</button>
+            <button onClick={() => setShowAddSofer(true)} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף סופר</button>
           </div>
           {soferimLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
           : soferimFull.length === 0 ? <div className="p-10 text-center text-gray-400">אין סופרים עדיין</div>
@@ -5952,7 +5952,7 @@ function CurationsTab() {
         <h2 style={{ fontSize: 20, fontWeight: 900, color: 'var(--ys-heading)' }}>✨ סלקציות (Curations)</h2>
         <button
           onClick={() => setNewRows(n => n + 1)}
-          style={{ background: 'var(--ys-accent)', color: 'var(--ys-heading)', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+          style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
         >
           + הוסף סלקציה
         </button>

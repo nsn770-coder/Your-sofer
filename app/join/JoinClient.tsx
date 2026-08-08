@@ -142,7 +142,7 @@ export default function JoinPage() {
             ← חזרה לחנות
           </button>
           <a href="mailto:info@your-sofer.com"
-            style={{ background: 'var(--ys-accent)', color: 'var(--ys-text)', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
+            style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
             📧 צור קשר
           </a>
         </div>
