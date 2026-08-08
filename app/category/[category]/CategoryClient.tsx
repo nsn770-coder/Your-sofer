@@ -2221,6 +2221,13 @@ export default function CategoryClient({ category }: { category: string }) {
                       : COLLECTIONS_ORDER;
                     const result: React.ReactNode[] = [];
                     let bannerIdx = 0;
+                    // כשתת-קטגוריה כבר נבחרה, הרצועה היא מתג מעבר בין סוגים —
+                    // ולכן מקומה מעל המוצרים ולא אחרי 16 מהם.
+                    if (!isStamCat && subCategoryFilter) {
+                      result.push(
+                        <SubcategoryTiles key="subcat-switch" category={category} activeFilter={subCategoryFilter} />
+                      );
+                    }
                     for (let start = 0; start < paginated.length; start += BANNER_EVERY) {
                       const chunk = paginated.slice(start, start + BANNER_EVERY);
                       result.push(
@@ -2263,12 +2270,12 @@ export default function CategoryClient({ category }: { category: string }) {
                       // אריחי תת-קטגוריה — אחרי הקבוצה הראשונה, ושוב בהמשך
                       // בעמודים ארוכים. הדפוס של NOTHS: קודם סחורה, ואז
                       // הצעה לצמצם. מוצג רק כשלא סוננה כבר תת-קטגוריה.
-                      if (!isStamCat && start === 0) {
+                      if (!isStamCat && !subCategoryFilter && start === 0) {
                         result.push(
                           <SubcategoryTiles key="subcat-tiles-1" category={category} activeFilter={subCategoryFilter} />
                         );
                       }
-                      if (!isStamCat && start === BANNER_EVERY * 2) {
+                      if (!isStamCat && !subCategoryFilter && start === BANNER_EVERY * 2) {
                         result.push(
                           <SubcategoryTiles key="subcat-tiles-2" category={category} activeFilter={subCategoryFilter} variant="compact" />
                         );
