@@ -817,7 +817,7 @@ export default function PrintOrderPage() {
                     padding: '14px 0',
                     background: GOLD,
                     border: 'none',
-                    color: NAVY,
+                    color: '#FEFBF7',
                     fontSize: 14,
                     fontWeight: 900,
                     cursor: 'pointer',

@@ -160,7 +160,7 @@ export default function BarMitzvaPage() {
                     </div>
                     <button
                       onClick={e => { e.stopPropagation(); addItem({ id: p.id, name: p.name, price: p.price, imgUrl: img || undefined, quantity: 1, cat: p.cat || undefined }); }}
-                      style={{ width: '100%', padding: '8px 0', borderRadius: 10, background: GOLD, color: 'var(--ys-text)', border: 'none', fontWeight: 800, fontSize: isMobile ? 12 : 13, cursor: 'pointer' }}>
+                      style={{ width: '100%', padding: '8px 0', borderRadius: 10, background: GOLD, color: '#FEFBF7', border: 'none', fontWeight: 800, fontSize: isMobile ? 12 : 13, cursor: 'pointer' }}>
                       הוסף לסל
                     </button>
                   </div>
@@ -184,7 +184,7 @@ export default function BarMitzvaPage() {
                 חולצות מודפסות לבר מצווה, הדפסות על כיפות — העלו תמונה, בחרו עיצוב, וקבלו הדפסה אישית
               </div>
             </div>
-            <div style={{ flexShrink: 0, background: GOLD, color: NAVY, fontWeight: 900, fontSize: 14, padding: '10px 22px', borderRadius: 10 }}>
+            <div style={{ flexShrink: 0, background: GOLD, color: '#FEFBF7', fontWeight: 900, fontSize: 14, padding: '10px 22px', borderRadius: 10 }}>
               להזמנה ←
             </div>
           </div>

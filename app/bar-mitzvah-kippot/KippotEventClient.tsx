@@ -382,7 +382,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
             <button
               onClick={scrollToGrid}
               style={{
-                background: GOLD, color: NAVY, border: 'none',
+                background: GOLD, color: '#FEFBF7', border: 'none',
                 padding: '14px 32px', fontSize: 15, fontWeight: 900,
                 cursor: 'pointer', fontFamily: 'inherit',
               }}
@@ -407,7 +407,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
 
       {/* ── 2. Promo banner ─────────────────────────────────────────────────── */}
       <div style={{ background: GOLD, padding: isMobile ? '14px 16px' : '16px 24px', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontSize: isMobile ? 13 : 15, fontWeight: 800, color: NAVY, lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontSize: isMobile ? 13 : 15, fontWeight: 800, color: '#FEFBF7', lineHeight: 1.5 }}>
           {config.promoBanner}
         </p>
       </div>
@@ -672,7 +672,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
               {config.ctaPrintBody}
             </div>
           </div>
-          <div style={{ flexShrink: 0, background: GOLD, color: NAVY, fontWeight: 900, fontSize: 14, padding: '10px 22px' }}>
+          <div style={{ flexShrink: 0, background: GOLD, color: '#FEFBF7', fontWeight: 900, fontSize: 14, padding: '10px 22px' }}>
             להזמנת הדפסה ←
           </div>
         </a>

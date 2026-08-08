@@ -92,7 +92,7 @@ export default function TwoPlusOneClient() {
       </div>
 
       {/* Badge strip */}
-      <div style={{ background: 'var(--ys-accent)', padding: '10px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: 'var(--ys-text)' }}>
+      <div style={{ background: 'var(--ys-accent)', padding: '10px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#FEFBF7' }}>
         🎁 המבצע תקף לכל המוצרים המסומנים &nbsp;·&nbsp; ניתן לשלב גדלים וצבעים שונים
       </div>
 

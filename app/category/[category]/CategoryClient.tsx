@@ -1691,13 +1691,19 @@ export default function CategoryClient({ category }: { category: string }) {
           הטקסט התיאורי היחיד בעמוד — עד עכשיו זחלני חיפוש ראו רק רשת מוצרים. */}
       <CategoryHero category={category} />
 
-      {/* ── Mobile toolbar ── */}
-      <div className="lg:hidden sticky top-0 z-20" style={{ background: '#FFFFFF', borderBottom: '1px solid #EDEDEF', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
+      {/* ── סרגל כלים — בכל הרזולוציות ──
+          עד 08/2026 הוא היה lg:hidden, וסרגל הסינון תפס 240px קבועים
+          בדסקטופ. אצל NOTHS גם ב-1536px הסינון הוא כפתור; זה מחזיר את
+          הרוחב למוצרים בלי לאבד אף יכולת סינון. */}
+      <div className="sticky top-0 z-20" style={{ background: '#FFFFFF', borderBottom: '1px solid #EDEDEF', padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 8 }} dir="rtl">
+        {/* ספירה ומיון — מובייל בלבד. בדסקטופ הם כבר בסרגל שמתחת,
+            יחד עם צ'יפי הסינון המהיר. */}
         {!loading && (
-          <span style={{ fontSize: 13, color: '#6B7280', flex: 1 }}>{filtered.length} מוצרים</span>
+          <span className="lg:hidden" style={{ fontSize: 13, color: '#6B7280', flex: 1 }}>{filtered.length} מוצרים</span>
         )}
+        <span className="hidden lg:block" style={{ flex: 1 }} />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 0, padding: '8px 14px' }}>
+        <div className="lg:hidden" style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 0, padding: '8px 14px' }}>
           <IconSort size={13} />
           <select
             value={sortBy}
@@ -1710,22 +1716,34 @@ export default function CategoryClient({ category }: { category: string }) {
 
         <button
           onClick={() => setDrawerOpen(true)}
-          style={{ background: '#FFFFFF', border: '1px solid #E7E2D8', borderRadius: 0, padding: '8px 14px', fontSize: 13, color: '#1F2937', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit', fontWeight: 600, flexShrink: 0 }}
+          className="ys-btn-secondary ys-btn-sm"
+          style={{ flexShrink: 0 }}
         >
           <IconFilter size={14} />
-          סינון
-          {anyActive && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#C9A227', flexShrink: 0, display: 'inline-block' }} />}
+          סינון ומיון
+          {anyActive && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ys-purple)', flexShrink: 0, display: 'inline-block' }} />}
         </button>
       </div>
 
-      {/* ── Mobile drawer ── */}
+      {/* ── חלונית הסינון ──
+          במובייל עולה מלמטה, בדסקטופ נכנסת מהצד. אותו רכיב FilterSidebar
+          משרת את שניהם — אין כפילות לוגיקה. */}
       {drawerOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end lg:flex-row lg:justify-start">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
-          <div className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 pb-8 shadow-2xl">
-            <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
+          <div
+            dir="rtl"
+            className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-5 pb-8 shadow-2xl
+                       lg:rounded-none lg:max-h-none lg:h-full lg:w-[340px] lg:mr-auto lg:p-6"
+          >
+            <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5 lg:hidden" />
+            <div className="hidden lg:flex items-center justify-between mb-4">
+              <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--ys-ink)' }}>סינון</span>
+              <button onClick={() => setDrawerOpen(false)} aria-label="סגור סינון"
+                style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888', lineHeight: 1 }}>✕</button>
+            </div>
             <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} availableCollections={availableCollections} />
-            <button onClick={() => setDrawerOpen(false)} className="mt-5 w-full py-3.5 bg-[#373A5A] text-white rounded-none font-medium text-sm hover:bg-[#2F324D] transition-colors">
+            <button onClick={() => setDrawerOpen(false)} className="ys-btn mt-5 w-full">
               הצג {filtered.length} תוצאות
             </button>
           </div>
@@ -1735,12 +1753,7 @@ export default function CategoryClient({ category }: { category: string }) {
       {/* ── Main layout ── */}
       <div className="max-w-7xl mx-auto px-4 py-10 flex gap-6 items-start">
 
-        {/* Desktop sidebar */}
-        <aside className="hidden lg:block w-60 flex-shrink-0 sticky top-4">
-          <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} availableCollections={availableCollections} />
-        </aside>
-
-        {/* Products area */}
+        {/* Products area — תופס את כל הרוחב מאז שסרגל הסינון הפך לחלונית */}
         <div className="flex-1 min-w-0">
 
           {/* ── Expert Recommended Section — ABOVE sort/filter bar ── */}
@@ -1751,7 +1764,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                     <h2 style={{ fontSize: 16, fontWeight: 600, color: '#373A5A', margin: 0 }}>מומלץ לרמת {lvl}</h2>
                   </div>
-                  <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7'}>
+                  <div className={(category.includes('מצווה') || category.includes('מצוה')) ? 'grid grid-cols-1 gap-4' : isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 gap-y-7'}>
                     {recs.map((p, idx) => (
                       <div key={p.id}
                         style={{ border: '1px solid #373A5A', borderRadius: 0, overflow: 'hidden', background: '#fff', cursor: (category.includes('מצווה') || category.includes('מצוה')) ? 'pointer' : 'default' }}
@@ -2040,7 +2053,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
           {/* Products grid / loading / empty */}
           {loading ? (
-            <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7'}>
+            <div className={isStamCat ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 gap-y-7'}>
               {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : hasExpertRec && !showAllProducts ? null
@@ -2063,7 +2076,7 @@ export default function CategoryClient({ category }: { category: string }) {
             <>
               {(['בתי מזוזה', 'קלפי מזוזה'].includes(category) && !active && !subCategoryFilter) ? (
                 (() => {
-                  const gridCls = 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7';
+                  const gridCls = 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 gap-y-7';
                   const renderCard = (p: Product, idx: number) => isStamCat ? (
                     <StamCard
                       key={p.id}
@@ -2184,7 +2197,7 @@ export default function CategoryClient({ category }: { category: string }) {
                         />
                       </div>
                     );
-                    const gridCls = "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7";
+                    const gridCls = "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 gap-y-7";
                     // חזרה שנייה על האריחים בעמודים ארוכים — מי שגלל 30 מוצרים
                     // כבר לא רואה את הרצועה הראשונה, וזו נקודת ההחלטה הטבעית
                     // לצמצם. אצלם הדפוס חוזר לאורך כל עמוד המחלקה.
@@ -2231,7 +2244,7 @@ export default function CategoryClient({ category }: { category: string }) {
                     for (let start = 0; start < paginated.length; start += BANNER_EVERY) {
                       const chunk = paginated.slice(start, start + BANNER_EVERY);
                       result.push(
-                        <div key={`chunk-${start}`} className={isStamCat ? '' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-7'}>
+                        <div key={`chunk-${start}`} className={isStamCat ? '' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 gap-y-7'}>
                           {chunk.map((p, idx) => isStamCat ? (
                             <StamCard
                               key={p.id}

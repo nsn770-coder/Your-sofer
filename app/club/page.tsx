@@ -95,7 +95,7 @@ export default function ClubJoinPage() {
               <a href="/account/loyalty" style={{ display: 'inline-block', background: 'var(--ys-dark-surface)', color: '#fff', padding: '12px 28px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none', marginLeft: 8 }}>
                 לנקודות שלי
               </a>
-              <a href="/" style={{ display: 'inline-block', background: GOLD, color: 'var(--ys-text)', padding: '12px 28px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
+              <a href="/" style={{ display: 'inline-block', background: GOLD, color: '#FEFBF7', padding: '12px 28px', borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
                 לחנות ←
               </a>
             </div>

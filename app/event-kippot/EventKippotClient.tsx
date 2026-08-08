@@ -283,7 +283,7 @@ export default function EventKippotClient() {
                 בתוקף בהזמנת {MIN_KIPPOT_QTY}+ כיפות מאותו דגם · {MIN_ADDON_QTY}+ יח׳ מכל מוצר נלווה
                 <br />קוד בעגלה: <b style={{ color: NAVY, letterSpacing: 1 }}>SIMCHA</b>
               </div>
-              <button onClick={closePromoPopup} style={{ background: GOLD, color: NAVY, border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 800, cursor: 'pointer', width: '100%' }}>
+              <button onClick={closePromoPopup} style={{ background: GOLD, color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 800, cursor: 'pointer', width: '100%' }}>
                 מעולה, בואו נתחיל ←
               </button>
             </div>
@@ -484,7 +484,7 @@ export default function EventKippotClient() {
           justifyContent: 'center',
           gap: 10,
           background: GOLD,
-          color: 'var(--ys-text)',
+          color: '#FEFBF7',
           fontWeight: 900,
           fontSize: 17,
           padding: '18px 32px',
