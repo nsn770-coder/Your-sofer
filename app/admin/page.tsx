@@ -3068,6 +3068,7 @@ export default function AdminPage() {
   const [editStoreShaliachId, setEditStoreShaliachId] = useState<string | null>(null);
   const [copiedUserId, setCopiedUserId] = useState<string | null>(null);
   const [productSearch, setProductSearch] = useState('');
+  const [productStatusFilter, setProductStatusFilter] = useState<'all' | 'draft' | 'pending' | 'active'>('all');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -4136,7 +4137,24 @@ export default function AdminPage() {
     .sort((a, b) => userCreatedAtMs(b) - userCreatedAtMs(a));
   const visibleProducts = products.filter(p => p.hidden !== true);
   const hiddenProducts  = products.filter(p => p.hidden === true);
-  const filteredProducts = visibleProducts.filter(p => !productSearch || p.name?.toLowerCase().includes(productSearch.toLowerCase()) || p.sku?.toLowerCase().includes(productSearch.toLowerCase()));
+  // ── מסנן סטטוס ──────────────────────────────────────────────────────────
+  // הסנכרון היומי מ-Israel Judaica מכניס מוצרים חדשים כ-status:'draft'.
+  // בלי המסנן הזה הם נבלעים בין אלפי המוצרים ואין דרך למצוא אותם.
+  const productMatchesSearch = (p: Product) =>
+    !productSearch ||
+    p.name?.toLowerCase().includes(productSearch.toLowerCase()) ||
+    p.sku?.toLowerCase().includes(productSearch.toLowerCase());
+
+  // מוצר בלי status נחשב פעיל — כך היו כל המוצרים לפני שהשדה נוסף
+  const statusOf = (p: Product) => (p as { status?: string }).status || 'active';
+
+  const searchedProducts = visibleProducts.filter(productMatchesSearch);
+  const draftCount   = searchedProducts.filter(p => statusOf(p) === 'draft').length;
+  const pendingCount = searchedProducts.filter(p => statusOf(p) === 'pending').length;
+
+  const filteredProducts = searchedProducts.filter(p =>
+    productStatusFilter === 'all' ? true : statusOf(p) === productStatusFilter
+  );
   const unassignedProducts = visibleProducts.filter(p => !p.soferId).length;
 
   return (
@@ -4165,7 +4183,9 @@ export default function AdminPage() {
       <div className="flex gap-2 mb-6 flex-wrap">
         {[
           { key: 'orders',         label: '📦 הזמנות',           color: 'bg-green-700' },
-          { key: 'products',       label: '📜 מוצרים',           color: 'bg-teal-600',   badge: unassignedProducts },
+          // הבאדג' מציג טיוטות ממתינות לאישור — הן מגיעות מהסנכרון היומי
+          // ובלי סימון הן יושבות שם בלי שאיש יידע. נופל חזרה ל"ללא סופר".
+          { key: 'products',       label: '📜 מוצרים',           color: 'bg-teal-600',   badge: draftCount || unassignedProducts },
           { key: 'commissions',    label: '🤝 עמלות',            color: 'bg-blue-600' },
           { key: 'soferim_list',   label: '✍️ סופרים',           color: 'bg-amber-700' },
           { key: 'soferim',        label: '📋 בקשות סופרים',     color: 'bg-amber-600',  badge: pendingApps.length },
@@ -4237,7 +4257,34 @@ export default function AdminPage() {
               <input value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder="חיפוש לפי שם או SKU..." className="border border-gray-200 rounded-xl px-4 py-2 text-sm w-full" />
               {productSearch && <button onClick={() => setProductSearch('')} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>}
             </div>
-            <span className="text-sm text-gray-500">{filteredProducts.length} מוצרים</span>
+            {/* מסנן סטטוס — טיוטות מגיעות מהסנכרון היומי וממתינות לאישור */}
+            <div className="flex gap-1 items-center">
+              {([
+                { key: 'all',     label: 'הכל',      count: searchedProducts.length },
+                { key: 'draft',   label: 'טיוטות',   count: draftCount },
+                { key: 'pending', label: 'ממתינים',  count: pendingCount },
+                { key: 'active',  label: 'פעילים',   count: searchedProducts.length - draftCount - pendingCount },
+              ] as const).map(f => {
+                const on = productStatusFilter === f.key;
+                // "ממתינים" מוסתר כשאין כאלה — הוא רלוונטי רק להעלאות של סופרים
+                if (f.key === 'pending' && f.count === 0 && !on) return null;
+                return (
+                  <button
+                    key={f.key}
+                    onClick={() => setProductStatusFilter(f.key)}
+                    className="rounded-full px-3 py-1.5 text-xs font-bold border transition-colors"
+                    style={{
+                      background: on ? 'var(--ys-plum)' : '#fff',
+                      color:      on ? '#FEFBF7' : 'var(--ys-ink)',
+                      borderColor: on ? 'var(--ys-plum)' : '#e5e7eb',
+                    }}
+                  >
+                    {f.label}
+                    <span style={{ opacity: 0.75, marginRight: 5 }}>{f.count}</span>
+                  </button>
+                );
+              })}
+            </div>
             {unassignedProducts > 0 && <span className="text-sm text-red-500 font-bold">{unassignedProducts} ללא סופר</span>}
             <button onClick={() => setShowAddProduct(true)} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר</button>
             <button onClick={exportToExcel} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📥 ייצוא ל-Excel</button>
