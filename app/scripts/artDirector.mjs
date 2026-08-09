@@ -40,6 +40,11 @@ export const VISUAL_DNA = {
   hardNegatives: [
     'do NOT alter, redesign, or restyle the product in any way',
     'preserve exactly: logo, typography, embroidery, print, material, shape, proportions, color, texture, stitching, edges',
+    // הכשלים שנצפו בפועל בלוג — נאמרים במפורש כי הכלל הכללי לא הספיק
+    'do NOT change the GEOMETRY of any embroidered or printed motif — a rectangle stays a rectangle, never becomes a hexagon, diamond or circle',
+    'do NOT change the product\'s base color or its lettering color (e.g. white must not become burgundy, black lettering must not become gold)',
+    'do NOT invent, simplify, add or remove ornamental details that are not in the reference image',
+    'do NOT "improve", beautify or modernize the product design',
     'no text overlays, no watermarks, no added logos',
     'no surreal or AI-fantasy environments, no exaggerated or unrealistic scenes',
     'no harsh flash, no HDR, no dramatic hard shadows, no artificial blur',
@@ -109,7 +114,19 @@ export function buildGeminiPrompt(product, profile) {
     ? `Up to 2 subtle props allowed: ${profile.suggestedProps}.`
     : 'No props unless they add realism.';
 
-  return `Premium luxury product photograph for a high-end Judaica brand (${VISUAL_DNA.brand}).
+  // ההנחיה על דיוק המוצר הועברה לראש הפרומפט (08/2026). קודם היא הופיעה
+  // בסוגריים בכותרת ובשלילות בסוף, והמודל התייחס אליה כהערת שוליים —
+  // הבריף העיצובי שבא אחריה גבר עליה ושינה רקמות, צבעים וטיפוגרפיה.
+  return `PRODUCT FIDELITY — ABSOLUTE, NON-NEGOTIABLE PRIORITY:
+This is a photograph of a REAL, EXISTING product shown in the reference image.
+You are relighting and re-staging it — you are NOT designing, redrawing or reimagining it.
+Reproduce the product pixel-faithfully: every embroidery stitch and its exact geometry,
+every printed or engraved letter, every ornament outline, the exact hues, the weave and
+texture of the fabric, the silhouette and proportions. If any single detail of the product
+would differ from the reference, the image is a failure — even if it looks more beautiful.
+The scene serves the product; the product never bends to the scene.
+
+Premium luxury product photograph for a high-end Judaica brand (${VISUAL_DNA.brand}).
 
 THE PRODUCT (the hero — keep it 100% identical to the reference image):
 ${product.title || product.name}. Material: ${profile.dominantMaterial}. Colors: ${profile.dominantColors}.
@@ -119,7 +136,8 @@ The product rests on ${surface}, set within a believable, realistic ${profile.ch
 The environment exists only to elevate the product's perceived value — never to compete with it.
 
 VISUAL DIRECTION:
-- Palette: ${VISUAL_DNA.palette}, harmonized to the product.
+- Palette: ${VISUAL_DNA.palette}, chosen to sit beside the product's own colors.
+  NEVER shift the product's colors to match the palette — the palette adapts, the product does not.
 - Lighting: ${VISUAL_DNA.lighting}.
 - Camera: ${VISUAL_DNA.camera}.
 - Depth of field: ${VISUAL_DNA.depthOfField}.
