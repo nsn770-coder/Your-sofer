@@ -6,6 +6,8 @@
 //   node app/scripts/generateProductImages.mjs --dry     ← רק פרומטים, בלי תמונות (מומלץ קודם!)
 //   node app/scripts/generateProductImages.mjs           ← מלא: פרומט + תמונה + Cloudinary
 //   node app/scripts/generateProductImages.mjs --cat="כיפות" --limit=300
+//   node app/scripts/generateProductImages.mjs --missing --since=2026-08-09 --limit=20
+//                                                ← רק מוצרים בלי תמונת AI, החדשים קודם
 //
 // תלויות: @google/generative-ai, cloudinary, firebase-admin
 
@@ -97,6 +99,11 @@ const DRY_RUN = args.includes('--dry');
 const FORCE = args.includes('--force'); // בלי דילוג — מרנדר גם מוצרים שכבר יש להם תמונת AI
 const VERIFY_EXISTING = args.includes('--verify-existing'); // בדוק תמונות AI קיימות מול המקור; ייצר מחדש רק את הלא-תואמות
 const ALL = args.includes('--all');     // כל האתר — מתעלם מ-CATEGORY_QUOTAS
+// --missing: כל מוצר שאין לו תמונת AI כלל, החדשים קודם. זה המצב הנכון
+// לעבודה שוטפת — הוא לא נוגע במה שכבר נוצר ולא תלוי במכסות הקטגוריות.
+const MISSING = args.includes('--missing');
+// --since=YYYY-MM-DD: רק מוצרים שנוצרו מהתאריך הזה ואילך (למשל היבוא של היום)
+const sinceArg = args.find((a) => a.startsWith('--since='))?.split('=')[1];
 const catArg = args.find((a) => a.startsWith('--cat='))?.split('=')[1];
 const fieldArg = args.find((a) => a.startsWith('--field='))?.split('=')[1] || 'category';
 const limitArg = args.find((a) => a.startsWith('--limit='))?.split('=')[1];
@@ -263,7 +270,11 @@ async function processProduct(db, product, i, total) {
       aiImageGeneratedAt: new Date().toISOString(),
       aiMatchScore: score,         // ציון אימות ההתאמה למקור (0–10)
     });
-    console.log(`✅ ${label} → ${url} (התאמה ${score}/10, ${attempts} נסיונות)`);
+    // הקישור לעמוד המוצר, לא רק ל-Cloudinary — כדי שאפשר יהיה להשוות
+    // את התמונה שנוצרה מול הצילום האמיתי בלי לחפש את המוצר באדמין.
+    console.log(`✅ ${label} (התאמה ${score}/10, ${attempts} נסיונות)`);
+    console.log(`   🔗 מוצר:  https://your-sofer.com/product/${product.id}`);
+    console.log(`   🖼  תמונה: ${url}`);
     return { ok: true };
   } catch (err) {
     console.error(`❌ ${label}: ${err.message}`);
@@ -312,7 +323,59 @@ async function main() {
     }
   }
 
-  if (ALL) {
+  if (MISSING) {
+    // createdAt מגיע כ-Timestamp של Firestore ברוב המוצרים, אבל בייבוא ישן
+    // הוא נשמר כמחרוזת ISO. שתי הצורות חייבות להיות מטופלות, אחרת מוצרי
+    // הייבוא הישן יקבלו 0 ויקפצו לראש הרשימה במקום לסופה.
+    const ms = (v) => {
+      if (!v) return 0;
+      if (typeof v.toMillis === 'function') return v.toMillis();
+      if (typeof v === 'string') return Date.parse(v) || 0;
+      if (v._seconds) return v._seconds * 1000;
+      return 0;
+    };
+    const sinceMs = sinceArg ? Date.parse(sinceArg) : null;
+
+    console.log('📦 מצב --missing: טוען את כל המוצרים מ-Firestore...');
+    const snap = await db.collection('products').get();
+    let products = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }))
+      .filter((p) => !SKIP_VALUES.has(p.cat) && !SKIP_VALUES.has(p.category) && !SKIP_VALUES.has(p.subcategory))
+      .filter((p) => resolveSourceImage(p)) // בלי תמונת מקור אין מה לשמר
+      // '' = נמחק ידנית באדמין. נכלל רק עם --force, כדי שמחיקה ידנית
+      // לא תבוטל בהרצה הבאה.
+      .filter((p) => (FORCE ? !p.aiLifestyleImage : p.aiLifestyleImage === undefined));
+
+    const before = products.length;
+    if (sinceMs) products = products.filter((p) => ms(p.createdAt) >= sinceMs);
+    // --missing יחד עם --cat: לצמצם לקטגוריה אחת. שימושי לבדיקת קטגוריה
+    // בעייתית לפני שמריצים על הכל.
+    if (catArg) products = products.filter((p) => p[fieldArg] === catArg);
+
+    products.sort((a, b) => ms(b.createdAt) - ms(a.createdAt)); // החדשים קודם
+    if (limitArg) products = products.slice(0, Number(limitArg));
+
+    console.log(`ללא תמונת AI: ${before}${sinceMs ? ` | מתוכם מ-${sinceArg} ואילך: ${products.length}` : ''}`);
+    if (FORCE) console.log('⚠️  --force: נכללות גם תמונות שנמחקו ידנית באדמין.');
+
+    // --count: רק ספירה. הרצה מלאה היא שעות ארוכות וקריאות API בתשלום,
+    // ולכן חייבת להיות דרך לראות את הגודל בלי להתחיל.
+    if (args.includes('--count')) {
+      const byCat = products.reduce((a, p) => {
+        const k = p.cat || p.category || '— ללא קטגוריה';
+        a[k] = (a[k] || 0) + 1;
+        return a;
+      }, {});
+      console.log('\n══ פילוח לפי קטגוריה ══');
+      for (const [k, n] of Object.entries(byCat).sort((a, b) => b[1] - a[1])) {
+        console.log(`  ${String(n).padStart(5)}  ${k}`);
+      }
+      const est = products.length * 20;
+      console.log(`\nסה"כ ${products.length} מוצרים | הערכת זמן: ~${Math.round(est / 3600)} שעות (כ-20 שניות למוצר)`);
+      process.exit(0);
+    }
+    await runList(products, sinceArg ? `ללא תמונת AI מ-${sinceArg}` : 'ללא תמונת AI (החדשים קודם)');
+  } else if (ALL) {
     // כל האתר — מתעלם ממכסות. מדלג על קלף/מגילות ועל מוצרים בלי תמונת מקור.
     console.log('📦 מצב --all: טוען את כל המוצרים מ-Firestore...');
     const snap = await db.collection('products').get();

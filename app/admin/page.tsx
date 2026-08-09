@@ -785,6 +785,10 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
   const [imgUrl, setImgUrl]   = useState(product.imgUrl || '');
   const [imgUrl2, setImgUrl2] = useState(product.imgUrl2 || '');
   const [imgUrl3, setImgUrl3] = useState(product.imgUrl3 || '');
+  // תמונת ה-AI מוצגת ראשונה בכרטיס המוצר, אבל עד 08/2026 לא הייתה שום
+  // דרך להסיר אותה מהפאנל — רק דרך סקריפט. כשהיא יוצאת פגומה זה חוסם.
+  const [aiLifestyleImage, setAiLifestyleImage] = useState(
+    (product as { aiLifestyleImage?: string }).aiLifestyleImage || '');
   const [stockVisible, setStockVisible] = useState<boolean>(() => {
     if (product.stockVisible !== undefined) return product.stockVisible;
     return !['מגילות', 'ספרי תורה'].includes(product.cat || product.category || '');
@@ -846,7 +850,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
     return data.secure_url;
   }
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>, field: 'main' | 'img2' | 'img3') {
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>, field: 'main' | 'img2' | 'img3' | 'ai') {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingImg(field);
@@ -854,12 +858,25 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
       const url = await uploadToCloudinary(file);
       if (field === 'main') setImgUrl(url);
       else if (field === 'img2') setImgUrl2(url);
+      else if (field === 'ai') setAiLifestyleImage(url);
       else setImgUrl3(url);
     } catch (err: any) {
       alert('שגיאה בהעלאת תמונה: ' + err.message);
     } finally {
       setUploadingImg(null);
     }
+  }
+
+  // העברת תמונת ה-AI לאחת מהמשבצות הרגילות. ברגע שהיא שם היא כבר לא
+  // "תמונת AI" שגוברת על הצילום האמיתי — היא סתם תמונה נוספת בגלריה.
+  function moveAiImageTo(target: 'main' | 'img2' | 'img3') {
+    if (!aiLifestyleImage) return;
+    const previous = target === 'main' ? imgUrl : target === 'img2' ? imgUrl2 : imgUrl3;
+    if (previous && !confirm(`המשבצת הזו כבר תפוסה. להחליף את התמונה שנמצאת בה?`)) return;
+    if (target === 'main') setImgUrl(aiLifestyleImage);
+    else if (target === 'img2') setImgUrl2(aiLifestyleImage);
+    else setImgUrl3(aiLifestyleImage);
+    setAiLifestyleImage('');
   }
 
   async function handleDuplicate() {
@@ -896,6 +913,9 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
         imgUrl: imgUrl || null,
         imgUrl2: imgUrl2 || null,
         imgUrl3: imgUrl3 || null,
+        // מחרוזת ריקה ולא null: הפייפליין בודק `!== undefined` כדי לדעת
+        // שהתמונה נמחקה ידנית, ולא לייצר אותה שוב אוטומטית.
+        aiLifestyleImage: aiLifestyleImage || '',
         stockVisible,
         stockCount: stockCountInput !== '' ? Number(stockCountInput) : null,
         outOfStock,
@@ -1152,6 +1172,50 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
           </div>
           <div>
             <label style={{ ...labelStyle, marginBottom: 8 }}>תמונות</label>
+
+            {/* ── תמונת AI ──
+                יושבת כאן ולא בבלוק נפרד, כי מבחינת האדמין זו עוד משבצת תמונה.
+                היא גוברת על הצילום האמיתי בכרטיס המוצר, ולכן צריך גם לראות את
+                כתובת ה-Cloudinary שלה, גם למחוק אותה, וגם להעביר אותה למשבצת
+                רגילה כשהיא תמונה טובה שפשוט לא צריכה להיות הראשונה. */}
+            <div style={{
+              marginBottom: 14, padding: 10, borderRadius: 8,
+              background: aiLifestyleImage ? '#FEFBF7' : '#fafafa',
+              border: `1px solid ${aiLifestyleImage ? '#E9E4DC' : '#eee'}`,
+            }}>
+              <div style={{ fontSize: 11, color: aiLifestyleImage ? 'var(--ys-heading)' : '#aaa', marginBottom: 6, fontWeight: 700 }}>
+                🤖 תמונת AI {aiLifestyleImage ? '— מוצגת ראשונה בכרטיס, לפני הצילום האמיתי' : '— אין'}
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                {aiLifestyleImage && <img src={aiLifestyleImage} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd', flexShrink: 0 }} />}
+                <label style={{ background: '#7c6f9e', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                  {uploadingImg === 'ai' ? '⏳...' : '📷 העלה'}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(e, 'ai')} />
+                </label>
+                <input
+                  value={aiLifestyleImage}
+                  onChange={e => setAiLifestyleImage(e.target.value)}
+                  placeholder="קישור Cloudinary של תמונת ה-AI"
+                  style={{ flex: 1, border: '1px solid #ddd', borderRadius: 8, padding: '8px 10px', fontSize: 12, minWidth: 0, direction: 'ltr', textAlign: 'left' }}
+                />
+              </div>
+              {aiLifestyleImage && (
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 11, color: '#888' }}>העבר אל:</span>
+                  {([['main', 'ראשית'], ['img2', 'תמונה 2'], ['img3', 'תמונה 3']] as const).map(([t, lbl]) => (
+                    <button key={t} type="button" onClick={() => moveAiImageTo(t)}
+                      style={{ background: '#fff', color: 'var(--ys-heading)', border: '1px solid #ccc', borderRadius: 6, padding: '5px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                      {lbl}
+                    </button>
+                  ))}
+                  <button type="button" onClick={() => setAiLifestyleImage('')}
+                    style={{ background: '#b91c1c', color: '#FEFBF7', border: 'none', borderRadius: 6, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', marginInlineStart: 'auto' }}>
+                    🗑️ הסר
+                  </button>
+                </div>
+              )}
+            </div>
+
             {(['main', 'img2', 'img3'] as const).map((field, idx) => {
               const currentUrl = field === 'main' ? imgUrl : field === 'img2' ? imgUrl2 : imgUrl3;
               const setUrl = field === 'main' ? setImgUrl : field === 'img2' ? setImgUrl2 : setImgUrl3;

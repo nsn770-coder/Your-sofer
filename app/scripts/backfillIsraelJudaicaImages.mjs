@@ -174,6 +174,10 @@ const isCloudinary = u => typeof u === 'string' && u.includes('cloudinary.com');
     try {
       await doc.ref.update({
         imgUrl: cloudUrl, hidden: false, status: 'active', needsImage: false,
+        // priority חובה: דפי הקטגוריה מריצים orderBy('priority'), ומסמך
+        // בלי השדה לא חוזר מהשאילתה כלל. מוצר יכול להיות גלוי ותקין
+        // לכל דבר — ופשוט לא להופיע בשום מקום.
+        ...(p.priority == null ? { priority: 50 } : {}),
       });
       stats.uploaded++; stats.published++;
     } catch (e) {
