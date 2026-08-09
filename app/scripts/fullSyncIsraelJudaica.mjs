@@ -170,6 +170,19 @@ const CATEGORY_MAP = [
   { code: '1185', label: 'קיטלים',               cat: 'יודאיקה',            subCategory: 'קיטלים' },
   { code: '1187', label: 'ברכונים',              cat: 'יודאיקה',            subCategory: 'ברכונים' },
   { code: '1193', label: 'גביעי קידוש פולימר',   cat: 'שבת',                subCategory: 'כוסות קידוש' },
+
+  // ── קטגוריות שהספק הוסיף ולא היו במפה (08/2026) ───────────────────────
+  // התגלו בהשוואה מול טאב "מוצרים חדשים" שלהם: 186 מוצרים שמעולם לא נסרקו,
+  // כי הסנכרון עובד לפי רשימת קודים קבועה. קטגוריה חדשה אצל הספק פשוט
+  // לא קיימת בשבילנו עד שמוסיפים אותה כאן.
+  { code: '1199', label: 'סכינים',                cat: 'שבת',      subCategory: 'קרשי חלה, סכינים ומפיונים' },
+  { code: '1200', label: 'מזוזות אקריליק',        cat: 'בתי מזוזה', subCategory: 'מזוזות פלסטיק' },
+  { code: '1201', label: 'מוצרי האש שלי',         cat: 'יודאיקה',  subCategory: 'סטים ומארזים' },
+  { code: '1202', label: 'מוצרי חב"ד',            cat: 'יודאיקה',  subCategory: 'סטים ומארזים' },
+  { code: '1126', label: 'הבדלה',                 cat: 'יודאיקה',  subCategory: 'הבדלה' },
+  { code: '1140', label: 'ילדים',                 cat: 'יודאיקה',  subCategory: 'מוצרים לילדים' },
+  { code: '1141', label: 'כריות לברית',           cat: 'יודאיקה',  subCategory: 'כריות לברית' },
+  { code: '1183', label: 'אביזרי תצוגה',          cat: 'יודאיקה',  subCategory: 'אביזרי תצוגה' },
 ];
 
 // ── Supplier API ──────────────────────────────────────────────────────────────
@@ -195,6 +208,49 @@ async function fetchAllSkusForCode(code) {
   let offset = 0;
   while (true) {
     const batch = await fetchBatch(code, offset);
+    const keys = Object.keys(batch);
+    if (!keys.length) break;
+    for (const [sku, p] of Object.entries(batch)) collected[sku] = p;
+    if (keys.length < BATCH) break;
+    offset += BATCH;
+    await sleep(300);
+  }
+  return collected;
+}
+
+/**
+ * רשת ביטחון: טאב "מוצרים חדשים" של הספק.
+ *
+ * הסנכרון עובד לפי CATEGORY_MAP — רשימת קודים קבועה. כשהספק מוסיף קטגוריה
+ * חדשה היא פשוט לא קיימת בשבילנו, וכל המוצרים שבה נעלמים. כך פספסנו 186
+ * מוצרים (08/2026), רובם בקטגוריות סכינים ומזוזות אקריליק שנוספו אצלם.
+ *
+ * הטאב הזה הוא סינון רוחבי מעל כל הקטגוריות (special_type=new_arrival),
+ * ולכן הוא תופס גם מה שאיננו מכירים. כישלון כאן אינו קריטי — הסנכרון
+ * הרגיל ממשיך כרגיל.
+ */
+async function fetchNewArrivals() {
+  const collected = {};
+  let offset = 0;
+  while (true) {
+    const body = new URLSearchParams({
+      category: '', filterChoices: '[]',
+      special_type: 'new_arrival',
+      limit: String(BATCH), offset: String(offset),
+      sortValue: '', sortDirection: '', note: '', search_term: '',
+    });
+    let json;
+    try {
+      const res = await fetch(`${BASE_URL}/index.php?option=com_art&task=category.getProducts&lang=${LANG}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+      });
+      if (!res.ok) break;
+      json = await res.json();
+    } catch { break; }
+    if (!json?.status) break;
+    const batch = json.products || {};
     const keys = Object.keys(batch);
     if (!keys.length) break;
     for (const [sku, p] of Object.entries(batch)) collected[sku] = p;
@@ -489,6 +545,31 @@ async function fetchAllSupplierSkus() {
   }
 
   console.log(`\n  📦 סה"כ ${supplierSkus.size} SKUs ייחודיים אצל הספק`);
+
+  // ── רשת ביטחון: השוואה מול טאב "מוצרים חדשים" ──────────────────────────
+  // מדווח בלבד, לא מייבא. מוצר שמופיע שם ולא נסרק אצלנו = הקטגוריה שלו
+  // חסרה ב-CATEGORY_MAP, וצריך להוסיף אותה ידנית עם השיוך הנכון.
+  // ייבוא אוטומטי היה מחייב ניחוש קטגוריה, וניחוש שגוי גרוע מחוסר.
+  try {
+    const arrivals = await fetchNewArrivals();
+    const unseen = Object.keys(arrivals).filter(sku => !supplierSkus.has(sku));
+    if (unseen.length) {
+      console.log(`\n  ⚠️  ${unseen.length} מוצרים בטאב "מוצרים חדשים" שלא נסרקו!`);
+      console.log(`      הקטגוריה שלהם חסרה ב-CATEGORY_MAP. דוגמאות:`);
+      for (const sku of unseen.slice(0, 10)) {
+        const p = arrivals[sku];
+        console.log(`        ${sku} — ${(p?.name || '').slice(0, 45)}`);
+      }
+      try {
+        writeFileSync(
+          resolve(ROOT, `scripts/uncovered-new-arrivals-${new Date().toISOString().slice(0,10)}.json`),
+          JSON.stringify(unseen.map(s => ({ sku: s, name: arrivals[s]?.name })), null, 2), 'utf8');
+      } catch {}
+    } else if (Object.keys(arrivals).length) {
+      console.log(`  ✅ כל ${Object.keys(arrivals).length} המוצרים החדשים אצל הספק מכוסים במפה`);
+    }
+  } catch { /* לא קריטי — הסנכרון ממשיך */ }
+
   return supplierSkus;
 }
 
