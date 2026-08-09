@@ -1,0 +1,98 @@
+name: סנכרון Israel Judaica — ייבוא מוצרים חדשים
+
+# למה GitHub Actions ולא Vercel cron:
+#   הסקריפט מריץ Playwright (דפדפן אמיתי מול אתר הספק), כותב קבצי לוג
+#   לדיסק, וסורק 64 קטגוריות. אף אחד משלושת אלה לא אפשרי ב-Vercel
+#   serverless, והתקרה שם היא 5 דקות. כאן יש סביבת Node מלאה ו-6 שעות.
+
+on:
+  schedule:
+    # 03:30 UTC = 06:30 בישראל בשעון קיץ (05:30 בחורף).
+    # GitHub Actions עובד ב-UTC בלבד ואינו מתחשב בשעון קיץ.
+    - cron: '30 3 * * *'
+  # מאפשר הרצה ידנית מלשונית Actions, כולל בחירת מצב
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'מצב הרצה'
+        required: true
+        default: 'dry-run'
+        type: choice
+        options:
+          - dry-run   # רק מפיק רשימת מועמדים, לא נוגע בנתונים
+          - execute   # מייבא בפועל כטיוטות
+
+concurrency:
+  # שתי ריצות במקביל היו יכולות לייבא את אותו מוצר פעמיים
+  group: sync-israel-judaica
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: משיכת הקוד
+        uses: actions/checkout@v4
+
+      - name: התקנת Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: התקנת תלויות
+        run: npm ci
+
+      - name: התקנת דפדפן ל-Playwright
+        # רק chromium — הסקריפט לא משתמש באחרים, וזה חוסך דקה בכל ריצה
+        run: npx playwright install --with-deps chromium
+
+      - name: כתיבת מפתח Firebase לדיסק
+        # הסקריפט קורא את הקובץ הזה בנתיב קבוע. הוא ב-gitignore ולכן
+        # מגיע מ-Secret. נמחק בסוף הריצה.
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA_JSON" ]; then
+            echo "::error::חסר Secret בשם FIREBASE_SERVICE_ACCOUNT"
+            exit 1
+          fi
+          printf '%s' "$SA_JSON" > your-sofer-firebase-adminsdk-fbsvc-418544c2de.json
+          node -e "JSON.parse(require('fs').readFileSync('your-sofer-firebase-adminsdk-fbsvc-418544c2de.json','utf8'))" \
+            || { echo "::error::ה-Secret אינו JSON תקין"; exit 1; }
+
+      - name: הרצת הסנכרון
+        env:
+          # הסקריפט קורא .env.local אם קיים, אבל משתני סביבה אמיתיים
+          # גוברים עליו (loadEnv בודק !process.env[key]) — אז אין צורך בקובץ.
+          CLOUDINARY_API_KEY:    ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          SUPPLIER_EMAIL:        ${{ secrets.SUPPLIER_EMAIL }}
+          SUPPLIER_PASSWORD:     ${{ secrets.SUPPLIER_PASSWORD }}
+        run: |
+          # ריצה מתוזמנת = execute. הרצה ידנית = לפי הבחירה בטופס.
+          MODE="${{ github.event.inputs.mode || 'execute' }}"
+          echo "מצב: $MODE"
+          if [ "$MODE" = "execute" ]; then
+            node app/scripts/fullSyncIsraelJudaica.mjs --import-only --execute
+          else
+            node app/scripts/fullSyncIsraelJudaica.mjs --import-only
+          fi
+
+      - name: מחיקת מפתח Firebase
+        # רץ תמיד, גם אם הסנכרון נכשל
+        if: always()
+        run: rm -f your-sofer-firebase-adminsdk-fbsvc-418544c2de.json
+
+      - name: שמירת הלוגים
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-logs-${{ github.run_number }}
+          path: |
+            scripts/new-products-candidates-*.csv
+            scripts/import-log-*.json
+          if-no-files-found: ignore
+          retention-days: 30
