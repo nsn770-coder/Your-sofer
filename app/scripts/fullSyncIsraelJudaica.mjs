@@ -633,6 +633,7 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
   }
 
   let imported = 0, failed = 0;
+  const skippedNoImage = [];
   const importLog = [];
   for (let i = 0; i < candidates.length; i++) {
     const c = candidates[i];
@@ -651,14 +652,29 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
       continue;
     }
 
-    // Upload image to Cloudinary
+    // ── העלאת תמונה ל-Cloudinary, עם ניסיונות חוזרים ─────────────────────
+    // עד 08/2026 היה כאן ניסיון בודד, ובכישלון נשמרה כתובת אתר הספק כ-
+    // fallback. זה קישור חם לשרת שלהם — הוא נחסם, והמוצר הופיע באתר בלי
+    // תמונה. שלושה ניסיונות עם השהיה עולה פותרים את רוב הכשלים, שהם
+    // בדרך כלל זמניים (עומס או timeout).
     let cloudinaryUrl = null;
     if (c.imgUrl) {
-      try {
-        cloudinaryUrl = await uploadToCloudinary(c.imgUrl);
-        process.stdout.write('☁️✓ ');
-      } catch { process.stdout.write('☁️✗ '); }
+      for (let attempt = 1; attempt <= 3 && !cloudinaryUrl; attempt++) {
+        try {
+          cloudinaryUrl = await uploadToCloudinary(c.imgUrl);
+          process.stdout.write(attempt === 1 ? '☁️✓ ' : `☁️✓${attempt} `);
+        } catch {
+          if (attempt === 3) process.stdout.write('☁️✗ ');
+          else await sleep(1200 * attempt); // 1.2 שנייה, ואז 2.4
+        }
+      }
       await sleep(400);
+    }
+
+    // עדיין בלי תמונה — המוצר עדיין מיובא (לבקשת המשתמש), אבל נרשם
+    // לקובץ נפרד כדי שאפשר יהיה להשלים לו תמונה ידנית.
+    if (!cloudinaryUrl) {
+      skippedNoImage.push({ sku: c.sku, name, reason: c.imgUrl ? 'העלאה נכשלה' : 'אין תמונה אצל הספק' });
     }
 
     const newDoc = {
@@ -669,9 +685,16 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
       cat:           c.category, // דפי הקטגוריה באתר שולפים לפי 'cat'
       category:      c.category,
       subCategory:   c.subCategory,
-      hidden:        true, // טיוטה — לא מוצג באתר עד פרסום ידני (הדפים מסננים לפי hidden)
+      // ── פרסום אוטומטי מותנה בתמונה (08/2026) ────────────────────────────
+      // מוצר עם תמונה תקינה עולה ישירות למכירה; בלי תמונה הוא נשאר טיוטה
+      // מוסתרת וממתין להשלמה ידנית. כרטיס מוצר ריק פוגע יותר מהיעדר המוצר.
+      hidden:        !cloudinaryUrl,
       description:   c.description || null,
-      imgUrl:        cloudinaryUrl || c.imgUrl || null,
+      // רק כתובת Cloudinary. אין נפילה לכתובת הספק — קישור חם לשרת שלהם
+      // נחסם ומייצר מוצר עם תמונה שבורה, וזה גרוע יותר מ-null (שאפשר לזהות).
+      imgUrl:        cloudinaryUrl || null,
+      // דגל לאיתור מהיר באדמין של מוצרים שצריך להשלים להם תמונה
+      needsImage:    !cloudinaryUrl,
       purchasePrice: c.purchasePrice,
       price:         c.price,
       was:           c.was,
@@ -680,7 +703,7 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
       expectedArrivalDate: c.expectedArrivalDate, // 'YYYY-MM-DD' או null
       stockStatus:   c.comingSoon ? 'coming_soon' : 'in_stock',
       outOfStock:    c.comingSoon, // טרם במלאי — צפייה כן, רכישה לא
-      status:        'draft', // טיוטה — פרסום ידני בלבד
+      status:        cloudinaryUrl ? 'active' : 'draft',
       priority:      50, // חובה! דפי קטגוריה ממיינים orderBy('priority') — בלי השדה המוצר לא מוצג
       supplierCatCode: c.catEntry.code,
       createdAt:     FieldValue.serverTimestamp(),
@@ -696,6 +719,17 @@ async function importNewProducts(firestoreProducts, supplierSkus) {
   const logPath = resolve(__dirname, `../../scripts/import-log-${new Date().toISOString().slice(0, 10)}.json`);
   writeFileSync(logPath, JSON.stringify({ date: new Date().toISOString(), imported, failed, items: importLog }, null, 2));
   console.log(`\n  ✅ יובאו ${imported} מוצרים חדשים | נכשלו: ${failed}`);
+  if (skippedNoImage.length) {
+    console.log(`  ⚠️  ${skippedNoImage.length} מוצרים יובאו ללא תמונה — סומנו needsImage:true:`);
+    for (const s of skippedNoImage.slice(0, 20)) console.log(`     ${s.sku} — ${s.name} (${s.reason})`);
+    if (skippedNoImage.length > 20) console.log(`     ...ועוד ${skippedNoImage.length - 20}`);
+    // נשמר לקובץ כדי שאפשר יהיה לטפל בהם ידנית מול הספק
+    try {
+      writeFileSync(
+        resolve(ROOT, `scripts/skipped-no-image-${new Date().toISOString().slice(0,10)}.json`),
+        JSON.stringify(skippedNoImage, null, 2), 'utf8');
+    } catch {}
+  }
   console.log(`  📄 לוג ייבוא: ${logPath}`);
   console.log('  ℹ️  כל המוצרים החדשים מוגדרים status=draft — בדוק ופרסם ידנית.');
 }
