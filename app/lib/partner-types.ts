@@ -106,6 +106,54 @@ export interface Partner {
   suspendedReason?: string;
   cancelledAt?: string;
   cancelledBy?: string;
+
+  // מחסן איסוף (Phase 13)
+  warehouse?: PartnerWarehouse;
+}
+
+export interface PartnerWarehouse {
+  city: string;
+  street: string;
+  number: string;
+  apartment?: string;
+  zipCode?: string;
+  phone: string;
+  recipientName: string;   // מוצג במשלוח LionWheel
+  type: 'partner' | 'dropship'; // partner = משלוח מהמחסן שלו, dropship = שולח אלינו למחסן
+  updatedAt: string;       // ISO date
+}
+
+export interface PartnerProductDimensions {
+  length: number; // cm
+  width: number;  // cm
+  height: number; // cm
+}
+
+export type PartnerProductStatus = 'active' | 'inactive';
+
+export interface PartnerProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;          // ₪, > 0
+  images: string[];       // Cloudinary URLs
+  sku: string;             // ייחודי לפרטנר
+  stock: number;           // >= 0
+  category: string;
+  weight: number;          // kg
+  dimensions: PartnerProductDimensions;
+
+  // Denormalized for indexing/display
+  partnerId: string;
+  partnerName: string;
+  warehouseType: 'partner' | 'dropship';
+
+  status: PartnerProductStatus;
+
+  // Audit
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;      // partner UID
 }
 
 export interface PartnerSubscription {

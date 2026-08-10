@@ -327,6 +327,21 @@ service cloud.firestore {
       allow update: if isAdmin() || (isSignedIn() && request.auth.uid == partnerId &&
                        request.resource.data.uid == resource.data.uid);
       allow delete: if isAdmin();
+
+      // Partner-uploaded products (Phase 13). Actual writes go through the
+      // Admin-SDK API routes under /api/partner/products; these rules are a
+      // defense-in-depth backstop matching the products/{id} sofer pattern.
+      match /products/{productId} {
+        allow read:   if isAdmin() || (isSignedIn() && request.auth.uid == partnerId);
+        allow create: if isPartner() && request.auth.uid == partnerId
+                      && request.resource.data.partnerId == partnerId
+                      && request.resource.data.sku is string
+                      && request.resource.data.price is number && request.resource.data.price > 0;
+        allow update: if isAdmin() || (isPartner() && request.auth.uid == partnerId
+                      && request.resource.data.sku == resource.data.sku
+                      && request.resource.data.partnerId == resource.data.partnerId);
+        allow delete: if isAdmin();
+      }
     }
 
     match /partners_subscriptions/{subscriptionId} {

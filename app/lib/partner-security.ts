@@ -69,6 +69,14 @@ export function validateHexColor(color: string): boolean {
 }
 
 /**
+ * Validate Israeli phone number (mobile or landline, with or without dashes)
+ */
+export function validateIsraeliPhone(phone: string): boolean {
+  const digits = phone.replace(/[\s-]/g, '');
+  return /^0(5\d|[2-489])\d{7}$/.test(digits);
+}
+
+/**
  * Rate limit check
  */
 const limiter = new Map<string, { count: number; resetAt: number }>();

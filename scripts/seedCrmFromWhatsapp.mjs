@@ -1,13 +1,20 @@
 /**
- * One-time backfill for the /admin/crm CRM.
+ * Backfill for the /admin/crm CRM.
  *
  * Creates a crmLeads doc for every existing whatsappConversations doc (that
  * predates the live hook in app/api/whatsapp/webhook/handler.ts), and for
  * every existing order whose phone doesn't already match a lead — those
  * become leads with status "עסקה נסגרה" (a customer who already bought).
  *
+ * Can be run multiple times safely — skips existing leads by normalized phone.
+ *
  * Run: node scripts/seedCrmFromWhatsapp.mjs
  *      node scripts/seedCrmFromWhatsapp.mjs --dry-run
+ *
+ * Use this if:
+ * - Setting up CRM for the first time
+ * - Adding new orders that should appear in CRM (e.g., from Google Ads campaigns)
+ * - Re-syncing after Firestore backups
  */
 
 import { readFileSync } from 'fs';
@@ -155,7 +162,8 @@ async function main() {
     if (existingByNormPhone.has(norm)) continue;
 
     const { source, sourceDetail } = sourceFromAttribution(order.attribution);
-    console.log(`  + lead from order: ${order.phone} (${order.customerName ?? 'ללא שם'}) — source=${source}`);
+    const orderRef = `#${order.orderNumber ?? order.id.slice(0, 6)}`;
+    console.log(`  + lead from order: ${order.phone} (${order.customerName ?? 'ללא שם'}) — source=${source} — ${orderRef}`);
     if (!DRY_RUN) {
       const leadId = normalizePhone(order.phone) || order.id;
       await db.collection('crmLeads').doc(leadId).set({
@@ -165,7 +173,7 @@ async function main() {
         sourceDetail,
         status: 'עסקה נסגרה',
         saleStage: null,
-        notes: [],
+        notes: [{ text: `יובא מהזמנה קיימת: ${orderRef}`, ts: Date.now() }],
         followUpAt: null,
         assignedTo: null,
         createdAt: order.createdMs ? new Date(order.createdMs) : new Date(),

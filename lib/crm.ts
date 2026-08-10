@@ -110,6 +110,8 @@ export function sourceFromAttribution(
 interface FirestoreLike {
   collection(path: string): {
     get(): Promise<{ docs: Array<{ id: string; data(): Record<string, unknown>; ref: { set(data: Record<string, unknown>, opts: { merge: boolean }): Promise<unknown> } }> }>;
+    doc(id: string): { set(data: Record<string, unknown>, opts?: { merge: boolean }): Promise<unknown> };
+    add(data: Record<string, unknown>): Promise<{ id: string }>;
   };
 }
 
@@ -124,19 +126,38 @@ export async function closeLeadForOrder(
   try {
     const snap = await db.collection('crmLeads').get();
     const match = snap.docs.find((d) => normalizePhone((d.data().phone as string | undefined) ?? d.id) === norm);
-    if (!match) return;
 
+    const derived = sourceFromAttribution(attribution);
+    const now = new Date();
+
+    if (!match) {
+      // Lead doesn't exist — create it as a new order customer
+      // Use normalized phone as doc ID (like manual entry or seed-script style)
+      const newLeadData: Record<string, unknown> = {
+        phone: phone,
+        name: null,
+        source: derived.source,
+        sourceDetail: derived.sourceDetail,
+        status: 'עסקה נסגרה' as CrmStatus,
+        notes: [{ text: `נוצרה הזמנה חדשה: #${orderNumber}`, ts: Date.now() }],
+        createdAt: now,
+        lastContactAt: now,
+      };
+      await db.collection('crmLeads').doc(norm).set(newLeadData);
+      return;
+    }
+
+    // Lead exists — update it
     const existingNotes = (match.data().notes as CrmNote[] | undefined) ?? [];
     const patch: Record<string, unknown> = {
       status: 'עסקה נסגרה' as CrmStatus,
-      lastContactAt: new Date(),
+      lastContactAt: now,
       notes: [...existingNotes, { text: `נוצרה הזמנה חדשה: #${orderNumber}`, ts: Date.now() }],
     };
 
     // Only overwrite source when attribution reveals a paid channel (google/facebook) —
     // never downgrade an already-known source (e.g. whatsapp) to the generic "אתר"
     // fallback just because this particular order carried no UTM/click-id.
-    const derived = sourceFromAttribution(attribution);
     if (derived.source === 'google' || derived.source === 'facebook') {
       patch.source = derived.source;
       patch.sourceDetail = derived.sourceDetail;

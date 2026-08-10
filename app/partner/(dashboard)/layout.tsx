@@ -10,6 +10,7 @@ const SIDEBAR_ITEMS = [
   { href: '/partner/onboarding', label: 'הקמת חנות', icon: '🚀' },
   { href: '/partner/store', label: 'החנות שלי', icon: '🏪' },
   { href: '/partner/orders', label: 'הזמנות', icon: '📦' },
+  { href: '/partner/products', label: 'מוצרים', icon: '🛒' },
   { href: '/partner/analytics', label: 'אנליטיקה', icon: '📈' },
   { href: '/partner/earnings', label: 'הרווחים שלי', icon: '💰' },
   { href: '/partner/payouts', label: 'משיכות כספים', icon: '🏦' },
