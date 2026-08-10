@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
@@ -24,7 +24,9 @@ type TabKey = 'product' | 'partner';
 export default function AdminCouponsPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabKey>('product');
+  const searchParams = useSearchParams();
+  const initialTab: TabKey = searchParams.get('tab') === 'partner' ? 'partner' : 'product';
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) router.push('/');

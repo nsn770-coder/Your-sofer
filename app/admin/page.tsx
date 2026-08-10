@@ -3139,6 +3139,7 @@ export default function AdminPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [couponsLoading, setCouponsLoading] = useState(false);
+  const [couponsSubTab, setCouponsSubTab] = useState<'product' | 'partner'>('product');
   const [showAddSofer, setShowAddSofer] = useState(false);
   const [editingSofer, setEditingSofer] = useState<SoferFull | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -5582,59 +5583,89 @@ export default function AdminPage() {
 
       {activeTab === 'coupons' && (
         <div className="grid gap-6">
-          {/* Create coupon form */}
-          <CouponCreateForm onCreated={loadCoupons} />
-
-          {/* Coupons table */}
-          <div className="bg-white rounded-xl shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-black" style={{ color: 'var(--ys-heading)' }}>קופונים קיימים</h2>
-              <span className="text-sm text-gray-500">{coupons.length} קופונים</span>
-            </div>
-            {couponsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div> : (
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="p-3 text-right">קוד</th>
-                    <th className="p-3 text-right">סוג</th>
-                    <th className="p-3 text-right">הנחה</th>
-                    <th className="p-3 text-right">מינימום</th>
-                    <th className="p-3 text-right">תפוגה</th>
-                    <th className="p-3 text-right">שימושים</th>
-                    <th className="p-3 text-right">סטטוס</th>
-                    <th className="p-3 text-right">פעולות</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {coupons.length === 0 ? (
-                    <tr><td colSpan={8} className="p-10 text-center text-gray-400">אין קופונים</td></tr>
-                  ) : coupons.map(c => (
-                    <tr key={c.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3 font-mono font-black tracking-widest text-sm">{c.code}</td>
-                      <td className="p-3 text-xs text-gray-500">{c.type === 'percent' ? 'אחוז' : 'סכום'}</td>
-                      <td className="p-3 font-bold text-green-700">{c.type === 'percent' ? `${c.discount}%` : `₪${c.discount}`}</td>
-                      <td className="p-3 text-xs text-gray-500">{c.minOrder ? `₪${c.minOrder}` : '—'}</td>
-                      <td className="p-3 text-xs text-gray-500">{c.expiresAt || '—'}</td>
-                      <td className="p-3 text-xs text-gray-600">{(c.usedBy || []).length} שימושים</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${c.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
-                          {c.active ? '● פעיל' : '● מושהה'}
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        <div className="flex gap-2">
-                          <button onClick={() => toggleCoupon(c.id, c.active)} className={`px-2 py-1 rounded-full text-xs font-bold ${c.active ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' : 'bg-green-50 text-green-700 hover:bg-green-100'}`}>
-                            {c.active ? 'השהה' : 'הפעל'}
-                          </button>
-                          <button onClick={() => deleteCoupon(c.id)} className="px-2 py-1 rounded-full text-xs font-bold bg-red-50 text-red-500 hover:bg-red-100">מחק</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+          {/* Sub-tabs: product coupons vs. partner-upgrade coupons */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCouponsSubTab('product')}
+              className={`px-4 py-2 rounded-full text-sm font-bold ${couponsSubTab === 'product' ? 'text-white' : 'bg-gray-100 text-gray-600'}`}
+              style={couponsSubTab === 'product' ? { background: 'var(--ys-accent)' } : undefined}
+            >
+              קופונים - פרודקטים
+            </button>
+            <button
+              onClick={() => setCouponsSubTab('partner')}
+              className={`px-4 py-2 rounded-full text-sm font-bold ${couponsSubTab === 'partner' ? 'text-white' : 'bg-gray-100 text-gray-600'}`}
+              style={couponsSubTab === 'partner' ? { background: 'var(--ys-accent)' } : undefined}
+            >
+              קופונים - שותפים
+            </button>
           </div>
+
+          {couponsSubTab === 'product' ? (
+            <div className="grid gap-6">
+              {/* Create coupon form */}
+              <CouponCreateForm onCreated={loadCoupons} />
+
+              {/* Coupons table */}
+              <div className="bg-white rounded-xl shadow overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                  <h2 className="text-lg font-black" style={{ color: 'var(--ys-heading)' }}>קופונים קיימים</h2>
+                  <span className="text-sm text-gray-500">{coupons.length} קופונים</span>
+                </div>
+                {couponsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div> : (
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="p-3 text-right">קוד</th>
+                        <th className="p-3 text-right">סוג</th>
+                        <th className="p-3 text-right">הנחה</th>
+                        <th className="p-3 text-right">מינימום</th>
+                        <th className="p-3 text-right">תפוגה</th>
+                        <th className="p-3 text-right">שימושים</th>
+                        <th className="p-3 text-right">סטטוס</th>
+                        <th className="p-3 text-right">פעולות</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {coupons.length === 0 ? (
+                        <tr><td colSpan={8} className="p-10 text-center text-gray-400">אין קופונים</td></tr>
+                      ) : coupons.map(c => (
+                        <tr key={c.id} className="border-t hover:bg-gray-50">
+                          <td className="p-3 font-mono font-black tracking-widest text-sm">{c.code}</td>
+                          <td className="p-3 text-xs text-gray-500">{c.type === 'percent' ? 'אחוז' : 'סכום'}</td>
+                          <td className="p-3 font-bold text-green-700">{c.type === 'percent' ? `${c.discount}%` : `₪${c.discount}`}</td>
+                          <td className="p-3 text-xs text-gray-500">{c.minOrder ? `₪${c.minOrder}` : '—'}</td>
+                          <td className="p-3 text-xs text-gray-500">{c.expiresAt || '—'}</td>
+                          <td className="p-3 text-xs text-gray-600">{(c.usedBy || []).length} שימושים</td>
+                          <td className="p-3">
+                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${c.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                              {c.active ? '● פעיל' : '● מושהה'}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex gap-2">
+                              <button onClick={() => toggleCoupon(c.id, c.active)} className={`px-2 py-1 rounded-full text-xs font-bold ${c.active ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' : 'bg-green-50 text-green-700 hover:bg-green-100'}`}>
+                                {c.active ? 'השהה' : 'הפעל'}
+                              </button>
+                              <button onClick={() => deleteCoupon(c.id)} className="px-2 py-1 rounded-full text-xs font-bold bg-red-50 text-red-500 hover:bg-red-100">מחק</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl shadow overflow-hidden" style={{ height: 'calc(100vh - 320px)' }}>
+              <iframe
+                src="/admin/coupons?tab=partner"
+                className="w-full h-full border-0"
+                title="קופונים לשדרוג Partner"
+              />
+            </div>
+          )}
         </div>
       )}
 
