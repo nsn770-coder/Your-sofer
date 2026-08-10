@@ -466,16 +466,17 @@ const ROLE_LABELS: Record<UserRole, string> = {
   sofer: '✍️ סופר',
   shaliach: '🟦 שליח',
   customer: '👤 לקוח',
-  partner: '🏪 שותף',  // ← הוסף את השורה הזו
+  partner: '🏪 שותף',  // ← הוסף
 };
 
+// ✅ ROLE_COLORS
 const ROLE_COLORS: Record<UserRole, string> = {
   admin: 'bg-purple-100 text-purple-700',
   sofer: 'bg-amber-100 text-amber-700',
   shaliach: 'bg-blue-100 text-blue-700',
-  customer: 'bg-gray-100 text-gray-600',
+  customer: 'bg-gray-100 text-gray-700',
+  partner: 'bg-green-100 text-green-700',  // ← הוסף
 };
-
 // ─── Sofer field - categories that show the sofer selector ───────────────────
 
 const SOFER_CATS_LIST = ['קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'בר מצווה'];
