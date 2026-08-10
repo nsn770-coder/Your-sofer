@@ -75,6 +75,7 @@ const COLUMNS: Column[] = [
     links: [
       { label: 'הצטרף כסופר',     path: '/soferim/apply' },
       { label: 'הצטרף כרב קהילה', path: '/join/apply' },
+      { label: 'שותף עסקי',       path: '/partner-signup' },
     ],
   },
 ];

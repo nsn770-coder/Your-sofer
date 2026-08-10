@@ -30,8 +30,8 @@ export default function JoinPage() {
         </div>
       </div>
 
-      {/* שתי אפשרויות */}
-      <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      {/* שלוש אפשרויות */}
+      <div style={{ maxWidth: 1100, margin: '40px auto', padding: '0 16px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24 }}>
 
         {/* סופר */}
         <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', border: '1px solid #eee' }}>
@@ -105,6 +105,44 @@ export default function JoinPage() {
             <button onClick={() => router.push('/join/apply')}
               style={{ width: '100%', background: 'var(--ys-dark-surface)', color: '#fff', border: 'none', borderRadius: 10, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
               שלח בקשת הצטרפות ←
+            </button>
+          </div>
+        </div>
+
+        {/* שותף עסקי */}
+        <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', border: '1px solid #eee' }}>
+          <div style={{ background: 'linear-gradient(135deg, #51285F, #31153C)', padding: '32px 28px', textAlign: 'center' }}>
+            <div style={{ fontSize: 56, marginBottom: 12 }}>🏪</div>
+            <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 8 }}>שותף עסקי</h2>
+            <p style={{ color: '#d8c8e0', fontSize: 14, lineHeight: 1.6 }}>
+              פתח חנות ברשת Your Sofer
+            </p>
+          </div>
+          <div style={{ padding: '28px' }}>
+            <div style={{ marginBottom: 20 }}>
+              {[
+                'חנות דיגיטלית משלך ברשת',
+                'דשבורד ניהול מכירות והזמנות',
+                'עמלה של 20% בלבד מכל מכירה',
+                'משיכות כספים ישירות לחשבון הבנק',
+                'ממשק נייד לניהול מכל מקום',
+                'תמיכה מקצועית מהצוות',
+              ].map(item => (
+                <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, fontSize: 14, color: '#333' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--ys-accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>✓</div>
+                  {item}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: '#faf5fb', borderRadius: 8, padding: '14px 16px', marginBottom: 20, fontSize: 13 }}>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: 'var(--ys-accent)' }}>דמי הקמה: ₪5,000 חד פעמי</div>
+              <div style={{ color: '#888' }}>עמלה של 20% בלבד על כל מכירה בהמשך</div>
+            </div>
+
+            <button onClick={() => router.push('/partner-signup')}
+              style={{ width: '100%', background: 'var(--ys-accent)', color: '#fff', border: 'none', borderRadius: 10, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+              הצטרף כשותף עסקי ←
             </button>
           </div>
         </div>
