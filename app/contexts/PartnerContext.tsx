@@ -37,6 +37,7 @@ export function PartnerProvider({ children }: { children: React.ReactNode }) {
 
   async function refreshPartner() {
     if (!user?.partnerId) return;
+    if (!user?.idToken) return;
 
     try {
       setLoading(true);
@@ -60,6 +61,7 @@ export function PartnerProvider({ children }: { children: React.ReactNode }) {
 
   async function refreshSubscription() {
     if (!user?.partnerId) return;
+    if (!user?.idToken) return;
 
     try {
       const response = await fetch('/api/partner/subscription', {
@@ -76,6 +78,7 @@ export function PartnerProvider({ children }: { children: React.ReactNode }) {
 
   async function updatePartnerProfile(updates: Partial<Partner>) {
     if (!user?.partnerId) return;
+    if (!user?.idToken) return;
 
     try {
       setError(null);
