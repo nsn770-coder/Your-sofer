@@ -466,6 +466,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
   sofer: '✍️ סופר',
   shaliach: '🟦 שליח',
   customer: '👤 לקוח',
+  partner: '🏪 שותף',  // ← הוסף את השורה הזו
 };
 
 const ROLE_COLORS: Record<UserRole, string> = {
