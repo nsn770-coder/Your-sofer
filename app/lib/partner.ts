@@ -69,7 +69,7 @@ export function isPartnerActive(partner: Partner | null): boolean {
 
 export function canPartnerPublish(partner: Partner | null): boolean {
   if (!partner) return false;
-  return (
+  return Boolean(
     partner.storeName &&
     partner.logoUrl &&
     partner.colors &&

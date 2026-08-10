@@ -95,7 +95,7 @@ export function PartnerEarningsChart({ idToken }: { idToken: string }) {
           />
           <YAxis tick={{ fontSize: 12 }} />
           <Tooltip
-            formatter={(value) => `₪${value.toLocaleString('he-IL')}`}
+            formatter={(value) => `₪${Number(value).toLocaleString('he-IL')}`}
             labelFormatter={(label) => new Date(label).toLocaleDateString('he-IL')}
           />
           <Line

@@ -7,6 +7,7 @@ interface Stats {
   orders: number;
   visitors: number;
   previousMonthRevenue?: number;
+  previousMonthCommission?: number;
   conversionRate: number;
   averageOrderValue: number;
 }

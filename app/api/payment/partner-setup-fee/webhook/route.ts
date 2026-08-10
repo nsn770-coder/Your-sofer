@@ -53,6 +53,10 @@ export async function POST(req: NextRequest) {
     }
 
     const paymentData = paymentSnap.data();
+    if (!paymentData) {
+      console.error('[partner-webhook] payment data empty:', paymentId);
+      return NextResponse.json({ error: 'payment data empty' }, { status: 404 });
+    }
 
     // NOTE: Idempotency check is moved INSIDE the transaction below
     // This prevents race conditions where two simultaneous webhook calls
@@ -100,6 +104,10 @@ export async function POST(req: NextRequest) {
     }
 
     const appData = appSnap.data();
+    if (!appData) {
+      console.error('[partner-webhook] application data empty:', applicationId);
+      return NextResponse.json({ error: 'application data empty' }, { status: 404 });
+    }
 
     // ── Create or get Firebase user ─────────────────────────────────────────
     const email = paymentData.email as string;
@@ -146,7 +154,7 @@ export async function POST(req: NextRequest) {
     await adminDb.runTransaction(async (transaction) => {
       // 0. IDEMPOTENCY CHECK (inside transaction for safety)
       const paymentCheckSnap = await transaction.get(paymentRef);
-      if (paymentCheckSnap.data().webhookReceived === true) {
+      if (paymentCheckSnap.data()?.webhookReceived === true) {
         console.log('[partner-webhook] Idempotent: already processed (inside transaction):', paymentId);
         return; // Exit silently, return 200 success
       }

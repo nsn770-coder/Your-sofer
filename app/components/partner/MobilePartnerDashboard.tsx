@@ -1,18 +1,17 @@
 // Phase 10: Mobile-Optimized Partner Dashboard
 'use client';
 
-import { useContext, useState, useEffect } from 'react';
-import { AuthContext } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { usePartner } from '@/app/contexts/PartnerContext';
 import { PartnerEarningsChart } from './PartnerEarningsChart';
 import { PayoutRequestForm } from './PayoutRequestForm';
 import { DashboardStats } from './DashboardStats';
 import { PartnerErrorBoundary } from './ErrorBoundary';
 
 function MobilePartnerDashboardContent() {
-  const authContext = useContext(AuthContext);
-  if (!authContext) throw new Error('Missing AuthContext');
-
-  const { user } = authContext;
+  const { user } = useAuth();
+  const { partner } = usePartner();
   const [availableBalance, setAvailableBalance] = useState(0);
 
   // Fetch available balance on mount
@@ -70,7 +69,7 @@ function MobilePartnerDashboardContent() {
   }
 
   const idToken = user.idToken || '';
-  const partnerName = user.partnerName || 'שם העסק';
+  const partnerName = partner?.businessName || 'שם העסק';
 
   return (
     <div className="min-h-screen bg-gray-50">

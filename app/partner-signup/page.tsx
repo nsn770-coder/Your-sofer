@@ -1,4 +1,4 @@
-import { PartnerSignupForm } from '@/app/components/partner/PartnerSignupForm';
+import PartnerSignupForm from '@/app/components/partner/PartnerSignupForm';
 
 export const metadata = {
   title: 'פתח חנות Your Sofer | Partner Program',
