@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
+import { getAdminDb } from '@/lib/firebaseAdmin';
+import { verifyAdminToken } from '@/lib/verifyAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { AdminCouponCreateRequest, PartnerCouponType } from '@/app/lib/partner-coupon-types';
 
@@ -17,20 +18,12 @@ export async function POST(req: NextRequest) {
     }
 
     const idToken = authHeader.slice(7);
-    const adminAuth = getAdminAuth();
-
-    let decodedToken;
-    try {
-      decodedToken = await adminAuth.verifyIdToken(idToken);
-    } catch {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    const decodedToken = await verifyAdminToken(idToken);
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const adminDb = getAdminDb();
-    const userSnap = await adminDb.collection('users').doc(decodedToken.uid).get();
-    if (!userSnap.exists || userSnap.data()?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
 
     const body = (await req.json()) as AdminCouponCreateRequest;
     const code = body.code?.trim().toUpperCase();

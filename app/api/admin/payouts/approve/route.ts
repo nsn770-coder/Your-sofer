@@ -1,6 +1,7 @@
 // Phase 9: Admin Payout Approval & Processing
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
+import { getAdminDb } from '@/lib/firebaseAdmin';
+import { verifyAdminToken } from '@/lib/verifyAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 
 /**
@@ -15,21 +16,12 @@ export async function POST(req: NextRequest) {
     }
 
     const idToken = authHeader.slice(7);
-    const adminAuth = getAdminAuth();
-
-    let decodedToken;
-    try {
-      decodedToken = await adminAuth.verifyIdToken(idToken);
-    } catch {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    const decodedToken = await verifyAdminToken(idToken);
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const adminDb = getAdminDb();
-    const userSnap = await adminDb.collection('users').doc(decodedToken.uid).get();
-
-    if (!userSnap.exists || userSnap.data()?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
 
     const { payoutId, action, transactionId, notes } = await req.json();
 
@@ -107,21 +99,12 @@ export async function GET(req: NextRequest) {
     }
 
     const idToken = authHeader.slice(7);
-    const adminAuth = getAdminAuth();
-
-    let decodedToken;
-    try {
-      decodedToken = await adminAuth.verifyIdToken(idToken);
-    } catch {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    const decodedToken = await verifyAdminToken(idToken);
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const adminDb = getAdminDb();
-    const userSnap = await adminDb.collection('users').doc(decodedToken.uid).get();
-
-    if (!userSnap.exists || userSnap.data()?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
 
     const status = req.nextUrl.searchParams.get('status') || 'pending';
     const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50'), 500);
