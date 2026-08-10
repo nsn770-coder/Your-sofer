@@ -184,7 +184,7 @@ export default function PartnerSignupForm() {
             <p className="text-3xl font-bold text-blue-600">₪5,000</p>
           </div>
           <a
-            href={`/partner-signup/payment?applicationId=${applicationId}`}
+            href={`/partner-signup/payment?applicationId=${encodeURIComponent(applicationId)}&email=${encodeURIComponent(formData.email)}&businessName=${encodeURIComponent(formData.businessName)}`}
             className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
           >
             לתשלום
