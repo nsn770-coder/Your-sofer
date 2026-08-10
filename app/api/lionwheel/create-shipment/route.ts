@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { sendCustomerShipmentEmail } from '@/app/lib/send-notification';
 
 // ── כתובת מוצא קבועה (נקודת האיסוף של YourSofer) ────────────────────────────
 // LionWheel לא ממלא את המוצא אוטומטית בקריאות API — בלי השדות האלה
@@ -194,6 +195,16 @@ export async function POST(request: NextRequest) {
       console.log('💾 [Firestore] Shipment saved to order:', orderId);
     } catch (e) {
       console.error('⚠️ [Firestore] Failed to save shipment to order (non-fatal):', e);
+    }
+
+    // Customer tracking email — non-fatal, shipment is already created either way
+    try {
+      await sendCustomerShipmentEmail(
+        { orderNumber: order.orderNumber || orderId, customerName: order.customerName || '', email: order.email || '' },
+        shipment,
+      );
+    } catch (emailErr) {
+      console.error('⚠️ [email] Failed to send customer shipment notification (non-fatal):', emailErr);
     }
 
     return NextResponse.json({ success: true, shipment }, { status: 200 });

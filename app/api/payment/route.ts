@@ -6,6 +6,8 @@ import { getTier } from '@/app/lib/loyalty';
 import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
 import { isBulkEventKippotLine } from '@/app/lib/kippot';
 import { closeLeadForOrder, type OrderAttribution } from '@/lib/crm';
+import { calculateFulfillmentPlan } from '@/app/lib/fulfillment';
+import { sendPartnerNewOrderEmail } from '@/app/lib/send-notification';
 
 // ── מימוש נקודות מועדון ──────────────────────────────────────────────────────
 // נקודה = ₪1 הנחה. ניתן לממש עד 50% מסכום המוצרים בעגלה (אחרי הנחות, לפני משלוח).
@@ -544,6 +546,8 @@ export async function POST(req: NextRequest) {
         items: [
           ...cartItems.map(i => ({
             id: i.id, productId: i.productId || i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity,
+            // Partner Stores — fulfillment source (Phase 13C), needed for Phase 14C partner notifications
+            partnerId: i.partnerId || null, partnerName: i.partnerName || null, warehouseType: i.warehouseType || null,
             selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null,
             embroideryText: i.embroideryText || null,
             embroideryOptions: i.embroideryOptions || null, embroiderySurcharge: i.embroiderySurcharge || null,
@@ -614,6 +618,28 @@ export async function POST(req: NextRequest) {
         await closeLeadForOrder(adminDb, customer.phone, orderNumber, attribution);
       } catch (crmErr) {
         console.error('[payment] CRM lead close failed (non-fatal):', crmErr);
+      }
+
+      // ── Partner notifications: notify each partner whose products were ordered ──
+      try {
+        const itemsByPartner = new Map<string, CartItem[]>();
+        for (const item of cartItems) {
+          if (!item.partnerId) continue; // Your Sofer's own items — no partner to notify
+          if (!itemsByPartner.has(item.partnerId)) itemsByPartner.set(item.partnerId, []);
+          itemsByPartner.get(item.partnerId)!.push(item);
+        }
+        for (const [partnerId, partnerItems] of itemsByPartner) {
+          const partnerSnap = await adminDb.collection('partners').doc(partnerId).get();
+          if (!partnerSnap.exists) continue;
+          const partner = partnerSnap.data()!;
+          await sendPartnerNewOrderEmail(
+            { email: partner.email, storeName: partner.storeName },
+            { id: orderRef.id, orderNumber, customerName: customer.name, address: address || '' },
+            partnerItems.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
+          );
+        }
+      } catch (partnerNotifyErr) {
+        console.error('[payment] partner notification failed (non-fatal):', partnerNotifyErr);
       }
     } catch (adminErr) {
       console.error('[payment] order creation failed after successful charge:', adminErr);

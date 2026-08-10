@@ -196,6 +196,12 @@ export interface Order {
   phone?: string;
   email?: string;
   address?: string;
+  // שדות כתובת מפוצלים — נשמרים בהזמנה עצמה לצורך יצירת משלוח (LionWheel וכו')
+  city?: string;
+  street?: string;
+  houseNumber?: string;
+  apartment?: string;
+  zipCode?: string;
   total: number;
   status?: string;
   shaliachName?: string;
@@ -204,11 +210,18 @@ export interface Order {
   printCustomization?: unknown;
   selectedGift?: unknown;
   couponCode?: string;
+
+  // ── Fulfillment (Phase 14A) ────────────────────────────────────────────────
+  // שדה נפרד מ-status — status נשאר "אמת התשלום" (paid/pending_payment/cancelled
+  // וכו') וממשיך לשמש לדוחות הכנסה/עמלות; תוכנית המילוי לא נוגעת בו.
+  fulfillmentPlan?: FulfillmentPlan;
 }
 
 export interface OrderItem {
+  id?: string;
   productId?: string;
   productName?: string;
+  name?: string;
   quantity: number;
   price: number;
 
@@ -221,6 +234,58 @@ export interface OrderItem {
     amount?: number;
     percent?: number;
   };
+
+  // ── Partner Stores — fulfillment source (Phase 13C/14A) ────────────────────
+  partnerId?: string;
+  partnerName?: string;
+  warehouseType?: 'partner' | 'dropship';
+}
+
+// ── Fulfillment (Phase 14A) ───────────────────────────────────────────────────
+
+export interface FulfillmentPlan {
+  status: 'pending' | 'ready' | 'in_progress' | 'completed';
+  shipmentCount: number;
+  shipments: ShipmentRecord[];
+}
+
+export interface ShipmentRecord {
+  id: string;
+  orderId: string;
+  source: 'main' | `partner_${string}`;
+  itemIds: string[];
+  pickupAddress: WarehouseAddress;
+  destinationAddress: CustomerAddress;
+  status: 'pending' | 'created' | 'picked' | 'shipped' | 'delivered';
+  lionwheelData?: {
+    taskId: string;
+    publicId: string;
+    trackingLink: string;
+    barcode: string;
+    createdAt: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WarehouseAddress {
+  city: string;
+  street: string;
+  number: string;
+  apartment?: string;
+  zipCode?: string;
+  phone: string;
+  recipientName: string;
+}
+
+export interface CustomerAddress {
+  city: string;
+  street: string;
+  number: string;
+  apartment?: string;
+  zipCode?: string;
+  phone: string;
+  recipientName: string;
 }
 
 export interface Curation {

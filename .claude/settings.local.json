@@ -224,7 +224,9 @@
       "Bash(tee /tmp/build5.log)",
       "Bash(tee /tmp/build6.log)",
       "Bash(echo \"ignore-check exit: $?\")",
-      "Bash(echo \"diff exit: $?\")"
+      "Bash(echo \"diff exit: $?\")",
+      "Bash(ps -o pid,ppid,etime,cmd -p 1509)",
+      "Bash(wmic process *)"
     ]
   }
 }

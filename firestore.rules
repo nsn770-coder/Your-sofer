@@ -367,8 +367,8 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    match /partners_analytics/{date}/{partnerId} {
-      allow read:   if isAdmin() || (isPartner() && request.auth.uid == partnerId);
+    match /partners_analytics/{partnerId}/daily/{date} {
+      allow read:   if isAdmin() || (isPartner() && partnerId == getPartnerIdForUser());
       allow write:  if isAdmin();
     }
 

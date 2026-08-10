@@ -11,6 +11,9 @@ interface DashboardStats {
   previousMonthOrders?: number;
   conversionRate: number;
   averageOrderValue: number;
+  previousAverageOrderValue?: number;
+  shipmentsCreated: number;
+  shipmentsPending: number;
 }
 
 /**
@@ -81,6 +84,7 @@ export async function GET(req: NextRequest) {
     let currentRevenue = 0;
     let currentCommission = 0;
     let currentOrders = 0;
+    let currentShipped = 0;
 
     currentOrdersSnap.forEach((doc) => {
       const data = doc.data();
@@ -88,6 +92,7 @@ export async function GET(req: NextRequest) {
         currentRevenue += data.total || 0;
         currentCommission += data.commissionAmount || 0;
         currentOrders += 1;
+        if (data.lionwheel?.publicId) currentShipped += 1;
       }
     });
 
@@ -117,6 +122,7 @@ export async function GET(req: NextRequest) {
     const visitorsEstimate = currentOrders > 0 ? Math.max(currentOrders * 10, 1) : 1;
     const conversionRate = (currentOrders / visitorsEstimate) * 100;
     const averageOrderValue = currentOrders > 0 ? Math.round(currentRevenue / currentOrders) : 0;
+    const previousAverageOrderValue = previousOrders > 0 ? Math.round(previousRevenue / previousOrders) : 0;
 
     const stats: DashboardStats = {
       revenue: currentRevenue,
@@ -128,6 +134,9 @@ export async function GET(req: NextRequest) {
       previousMonthOrders: previousOrders,
       conversionRate,
       averageOrderValue,
+      previousAverageOrderValue,
+      shipmentsCreated: currentShipped,
+      shipmentsPending: currentOrders - currentShipped,
     };
 
     console.log(`[dashboard] Generated stats for partner ${partnerId}:`, stats);

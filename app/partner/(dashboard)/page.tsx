@@ -2,6 +2,7 @@
 import { useAuth } from '@/app/contexts/AuthContext';
 import { usePartner } from '@/app/contexts/PartnerContext';
 import { DashboardStats } from '@/app/components/partner/DashboardStats';
+import { PartnerEarningsChart } from '@/app/components/partner/PartnerEarningsChart';
 import { OnboardingChecklist } from '@/app/components/partner/OnboardingChecklist';
 
 export default function PartnerDashboard() {
@@ -12,7 +13,7 @@ export default function PartnerDashboard() {
     return <div className="text-center py-12">בטעינה...</div>;
   }
 
-  if (!partner || !user) {
+  if (!partner || !user || !user.idToken) {
     return <div className="text-center py-12 text-gray-500">לא ניתן לטעון נתונים</div>;
   }
 
@@ -50,7 +51,13 @@ export default function PartnerDashboard() {
 
       {/* Stats cards */}
       <div className="mb-8">
-        <DashboardStats idToken={user.uid} />
+        <DashboardStats idToken={user.idToken} />
+      </div>
+
+      {/* Revenue chart */}
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">הכנסות לאורך זמן</h2>
+        <PartnerEarningsChart idToken={user.idToken} />
       </div>
 
       {/* Onboarding Checklist */}

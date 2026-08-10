@@ -2,15 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 /**
- * POST /api/cron/aggregate-partner-analytics
- * Runs nightly to aggregate daily analytics from raw events
+ * GET /api/cron/aggregate-partner-analytics
+ * Runs nightly (via vercel.json cron) to aggregate daily analytics from raw events
  * SECURITY: Requires CRON_SECRET in Authorization header
  */
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const secret = req.headers.get('Authorization')?.replace('Bearer ', '');
-    if (secret !== process.env.CRON_SECRET) {
+    if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -65,7 +68,9 @@ export async function POST(req: NextRequest) {
     for (const [partnerId, counts] of Object.entries(aggregates)) {
       await adminDb
         .collection('partners_analytics')
-        .doc(`daily/${partnerId}/${dateStr}`)
+        .doc(partnerId)
+        .collection('daily')
+        .doc(dateStr)
         .set(
           {
             partnerId,

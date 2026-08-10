@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/whatsapp-followup",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/aggregate-partner-analytics",
+      "schedule": "0 2 * * *"
     }
   ]
 }
