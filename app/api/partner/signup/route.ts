@@ -24,19 +24,6 @@ function validateName(name: string): boolean {
   return name.length >= 2 && name.length <= 50;
 }
 
-async function checkEmailExists(db: ReturnType<typeof getAdminDb>, email: string): Promise<boolean> {
-  try {
-    const snap = await db.collection('partners_applications')
-      .where('email', '==', email.toLowerCase().trim())
-      .limit(1)
-      .get();
-    return !snap.empty;
-  } catch (error) {
-    console.error('[partner/signup] email check failed:', error);
-    return false;
-  }
-}
-
 async function checkPartnerExists(db: ReturnType<typeof getAdminDb>, email: string): Promise<boolean> {
   try {
     const snap = await db.collection('partners')
@@ -112,18 +99,10 @@ export async function POST(req: NextRequest) {
 
     const adminDb = getAdminDb();
 
-    // ── Check for duplicates ────────────────────────────────────────────────
-    const [appExists, partnerExists] = await Promise.all([
-      checkEmailExists(adminDb, email),
-      checkPartnerExists(adminDb, email),
-    ]);
-
-    if (appExists) {
-      return NextResponse.json(
-        { success: false, error: 'כבר קיימת בקשה להרשמה עם אימייל זה' },
-        { status: 409 }
-      );
-    }
+    // ── Block only if an actual partner account already exists ─────────────
+    // A prior pending/rejected application with the same email is fine — the
+    // applicant may be retrying after an abandoned or failed payment.
+    const partnerExists = await checkPartnerExists(adminDb, email);
 
     if (partnerExists) {
       return NextResponse.json(

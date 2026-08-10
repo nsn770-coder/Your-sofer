@@ -13,6 +13,7 @@ import type { UserRole } from '../contexts/AuthContext';
 import { CATS, getSubCats, findParentCat } from '../constants/categories';
 import { EVENT_SCROLL_SECTIONS } from '../constants/eventScrollSections';
 import HomepageConfigTab from './components/HomepageConfigTab';
+import type { PartnerCoupon, PartnerCouponType } from '@/app/lib/partner-coupon-types';
 import HomepageCategorySectionsTab from './components/HomepageCategorySectionsTab';
 import BestSellersTab from './components/BestSellersTab';
 import InventoryTab from './components/InventoryTab';
@@ -317,7 +318,7 @@ interface Category {
   description?: string;
 }
 
-type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions' | 'best_sellers' | 'seasonal' | 'hero';
+type TabType = 'orders' | 'commissions' | 'soferim' | 'soferim_list' | 'shluchim' | 'rabbi_requests' | 'partner_requests' | 'users' | 'products' | 'content' | 'categories' | 'reviews' | 'testimonials' | 'homepage' | 'edit_requests' | 'hidden_products' | 'theme_editor' | 'curations' | 'abandoned_carts' | 'customers' | 'leads' | 'emails' | 'coupons' | 'out_of_stock' | 'gifts' | 'inventory' | 'prints' | 'stickers' | 'profitability' | 'site_settings' | 'promotions' | 'best_sellers' | 'seasonal' | 'hero';
 
 interface Coupon {
   id: string;
@@ -345,6 +346,18 @@ interface RabbiRequest {
   bankAccount?: string;
   accountHolder?: string;
   logoUrl?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt?: { seconds: number };
+}
+
+interface PartnerApplication {
+  id: string;
+  businessName: string;
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  phone: string;
+  city: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt?: { seconds: number };
 }
@@ -3097,6 +3110,99 @@ function CouponCreateForm({ onCreated }: { onCreated: () => void }) {
   );
 }
 
+function PartnerCouponCreateForm({ onCreated }: { onCreated: () => void }) {
+  const codeRef = useRef<HTMLInputElement>(null);
+  const valueRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLInputElement>(null);
+  const maxUsesRef = useRef<HTMLInputElement>(null);
+  const expiresAtRef = useRef<HTMLInputElement>(null);
+
+  const [type, setType] = useState<PartnerCouponType>('percent');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function createPartnerCoupon() {
+    const code = codeRef.current?.value.trim().toUpperCase() || '';
+    const value = Number(valueRef.current?.value || 0);
+    const description = descriptionRef.current?.value.trim() || '';
+    const maxUses = Number(maxUsesRef.current?.value || 0);
+    const expiresAt = expiresAtRef.current?.value || undefined;
+
+    setError(null);
+    if (!code) { setError('נא להזין קוד קופון'); return; }
+    if (type !== 'free' && value <= 0) { setError('נא להזין ערך תקין'); return; }
+    if (maxUses < 1) { setError('נא להזין מספר שימושים תקין'); return; }
+
+    setSaving(true);
+    try {
+      const _auth = await getAuthLazy();
+      const idToken = await _auth.currentUser?.getIdToken();
+      const res = await fetch('/api/admin/coupons/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ code, type, value, description, maxUses, expiresAt }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'שגיאה ביצירת הקופון');
+        return;
+      }
+      if (codeRef.current) codeRef.current.value = '';
+      if (valueRef.current) valueRef.current.value = '10';
+      if (descriptionRef.current) descriptionRef.current.value = '';
+      if (maxUsesRef.current) maxUsesRef.current.value = '1';
+      if (expiresAtRef.current) expiresAtRef.current.value = '';
+      onCreated();
+    } catch (e) {
+      setError('שגיאה ביצירת הקופון');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-xl shadow p-6">
+      <h2 className="text-xl font-black mb-4" style={{ color: 'var(--ys-heading)' }}>🆙 יצירת קופון שדרוג Partner</h2>
+      <div className="flex flex-wrap gap-3 items-end">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-bold text-gray-500">קוד</label>
+          <input ref={codeRef} placeholder="PARTNER50" autoComplete="off" autoCorrect="off" autoCapitalize="characters" spellCheck={false} className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono tracking-widest w-36" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-bold text-gray-500">סוג</label>
+          <select value={type} onChange={(e) => setType(e.target.value as PartnerCouponType)} className="border border-gray-200 rounded-xl px-3 py-2 text-sm">
+            <option value="percent">אחוז (%)</option>
+            <option value="fixed">סכום קבוע (₪)</option>
+            <option value="free">בחינם</option>
+          </select>
+        </div>
+        {type !== 'free' && (
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-bold text-gray-500">ערך</label>
+            <input ref={valueRef} type="number" min={1} defaultValue={10} onFocus={(e) => e.target.select()} className="border border-gray-200 rounded-xl px-3 py-2 text-sm w-24" />
+          </div>
+        )}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-bold text-gray-500">תיאור</label>
+          <input ref={descriptionRef} placeholder="הנחה מיוחדת לשותפים" className="border border-gray-200 rounded-xl px-3 py-2 text-sm w-48" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-bold text-gray-500">מספר שימושים</label>
+          <input ref={maxUsesRef} type="number" min={1} defaultValue={1} onFocus={(e) => e.target.select()} className="border border-gray-200 rounded-xl px-3 py-2 text-sm w-28" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-bold text-gray-500">תוקף עד</label>
+          <input ref={expiresAtRef} type="date" className="border border-gray-200 rounded-xl px-3 py-2 text-sm" />
+        </div>
+        <button onClick={createPartnerCoupon} disabled={saving} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>
+          {saving ? '...' : '➕ צור קופון'}
+        </button>
+      </div>
+      {error && <p className="text-red-600 text-sm font-bold mt-3">{error}</p>}
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -3139,6 +3245,8 @@ export default function AdminPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [couponsLoading, setCouponsLoading] = useState(false);
+  const [partnerCoupons, setPartnerCoupons] = useState<PartnerCoupon[]>([]);
+  const [partnerCouponsLoading, setPartnerCouponsLoading] = useState(false);
   const [couponsSubTab, setCouponsSubTab] = useState<'product' | 'partner'>('product');
   const [showAddSofer, setShowAddSofer] = useState(false);
   const [editingSofer, setEditingSofer] = useState<SoferFull | null>(null);
@@ -3149,6 +3257,8 @@ export default function AdminPage() {
   const [shluchimAppsLoading, setShluchimAppsLoading] = useState(true);
   const [rabbiRequests, setRabbiRequests] = useState<RabbiRequest[]>([]);
   const [rabbiRequestsLoading, setRabbiRequestsLoading] = useState(true);
+  const [partnerApplications, setPartnerApplications] = useState<PartnerApplication[]>([]);
+  const [partnerApplicationsLoading, setPartnerApplicationsLoading] = useState(true);
   const [showAddShliach, setShowAddShliach] = useState(false);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [testimonialsLoading, setTestimonialsLoading] = useState(true);
@@ -3177,7 +3287,7 @@ export default function AdminPage() {
       loadOrders(); loadApplications(); loadUsers();
       loadProducts(); loadSoferim(); loadSoferimFull(); loadContent(); loadCategories();
       loadReviews(); loadShluchimApplications(); loadTestimonials(); loadEditRequests();
-      loadAbandonedCarts(); loadCustomers(); loadLeads(); loadRabbiRequests(); loadCoupons(); loadOutOfStockProducts();
+      loadAbandonedCarts(); loadCustomers(); loadLeads(); loadRabbiRequests(); loadPartnerApplications(); loadCoupons(); loadPartnerCoupons(); loadOutOfStockProducts();
       loadCrmFollowUpsDue();
     }
   }, [user]);
@@ -3452,6 +3562,34 @@ export default function AdminPage() {
       setRabbiRequests(data);
     } catch (e) { console.error(e); }
     finally { setRabbiRequestsLoading(false); }
+  }
+
+  async function loadPartnerApplications() {
+    try {
+      const snap = await getDocs(query(collection(db, 'partners_applications'), orderBy('createdAt', 'desc')));
+      const data: PartnerApplication[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as PartnerApplication));
+      setPartnerApplications(data);
+    } catch (e) { console.error(e); }
+    finally { setPartnerApplicationsLoading(false); }
+  }
+
+  async function approvePartnerApplication(id: string) {
+    setActionLoading(id);
+    try {
+      await updateDoc(doc(db, 'partners_applications', id), { status: 'approved', approvedAt: serverTimestamp() });
+      setPartnerApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'approved' } : a));
+    } catch (e) { console.error(e); }
+    finally { setActionLoading(null); }
+  }
+
+  async function rejectPartnerApplication(id: string) {
+    setActionLoading(id);
+    try {
+      await updateDoc(doc(db, 'partners_applications', id), { status: 'rejected', rejectedAt: serverTimestamp() });
+      setPartnerApplications(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected' } : a));
+    } catch (e) { console.error(e); }
+    finally { setActionLoading(null); }
   }
 
   async function approveRabbiRequest(req: RabbiRequest) {
@@ -3733,6 +3871,17 @@ export default function AdminPage() {
   async function deleteCoupon(id: string) {
     await deleteDoc(doc(db, 'coupons', id));
     setCoupons(prev => prev.filter(c => c.id !== id));
+  }
+
+  async function loadPartnerCoupons() {
+    setPartnerCouponsLoading(true);
+    try {
+      const snap = await getDocs(query(collection(db, 'partner_coupons'), orderBy('createdAt', 'desc')));
+      const data: PartnerCoupon[] = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() } as PartnerCoupon));
+      setPartnerCoupons(data);
+    } catch (e) { console.error('[admin/partner-coupons] load failed:', e); }
+    finally { setPartnerCouponsLoading(false); }
   }
 
   async function saveContent() {
@@ -4187,6 +4336,7 @@ export default function AdminPage() {
   const pendingApps = applications.filter(a => a.status === 'pending');
   const pendingShluchimApps = shluchimApps.filter(a => a.status === 'pending');
   const pendingRabbiRequests = rabbiRequests.filter(r => r.status === 'pending');
+  const pendingPartnerApplications = partnerApplications.filter(a => a.status === 'pending');
   const userCreatedAtMs = (u: AppUser): number => {
     const c = u.createdAt as { seconds?: number } | Date | undefined;
     if (!c) return 0;
@@ -4258,6 +4408,7 @@ export default function AdminPage() {
           { key: 'soferim',        label: '📋 בקשות סופרים',     color: 'bg-amber-600',  badge: pendingApps.length },
           { key: 'shluchim',       label: '🟦 בקשות שלוחים',     color: 'bg-blue-700',   badge: pendingShluchimApps.length },
           { key: 'rabbi_requests', label: '🏪 חנויות סופרים',    color: 'bg-green-800',  badge: pendingRabbiRequests.length },
+          { key: 'partner_requests', label: '🤝 בקשות שותפים',  color: 'bg-teal-700',   badge: pendingPartnerApplications.length },
           { key: 'users',          label: '👥 משתמשים',          color: 'bg-purple-600' },
           { key: 'content',        label: '✏️ תוכן',             color: 'bg-pink-600' },
           { key: 'categories',     label: '🖼️ קטגוריות',        color: 'bg-indigo-600' },
@@ -4902,6 +5053,56 @@ export default function AdminPage() {
                     <div>
                       <span className="text-gray-400 text-xs block">שם בעל החשבון</span>
                       <span className="font-semibold">{req.accountHolder || '—'}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'partner_requests' && (
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-black">🤝 בקשות שותפים ({partnerApplications.length})</h2>
+          </div>
+          {partnerApplicationsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div>
+          : partnerApplications.filter(a => a.status === 'pending').length === 0 ? <div className="p-10 text-center text-gray-400">אין בקשות ממתינות</div>
+          : (
+            <div className="grid gap-4">
+              {partnerApplications.filter(a => a.status === 'pending').map(app => (
+                <div key={app.id} className="bg-white rounded-xl shadow p-5">
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div>
+                      <div className="text-lg font-black mb-0.5">{app.businessName}</div>
+                      <div className="text-sm font-semibold text-gray-600">{app.firstName} {app.lastName}</div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-gray-600 mt-2">
+                        <span>✉️ {app.email}</span>
+                        <span>📞 {app.phone}</span>
+                        <span>📍 {app.city}</span>
+                      </div>
+                      {app.createdAt && (
+                        <div className="text-xs text-gray-400 mt-2">
+                          נשלח: {new Date(app.createdAt.seconds * 1000).toLocaleDateString('he-IL')}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <button
+                        onClick={() => approvePartnerApplication(app.id)}
+                        disabled={actionLoading === app.id}
+                        className="bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm"
+                        style={{ opacity: actionLoading === app.id ? 0.6 : 1, cursor: actionLoading === app.id ? 'not-allowed' : 'pointer' }}>
+                        {actionLoading === app.id ? '...' : '✅ אשר'}
+                      </button>
+                      <button
+                        onClick={() => rejectPartnerApplication(app.id)}
+                        disabled={actionLoading === app.id}
+                        className="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-bold text-sm"
+                        style={{ cursor: actionLoading === app.id ? 'not-allowed' : 'pointer' }}>
+                        ❌ דחה
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -5658,12 +5859,49 @@ export default function AdminPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow overflow-hidden" style={{ height: 'calc(100vh - 320px)' }}>
-              <iframe
-                src="/admin/coupons?tab=partner"
-                className="w-full h-full border-0"
-                title="קופונים לשדרוג Partner"
-              />
+            <div className="grid gap-6">
+              <PartnerCouponCreateForm onCreated={loadPartnerCoupons} />
+
+              <div className="bg-white rounded-xl shadow overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                  <h2 className="text-lg font-black" style={{ color: 'var(--ys-heading)' }}>קופונים קיימים</h2>
+                  <span className="text-sm text-gray-500">{partnerCoupons.length} קופונים</span>
+                </div>
+                {partnerCouponsLoading ? <div className="p-10 text-center text-gray-400">טוען...</div> : (
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="p-3 text-right">קוד</th>
+                        <th className="p-3 text-right">תיאור</th>
+                        <th className="p-3 text-right">ערך</th>
+                        <th className="p-3 text-right">שימושים</th>
+                        <th className="p-3 text-right">תוקף</th>
+                        <th className="p-3 text-right">סטטוס</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {partnerCoupons.length === 0 ? (
+                        <tr><td colSpan={6} className="p-10 text-center text-gray-400">אין קופונים</td></tr>
+                      ) : partnerCoupons.map((c) => (
+                        <tr key={c.id} className="border-t hover:bg-gray-50">
+                          <td className="p-3 font-mono font-black tracking-widest text-sm">{c.code}</td>
+                          <td className="p-3 text-xs text-gray-500">{c.description || '—'}</td>
+                          <td className="p-3 font-bold text-green-700">
+                            {c.type === 'free' ? 'חינם' : c.type === 'percent' ? `${c.value}%` : `₪${c.value}`}
+                          </td>
+                          <td className="p-3 text-xs text-gray-600">{c.usedCount} / {c.maxUses}</td>
+                          <td className="p-3 text-xs text-gray-500">{c.expiresAt || '—'}</td>
+                          <td className="p-3">
+                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${c.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                              {c.active ? '● פעיל' : '● מושהה'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
           )}
         </div>
