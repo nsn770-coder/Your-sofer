@@ -3,8 +3,20 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs, orderBy, query, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useOpsAuth } from '@/app/contexts/OpsAuthContext';
+import { getAuthLazy } from '@/lib/authLazy';
 import type { InternalOrder } from '@/app/ops/types';
+import type { FulfillmentPlan } from '@/app/lib/types';
 import StatusBadge from '@/components/ops/StatusBadge';
+import FulfillmentPlanModal from '@/components/ops/FulfillmentPlanModal';
+import ShipmentsTable from '@/components/ops/ShipmentsTable';
+
+interface PlanOrder {
+  id: string;
+  orderNumber: string;
+  customerName: string;
+  items: { id?: string; name?: string; productName?: string; quantity: number; price: number }[];
+  fulfillmentPlan: FulfillmentPlan;
+}
 
 const RELEVANT_STATUSES = new Set([
   'in_fulfillment', 'waiting_supplier', 'fulfillment_ready',
@@ -20,7 +32,9 @@ export default function FulfillmentDashboard() {
   const [commNote, setCommNote] = useState<Record<string, string>>({});
   const [commChannel, setCommChannel] = useState<Record<string, 'phone' | 'whatsapp' | 'email'>>({});
   const [savingComm, setSavingComm] = useState<Record<string, boolean>>({});
-  const [activeTab, setActiveTab] = useState<'queue' | 'shipped'>('queue');
+  const [activeTab, setActiveTab] = useState<'queue' | 'shipped' | 'shipments'>('queue');
+  const [plansByOrderId, setPlansByOrderId] = useState<Record<string, PlanOrder>>({});
+  const [modalOrder, setModalOrder] = useState<PlanOrder | null>(null);
 
   async function load() {
     setLoading(true);
@@ -33,7 +47,28 @@ export default function FulfillmentDashboard() {
     setLoading(false);
   }
 
-  useEffect(() => { load(); }, []);
+  // תוכניות מילוי רב-מחסניות — נטענות מ-orders (לא internalOrders), ראו החלטה
+  // ב-Phase 14B: ה-ops UI קורא fulfillmentPlan ישירות מהזמנת המקור.
+  async function loadPlans() {
+    try {
+      const auth = await getAuthLazy();
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) return;
+      const res = await fetch('/api/ops/fulfillment-plans', {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const map: Record<string, PlanOrder> = {};
+        for (const o of data.orders || []) map[o.id] = o;
+        setPlansByOrderId(map);
+      }
+    } catch (e) {
+      console.error('[fulfillment] loadPlans failed:', e);
+    }
+  }
+
+  useEffect(() => { load(); loadPlans(); }, []);
 
   const queue = orders.filter((o) =>
     ['in_fulfillment', 'waiting_supplier', 'fulfillment_ready', 'ready_for_shipment'].includes(o.status)
@@ -138,7 +173,25 @@ export default function FulfillmentDashboard() {
         >
           נשלחו / נמסרו ({shipped.length})
         </button>
+        <button
+          onClick={() => setActiveTab('shipments')}
+          className={`px-4 py-2.5 font-semibold text-sm rounded-t-lg transition-colors ${
+            activeTab === 'shipments' ? 'border-b-2 border-yellow-500 text-yellow-700 bg-yellow-50' : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          📦 משלוחים (LionWheel)
+        </button>
       </div>
+
+      {activeTab === 'shipments' && <ShipmentsTable />}
+
+      {modalOrder && (
+        <FulfillmentPlanModal
+          order={modalOrder}
+          onClose={() => setModalOrder(null)}
+          onDone={() => { setModalOrder(null); loadPlans(); }}
+        />
+      )}
 
       {activeTab === 'queue' && (
         <div className="space-y-4">
@@ -159,6 +212,14 @@ export default function FulfillmentDashboard() {
                   </div>
                   <div className="flex items-center gap-3">
                     <StatusBadge status={order.status} />
+                    {plansByOrderId[order.orderId]?.fulfillmentPlan?.shipments?.some((s) => s.status === 'pending') && (
+                      <button
+                        onClick={() => setModalOrder(plansByOrderId[order.orderId])}
+                        className="text-xs font-bold px-2 py-1 rounded border border-cyan-300 text-cyan-700 bg-cyan-50 hover:bg-cyan-100 whitespace-nowrap"
+                      >
+                        📦 צור משלוחים
+                      </button>
+                    )}
                     <a
                       href={`/ops/orders/${order.id}`}
                       style={{ background: 'var(--ys-heading)', color: 'var(--ys-accent)' }}

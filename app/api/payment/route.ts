@@ -8,6 +8,7 @@ import { isBulkEventKippotLine } from '@/app/lib/kippot';
 import { closeLeadForOrder, type OrderAttribution } from '@/lib/crm';
 import { calculateFulfillmentPlan } from '@/app/lib/fulfillment';
 import { sendPartnerNewOrderEmail } from '@/app/lib/send-notification';
+import type { Order } from '@/app/lib/types';
 
 // ── מימוש נקודות מועדון ──────────────────────────────────────────────────────
 // נקודה = ₪1 הנחה. ניתן לממש עד 50% מסכום המוצרים בעגלה (אחרי הנחות, לפני משלוח).
@@ -640,6 +641,20 @@ export async function POST(req: NextRequest) {
         }
       } catch (partnerNotifyErr) {
         console.error('[payment] partner notification failed (non-fatal):', partnerNotifyErr);
+      }
+
+      // ── Fulfillment plan — groups items by warehouse source (main vs partner) ──
+      // status stays 'paid': app/api/partner/dashboard/route.ts sums revenue on
+      // status==='paid', and the thank-you page polls for status==='paid' before
+      // rendering — overwriting it here would break both. fulfillmentPlan carries
+      // its own .status instead.
+      try {
+        const orderSnap = await orderRef.get();
+        const orderData = { id: orderRef.id, ...orderSnap.data() } as Order;
+        const plan = await calculateFulfillmentPlan(orderData, adminDb);
+        await orderRef.update({ fulfillmentPlan: plan });
+      } catch (fulfillErr) {
+        console.error('[payment] fulfillment plan calculation failed (non-fatal):', fulfillErr);
       }
     } catch (adminErr) {
       console.error('[payment] order creation failed after successful charge:', adminErr);

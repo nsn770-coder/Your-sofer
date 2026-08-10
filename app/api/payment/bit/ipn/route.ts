@@ -5,6 +5,8 @@ import { createHash } from 'crypto';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
 import { closeLeadForOrder } from '@/lib/crm';
+import { calculateFulfillmentPlan } from '@/app/lib/fulfillment';
+import type { Order } from '@/app/lib/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://your-sofer.com';
 
@@ -229,6 +231,17 @@ export async function POST(req: NextRequest) {
       });
     } catch (opsErr) {
       console.error('[bit-ipn] ops sync failed (non-fatal):', opsErr);
+    }
+
+    // ── Fulfillment plan — groups items by warehouse source (main vs partner) ──
+    // status stays 'paid' (just set above) — fulfillmentPlan carries its own
+    // .status, see the identical note in /api/payment/route.ts.
+    try {
+      const orderData = { id: orderId, ...order, status: 'paid' } as Order;
+      const plan = await calculateFulfillmentPlan(orderData, adminDb);
+      await orderRef.update({ fulfillmentPlan: plan });
+    } catch (fulfillErr) {
+      console.error('[bit-ipn] fulfillment plan calculation failed (non-fatal):', fulfillErr);
     }
 
     // ── תופעות לוואי (כמו בזרימת האשראי, non-fatal) ───────────────────────────

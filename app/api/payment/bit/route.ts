@@ -348,6 +348,8 @@ export async function POST(req: NextRequest) {
       items: [
         ...cartItems.map(i => ({
           id: i.id, productId: i.productId || i.id, name: i.name, productName: i.name, price: i.price, quantity: i.quantity,
+          // Partner Stores — fulfillment source (Phase 13C/14A), same fields the card route stores
+          partnerId: i.partnerId || null, partnerName: i.partnerName || null, warehouseType: i.warehouseType || null,
           selectedKlafId: i.selectedKlafId || null, selectedKlafName: i.selectedKlafName || null,
           embroideryText: i.embroideryText || null,
           embroideryOptions: i.embroideryOptions || null, embroiderySurcharge: i.embroiderySurcharge || null,

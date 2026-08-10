@@ -394,6 +394,14 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // ── Fulfillment shipments (Phase 14B) — defense-in-depth only. Real access
+    // (create/list/status-advance) goes through Admin-SDK API routes gated by
+    // verifyOpsOrAdminToken (lib/verifyOps.ts), which also accepts the ops team
+    // (opsUsers, checked by email) that isAdmin() alone doesn't cover.
+    match /fulfillment_shipments/{shipmentId} {
+      allow read, create, update: if isAdmin();
+    }
+
     // ── Orders (extended to support partner reads) ──────────────────────────
     match /orders/{orderId} {
       // Signed-in users or guests who include a guestId string can create orders

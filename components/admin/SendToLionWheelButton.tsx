@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getAuthLazy } from '@/lib/authLazy';
 
 interface Shipment {
   taskId?: string | null;
@@ -43,9 +44,16 @@ export function SendToLionWheelButton({
     setError('');
 
     try {
+      const auth = await getAuthLazy();
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) throw new Error('לא מחובר — התחבר מחדש ונסה שוב');
+
       const response = await fetch('/api/lionwheel/create-shipment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
         body: JSON.stringify({ orderId, force: sent }),
       });
 
