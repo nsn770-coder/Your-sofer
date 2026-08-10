@@ -650,11 +650,15 @@ export async function POST(req: NextRequest) {
       // its own .status instead.
       try {
         const orderSnap = await orderRef.get();
-        const orderData = { id: orderRef.id, ...orderSnap.data() } as Order;
-        const plan = await calculateFulfillmentPlan(orderData, adminDb);
-        await orderRef.update({ fulfillmentPlan: plan });
+        const orderDoc = orderSnap.data() as Order;
+        // Only calculate if order has items (guard against empty carts)
+        if (orderDoc?.items && orderDoc.items.length > 0) {
+          const plan = await calculateFulfillmentPlan(orderDoc, adminDb);
+          await orderRef.update({ fulfillmentPlan: plan });
+        }
       } catch (fulfillErr) {
         console.error('[payment] fulfillment plan calculation failed (non-fatal):', fulfillErr);
+        // Don't fail payment if fulfillment plan calculation fails
       }
     } catch (adminErr) {
       console.error('[payment] order creation failed after successful charge:', adminErr);

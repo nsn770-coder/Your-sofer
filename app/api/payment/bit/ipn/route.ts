@@ -236,12 +236,16 @@ export async function POST(req: NextRequest) {
     // ── Fulfillment plan — groups items by warehouse source (main vs partner) ──
     // status stays 'paid' (just set above) — fulfillmentPlan carries its own
     // .status, see the identical note in /api/payment/route.ts.
-    try {
-      const orderData = { id: orderId, ...order, status: 'paid' } as Order;
-      const plan = await calculateFulfillmentPlan(orderData, adminDb);
-      await orderRef.update({ fulfillmentPlan: plan });
-    } catch (fulfillErr) {
-      console.error('[bit-ipn] fulfillment plan calculation failed (non-fatal):', fulfillErr);
+    // Only calculate if order has items (guard against empty carts)
+    if (order.items && order.items.length > 0) {
+      try {
+        const orderData = { id: orderId, ...order, status: 'paid' } as Order;
+        const plan = await calculateFulfillmentPlan(orderData, adminDb);
+        await orderRef.update({ fulfillmentPlan: plan });
+      } catch (fulfillErr) {
+        console.error('[bit-ipn] fulfillment plan calculation failed (non-fatal):', fulfillErr);
+        // Don't fail payment if fulfillment plan calculation fails
+      }
     }
 
     // ── תופעות לוואי (כמו בזרימת האשראי, non-fatal) ───────────────────────────
