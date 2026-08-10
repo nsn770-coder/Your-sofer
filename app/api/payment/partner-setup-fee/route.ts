@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     }
 
     const appData = appSnap.data();
-    if (appData.status !== 'pending') {
+    if (!appData || appData.status !== 'pending') {
       return NextResponse.json(
         { error: 'הבקשה לא בסטטוס של מעתידה' },
         { status: 409 }
