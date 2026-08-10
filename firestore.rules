@@ -28,6 +28,20 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'shaliach';
     }
 
+    // Check that the caller has role "partner" in their users document
+    function isPartner() {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'partner';
+    }
+
+    // Get the partner ID for the current user (if they are a partner)
+    function getPartnerIdForUser() {
+      return isSignedIn()
+        && isPartner()
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.partnerId
+        : null;
+    }
+
     // ── Public shop data ────────────────────────────────────────────────────
 
     match /products/{id} {
@@ -133,29 +147,6 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // ── Orders ──────────────────────────────────────────────────────────────
-
-    match /orders/{orderId} {
-      // Signed-in users or guests who include a guestId string can create orders
-      allow create: if isSignedIn()
-                    || request.resource.data.guestId is string;
-      // Guest orders (guestId present) are readable/updatable by anyone with the orderId.
-      // The 20-char random Firestore ID acts as an unguessable access token.
-      // Logged-in customers can read their own orders by uid (new orders) or email (legacy).
-      allow read:   if isAdmin()
-                    || resource.data.guestId is string
-                    || (isSignedIn() && resource.data.uid == request.auth.uid)
-                    || (isSignedIn() && resource.data.email == request.auth.token.email)
-                    || (isShaliach()
-                        && resource.data.shaliachId ==
-                           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shaliachId)
-                    || (isSignedIn()
-                        && resource.data.shaliachId == request.auth.uid
-                        && exists(/databases/$(database)/documents/shluchim/$(request.auth.uid)));
-      allow update: if isAdmin()
-                    || resource.data.guestId is string;
-      allow delete: if isAdmin();
-    }
 
     // ── Order line items (sofer dashboard reads by soferId) ─────────────────
 
@@ -319,6 +310,93 @@ service cloud.firestore {
     // ── CRM leads (admin-only, /admin/crm) ──────────────────────────────────
     match /crmLeads/{id} {
       allow read, write: if isAdmin();
+    }
+
+    // ── Partner data (new Partner Stores system) ────────────────────────────
+
+    match /partners/{partnerId} {
+      // Partner can read/write their own document; admin can read all
+      allow read:   if isAdmin() || (isSignedIn() && request.auth.uid == partnerId);
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if isAdmin() || (isSignedIn() && request.auth.uid == partnerId &&
+                       request.resource.data.uid == resource.data.uid);
+      allow delete: if isAdmin();
+    }
+
+    match /partners_subscriptions/{subscriptionId} {
+      allow read:   if isAdmin() || (isPartner() && resource.data.partnerId == getPartnerIdForUser());
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /partners_commission_settings/{settingId} {
+      allow read:   if isAdmin();
+      allow write:  if isAdmin();
+    }
+
+    match /partners_earnings/{earningId} {
+      allow read:   if isAdmin() || (isPartner() && resource.data.partnerId == getPartnerIdForUser());
+      allow write:  if isAdmin();
+    }
+
+    match /partners_payouts/{payoutId} {
+      allow read:   if isAdmin() || (isPartner() && resource.data.partnerId == getPartnerIdForUser());
+      allow create: if isPartner() && request.resource.data.partnerId == getPartnerIdForUser();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /partners_analytics/{date}/{partnerId} {
+      allow read:   if isAdmin() || (isPartner() && request.auth.uid == partnerId);
+      allow write:  if isAdmin();
+    }
+
+    match /partners_events/{eventId} {
+      allow create: if true;
+      allow read:   if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /partners_applications/{appId} {
+      allow create: if true;
+      allow read:   if isAdmin() || (isSignedIn() && resource.data.email == request.auth.token.email);
+      allow update, delete: if isAdmin();
+    }
+
+    match /partner_payments/{paymentId} {
+      allow create: if true;
+      allow read:   if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    match /audit_log/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ── Orders (extended to support partner reads) ──────────────────────────
+    match /orders/{orderId} {
+      // Signed-in users or guests who include a guestId string can create orders
+      allow create: if isSignedIn() || request.resource.data.guestId is string;
+
+      // Guest orders (guestId present) are readable/updatable by anyone with the orderId.
+      // The 20-char random Firestore ID acts as an unguessable access token.
+      // Logged-in customers can read their own orders by uid (new orders) or email (legacy).
+      // Partners can read orders from their storefronts.
+      allow read:   if isAdmin()
+                    || resource.data.guestId is string
+                    || (isSignedIn() && resource.data.uid == request.auth.uid)
+                    || (isSignedIn() && resource.data.email == request.auth.token.email)
+                    || (isShaliach()
+                        && resource.data.shaliachId ==
+                           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shaliachId)
+                    || (isSignedIn()
+                        && resource.data.shaliachId == request.auth.uid
+                        && exists(/databases/$(database)/documents/shluchim/$(request.auth.uid)))
+                    || (isPartner()
+                        && resource.data.partnerId == getPartnerIdForUser());
+
+      allow update: if isAdmin() || resource.data.guestId is string;
+      allow delete: if isAdmin();
     }
   }
 }

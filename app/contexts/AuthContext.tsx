@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { getAuthLazy } from '@/lib/authLazy';
 
-export type UserRole = 'customer' | 'shaliach' | 'sofer' | 'admin';
+export type UserRole = 'customer' | 'shaliach' | 'sofer' | 'partner' | 'admin';
 
 // כתובת — נשמרת ב-addresses[] ב-Firestore
 export interface Address {
@@ -22,9 +22,12 @@ export interface AuthUser {
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
+  idToken?: string; // JWT token for API calls
   role: UserRole;
   soferId?: string;
   shaliachId?: string;
+  partnerId?: string;
+  partnerRole?: 'owner' | 'manager' | 'marketing' | 'viewer';
   // שדות פרופיל לקוח (מתמלאים מ-Firestore)
   firstName?: string;
   lastName?: string;
