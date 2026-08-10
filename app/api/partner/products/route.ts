@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { checkRateLimit } from '@/app/lib/partner-security';
-import type { PartnerProduct } from '@/app/lib/partner-types';
+import { buildMirrorDoc } from '@/app/lib/partnerProductMirror';
+import type { PartnerProduct, PartnerWarehouse } from '@/app/lib/partner-types';
 
 /**
  * GET /api/partner/products - List the caller's own products
@@ -167,6 +168,21 @@ export async function POST(req: NextRequest) {
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
+
+    // Mirror into the main products collection so the storefront (home, category
+    // pages, product detail, Algolia sync) can display it with zero new query code.
+    try {
+      const mirrorDoc = buildMirrorDoc(
+        { ...newProduct, id: docRef.id },
+        partnerData.warehouse as PartnerWarehouse
+      );
+      await adminDb
+        .collection('products')
+        .doc(docRef.id)
+        .set({ ...mirrorDoc, createdAt: FieldValue.serverTimestamp() }, { merge: true });
+    } catch (mirrorErr) {
+      console.error('[partner/products] mirror write failed (non-fatal):', mirrorErr);
+    }
 
     return NextResponse.json({
       success: true,

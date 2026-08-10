@@ -65,6 +65,9 @@ interface Product {
   soferName?: string;
   soferPhoto?: string;
   soferId?: string;
+  partnerId?: string;
+  partnerName?: string;
+  warehouseType?: 'partner' | 'dropship';
   stars?: number;
   outOfStock?: boolean;
   hasKlafSelection?: boolean;
@@ -638,6 +641,7 @@ export default function KippotEventClient({ faqItems, config = BAR_MITZVAH_CONFI
                     soferName={p.soferName}
                     soferPhoto={p.soferPhoto}
                     soferId={p.soferId}
+                    partnerId={p.partnerId} partnerName={p.partnerName} warehouseType={p.warehouseType}
                     stars={p.stars}
                     outOfStock={p.outOfStock}
                   />

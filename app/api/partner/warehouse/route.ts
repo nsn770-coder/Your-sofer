@@ -104,6 +104,42 @@ export async function PUT(req: NextRequest) {
       updatedAt: FieldValue.serverTimestamp(),
     });
 
+    // Keep the storefront mirror in sync — otherwise already-uploaded products would
+    // keep showing a stale pickup address after the partner moves warehouses.
+    try {
+      const activeProducts = await adminDb
+        .collection('partners')
+        .doc(partnerId)
+        .collection('products')
+        .where('status', '==', 'active')
+        .get();
+
+      const mirrorAddress = {
+        city: warehouse.city,
+        street: warehouse.street,
+        number: warehouse.number,
+        apartment: warehouse.apartment ?? '',
+        zipCode: warehouse.zipCode ?? '',
+        phone: warehouse.phone,
+        recipientName: warehouse.recipientName,
+      };
+
+      const docs = activeProducts.docs;
+      for (let i = 0; i < docs.length; i += 500) {
+        const batch = adminDb.batch();
+        for (const doc of docs.slice(i, i + 500)) {
+          batch.set(
+            adminDb.collection('products').doc(doc.id),
+            { warehouseAddress: mirrorAddress, warehouseType: warehouse.type, updatedAt: FieldValue.serverTimestamp() },
+            { merge: true }
+          );
+        }
+        await batch.commit();
+      }
+    } catch (mirrorErr) {
+      console.error('[warehouse] mirror address sync failed (non-fatal):', mirrorErr);
+    }
+
     return NextResponse.json({ success: true, warehouse });
   } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error(String(error));

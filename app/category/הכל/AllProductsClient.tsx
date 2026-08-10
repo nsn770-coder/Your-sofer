@@ -56,6 +56,9 @@ interface Product {
   hasKlafSelection?: boolean;
   soferId?: string;
   soferName?: string;
+  partnerId?: string;
+  partnerName?: string;
+  warehouseType?: 'partner' | 'dropship';
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -498,6 +501,7 @@ export default function AllProductsClient() {
                       cat={p.cat}
                       soferId={p.soferId}
                       soferName={p.soferName}
+                      partnerId={p.partnerId} partnerName={p.partnerName} warehouseType={p.warehouseType}
                       stars={p.stars}
                       outOfStock={p.outOfStock} comingSoon={p.comingSoon} expectedArrivalDate={p.expectedArrivalDate}
                     />

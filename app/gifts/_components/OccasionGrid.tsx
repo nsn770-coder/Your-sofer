@@ -62,6 +62,7 @@ export default function OccasionGrid({ products }: { products: MomentProduct[] }
             soferId={p.soferId}
             soferName={p.soferName}
             soferPhoto={p.soferPhoto}
+            partnerId={p.partnerId} partnerName={p.partnerName} warehouseType={p.warehouseType}
             stars={p.stars}
             outOfStock={p.outOfStock}
           />

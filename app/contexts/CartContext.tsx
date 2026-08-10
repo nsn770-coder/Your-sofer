@@ -44,6 +44,10 @@ export interface CartItem {
   image_url?: string;
   quantity: number;
   cat?: string;                    // 'כיפות' for kippot | 'הדפסה' for print-service
+  // ── Partner Stores — fulfillment source (Phase 13C) ───────────────────────
+  partnerId?: string;               // undefined = Your Sofer (main warehouse)
+  partnerName?: string;
+  warehouseType?: 'partner' | 'dropship';
   selectedKlafId?: string;
   selectedKlafName?: string;
   embroideryText?: string;

@@ -27,6 +27,9 @@ interface Product {
   soferId?: string;
   soferName?: string;
   soferPhoto?: string;
+  partnerId?: string;
+  partnerName?: string;
+  warehouseType?: 'partner' | 'dropship';
   stars?: number;
   outOfStock?: boolean;
 }
@@ -344,6 +347,7 @@ export default function MomentClient({
                   soferId={p.soferId}
                   soferName={p.soferName}
                   soferPhoto={p.soferPhoto}
+                  partnerId={p.partnerId} partnerName={p.partnerName} warehouseType={p.warehouseType}
                   stars={p.stars}
                   outOfStock={p.outOfStock}
                 />

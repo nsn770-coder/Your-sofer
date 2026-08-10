@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { buildMirrorDoc } from '@/app/lib/partnerProductMirror';
+import type { PartnerProduct, PartnerWarehouse } from '@/app/lib/partner-types';
 
 /**
  * GET /api/partner/products/[productId]
@@ -38,6 +40,29 @@ async function requirePartner(req: NextRequest) {
 
   const partnerId = userSnap.data()?.partnerId as string;
   return { adminDb, partnerId } as const;
+}
+
+// Re-reads the (just-updated) partner product + the partner's warehouse and
+// re-mirrors it into products/{id} — keeps the storefront read-model in sync.
+async function mirrorPartnerProduct(
+  adminDb: FirebaseFirestore.Firestore,
+  partnerId: string,
+  productId: string
+) {
+  try {
+    const [productSnap, partnerSnap] = await Promise.all([
+      adminDb.collection('partners').doc(partnerId).collection('products').doc(productId).get(),
+      adminDb.collection('partners').doc(partnerId).get(),
+    ]);
+    if (!productSnap.exists) return;
+
+    const product = { id: productSnap.id, ...productSnap.data() } as PartnerProduct;
+    const warehouse = (partnerSnap.data()?.warehouse as PartnerWarehouse) ?? null;
+    const mirrorDoc = buildMirrorDoc(product, warehouse);
+    await adminDb.collection('products').doc(productId).set(mirrorDoc, { merge: true });
+  } catch (mirrorErr) {
+    console.error('[partner/products/[id]] mirror update failed (non-fatal):', mirrorErr);
+  }
 }
 
 export async function GET(
@@ -101,6 +126,7 @@ export async function PUT(
 
     updates.updatedAt = FieldValue.serverTimestamp();
     await productRef.update(updates);
+    await mirrorPartnerProduct(adminDb, partnerId, productId);
 
     const updated = await productRef.get();
     return NextResponse.json({ success: true, product: { id: updated.id, ...updated.data() } });
@@ -128,6 +154,7 @@ export async function DELETE(
     }
 
     await productRef.update({ status: 'inactive', updatedAt: FieldValue.serverTimestamp() });
+    await mirrorPartnerProduct(adminDb, partnerId, productId);
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

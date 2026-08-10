@@ -65,6 +65,9 @@ interface Product {
   clearanceSalePrice?: number;
   originalPrice?: number;
   inStock?: number | boolean;
+  partnerId?: string;
+  partnerName?: string;
+  warehouseType?: 'partner' | 'dropship';
 }
 
 interface Curation {
@@ -1836,6 +1839,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 was={p.was} productDoc={p} isBundle={!!p.bundleComponentCodes?.length} createdAt={p.createdAt} aboveFold={idx < 2}
                                 hasKlafSelection={p.hasKlafSelection} cat={p.cat}
                                 soferId={p.soferId}
+                                partnerId={p.partnerId} partnerName={p.partnerName} warehouseType={p.warehouseType}
                                 soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                                 soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                                 stars={p.stars || undefined}
@@ -2093,6 +2097,7 @@ export default function CategoryClient({ category }: { category: string }) {
                         was={p.was} productDoc={p} isBundle={!!p.bundleComponentCodes?.length} createdAt={p.createdAt} aboveFold={idx < 4}
                         hasKlafSelection={p.hasKlafSelection} cat={p.cat}
                         soferId={p.soferId}
+                        partnerId={p.partnerId} partnerName={p.partnerName} warehouseType={p.warehouseType}
                         soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                         soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                         stars={p.stars || undefined}
@@ -2189,6 +2194,7 @@ export default function CategoryClient({ category }: { category: string }) {
                           hasKlafSelection={p.hasKlafSelection}
                           cat={p.cat}
                           soferId={p.soferId}
+                          partnerId={p.partnerId} partnerName={p.partnerName} warehouseType={p.warehouseType}
                           soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                           soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                           stars={p.stars || undefined}
@@ -2270,6 +2276,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 hasKlafSelection={p.hasKlafSelection}
                                 cat={p.cat}
                                 soferId={p.soferId}
+                                partnerId={p.partnerId} partnerName={p.partnerName} warehouseType={p.warehouseType}
                                 soferName={p.soferId ? (soferMap[p.soferId]?.name ?? p.soferName ?? p.sofer) : (p.soferName ?? p.sofer)}
                                 soferPhoto={p.soferId ? soferMap[p.soferId]?.imageUrl : undefined}
                                 stars={p.stars || undefined}

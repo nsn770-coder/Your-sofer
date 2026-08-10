@@ -29,6 +29,9 @@ interface Props {
   soferId?: string;
   soferName?: string;
   soferPhoto?: string;
+  partnerId?: string;
+  partnerName?: string;
+  warehouseType?: 'partner' | 'dropship';
   horizontal?: boolean;
   stars?: number;
   outOfStock?: boolean;
@@ -113,6 +116,7 @@ export default function ProductCard({
   id, name, price, images, aiLifestyleImage, priority, isBestSeller, badge, bundlePromo, was, createdAt, hidden, eventsOnly, aboveFold, hasKlafSelection, cat,
   soferId, soferName, soferPhoto, horizontal, outOfStock, clearanceDiscount, clearanceSalePrice, originalPrice,
   comingSoon, expectedArrivalDate, productDoc, isBundle,
+  partnerId, partnerName, warehouseType,
 }: Props) {
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
@@ -194,7 +198,10 @@ export default function ProductCard({
     // ⚠️ displayPrice ולא price: הכרטיס הוסיף עד כה לסל את המחיר הבסיסי גם
     // כשהוצג מחיר מבצע/מלאי — כלומר הלקוח חויב יותר ממה שראה, ובסכום שונה
     // מהוספה של אותו מוצר מעמוד המוצר (שם משתמשים ב-cartPrice האפקטיבי).
-    addItem({ id, name, price: displayPrice, imgUrl: imgSrc ?? undefined, quantity: 1, cat, bundlePromo: bundlePromo ?? undefined });
+    addItem({
+      id, name, price: displayPrice, imgUrl: imgSrc ?? undefined, quantity: 1, cat, bundlePromo: bundlePromo ?? undefined,
+      partnerId, partnerName, warehouseType,
+    });
     try { localStorage.removeItem('bmWizard_step'); } catch {}
   }
 
@@ -352,6 +359,17 @@ export default function ProductCard({
             ) : null}
             <span style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               נכתב ע״י {soferName ?? 'סופר מוסמך'}
+            </span>
+          </div>
+        )}
+
+        {partnerId && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1, marginBottom: 2 }}>
+            <span style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              🏪 {partnerName ?? 'חנות שותף'}
+            </span>
+            <span style={{ fontSize: 10, color: '#B0B4C0' }}>
+              {warehouseType === 'dropship' ? 'משלוח עד 5 ימים' : `משלוח ישיר מ${partnerName ?? 'השותף'}`}
             </span>
           </div>
         )}

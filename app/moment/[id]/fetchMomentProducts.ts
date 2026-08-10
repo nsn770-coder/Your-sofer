@@ -51,6 +51,9 @@ export interface MomentProduct {
   soferId?: string;
   soferName?: string;
   soferPhoto?: string;
+  partnerId?: string;
+  partnerName?: string;
+  warehouseType?: 'partner' | 'dropship';
   stars?: number;
   outOfStock?: boolean;
   /** מוצר מארז — עד 4 קודי רכיבים. מזין את הבאדג' "מארז מהודר" בכרטיס. */
@@ -86,7 +89,7 @@ const SELECT_FIELDS = [
   'name', 'price', 'imgUrl', 'image_url', 'imgUrl2', 'imgUrl3', 'aiLifestyleImage',
   'priority', 'isBestSeller', 'badge', 'was', 'createdAt', 'hidden',
   'cat', 'subCategory', 'filterAttributes', 'hasKlafSelection',
-  'soferId', 'soferName', 'soferPhoto', 'stars', 'outOfStock',
+  'soferId', 'soferName', 'soferPhoto', 'partnerId', 'partnerName', 'warehouseType', 'stars', 'outOfStock',
   'bundleComponentCodes',
   'isOnSale', 'salePrice', 'saleStartsAt', 'saleEndsAt',
   'clearanceDiscount', 'clearanceSalePrice', 'originalPrice',

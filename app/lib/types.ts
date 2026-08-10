@@ -85,6 +85,20 @@ export interface Product {
   storageNote?: string;
   warehouseBox?: string;            // מספר ארגז במחסן
 
+  // Partner Stores — mirrored from partners/{partnerId}/products (Phase 13C)
+  partnerId?: string;                // null/undefined = Your Sofer
+  partnerName?: string;
+  warehouseType?: 'partner' | 'dropship';
+  warehouseAddress?: {
+    city: string;
+    street: string;
+    number: string;
+    apartment?: string;
+    zipCode?: string;
+    phone: string;
+    recipientName: string;
+  };
+
   // Metadata
   createdAt?: { seconds: number };
 }
