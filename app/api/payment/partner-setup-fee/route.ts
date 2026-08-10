@@ -24,6 +24,7 @@ interface ChargeRequest {
 
 interface SumitChargeBody {
   CompanyID: string;
+  APIKey: string;
   SingleUseToken: string;
   PaymentsCount: number;
   ChargeDescription: string;
@@ -158,6 +159,7 @@ export async function POST(req: NextRequest) {
     // ── Call Sumit API ──────────────────────────────────────────────────────
     const chargeBody: SumitChargeBody = {
       CompanyID: SUMIT_COMPANY_ID,
+      APIKey: process.env.SUMIT_API_PRIVATE_KEY!,
       SingleUseToken: singleUseToken,
       PaymentsCount: paymentsCount,
       ChargeDescription: SETUP_FEE_DESCRIPTION,
