@@ -251,6 +251,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── Partner-upgrade coupons (discount the ₪5,000 setup fee — admin-only) ──
+
+    match /partner_coupons/{id} {
+      allow read, write: if isAdmin();
+    }
+
     // ── Promotions (sale campaigns — public read so catalog can check active sales) ──
 
     match /promotions/{id} {
