@@ -242,14 +242,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
 
             if (!cancelled) {
+              // Get idToken for API calls
+              const idToken = await firebaseUser.getIdToken();
+
+              // Extract partnerId from users doc if partner role
+              let partnerId: string | undefined;
+              if (role === 'partner') {
+                try {
+                  const userSnap = await getDoc(doc(db, 'users', firebaseUser.uid));
+                  if (userSnap.exists()) {
+                    partnerId = userSnap.data()?.partnerId;
+                  }
+                } catch (e) {
+                  console.warn('[AuthContext] Failed to load partnerId:', e);
+                }
+              }
+
               setUser({
                 uid: firebaseUser.uid,
                 email: firebaseUser.email,
                 displayName: firebaseUser.displayName,
                 photoURL: firebaseUser.photoURL,
+                idToken,
                 role,
                 soferId,
                 shaliachId,
+                partnerId,
                 ...extraProfile,
               });
             }
@@ -261,13 +279,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Firebase Auth succeeded — a Firestore hiccup must NOT log the user
           // out of the UI. Fall back to a minimal customer identity.
           if (!cancelled) {
-            setUser(firebaseUser ? {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              displayName: firebaseUser.displayName,
-              photoURL: firebaseUser.photoURL,
-              role: 'customer',
-            } : null);
+            if (firebaseUser) {
+              const idToken = await firebaseUser.getIdToken();
+              setUser({
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                displayName: firebaseUser.displayName,
+                photoURL: firebaseUser.photoURL,
+                idToken,
+                role: 'customer',
+              });
+            } else {
+              setUser(null);
+            }
           }
         } finally {
           if (!cancelled) setLoading(false);

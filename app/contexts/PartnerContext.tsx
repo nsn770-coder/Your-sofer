@@ -43,7 +43,7 @@ export function PartnerProvider({ children }: { children: React.ReactNode }) {
       setError(null);
 
       const response = await fetch('/api/partner/profile', {
-        headers: { 'Authorization': `Bearer ${await user.uid}` },
+        headers: { 'Authorization': `Bearer ${user.idToken}` },
       });
 
       if (!response.ok) throw new Error('Failed to load partner');
@@ -63,7 +63,7 @@ export function PartnerProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const response = await fetch('/api/partner/subscription', {
-        headers: { 'Authorization': `Bearer ${await user.uid}` },
+        headers: { 'Authorization': `Bearer ${user.idToken}` },
       });
 
       if (!response.ok) return;
@@ -83,7 +83,7 @@ export function PartnerProvider({ children }: { children: React.ReactNode }) {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${await user.uid}`,
+          'Authorization': `Bearer ${user.idToken}`,
         },
         body: JSON.stringify(updates),
       });
