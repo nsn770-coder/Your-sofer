@@ -11,6 +11,7 @@ const SETUP_FEE_DESCRIPTION = 'דמי הקמת חנות Partner';
 
 const SUMIT_API_URL = 'https://api.sumit.co.il/billing/payments/charge/';
 const SUMIT_COMPANY_ID = process.env.SUMIT_COMPANY_ID!;
+const SUMIT_API_PRIVATE_KEY = process.env.SUMIT_API_PRIVATE_KEY!;
 const WEBHOOK_SECRET = process.env.PARTNER_WEBHOOK_SECRET || 'partner-webhook-secret';
 
 interface ChargeRequest {
@@ -23,17 +24,25 @@ interface ChargeRequest {
 }
 
 interface SumitChargeBody {
-  CompanyID: string;
-  APIKey: string;
   SingleUseToken: string;
-  PaymentsCount: number;
-  ChargeDescription: string;
-  ChargeAmount: number;
-  Currency: string;
-  Terms: number;
-  Reference?: string;
-  CustomerEmail?: string;
-  CustomerName?: string;
+  Credentials: {
+    CompanyID: number;
+    APIKey: string;
+  };
+  Customer: {
+    Name: string;
+    EmailAddress: string;
+    Phone?: string;
+    SearchMode: number;
+  };
+  Items: Array<{
+    Item: { Name: string };
+    Quantity: number;
+    UnitPrice: number;
+  }>;
+  Payments_Count: number;
+  VATIncluded: boolean;
+  SendDocumentByEmail: boolean;
 }
 
 export async function POST(req: NextRequest) {
@@ -158,17 +167,27 @@ export async function POST(req: NextRequest) {
 
     // ── Call Sumit API ──────────────────────────────────────────────────────
     const chargeBody: SumitChargeBody = {
-      CompanyID: SUMIT_COMPANY_ID,
-      APIKey: process.env.SUMIT_API_PRIVATE_KEY!,
       SingleUseToken: singleUseToken,
-      PaymentsCount: paymentsCount,
-      ChargeDescription: SETUP_FEE_DESCRIPTION,
-      ChargeAmount: amount,
-      Currency: 'ILS',
-      Terms: 1,
-      Reference: paymentId,
-      CustomerEmail: email,
-      CustomerName: businessName,
+      Credentials: {
+        CompanyID: parseInt(SUMIT_COMPANY_ID),
+        APIKey: SUMIT_API_PRIVATE_KEY,
+      },
+      Customer: {
+        Name: businessName,
+        EmailAddress: email,
+        Phone: appData.phone,
+        SearchMode: 0,
+      },
+      Items: [
+        {
+          Item: { Name: SETUP_FEE_DESCRIPTION },
+          Quantity: 1,
+          UnitPrice: amount,
+        },
+      ],
+      Payments_Count: paymentsCount,
+      VATIncluded: true,
+      SendDocumentByEmail: true,
     };
 
     console.log(

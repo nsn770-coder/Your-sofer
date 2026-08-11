@@ -16,15 +16,8 @@ const POINTS_REDEEM_LINE_NAME = 'הנחת נקודות מועדון';
 const POINTS_MAX_CART_PERCENT = 0.5;
 
 const SUMIT_API_URL        = 'https://api.sumit.co.il/billing/payments/charge/';
-const rawSumitCompanyId     = process.env.SUMIT_COMPANY_ID;
-const rawSumitApiPrivateKey = process.env.SUMIT_API_PRIVATE_KEY;
-
-if (!rawSumitCompanyId || !rawSumitApiPrivateKey) {
-  throw new Error('Missing Sumit payment credentials: SUMIT_COMPANY_ID and SUMIT_API_PRIVATE_KEY must be set in environment variables');
-}
-
-const SUMIT_COMPANY_ID: string      = rawSumitCompanyId;
-const SUMIT_API_PRIVATE_KEY: string = rawSumitApiPrivateKey;
+const SUMIT_COMPANY_ID      = process.env.SUMIT_COMPANY_ID!;
+const SUMIT_API_PRIVATE_KEY = process.env.SUMIT_API_PRIVATE_KEY!;
 
 // Klaf-bearing items (mezuzah/tefillin scrolls) earn a reduced shaliach commission —
 // thinner margin on these than on general merchandise.
