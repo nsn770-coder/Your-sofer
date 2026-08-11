@@ -563,6 +563,7 @@ export default function CheckoutPage() {
   }
 
   async function handlePaymentToken(singleUseToken: string, paymentsCount: number) {
+    console.log('[checkout] handlePaymentToken called with token');
     setSubmitError(null);
     setLoading(true);
     saveAbandonedCartBeforePayment();
@@ -587,6 +588,7 @@ export default function CheckoutPage() {
         }
       }
 
+      console.log('[checkout] sending payment request to /api/payment', { total: finalTotal, paymentsCount });
       const paymentRes = await fetch('/api/payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -639,15 +641,18 @@ export default function CheckoutPage() {
         }),
       });
 
+      console.log('[checkout] payment response status:', paymentRes.status);
       const paymentData = await paymentRes.json();
+      console.log('[checkout] payment response data:', paymentData);
       if (paymentData.success) {
+        console.log('[checkout] payment succeeded, redirecting to thank-you');
         router.push(`/thank-you?order=${paymentData.orderNumber}&orderId=${paymentData.orderId}`);
       } else {
         throw new Error(paymentData.error || 'התשלום נכשל');
       }
     } catch (e: any) {
+      console.error('[checkout] payment error:', e);
       setSubmitError('שגיאה: ' + (e.message || 'נסה שוב'));
-      console.error(e);
       setLoading(false);
     }
   }

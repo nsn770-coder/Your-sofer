@@ -40,9 +40,11 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
   const [termsModalOpen, setTermsModalOpen] = useState(false);
 
   useEffect(() => {
+    console.log('[SumitPaymentForm] sumitReady:', sumitReady, 'OfficeGuy:', !!window.OfficeGuy);
     if (sumitReady) {
       try {
         window.OfficeGuy?.Payments.InitEditors();
+        console.log('[SumitPaymentForm] InitEditors succeeded');
       } catch (err) {
         console.error('[SumitPaymentForm] InitEditors failed:', err);
         setScriptError('Sumit');
@@ -52,20 +54,25 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    console.log('[SumitPaymentForm] handleSubmit called');
     const form = formRef.current;
     if (!form || !window.OfficeGuy || !window.jQuery) {
+      console.error('[SumitPaymentForm] Missing dependencies:', { form: !!form, OfficeGuy: !!window.OfficeGuy, jQuery: !!window.jQuery });
       onError('מודול התשלום עדיין נטען, נסה שוב בעוד רגע');
       return;
     }
     if (!form.checkValidity()) {
+      console.warn('[SumitPaymentForm] Form is invalid');
       form.reportValidity();
       return;
     }
     if (!termsAccepted) {
+      console.warn('[SumitPaymentForm] Terms not accepted');
       onError('חייב להסכים לתקנון כדי להמשיך בתשלום');
       return;
     }
 
+    console.log('[SumitPaymentForm] Starting token creation...');
     setTokenizing(true);
     const started = window.OfficeGuy.Payments.CreateToken({
       FormSelector: (window.jQuery as (s: HTMLFormElement) => unknown)(form),
@@ -73,6 +80,7 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
       APIPublicKey: apiPublicKey,
       ResponseLanguage: 'he',
       Callback: (token) => {
+        console.log('[SumitPaymentForm] Token callback received:', { token: token ? 'TOKEN' : 'NULL', paymentsCount });
         setTokenizing(false);
         if (token) {
           onToken(token, paymentsCount);
@@ -82,6 +90,7 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
       },
     });
     if (!started) {
+      console.error('[SumitPaymentForm] CreateToken returned false');
       setTokenizing(false);
       onError('שגיאה בשליחת פרטי האשראי, נסה שוב');
     }
