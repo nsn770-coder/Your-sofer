@@ -394,6 +394,18 @@ export default function CheckoutPage() {
   useEffect(() => { formRef.current = form; }, [form]);
   const abandonedSavedRef = useRef(false);
   const [giftOptions, setGiftOptions] = useState<{ id: string; name: string; imgUrl?: string; productId?: string }[]>([]);
+  const [sumitConfig, setSumitConfig] = useState({ companyId: 0, publicKey: '' });
+
+  // Fetch Sumit config from API
+  useEffect(() => {
+    fetch('/api/config')
+      .then(r => r.json())
+      .then(data => setSumitConfig({
+        companyId: Number(data.sumit.companyId),
+        publicKey: data.sumit.publicKey || ''
+      }))
+      .catch(e => console.error('[checkout] Failed to fetch Sumit config:', e));
+  }, []);
 
   // Fetch site settings (checkout enabled/disabled)
   useEffect(() => {
@@ -947,9 +959,9 @@ export default function CheckoutPage() {
               ) : (
                 <>
                   <SumitPaymentForm
-                    companyId={Number(process.env.NEXT_PUBLIC_SUMIT_COMPANY_ID)}
-                    apiPublicKey={process.env.NEXT_PUBLIC_SUMIT_API_PUBLIC_KEY || ''}
-                    disabled={loading || bitLoading}
+                    companyId={sumitConfig.companyId}
+                    apiPublicKey={sumitConfig.publicKey}
+                    disabled={loading || bitLoading || !sumitConfig.publicKey}
                     onToken={handlePaymentToken}
                     onError={handlePaymentError}
                   />
