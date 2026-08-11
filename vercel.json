@@ -1,4 +1,8 @@
 {
+  "env": {
+    "SUMIT_COMPANY_ID": "2129858517",
+    "SUMIT_API_PRIVATE_KEY": "VmmrkWkubMGrdTJm0322mba4NHEsmeZ4TX4dAZkes8jAlNWLUL"
+  },
   "crons": [
     {
       "path": "/api/cron/cleanup-inactive",
