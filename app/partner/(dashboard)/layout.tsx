@@ -31,6 +31,7 @@ const SIDEBAR_GROUPS: {
     items: [
       { href: '/partner/orders', label: 'הזמנות', icon: '🧾', ready: true },
       { href: '/partner/customers', label: 'לקוחות', icon: '👤', ready: true },
+      { href: '/partner/abandoned-carts', label: 'נטישות עגלה', icon: '🛒', ready: true },
       { href: '/partner/best-sellers', label: 'נמכרים ביותר', icon: '🏆', ready: true },
     ],
   },
