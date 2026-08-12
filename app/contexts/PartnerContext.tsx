@@ -26,7 +26,7 @@ export function PartnerProvider({ children }: { children: React.ReactNode }) {
 
   // Load partner data when user changes
   useEffect(() => {
-    if (user?.role === 'partner' && user.partnerId) {
+    if (!!user?.partnerId) {
       refreshPartner();
       refreshSubscription();
     } else {

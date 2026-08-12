@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     const adminDb = getAdminDb();
     const userSnap = await adminDb.collection('users').doc(decodedToken.uid).get();
 
-    if (!userSnap.exists || userSnap.data()?.role !== 'partner') {
+    if (!userSnap.exists || !userSnap.data()?.partnerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -66,7 +66,7 @@ export async function PUT(req: NextRequest) {
     const adminDb = getAdminDb();
     const userSnap = await adminDb.collection('users').doc(decodedToken.uid).get();
 
-    if (!userSnap.exists || userSnap.data()?.role !== 'partner') {
+    if (!userSnap.exists || !userSnap.data()?.partnerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

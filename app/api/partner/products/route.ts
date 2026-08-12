@@ -33,7 +33,7 @@ async function requirePartner(req: NextRequest) {
   const adminDb = getAdminDb();
   const userSnap = await adminDb.collection('users').doc(decodedToken.uid).get();
 
-  if (!userSnap.exists || userSnap.data()?.role !== 'partner') {
+  if (!userSnap.exists || !userSnap.data()?.partnerId) {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) } as const;
   }
 

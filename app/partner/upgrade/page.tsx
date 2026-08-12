@@ -42,7 +42,7 @@ export default function PartnerUpgradePage() {
   // /api/payment/partner-setup-fee requires an existing partners_applications
   // doc before it will accept a charge.
   useEffect(() => {
-    if (loading || !user || user.role === 'partner') return;
+    if (loading || !user || !!user.partnerId) return;
 
     let cancelled = false;
     async function ensureApplication() {
@@ -194,7 +194,7 @@ export default function PartnerUpgradePage() {
     );
   }
 
-  if (user.role === 'partner') {
+  if (!!user.partnerId) {
     return (
       <div dir="rtl" className="flex items-center justify-center min-h-screen px-4" style={{ background: 'var(--ys-page)' }}>
         <div className="bg-white rounded-2xl shadow p-8 max-w-sm w-full text-center">

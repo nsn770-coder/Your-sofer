@@ -346,8 +346,9 @@ function NavBarContent() {
                         </button>
                       </div>
 
-                      {/* קישורי תפקיד — admin/sofer/shaliach */}
-                      {(user.role === "admin" || user.role === "sofer" || user.role === "shaliach") && (
+                      {/* קישורי תפקיד — משתמש אחד יכול להחזיק בכמה כובעים
+                          במקביל, ולכן כל פאנל נבדק בנפרד לפי המזהה שלו */}
+                      {(user.role === "admin" || user.soferId || user.shaliachId || user.partnerId) && (
                         <>
                           <div style={{ height: 1, background: "#F0EDE8" }} />
                           <div style={{ padding: "6px 0" }}>
@@ -356,14 +357,19 @@ function NavBarContent() {
                                 <span style={{ fontSize: 15 }}>⚙️</span> פאנל ניהול
                               </button>
                             )}
-                            {user.role === "sofer" && (
+                            {user.soferId && (
                               <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/sofer-dashboard"); }}>
                                 <span style={{ fontSize: 15 }}>✍️</span> פאנל סופר
                               </button>
                             )}
-                            {user.role === "shaliach" && (
+                            {user.shaliachId && (
                               <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/shaliach-dashboard"); }}>
                                 <span style={{ fontSize: 15 }}>🏠</span> פאנל שלוחה
+                              </button>
+                            )}
+                            {user.partnerId && (
+                              <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/partner"); }}>
+                                <span style={{ fontSize: 15 }}>🏪</span> פאנל שותף עסקי
                               </button>
                             )}
                           </div>

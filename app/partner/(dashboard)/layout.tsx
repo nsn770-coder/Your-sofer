@@ -24,12 +24,12 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== 'partner')) {
+    if (!loading && (!user || !user.partnerId)) {
       router.push('/');
     }
   }, [user, loading, router]);
 
-  if (loading || !user || user.role !== 'partner') {
+  if (loading || !user || !user.partnerId) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

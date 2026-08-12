@@ -245,17 +245,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               // Get idToken for API calls
               const idToken = await firebaseUser.getIdToken();
 
-              // Extract partnerId from users doc if partner role
+              // Load every role handle from the users doc — an account may hold
+              // several hats at once (sofer + shaliach + partner). Access is
+              // driven by these IDs, not by the single `role` field.
               let partnerId: string | undefined;
-              if (role === 'partner') {
-                try {
-                  const userSnap = await getDoc(doc(db, 'users', firebaseUser.uid));
-                  if (userSnap.exists()) {
-                    partnerId = userSnap.data()?.partnerId;
-                  }
-                } catch (e) {
-                  console.warn('[AuthContext] Failed to load partnerId:', e);
+              try {
+                const userSnap = await getDoc(doc(db, 'users', firebaseUser.uid));
+                if (userSnap.exists()) {
+                  const d = userSnap.data();
+                  partnerId = d?.partnerId;
+                  soferId = soferId || d?.soferId;
+                  shaliachId = shaliachId || d?.shaliachId;
                 }
+              } catch (e) {
+                console.warn('[AuthContext] Failed to load role handles:', e);
               }
 
               setUser({

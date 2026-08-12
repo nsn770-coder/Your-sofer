@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     const userRef = adminDb.collection('users').doc(uid);
     const userSnap = await userRef.get();
 
-    if (!userSnap.exists || userSnap.data()?.role !== 'partner') {
+    if (!userSnap.exists || !userSnap.data()?.partnerId) {
       return NextResponse.json({ error: 'Not a partner' }, { status: 403 });
     }
 

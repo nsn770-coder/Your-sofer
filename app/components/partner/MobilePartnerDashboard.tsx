@@ -60,7 +60,7 @@ function MobilePartnerDashboardContent() {
     fetchBalance();
   }, [user?.idToken]);
 
-  if (!user || user.role !== 'partner') {
+  if (!user || !user.partnerId) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-600">גישה מוגבלת</p>

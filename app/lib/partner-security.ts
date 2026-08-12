@@ -11,7 +11,7 @@ export async function verifyPartnerOwnership(
   const adminDb = getAdminDb();
   const userSnap = await adminDb.collection('users').doc(uid).get();
 
-  if (!userSnap.exists || userSnap.data()?.role !== 'partner') {
+  if (!userSnap.exists || !userSnap.data()?.partnerId) {
     return false;
   }
 

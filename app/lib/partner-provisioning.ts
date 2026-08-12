@@ -74,13 +74,19 @@ export async function provisionPartnerAccount(params: {
   };
 
   await adminDb.runTransaction(async (transaction) => {
-    const paymentCheckSnap = await transaction.get(paymentRef);
+    // Firestore requires ALL reads to happen before ANY write in a transaction.
+    const partnerRef = adminDb.collection('partners').doc(uid);
+    const userRef = adminDb.collection('users').doc(uid);
+
+    const [paymentCheckSnap, partnerSnap, userSnap] = await Promise.all([
+      transaction.get(paymentRef),
+      transaction.get(partnerRef),
+      transaction.get(userRef),
+    ]);
+
     if (paymentCheckSnap.data()?.webhookReceived === true) {
       return; // already provisioned
     }
-
-    const partnerRef = adminDb.collection('partners').doc(uid);
-    const partnerSnap = await transaction.get(partnerRef);
 
     if (!partnerSnap.exists) {
       transaction.set(partnerRef, {
@@ -120,8 +126,6 @@ export async function provisionPartnerAccount(params: {
       });
     }
 
-    const userRef = adminDb.collection('users').doc(uid);
-    const userSnap = await transaction.get(userRef);
     if (!userSnap.exists) {
       transaction.set(userRef, {
         email: partnerPayload.email,
@@ -130,6 +134,15 @@ export async function provisionPartnerAccount(params: {
         partnerId: uid,
         status: 'active',
         createdAt: FieldValue.serverTimestamp(),
+      });
+    } else {
+      // User already existed (e.g. previously registered as sofer/shaliach).
+      // Grant the partner hat WITHOUT clobbering their existing role — access is
+      // driven by partnerId, so one account can hold several roles at once.
+      transaction.update(userRef, {
+        partnerId: uid,
+        status: 'active',
+        updatedAt: FieldValue.serverTimestamp(),
       });
     }
 
