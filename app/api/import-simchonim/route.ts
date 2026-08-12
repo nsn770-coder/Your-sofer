@@ -27,7 +27,7 @@ try {
     privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
   };
 
-  if (!serviceAccount.projectId) {
+  if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
     console.error('❌ Missing Firebase credentials in environment');
   } else {
     initializeApp({ credential: cert(serviceAccount as any) });
