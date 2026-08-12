@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { usePartner } from '@/app/contexts/PartnerContext';
+import { ImageUploadField } from '@/app/components/partner/ImageUploadField';
 
 const DEFAULT_COLORS = { primary: '#3A2352', secondary: '#F0EDE8', cta: '#C9A227' };
 
@@ -131,25 +132,21 @@ export default function PartnerStorePage() {
           />
         </Field>
 
-        <Field label="קישור ללוגו *">
-          <input
-            value={logoUrl}
-            onChange={(e) => setLogoUrl(e.target.value)}
-            placeholder="https://res.cloudinary.com/..."
-            dir="ltr"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </Field>
+        <ImageUploadField
+          label="לוגו החנות"
+          required
+          shape="square"
+          value={logoUrl}
+          onChange={setLogoUrl}
+          hint="מומלץ ריבועי, רקע שקוף או לבן"
+        />
 
-        <Field label="תמונת נושא">
-          <input
-            value={heroImageUrl}
-            onChange={(e) => setHeroImageUrl(e.target.value)}
-            placeholder="https://res.cloudinary.com/..."
-            dir="ltr"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </Field>
+        <ImageUploadField
+          label="תמונת נושא"
+          value={heroImageUrl}
+          onChange={setHeroImageUrl}
+          hint="תמונה רחבה שתופיע בראש עמוד החנות"
+        />
       </section>
 
       <section className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">

@@ -61,6 +61,15 @@ export default function ProductFormModal({
   }
 
   async function handleImageSelect(index: number, file: File) {
+    if (!file.type.startsWith('image/')) {
+      setError('יש לבחור קובץ תמונה');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('הקובץ גדול מדי (מקסימום 10MB)');
+      return;
+    }
+
     setUploadingIndex(index);
     setError(null);
     try {
@@ -76,6 +85,14 @@ export default function ProductFormModal({
     } finally {
       setUploadingIndex(null);
     }
+  }
+
+  function removeImage(index: number) {
+    setForm((f) => {
+      const images = [...f.images];
+      images[index] = '';
+      return { ...f, images: images.filter(Boolean) };
+    });
   }
 
   function validate(): string | null {
@@ -226,30 +243,56 @@ export default function ProductFormModal({
 
         <div>
           <span className="text-sm font-medium text-gray-700">תמונות</span>
-          <div className="flex gap-2 mt-1 flex-wrap">
+          <p className="text-xs text-gray-500 mt-0.5">
+            לחצו או גררו קובץ לכל משבצת · עד 10MB · התמונה הראשונה היא הראשית
+          </p>
+          <div className="flex gap-2 mt-2 flex-wrap">
             {Array.from({ length: MAX_IMAGES }).map((_, i) => (
-              <label
-                key={i}
-                className="w-20 h-20 border border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden text-xs text-gray-400"
-              >
-                {form.images[i] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={form.images[i]} alt="" className="w-full h-full object-cover" />
-                ) : uploadingIndex === i ? (
-                  '...'
-                ) : (
-                  '+ תמונה'
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
+              <div key={i} className="relative">
+                <label
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files?.[0];
                     if (file) handleImageSelect(i, file);
                   }}
-                />
-              </label>
+                  className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden text-xs text-gray-400 hover:border-blue-400 hover:bg-gray-50 transition-colors"
+                >
+                  {form.images[i] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={form.images[i]} alt="" className="w-full h-full object-cover" />
+                  ) : uploadingIndex === i ? (
+                    'מעלה...'
+                  ) : (
+                    '+ תמונה'
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageSelect(i, file);
+                      e.target.value = '';
+                    }}
+                  />
+                </label>
+                {form.images[i] && (
+                  <button
+                    type="button"
+                    onClick={() => removeImage(i)}
+                    className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-black/70 text-white text-xs leading-none"
+                    aria-label="הסרת התמונה"
+                  >
+                    ×
+                  </button>
+                )}
+                {i === 0 && form.images[0] && (
+                  <span className="absolute bottom-0 right-0 left-0 bg-black/60 text-white text-[9px] text-center py-0.5">
+                    ראשית
+                  </span>
+                )}
+              </div>
             ))}
           </div>
         </div>
