@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart, SHIPPING_REGULAR, FREE_SHIPPING_THRESHOLD, getEventKippahPricePerUnit, type CartItem } from '../contexts/CartContext';
+import { useCart, getEventKippahPricePerUnit, type CartItem } from '../contexts/CartContext';
 import dynamic from 'next/dynamic';
 import type { KippaDesign } from '../designer/utils/types';
 // עורך כיפה — נטען רק כשעורכים עיצוב קיים (ssr:false — canvas)
@@ -113,11 +113,9 @@ export default function CartPage() {
 
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
 
-  // משלוח חינם אוטומטי מעל FREE_SHIPPING_THRESHOLD (אחרי הנחת קופון)
-  const freeShipping = total - discountAmount >= FREE_SHIPPING_THRESHOLD;
-  const cartShippingCost = freeShipping ? 0 : SHIPPING_REGULAR;
-  // Final total shown in cart: products + shipping - coupon
-  const cartFinalTotal = total - discountAmount + cartShippingCost;
+  // משלוח יחושב בדף התשלום בלבד אחרי שהלקוח יבחר בין איסוף לבית
+  // Final total shown in cart: products - coupon (ללא משלוח עדיין)
+  const cartFinalTotal = total - discountAmount;
 
   return (
     <div style={{
@@ -450,19 +448,9 @@ export default function CartPage() {
                     <span>-{formatPrice(bundleDiscountAmount)}</span>
                   </div>
                 )}
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: '#555' }}>משלוח עד הבית:</span>
-                  {freeShipping ? (
-                    <span style={{ fontWeight: 700, color: '#15803d' }}>חינם! 🎉</span>
-                  ) : (
-                    <span style={{ fontWeight: 700, color: 'var(--ys-text)' }}>{formatPrice(SHIPPING_REGULAR)}</span>
-                  )}
+                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '8px 10px', marginBottom: 8, fontSize: 12.5, color: '#15803d', fontWeight: 700, textAlign: 'center' }}>
+                  💡 אופן המשלוח (משלוח / איסוף) ודמי המשלוח יחושבו בדף התשלום
                 </div>
-                {!freeShipping && (
-                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '8px 10px', marginBottom: 8, fontSize: 12.5, color: '#15803d', fontWeight: 700, textAlign: 'center' }}>
-                    🚚 עוד {formatPrice(FREE_SHIPPING_THRESHOLD - (total - discountAmount))} למשלוח חינם!
-                  </div>
-                )}
                 {appliedCoupon && discountAmount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
                     <span>{appliedCoupon.type === 'simcha' ? '🎉 הנחת מבצע SIMCHA:' : `🏷️ קופון (${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`}):`}</span>
