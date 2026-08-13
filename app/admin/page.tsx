@@ -3244,6 +3244,7 @@ export default function AdminPage() {
   const [productStatusFilter, setProductStatusFilter] = useState<'all' | 'draft' | 'pending' | 'active'>('all');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [selectedProductForPreview, setSelectedProductForPreview] = useState<Product | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [couponsLoading, setCouponsLoading] = useState(false);
   const [partnerCoupons, setPartnerCoupons] = useState<PartnerCoupon[]>([]);
@@ -4286,6 +4287,42 @@ export default function AdminPage() {
     a.click();
   }
 
+  async function fixDraftProducts() {
+    if (!window.confirm('תיקון מוצרי draft: שינוי status ל-active ו-Algolia sync. להמשיך?')) return;
+
+    const button = document.querySelector('[style*="f59e0b"]') as HTMLButtonElement;
+    if (button) button.disabled = true;
+
+    try {
+      const token = await (user as any).getIdToken();
+
+      // 1. תיקון מוצרים בـ Firestore
+      const fixRes = await fetch('/api/admin/fix-draft-products', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const fixData = await fixRes.json();
+      if (!fixRes.ok) throw new Error(fixData.error || 'תיקון נכשל');
+
+      // 2. סנכרון Algolia
+      const alRes = await fetch('/api/admin/algolia-resync', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const alData = await alRes.json();
+      if (!alRes.ok) throw new Error(alData.error || 'סנכרון Algolia נכשל');
+
+      alert(`✅ בוצע בהצלחה!\n\n📝 עדכנו ${fixData.updated} מוצרים מ-draft ל-active\n🔍 סונכרנו ${alData.products} מוצרים ל-Algolia\n\nהמוצרים יופיעו בחנות ובחיפוש תוך ~2 דקות.`);
+
+      // רענון הטבלה
+      window.location.reload();
+    } catch (err) {
+      alert('❌ ' + (err instanceof Error ? err.message : 'שגיאה לא ידועה'));
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
   async function importFromCSV(file: File) {
     setImportStatus('⏳ מייבא מוצרים...');
     try {
@@ -4470,22 +4507,27 @@ export default function AdminPage() {
             <button onClick={() => setShowAddProduct(true)} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר</button>
             <button onClick={exportToExcel} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📥 ייצוא ל-Excel</button>
             <button onClick={downloadTemplate} style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📋 הורד תבנית</button>
+            <button onClick={fixDraftProducts} style={{ background: '#f59e0b', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>🔧 תקן Draft מוצרים</button>
             <label style={{ background: '#0284c7', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
               📤 ייבוא CSV
               <input type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { if (e.target.files?.[0]) { importFromCSV(e.target.files[0]); e.target.value = ''; } }} />
             </label>
           </div>
           {importStatus && <div style={{ marginBottom: 16, padding: '12px 16px', borderRadius: 10, fontSize: 14, fontWeight: 700, background: importStatus.startsWith('✅') ? '#f0fdf4' : importStatus.startsWith('❌') ? '#fef2f2' : '#eff6ff', color: importStatus.startsWith('✅') ? '#15803d' : importStatus.startsWith('❌') ? '#dc2626' : '#1d4ed8' }}>{importStatus}</div>}
-          {productsLoading ? <div className="p-10 text-center text-gray-400">טוען מוצרים...</div> : (
+          {productsLoading ? <div className="p-10 text-center text-gray-400">טוען {products.length || '~6000'} מוצרים...</div> : (
             <>
-            <div className="bg-white rounded-xl shadow overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">מחסן</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">נמכר ביותר</th><th className="p-3 text-right">הסתרה</th><th className="p-3 text-right">עריכה</th><th className="p-3 text-right">מחיקה</th></tr></thead>
-                <tbody>
+            <div style={{ background: '#f0f9ff', border: '1px solid #bfdbfe', borderRadius: 8, padding: '12px 16px', marginBottom: 12, fontSize: 12, color: '#1e40af' }}>
+              💡 <strong>רמז:</strong> הרשימה עלה ללא תמונות להטעינה מהירה. לחץ על שם מוצר כדי לראות תמונה ופרטים נוספים.
+            </div>
+            <>
+            <div className="bg-white rounded-xl shadow overflow-x-auto" style={{ maxHeight: 'calc(100vh - 400px)', display: 'flex', flexDirection: 'column' }}>
+              <table className="w-full text-sm flex-1">
+                <thead className="bg-gray-50 sticky top-0"><tr><th className="p-3 text-right">מוצר</th><th className="p-3 text-right">קטגוריה</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">מחסן</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">שיוך לסופר</th><th className="p-3 text-right">עדיפות</th><th className="p-3 text-right">נמכר ביותר</th><th className="p-3 text-right">הסתרה</th><th className="p-3 text-right">עריכה</th><th className="p-3 text-right">מחיקה</th></tr></thead>
+                <tbody style={{ overflowY: 'auto' }}>
                   {filteredProducts.length === 0 ? <tr><td colSpan={8} className="p-10 text-center text-gray-400">אין מוצרים</td></tr>
                   : filteredProducts.map(p => (
-                    <tr key={p.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3"><div className="flex items-center gap-2">{(p.imgUrl || p.image_url) && <img src={p.imgUrl || p.image_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover" onError={e => (e.currentTarget.style.display = 'none')} />}<span className="font-bold text-xs">{p.name}</span></div></td>
+                    <tr key={p.id} className="border-t hover:bg-gray-50 cursor-pointer group" onClick={() => setSelectedProductForPreview(p)}>
+                      <td className="p-3"><span className="font-bold text-xs group-hover:text-blue-600">{p.name}</span></td>
                       <td className="p-3 text-gray-500 text-xs">{p.cat || p.category || '-'}</td>
                       <td className="p-3 font-bold text-green-700">{formatPrice(p.price)}</td>
                       <td className="p-3 text-xs font-mono text-green-700">
@@ -4545,6 +4587,7 @@ export default function AdminPage() {
                 {productSearch ? `${filteredProducts.length} תוצאות מסוננות` : `${products.length} מוצרים`}
               </span>
             </div>
+            </>
             </>
           )}
         </div>
@@ -5875,6 +5918,49 @@ export default function AdminPage() {
       {editStoreShaliachId && <EditShaliachStoreModal shaliachId={editStoreShaliachId} onClose={() => setEditStoreShaliachId(null)} onSave={() => loadUsers()} />}
       {showAddProduct && <AddProductModal soferim={soferim} soferimFull={soferimFull} onClose={() => setShowAddProduct(false)} onSave={() => loadProducts()} />}
       {editingProduct && <EditProductModal product={editingProduct} soferim={soferim} soferimFull={soferimFull} onClose={() => setEditingProduct(null)} onSave={() => { loadProducts(); }} />}
+
+      {selectedProductForPreview && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setSelectedProductForPreview(null)}>
+          <div style={{ background: '#fff', borderRadius: 14, padding: 24, maxWidth: 600, width: '100%', direction: 'rtl', maxHeight: '90vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-heading)' }}>{selectedProductForPreview.name}</h3>
+              <button onClick={() => setSelectedProductForPreview(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#999' }}>✕</button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+              <div>
+                <div style={{ fontSize: 12, color: '#666', marginBottom: 4, fontWeight: 700 }}>קטגוריה</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{selectedProductForPreview.cat || selectedProductForPreview.category || '-'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: '#666', marginBottom: 4, fontWeight: 700 }}>מחיר</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#16a34a' }}>₪{selectedProductForPreview.price}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: '#666', marginBottom: 4, fontWeight: 700 }}>סטטוס</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: selectedProductForPreview.status === 'active' ? '#16a34a' : '#dc2626' }}>{selectedProductForPreview.status === 'active' ? '✓ פעיל' : '✗ ' + selectedProductForPreview.status}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: '#666', marginBottom: 4, fontWeight: 700 }}>SKU</div>
+                <div style={{ fontSize: 13, fontWeight: 600, fontFamily: 'monospace' }}>{selectedProductForPreview.sku || '-'}</div>
+              </div>
+            </div>
+
+            {selectedProductForPreview.imgUrl && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 12, color: '#666', marginBottom: 8, fontWeight: 700 }}>תמונה ראשית</div>
+                <img src={selectedProductForPreview.imgUrl} alt={selectedProductForPreview.name} style={{ width: '100%', maxHeight: 300, objectFit: 'cover', borderRadius: 8, background: '#f3f4f6' }} onError={e => (e.currentTarget.style.display = 'none')} />
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => { setEditingProduct(selectedProductForPreview); setSelectedProductForPreview(null); }} style={{ flex: 1, background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>✏️ ערוך מלא</button>
+              <button onClick={() => setSelectedProductForPreview(null)} style={{ flex: 1, background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>סגור</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {editingSofer && (
         <EditSoferModal sofer={editingSofer} onClose={() => setEditingSofer(null)}
           onSave={(updated) => { setSoferimFull(prev => prev.map(s => s.id === updated.id ? updated : s)); setEditingSofer(null); }} />

@@ -481,9 +481,10 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
           outOfStock: qty === 0,
           stockVisible: true,
           priority: 50,
+          active: true,
+          status: 'active',
           // בלי תמונה — נשמר כטיוטה מוסתרת עד השלמה, כמו בזרימת ההזנה הידנית
           hidden: !hasImage,
-          ...(hasImage ? {} : { status: 'draft' }),
           createdAt: serverTimestamp(),
         };
         const ref = await addDoc(collection(db, 'products'), productData);
@@ -579,8 +580,9 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
             receivedFromSupplier: qty,
             inStock: qty,
             outOfStock: qty === 0,
+            active: true,
+            status: 'active',
             hidden: true,
-            status: 'draft',
             createdAt: serverTimestamp(),
           };
           const newDoc = await addDoc(collection(db, 'products'), newProductData);
