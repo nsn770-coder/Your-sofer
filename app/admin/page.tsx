@@ -4327,11 +4327,13 @@ export default function AdminPage() {
     if (!window.confirm('תיקון retroactive של מוצרי קבלת ספק: שינוי status ל-active, הסרת hidden. להמשיך?')) return;
 
     try {
-      const token = await (user as any).getIdToken();
+      const _auth = await getAuthLazy();
+      const idToken = await _auth.currentUser?.getIdToken(true);
+      if (!idToken) throw new Error('לא ניתן להוציא token');
 
       const fixRes = await fetch('/api/admin/fix-draft-inventory', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${idToken}` }
       });
       const fixData = await fixRes.json();
       if (!fixRes.ok) throw new Error(fixData.error || 'תיקון נכשל');
