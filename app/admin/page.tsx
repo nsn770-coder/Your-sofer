@@ -4403,7 +4403,7 @@ export default function AdminPage() {
   // מוצר בלי status נחשב פעיל — כך היו כל המוצרים לפני שהשדה נוסף
   const statusOf = (p: Product) => (p as { status?: string }).status || 'active';
 
-  const searchedProducts = visibleProducts.filter(productMatchesSearch);
+  const searchedProducts = products.filter(p => p.hidden !== true).filter(productMatchesSearch);
   const draftCount   = searchedProducts.filter(p => statusOf(p) === 'draft').length;
   const pendingCount = searchedProducts.filter(p => statusOf(p) === 'pending').length;
 
