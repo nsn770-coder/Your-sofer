@@ -483,8 +483,8 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
           priority: 50,
           active: true,
           status: 'active',
-          // בלי תמונה — נשמר כטיוטה מוסתרת עד השלמה, כמו בזרימת ההזנה הידנית
-          hidden: !hasImage,
+          // בלי תמונה — מופיע בחנות תשר אמנם הפרטים לא מלאים
+          hidden: false,
           createdAt: serverTimestamp(),
         };
         const ref = await addDoc(collection(db, 'products'), productData);
