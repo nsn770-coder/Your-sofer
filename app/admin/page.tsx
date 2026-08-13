@@ -4323,6 +4323,27 @@ export default function AdminPage() {
     }
   }
 
+  async function fixDraftInventoryProducts() {
+    if (!window.confirm('תיקון retroactive של מוצרי קבלת ספק: שינוי status ל-active, הסרת hidden. להמשיך?')) return;
+
+    try {
+      const token = await (user as any).getIdToken();
+
+      const fixRes = await fetch('/api/admin/fix-draft-inventory', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const fixData = await fixRes.json();
+      if (!fixRes.ok) throw new Error(fixData.error || 'תיקון נכשל');
+
+      alert(`✅ בוצע בהצלחה!\n\n📝 עדכנו ${fixData.updated} מוצרים מ-draft ל-active\n\nהמוצרים יופיעו בחנות תוך שניות.`);
+
+      loadProducts();
+    } catch (err) {
+      alert('❌ ' + (err instanceof Error ? err.message : 'שגיאה לא ידועה'));
+    }
+  }
+
   async function importFromCSV(file: File) {
     setImportStatus('⏳ מייבא מוצרים...');
     try {
@@ -4508,6 +4529,7 @@ export default function AdminPage() {
             <button onClick={exportToExcel} style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📥 ייצוא ל-Excel</button>
             <button onClick={downloadTemplate} style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📋 הורד תבנית</button>
             <button onClick={fixDraftProducts} style={{ background: '#f59e0b', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>🔧 תקן Draft מוצרים</button>
+            <button onClick={fixDraftInventoryProducts} style={{ background: '#d97706', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📦 תקן מוצרי מלאי</button>
             <label style={{ background: '#0284c7', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
               📤 ייבוא CSV
               <input type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { if (e.target.files?.[0]) { importFromCSV(e.target.files[0]); e.target.value = ''; } }} />
