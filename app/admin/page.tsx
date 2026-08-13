@@ -22,6 +22,7 @@ import StickersTab from './components/StickersTab';
 import ProfitabilityTab from './components/ProfitabilityTab';
 import SiteSettingsTab from './components/SiteSettingsTab';
 import PromotionsTab from './components/PromotionsTab';
+import { AdminSidebar } from './AdminSidebar';
 import { useProductLabelPrint, PRODUCT_LABEL_PRINT_STYLES, openPrintWindow } from '@/app/components/ProductLabelPrint';
 import { getTier } from '@/app/lib/loyalty';
 import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
@@ -4375,7 +4376,7 @@ export default function AdminPage() {
   const unassignedProducts = visibleProducts.filter(p => !p.soferId).length;
 
   return (
-    <main className="max-w-6xl mx-auto p-6" dir="rtl">
+    <main className="max-w-[1600px] mx-auto p-6" dir="rtl">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">👑 דשבורד מנהל</h1>
         <div className="flex items-center gap-4">
@@ -4392,69 +4393,31 @@ export default function AdminPage() {
         <div className="bg-white rounded-xl shadow p-4 text-center"><div className="text-3xl font-black text-blue-500">{pendingShluchimApps.length}</div><div className="text-sm text-gray-500 mt-1">בקשות שלוחים</div></div>
       </div>
 
-      <div className="flex justify-end mb-4">
-        <button onClick={() => setShowAddProduct(true)} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>➕ הוסף מוצר חדש</button>
-      </div>
+      {/* ── ניווט + תוכן ── */}
+      <div className="lg:flex lg:gap-6 lg:items-start">
+        <AdminSidebar
+          activeTab={activeTab}
+          onSelectTab={(t) => setActiveTab(t as TabType)}
+          onAddProduct={() => setShowAddProduct(true)}
+          badges={{
+            // הבאדג' של מוצרים מציג טיוטות ממתינות לאישור — הן מגיעות מהסנכרון
+            // היומי ובלי סימון הן יושבות שם בלי שאיש יידע. נופל חזרה ל"ללא סופר".
+            products: draftCount || unassignedProducts,
+            soferim: pendingApps.length,
+            shluchim: pendingShluchimApps.length,
+            rabbi_requests: pendingRabbiRequests.length,
+            partner_requests: pendingPartnerApplications.length,
+            reviews: reviews.filter(r => !r.approved).length,
+            edit_requests: editRequests.filter(r => r.status === 'pending').length,
+            hidden_products: hiddenProducts.length,
+            abandoned_carts: abandonedCarts.length,
+            leads: leads.length,
+            out_of_stock: outOfStockProducts.length,
+            crm: crmFollowUpsDue,
+          }}
+        />
 
-      {/* ── טאבים ── */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {[
-          { key: 'orders',         label: '📦 הזמנות',           color: 'bg-green-700' },
-          // הבאדג' מציג טיוטות ממתינות לאישור — הן מגיעות מהסנכרון היומי
-          // ובלי סימון הן יושבות שם בלי שאיש יידע. נופל חזרה ל"ללא סופר".
-          { key: 'products',       label: '📜 מוצרים',           color: 'bg-teal-600',   badge: draftCount || unassignedProducts },
-          { key: 'commissions',    label: '🤝 עמלות',            color: 'bg-blue-600' },
-          { key: 'soferim_list',   label: '✍️ סופרים',           color: 'bg-amber-700' },
-          { key: 'soferim',        label: '📋 בקשות סופרים',     color: 'bg-amber-600',  badge: pendingApps.length },
-          { key: 'shluchim',       label: '🟦 בקשות שלוחים',     color: 'bg-blue-700',   badge: pendingShluchimApps.length },
-          { key: 'rabbi_requests', label: '🏪 חנויות סופרים',    color: 'bg-green-800',  badge: pendingRabbiRequests.length },
-          { key: 'partner_requests', label: '🤝 בקשות שותפים',  color: 'bg-teal-700',   badge: pendingPartnerApplications.length },
-          { key: 'users',          label: '👥 משתמשים',          color: 'bg-purple-600' },
-          { key: 'content',        label: '✏️ תוכן',             color: 'bg-pink-600' },
-          { key: 'categories',     label: '🖼️ קטגוריות',        color: 'bg-indigo-600' },
-          { key: 'reviews',        label: '⭐ ביקורות',          color: 'bg-yellow-600', badge: reviews.filter(r => !r.approved).length },
-          { key: 'testimonials',   label: '💬 עדויות לקוחות',   color: 'bg-rose-600' },
-          { key: 'homepage',       label: '🏠 דף הבית',          color: 'bg-slate-700' },
-          { key: 'edit_requests',  label: '✏️ בקשות עריכה',     color: 'bg-emerald-700', badge: editRequests.filter(r => r.status === 'pending').length },
-          { key: 'hidden_products',label: '👁️ מוסתרים',         color: 'bg-gray-600',   badge: hiddenProducts.length },
-          { key: 'theme_editor',   label: '🎨 עורך עיצוב',      color: 'bg-violet-600' },
-          { key: 'curations',      label: '✨ סלקציות',          color: 'bg-fuchsia-700' },
-          { key: 'abandoned_carts', label: '🛒 נטישות עגלה',    color: 'bg-orange-600',  badge: abandonedCarts.length },
-          { key: 'customers',      label: '👤 לקוחות',           color: 'bg-cyan-700' },
-          { key: 'leads',          label: '📋 לידים',            color: 'bg-lime-700',   badge: leads.length },
-          { key: 'emails',         label: '📧 מיילים',           color: 'bg-sky-700' },
-          { key: 'coupons',        label: '🏷️ קופונים',          color: 'bg-rose-700' },
-          { key: 'out_of_stock',   label: '🔴 אזל מלאי',         color: 'bg-red-700',    badge: outOfStockProducts.length },
-          { key: 'gifts',          label: '🎁 מתנות VIP',         color: 'bg-pink-600' },
-          { key: 'seasonal',       label: '🍂 עכשיו בעונה',        color: 'bg-amber-600' },
-          { key: 'hero',           label: '🖼️ באנר ראשי',          color: 'bg-violet-600' },
-          { key: 'inventory',      label: '📦 מלאי',               color: 'bg-teal-600' },
-          { key: 'prints',         label: '🖨️ הדפסות',             color: 'bg-amber-600' },
-          { key: 'stickers',       label: '🏷️ מדבקות QR',          color: 'bg-indigo-600' },
-          { key: 'profitability',  label: '📊 רווחיות',             color: 'bg-emerald-700' },
-          { key: 'promotions',     label: '🏷️ מבצעים',              color: 'bg-orange-500' },
-          { key: 'site_settings',  label: '⚙️ הגדרות אתר',          color: 'bg-slate-600' },
-          { key: 'best_sellers',   label: '🏆 נמכרים ביותר',         color: 'bg-amber-500' },
-        ].map(t => (
-          <button key={t.key} onClick={() => setActiveTab(t.key as TabType)}
-            className={`px-4 py-2 rounded-xl font-bold transition relative ${activeTab === t.key ? `${t.color} text-white` : 'bg-white text-gray-600'}`}>
-            {t.label}
-            {(t as any).badge > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{(t as any).badge}</span>}
-          </button>
-        ))}
-        <a href="/admin/klafim" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-amber-700 hover:text-white" style={{ textDecoration: 'none' }}>
-          📜 ניהול קלפים
-        </a>
-        <a href="/admin/whatsapp" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-green-700 hover:text-white" style={{ textDecoration: 'none' }}>
-          💬 שיחות WhatsApp
-        </a>
-        <a href="/admin/crm" className="px-4 py-2 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-blue-700 hover:text-white relative" style={{ textDecoration: 'none' }}>
-          📇 CRM לקוחות
-          {crmFollowUpsDue > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{crmFollowUpsDue}</span>
-          )}
-        </a>
-      </div>
+        <div className="flex-1 min-w-0">
 
       {/* ── תוכן טאבים ── */}
 
@@ -6015,6 +5978,9 @@ export default function AdminPage() {
       {activeTab === 'site_settings' && <SiteSettingsTab />}
 
       {activeTab === 'best_sellers' && <BestSellersTab orders={orders} products={products} />}
+
+        </div>
+      </div>
 
       {lightboxImage && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }} onClick={() => setLightboxImage(null)}>
