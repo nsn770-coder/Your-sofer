@@ -44,20 +44,7 @@ interface OrderItem {
   threadColor?: { id: string; name: string; hex: string } | null;
   selectedKlafName?: string | null;
   selectedCover?: { id: string; name: string; imgUrl: string } | null;
-  printCustomization?: {
-    productType: string;
-    side: string;
-    color?: string;
-    uploadedImageUrl: string;
-    bgRemoved: boolean;
-    originalImageUrl: string;
-    imageX?: number;
-    imageY?: number;
-    imageScale?: number;
-    imageRotation?: number;
-    logoWidthPct?: number;
-    mockupUrl?: string;
-  } | null;
+  printCustomization?: PrintCustomizationData | null;
   /** עיצוב כיפה מהעורך (app/designer) — אופציונלי */
   customDesign?: {
     designId: string;
@@ -414,20 +401,7 @@ interface AbandonedCartItem {
   price: number;
   quantity: number;
   imgUrl?: string | null;
-  printCustomization?: {
-    productType: string;
-    side: string;
-    color?: string;
-    uploadedImageUrl: string;
-    bgRemoved: boolean;
-    originalImageUrl: string;
-    imageX?: number;
-    imageY?: number;
-    imageScale?: number;
-    imageRotation?: number;
-    logoWidthPct?: number;
-    mockupUrl?: string;
-  } | null;
+  printCustomization?: PrintCustomizationData | null;
   customDesign?: {
     designId: string;
     baseColor: string;
@@ -1986,20 +1960,84 @@ interface PrintCustomizationData {
   productType: string;
   side: string;
   color?: string;
-  uploadedImageUrl: string;
+  /** אופציונלי — יש הזמנות בלי לוגו (העלאה היא רשות) */
+  uploadedImageUrl?: string;
   bgRemoved: boolean;
-  originalImageUrl: string;
+  originalImageUrl?: string;
   imageX?: number;
   imageY?: number;
   imageScale?: number;
   imageRotation?: number;
   logoWidthPct?: number;
   mockupUrl?: string;
+  // ── תוספות הזמנת כיפות לאירועים (/kippot-order) ──
+  designText?: string;
+  designExample?: string;
+  selectedFont?: string;
+  selectedFontLabel?: string;
+  addSide?: boolean;
+  addSideText?: string;
+  kippahStyle?: string;
+  kippahLabel?: string;
+  printType?: string;
+}
+
+const PRINT_TYPE_LABELS: Record<string, string> = {
+  'print-top': 'הדפסה למעלה',
+  'print-bottom': 'הדפסה למטה',
+  'print-both': 'הדפסה למעלה ולמטה',
+  embroidery: 'רקמה',
+};
+
+/**
+ * מחזיר קישור אמיתי לקובץ, או null.
+ * חוסם ערכים שאי אפשר לפתוח מהאדמין: מחרוזת ריקה (גרמה להורדת דף ה-HTML
+ * של האדמין עצמו במקום הקובץ), blob: מהדפדפן של הלקוח, ו-data: ענקיים.
+ */
+function realFileUrl(url?: string | null): string | null {
+  const u = (url ?? '').trim();
+  if (!u || !/^https?:\/\//i.test(u)) return null;
+  return u;
+}
+
+/** אותו קובץ, אבל מאלץ הורדה אמיתית (Cloudinary fl_attachment) */
+function attachmentUrl(url?: string | null): string | null {
+  const u = realFileUrl(url);
+  if (!u) return null;
+  return u.includes('res.cloudinary.com') && u.includes('/upload/')
+    ? u.replace('/upload/', '/upload/fl_attachment/')
+    : u;
 }
 
 function PrintCustomizationView({ pc }: { pc: PrintCustomizationData }) {
+  const logoUrl   = realFileUrl(pc.uploadedImageUrl) ?? realFileUrl(pc.originalImageUrl);
+  const logoDl    = attachmentUrl(pc.uploadedImageUrl) ?? attachmentUrl(pc.originalImageUrl);
+  const mockupUrl = realFileUrl(pc.mockupUrl);
+  const mockupDl  = attachmentUrl(pc.mockupUrl);
+  // הלקוח סימן שהעלה קובץ אבל מה שנשמר אינו כתובת אמיתית (blob:/ריק)
+  const brokenUpload = !logoUrl && !!(pc.uploadedImageUrl || pc.originalImageUrl);
+
+  const details: { label: string; value: string }[] = [];
+  if (pc.kippahLabel)       details.push({ label: 'דגם כיפה',     value: pc.kippahLabel });
+  if (pc.printType)         details.push({ label: 'סוג הדפסה',    value: PRINT_TYPE_LABELS[pc.printType] ?? pc.printType });
+  if (pc.designExample)     details.push({ label: 'דוגמת עיצוב',  value: pc.designExample });
+  if (pc.selectedFontLabel || pc.selectedFont) {
+    details.push({ label: 'גופן', value: pc.selectedFontLabel ?? pc.selectedFont! });
+  }
+  if (pc.addSide)           details.push({ label: 'צד נוסף',      value: 'כן' });
+
+  const copyAll = () => {
+    const lines = [
+      ...details.map(d => `${d.label}: ${d.value}`),
+      ...(pc.designText ? [`טקסט להדפסה: ${pc.designText}`] : []),
+      ...(pc.addSideText ? [`טקסט צד נוסף: ${pc.addSideText}`] : []),
+      ...(logoUrl ? [`קובץ לוגו: ${logoUrl}`] : []),
+    ];
+    navigator.clipboard?.writeText(lines.join('\n'));
+  };
+
   return (
-    <div className="mt-1 flex flex-col gap-1.5">
+    <div className="mt-1 flex flex-col gap-2 rounded-lg border border-blue-200 bg-blue-50/40 p-2">
       <span className="inline-flex flex-wrap items-center gap-1.5">
         <span className="inline-flex items-center gap-1 text-blue-800 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5">
           🖨️ {pc.productType === 'shirt' ? 'חולצה' : 'כיפה'} · {pc.side}{pc.color ? ` · ${pc.color === 'white' ? 'לבן' : 'שחור'}` : ''}
@@ -2010,19 +2048,71 @@ function PrintCustomizationView({ pc }: { pc: PrintCustomizationData }) {
           </span>
         )}
       </span>
-      {pc.mockupUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={pc.mockupUrl}
-          alt="הדמיה"
-          style={{ maxWidth: 200, display: 'block', border: '1px solid #e5e7eb', borderRadius: 4 }}
-        />
+
+      {/* ── פרטי העיצוב שהלקוח מילא ── */}
+      {details.length > 0 && (
+        <span className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-gray-700">
+          {details.map(d => (
+            <span key={d.label}>{d.label}: <strong>{d.value}</strong></span>
+          ))}
+        </span>
       )}
+
+      {/* ── הטקסט להדפסה — הדבר החשוב ביותר לייצור ── */}
+      {pc.designText && (
+        <span className="block text-xs text-gray-800 bg-white border border-blue-200 rounded p-1.5 whitespace-pre-wrap">
+          ✏️ טקסט להדפסה: <strong>{pc.designText}</strong>
+        </span>
+      )}
+      {pc.addSideText && (
+        <span className="block text-xs text-gray-800 bg-white border border-blue-200 rounded p-1.5 whitespace-pre-wrap">
+          ✏️ טקסט לצד הנוסף: <strong>{pc.addSideText}</strong>
+        </span>
+      )}
+
+      {/* ── תצוגה מקדימה: הלוגו שהלקוח העלה + ההדמיה ── */}
+      <span className="flex flex-wrap items-start gap-3">
+        {logoUrl && (
+          <a href={logoUrl} target="_blank" rel="noopener noreferrer" title="פתח את הקובץ בגודל מלא">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={logoUrl}
+              alt="הלוגו שהלקוח העלה"
+              style={{ maxWidth: 140, maxHeight: 140, display: 'block', border: '1px solid #e5e7eb', borderRadius: 4, background: '#fff', padding: 4 }}
+            />
+            <span className="block text-[10px] text-gray-500 text-center mt-0.5">הלוגו שהועלה</span>
+          </a>
+        )}
+        {mockupUrl && (
+          <a href={mockupUrl} target="_blank" rel="noopener noreferrer" title="פתח את ההדמיה בגודל מלא">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={mockupUrl}
+              alt="הדמיה"
+              style={{ maxWidth: 160, display: 'block', border: '1px solid #e5e7eb', borderRadius: 4 }}
+            />
+            <span className="block text-[10px] text-gray-500 text-center mt-0.5">הדמיה</span>
+          </a>
+        )}
+      </span>
+
+      {brokenUpload && (
+        <span className="block text-[11px] text-red-700 bg-red-50 border border-red-200 rounded p-1.5">
+          ⚠️ הקובץ של הלקוח לא נשמר בשרת (ההזמנה נשלחה לפני שההעלאה הסתיימה).
+          יש לבקש מהלקוח לשלוח את הלוגו בוואטסאפ / במייל.
+        </span>
+      )}
+      {!logoUrl && !brokenUpload && (
+        <span className="block text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded p-1.5">
+          ℹ️ הלקוח לא העלה קובץ — העיצוב לפי הטקסט/הדוגמה שלמעלה.
+        </span>
+      )}
+
+      {/* ── הורדות — רק כשיש קובץ אמיתי ── */}
       <span className="inline-flex flex-wrap gap-1.5">
-        {pc.mockupUrl && (
+        {mockupDl && (
           <a
-            href={pc.mockupUrl}
-            download
+            href={mockupDl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5 hover:underline text-xs"
@@ -2030,16 +2120,27 @@ function PrintCustomizationView({ pc }: { pc: PrintCustomizationData }) {
             ⬇️ הורד הדמיה
           </a>
         )}
-        <a
-          href={pc.uploadedImageUrl}
-          download
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-2 py-0.5 hover:underline text-xs"
-        >
-          ⬇️ הורד קובץ מקורי
-        </a>
+        {logoDl && (
+          <a
+            href={logoDl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full px-2 py-0.5 hover:underline text-xs"
+          >
+            ⬇️ הורד קובץ מקורי
+          </a>
+        )}
+        {(details.length > 0 || pc.designText || pc.addSideText || logoUrl) && (
+          <button
+            type="button"
+            onClick={copyAll}
+            className="inline-flex items-center gap-1 text-gray-700 bg-white border border-gray-300 rounded-full px-2 py-0.5 hover:underline text-xs"
+          >
+            📋 העתק פרטי עיצוב
+          </button>
+        )}
       </span>
+
       {pc.imageX !== undefined && (
         <span className="text-[10px] text-gray-400 font-mono" dir="ltr">
           X:{pc.imageX?.toFixed(1)} Y:{pc.imageY?.toFixed(1)} scale:{pc.imageScale?.toFixed(2)} rot:{pc.imageRotation?.toFixed(0)}°
@@ -2058,9 +2159,7 @@ const KIPPA_DESIGN_LABELS: Record<string, string> = {
 };
 
 function KippaDesignView({ cd }: { cd: KippaDesignData }) {
-  const downloadUrl = cd.previewImageUrl.includes('/upload/')
-    ? cd.previewImageUrl.replace('/upload/', '/upload/fl_attachment/')
-    : cd.previewImageUrl;
+  const downloadUrl = attachmentUrl(cd.previewImageUrl);
   return (
     <div className="mt-1 flex flex-col gap-1.5 rounded-lg border border-purple-200 bg-purple-50/50 p-2">
       <span className="text-xs font-bold text-purple-800">🎨 עיצוב מותאם אישית</span>
@@ -2086,17 +2185,18 @@ function KippaDesignView({ cd }: { cd: KippaDesignData }) {
         <span>גודל: {cd.fontSize}</span>
         <span>מיקום: {KIPPA_DESIGN_LABELS[cd.position] ?? cd.position}</span>
       </span>
-      <span>
-        <a
-          href={downloadUrl}
-          download
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-purple-700 bg-white border border-purple-300 rounded-full px-2.5 py-1 hover:underline text-xs font-bold"
-        >
-          ⬇️ הורד קובץ להדפסה
-        </a>
-      </span>
+      {downloadUrl && (
+        <span>
+          <a
+            href={downloadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-purple-700 bg-white border border-purple-300 rounded-full px-2.5 py-1 hover:underline text-xs font-bold"
+          >
+            ⬇️ הורד קובץ להדפסה
+          </a>
+        </span>
+      )}
     </div>
   );
 }
@@ -2436,6 +2536,11 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         if (it.printCustomization) {
           const pc = it.printCustomization;
           extras.push(`הדפסה אישית (${pc.side === 'bottom' ? 'למטה' : 'למעלה'})${pc.mockupUrl ? ' — יש הדמיה בהזמנה' : ''}`);
+          // פרטי העיצוב מודפסים על דף האריזה — כדי שלא צריך לפתוח את האדמין בייצור
+          if (pc.designText) extras.push(`טקסט: "${esc(pc.designText)}"`);
+          if (pc.addSideText) extras.push(`טקסט צד נוסף: "${esc(pc.addSideText)}"`);
+          if (pc.designExample) extras.push(`דוגמת עיצוב: ${esc(pc.designExample)}`);
+          if (pc.selectedFontLabel || pc.selectedFont) extras.push(`גופן: ${esc(pc.selectedFontLabel ?? pc.selectedFont!)}`);
         }
         if (it.customDesign) {
           extras.push(`🎨 עיצוב מותאם אישית: "${esc(it.customDesign.text)}" (${it.customDesign.quantity} יח׳)`);

@@ -82,9 +82,10 @@ export interface CartItem {
     productType: string;
     side: string;
     color?: string;
-    uploadedImageUrl: string;
+    /** אופציונלי — יש הזמנות בלי לוגו (העלאה היא רשות) */
+    uploadedImageUrl?: string;
     bgRemoved: boolean;
-    originalImageUrl: string;
+    originalImageUrl?: string;
     imageX?: number;
     imageY?: number;
     imageScale?: number;
@@ -95,6 +96,9 @@ export interface CartItem {
     designText?: string;
     /** סגנון עיצוב שנבחר מגלריית הדוגמאות בעמוד ההזמנה */
     designExample?: string;
+    /** גופן שנבחר בעמוד ההזמנה (/kippot-order) */
+    selectedFont?: string;
+    selectedFontLabel?: string;
     addSide?: boolean;
     addSideText?: string;
     kippahStyle?: string;
@@ -111,6 +115,8 @@ export interface CartItem {
     fontSize: number;
     fontFamily: string;
     position: 'top' | 'center' | 'bottom';
+    /** הזזה חופשית של הטקסט על הכיפה (גרירה בעורך) — יחסית לגודל הקנבס */
+    offset?: { x: number; y: number };
     quantity: number;
     previewImageUrl: string;
     createdAt: string;

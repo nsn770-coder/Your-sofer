@@ -350,6 +350,25 @@ function MobileOrderSummary({ itemCount, finalTotal, children }: {
   );
 }
 
+// ── שמירת קובץ ההדפסה של הלקוח בהזמנה ────────────────────────────────────────
+// בעבר נמחקו כאן uploadedImageUrl / originalImageUrl / mockupUrl כדי לא לנפח את
+// ה-payload — אבל היום אלו כתובות https קצרות מקלודינרי, וכשהן נמחקו ההזמנה
+// באדמין נשארה בלי הלוגו של הלקוח (וכפתור ההורדה הצביע ל-href="" והוריד את
+// דף ה-HTML של האדמין). לכן: משאירים כתובות http(s), ומסננים רק data:/blob:
+// שהם באמת כבדים או חסרי משמעות מחוץ לדפדפן של הלקוח.
+function keepFileUrl(url?: string | null): string | undefined {
+  const u = (url ?? '').trim();
+  return /^https?:\/\//i.test(u) ? u : undefined;
+}
+function slimPrintCustomization<T extends Record<string, unknown>>(pc: T): T {
+  const out = { ...pc } as Record<string, unknown>;
+  for (const k of ['uploadedImageUrl', 'originalImageUrl', 'mockupUrl'] as const) {
+    const kept = keepFileUrl(out[k] as string | undefined);
+    if (kept) out[k] = kept; else delete out[k];
+  }
+  return out as T;
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -617,18 +636,8 @@ export default function CheckoutPage() {
           customer: { name: form.name, email: form.email, phone: form.phone },
           couponCode: appliedCoupon?.code || undefined,
           cartItems: items.map(i => {
-            // Filter out large image URLs from printCustomization to prevent payload bloat
             if (!i.printCustomization) return i;
-            return {
-              ...i,
-              printCustomization: {
-                ...i.printCustomization,
-                // Omit large base64 image URLs — they're not needed for order processing
-                uploadedImageUrl: '',
-                originalImageUrl: '',
-                mockupUrl: undefined,
-              },
-            };
+            return { ...i, printCustomization: slimPrintCustomization(i.printCustomization) };
           }),
           address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : buildAddressString(form),
           // שדות כתובת מפוצלים — נדרשים ע"י חברת המשלוחים (LionWheel)
@@ -724,16 +733,9 @@ export default function CheckoutPage() {
           customer: { name: form.name, email: form.email, phone: form.phone },
           couponCode: appliedCoupon?.code || undefined,
           cartItems: items.map(i => {
-            // Filter out large image URLs from printCustomization to prevent payload bloat
             const filtered: CartItem = { ...i };
             if (filtered.printCustomization) {
-              filtered.printCustomization = {
-                ...filtered.printCustomization,
-                // Omit large base64 image URLs — they're not needed for order processing
-                uploadedImageUrl: '',
-                originalImageUrl: '',
-                mockupUrl: undefined,
-              };
+              filtered.printCustomization = slimPrintCustomization(filtered.printCustomization);
             }
             return filtered;
           }),

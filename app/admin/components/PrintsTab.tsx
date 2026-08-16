@@ -8,9 +8,10 @@ interface PC {
   productType: string;
   side: string;
   color?: string;
-  uploadedImageUrl: string;
+  /** אופציונלי — יש הזמנות בלי לוגו (העלאה היא רשות) */
+  uploadedImageUrl?: string;
   bgRemoved: boolean;
-  originalImageUrl: string;
+  originalImageUrl?: string;
   imageX?: number;
   imageY?: number;
   imageScale?: number;
@@ -18,6 +19,9 @@ interface PC {
   logoWidthPct?: number;
   mockupUrl?: string;
   designText?: string;
+  designExample?: string;
+  selectedFont?: string;
+  selectedFontLabel?: string;
   addSide?: boolean;
   addSideText?: string;
   kippahLabel?: string;
@@ -86,7 +90,8 @@ export default function PrintsTab({ orders }: PrintsTabProps) {
   }
 
   function openForPrint(row: PrintRow) {
-    const url = row.pc.mockupUrl || row.pc.uploadedImageUrl;
+    const url = row.pc.mockupUrl || row.pc.uploadedImageUrl || row.pc.originalImageUrl;
+    if (!url) { alert('אין קובץ שמור בהזמנה הזו — יש לבקש מהלקוח לשלוח את הלוגו'); return; }
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 
@@ -206,21 +211,25 @@ export default function PrintsTab({ orders }: PrintsTabProps) {
                       />
                     </div>
                   )}
-                  <div>
-                    <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>תמונה מקורית</div>
-                    <img
-                      src={row.pc.uploadedImageUrl}
-                      alt="uploaded"
-                      style={{
-                        width: 100, height: 100,
-                        objectFit: 'contain',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: 6,
-                        background: '#f9fafb',
-                        display: 'block',
-                      }}
-                    />
-                  </div>
+                  {(row.pc.uploadedImageUrl || row.pc.originalImageUrl) ? (
+                    <div>
+                      <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>תמונה מקורית</div>
+                      <img
+                        src={row.pc.uploadedImageUrl || row.pc.originalImageUrl}
+                        alt="uploaded"
+                        style={{
+                          width: 100, height: 100,
+                          objectFit: 'contain',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: 6,
+                          background: '#f9fafb',
+                          display: 'block',
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 11, color: '#b45309' }}>אין קובץ מקורי בהזמנה</div>
+                  )}
 
                   {(row.pc.imageScale != null || row.pc.imageX != null || row.pc.logoWidthPct != null) && (
                     <div style={{ fontSize: 11, color: '#555', lineHeight: 1.8 }}>

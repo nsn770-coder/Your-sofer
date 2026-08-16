@@ -259,7 +259,8 @@ function KippotOrderInner() {
 
   // ── Build Cloudinary mockup URL ─────────────────────────────────────────────
   function buildMockupUrl(): string {
-    const logoUrl = uploadedUrl || localUrl;
+    // רק כתובת קבועה מקלודינרי — blob: של הדפדפן חסר משמעות מחוץ למכשיר הלקוח
+    const logoUrl = uploadedUrl;
     if (!logoUrl) return '';
     const el = printAreaRef.current, logoEl = logoImgRef.current;
     const imageX = el ? (imgPosRef.current.x / el.offsetWidth) * 100 : 0;
@@ -307,7 +308,18 @@ function KippotOrderInner() {
   }
 
   function handleAddToCart() {
-    const logoUrl    = uploadedUrl || localUrl || '';
+    // ── שמירה על הקובץ של הלקוח ──────────────────────────────────────────────
+    // בעבר נשמר כאן localUrl (blob: מקומי) כשההעלאה לקלודינרי לא הספיקה להסתיים,
+    // ואז באדמין לא היה קובץ להוריד. עכשיו לא ממשיכים בלי כתובת קבועה.
+    if (uploading) {
+      alert('הקובץ עדיין נטען — עוד רגע ונסו שוב 🙂');
+      return;
+    }
+    if (localUrl && !uploadedUrl) {
+      alert('העלאת הקובץ לא הושלמה. אנא העלו את הלוגו שוב (או המשיכו בלי לוגו ושלחו אותו בוואטסאפ).');
+      return;
+    }
+    const logoUrl    = uploadedUrl || '';
     const mockupUrl  = buildMockupUrl();
     const el         = printAreaRef.current, logoEl = logoImgRef.current;
     const imageX     = el ? (imgPosRef.current.x / el.offsetWidth)  * 100 : 0;
@@ -326,8 +338,9 @@ function KippotOrderInner() {
       printCustomization: {
         productType:      'kipa',
         side:             type === 'print-bottom' ? 'bottom' : 'top',
-        uploadedImageUrl: logoUrl,
-        originalImageUrl: logoUrl,
+        // מחרוזת ריקה גרמה באדמין לקישור href="" שהוריד את דף ה-HTML של האדמין
+        // במקום קובץ — לכן כשאין לוגו פשוט לא שומרים את השדות האלה.
+        ...(logoUrl ? { uploadedImageUrl: logoUrl, originalImageUrl: logoUrl } : {}),
         bgRemoved:        false,
         imageX, imageY,
         imageScale:    imgScale,

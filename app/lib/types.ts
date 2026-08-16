@@ -168,15 +168,26 @@ export interface CartItem extends Product {
     productType: string;
     side: string;
     color?: string;
-    uploadedImageUrl: string;
+    /** אופציונלי — יש הזמנות בלי לוגו (העלאה היא רשות) */
+    uploadedImageUrl?: string;
     bgRemoved: boolean;
-    originalImageUrl: string;
+    originalImageUrl?: string;
     imageX?: number;
     imageY?: number;
     imageScale?: number;
     imageRotation?: number;
     logoWidthPct?: number;
     mockupUrl?: string;
+    // ── תוספות הזמנת כיפות לאירועים (/kippot-order) ──
+    designText?: string;
+    designExample?: string;
+    selectedFont?: string;
+    selectedFontLabel?: string;
+    addSide?: boolean;
+    addSideText?: string;
+    kippahStyle?: string;
+    kippahLabel?: string;
+    printType?: string;
   };
 
   // Profitability per item
