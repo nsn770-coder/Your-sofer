@@ -1,3 +1,7 @@
+'use client';
+import { useT } from '@/app/lib/i18n/useT';
+import type { DictKey } from '@/app/lib/i18n/dictionaries';
+
 interface Props {
   isBestSeller?: boolean;
   priority?: number;
@@ -6,51 +10,50 @@ interface Props {
 }
 
 interface BadgeConfig {
-  label: string;
+  /** מפתח במילון — התרגום נעשה בזמן הרינדור, לא כאן */
+  labelKey: DictKey;
   className: string;
 }
 
-const BUNDLE_LABELS: Record<string, string> = {
-  '3for100':  '3 ב-₪100',
-  '4for100':  '4 ב-₪100',
-  '5for100':  '5 ב-₪100',
-  '12for100': '12 ב-₪100',
+/** מיפוי מבצע-מארז ← מספר הפריטים (התבנית עצמה מתורגמת: badge.forPrice) */
+const BUNDLE_COUNTS: Record<string, string> = {
+  '3for100': '3', '4for100': '4', '5for100': '5', '12for100': '12',
 };
 
 function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundlePromo'>): BadgeConfig | null {
   if (isBestSeller) {
     return {
-      label: 'הכי נמכר',
+      labelKey: 'badge.bestSeller',
       className: 'bg-[#FEFBF7] text-[var(--ys-accent)] border-[var(--ys-accent)]',
     };
   }
   if (typeof priority === 'number' && priority >= 80) {
     return {
-      label: 'מומלץ',
+      labelKey: 'badge.recommended',
       className: 'bg-[var(--ys-accent)] text-[#FEFBF7] border-[var(--ys-accent)]',
     };
   }
   if (badge === 'מהודר') {
     return {
-      label: 'מהודר',
+      labelKey: 'badge.mehudar',
       className: 'bg-[#FEFBF7] text-[var(--ys-accent)] border-[var(--ys-accent)]',
     };
   }
   if (badge === 'מתנה') {
     return {
-      label: 'מתאים כמתנה',
+      labelKey: 'badge.giftable',
       className: 'bg-[#FEFBF7] text-[var(--ys-accent)] border-[var(--ys-accent)]',
     };
   }
   if (badge === 'בטוח') {
     return {
-      label: 'בחירה בטוחה',
+      labelKey: 'badge.safeChoice',
       className: 'bg-white text-gray-500 border-gray-300',
     };
   }
   if (badge === 'מהדרין') {
     return {
-      label: 'מהדרין',
+      labelKey: 'badge.mehadrin',
       className: 'bg-[var(--ys-accent)] text-[#FEFBF7] border-[var(--ys-accent)]',
     };
   }
@@ -58,16 +61,18 @@ function resolveBadge({ isBestSeller, priority, badge }: Omit<Props, 'bundleProm
 }
 
 export default function ProductBadge({ isBestSeller, priority, badge, bundlePromo }: Props) {
+  const { t, dir } = useT();
   const config = resolveBadge({ isBestSeller, priority, badge });
-  const bundleLabel = bundlePromo ? BUNDLE_LABELS[bundlePromo] : null;
+  const bundleCount = bundlePromo ? BUNDLE_COUNTS[bundlePromo] : null;
+  const bundleLabel = bundleCount ? t('badge.forPrice').replace('{n}', bundleCount) : null;
 
   if (!config && !bundleLabel) return null;
 
   return (
-    <span dir="rtl" className="inline-flex flex-col items-end gap-1">
+    <span dir={dir} className={`inline-flex flex-col gap-1 ${dir === 'rtl' ? 'items-end' : 'items-start'}`}>
       {config && (
         <span className={`inline-flex items-center border rounded-none px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap ${config.className}`}>
-          {config.label}
+          {t(config.labelKey)}
         </span>
       )}
       {bundleLabel && (

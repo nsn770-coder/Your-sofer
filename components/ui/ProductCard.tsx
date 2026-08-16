@@ -8,6 +8,7 @@ import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice, effectivePrice as computeEffectivePrice, type EffectivePriceFields } from '@/app/lib/utils';
+import { useT } from '@/app/lib/i18n/useT';
 
 interface Props {
   id: string;
@@ -118,6 +119,7 @@ export default function ProductCard({
   comingSoon, expectedArrivalDate, productDoc, isBundle,
   partnerId, partnerName, warehouseType,
 }: Props) {
+  const { t, dir } = useT();
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
   const { user } = useAuth();
@@ -300,27 +302,27 @@ export default function ProductCard({
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {localEventsOnly && (
             <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#7C3AED' }}>
-              🎉 רק אירועים
+              🎉 {t('card.eventsOnly')}
             </span>
           )}
           {comingSoon && (
             <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: 'var(--ys-dark-surface)' }}>
-              מגיע בקרוב{expectedArrivalDate ? ` ${formatArrivalDate(expectedArrivalDate)}` : ''}
+              {t('card.comingSoon')}{expectedArrivalDate ? ` ${formatArrivalDate(expectedArrivalDate)}` : ''}
             </span>
           )}
           {hasClearance && (
             <span className="flex items-center gap-1 text-white text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: 'var(--ys-dark-surface)' }}>
-              10% הנחת מלאי
+              {t('card.clearance10')}
             </span>
           )}
           {hasSale && !hasClearance && (
             <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: 'var(--ys-accent)', color: '#FEFBF7' }}>
-              מבצע {savePct}%-
+              {t('card.salePct').replace('{p}', String(savePct))}
             </span>
           )}
           {isBundle && (
             <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-none leading-tight" style={{ background: '#FEFBF7', color: 'var(--ys-accent)', border: '1px solid var(--ys-accent)' }}>
-              ✦ מארז מהודר
+              ✦ {t('card.bundlePremium')}
             </span>
           )}
           {/* תגית "רקמה אישית" הוסרה (07/2026) — היא הצטברה מעל התמונה יחד עם
@@ -328,12 +330,12 @@ export default function ProductCard({
               המוצר, ליד כפתור ההוספה לסל. */}
           {isNew && (
             <span className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-none leading-tight" style={{ background: '#FEFBF7', color: 'var(--ys-accent)', border: '1px solid var(--ys-accent)' }}>
-              חדש
+              {t('card.new')}
             </span>
           )}
           {hasKlafSelection && (
             <span style={{ background: '#FEFBF7', color: 'var(--ys-accent)', border: '1px solid var(--ys-accent)', borderRadius: 0, fontSize: 11, fontWeight: 700, padding: '3px 8px', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
-              ✦ בחר את הקלף שלך
+              {t('card.chooseKlaf')}
             </span>
           )}
         </div>
@@ -353,12 +355,12 @@ export default function ProductCard({
             {soferPhoto ? (
               <img
                 src={soferPhoto}
-                alt={soferName ?? 'סופר'}
+                alt={soferName ?? t('card.scribe')}
                 style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover', border: '1px solid #E5E7EB', flexShrink: 0 }}
               />
             ) : null}
             <span style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              נכתב ע״י {soferName ?? 'סופר מוסמך'}
+              {t('card.writtenBy').replace('{x}', soferName ?? t('card.certifiedScribe'))}
             </span>
           </div>
         )}
@@ -366,16 +368,18 @@ export default function ProductCard({
         {partnerId && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 1, marginBottom: 2 }}>
             <span style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              🏪 {partnerName ?? 'חנות שותף'}
+              🏪 {partnerName ?? t('card.partnerStore')}
             </span>
             <span style={{ fontSize: 10, color: '#B0B4C0' }}>
-              {warehouseType === 'dropship' ? 'משלוח עד 5 ימים' : `משלוח ישיר מ${partnerName ?? 'השותף'}`}
+              {warehouseType === 'dropship'
+                ? t('card.ship5days')
+                : t('card.directShipFrom').replace('{x}', partnerName ?? t('card.thePartner'))}
             </span>
           </div>
         )}
 
         {/* Price */}
-        <div className="mt-1 flex items-center justify-start gap-2" dir="rtl">
+        <div className="mt-1 flex items-center justify-start gap-2" dir={dir}>
           <span style={{ fontSize: 17, fontWeight: 700, color: '#111111', lineHeight: 1 }}>
             {formatPrice(displayPrice)}
           </span>
@@ -389,16 +393,16 @@ export default function ProductCard({
         {/* Kippot promo text */}
         {cat === 'כיפות' && (
           <div style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 600, marginTop: 4, marginBottom: 4, lineHeight: 1.3 }}>
-            מוצר 2 ב-10% הנחה<br />3 ומעלה 15%
+            {t('card.kippotPromo')}
           </div>
         )}
 
         {/* Cart button — minimal underlined text link */}
-        <div style={{ marginTop: 'auto', paddingTop: 6, textAlign: 'right' }} onClick={e => e.stopPropagation()}>
+        <div style={{ marginTop: 'auto', paddingTop: 6, textAlign: dir === 'rtl' ? 'right' : 'left' }} onClick={e => e.stopPropagation()}>
           {/* Tefilin Komplet — hint + add covers button */}
           {cat === 'תפילין קומפלט' && qty === 0 && !notPurchasable && (
             <div style={{ marginBottom: 8, fontSize: 11, color: '#6B7280', lineHeight: 1.4 }}>
-              ניתן לבחור גם סט כיסויים לטלית ותפילין
+              {t('card.tefillinCoverHint')}
             </div>
           )}
           {cat === 'תפילין קומפלט' && qty > 0 && !notPurchasable && (
@@ -415,14 +419,14 @@ export default function ProductCard({
                 onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#373A5A'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#111111'; }}
               >
-                ➕ הוסף כיסוי מתאים
+                {t('card.addMatchingCover')}
               </a>
             </div>
           )}
 
           {notPurchasable ? (
             <a
-              href={`https://wa.me/972587479933?text=${encodeURIComponent('שלום, אני מתעניין במוצר: ' + name)}`}
+              href={`https://wa.me/972587479933?text=${encodeURIComponent(t('card.waInterest') + name)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
@@ -433,7 +437,7 @@ export default function ProductCard({
                 cursor: 'pointer',
               }}
             >
-              עדכנו אותי
+              {t('card.notifyMe')}
             </a>
           ) : qty === 0 ? (
             <button
@@ -448,7 +452,7 @@ export default function ProductCard({
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}
             >
-              הוספה לסל
+              {t('action.addToCart')}
             </button>
           ) : (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 0, height: 30 }}>

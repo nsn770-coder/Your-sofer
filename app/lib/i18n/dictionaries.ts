@@ -146,6 +146,31 @@ export const he = {
   'account.continueGoogle': 'המשך עם Google',
   'account.toLoginPage': 'לעמוד הכניסה',
   'account.exit': 'יציאה',
+
+  // ── כרטיס מוצר (המשך) ──
+  'card.eventsOnly': 'רק אירועים',
+  'card.comingSoon': 'מגיע בקרוב',
+  'card.clearance10': '10% הנחת מלאי',
+  'card.salePct': 'מבצע {p}%-',
+  'card.chooseKlaf': '✦ בחר את הקלף שלך',
+  'card.writtenBy': 'נכתב ע״י {x}',
+  'card.scribe': 'סופר',
+  'card.thePartner': 'השותף',
+  'card.directShipFrom': 'משלוח ישיר מ{x}',
+  'card.kippotPromo': 'מוצר 2 ב-10% הנחה · 3 ומעלה 15%',
+  'card.tefillinCoverHint': 'ניתן לבחור גם סט כיסויים לטלית ותפילין',
+  'card.addMatchingCover': '➕ הוסף כיסוי מתאים',
+  'card.notifyMe': 'עדכנו אותי',
+  'card.waInterest': 'שלום, אני מתעניין במוצר: ',
+
+  // ── תוויות (Badges) ──
+  'badge.bestSeller': 'הכי נמכר',
+  'badge.recommended': 'מומלץ',
+  'badge.mehudar': 'מהודר',
+  'badge.giftable': 'מתאים כמתנה',
+  'badge.safeChoice': 'בחירה בטוחה',
+  'badge.mehadrin': 'מהדרין',
+  'badge.forPrice': '{n} ב-₪100',
 } as const;
 
 export type DictKey = keyof typeof he;
@@ -283,6 +308,29 @@ export const en: Dict = {
   'account.continueGoogle': 'Continue with Google',
   'account.toLoginPage': 'Go to sign-in page',
   'account.exit': 'Sign out',
+
+  'card.eventsOnly': 'Events only',
+  'card.comingSoon': 'Coming soon',
+  'card.clearance10': '10% clearance',
+  'card.salePct': '{p}% off',
+  'card.chooseKlaf': '✦ Choose your parchment',
+  'card.writtenBy': 'Written by {x}',
+  'card.scribe': 'Scribe',
+  'card.thePartner': 'the partner',
+  'card.directShipFrom': 'Ships directly from {x}',
+  'card.kippotPromo': '2nd item 10% off · 3 or more 15%',
+  'card.tefillinCoverHint': 'A matching tallit & tefillin cover set is also available',
+  'card.addMatchingCover': '➕ Add a matching cover',
+  'card.notifyMe': 'Notify me',
+  'card.waInterest': 'Hello, I am interested in this product: ',
+
+  'badge.bestSeller': 'Best seller',
+  'badge.recommended': 'Recommended',
+  'badge.mehudar': 'Mehudar',
+  'badge.giftable': 'Great as a gift',
+  'badge.safeChoice': 'Safe choice',
+  'badge.mehadrin': 'Mehadrin',
+  'badge.forPrice': '{n} for ₪100',
 };
 
 export const fr: Dict = {
@@ -417,6 +465,29 @@ export const fr: Dict = {
   'account.continueGoogle': 'Continuer avec Google',
   'account.toLoginPage': 'Aller à la page de connexion',
   'account.exit': 'Déconnexion',
+
+  'card.eventsOnly': 'Événements uniquement',
+  'card.comingSoon': 'Bientôt disponible',
+  'card.clearance10': '10% déstockage',
+  'card.salePct': '-{p}%',
+  'card.chooseKlaf': '✦ Choisissez votre parchemin',
+  'card.writtenBy': 'Écrit par {x}',
+  'card.scribe': 'Scribe',
+  'card.thePartner': 'le partenaire',
+  'card.directShipFrom': 'Expédié directement par {x}',
+  'card.kippotPromo': '2e article -10% · 3 et plus -15%',
+  'card.tefillinCoverHint': 'Un ensemble de housses assorties est également disponible',
+  'card.addMatchingCover': '➕ Ajouter une housse assortie',
+  'card.notifyMe': 'Prévenez-moi',
+  'card.waInterest': 'Bonjour, je suis intéressé par ce produit : ',
+
+  'badge.bestSeller': 'Meilleure vente',
+  'badge.recommended': 'Recommandé',
+  'badge.mehudar': 'Mehoudar',
+  'badge.giftable': 'Idéal en cadeau',
+  'badge.safeChoice': 'Choix sûr',
+  'badge.mehadrin': 'Mehadrin',
+  'badge.forPrice': '{n} pour ₪100',
 };
 
 export const es: Dict = {
@@ -551,6 +622,29 @@ export const es: Dict = {
   'account.continueGoogle': 'Continuar con Google',
   'account.toLoginPage': 'Ir a la página de acceso',
   'account.exit': 'Cerrar sesión',
+
+  'card.eventsOnly': 'Solo eventos',
+  'card.comingSoon': 'Próximamente',
+  'card.clearance10': '10% liquidación',
+  'card.salePct': '-{p}%',
+  'card.chooseKlaf': '✦ Elige tu pergamino',
+  'card.writtenBy': 'Escrito por {x}',
+  'card.scribe': 'Escriba',
+  'card.thePartner': 'el socio',
+  'card.directShipFrom': 'Envío directo desde {x}',
+  'card.kippotPromo': '2º artículo -10% · 3 o más -15%',
+  'card.tefillinCoverHint': 'También hay un juego de fundas a juego disponible',
+  'card.addMatchingCover': '➕ Añadir funda a juego',
+  'card.notifyMe': 'Avísame',
+  'card.waInterest': 'Hola, me interesa este producto: ',
+
+  'badge.bestSeller': 'Más vendido',
+  'badge.recommended': 'Recomendado',
+  'badge.mehudar': 'Mehudar',
+  'badge.giftable': 'Ideal para regalo',
+  'badge.safeChoice': 'Elección segura',
+  'badge.mehadrin': 'Mehadrin',
+  'badge.forPrice': '{n} por ₪100',
 };
 
 export const ar: Dict = {
@@ -685,6 +779,29 @@ export const ar: Dict = {
   'account.continueGoogle': 'المتابعة مع Google',
   'account.toLoginPage': 'الذهاب لصفحة الدخول',
   'account.exit': 'تسجيل الخروج',
+
+  'card.eventsOnly': 'للمناسبات فقط',
+  'card.comingSoon': 'قريبًا',
+  'card.clearance10': 'خصم تصفية 10%',
+  'card.salePct': 'خصم {p}%',
+  'card.chooseKlaf': '✦ اختر الرق الخاص بك',
+  'card.writtenBy': 'كتبه {x}',
+  'card.scribe': 'كاتب',
+  'card.thePartner': 'الشريك',
+  'card.directShipFrom': 'شحن مباشر من {x}',
+  'card.kippotPromo': 'المنتج الثاني بخصم 10% · 3 فأكثر 15%',
+  'card.tefillinCoverHint': 'يتوفر أيضًا طقم أغطية مناسب',
+  'card.addMatchingCover': '➕ أضف غطاءً مناسبًا',
+  'card.notifyMe': 'أعلمني',
+  'card.waInterest': 'مرحبًا، أنا مهتم بهذا المنتج: ',
+
+  'badge.bestSeller': 'الأكثر مبيعًا',
+  'badge.recommended': 'موصى به',
+  'badge.mehudar': 'فاخر',
+  'badge.giftable': 'مناسب كهدية',
+  'badge.safeChoice': 'خيار آمن',
+  'badge.mehadrin': 'مهدرين',
+  'badge.forPrice': '{n} بـ ₪100',
 };
 
 export const ru: Dict = {
@@ -819,6 +936,29 @@ export const ru: Dict = {
   'account.continueGoogle': 'Продолжить с Google',
   'account.toLoginPage': 'На страницу входа',
   'account.exit': 'Выйти',
+
+  'card.eventsOnly': 'Только для торжеств',
+  'card.comingSoon': 'Скоро в продаже',
+  'card.clearance10': 'Распродажа 10%',
+  'card.salePct': 'Скидка {p}%',
+  'card.chooseKlaf': '✦ Выберите свой пергамент',
+  'card.writtenBy': 'Написано: {x}',
+  'card.scribe': 'Софер',
+  'card.thePartner': 'партнёра',
+  'card.directShipFrom': 'Прямая доставка от {x}',
+  'card.kippotPromo': '2-й товар -10% · от 3 штук -15%',
+  'card.tefillinCoverHint': 'Также доступен подходящий комплект чехлов',
+  'card.addMatchingCover': '➕ Добавить подходящий чехол',
+  'card.notifyMe': 'Сообщить мне',
+  'card.waInterest': 'Здравствуйте, меня интересует этот товар: ',
+
+  'badge.bestSeller': 'Хит продаж',
+  'badge.recommended': 'Рекомендуем',
+  'badge.mehudar': 'Мехудар',
+  'badge.giftable': 'Отличный подарок',
+  'badge.safeChoice': 'Надёжный выбор',
+  'badge.mehadrin': 'Мехадрин',
+  'badge.forPrice': '{n} за ₪100',
 };
 
 export const DICTIONARIES: Record<string, Dict> = { he, en, fr, es, ar, ru };
