@@ -17,8 +17,10 @@ import PaymentMethodsRow from '../components/trust/PaymentMethodsRow';
 import TrustCluster from '../components/trust/TrustCluster';
 import ReviewProof from '../components/trust/ReviewProof';
 import PageFaqSection from '../components/faq/PageFaqSection';
+import { useT } from '@/app/lib/i18n/useT';
 
 export default function CartPage() {
+  const { t } = useT();
   const router = useRouter();
   const {
     items, removeItem, updateQty, total,
@@ -70,13 +72,13 @@ export default function CartPage() {
       const data = await res.json();
       if (!res.ok || !data.cartId) {
         console.error('[shareCart] API error:', data.error);
-        alert('שגיאה ביצירת קישור שיתוף: ' + (data.error || 'שגיאת שרת'));
+        alert(t('cart.shareError') + ': ' + (data.error || t('cart.serverError')));
         return;
       }
       setShareUrl(`${window.location.origin}/shared-cart/${data.cartId}`);
     } catch (err) {
       console.error('[shareCart]', err);
-      alert('שגיאה ביצירת קישור שיתוף');
+      alert(t('cart.shareError'));
     } finally {
       setShareLoading(false);
     }
@@ -131,9 +133,9 @@ export default function CartPage() {
       <div style={{ background: 'var(--ys-dark-surface)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 16 }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -1 }}>Your Sofer</div>
-          <div style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>ישראל ✡</div>
+          <div style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>{t('cart.israel')}</div>
         </div>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#fff', marginRight: 16 }}>🛒 סל הקניות</h1>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#fff', marginRight: 16 }}>🛒 {t('cart.title')}</h1>
       </div>
 
       {/* Main content */}
@@ -157,11 +159,11 @@ export default function CartPage() {
         ) : items.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', background: '#fff', borderRadius: 8, border: '1px solid #ddd', padding: isMobile ? 32 : 60, textAlign: 'center' }}>
             <div style={{ fontSize: 64, marginBottom: 16 }}>🛒</div>
-            <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>הסל שלך ריק</div>
-            <div style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>הוסף מוצרים מהחנות כדי להתחיל</div>
+            <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>{t('cart.empty')}</div>
+            <div style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>{t('cart.emptyHint')}</div>
             <button onClick={() => router.push('/')}
               style={{ background: '#FFFFFF', color: 'var(--ys-text)', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 32px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-              המשך בקנייה
+              {t('action.continueShopping')}
             </button>
           </div>
         ) : (
@@ -169,15 +171,15 @@ export default function CartPage() {
             {/* ── Product list ── */}
             <div style={{ minWidth: 0 }}>
               <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #ddd', padding: '14px 16px', marginBottom: 12 }}>
-                <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0f1111', margin: 0 }}>סל הקניות ({totalItems} פריטים)</h2>
+                <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0f1111', margin: 0 }}>{t('cart.titleCount').replace('{n}', String(totalItems))}</h2>
               </div>
 
               {bundleDiscountAmount > 0 && (
                 <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '10px 14px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 18 }}>🎁</span>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: '#15803d' }}>מבצע כיפות חבילות הופעל!</div>
-                    <div style={{ fontSize: 12, color: '#166534' }}>מחיר חבילה מיוחד הופעל — חיסכון של ₪{bundleDiscountAmount.toFixed(2)}</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: '#15803d' }}>{t('cart.bundleOn')}</div>
+                    <div style={{ fontSize: 12, color: '#166534' }}>{t('cart.bundleSave').replace('{x}', bundleDiscountAmount.toFixed(2))}</div>
                   </div>
                 </div>
               )}
@@ -219,41 +221,41 @@ export default function CartPage() {
                               style={{ fontSize: 14, fontWeight: 600, color: '#0f1111', lineHeight: 1.4, cursor: 'pointer', marginBottom: 4 }}>
                               {item.name}
                             </div>
-                            <div style={{ fontSize: 11, color: '#1a6b3c', marginBottom: 2 }}>✓ במלאי</div>
+                            <div style={{ fontSize: 11, color: '#1a6b3c', marginBottom: 2 }}>✓ {t('cart.inStock')}</div>
                           {item.embroideryText && (
-                            <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ ריקמה: {item.embroideryText}</div>
+                            <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4 }}>✍️ {t('cart.embroidery')}: {item.embroideryText}</div>
                           )}
                           {item.customDesign && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 8, padding: '5px 8px', marginBottom: 4 }}>
-                              <img src={optimizeCloudinaryUrl(item.customDesign.previewImageUrl, 60)} alt="עיצוב הכיפה" style={{ width: 34, height: 34, borderRadius: 6, objectFit: 'cover', border: '1px solid #c4b5fd', background: '#fff' }} />
+                              <img src={optimizeCloudinaryUrl(item.customDesign.previewImageUrl, 60)} alt={t('cart.customDesign')} style={{ width: 34, height: 34, borderRadius: 6, objectFit: 'cover', border: '1px solid #c4b5fd', background: '#fff' }} />
                               <div style={{ fontSize: 11, color: '#5b21b6', fontWeight: 700, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                🎨 עיצוב אישי: „{item.customDesign.text}"
+                                🎨 {t('cart.customDesign')}: „{item.customDesign.text}"
                               </div>
                               <button onClick={() => setEditingDesignItem(item)}
                                 style={{ background: 'none', border: '1px solid #8b5cf6', color: '#6d28d9', fontSize: 11, fontWeight: 700, borderRadius: 6, padding: '3px 8px', cursor: 'pointer', flexShrink: 0 }}>
-                                ערוך עיצוב
+                                {t('cart.editDesign')}
                               </button>
                             </div>
                           )}
                           {item.threadColor && (
                             <div style={{ fontSize: 11, color: '#92400e', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
                               <span style={{ width: 12, height: 12, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} />
-                              צבע חוט: {item.threadColor.id} - {item.threadColor.name}
+                              {t('cart.threadColor')}: {item.threadColor.id} - {item.threadColor.name}
                             </div>
                           )}
                           {item.embroideryOptions && item.embroideryOptions.length > 0 && (
                             <div style={{ fontSize: 11, color: '#92400e', fontWeight: 600, marginBottom: 4 }}>
-                              תוספת רקמה ({item.embroideryOptions.join(' + ')}): +₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50}
+                              {t('cart.embroideryExtra')} ({item.embroideryOptions.join(' + ')}): +₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50}
                             </div>
                           )}
                           {item.embossingText && (
                             <div style={{ fontSize: 11, color: '#92400e', fontWeight: 600, marginBottom: 4 }}>
-                              🔖 הטבעה: {item.embossingText} ({item.embossingColor === 'silver' ? 'כסף' : 'זהב'}) +₪{item.embossingSurcharge ?? 15}
+                              🔖 {t('cart.embossing')}: {item.embossingText} ({item.embossingColor === 'silver' ? t('cart.silver') : t('cart.gold')}) +₪{item.embossingSurcharge ?? 15}
                             </div>
                           )}
                           {item.selectedCover && (
                             <div style={{ fontSize: 11, color: '#5B4B12', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              כיסוי נבחר:
+                              {t('cart.selectedCover')}
                               <img src={optimizeCloudinaryUrl(item.selectedCover.imgUrl, 40)} alt={item.selectedCover.name}
                                 style={{ width: 28, height: 28, borderRadius: 3, objectFit: 'cover', border: '1px solid #ddd' }} />
                               {item.selectedCover.name}
@@ -266,14 +268,14 @@ export default function CartPage() {
                           )}
                           {(item.selectedAddons ?? []).map(a => (
                             <div key={a.id} style={{ fontSize: 11, color: '#92400e', fontWeight: 600, marginBottom: 4 }}>
-                              ✨ {a.label}{a.text ? `: „${a.text}"` : ''} — {a.pricing === 'perUnit' ? `+₪${a.price} ליחידה` : `+₪${a.price} חד־פעמי`}
+                              ✨ {a.label}{a.text ? `: „${a.text}"` : ''} — {a.pricing === 'perUnit' ? `+₪${a.price} ${t('cart.perUnit')}` : `+₪${a.price} ${t('cart.oneTime')}`}
                             </div>
                           ))}
                             <div style={{ fontSize: 17, fontWeight: 900, color: 'var(--ys-text)' }}>
                               {formatPrice(item.price * item.quantity + (item.addonsFlatSurcharge ?? 0))}
                             </div>
                             {item.quantity > 1 && (
-                              <div style={{ fontSize: 11, color: '#888' }}>{formatPrice(item.price)} × {item.quantity}{(item.addonsFlatSurcharge ?? 0) > 0 ? ` + ₪${item.addonsFlatSurcharge} חד־פעמי` : ''}</div>
+                              <div style={{ fontSize: 11, color: '#888' }}>{formatPrice(item.price)} × {item.quantity}{(item.addonsFlatSurcharge ?? 0) > 0 ? ` + ₪${item.addonsFlatSurcharge} ${t('cart.oneTime')}` : ''}</div>
                             )}
                           </div>
                         </div>
@@ -282,24 +284,24 @@ export default function CartPage() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between' }}>
                           {/* Qty stepper */}
                           <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 6, overflow: 'hidden' }}>
-                            <button onClick={() => updateQty(item.id, item.quantity - 1)} aria-label={`הקטנת כמות של ${item.name}`}
+                            <button onClick={() => updateQty(item.id, item.quantity - 1)} aria-label={t('cart.decreaseQty').replace('{x}', item.name)}
                               style={{ width: 34, height: 34, background: '#f8f9fa', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, color: '#333' }}>−</button>
                             <span aria-live="polite" style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 700, borderRight: '1px solid #ddd', borderLeft: '1px solid #ddd', lineHeight: '34px' }}>
                               {item.quantity}
                             </span>
-                            <button onClick={() => updateQty(item.id, item.quantity + 1)} aria-label={`הגדלת כמות של ${item.name}`}
+                            <button onClick={() => updateQty(item.id, item.quantity + 1)} aria-label={t('cart.increaseQty').replace('{x}', item.name)}
                               style={{ width: 34, height: 34, background: '#f8f9fa', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, color: '#333' }}>+</button>
                           </div>
 
                           {/* Actions */}
                           <div style={{ display: 'flex', gap: 12 }}>
-                            <button onClick={() => removeItem(item.id)} aria-label={`הסרת ${item.name} מהסל`}
+                            <button onClick={() => removeItem(item.id)} aria-label={t('cart.removeAria').replace('{x}', item.name)}
                               style={{ background: 'none', border: 'none', color: '#c0392b', fontSize: 13, cursor: 'pointer', padding: 0, fontWeight: 600 }}>
-                              הסר
+                              {t('cart.remove')}
                             </button>
                             <button onClick={() => router.push(`/product/${item.id}`)}
                               style={{ background: 'none', border: 'none', color: '#0e6ba8', fontSize: 13, cursor: 'pointer', padding: 0 }}>
-                              פרטים
+                              {t('cart.details')}
                             </button>
                           </div>
                         </div>
@@ -326,47 +328,47 @@ export default function CartPage() {
                             onMouseLeave={e => (e.currentTarget.style.color = '#0f1111')}>
                             {item.name}
                           </div>
-                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText || item.embossingText || item.selectedCover ? 4 : 10 }}>✓ במלאי</div>
+                          <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText || item.embossingText || item.selectedCover ? 4 : 10 }}>✓ {t('cart.inStock')}</div>
                           {/* כיפות לאירועים בכמויות — מחיר מדרגות; קופונים לא חלים */}
                           {isBulkEventKippotLine(item) && (
                             <div style={{ fontSize: 11.5, color: '#92400e', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, padding: '3px 8px', display: 'inline-block', fontWeight: 700, marginBottom: 6 }}>
-                              🏷️ הנחת כמות כלולה במחיר — קוד קופון לא חל על פריט זה
+                              {t('cart.qtyDiscountNote')}
                             </div>
                           )}
                           {item.embroideryText && (
-                            <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6 }}>✍️ ריקמה: {item.embroideryText}</div>
+                            <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6 }}>✍️ {t('cart.embroidery')}: {item.embroideryText}</div>
                           )}
                           {item.customDesign && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 8, padding: '6px 10px', marginBottom: 6, maxWidth: 420 }}>
-                              <img src={optimizeCloudinaryUrl(item.customDesign.previewImageUrl, 80)} alt="עיצוב הכיפה" style={{ width: 44, height: 44, borderRadius: 6, objectFit: 'cover', border: '1px solid #c4b5fd', background: '#fff' }} />
+                              <img src={optimizeCloudinaryUrl(item.customDesign.previewImageUrl, 80)} alt={t('cart.customDesign')} style={{ width: 44, height: 44, borderRadius: 6, objectFit: 'cover', border: '1px solid #c4b5fd', background: '#fff' }} />
                               <div style={{ fontSize: 12, color: '#5b21b6', fontWeight: 700, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                🎨 עיצוב אישי: „{item.customDesign.text}"
+                                🎨 {t('cart.customDesign')}: „{item.customDesign.text}"
                               </div>
                               <button onClick={() => setEditingDesignItem(item)}
                                 style={{ background: 'none', border: '1px solid #8b5cf6', color: '#6d28d9', fontSize: 12, fontWeight: 700, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', flexShrink: 0 }}>
-                                ערוך עיצוב
+                                {t('cart.editDesign')}
                               </button>
                             </div>
                           )}
                           {item.threadColor && (
                             <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 5 }}>
                               <span style={{ width: 14, height: 14, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} />
-                              צבע חוט: {item.threadColor.id} - {item.threadColor.name}
+                              {t('cart.threadColor')}: {item.threadColor.id} - {item.threadColor.name}
                             </div>
                           )}
                           {item.embroideryOptions && item.embroideryOptions.length > 0 && (
                             <div style={{ fontSize: 12, color: '#92400e', fontWeight: 600, marginBottom: 6 }}>
-                              תוספת רקמה ({item.embroideryOptions.join(' + ')}): +₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50}
+                              {t('cart.embroideryExtra')} ({item.embroideryOptions.join(' + ')}): +₪{item.embroiderySurcharge ?? item.embroideryOptions.length * 50}
                             </div>
                           )}
                           {item.embossingText && (
                             <div style={{ fontSize: 12, color: '#92400e', fontWeight: 600, marginBottom: 6 }}>
-                              🔖 הטבעה: {item.embossingText} ({item.embossingColor === 'silver' ? 'כסף' : 'זהב'}) +₪{item.embossingSurcharge ?? 15}
+                              🔖 {t('cart.embossing')}: {item.embossingText} ({item.embossingColor === 'silver' ? t('cart.silver') : t('cart.gold')}) +₪{item.embossingSurcharge ?? 15}
                             </div>
                           )}
                           {item.selectedCover && (
                             <div style={{ fontSize: 11, color: '#5B4B12', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              כיסוי נבחר:
+                              {t('cart.selectedCover')}
                               <img src={optimizeCloudinaryUrl(item.selectedCover.imgUrl, 40)} alt={item.selectedCover.name}
                                 style={{ width: 28, height: 28, borderRadius: 3, objectFit: 'cover', border: '1px solid #ddd' }} />
                               {item.selectedCover.name}
@@ -379,29 +381,29 @@ export default function CartPage() {
                           )}
                           {(item.selectedAddons ?? []).map(a => (
                             <div key={a.id} style={{ fontSize: 12, color: '#92400e', fontWeight: 600, marginBottom: 6 }}>
-                              ✨ {a.label}{a.text ? `: „${a.text}"` : ''} — {a.pricing === 'perUnit' ? `+₪${a.price} ליחידה` : `+₪${a.price} חד־פעמי`}
+                              ✨ {a.label}{a.text ? `: „${a.text}"` : ''} — {a.pricing === 'perUnit' ? `+₪${a.price} ${t('cart.perUnit')}` : `+₪${a.price} ${t('cart.oneTime')}`}
                             </div>
                           ))}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                             <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 6, overflow: 'hidden' }}>
-                              <button onClick={() => updateQty(item.id, item.quantity - 1)} aria-label={`הקטנת כמות של ${item.name}`}
+                              <button onClick={() => updateQty(item.id, item.quantity - 1)} aria-label={t('cart.decreaseQty').replace('{x}', item.name)}
                                 style={{ width: 32, height: 32, background: '#f8f9fa', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, color: '#333' }}>−</button>
                               <span aria-live="polite" style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 700, borderRight: '1px solid #ddd', borderLeft: '1px solid #ddd', lineHeight: '32px' }}>
                                 {item.quantity}
                               </span>
-                              <button onClick={() => updateQty(item.id, item.quantity + 1)} aria-label={`הגדלת כמות של ${item.name}`}
+                              <button onClick={() => updateQty(item.id, item.quantity + 1)} aria-label={t('cart.increaseQty').replace('{x}', item.name)}
                                 style={{ width: 32, height: 32, background: '#f8f9fa', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, color: '#333' }}>+</button>
                             </div>
                             <span style={{ color: '#ddd' }} aria-hidden="true">|</span>
-                            <button onClick={() => removeItem(item.id)} aria-label={`הסרת ${item.name} מהסל`}
+                            <button onClick={() => removeItem(item.id)} aria-label={t('cart.removeAria').replace('{x}', item.name)}
                               style={{ background: 'none', border: 'none', color: '#0e6ba8', fontSize: 13, cursor: 'pointer', padding: 0 }}
                               onMouseEnter={e => (e.currentTarget.style.color = '#c0392b')}
                               onMouseLeave={e => (e.currentTarget.style.color = '#0e6ba8')}>
-                              הסר
+                              {t('cart.remove')}
                             </button>
                             <button onClick={() => router.push(`/product/${item.id}`)}
                               style={{ background: 'none', border: 'none', color: '#0e6ba8', fontSize: 13, cursor: 'pointer', padding: 0 }}>
-                              פרטי מוצר
+                              {t('cart.productDetails')}
                             </button>
                           </div>
                         </div>
@@ -410,7 +412,7 @@ export default function CartPage() {
                         <div style={{ textAlign: 'left', flexShrink: 0 }}>
                           <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)' }}>{formatPrice(item.price * item.quantity + (item.addonsFlatSurcharge ?? 0))}</div>
                           {item.quantity > 1 && (
-                            <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{formatPrice(item.price)} × {item.quantity}{(item.addonsFlatSurcharge ?? 0) > 0 ? ` + ₪${item.addonsFlatSurcharge} חד־פעמי` : ''}</div>
+                            <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{formatPrice(item.price)} × {item.quantity}{(item.addonsFlatSurcharge ?? 0) > 0 ? ` + ₪${item.addonsFlatSurcharge} ${t('cart.oneTime')}` : ''}</div>
                           )}
                         </div>
                       </>
@@ -422,7 +424,7 @@ export default function CartPage() {
               <div style={{ marginTop: 12 }}>
                 <button onClick={() => router.push('/')}
                   style={{ background: 'none', border: 'none', color: '#0e6ba8', fontSize: 13, cursor: 'pointer', padding: 0 }}>
-                  ← המשך בקנייה
+                  ← {t('action.continueShopping')}
                 </button>
               </div>
             </div>
@@ -439,30 +441,30 @@ export default function CartPage() {
               {/* Pricing breakdown */}
               <div style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
-                  <span style={{ color: '#555' }}>סכום ביניים ({totalItems} פריטים):</span>
+                  <span style={{ color: '#555' }}>{t('cart.subtotalCount').replace('{n}', String(totalItems))}</span>
                   <span style={{ fontWeight: 700 }}>{formatPrice(total + bundleDiscountAmount)}</span>
                 </div>
                 {bundleDiscountAmount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
-                    <span>🎁 מבצע כיפות: 2nd ב-10%, 3+ ב-15%</span>
+                    <span>{t('cart.kippotPromoLine')}</span>
                     <span>-{formatPrice(bundleDiscountAmount)}</span>
                   </div>
                 )}
                 <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '8px 10px', marginBottom: 8, fontSize: 12.5, color: '#15803d', fontWeight: 700, textAlign: 'center' }}>
-                  💡 אופן המשלוח (משלוח / איסוף) ודמי המשלוח יחושבו בדף התשלום
+                  {t('cart.shippingNote')}
                 </div>
                 {appliedCoupon && discountAmount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, color: '#15803d', fontWeight: 700 }}>
-                    <span>{appliedCoupon.type === 'simcha' ? '🎉 הנחת מבצע SIMCHA:' : `🏷️ קופון (${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`}):`}</span>
+                    <span>{appliedCoupon.type === 'simcha' ? t('cart.simchaDiscount') : `🏷️ ${t('cart.couponLabel')} (${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`}):`}</span>
                     <span>-{formatPrice(discountAmount)}</span>
                   </div>
                 )}
                 <div style={{ borderTop: '1px solid #eee', paddingTop: 12, marginTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 900 }}>
-                    <span>סה"כ לתשלום:</span>
+                    <span>{t('cart.totalDue')}</span>
                     <span style={{ color: 'var(--ys-text)' }}>{formatPrice(cartFinalTotal)}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>כולל מע״מ</div>
+                  <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>{t('cart.inclVat')}</div>
                 </div>
               </div>
 
@@ -473,14 +475,14 @@ export default function CartPage() {
 
               {/* Coupon section */}
               <div style={{ marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid #eee' }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8 }}>🏷️ קוד קופון</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8 }}>{t('cart.couponTitle')}</div>
                 {appliedCoupon ? (
                   <>
                   <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: 12, color: '#15803d', fontWeight: 700 }}>
-                      ✓ {appliedCoupon.code} — {appliedCoupon.type === 'simcha' ? 'מבצע אירועים' : `${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} הנחה`}
+                      ✓ {appliedCoupon.code} — {appliedCoupon.type === 'simcha' ? t('cart.eventPromo') : `${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`} ${t('card.off')}`}
                     </span>
-                    <button onClick={() => setAppliedCoupon(null)} aria-label="הסרת הקופון" style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 2px' }}>×</button>
+                    <button onClick={() => setAppliedCoupon(null)} aria-label={t('cart.removeCoupon')} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 2px' }}>×</button>
                   </div>
                   {appliedCoupon.type === 'simcha' && simchaResult && (
                     <div style={{ marginTop: 8, background: simchaResult.totalDiscount > 0 ? '#f0fdf4' : '#fffbeb', border: `1px solid ${simchaResult.totalDiscount > 0 ? '#86efac' : '#fcd34d'}`, borderRadius: 10, padding: '10px 12px' }}>
@@ -510,7 +512,7 @@ export default function CartPage() {
                       value={couponInput}
                       onChange={e => setCouponInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && applyCoupon()}
-                      placeholder="הזן קוד קופון"
+                      placeholder={t('cart.couponPlaceholder')}
                       style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit', background: '#fff', color: 'var(--ys-text)' }}
                     />
                     <button
@@ -518,7 +520,7 @@ export default function CartPage() {
                       disabled={couponLoading}
                       style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: couponLoading ? 'default' : 'pointer', opacity: couponLoading ? 0.5 : 1, whiteSpace: 'nowrap' }}
                     >
-                      {couponLoading ? '...' : 'החל'}
+                      {couponLoading ? '...' : t('cart.apply')}
                     </button>
                   </div>
                 )}
@@ -526,12 +528,12 @@ export default function CartPage() {
                 {/* כיפות לאירועים בכמויות — כבר במחירי מדרגות; קופונים לא חלים עליהן */}
                 {appliedCoupon && appliedCoupon.type !== 'simcha' && items.some(isBulkEventKippotLine) && (
                   <div style={{ marginTop: 8, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 10, padding: '8px 12px', fontSize: 11.5, fontWeight: 700, lineHeight: 1.6, color: '#92400e' }}>
-                    🏷️ הכיפות לאירועים בסל כבר כוללות הנחת כמות (מחיר מדרגות מוזל) — קוד הקופון חל על שאר המוצרים בלבד.
+                    {t('cart.kippotCouponNote')}
                   </div>
                 )}
                 {!appliedCoupon && (
                   <div style={{ fontSize: 11, color: '#888', marginTop: 6, lineHeight: 1.5 }}>
-                    קוד ההצטרפות של 5% מתקבל לאחר ההצטרפות למועדון ונשלח גם למייל.
+                    {t('cart.clubCodeNote')}
                   </div>
                 )}
               </div>
@@ -542,7 +544,7 @@ export default function CartPage() {
                   {giftEligible && giftOptions.length > 0 ? (
                     <>
                       <div style={{ fontSize: 13, fontWeight: 800, color: '#1a6b3c', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
-                        🎁 {giftOptions.length === 1 ? 'קיבלת מתנה חינם!' : 'בחר מתנה חינם!'}
+                        {giftOptions.length === 1 ? t('cart.giftReceived') : t('cart.chooseGift')}
                       </div>
                       {giftOptions.length === 1 ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '8px 10px' }}>
@@ -550,7 +552,7 @@ export default function CartPage() {
                             <img src={optimizeCloudinaryUrl(giftOptions[0].imgUrl, 100)} alt={giftOptions[0].name} style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />
                           )}
                           <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ys-text)' }}>{giftOptions[0].name}</span>
-                          <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>חינם</span>
+                          <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>{t('cart.free')}</span>
                         </div>
                       ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -559,7 +561,7 @@ export default function CartPage() {
                               <input type="radio" name="gift" value={g.id} checked={selectedGift === g.id} onChange={() => setSelectedGift(g.id)} style={{ accentColor: '#1a6b3c', flexShrink: 0 }} />
                               {g.imgUrl && <img src={optimizeCloudinaryUrl(g.imgUrl, 100)} alt={g.name} style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />}
                               <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ys-text)' }}>{g.name}</span>
-                              <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>חינם</span>
+                              <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>{t('cart.free')}</span>
                             </label>
                           ))}
                         </div>
@@ -601,9 +603,9 @@ export default function CartPage() {
                       {/* Text + bar */}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ color: '#fff', fontSize: 12, fontWeight: 600, marginBottom: 5 }}>
-                          הוסף עוד{' '}
+                          {t('cart.addMore')}{' '}
                           <strong style={{ color: '#E6C25A' }}>{formatPrice(amountToGift)}</strong>
-                          {' '}לקבלת מתנה חינם
+                          {' '}{t('cart.forFreeGift')}
                         </div>
                         <div style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 9999, height: 4, overflow: 'hidden' }}>
                           <div style={{
@@ -630,27 +632,27 @@ export default function CartPage() {
                   router.push('/checkout');
                 }}
                 style={{ width: '100%', background: '#C9A227', color: '#1F3D8F', border: 'none', borderRadius: 14, height: 52, fontSize: 15, fontWeight: 800, cursor: 'pointer', marginBottom: 10 }}>
-                המשך לתשלום →
+                {t('action.checkout')} →
               </button>
 
               <button onClick={() => router.push('/')}
                 style={{ width: '100%', background: '#FFFFFF', color: 'var(--ys-text)', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                המשך בקנייה
+                {t('action.continueShopping')}
               </button>
 
               {user?.role === 'admin' && (
                 <div style={{ marginTop: 12 }}>
                   {!shareUrl ? (
                     <button onClick={shareCart} disabled={shareLoading} style={{ width: '100%', background: '#f8f4ec', color: 'var(--ys-text)', border: '1.5px solid var(--ys-accent)', borderRadius: 12, height: 44, fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: shareLoading ? 0.6 : 1 }}>
-                      {shareLoading ? '...' : '🔗 שתף עגלה'}
+                      {shareLoading ? '...' : t('cart.share')}
                     </button>
                   ) : (
                     <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '10px 12px' }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#15803d', marginBottom: 6 }}>✓ קישור שיתוף מוכן</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#15803d', marginBottom: 6 }}>{t('cart.shareReady')}</div>
                       <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                         <input readOnly value={shareUrl} style={{ flex: 1, fontSize: 11, border: '1px solid #d1fae5', borderRadius: 8, padding: '6px 8px', background: '#fff', color: '#333', direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} />
                         <button onClick={copyShareUrl} style={{ flexShrink: 0, background: shareCopied ? '#16a34a' : '#1a1a1a', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                          {shareCopied ? '✓ הועתק' : 'העתק'}
+                          {shareCopied ? t('cart.copied') : t('cart.copy')}
                         </button>
                       </div>
                     </div>
@@ -673,7 +675,7 @@ export default function CartPage() {
       </div>
 
       {/* FAQ ממוקד לעגלה — מבצעים, קופונים, נקודות ומשלוח (מקור: data/faq.ts) */}
-      <PageFaqSection pageKey="cart" title="שאלות נפוצות לפני התשלום" max={6} showWhatsAppCta={false} />
+      <PageFaqSection pageKey="cart" title={t('cart.faqTitle')} max={6} showWhatsAppCta={false} />
 
       {/* עורך כיפה — עריכת עיצוב קיים מהסל (תוספת אדיטיבית) */}
       {editingDesignItem?.customDesign && (
