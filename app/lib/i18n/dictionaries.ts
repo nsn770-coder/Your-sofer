@@ -223,6 +223,7 @@ export const he = {
   'cart.shareError': 'שגיאה ביצירת קישור שיתוף',
   'cart.serverError': 'שגיאת שרת',
   'cart.faqTitle': 'שאלות נפוצות לפני התשלום',
+  'cart.chargedInIls': 'ההערכה במטבע שלכם היא לנוחות בלבד — החיוב בפועל מתבצע בשקלים.',
 } as const;
 
 export type DictKey = keyof typeof he;
@@ -434,6 +435,7 @@ export const en: Dict = {
   'cart.shareError': 'Could not create a share link',
   'cart.serverError': 'Server error',
   'cart.faqTitle': 'Common questions before checkout',
+  'cart.chargedInIls': 'The amount in your currency is an estimate for convenience — your card is charged in ILS.',
 };
 
 export const fr: Dict = {
@@ -642,6 +644,7 @@ export const fr: Dict = {
   'cart.shareError': 'Impossible de créer le lien de partage',
   'cart.serverError': 'Erreur serveur',
   'cart.faqTitle': 'Questions fréquentes avant le paiement',
+  'cart.chargedInIls': 'Le montant dans votre devise est une estimation — le débit est effectué en shekels (ILS).',
 };
 
 export const es: Dict = {
@@ -850,6 +853,7 @@ export const es: Dict = {
   'cart.shareError': 'No se pudo crear el enlace',
   'cart.serverError': 'Error del servidor',
   'cart.faqTitle': 'Preguntas frecuentes antes de pagar',
+  'cart.chargedInIls': 'El importe en tu moneda es una estimación — el cargo se realiza en shékels (ILS).',
 };
 
 export const ar: Dict = {
@@ -1058,6 +1062,7 @@ export const ar: Dict = {
   'cart.shareError': 'تعذّر إنشاء رابط المشاركة',
   'cart.serverError': 'خطأ في الخادم',
   'cart.faqTitle': 'أسئلة شائعة قبل الدفع',
+  'cart.chargedInIls': 'المبلغ بعملتك تقديري للتسهيل — الخصم الفعلي يتم بالشيكل (ILS).',
 };
 
 export const ru: Dict = {
@@ -1266,6 +1271,7 @@ export const ru: Dict = {
   'cart.shareError': 'Не удалось создать ссылку',
   'cart.serverError': 'Ошибка сервера',
   'cart.faqTitle': 'Частые вопросы перед оплатой',
+  'cart.chargedInIls': 'Сумма в вашей валюте — приблизительная оценка. Списание производится в шекелях (ILS).',
 };
 
 export const DICTIONARIES: Record<string, Dict> = { he, en, fr, es, ar, ru };

@@ -18,9 +18,12 @@ import TrustCluster from '../components/trust/TrustCluster';
 import ReviewProof from '../components/trust/ReviewProof';
 import PageFaqSection from '../components/faq/PageFaqSection';
 import { useT } from '@/app/lib/i18n/useT';
+import PriceApprox from '@/app/components/PriceApprox';
+import { useFx } from '@/app/lib/i18n/useFx';
 
 export default function CartPage() {
   const { t } = useT();
+  const fx = useFx();
   const router = useRouter();
   const {
     items, removeItem, updateQty, total,
@@ -464,7 +467,16 @@ export default function CartPage() {
                     <span>{t('cart.totalDue')}</span>
                     <span style={{ color: 'var(--ys-text)' }}>{formatPrice(cartFinalTotal)}</span>
                   </div>
+                  {/* הערכה במטבע הלקוח — תצוגה בלבד, החיוב בשקלים */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <PriceApprox ils={cartFinalTotal} style={{ fontSize: 13 }} />
+                  </div>
                   <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>{t('cart.inclVat')}</div>
+                  {fx.enabled && (
+                    <div style={{ fontSize: 10.5, color: '#9CA3AF', marginTop: 6, lineHeight: 1.5 }}>
+                      {t('cart.chargedInIls')}
+                    </div>
+                  )}
                 </div>
               </div>
 

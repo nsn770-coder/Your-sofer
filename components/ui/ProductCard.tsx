@@ -9,6 +9,7 @@ import { db } from '@/app/firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice, effectivePrice as computeEffectivePrice, type EffectivePriceFields } from '@/app/lib/utils';
 import { useT } from '@/app/lib/i18n/useT';
+import PriceApprox from '@/app/components/PriceApprox';
 
 interface Props {
   id: string;
@@ -388,6 +389,8 @@ export default function ProductCard({
           ) : hasSale ? (
             <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(compareAt!)}</span>
           ) : null}
+          {/* הערכה במטבע הלקוח — מוצגת רק בשפות שאינן עברית */}
+          <PriceApprox ils={displayPrice} />
         </div>
 
         {/* Kippot promo text */}
