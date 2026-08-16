@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { hreflangAlternates } from "@/app/lib/i18n/config";
 import { Suspense } from "react";
 import Script from "next/script";
 import "./globals.css";
@@ -65,7 +66,8 @@ export const metadata: Metadata = {
     description: 'מעל 5,000 מוצרים לבית היהודי: תכשיטים ומתנות בעיצוב אישי, 800+ סוגי כיפות, מזכרות לאירועים.',
     images: ['/og-default.png'],
   },
-  alternates: {},
+  // hreflang — מצהיר לגוגל על כל גרסאות השפה של דף הבית
+  alternates: { languages: hreflangAlternates('/', BASE_URL) },
   // הלוגו המקורי (דמות הסופר) מקלאודינרי באיכות מלאה — 96×96 (כפולה של 48, דרישת גוגל)
   icons: {
     icon: [

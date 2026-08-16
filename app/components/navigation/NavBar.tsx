@@ -11,6 +11,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useShaliach } from "@/app/contexts/ShaliachContext";
 import { getTier, getNextTierInfo } from "@/app/lib/loyalty";
 import MobileDrawerMenu from "./MobileDrawerMenu";
+import LanguageSwitcher from "@/app/components/LanguageSwitcher";
 import lifeEvents from "@/data/lifeEvents";
 import AlgoliaSearch from "@/app/components/search/AlgoliaSearch";
 // CouponStrip אוחד לתוך AnnouncementBar (08/2026)
@@ -261,6 +262,9 @@ function NavBarContent() {
           <div className="lg:hidden" style={{ flex: 1 }} />
 
           <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexShrink: 0 }}>
+
+            {/* ── בורר שפה (דגלים) ── */}
+            <LanguageSwitcher compact={isMobile} />
 
             {/* ── אייקון משתמש + תפריט נפתח ── */}
             <div ref={userMenuRef} style={{ position: "relative" }}>
