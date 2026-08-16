@@ -5,6 +5,7 @@ import { MEGA_MENU_DATA, categoryUrl } from '@/data/categoriesMenu';
 import PaymentMethodsRow from './trust/PaymentMethodsRow';
 import { BUSINESS, TRUST_TEXT } from '@/app/config/siteTrust';
 import { buildWhatsAppLink, WA_PREFILL } from '@/lib/whatsapp';
+import { useT } from '@/app/lib/i18n/useT';
 
 const WA_LINK = buildWhatsAppLink(WA_PREFILL.general);
 
@@ -14,75 +15,84 @@ interface Column { title: string; links: LinkItem[]; }
 // ── All categories + subcategories, derived from the same data as the mega menu ──
 interface CatBlock { title: string; path: string; subs: LinkItem[] }
 
-const CATEGORY_BLOCKS: CatBlock[] = [
-  ...MEGA_MENU_DATA.map(item => {
-    const seen = new Set<string>();
-    const subs: LinkItem[] = [];
-    for (const col of item.columns) {
-      for (const s of col.items) {
-        if (!s.filter && s.label.startsWith('כל')) continue; // "כל X" — the block title already links there
-        const key = `${s.cat}|${s.filter ?? ''}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        subs.push({ label: s.label, path: categoryUrl(s.cat, s.filter) });
-      }
-    }
-    return { title: item.label, path: categoryUrl(item.cat), subs };
-  }),
-  {
-    title: 'בר מצווה',
-    path: '/bar-mitzva',
-    subs: [
-      { label: 'סט בר מצווה',    path: '/bar-mitzva' },
-      { label: 'כיפות ומזכרות לאירועים', path: '/event-kippot' },
-    ],
-  },
-];
-
-const COLUMNS: Column[] = [
-  {
-    title: 'שירות לקוחות',
-    links: [
-      { label: 'שאלות ותשובות',  path: '/faq' },
-      { label: 'מדיניות החזרות', path: '/legal/returns' },
-      { label: 'צור קשר',        path: '/contact' },
-      { label: 'וואטסאפ',        href: WA_LINK },
-    ],
-  },
-  {
-    title: 'אמון וכשרות',
-    links: [
-      { label: 'הסופרים שלנו',  path: '/soferim' },
-      { label: 'בדיקת מגיה',    path: '/kashrut' },
-      { label: 'תעודות כשרות',  path: '/kashrut' },
-      { label: 'מי אנחנו',      path: '/about' },
-    ],
-  },
-  {
-    title: 'מידע',
-    links: [
-      { label: 'מדריך לעולם הסת״ם', path: '/madrich' },
-      { label: 'תקנון האתר',          path: '/legal/takanon' },
-      { label: 'מדיניות פרטיות',      path: '/legal/privacy' },
-      { label: 'משלוחים',              path: '/legal/shipping' },
-      { label: 'נגישות',               path: '/legal/accessibility' },
-      { label: 'שאלות ותשובות',        path: '/faq' },
-      { label: 'מדריך שאלות הלכתיות',  path: '/madrich/faq' },
-    ],
-  },
-  {
-    title: 'הצטרפו אלינו',
-    links: [
-      { label: 'הצטרף כסופר',     path: '/soferim/apply' },
-      { label: 'הצטרף כרב קהילה', path: '/join/apply' },
-      { label: 'שותף עסקי',       path: '/partner-signup' },
-    ],
-  },
-];
-
 export default function Footer() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t, tc, dir, locale } = useT();
+
+  // התוויות מתורגמות לפי השפה; ה-cat/filter נשארים בעברית — הם ערכי Firestore
+  // ומרכיבי ה-URL, ושינויָם היה שובר כל שאילתה בקטלוג.
+  const CATEGORY_BLOCKS: CatBlock[] = [
+    ...MEGA_MENU_DATA.map(item => {
+      const seen = new Set<string>();
+      const subs: LinkItem[] = [];
+      for (const col of item.columns) {
+        for (const s of col.items) {
+          if (!s.filter && s.label.startsWith('כל')) continue; // "כל X" — the block title already links there
+          const key = `${s.cat}|${s.filter ?? ''}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          const translated = tc(s.filter ?? s.cat);
+          subs.push({
+            label: translated && translated !== (s.filter ?? s.cat) ? translated : s.label,
+            path: categoryUrl(s.cat, s.filter),
+          });
+        }
+      }
+      const title = tc(item.cat);
+      return { title: title && title !== item.cat ? title : item.label, path: categoryUrl(item.cat), subs };
+    }),
+    {
+      title: tc('בר מצווה'),
+      path: '/bar-mitzva',
+      subs: [
+        { label: t('footer.barMitzvahSet'), path: '/bar-mitzva' },
+        { label: t('nav.eventKippot'),      path: '/event-kippot' },
+      ],
+    },
+  ];
+
+  const COLUMNS: Column[] = [
+    {
+      title: t('footer.customerService'),
+      links: [
+        { label: t('footer.faq'),      path: '/faq' },
+        { label: t('footer.returns'),  path: '/legal/returns' },
+        { label: t('footer.contact'),  path: '/contact' },
+        { label: t('footer.whatsapp'), href: WA_LINK },
+      ],
+    },
+    {
+      title: t('footer.trustTitle'),
+      links: [
+        { label: t('footer.ourScribes'),   path: '/soferim' },
+        { label: t('footer.proofreading'), path: '/kashrut' },
+        { label: t('footer.kashrutCerts'), path: '/kashrut' },
+        { label: t('footer.about'),        path: '/about' },
+      ],
+    },
+    {
+      title: t('footer.infoTitle'),
+      links: [
+        { label: t('footer.stamGuide'),      path: '/madrich' },
+        { label: t('footer.terms'),          path: '/legal/takanon' },
+        { label: t('footer.privacy'),        path: '/legal/privacy' },
+        { label: t('footer.shippingPolicy'), path: '/legal/shipping' },
+        { label: t('footer.accessibility'),  path: '/legal/accessibility' },
+        { label: t('footer.faq'),            path: '/faq' },
+        { label: t('footer.halachicFaq'),    path: '/madrich/faq' },
+      ],
+    },
+    {
+      title: t('footer.joinTitle'),
+      links: [
+        { label: t('footer.joinScribe'),      path: '/soferim/apply' },
+        { label: t('footer.joinRabbi'),       path: '/join/apply' },
+        { label: t('footer.businessPartner'), path: '/partner-signup' },
+      ],
+    },
+  ];
+
   const [isMobile, setIsMobile] = useState(false);
   const [openCols, setOpenCols] = useState<Set<number>>(new Set());
   const [openCats, setOpenCats] = useState<Set<number>>(new Set());
@@ -127,7 +137,7 @@ export default function Footer() {
     border: 'none',
     padding: 0,
     fontFamily: 'inherit',
-    textAlign: 'right',
+    textAlign: dir === 'rtl' ? 'right' : 'left',
   };
 
   function NavLink({ label, path, href }: LinkItem) {
@@ -168,7 +178,7 @@ export default function Footer() {
         @media (max-width: 1023px) { .ys-footer-cats { columns: 4 150px; } }
       `}</style>
 
-      <footer dir="rtl" style={{ background: '#1F2937', color: '#F9FAFB' }}>
+      <footer dir={dir} style={{ background: '#1F2937', color: '#F9FAFB' }}>
 
         {/* Top section */}
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '32px 20px 24px' : '48px 24px 32px' }}>
@@ -177,7 +187,7 @@ export default function Footer() {
               Your Sofer
             </div>
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
-              אתר היודאיקה הגדול בישראל — כיפות, מתנות ומזכרות לאירועים
+              {t('footer.tagline')}
             </div>
           </div>
 
@@ -193,7 +203,7 @@ export default function Footer() {
                   borderBottom: '1px solid rgba(255,255,255,0.08)',
                 }}
               >
-                <span style={{ ...colTitleStyle, marginBottom: 0 }}>קטגוריות</span>
+                <span style={{ ...colTitleStyle, marginBottom: 0 }}>{t('footer.categories')}</span>
                 <svg
                   width="13" height="13" viewBox="0 0 24 24" fill="none"
                   stroke="rgba(255,255,255,0.5)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
@@ -203,7 +213,7 @@ export default function Footer() {
                 </svg>
               </button>
             ) : (
-              <div style={{ ...colTitleStyle, marginBottom: 18 }}>קטגוריות</div>
+              <div style={{ ...colTitleStyle, marginBottom: 18 }}>{t('footer.categories')}</div>
             )}
 
             {isMobile ? (
@@ -242,7 +252,7 @@ export default function Footer() {
                         paddingBottom: isOpen ? 12 : 0,
                         paddingRight: 10,
                       }}>
-                        <NavLink label={`לכל ${block.title} ←`} path={block.path} />
+                        <NavLink label={t('footer.allOf').replace('{x}', block.title)} path={block.path} />
                         {block.subs.map(s => (
                           <NavLink key={`${s.label}-${s.path}`} {...s} />
                         ))}
@@ -262,7 +272,7 @@ export default function Footer() {
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.9)'; }}
                       style={{
                         background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                        fontFamily: 'inherit', textAlign: 'right', display: 'block',
+                        fontFamily: 'inherit', textAlign: dir === 'rtl' ? 'right' : 'left', display: 'block',
                         fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
                         marginBottom: 8, borderBottom: '1px solid rgba(201,162,39,0.35)', paddingBottom: 5,
                         width: '100%',
@@ -334,7 +344,11 @@ export default function Footer() {
           color: 'rgba(255,255,255,0.7)',
         }}>
           <div style={{ marginBottom: 8, fontSize: 13, color: 'rgba(255,255,255,0.85)', fontWeight: 600 }}>
-            {BUSINESS.name} — בבעלות ובניהול {BUSINESS.legalName}, עוסק מורשה {BUSINESS.businessNumber}
+            {/* הנוסח המשפטי העברי הוא הנוסח המחייב — בשפות אחרות מוצגים הפרטים
+                העובדתיים בלבד, בלי לתרגם מונח רשמי כמו "עוסק מורשה". */}
+            {locale === 'he'
+              ? <>{BUSINESS.name} — בבעלות ובניהול {BUSINESS.legalName}, עוסק מורשה {BUSINESS.businessNumber}</>
+              : <>{BUSINESS.name} — {BUSINESS.legalName} · {BUSINESS.businessNumber}</>}
           </div>
           <div style={{ marginBottom: 14, fontSize: 13, color: 'rgba(255,255,255,0.75)', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px 16px' }}>
             <span>📍 {BUSINESS.address}</span>
@@ -350,7 +364,7 @@ export default function Footer() {
               {TRUST_TEXT.paymentBody}
             </div>
           </div>
-          <span style={{ color: 'rgba(255,255,255,0.55)' }}>© 2026 {BUSINESS.name} — כל הזכויות שמורות</span>
+          <span style={{ color: 'rgba(255,255,255,0.55)' }}>© 2026 {BUSINESS.name} — {t('footer.rights')}</span>
         </div>
 
       </footer>
