@@ -13,6 +13,12 @@ export interface KippaDesign {
   fontSize: number;
   fontFamily: string;
   position: 'top' | 'center' | 'bottom';
+  /**
+   * הזזה חופשית של הטקסט ביחס לעוגן ה-position — יחסית לגודל הקנבס
+   * (‎-0.45..0.45‎), כך שהמיקום זהה בתצוגה ובייצוא ההדפסה.
+   * חסר / {0,0} = בדיוק על העוגן (ההתנהגות הקודמת).
+   */
+  offset?: { x: number; y: number };
   quantity: number;
   /** תמונת preview שהועלתה ל-Cloudinary (PNG באיכות הדפסה, pixelRatio 3) */
   previewImageUrl: string;
