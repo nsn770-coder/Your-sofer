@@ -214,7 +214,7 @@ async function handleLegacyShipment(
     destination_phone: order.phone || '',
     destination_email: order.email || '',
     line_items: lineItems,
-    notes: `הזמנה YourSofer #${order.orderNumber || orderId}`,
+    notes: order.notes || `הזמנה YourSofer #${order.orderNumber || orderId}`,
   };
 
   const { ok, status, data } = await callLionWheel(lionWheelPayload, apiKey);
@@ -327,7 +327,7 @@ async function handleMultiWarehouseShipment(
     destination_phone: destinationAddress?.phone || order.phone || '',
     destination_email: order.email || '',
     line_items: lineItems,
-    notes: `הזמנה YourSofer #${order.orderNumber || orderId} — משלוח ${shipmentId}`,
+    notes: order.notes || `הזמנה YourSofer #${order.orderNumber || orderId} — משלוח ${shipmentId}`,
   };
 
   const { ok, status, data } = await callLionWheel(lionWheelPayload, apiKey);
