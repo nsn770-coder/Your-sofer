@@ -72,3 +72,33 @@ export function getCloudinaryUrl(
   const base = 'https://res.cloudinary.com/dyxzq3ucy/image/upload';
   return `${base}/${transforms[context]}/${urlOrPublicId}`;
 }
+// ── Hero banners — format/quality only, never resize ──────────────────────────
+/**
+ * PERF (08/2026): כתובות באנרי ה-Hero נשמרות ב-Firestore כקישור Cloudinary גולמי,
+ * ולכן הדפדפן מקבל את **קובץ המקור** — PNG של ~1MB לכל שקופית (ארבע השקופיות
+ * הפעילות ≈ 4.2MB, והראשונה היא ה-LCP במובייל).
+ *
+ * מוסיפים f_auto,q_auto בלבד — בלי w_, בלי c_, בלי שום שינוי ממדים: אותה תמונה,
+ * אותו רוחב וגובה, אותו crop, אותו יחס. רק הפורמט והדחיסה נבחרים אוטומטית
+ * (WebP/AVIF בדפדפנים שתומכים). נמדד: 988KB→65KB במובייל, 830KB→53KB בדסקטופ,
+ * באותם 1080×810 / 1400×480 בדיוק.
+ *
+ * שמרנות בכוונה: נוגעים אך ורק בכתובת בצורה
+ *   https://res.cloudinary.com/<cloud>/image/upload/v<digits>/<path>
+ * כלומר כתובת שאין בה כבר טרנספורמציה. כל צורה אחרת — תיקייה ללא גרסה, כתובת
+ * שכבר עברה אופטימיזציה, או דומיין אחר — מוחזרת כמו שהיא, כדי שלא תישבר תמונה.
+ *
+ * ⚠️ הפונקציה יושבת כאן ולא ב-HeroCarousel.tsx בכוונה: HeroCarousel הוא
+ * 'use client', ו-app/page.tsx (server component) חייב לקרוא לה בזמן בנייה כדי
+ * לבנות את ה-preload. קריאה לפונקציה שמיוצאת ממודול 'use client' מהשרת נכשלת
+ * ב-build ("Attempted to call heroSrc() from the server").
+ */
+const CLD_RAW_RE = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/;
+
+export function heroSrc(url: string): string;
+export function heroSrc(url: string | undefined): string | undefined;
+export function heroSrc(url: string | undefined): string | undefined {
+  if (!url) return url;
+  const m = CLD_RAW_RE.exec(url);
+  return m ? `${m[1]}f_auto,q_auto/${m[2]}` : url;
+}

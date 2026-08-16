@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from 'next';
 import HomePageClient from './HomePageClient';
 import PageFaqSection from '@/app/components/faq/PageFaqSection';
-import { heroSrc } from '@/app/components/HeroCarousel';
+import { heroSrc } from '@/lib/cloudinary';
 
 /**
  * סדר השאלות בדף הבית — מפורש בכוונה.
