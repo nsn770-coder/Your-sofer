@@ -71,6 +71,12 @@ interface Order {
   email?: string;
   phone?: string;
   address?: string;
+  // שדות כתובת מפוצלים — נדרשים ע"י LionWheel; חייבים להתעדכן יחד עם address
+  city?: string;
+  street?: string;
+  houseNumber?: string;
+  apartment?: string;
+  zipCode?: string;
   notes?: string;
   shippingCost?: number;
   shippingType?: string;
@@ -2217,6 +2223,10 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
   const [editDraft, setEditDraft] = useState<{
     customerName: string; phone: string; email: string;
     address: string; notes: string; items: OrderItem[];
+    city: string; street: string; houseNumber: string; apartment: string; zipCode: string;
+    shippingCost: number;
+    /** עקיפת סכום ידנית — מעדכנת total בלבד; paymentTotal (מה שבאמת חויב) נשאר נעול */
+    overrideTotal: boolean; totalOverride: number;
   } | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
   const [itemSearchQuery, setItemSearchQuery] = useState('');
@@ -2329,7 +2339,20 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
       email: o.email || '',
       address: o.address || '',
       notes: o.notes || '',
-      items: (o.items || []).map(it => ({ ...it })),
+      // עותק עמוק — כדי שעריכת printCustomization לא תשנה את ה-state המקורי
+      items: (o.items || []).map(it => ({
+        ...it,
+        printCustomization: it.printCustomization ? { ...it.printCustomization } : it.printCustomization,
+        customDesign: it.customDesign ? { ...it.customDesign } : it.customDesign,
+      })),
+      city: o.city || '',
+      street: o.street || '',
+      houseNumber: o.houseNumber || '',
+      apartment: o.apartment || '',
+      zipCode: o.zipCode || '',
+      shippingCost: o.shippingCost ?? 0,
+      overrideTotal: false,
+      totalOverride: o.total ?? 0,
     });
     setItemSearchQuery('');
     setItemSearchResults([]);
@@ -2347,6 +2370,28 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
       if (!d) return d;
       const items = d.items.map((it, i) => i === idx ? { ...it, [field]: value } : it);
       return { ...d, items };
+    });
+  }
+
+  /** עדכון שדה חופשי בפריט (שם וכו') */
+  function patchDraftItem(idx: number, patch: Partial<OrderItem>) {
+    setEditDraft(d => d ? { ...d, items: d.items.map((it, i) => i === idx ? { ...it, ...patch } : it) } : d);
+  }
+
+  /** עדכון פרטי ההדפסה/העיצוב של פריט (סוג הדפסה, טקסט, גופן, קובץ לוגו...) */
+  function patchDraftPrint(idx: number, patch: Partial<PrintCustomizationData>) {
+    setEditDraft(d => {
+      if (!d) return d;
+      return {
+        ...d,
+        items: d.items.map((it, i) => {
+          if (i !== idx) return it;
+          const base: PrintCustomizationData = it.printCustomization ?? {
+            productType: 'kipa', side: 'top', bgRemoved: false,
+          };
+          return { ...it, printCustomization: { ...base, ...patch } };
+        }),
+      };
     });
   }
 
@@ -2417,16 +2462,30 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         address: editDraft.address,
         notes: editDraft.notes,
         items: updatedItems,
+        // שדות הכתובת המפוצלים — LionWheel קורא מהם, לכן חייבים להישמר יחד
+        city: editDraft.city,
+        street: editDraft.street,
+        houseNumber: editDraft.houseNumber,
+        apartment: editDraft.apartment,
+        zipCode: editDraft.zipCode,
+        shippingCost: editDraft.shippingCost,
       };
 
       if (!isPaid) {
         // Pre-payment: recalculate total normally
-        updateData.total = calcTotal(editDraft.items, o.shippingCost);
+        updateData.total = calcTotal(editDraft.items, editDraft.shippingCost);
       } else {
         // Post-payment: lock original total; stamp paymentTotal on first edit
         if (!o.paymentTotal) {
           updateData.paymentTotal = o.total;
         }
+      }
+
+      // עקיפת סכום ידנית — משנה רק את total (מה שמוצג/נגבה בהמשך).
+      // paymentTotal, שהוא "מה שהלקוח באמת שילם", לא נוגעים בו — דוחות ההכנסות
+      // והעמלות ממשיכים להסתמך עליו.
+      if (editDraft.overrideTotal) {
+        updateData.total = editDraft.totalOverride;
       }
 
       await updateDoc(doc(db, 'orders', o.id), updateData);
@@ -2440,7 +2499,9 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         note: '',
       });
 
-      const newTotal = isPaid ? o.total : calcTotal(editDraft.items, o.shippingCost);
+      const newTotal = editDraft.overrideTotal
+        ? editDraft.totalOverride
+        : isPaid ? o.total : calcTotal(editDraft.items, editDraft.shippingCost);
       setOrders(prev => prev.map(ord => ord.id === o.id ? {
         ...ord,
         customerName: editDraft.customerName,
@@ -2449,6 +2510,12 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
         address: editDraft.address,
         notes: editDraft.notes,
         items: updatedItems,
+        city: editDraft.city,
+        street: editDraft.street,
+        houseNumber: editDraft.houseNumber,
+        apartment: editDraft.apartment,
+        zipCode: editDraft.zipCode,
+        shippingCost: editDraft.shippingCost,
         total: newTotal,
         paymentTotal: o.paymentTotal ?? (isPaid ? o.total : undefined),
       } : ord));
@@ -2888,13 +2955,54 @@ ${visibleOrders.map(orderBlock).join('\n')}
                                   <input value={editDraft.email} onChange={e => setEditDraft(d => d ? { ...d, email: e.target.value } : d)} className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs" dir="ltr" />
                                 </div>
                                 <div>
-                                  <label className="text-xs text-gray-500 block mb-1">כתובת</label>
+                                  <label className="text-xs text-gray-500 block mb-1">כתובת מלאה (מוצגת בהזמנה ובדף האריזה)</label>
                                   <input value={editDraft.address} onChange={e => setEditDraft(d => d ? { ...d, address: e.target.value } : d)} className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs" />
                                 </div>
                                 <div className="col-span-2">
                                   <label className="text-xs text-gray-500 block mb-1">הערות</label>
                                   <input value={editDraft.notes} onChange={e => setEditDraft(d => d ? { ...d, notes: e.target.value } : d)} className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs" />
                                 </div>
+                              </div>
+
+                              {/* ── כתובת מפוצלת — זה מה ש-LionWheel קורא ── */}
+                              <div className="mt-3 pt-3 border-t border-gray-100">
+                                <p className="text-[11px] text-gray-400 mb-2">
+                                  שדות משלוח (LionWheel) — עדכנו גם אותם כשמשנים כתובת, אחרת המשלוח ייווצר לכתובת הישנה
+                                </p>
+                                <div className="grid grid-cols-5 gap-2">
+                                  {([
+                                    ['city', 'עיר'],
+                                    ['street', 'רחוב'],
+                                    ['houseNumber', 'מס׳ בית'],
+                                    ['apartment', 'דירה'],
+                                    ['zipCode', 'מיקוד'],
+                                  ] as const).map(([key, label]) => (
+                                    <div key={key}>
+                                      <label className="text-xs text-gray-500 block mb-1">{label}</label>
+                                      <input
+                                        value={editDraft[key]}
+                                        onChange={e => { const v = e.target.value; setEditDraft(d => d ? { ...d, [key]: v } : d); }}
+                                        className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setEditDraft(d => {
+                                    if (!d) return d;
+                                    const parts = [
+                                      [d.street, d.houseNumber].filter(Boolean).join(' '),
+                                      d.apartment ? `דירה ${d.apartment}` : '',
+                                      d.city,
+                                      d.zipCode,
+                                    ].filter(Boolean);
+                                    return { ...d, address: parts.join(', ') };
+                                  })}
+                                  className="mt-2 text-[11px] px-2 py-1 border border-gray-300 rounded bg-white hover:bg-gray-50 text-gray-600"
+                                >
+                                  ↻ בנה את הכתובת המלאה מהשדות
+                                </button>
                               </div>
                             </div>
 
@@ -2903,31 +3011,140 @@ ${visibleOrders.map(orderBlock).join('\n')}
                               <p className="text-xs font-bold text-gray-400 mb-3">פריטים</p>
                               <div className="flex flex-col gap-2">
                                 {editDraft.items.map((item, idx) => (
-                                  <div key={idx} className="flex items-center gap-2 text-xs flex-wrap">
-                                    <span className="font-medium flex-1 min-w-0">{item.name}</span>
-                                    <label className="text-gray-400 shrink-0">כמות</label>
-                                    <input
-                                      type="number" min={1}
-                                      value={item.quantity}
-                                      onChange={e => updateDraftItem(idx, 'quantity', Math.max(1, Number(e.target.value) || 1))}
-                                      className="border border-gray-200 rounded px-2 py-1 w-16 text-center"
-                                    />
-                                    <label className="text-gray-400 shrink-0">מחיר ₪</label>
-                                    <input
-                                      type="number" min={0}
-                                      value={item.price}
-                                      onChange={e => updateDraftItem(idx, 'price', Number(e.target.value) || 0)}
-                                      className="border border-gray-200 rounded px-2 py-1 w-24 text-center"
-                                    />
-                                    <span className="text-green-700 font-bold shrink-0 w-20 text-left">
-                                      {formatPrice(item.price * item.quantity)}
-                                    </span>
-                                    <button
-                                      onClick={() => removeDraftItem(idx)}
-                                      className="text-xs text-red-600 border border-red-200 rounded px-2 py-1 hover:bg-red-50 shrink-0"
-                                    >
-                                      הסר פריט
-                                    </button>
+                                  <div key={idx} className="border border-gray-100 rounded-lg p-2">
+                                    <div className="flex items-center gap-2 text-xs flex-wrap">
+                                      <input
+                                        value={item.name}
+                                        onChange={e => patchDraftItem(idx, { name: e.target.value })}
+                                        className="font-medium flex-1 min-w-[180px] border border-gray-200 rounded px-2 py-1"
+                                        title="שם הפריט כפי שיופיע בהזמנה, במייל ובדף האריזה"
+                                      />
+                                      <label className="text-gray-400 shrink-0">כמות</label>
+                                      <input
+                                        type="number" min={1}
+                                        value={item.quantity}
+                                        onChange={e => updateDraftItem(idx, 'quantity', Math.max(1, Number(e.target.value) || 1))}
+                                        className="border border-gray-200 rounded px-2 py-1 w-16 text-center"
+                                      />
+                                      <label className="text-gray-400 shrink-0">מחיר ₪</label>
+                                      <input
+                                        type="number" min={0}
+                                        value={item.price}
+                                        onChange={e => updateDraftItem(idx, 'price', Number(e.target.value) || 0)}
+                                        className="border border-gray-200 rounded px-2 py-1 w-24 text-center"
+                                      />
+                                      <span className="text-green-700 font-bold shrink-0 w-20 text-left">
+                                        {formatPrice(item.price * item.quantity)}
+                                      </span>
+                                      <button
+                                        onClick={() => removeDraftItem(idx)}
+                                        className="text-xs text-red-600 border border-red-200 rounded px-2 py-1 hover:bg-red-50 shrink-0"
+                                      >
+                                        הסר פריט
+                                      </button>
+                                    </div>
+
+                                    {/* ── עריכת פרטי ההדפסה / העיצוב של הפריט ── */}
+                                    <details open={!!item.printCustomization} className="mt-2">
+                                      <summary className="cursor-pointer text-[11px] font-bold text-blue-800 select-none">
+                                        🖨️ פרטי הדפסה ועיצוב {item.printCustomization ? '' : '(אין — לחצו כדי להוסיף)'}
+                                      </summary>
+                                      <div className="mt-2 grid grid-cols-2 gap-2 bg-blue-50/40 border border-blue-100 rounded p-2">
+                                        <div>
+                                          <label className="text-[11px] text-gray-500 block mb-1">סוג הדפסה</label>
+                                          <select
+                                            value={item.printCustomization?.printType ?? ''}
+                                            onChange={e => {
+                                              const v = e.target.value;
+                                              // side נגזר מסוג ההדפסה — כך שגם הצ׳יפ בראש הכרטיס מתעדכן
+                                              patchDraftPrint(idx, { printType: v, side: v === 'print-bottom' ? 'bottom' : 'top' });
+                                            }}
+                                            className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs bg-white"
+                                          >
+                                            <option value="">— לא נבחר —</option>
+                                            {Object.entries(PRINT_TYPE_LABELS).map(([v, l]) => (
+                                              <option key={v} value={v}>{l}</option>
+                                            ))}
+                                          </select>
+                                        </div>
+                                        <div>
+                                          <label className="text-[11px] text-gray-500 block mb-1">דגם כיפה</label>
+                                          <input
+                                            value={item.printCustomization?.kippahLabel ?? ''}
+                                            onChange={e => patchDraftPrint(idx, { kippahLabel: e.target.value })}
+                                            className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
+                                          />
+                                        </div>
+                                        <div className="col-span-2">
+                                          <label className="text-[11px] text-gray-500 block mb-1">טקסט להדפסה</label>
+                                          <textarea
+                                            rows={2}
+                                            value={item.printCustomization?.designText ?? ''}
+                                            onChange={e => patchDraftPrint(idx, { designText: e.target.value })}
+                                            className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs resize-y"
+                                          />
+                                        </div>
+                                        <div className="col-span-2">
+                                          <label className="text-[11px] text-gray-500 block mb-1">טקסט לצד הנוסף</label>
+                                          <textarea
+                                            rows={2}
+                                            value={item.printCustomization?.addSideText ?? ''}
+                                            onChange={e => patchDraftPrint(idx, { addSideText: e.target.value })}
+                                            className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs resize-y"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-[11px] text-gray-500 block mb-1">גופן</label>
+                                          <input
+                                            value={item.printCustomization?.selectedFontLabel ?? ''}
+                                            onChange={e => patchDraftPrint(idx, { selectedFontLabel: e.target.value })}
+                                            className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-[11px] text-gray-500 block mb-1">דוגמת עיצוב</label>
+                                          <input
+                                            value={item.printCustomization?.designExample ?? ''}
+                                            onChange={e => patchDraftPrint(idx, { designExample: e.target.value })}
+                                            className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
+                                          />
+                                        </div>
+                                        <div className="col-span-2 flex items-center gap-2">
+                                          <input
+                                            id={`addside-${o.id}-${idx}`}
+                                            type="checkbox"
+                                            checked={!!item.printCustomization?.addSide}
+                                            onChange={e => patchDraftPrint(idx, { addSide: e.target.checked })}
+                                          />
+                                          <label htmlFor={`addside-${o.id}-${idx}`} className="text-[11px] text-gray-600">הדפסה בצד נוסף</label>
+                                        </div>
+                                        <div className="col-span-2">
+                                          <label className="text-[11px] text-gray-500 block mb-1">
+                                            קישור לקובץ הלוגו (Cloudinary) — אפשר להדביק כאן קובץ שהלקוח שלח בוואטסאפ
+                                          </label>
+                                          <input
+                                            value={item.printCustomization?.uploadedImageUrl ?? ''}
+                                            onChange={e => {
+                                              const v = e.target.value.trim();
+                                              patchDraftPrint(idx, { uploadedImageUrl: v, originalImageUrl: v });
+                                            }}
+                                            placeholder="https://res.cloudinary.com/..."
+                                            dir="ltr"
+                                            className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
+                                          />
+                                        </div>
+                                        <div className="col-span-2">
+                                          <label className="text-[11px] text-gray-500 block mb-1">קישור להדמיה (אופציונלי)</label>
+                                          <input
+                                            value={item.printCustomization?.mockupUrl ?? ''}
+                                            onChange={e => patchDraftPrint(idx, { mockupUrl: e.target.value.trim() })}
+                                            placeholder="https://res.cloudinary.com/..."
+                                            dir="ltr"
+                                            className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs"
+                                          />
+                                        </div>
+                                      </div>
+                                    </details>
                                   </div>
                                 ))}
                               </div>
@@ -2964,16 +3181,65 @@ ${visibleOrders.map(orderBlock).join('\n')}
                               </div>
                             </div>
 
+                            {/* ── משלוח + סכום ── */}
+                            <div className="bg-white border border-blue-100 rounded-lg px-4 py-3">
+                              <p className="text-xs font-bold text-gray-400 mb-3">משלוח וסכום</p>
+                              <div className="flex flex-wrap items-end gap-4">
+                                <div>
+                                  <label className="text-xs text-gray-500 block mb-1">עלות משלוח ₪</label>
+                                  <input
+                                    type="number" min={0}
+                                    value={editDraft.shippingCost}
+                                    onChange={e => { const v = Number(e.target.value) || 0; setEditDraft(d => d ? { ...d, shippingCost: v } : d); }}
+                                    className="border border-gray-200 rounded px-2 py-1.5 text-xs w-28 text-center"
+                                  />
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  סכום מחושב מהפריטים + משלוח:{' '}
+                                  <strong className="text-gray-700">{formatPrice(calcTotal(editDraft.items, editDraft.shippingCost))}</strong>
+                                </div>
+                              </div>
+
+                              <div className="mt-3 pt-3 border-t border-gray-100">
+                                <label className="flex items-center gap-2 text-xs text-gray-700">
+                                  <input
+                                    type="checkbox"
+                                    checked={editDraft.overrideTotal}
+                                    onChange={e => { const c = e.target.checked; setEditDraft(d => d ? { ...d, overrideTotal: c, totalOverride: c ? calcTotal(d.items, d.shippingCost) : d.totalOverride } : d); }}
+                                  />
+                                  קבע סכום הזמנה ידנית
+                                </label>
+                                {editDraft.overrideTotal && (
+                                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                                    <input
+                                      type="number" min={0}
+                                      value={editDraft.totalOverride}
+                                      onChange={e => { const v = Number(e.target.value) || 0; setEditDraft(d => d ? { ...d, totalOverride: v } : d); }}
+                                      className="border border-gray-300 rounded px-2 py-1.5 text-xs w-32 text-center"
+                                    />
+                                    <span className="text-[11px] text-amber-700">
+                                      משנה את סכום ההזמנה בלבד. הסכום שהלקוח באמת חויב בו נשמר בנפרד ולא משתנה —
+                                      דוחות ההכנסות והעמלות ממשיכים להסתמך עליו.
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
                             {/* ── סה"כ + כפתורי שמירה ── */}
                             <div className="flex items-center justify-between flex-wrap gap-3">
                               <div className="text-sm font-bold text-gray-700">
-                                {o.status !== 'pending_payment' && o.status !== 'cancelled' ? 'סה״כ ששולם (נעול):' : 'סה״כ מעודכן:'}{' '}
+                                {editDraft.overrideTotal
+                                  ? 'סה״כ (נקבע ידנית):'
+                                  : o.status !== 'pending_payment' && o.status !== 'cancelled' ? 'סה״כ ששולם (נעול):' : 'סה״כ מעודכן:'}{' '}
                                 <span className="text-green-700 text-base">
-                                  {o.status !== 'pending_payment' && o.status !== 'cancelled'
-                                    ? formatPrice(o.paymentTotal ?? o.total)
-                                    : formatPrice(calcTotal(editDraft.items, o.shippingCost))}
+                                  {editDraft.overrideTotal
+                                    ? formatPrice(editDraft.totalOverride)
+                                    : o.status !== 'pending_payment' && o.status !== 'cancelled'
+                                      ? formatPrice(o.paymentTotal ?? o.total)
+                                      : formatPrice(calcTotal(editDraft.items, editDraft.shippingCost))}
                                 </span>
-                                {o.shippingCost && (o.status === 'pending_payment' || o.status === 'cancelled') ? <span className="text-gray-400 font-normal text-xs mr-2">(כולל משלוח ₪{o.shippingCost})</span> : null}
+                                {editDraft.shippingCost && !editDraft.overrideTotal && (o.status === 'pending_payment' || o.status === 'cancelled') ? <span className="text-gray-400 font-normal text-xs mr-2">(כולל משלוח ₪{editDraft.shippingCost})</span> : null}
                               </div>
                               <div className="flex gap-2">
                                 <button onClick={cancelEdit} className="text-xs px-3 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 text-gray-600 font-medium">ביטול עריכה</button>
