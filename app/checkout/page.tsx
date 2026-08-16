@@ -1,7 +1,9 @@
 'use client';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart, CartItem, SHIPPING_REGULAR, FREE_SHIPPING_THRESHOLD } from '../contexts/CartContext';
+import { useCart, CartItem, SHIPPING_REGULAR, SHIPPING_INTERNATIONAL, FREE_SHIPPING_THRESHOLD } from '../contexts/CartContext';
+import { DEFAULT_COUNTRY, isInternational, sortedCountries, countryName } from '@/app/lib/i18n/countries';
+import { useT } from '@/app/lib/i18n/useT';
 import type { SimchaResult } from '../lib/promoRules';
 import { isBulkEventKippotLine } from '../lib/kippot';
 import { useShaliach } from '../contexts/ShaliachContext';
@@ -76,14 +78,18 @@ interface SiteSettings {
 
 /** בונה מחרוזת כתובת קריאה אחת מהשדות המפוצלים (לתצוגה בחשבונית/מייל/אדמין) */
 function buildAddressString(f: {
-  street?: string; houseNumber?: string; apartment?: string; city?: string; zipCode?: string;
+  street?: string; houseNumber?: string; apartment?: string; city?: string; zipCode?: string; country?: string;
 }): string {
   const line1 = [f.street, f.houseNumber].filter(Boolean).join(' ').trim();
+  // שם המדינה נכתב באנגלית בכוונה — הכתובת הזו מודפסת על חבילה בינלאומית
+  // ונקראת ע"י דואר במדינת היעד, לא ע"י הלקוח.
+  const country = f.country && f.country !== 'IL' ? countryName(f.country, 'en') : '';
   return [
     line1,
     f.apartment ? `דירה ${f.apartment}` : '',
     f.city,
     f.zipCode ? `מיקוד ${f.zipCode}` : '',
+    country,
   ].filter(Boolean).join(', ');
 }
 
@@ -370,6 +376,7 @@ function slimPrintCustomization<T extends Record<string, unknown>>(pc: T): T {
 }
 
 export default function CheckoutPage() {
+  const { t, locale } = useT();
   const router = useRouter();
   const { user } = useAuth();
   const {
@@ -396,6 +403,7 @@ export default function CheckoutPage() {
   // עיר*, רחוב*, מספר בית*, דירה, מיקוד
   const [form, setForm] = useState({
     name: '', email: '', phone: '',
+    country: DEFAULT_COUNTRY,
     city: '', street: '', houseNumber: '', apartment: '', zipCode: '',
     notes: '',
   });
@@ -555,9 +563,18 @@ export default function CheckoutPage() {
       .catch(e => console.error('[checkout] partial abandoned_cart FAILED:', e));
   }
 
-  // משלוח חינם אוטומטי: הזמנות מעל FREE_SHIPPING_THRESHOLD (אחרי הנחת קופון)
-  const freeShippingEligible = total - discountAmount >= FREE_SHIPPING_THRESHOLD;
-  const shippingCost = deliveryMethod === 'pickup' || freeShippingEligible ? 0 : SHIPPING_REGULAR;
+  // ── משלוח בינלאומי ──────────────────────────────────────────────────────
+  const isIntl = isInternational(form.country);
+
+  // משלוח חינם אוטומטי: הזמנות מעל FREE_SHIPPING_THRESHOLD (אחרי הנחת קופון).
+  // ⚠️ ישראל בלבד — הזמנה בינלאומית משלמת תעריף אחיד תמיד, כי עלות המשלוח
+  //    בפועל גבוהה מהתעריף, ו"חינם מעל הסף" היה הפסד ישיר בכל הזמנה כזו.
+  const freeShippingEligible = !isIntl && total - discountAmount >= FREE_SHIPPING_THRESHOLD;
+  const shippingCost =
+    deliveryMethod === 'pickup' ? 0
+    : isIntl                    ? SHIPPING_INTERNATIONAL
+    : freeShippingEligible      ? 0
+    : SHIPPING_REGULAR;
   const finalTotal = total - discountAmount - pointsToUse + shippingCost;
 
   // מוצר בהתאמה אישית (רקמה / הטבעה / הדפסה) — משפיע על הודעת תנאי הביטול
@@ -646,10 +663,12 @@ export default function CheckoutPage() {
           houseNumber: deliveryMethod === 'pickup' ? '' : form.houseNumber.trim(),
           apartment:   deliveryMethod === 'pickup' ? '' : form.apartment.trim(),
           zipCode:     deliveryMethod === 'pickup' ? '' : form.zipCode.trim(),
+          country:     deliveryMethod === 'pickup' ? DEFAULT_COUNTRY : form.country,
+          isInternational: deliveryMethod !== 'pickup' && isIntl,
           notes: form.notes || '',
           selectedGift: selectedGift || null,
           giftLine: gift ? { id: gift.id, name: gift.name, productId: gift.productId } : null,
-          shippingCost, shippingType: deliveryMethod === 'pickup' ? 'pickup' : 'regular',
+          shippingCost, shippingType: deliveryMethod === 'pickup' ? 'pickup' : isIntl ? 'international' : 'regular',
           sessionId,
           refCode: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
           commissionPercent,
@@ -746,10 +765,12 @@ export default function CheckoutPage() {
           houseNumber: deliveryMethod === 'pickup' ? '' : form.houseNumber.trim(),
           apartment:   deliveryMethod === 'pickup' ? '' : form.apartment.trim(),
           zipCode:     deliveryMethod === 'pickup' ? '' : form.zipCode.trim(),
+          country:     deliveryMethod === 'pickup' ? DEFAULT_COUNTRY : form.country,
+          isInternational: deliveryMethod !== 'pickup' && isIntl,
           notes: form.notes || '',
           selectedGift: selectedGift || null,
           giftLine: gift ? { id: gift.id, name: gift.name, productId: gift.productId } : null,
-          shippingCost, shippingType: deliveryMethod === 'pickup' ? 'pickup' : 'regular',
+          shippingCost, shippingType: deliveryMethod === 'pickup' ? 'pickup' : isIntl ? 'international' : 'regular',
           sessionId,
           refCode: refCode || null, shaliachId: shaliach?.id || null, shaliachName: shaliach?.name || null,
           commissionPercent,
@@ -774,10 +795,13 @@ export default function CheckoutPage() {
     }
   }
 
-  // חובה בדיוק כמו בטופס חברת המשלוחים: עיר, רחוב, מספר בית
+  // בישראל: חובה עיר, רחוב ומספר בית — בדיוק כמו בטופס LionWheel.
+  // בחו"ל: מספר הבית הוא חלק משורת הכתובת החופשית ולא שדה נפרד, ודרישה
+  // שלו הייתה חוסמת לקוחות בינלאומיים לגיטימיים.
   const isFormValid = !!(
     form.name && form.email && form.phone &&
-    (deliveryMethod === 'pickup' || (form.city.trim() && form.street.trim() && form.houseNumber.trim()))
+    (deliveryMethod === 'pickup' ||
+      (form.city.trim() && form.street.trim() && (isIntl || form.houseNumber.trim())))
   );
 
   return (
@@ -842,8 +866,36 @@ export default function CheckoutPage() {
             <div style={{ marginBottom: 14 }}>
               <Input label="אימייל" name="email" value={form.email} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ email: e.target.value })} placeholder="your@email.com" type="email" inputMode="email" autoComplete="email" required />
             </div>
-            {/* ── בחירת אופן קבלת ההזמנה: משלוח / איסוף עצמי ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+            {/* ── מדינת היעד — קובעת את תעריף המשלוח ואת מבנה הכתובת ── */}
+            <div style={{ marginBottom: 14 }}>
+              <label htmlFor="checkout-country" style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>
+                {t('checkout.country')}
+              </label>
+              <select
+                id="checkout-country"
+                name="country"
+                value={form.country}
+                onChange={e => {
+                  const country = e.target.value;
+                  setForm(f => ({ ...f, country }));
+                  // מעבר ליעד בינלאומי מבטל איסוף עצמי — אין מה לאסוף בדימונה
+                  if (isInternational(country)) setDeliveryMethod('shipping');
+                }}
+                style={{ width: '100%', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa', color: 'var(--ys-text)' }}
+              >
+                {sortedCountries(locale).map(c => (
+                  <option key={c.code} value={c.code}>{c.name}</option>
+                ))}
+              </select>
+              {isIntl && (
+                <div style={{ fontSize: 11.5, color: '#9C7B3F', marginTop: 6, lineHeight: 1.6 }}>
+                  {t('checkout.intlNote').replace('{x}', formatPrice(SHIPPING_INTERNATIONAL))}
+                </div>
+              )}
+            </div>
+
+            {/* ── בחירת אופן קבלת ההזמנה: משלוח / איסוף עצמי (איסוף רק בישראל) ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: isIntl ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 14 }}>
               <button type="button" onClick={() => setDeliveryMethod('shipping')}
                 style={{
                   border: deliveryMethod === 'shipping' ? '2px solid var(--ys-heading)' : '1.5px solid #e0e0e0',
@@ -853,18 +905,24 @@ export default function CheckoutPage() {
                 <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-heading)' }}>🚚 משלוח עד הבית</div>
                 <div style={{ fontSize: 12, color: freeShippingEligible ? '#1a6b3c' : '#777', fontWeight: freeShippingEligible ? 700 : 400, marginTop: 3 }}>
                   {/* הסף נקרא מהקבוע — היה כאן ₪600 קשיח שנשאר מאחור בכל שינוי מדיניות */}
-                  {freeShippingEligible ? `חינם! 🎉 (הזמנה מעל ${formatPrice(FREE_SHIPPING_THRESHOLD)})` : formatPrice(SHIPPING_REGULAR)}
+                  {isIntl
+                    ? formatPrice(SHIPPING_INTERNATIONAL)
+                    : freeShippingEligible
+                      ? t('checkout.freeOver').replace('{x}', formatPrice(FREE_SHIPPING_THRESHOLD))
+                      : formatPrice(SHIPPING_REGULAR)}
                 </div>
               </button>
-              <button type="button" onClick={() => setDeliveryMethod('pickup')}
-                style={{
-                  border: deliveryMethod === 'pickup' ? '2px solid #1a6b3c' : '1.5px solid #e0e0e0',
-                  background: deliveryMethod === 'pickup' ? '#f2faf5' : '#fafafa',
-                  borderRadius: 12, padding: '12px 10px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center',
-                }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a6b3c' }}>🏠 איסוף עצמי</div>
-                <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 700, marginTop: 3 }}>האורן 18 · ללא עלות משלוח</div>
-              </button>
+              {!isIntl && (
+                <button type="button" onClick={() => setDeliveryMethod('pickup')}
+                  style={{
+                    border: deliveryMethod === 'pickup' ? '2px solid #1a6b3c' : '1.5px solid #e0e0e0',
+                    background: deliveryMethod === 'pickup' ? '#f2faf5' : '#fafafa',
+                    borderRadius: 12, padding: '12px 10px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center',
+                  }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#1a6b3c' }}>🏠 {t('checkout.pickup')}</div>
+                  <div style={{ fontSize: 12, color: '#1a6b3c', fontWeight: 700, marginTop: 3 }}>{t('checkout.pickupAddress')}</div>
+                </button>
+              )}
             </div>
             {deliveryMethod === 'pickup' && (
               <div style={{ background: '#f2faf5', border: '1px solid #bbe3c8', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#1a6b3c', marginBottom: 14, lineHeight: 1.6 }}>
@@ -878,7 +936,7 @@ export default function CheckoutPage() {
                   <Input label="רחוב" name="street" value={form.street} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ street: e.target.value })} placeholder="הרצל" autoComplete="address-line1" required />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
-                  <Input label="מספר בית" name="houseNumber" value={form.houseNumber} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="5" inputMode="numeric" autoComplete="address-line2" required />
+                  <Input label={t('checkout.houseNumber')} name="houseNumber" value={form.houseNumber} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="5" inputMode="numeric" autoComplete="address-line2" required={!isIntl} />
                   <Input label="דירה" name="apartment" value={form.apartment} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="12" inputMode="numeric" />
                   <Input label="מיקוד" name="zipCode" value={form.zipCode} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="6789012" inputMode="numeric" autoComplete="postal-code" />
                 </div>

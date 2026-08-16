@@ -224,6 +224,14 @@ export const he = {
   'cart.serverError': 'שגיאת שרת',
   'cart.faqTitle': 'שאלות נפוצות לפני התשלום',
   'cart.chargedInIls': 'ההערכה במטבע שלכם היא לנוחות בלבד — החיוב בפועל מתבצע בשקלים.',
+
+  // ── תשלום ──
+  'checkout.country': 'מדינת היעד',
+  'checkout.intlNote': 'משלוח בינלאומי — {x} לכל הזמנה. סף המשלוח החינם חל על הזמנות בתוך ישראל בלבד.',
+  'checkout.freeOver': 'חינם! 🎉 (הזמנה מעל {x})',
+  'checkout.pickup': 'איסוף עצמי',
+  'checkout.pickupAddress': 'האורן 18 · ללא עלות משלוח',
+  'checkout.houseNumber': 'מספר בית',
 } as const;
 
 export type DictKey = keyof typeof he;
@@ -436,6 +444,13 @@ export const en: Dict = {
   'cart.serverError': 'Server error',
   'cart.faqTitle': 'Common questions before checkout',
   'cart.chargedInIls': 'The amount in your currency is an estimate for convenience — your card is charged in ILS.',
+
+  'checkout.country': 'Destination country',
+  'checkout.intlNote': 'International shipping — {x} per order. The free-shipping threshold applies to orders within Israel only.',
+  'checkout.freeOver': 'Free! 🎉 (orders over {x})',
+  'checkout.pickup': 'Self pickup',
+  'checkout.pickupAddress': 'Ha-Oren 18 · no shipping fee',
+  'checkout.houseNumber': 'House number',
 };
 
 export const fr: Dict = {
@@ -645,6 +660,13 @@ export const fr: Dict = {
   'cart.serverError': 'Erreur serveur',
   'cart.faqTitle': 'Questions fréquentes avant le paiement',
   'cart.chargedInIls': 'Le montant dans votre devise est une estimation — le débit est effectué en shekels (ILS).',
+
+  'checkout.country': 'Pays de destination',
+  'checkout.intlNote': 'Livraison internationale — {x} par commande. Le seuil de livraison offerte s’applique uniquement aux commandes en Israël.',
+  'checkout.freeOver': 'Offerte ! 🎉 (commandes de plus de {x})',
+  'checkout.pickup': 'Retrait sur place',
+  'checkout.pickupAddress': 'Ha-Oren 18 · sans frais de livraison',
+  'checkout.houseNumber': 'Numéro',
 };
 
 export const es: Dict = {
@@ -854,6 +876,13 @@ export const es: Dict = {
   'cart.serverError': 'Error del servidor',
   'cart.faqTitle': 'Preguntas frecuentes antes de pagar',
   'cart.chargedInIls': 'El importe en tu moneda es una estimación — el cargo se realiza en shékels (ILS).',
+
+  'checkout.country': 'País de destino',
+  'checkout.intlNote': 'Envío internacional — {x} por pedido. El umbral de envío gratis aplica solo a pedidos dentro de Israel.',
+  'checkout.freeOver': '¡Gratis! 🎉 (pedidos superiores a {x})',
+  'checkout.pickup': 'Recogida en tienda',
+  'checkout.pickupAddress': 'Ha-Oren 18 · sin gastos de envío',
+  'checkout.houseNumber': 'Número',
 };
 
 export const ar: Dict = {
@@ -1063,6 +1092,13 @@ export const ar: Dict = {
   'cart.serverError': 'خطأ في الخادم',
   'cart.faqTitle': 'أسئلة شائعة قبل الدفع',
   'cart.chargedInIls': 'المبلغ بعملتك تقديري للتسهيل — الخصم الفعلي يتم بالشيكل (ILS).',
+
+  'checkout.country': 'بلد الوجهة',
+  'checkout.intlNote': 'شحن دولي — {x} لكل طلب. حدّ الشحن المجاني ينطبق على الطلبات داخل إسرائيل فقط.',
+  'checkout.freeOver': 'مجانًا! 🎉 (للطلبات فوق {x})',
+  'checkout.pickup': 'استلام ذاتي',
+  'checkout.pickupAddress': 'هاأورن 18 · بدون رسوم شحن',
+  'checkout.houseNumber': 'رقم المنزل',
 };
 
 export const ru: Dict = {
@@ -1272,6 +1308,13 @@ export const ru: Dict = {
   'cart.serverError': 'Ошибка сервера',
   'cart.faqTitle': 'Частые вопросы перед оплатой',
   'cart.chargedInIls': 'Сумма в вашей валюте — приблизительная оценка. Списание производится в шекелях (ILS).',
+
+  'checkout.country': 'Страна доставки',
+  'checkout.intlNote': 'Международная доставка — {x} за заказ. Порог бесплатной доставки действует только для заказов внутри Израиля.',
+  'checkout.freeOver': 'Бесплатно! 🎉 (заказы свыше {x})',
+  'checkout.pickup': 'Самовывоз',
+  'checkout.pickupAddress': 'Ха-Орен 18 · без стоимости доставки',
+  'checkout.houseNumber': 'Номер дома',
 };
 
 export const DICTIONARIES: Record<string, Dict> = { he, en, fr, es, ar, ru };
