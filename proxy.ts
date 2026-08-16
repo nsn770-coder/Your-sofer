@@ -8,7 +8,7 @@ import {
 } from '@/app/lib/i18n/config';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// זיהוי שפה אוטומטי + הפניה
+// זיהוי שפה אוטומטי + הפניה   (Next 16: middleware → proxy)
 //
 // כללי ברזל:
 //  1. בוטים (Googlebot וחבריו) לא מופנים לעולם — כל שפה חייבת להיות ניתנת
@@ -46,7 +46,7 @@ function shouldSkip(pathname: string): boolean {
   return /\.[a-zA-Z0-9]{2,5}$/.test(pathname);
 }
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   if (shouldSkip(pathname)) return NextResponse.next();
 
