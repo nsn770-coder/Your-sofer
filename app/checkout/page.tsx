@@ -135,11 +135,12 @@ function OrderSummary({
   couponInput, setCouponInput, applyCoupon, couponLoading, couponError, shaliach,
   pointsAvailable, pointsToUse, setPointsToUse, maxRedeemablePoints, shippingCost, freeShipping,
 }: OrderSummaryProps) {
+  const { t, locale } = useT();
   const [pointsInput, setPointsInput] = useState('');
   return (
     <div style={{ background: '#fff', borderRadius: framed ? 16 : 0, border: framed ? '1px solid #e8e2d8' : 'none', padding: 16, position: isSticky ? 'sticky' : 'static', top: 20, width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
       <h3 style={{ fontSize: 15, fontWeight: 800, color: 'var(--ys-heading)', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0ebe0', display: 'flex', alignItems: 'center', gap: 6 }}>
-        <IconCart size={15} color="var(--ys-heading)" /> סיכום הזמנה
+        <IconCart size={15} color="var(--ys-heading)" /> {t('checkout.orderSummary')}
       </h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
         {items.map(item => (
@@ -149,9 +150,9 @@ function OrderSummary({
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ys-heading)', lineHeight: 1.4, overflowWrap: 'break-word' }}>{item.name}</div>
-              <div style={{ fontSize: 11, color: '#999' }}>כמות: {item.quantity}</div>
+              <div style={{ fontSize: 11, color: '#999' }}>{t('checkout.qty')}: {item.quantity}</div>
               {item.selectedKlafName && <div style={{ fontSize: 10, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 3 }}><IconCheck size={9} color="#1a6b3c" /> {item.selectedKlafName}</div>}
-              {item.threadColor && <div style={{ fontSize: 10, color: '#92400e', display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 11, height: 11, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} /> צבע חוט: {item.threadColor.id} - {item.threadColor.name}</div>}
+              {item.threadColor && <div style={{ fontSize: 10, color: '#92400e', display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ width: 11, height: 11, borderRadius: '50%', border: '1px solid #ccc', background: item.threadColor.hex, display: 'inline-block', flexShrink: 0 }} /> {t('checkout.threadColor')}: {item.threadColor.id} - {item.threadColor.name}</div>}
             </div>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ys-heading)', flexShrink: 1, minWidth: 0 }}>{formatPrice(item.price * item.quantity)}</div>
           </div>
@@ -159,52 +160,52 @@ function OrderSummary({
       </div>
       <div style={{ borderTop: '1px solid #f0ebe0', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#777' }}>
-          <span style={{ minWidth: 0 }}>סכום ביניים</span>
+          <span style={{ minWidth: 0 }}>{t('checkout.subtotal')}</span>
           <span style={{ paddingLeft: 4 }}>{formatPrice(total + bundleDiscountAmount)}</span>
         </div>
         {bundleDiscountAmount > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מבצע כיפות: 2nd ב-10%, 3+ ב-15%</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>{t('cart.kippotPromoLine')}</span>
             <span style={{ paddingLeft: 4 }}>-{formatPrice(bundleDiscountAmount)}</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13 }}>
-          <span style={{ color: '#777', minWidth: 0 }}>משלוח</span>
+          <span style={{ color: '#777', minWidth: 0 }}>{t('checkout.shipping')}</span>
           {shippingCost === 0 ? (
             freeShipping ? (
-              <span style={{ fontWeight: 700, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>🚚 משלוח חינם! 🎉</span>
+              <span style={{ fontWeight: 700, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>{t('checkout.freeShippingLine')}</span>
             ) : (
-              <span style={{ fontWeight: 700, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>🏠 איסוף עצמי · חינם</span>
+              <span style={{ fontWeight: 700, color: '#1a6b3c', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>{t('checkout.pickupFree')}</span>
             )
           ) : (
-            <span style={{ fontWeight: 600, color: 'var(--ys-heading)', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}><IconTruck size={12} color="var(--ys-heading)" /> עד הבית · {formatPrice(shippingCost)}</span>
+            <span style={{ fontWeight: 600, color: 'var(--ys-heading)', display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}><IconTruck size={12} color="var(--ys-heading)" /> {t('checkout.toDoor')} · {formatPrice(shippingCost)}</span>
           )}
         </div>
         {appliedCoupon && discountAmount > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconTag size={12} color="#1a6b3c" /> {appliedCoupon.type === 'simcha' ? 'הנחת מבצע SIMCHA' : `קופון (${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})`}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}><IconTag size={12} color="#1a6b3c" /> {appliedCoupon.type === 'simcha' ? t('checkout.simchaDiscount') : `קופון (${appliedCoupon.type === 'fixed' ? `₪${appliedCoupon.discount}` : `${appliedCoupon.discount}%`})`}</span>
             <span style={{ paddingLeft: 4 }}>-{formatPrice(discountAmount)}</span>
           </div>
         )}
         {pointsToUse > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#7c3aed', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>⭐ נקודות מועדון ({pointsToUse} נק')</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>{t('checkout.clubPoints')} ({pointsToUse} {t('checkout.pts')})</span>
             <span style={{ paddingLeft: 4 }}>-{formatPrice(pointsToUse)}</span>
           </div>
         )}
         {selectedGift && giftOptions.find(g => g.id === selectedGift) && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 13, color: '#1a6b3c', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>🎁 מתנה: {giftOptions.find(g => g.id === selectedGift)!.name}</span>
-            <span style={{ paddingLeft: 4 }}>חינם</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>{t('checkout.giftLine')}: {giftOptions.find(g => g.id === selectedGift)!.name}</span>
+            <span style={{ paddingLeft: 4 }}>{t('cart.free')}</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 17, fontWeight: 900, color: 'var(--ys-heading)', borderTop: '1px solid #f0ebe0', paddingTop: 10, marginTop: 4 }}>
-          <span style={{ minWidth: 0 }}>סה"כ לתשלום</span><span style={{ paddingLeft: 4 }}>{formatPrice(finalTotal)}</span>
+          <span style={{ minWidth: 0 }}>{t('checkout.totalDue')}</span><span style={{ paddingLeft: 4 }}>{formatPrice(finalTotal)}</span>
         </div>
-        <div style={{ fontSize: 11, color: '#aaa' }}>כולל מע"מ</div>
+        <div style={{ fontSize: 11, color: '#aaa' }}>{t('cart.inclVat')}</div>
       </div>
       <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#555" /> קוד קופון</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}><IconTag size={12} color="#555" /> {t('checkout.couponCode')}</div>
         {appliedCoupon ? (
           <>
           <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflow: 'hidden' }}>
@@ -219,9 +220,9 @@ function OrderSummary({
           </>
         ) : (
           <div style={{ display: 'flex', gap: 6 }}>
-            <input value={couponInput} onChange={e => setCouponInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="הזן קוד קופון" aria-label="קוד קופון" style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit', background: '#fff', color: 'var(--ys-text)' }} />
+            <input value={couponInput} onChange={e => setCouponInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder={t('cart.couponPlaceholder')} aria-label={t('checkout.couponCode')} style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr', letterSpacing: 1, fontFamily: 'inherit', background: '#fff', color: 'var(--ys-text)' }} />
             <button onClick={applyCoupon} disabled={couponLoading} style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: couponLoading ? 0.5 : 1, whiteSpace: 'nowrap' }}>
-              {couponLoading ? '...' : 'החל'}
+              {couponLoading ? '...' : t('cart.apply')}
             </button>
           </div>
         )}
@@ -229,7 +230,7 @@ function OrderSummary({
         {/* קופונים אינם חלים על כיפות לאירועים בכמויות (מחירי מדרגות) */}
         {appliedCoupon && appliedCoupon.type !== 'simcha' && items.some(isBulkEventKippotLine) && (
           <div style={{ fontSize: 11, color: '#92400e', marginTop: 5, fontWeight: 600 }}>
-            שימו לב: הקופון אינו חל על כיפות לאירועים בכמויות — המחירים שם הם מחירי מדרגות מוזלים.
+            {t('checkout.couponNote')}
           </div>
         )}
       </div>
@@ -237,13 +238,13 @@ function OrderSummary({
       {pointsAvailable > 0 && (
         <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ebe0' }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
-            ⭐ נקודות מועדון
-            <span style={{ fontWeight: 400, color: '#999' }}>· יש לך {pointsAvailable.toLocaleString('he-IL')} נק' (נקודה = ₪1)</span>
+            {t('checkout.clubPoints')}
+            <span style={{ fontWeight: 400, color: '#999' }}>· {t('checkout.pointsAvail').replace('{n}', pointsAvailable.toLocaleString(locale))}</span>
           </div>
           {pointsToUse > 0 ? (
             <div style={{ background: '#f5f3ff', border: '1px solid #c4b5fd', borderRadius: 10, padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflow: 'hidden' }}>
               <span style={{ fontSize: 12, color: '#6d28d9', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>
-                <IconCheck size={12} color="#6d28d9" /> מומשו {pointsToUse} נקודות — {formatPrice(pointsToUse)} הנחה
+                <IconCheck size={12} color="#6d28d9" /> {t('checkout.pointsRedeemed').replace('{n}', String(pointsToUse)).replace('{x}', formatPrice(pointsToUse))}
               </span>
               <button onClick={() => { setPointsToUse(0); setPointsInput(''); }} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', display: 'flex', flexShrink: 0 }}><IconX size={14} /></button>
             </div>
@@ -254,23 +255,23 @@ function OrderSummary({
                   value={pointsInput}
                   onChange={e => setPointsInput(e.target.value.replace(/\D/g, ''))}
                   onKeyDown={e => { if (e.key === 'Enter') { const n = Math.min(parseInt(pointsInput) || 0, maxRedeemablePoints); if (n > 0) setPointsToUse(n); } }}
-                  placeholder={`עד ${maxRedeemablePoints} נק'`}
+                  placeholder={t('checkout.pointsPlaceholder').replace('{n}', String(maxRedeemablePoints))}
                   inputMode="numeric"
                   style={{ flex: 1, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fff', color: 'var(--ys-text)' }}
                 />
                 <button
                   onClick={() => { const n = Math.min(parseInt(pointsInput) || 0, maxRedeemablePoints); if (n > 0) setPointsToUse(n); }}
                   style={{ background: '#FFFFFF', color: '#6d28d9', border: '1.5px solid #E7E2D8', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
-                >ממש</button>
+                >{t('checkout.redeem')}</button>
                 <button
                   onClick={() => { setPointsToUse(maxRedeemablePoints); setPointsInput(String(maxRedeemablePoints)); }}
                   style={{ background: '#6d28d9', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
-                >הכל ({maxRedeemablePoints})</button>
+                >{t('checkout.allPoints').replace('{n}', String(maxRedeemablePoints))}</button>
               </div>
-              <div style={{ fontSize: 11, color: '#aaa', marginTop: 5 }}>ניתן לממש עד 50% מסכום העגלה בנקודות</div>
+              <div style={{ fontSize: 11, color: '#aaa', marginTop: 5 }}>{t('checkout.pointsMax50')}</div>
             </>
           ) : (
-            <div style={{ fontSize: 11, color: '#aaa' }}>לא ניתן לממש נקודות בהזמנה זו</div>
+            <div style={{ fontSize: 11, color: '#aaa' }}>{t('checkout.pointsUnavailable')}</div>
           )}
         </div>
       )}
@@ -280,13 +281,13 @@ function OrderSummary({
           {giftEligible && giftOptions.length > 0 ? (
             <>
               <div style={{ fontSize: 13, fontWeight: 800, color: '#1a6b3c', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
-                🎁 {giftOptions.length === 1 ? 'קיבלת מתנה חינם!' : 'בחר מתנה חינם!'}
+                {giftOptions.length === 1 ? t('cart.giftReceived') : t('cart.chooseGift')}
               </div>
               {giftOptions.length === 1 ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 8, padding: '8px 10px' }}>
                   {giftOptions[0].imgUrl && <img src={optimizeCloudinaryUrl(giftOptions[0].imgUrl, 100)} alt={giftOptions[0].name} style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />}
                   <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ys-text)' }}>{giftOptions[0].name}</span>
-                  <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>חינם</span>
+                  <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>{t('cart.free')}</span>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -295,7 +296,7 @@ function OrderSummary({
                       <input type="radio" name="gift" value={g.id} checked={selectedGift === g.id} onChange={() => setSelectedGift(g.id)} style={{ accentColor: '#1a6b3c', flexShrink: 0 }} />
                       {g.imgUrl && <img src={optimizeCloudinaryUrl(g.imgUrl, 100)} alt={g.name} style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />}
                       <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ys-text)' }}>{g.name}</span>
-                      <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>חינם</span>
+                      <span style={{ marginRight: 'auto', fontSize: 12, color: '#1a6b3c', fontWeight: 700 }}>{t('cart.free')}</span>
                     </label>
                   ))}
                 </div>
@@ -303,7 +304,7 @@ function OrderSummary({
             </>
           ) : !giftEligible ? (
             <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#92400e' }}>
-              🎁 הוסף עוד <strong>{formatPrice(amountToGift)}</strong> לקבלת מתנה חינם
+              {t('checkout.addMoreForGift').replace('{x}', formatPrice(amountToGift))}
               <div style={{ marginTop: 6, background: '#e5e7eb', borderRadius: 4, height: 6, overflow: 'hidden' }}>
                 <div style={{ background: 'var(--ys-accent)', height: '100%', width: `${Math.min(100, (total / giftThreshold) * 100)}%`, transition: 'width 0.3s' }} />
               </div>
@@ -318,7 +319,7 @@ function OrderSummary({
       {shaliach && (
         <div style={{ marginTop: 12, padding: '10px 12px', background: '#f0f7ff', borderRadius: 10, fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
           <IconHandshake size={13} color="#0e6ba8" />
-          <div><div style={{ color: '#0e6ba8', fontWeight: 700 }}>דרך: {shaliach.chabadName || shaliach.name}</div><div style={{ color: '#555', marginTop: 1 }}>15% מהרכישה יועברו כתרומה</div></div>
+          <div><div style={{ color: '#0e6ba8', fontWeight: 700 }}>{t('checkout.via')}: {shaliach.chabadName || shaliach.name}</div><div style={{ color: '#555', marginTop: 1 }}>15% מהרכישה יועברו כתרומה</div></div>
         </div>
       )}
     </div>
@@ -334,6 +335,7 @@ function MobileOrderSummary({ itemCount, finalTotal, children }: {
   finalTotal: number;
   children: React.ReactNode;
 }) {
+  const { t } = useT();
   return (
     <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8e2d8', overflow: 'hidden' }}>
       <div
@@ -344,8 +346,8 @@ function MobileOrderSummary({ itemCount, finalTotal, children }: {
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 800, color: 'var(--ys-heading)' }}>
           <IconCart size={15} color="var(--ys-heading)" />
-          סיכום ההזמנה
-          <span style={{ fontSize: 12, fontWeight: 600, color: '#888' }}>({itemCount} {itemCount === 1 ? 'פריט' : 'פריטים'})</span>
+          {t('checkout.summaryTitle')}
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#888' }}>({itemCount} {itemCount === 1 ? t('checkout.item') : t('checkout.items')})</span>
         </span>
         <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--ys-heading)' }}>{formatPrice(finalTotal)}</span>
       </div>
@@ -457,7 +459,7 @@ export default function CheckoutPage() {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     if (params.get('bit') === 'cancelled') {
-      setSubmitError('התשלום בביט בוטל — אפשר לנסות שוב או לשלם באשראי');
+      setSubmitError(t('checkout.errBitCancelled'));
       window.history.replaceState({}, '', '/checkout');
     }
   }, []);
@@ -498,8 +500,8 @@ export default function CheckoutPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: 'Heebo, Arial, sans-serif', direction: 'rtl', background: '#f8f6f2' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, color: '#ccc' }}><IconCart size={48} /></div>
-          <div style={{ fontSize: 18, color: '#888', marginBottom: 20 }}>הסל ריק</div>
-          <button onClick={() => router.push('/')} style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
+          <div style={{ fontSize: 18, color: '#888', marginBottom: 20 }}>{t('checkout.cartEmpty')}</div>
+          <button onClick={() => router.push('/')} style={{ background: '#FFFFFF', color: '#2446A6', border: '1.5px solid #E7E2D8', borderRadius: 12, height: 48, padding: '0 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>{t('checkout.backToStore')}</button>
         </div>
       </div>
     );
@@ -629,7 +631,7 @@ export default function CheckoutPage() {
           console.error('[checkout] failed to get idToken for points redemption:', e);
         }
         if (!idToken) {
-          setSubmitError('מימוש נקודות מחייב התחברות — התחבר מחדש ונסה שוב');
+          setSubmitError(t('checkout.errPointsLogin'));
           setLoading(false);
           return;
         }
@@ -683,10 +685,10 @@ export default function CheckoutPage() {
       if (paymentData.success) {
         router.push(`/thank-you?order=${paymentData.orderNumber}&orderId=${paymentData.orderId}`);
       } else {
-        throw new Error(paymentData.error || 'התשלום נכשל');
+        throw new Error(paymentData.error || t('checkout.errPaymentFailed'));
       }
     } catch (e: any) {
-      setSubmitError('שגיאה: ' + (e.message || 'נסה שוב'));
+      setSubmitError(t('checkout.errPrefix') + (e.message || t('checkout.errTryAgain')));
       console.error(e);
       setLoading(false);
     }
@@ -717,7 +719,7 @@ export default function CheckoutPage() {
           console.error('[checkout] failed to get idToken for points redemption:', e);
         }
         if (!idToken) {
-          setSubmitError('מימוש נקודות מחייב התחברות — התחבר מחדש ונסה שוב');
+          setSubmitError(t('checkout.errPointsLogin'));
           setBitLoading(false);
           return;
         }
@@ -786,10 +788,10 @@ export default function CheckoutPage() {
         // הפניה לדף התשלום המאובטח של ביט (Sumit)
         window.location.href = data.url;
       } else {
-        throw new Error(data.error || 'שגיאה ביצירת התשלום בביט');
+        throw new Error(data.error || t('checkout.errBitCreate'));
       }
     } catch (e: any) {
-      setSubmitError('שגיאה: ' + (e.message || 'נסה שוב'));
+      setSubmitError(t('checkout.errPrefix') + (e.message || t('checkout.errTryAgain')));
       console.error(e);
       setBitLoading(false);
     }
@@ -810,20 +812,20 @@ export default function CheckoutPage() {
       <div style={{ background: 'var(--ys-heading)', padding: '12px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)', width: '100%', boxSizing: 'border-box' }}>
         <div onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: -0.5 }}>Your Sofer</div>
-          <div style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700, letterSpacing: 1 }}>ישראל ✡</div>
+          <div style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700, letterSpacing: 1 }}>{t('cart.israel')}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--ys-accent)', fontWeight: 700 }}>
           <IconLock size={13} color="var(--ys-accent)" />
-          תשלום מאובטח
+          {t('checkout.securePayment')}
         </div>
-        <button onClick={() => router.push('/cart')} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: '#aaa', fontSize: 12, cursor: 'pointer', borderRadius: 8, padding: '5px 12px' }}>חזרה לסל</button>
+        <button onClick={() => router.push('/cart')} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: '#aaa', fontSize: 12, cursor: 'pointer', borderRadius: 8, padding: '5px 12px' }}>{t('checkout.backToCart')}</button>
       </div>
 
       {shaliach && (
         <div style={{ background: 'linear-gradient(135deg, var(--ys-heading), #2563EB)', borderBottom: '2px solid var(--ys-accent)', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box' }}>
           <IconHandshake size={16} color="var(--ys-accent)" />
           <div style={{ fontSize: 13, color: '#a8c0d8' }}>
-            הזמנה זו מיוחסת לרב הקהילה: <strong style={{ color: '#fff' }}>{shaliach.chabadName || shaliach.name}</strong>
+            {t('checkout.attributedTo')} <strong style={{ color: '#fff' }}>{shaliach.chabadName || shaliach.name}</strong>
             {shaliach.city && <span style={{ color: 'var(--ys-accent)' }}> · {shaliach.city}</span>}
           </div>
         </div>
@@ -854,17 +856,17 @@ export default function CheckoutPage() {
           <div style={{ background: '#f8f6f2', borderBottom: '1px solid #e8e2d8', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--ys-accent)', color: '#FEFBF7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>📦</div>
             <div>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--ys-heading)', margin: 0 }}>פרטי משלוח</h2>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ys-accent)', marginTop: 3 }}>למלא פרטים ולהתקדם לרכישה</div>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--ys-heading)', margin: 0 }}>{t('checkout.shippingDetails')}</h2>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ys-accent)', marginTop: 3 }}>{t('checkout.fillDetails')}</div>
             </div>
           </div>
           <div style={{ padding: '24px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
-              <Input label="שם מלא" name="name" value={form.name} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ name: e.target.value })} placeholder="ישראל ישראלי" autoComplete="name" required />
-              <Input label="טלפון" name="phone" value={form.phone} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ phone: e.target.value })} placeholder="050-0000000" type="tel" inputMode="tel" autoComplete="tel" required />
+              <Input label={t('checkout.fullName')} name="name" value={form.name} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ name: e.target.value })} placeholder={t('checkout.phNameEx')} autoComplete="name" required />
+              <Input label={t('checkout.phone')} name="phone" value={form.phone} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ phone: e.target.value })} placeholder="050-0000000" type="tel" inputMode="tel" autoComplete="tel" required />
             </div>
             <div style={{ marginBottom: 14 }}>
-              <Input label="אימייל" name="email" value={form.email} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ email: e.target.value })} placeholder="your@email.com" type="email" inputMode="email" autoComplete="email" required />
+              <Input label={t('checkout.email')} name="email" value={form.email} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ email: e.target.value })} placeholder="your@email.com" type="email" inputMode="email" autoComplete="email" required />
             </div>
             {/* ── מדינת היעד — קובעת את תעריף המשלוח ואת מבנה הכתובת ── */}
             <div style={{ marginBottom: 14 }}>
@@ -902,7 +904,7 @@ export default function CheckoutPage() {
                   background: deliveryMethod === 'shipping' ? '#f4f7ff' : '#fafafa',
                   borderRadius: 12, padding: '12px 10px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center',
                 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-heading)' }}>🚚 משלוח עד הבית</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-heading)' }}>{t('checkout.toDoorTitle')}</div>
                 <div style={{ fontSize: 12, color: freeShippingEligible ? '#1a6b3c' : '#777', fontWeight: freeShippingEligible ? 700 : 400, marginTop: 3 }}>
                   {/* הסף נקרא מהקבוע — היה כאן ₪600 קשיח שנשאר מאחור בכל שינוי מדיניות */}
                   {isIntl
@@ -926,25 +928,25 @@ export default function CheckoutPage() {
             </div>
             {deliveryMethod === 'pickup' && (
               <div style={{ background: '#f2faf5', border: '1px solid #bbe3c8', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#1a6b3c', marginBottom: 14, lineHeight: 1.6 }}>
-                ההזמנה תמתין לאיסוף בכתובת <strong>האורן 18</strong>. נעדכן אותך כשהיא מוכנה לאיסוף.
+                {t('checkout.pickupInfo')}
               </div>
             )}
             {deliveryMethod === 'shipping' && (
               <>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
-                  <Input label="עיר" name="city" value={form.city} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ city: e.target.value })} placeholder="תל אביב" autoComplete="address-level2" required />
-                  <Input label="רחוב" name="street" value={form.street} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ street: e.target.value })} placeholder="הרצל" autoComplete="address-line1" required />
+                  <Input label={t('checkout.city')} name="city" value={form.city} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ city: e.target.value })} placeholder={t('checkout.phCityEx')} autoComplete="address-level2" required />
+                  <Input label={t('checkout.street')} name="street" value={form.street} onChange={handleChange} onBlur={(e) => savePartialAbandonedCart({ street: e.target.value })} placeholder={t('checkout.phStreetEx')} autoComplete="address-line1" required />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
                   <Input label={t('checkout.houseNumber')} name="houseNumber" value={form.houseNumber} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="5" inputMode="numeric" autoComplete="address-line2" required={!isIntl} />
-                  <Input label="דירה" name="apartment" value={form.apartment} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="12" inputMode="numeric" />
-                  <Input label="מיקוד" name="zipCode" value={form.zipCode} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="6789012" inputMode="numeric" autoComplete="postal-code" />
+                  <Input label={t('checkout.apartment')} name="apartment" value={form.apartment} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="12" inputMode="numeric" />
+                  <Input label={t('checkout.zipCode')} name="zipCode" value={form.zipCode} onChange={handleChange} onBlur={() => savePartialAbandonedCart()} placeholder="6789012" inputMode="numeric" autoComplete="postal-code" />
                 </div>
               </>
             )}
             <div style={{ marginBottom: 24 }}>
-              <label htmlFor="checkout-notes" style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>הערות למשלוח</label>
-              <textarea id="checkout-notes" name="notes" value={form.notes} onChange={handleChange} placeholder="הוראות מיוחדות, קומה, דירה..." rows={2}
+              <label htmlFor="checkout-notes" style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 }}>{t('checkout.notes')}</label>
+              <textarea id="checkout-notes" name="notes" value={form.notes} onChange={handleChange} placeholder={t('checkout.notesPlaceholder')} rows={2}
                 style={{ width: '100%', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '11px 14px', fontSize: 14, outline: 'none', resize: 'none', boxSizing: 'border-box', fontFamily: 'inherit', background: '#fafafa', color: 'var(--ys-text)', transition: 'border-color 0.15s' }}
                 onFocus={e => (e.currentTarget.style.borderColor = 'var(--ys-accent)')}
                 onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; savePartialAbandonedCart(); }} />
@@ -962,11 +964,11 @@ export default function CheckoutPage() {
             {!siteSettings.checkoutEnabled && (
               <div style={{ background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
                 <div style={{ fontSize: 14, color: '#9a3412', fontWeight: 700, marginBottom: 4 }}>
-                  🔒 הרכישות זמנית אינן זמינות
+                  {t('checkout.disabledTitle')}
                 </div>
                 <div style={{ fontSize: 13, color: '#7c2d12', lineHeight: 1.5 }}>
                   {siteSettings.checkoutDisabledMessage ||
-                    'הרכישות באתר אינן זמינות כעת. ניתן לעיין במוצרים, והאפשרות להזמנה תחזור בקרוב.'}
+                    t('checkout.disabledBody')}
                 </div>
                 {user?.role === 'admin' && (
                   <div style={{ marginTop: 8, fontSize: 11, color: '#b45309', fontWeight: 700 }}>
@@ -993,9 +995,9 @@ export default function CheckoutPage() {
             {/* מוצרים בהתאמה אישית — תנאי ביטול שונים (לפי מדיניות האתר) */}
             {siteSettings.checkoutEnabled && hasCustomMadeItem && (
               <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#92400e', lineHeight: 1.6 }}>
-                ההזמנה כוללת מוצר בהתאמה אישית (רקמה / הטבעה / הדפסה). תנאי הביטול עשויים להיות שונים ממוצר רגיל.
+                {t('checkout.customItemNotice')}
                 {' '}
-                <a href="/legal/returns" style={{ color: '#92400e', fontWeight: 700, textDecorationLine: 'underline', textUnderlineOffset: 2 }}>לפרטי מדיניות הביטולים</a>
+                <a href="/legal/returns" style={{ color: '#92400e', fontWeight: 700, textDecorationLine: 'underline', textUnderlineOffset: 2 }}>{t('checkout.returnsLink')}</a>
               </div>
             )}
 
@@ -1003,7 +1005,7 @@ export default function CheckoutPage() {
             {siteSettings.checkoutEnabled && (
               <div style={{ marginBottom: 14 }}>
                 <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--ys-heading)', textAlign: 'center', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <IconCreditCard size={16} color="var(--ys-heading)" /> פרטי תשלום
+                  <IconCreditCard size={16} color="var(--ys-heading)" /> {t('checkout.paymentDetails')}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <PaymentMethodsRow size="sm" />
@@ -1014,7 +1016,7 @@ export default function CheckoutPage() {
             {siteSettings.checkoutEnabled && (
               !isFormValid ? (
                 <div style={{ textAlign: 'center', fontSize: 13, color: '#9ca3af', padding: '12px 0' }}>
-                  למלא את פרטי המשלוח למעלה כדי להמשיך לתשלום
+                  {t('checkout.fillToContinue')}
                 </div>
               ) : (
                 <>
@@ -1029,7 +1031,7 @@ export default function CheckoutPage() {
                   {/* ── או תשלום בביט ─────────────────────────────────────── */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '18px 0 14px' }}>
                     <div style={{ flex: 1, height: 1, background: '#e8e2d8' }} />
-                    <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 700 }}>או</span>
+                    <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 700 }}>{t('checkout.or')}</span>
                     <div style={{ flex: 1, height: 1, background: '#e8e2d8' }} />
                   </div>
                   <button
@@ -1045,9 +1047,9 @@ export default function CheckoutPage() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     }}
                   >
-                    {bitLoading ? 'מעביר לתשלום בביט...' : (
+                    {bitLoading ? t('checkout.bitRedirecting') : (
                       <>
-                        תשלום בביט
+                        {t('checkout.bitPay')}
                         <span style={{
                           background: '#fff', color: '#00a3e0', borderRadius: 8,
                           padding: '1px 9px', fontSize: 15, fontWeight: 900,
@@ -1057,14 +1059,14 @@ export default function CheckoutPage() {
                     )}
                   </button>
                   <div style={{ fontSize: 11, color: '#9ca3af', textAlign: 'center', marginTop: 8 }}>
-                    תועברו לדף תשלום מאובטח של ביט, ואחרי האישור תוחזרו לאתר
+                    {t('checkout.bitNote')}
                   </div>
                 </>
               )
             )}
             {siteSettings.checkoutEnabled && (
               <div style={{ fontSize: 12, color: '#6b7280', textAlign: 'center', marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                <IconLock size={12} color="#6b7280" /> תשלום מאובטח · אישור הזמנה מיידי במייל
+                <IconLock size={12} color="#6b7280" /> {t('checkout.secureFooter')}
               </div>
             )}
           </div>
@@ -1079,7 +1081,7 @@ export default function CheckoutPage() {
       </div>{/* /centering wrapper */}
 
       {/* FAQ קומפקטי לעמוד התשלום — מחוץ ל-flex wrapper כדי שיופיע מתחת לטופס ולא לצידו */}
-      <PageFaqSection pageKey="checkout" title="שאלות נפוצות על תשלום ומשלוח" max={6} showWhatsAppCta={false} />
+      <PageFaqSection pageKey="checkout" title={t('checkout.faqTitle')} max={6} showWhatsAppCta={false} />
     </div>
   );
 }
