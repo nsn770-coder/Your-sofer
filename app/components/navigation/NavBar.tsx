@@ -16,22 +16,24 @@ import lifeEvents from "@/data/lifeEvents";
 import AlgoliaSearch from "@/app/components/search/AlgoliaSearch";
 // CouponStrip אוחד לתוך AnnouncementBar (08/2026)
 import { MEGA_MENU_DATA, type NavMenuItem, type NavSubItem } from "@/data/categoriesMenu";
+import { useT } from "@/app/lib/i18n/useT";
 
-const SIMPLE_NAV = [
-  { label: "בנה מארז משלך ✦", action: "build" },
-  { label: "מתנות לאירועים 🎁", action: "gifts" },
-  { label: "כיפות ומזכרות לאירועים", action: "event-kippot" },
-  { label: "הסיפור שלנו", action: "about" },
-  { label: "שאלות ותשובות", action: "faq" },
-  { label: "צור קשר", action: "contact" },
-];
+// התוויות נשלפות מהמילון לפי מפתח — ראה SIMPLE_NAV בתוך NavBarContent
+const SIMPLE_NAV_ACTIONS = ["build", "gifts", "event-kippot", "about", "faq", "contact"] as const;
 
 function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: string, filter?: string) => void }) {
+  const { t, tc, dir } = useT();
+  // תווית מתורגמת אם קיימת, אחרת התווית המקורית מהתפריט
+  const label = (key: string | undefined, fallback: string) => {
+    if (!key) return fallback;
+    const x = tc(key);
+    return x && x !== key ? x : fallback;
+  };
   return (
     <>
       <style>{`@keyframes navMegaIn{from{opacity:0;transform:translateX(50%) translateY(-8px) scale(0.98)}to{opacity:1;transform:translateX(50%) translateY(0) scale(1)}}`}</style>
       <div
-        dir="rtl"
+        dir={dir}
         style={{ position: "absolute", top: "calc(100% + 4px)", right: "50%", transform: "translateX(50%)", zIndex: 200, minWidth: 520, maxWidth: 860, animation: "navMegaIn 0.2s ease-out" }}
         onMouseDown={e => e.preventDefault()}
       >
@@ -40,17 +42,17 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
           <div style={{ display: "flex", flexDirection: "row", padding: "24px 24px 16px" }}>
             {item.columns.map((col, ci) => (
               <div key={ci} style={{ flex: 1, minWidth: 140, padding: "0 16px", borderLeft: ci < item.columns.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.9)", textAlign: "right", marginBottom: 10, paddingBottom: 6, borderBottom: "1px solid rgba(197,160,40,0.5)" }}>{col.title}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.9)", textAlign: dir === "rtl" ? "right" : "left", marginBottom: 10, paddingBottom: 6, borderBottom: "1px solid rgba(197,160,40,0.5)" }}>{label(col.title, col.title)}</div>
                 <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                   {col.items.map((sub, si) => (
                     <li key={si}>
                       <button onClick={() => onSelect(sub.cat, sub.filter)}
-                        style={{ display: "flex", alignItems: "center", flexDirection: "row-reverse", justifyContent: "flex-end", gap: 8, width: "100%", padding: "7px 8px", borderRadius: 0, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "right", fontFamily: "inherit", transition: "all 0.15s" }}
+                        style={{ display: "flex", alignItems: "center", flexDirection: "row-reverse", justifyContent: "flex-end", gap: 8, width: "100%", padding: "7px 8px", borderRadius: 0, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: dir === "rtl" ? "right" : "left", fontFamily: "inherit", transition: "all 0.15s" }}
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(184,151,42,0.12)"; e.currentTarget.style.color = "#fff"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}
                       >
                         <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--ys-purple)", flexShrink: 0, opacity: 0.6 }} />
-                        {sub.label}
+                        {label(sub.filter ?? sub.cat, sub.label)}
                       </button>
                     </li>
                   ))}
@@ -59,7 +61,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
             ))}
           </div>
           <div style={{ padding: "10px 24px", background: "rgba(0,0,0,0.2)", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "flex-end" }}>
-            <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "var(--ys-on-dark)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>הכל {item.label} ←</button>
+            <button onClick={() => onSelect(item.cat)} style={{ fontSize: 12, color: "var(--ys-on-dark)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>{t("nav.allOf").replace("{x}", label(item.cat, item.label))}</button>
           </div>
         </div>
       </div>
@@ -68,6 +70,7 @@ function MegaPanel({ item, onSelect }: { item: NavMenuItem; onSelect: (cat: stri
 }
 
 function NavBarContent() {
+  const { t, tc, dir, def } = useT();
   const [activeId,      setActiveId]      = useState<string | null>(null);
   const [mobileOpen,    setMobileOpen]    = useState(false);
   const [isMobile,      setIsMobile]      = useState(false);
@@ -88,24 +91,41 @@ function NavBarContent() {
 
   const menuData = useMemo<NavMenuItem[]>(() => {
     const allItems: NavSubItem[] = [
-      { label: 'כל הכיפות', cat: 'כיפות' },
+      { label: t('nav.allKippot'), cat: 'כיפות' },
       ...kipotSubcats.map(s => ({ label: s.displayName, cat: 'כיפות', filter: s.slug })),
     ];
     const mid = Math.ceil(allItems.length / 2);
     const kipotEntry: NavMenuItem = {
-      id: 'kipot', label: 'כיפות', cat: 'כיפות',
+      id: 'kipot', label: tc('כיפות'), cat: 'כיפות',
       columns: [
         ...(allItems.length <= 6
-          ? [{ title: 'כיפות', items: allItems }]
+          ? [{ title: tc('כיפות'), items: allItems }]
           : [
-              { title: 'כיפות', items: allItems.slice(0, mid) },
-              { title: 'עוד',   items: allItems.slice(mid) },
+              { title: tc('כיפות'),   items: allItems.slice(0, mid) },
+              { title: t('nav.more'), items: allItems.slice(mid) },
             ]),
-        { title: 'הדפסה', items: [{ label: 'כיפות ומזכרות לאירועים', cat: '__event-kippot' }] },
+        { title: t('nav.printing'), items: [{ label: t('nav.eventKippot'), cat: '__event-kippot' }] },
       ],
     };
-    return MEGA_MENU_DATA.map(item => (item.id === 'kipot' ? kipotEntry : item));
-  }, [kipotSubcats]);
+    return MEGA_MENU_DATA.map(item => {
+      if (item.id === 'kipot') return kipotEntry;
+      const translated = tc(item.cat);
+      return translated && translated !== item.cat ? { ...item, label: translated } : item;
+    });
+  }, [kipotSubcats, t, tc]);
+
+  // תוויות פריטי הניווט הפשוט — נגזרות מהמילון לפי ה-action
+  const SIMPLE_NAV = useMemo(() => {
+    const labels: Record<string, string> = {
+      'build':        t('nav.buildBundle'),
+      'gifts':        t('nav.eventGifts'),
+      'event-kippot': t('nav.eventKippot'),
+      'about':        t('nav.ourStory'),
+      'faq':          t('footer.faq'),
+      'contact':      t('footer.contact'),
+    };
+    return SIMPLE_NAV_ACTIONS.map(action => ({ action, label: labels[action] }));
+  }, [t]);
   const openTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const signingInFromDropdown = useRef(false);
@@ -203,12 +223,12 @@ function NavBarContent() {
   }
 
   return (
-    <div dir="rtl" style={{ fontFamily: "'Heebo', Arial, sans-serif" }}>
+    <div dir={dir} style={{ fontFamily: "'Heebo', Arial, sans-serif" }}>
       <style>{`
         .ys-nav-logo { height: 32px; }
         @media (max-width: 1023px) { .ys-nav-logo { height: 26px; } }
         @keyframes ysUserMenuIn { from { opacity:0; transform:translateY(-6px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
-        .ys-user-menu-item { display:flex; align-items:center; gap:8px; width:100%; padding:9px 16px; background:none; border:none; cursor:pointer; font-size:14px; color:#1a1a1a; text-align:right; font-family:inherit; text-decoration:none; transition:background 0.12s; }
+        .ys-user-menu-item { display:flex; align-items:center; gap:8px; width:100%; padding:9px 16px; background:none; border:none; cursor:pointer; font-size:14px; color:#1a1a1a; text-align:start; font-family:inherit; text-decoration:none; transition:background 0.12s; }
         .ys-user-menu-item:hover { background:#F5F3EE; }
         .ys-user-menu-item-coming { color:#aaa; }
         .ys-user-menu-item-coming:hover { background:none; cursor:default; }
@@ -230,7 +250,7 @@ function NavBarContent() {
           {shaliach.phone && (
             <a href={`https://wa.me/972${shaliach.phone.replace(/\D/g, "").slice(1)}`} target="_blank" rel="noopener noreferrer"
               style={{ background: "#25D366", color: "#fff", borderRadius: 0, padding: "8px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-              📲 צור קשר
+              📲 {t("footer.contact")}
             </a>
           )}
         </div>
@@ -239,7 +259,7 @@ function NavBarContent() {
       <header style={{ background: "var(--ys-page)", color: "var(--ys-ink)", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E9E4DC" }}>
         {/* CouponStrip הוסר — הקופון הוא כעת המסר השלישי ב-AnnouncementBar */}
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center", gap: isMobile ? 6 : 12 }}>
-          <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "var(--ys-ink)", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label="פתח תפריט">
+          <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "var(--ys-ink)", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label={t("nav.openMenu")}>
             <div style={{ width: 20, height: 2, background: "var(--ys-plum)", borderRadius: 0 }} />
             <div style={{ width: 20, height: 2, background: "var(--ys-plum)", borderRadius: 0 }} />
             <div style={{ width: 20, height: 2, background: "var(--ys-plum)", borderRadius: 0 }} />
@@ -270,7 +290,7 @@ function NavBarContent() {
             <div ref={userMenuRef} style={{ position: "relative" }}>
               <button
                 onClick={() => setUserMenuOpen(v => !v)}
-                aria-label="חשבון משתמש"
+                aria-label={t("account.menuAria")}
                 style={{ background: "none", border: userMenuOpen ? "1px solid var(--ys-purple)" : "1px solid transparent", borderRadius: 0, padding: "5px 7px", color: "var(--ys-ink)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "border-color 0.15s" }}
               >
                 {/* אייקון דמות */}
@@ -279,7 +299,7 @@ function NavBarContent() {
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
                 {!isMobile && <span style={{ fontSize: 11, fontWeight: user ? 600 : 400, color: "var(--ys-ink)" }}>
-                  {user ? (user.firstName || user.displayName?.split(" ")[0] || "חשבון") : "כניסה"}
+                  {user ? (user.firstName || user.displayName?.split(" ")[0] || t("account.short")) : t("nav.login")}
                 </span>}
               </button>
 
@@ -292,7 +312,7 @@ function NavBarContent() {
                       {/* כותרת — שלום + נקודות */}
                       <div style={{ padding: "14px 16px 10px", borderBottom: "1px solid #F0EDE8" }}>
                         <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ys-ink)", marginBottom: 8 }}>
-                          שלום, {user.firstName || user.displayName?.split(" ")[0] || "אורח"} 👋
+                          {t("nav.hello")}, {user.firstName || user.displayName?.split(" ")[0] || t("account.guest")} 👋
                         </div>
                         {/* פס דרגה — מחובר ל-totalSpent אמיתי */}
                         {(() => {
@@ -305,7 +325,7 @@ function NavBarContent() {
                               <div style={{ fontSize: 11, color: "#888", marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
                                 <span style={{ color: tier.color, fontWeight: 700 }}>{tier.icon} {tier.label}</span>
                                 <span>·</span>
-                                <span>{pts.toLocaleString("he-IL")} נקודות</span>
+                                <span>{pts.toLocaleString(def.htmlLang)} {t("account.points")}</span>
                               </div>
                               {next.nextTier ? (
                                 <>
@@ -315,7 +335,7 @@ function NavBarContent() {
                                   <div style={{ fontSize: 10, color: "#bbb", marginTop: 3 }}>{next.progressLabel}</div>
                                 </>
                               ) : (
-                                <div style={{ fontSize: 10, color: tier.color, marginTop: 3, fontWeight: 600 }}>הדרגה הגבוהה ביותר 🏆</div>
+                                <div style={{ fontSize: 10, color: tier.color, marginTop: 3, fontWeight: 600 }}>{t("account.topTier")}</div>
                               )}
                             </>
                           );
@@ -325,17 +345,17 @@ function NavBarContent() {
                       {/* קישורי חשבון */}
                       <div style={{ padding: "6px 0" }}>
                         <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/orders"); }}>
-                          <span style={{ fontSize: 15 }}>📦</span> ההזמנות שלי
+                          <span style={{ fontSize: 15 }}>📦</span> {t("nav.myOrders")}
                         </button>
                         <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/loyalty"); }}>
-                          <span style={{ fontSize: 15 }}>⭐</span> הנקודות שלי
+                          <span style={{ fontSize: 15 }}>⭐</span> {t("account.myPoints")}
                         </button>
                         <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/club-deals"); }}>
-                          <span style={{ fontSize: 15 }}>🏷️</span> מבצעי מועדון
+                          <span style={{ fontSize: 15 }}>🏷️</span> {t("account.clubDeals")}
                         </button>
                         <button className="ys-user-menu-item ys-user-menu-item-coming" disabled>
-                          <span style={{ fontSize: 15 }}>🔔</span> ההודעות שלי
-                          <span style={{ marginRight: "auto", fontSize: 10, color: "var(--ys-on-dark)", border: "1px solid var(--ys-purple)", padding: "1px 5px" }}>בקרוב</span>
+                          <span style={{ fontSize: 15 }}>🔔</span> {t("account.myMessages")}
+                          <span style={{ marginRight: "auto", fontSize: 10, color: "var(--ys-on-dark)", border: "1px solid var(--ys-purple)", padding: "1px 5px" }}>{t("account.soon")}</span>
                         </button>
                       </div>
 
@@ -343,10 +363,10 @@ function NavBarContent() {
 
                       <div style={{ padding: "6px 0" }}>
                         <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/profile"); }}>
-                          <span style={{ fontSize: 15 }}>👤</span> הפרטים שלי
+                          <span style={{ fontSize: 15 }}>👤</span> {t("account.myDetails")}
                         </button>
                         <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/account/addresses"); }}>
-                          <span style={{ fontSize: 15 }}>📍</span> הכתובות שלי
+                          <span style={{ fontSize: 15 }}>📍</span> {t("account.myAddresses")}
                         </button>
                       </div>
 
@@ -358,22 +378,22 @@ function NavBarContent() {
                           <div style={{ padding: "6px 0" }}>
                             {user.role === "admin" && (
                               <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/admin"); }}>
-                                <span style={{ fontSize: 15 }}>⚙️</span> פאנל ניהול
+                                <span style={{ fontSize: 15 }}>⚙️</span> {t("account.adminPanel")}
                               </button>
                             )}
                             {user.soferId && (
                               <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/sofer-dashboard"); }}>
-                                <span style={{ fontSize: 15 }}>✍️</span> פאנל סופר
+                                <span style={{ fontSize: 15 }}>✍️</span> {t("account.scribePanel")}
                               </button>
                             )}
                             {user.shaliachId && (
                               <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/shaliach-dashboard"); }}>
-                                <span style={{ fontSize: 15 }}>🏠</span> פאנל שלוחה
+                                <span style={{ fontSize: 15 }}>🏠</span> {t("account.shaliachPanel")}
                               </button>
                             )}
                             {user.partnerId && (
                               <button className="ys-user-menu-item" onClick={() => { setUserMenuOpen(false); router.push("/partner"); }}>
-                                <span style={{ fontSize: 15 }}>🏪</span> פאנל שותף עסקי
+                                <span style={{ fontSize: 15 }}>🏪</span> {t("account.partnerPanel")}
                               </button>
                             )}
                           </div>
@@ -383,25 +403,25 @@ function NavBarContent() {
                       <div style={{ height: 1, background: "#F0EDE8" }} />
                       <div style={{ padding: "6px 0" }}>
                         <button className="ys-user-menu-item" style={{ color: "#888" }} onClick={() => { setUserMenuOpen(false); logout(); }}>
-                          <span style={{ fontSize: 15 }}>🚪</span> התנתקות
+                          <span style={{ fontSize: 15 }}>🚪</span> {t("nav.logout")}
                         </button>
                       </div>
                     </>
                   ) : (
                     /* לא מחובר */
                     <div style={{ padding: "20px 16px" }}>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ys-ink)", marginBottom: 4, textAlign: "center" }}>כניסה לחשבון</div>
-                      <div style={{ fontSize: 12, color: "#888", marginBottom: 16, textAlign: "center" }}>עקוב אחרי הזמנות, צבור נקודות</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ys-ink)", marginBottom: 4, textAlign: "center" }}>{t("account.signInTitle")}</div>
+                      <div style={{ fontSize: 12, color: "#888", marginBottom: 16, textAlign: "center" }}>{t("account.signInSub")}</div>
                       <button
                         onClick={() => { setUserMenuOpen(false); signingInFromDropdown.current = true; signInWithGoogle(); }}
                         style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 16px", background: "var(--ys-plum)", color: "#fff", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}
                       >
                         <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
-                        המשך עם Google
+                        {t("account.continueGoogle")}
                       </button>
                       <div style={{ marginTop: 10, textAlign: "center" }}>
                         <button onClick={() => { setUserMenuOpen(false); router.push("/account/login"); }} style={{ background: "none", border: "none", color: "#888", fontSize: 11, cursor: "pointer", textDecoration: "underline", fontFamily: "inherit" }}>
-                          לעמוד הכניסה
+                          {t("account.toLoginPage")}
                         </button>
                       </div>
                     </div>
@@ -409,13 +429,13 @@ function NavBarContent() {
                 </div>
               )}
             </div>
-            <button onClick={() => router.push("/cart")} aria-label={`סל קניות, ${count} פריטים`}
+            <button onClick={() => router.push("/cart")} aria-label={t("nav.cartAria").replace("{n}", String(count))}
               style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", gap: 3, background: "none", border: "none", padding: 0, fontFamily: "inherit" }}>
               <div style={{ position: "relative" }}>
                 <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#3B3B41" strokeWidth="1.8" aria-hidden="true" focusable="false"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
                 {count > 0 && <span aria-hidden="true" style={{ position: "absolute", top: -4, left: -4, background: "var(--ys-purple)", color: "var(--ys-on-dark)", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
               </div>
-              <div style={{ fontSize: 11, color: "var(--ys-ink)", fontWeight: 700 }}>סל ({count})</div>
+              <div style={{ fontSize: 11, color: "var(--ys-ink)", fontWeight: 700 }}>{t("nav.cart")} ({count})</div>
             </button>
           </div>
         </div>
@@ -433,7 +453,7 @@ function NavBarContent() {
                 onMouseEnter={e => { e.currentTarget.style.borderBottomColor = '#c0392b'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderBottomColor = 'transparent'; }}
               >
-                🏷️ מבצעים
+                🏷️ {t("nav.sales")}
               </button>
               {menuData.map(item => (
                 <div key={item.id} style={{ position: "relative" }}
@@ -470,7 +490,7 @@ function NavBarContent() {
                 onClick={() => router.push('/soferim')}
                 style={{ background: 'var(--ys-page)', color: 'var(--ys-plum)', border: '1px solid var(--ys-plum)', borderRadius: 'var(--ys-radius-pill)', padding: '7px 16px', fontWeight: 700, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', flexShrink: 0 }}
               >
-                הכירו את הסופרים שלנו ←
+                {t("nav.meetScribes")}
               </button>
             </div>
           </div>

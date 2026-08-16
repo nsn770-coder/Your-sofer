@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { X, ChevronLeft, ArrowRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft } from "lucide-react";
+import { useT } from "@/app/lib/i18n/useT";
 
 export interface NavSubItem { label: string; cat: string; filter?: string; }
 export interface NavColumn { title: string; items: NavSubItem[]; }
@@ -30,14 +31,16 @@ type Path = { deptId?: string; colIndex?: number };
 
 // ── שורה בודדת ברשימה ────────────────────────────────────────────────────────
 function Row({
-  label, onClick, hasChildren = false, tone = 'default',
+  label, onClick, hasChildren = false, tone = 'default', rtl = true,
 }: {
   label: string;
   onClick: () => void;
   hasChildren?: boolean;
   tone?: 'default' | 'muted' | 'sale';
+  rtl?: boolean;
 }) {
   const color = tone === 'sale' ? '#c0392b' : tone === 'muted' ? '#6B6B72' : 'var(--ys-ink)';
+  const Chevron = rtl ? ChevronLeft : ChevronRight;
   return (
     <button
       onClick={onClick}
@@ -49,12 +52,12 @@ function Row({
         color,
         background: tone === 'sale' ? '#FFF5F5' : 'none',
         border: 'none', borderBottom: '1px solid #F0EDE8',
-        cursor: 'pointer', textAlign: 'right', fontFamily: 'inherit',
+        cursor: 'pointer', textAlign: rtl ? 'right' : 'left', fontFamily: 'inherit',
       }}
     >
       <span>{label}</span>
-      {/* ב-RTL ההתקדמות פנימה היא שמאלה — ולכן החץ מצביע שמאלה */}
-      {hasChildren && <ChevronLeft size={18} style={{ color: '#b0a898', flexShrink: 0 }} />}
+      {/* ההתקדמות פנימה היא לכיוון סוף השורה — ולכן החץ מתהפך עם השפה */}
+      {hasChildren && <Chevron size={18} style={{ color: '#b0a898', flexShrink: 0 }} />}
     </button>
   );
 }
@@ -71,6 +74,17 @@ export default function MobileDrawerMenu({
   signInWithGoogle,
   logout,
 }: MobileDrawerMenuProps) {
+  // ⚠️ 'dir' בקומפוננטה הזו הוא כיוון האנימציה (in/out) ולא כיוון הכתיבה —
+  //    ולכן כיוון הכתיבה נקרא textDir, ו-rtl הוא הקיצור לתנאי העיצוב.
+  const { t, tc, dir: textDir } = useT();
+  const rtl = textDir === 'rtl';
+  /** תווית מתורגמת אם קיימת, אחרת התווית המקורית מהתפריט */
+  const label = (key: string | undefined, fallback: string) => {
+    if (!key) return fallback;
+    const x = tc(key);
+    return x && x !== key ? x : fallback;
+  };
+
   const [path, setPath] = useState<Path>({});
   // כיוון האנימציה — 'in' בכניסה לעומק, 'out' בחזרה
   const [dir, setDir] = useState<'in' | 'out'>('in');
@@ -99,7 +113,7 @@ export default function MobileDrawerMenu({
   const col  = dept && path.colIndex !== undefined ? dept.columns[path.colIndex] : undefined;
 
   const atRoot = !dept;
-  const title  = col ? col.title : dept ? dept.label : 'קנייה לפי קטגוריה';
+  const title  = col ? col.title : dept ? dept.label : t('nav.shopByCategory');
   // מפתח ייחודי לרמה — מאלץ React לרנדר מחדש ולהפעיל את האנימציה
   const levelKey = `${path.deptId ?? ''}-${path.colIndex ?? ''}`;
 
@@ -129,16 +143,18 @@ export default function MobileDrawerMenu({
       {/* Drawer panel */}
       <div
         style={{
-          position: 'fixed', top: 0, right: 0, bottom: 0,
+          position: 'fixed', top: 0, bottom: 0,
+          ...(rtl ? { right: 0 } : { left: 0 }),
           zIndex: 310,
           width: '85vw', maxWidth: 360,
           background: 'var(--ys-surface)',
-          boxShadow: '-4px 0 24px rgba(0,0,0,0.12)',
+          boxShadow: rtl ? '-4px 0 24px rgba(0,0,0,0.12)' : '4px 0 24px rgba(0,0,0,0.12)',
           display: 'flex', flexDirection: 'column',
-          transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+          // סגור: מוסתר אל מחוץ לצד שממנו הוא נפתח
+          transform: isOpen ? 'translateX(0)' : `translateX(${rtl ? '100%' : '-100%'})`,
           transition: 'transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)',
         }}
-        dir="rtl"
+        dir={textDir}
         aria-hidden={!isOpen}
       >
         {/* ── Header — חץ חזרה מופיע רק בתוך רמות פנימיות ── */}
@@ -150,11 +166,11 @@ export default function MobileDrawerMenu({
           {!atRoot && (
             <button
               onClick={goBack}
-              aria-label="חזרה"
+              aria-label={t('action.back')}
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: 'var(--ys-ink)', display: 'flex', flexShrink: 0 }}
             >
-              {/* ב-RTL החזרה היא ימינה */}
-              <ArrowRight size={20} />
+              {/* החזרה היא לכיוון תחילת השורה — מתהפך עם השפה */}
+              {rtl ? <ArrowRight size={20} /> : <ArrowLeft size={20} />}
             </button>
           )}
           <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--ys-ink)', flex: 1, minWidth: 0 }}>
@@ -162,7 +178,7 @@ export default function MobileDrawerMenu({
           </span>
           <button
             onClick={onClose}
-            aria-label="סגור תפריט"
+            aria-label={t('nav.closeMenu')}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#888', display: 'flex', flexShrink: 0 }}
           >
             <X size={22} />
@@ -176,7 +192,7 @@ export default function MobileDrawerMenu({
             {/* ══ רמה 1 — מחלקות ══ */}
             {atRoot && (
               <>
-                <Row label="🏷️ מבצעים" tone="sale" onClick={() => act('sale')} />
+                <Row label={`🏷️ ${t('nav.sales')}`} tone="sale" rtl={rtl} onClick={() => act('sale')} />
 
                 {menuData.map(item => {
                   // מחלקה עם פריט בודד ויחיד — קיצור ישיר, בלי רמה מיותרת
@@ -186,6 +202,7 @@ export default function MobileDrawerMenu({
                       key={item.id}
                       label={item.label}
                       hasChildren={!flat}
+                      rtl={rtl}
                       onClick={() => (flat ? pick(item.cat) : goDeeper({ deptId: item.id }))}
                     />
                   );
@@ -199,16 +216,16 @@ export default function MobileDrawerMenu({
                       display: 'block', width: '100%',
                       background: 'var(--ys-page)', color: 'var(--ys-plum)',
                       border: '1px solid var(--ys-plum)', padding: '12px 16px',
-                      fontWeight: 700, fontSize: 14, textAlign: 'right',
+                      fontWeight: 700, fontSize: 14, textAlign: rtl ? 'right' : 'left',
                       textDecoration: 'none', boxSizing: 'border-box',
                     }}
                   >
-                    הכירו את הסופרים שלנו ←
+                    {t('nav.meetScribes')}
                   </a>
                 </div>
 
                 {simpleNav.map(nav => (
-                  <Row key={nav.action} label={nav.label} tone="muted" onClick={() => act(nav.action)} />
+                  <Row key={nav.action} label={nav.label} tone="muted" rtl={rtl} onClick={() => act(nav.action)} />
                 ))}
               </>
             )}
@@ -220,13 +237,13 @@ export default function MobileDrawerMenu({
                   // קבוצה יחידה — פורסים את הפריטים כאן במקום רמה נוספת מיותרת
                   dept.columns.length === 1 ? (
                     c.items.map((sub, si) => (
-                      <Row key={si} label={sub.label} onClick={() => pick(sub.cat, sub.filter)} />
+                      <Row key={si} label={label(sub.filter ?? sub.cat, sub.label)} rtl={rtl} onClick={() => pick(sub.cat, sub.filter)} />
                     ))
                   ) : (
-                    <Row key={ci} label={c.title} hasChildren onClick={() => goDeeper({ deptId: dept.id, colIndex: ci })} />
+                    <Row key={ci} label={label(c.title, c.title)} hasChildren rtl={rtl} onClick={() => goDeeper({ deptId: dept.id, colIndex: ci })} />
                   )
                 )}
-                <SeeAll label={dept.label} onClick={() => pick(dept.cat)} />
+                <SeeAll label={dept.label} template={t('nav.showAll')} onClick={() => pick(dept.cat)} />
               </>
             )}
 
@@ -234,9 +251,9 @@ export default function MobileDrawerMenu({
             {dept && col && (
               <>
                 {col.items.map((sub, si) => (
-                  <Row key={si} label={sub.label} onClick={() => pick(sub.cat, sub.filter)} />
+                  <Row key={si} label={label(sub.filter ?? sub.cat, sub.label)} rtl={rtl} onClick={() => pick(sub.cat, sub.filter)} />
                 ))}
-                <SeeAll label={dept.label} onClick={() => pick(dept.cat)} />
+                <SeeAll label={dept.label} template={t('nav.showAll')} onClick={() => pick(dept.cat)} />
               </>
             )}
           </div>
@@ -245,22 +262,22 @@ export default function MobileDrawerMenu({
         {/* ── Footer — auth ── */}
         <div style={{ borderTop: '1px solid #F0EDE8', background: 'var(--ys-page)', flexShrink: 0 }}>
           {user ? (
-            <div dir="rtl">
+            <div dir={textDir}>
               <div style={{ padding: '14px 20px 6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 14, color: 'var(--ys-ink)', fontWeight: 700 }}>
-                  שלום, {user.firstName || user.displayName?.split(' ')[0] || 'אורח'} 👋
+                  {t('nav.hello')}, {user.firstName || user.displayName?.split(' ')[0] || t('account.guest')} 👋
                 </span>
                 <button onClick={logout} style={{ border: '1px solid #ddd', color: '#888', background: '#fff', padding: '5px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
-                  יציאה
+                  {t('account.exit')}
                 </button>
               </div>
               <div style={{ display: 'flex', gap: 0, padding: '4px 20px 16px', flexWrap: 'wrap' }}>
                 {[
-                  { label: '📦 הזמנות', href: '/account/orders' },
-                  { label: '👤 הפרטים שלי', href: '/account/profile' },
-                  { label: '📍 כתובות', href: '/account/addresses' },
-                  { label: '⭐ הנקודות שלי', href: '/account/loyalty' },
-                  { label: '🏷️ מבצעי מועדון', href: '/account/club-deals' },
+                  { label: `📦 ${t('account.orders')}`, href: '/account/orders' },
+                  { label: `👤 ${t('account.myDetails')}`, href: '/account/profile' },
+                  { label: `📍 ${t('account.addresses')}`, href: '/account/addresses' },
+                  { label: `⭐ ${t('account.myPoints')}`, href: '/account/loyalty' },
+                  { label: `🏷️ ${t('account.clubDeals')}`, href: '/account/club-deals' },
                 ].map(link => (
                   <a key={link.href} href={link.href} style={{ fontSize: 12, color: '#555', textDecoration: 'none', padding: '4px 8px 4px 0', marginLeft: 4 }}>
                     {link.label}
@@ -275,7 +292,7 @@ export default function MobileDrawerMenu({
                 style={{ width: '100%', background: 'var(--ys-plum)', border: 'none', color: 'var(--ys-on-dark)', borderRadius: 'var(--ys-radius-pill)', padding: '13px', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
               >
                 <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
-                התחבר עם Google
+                {t('account.continueGoogle')}
               </button>
             </div>
           )}
@@ -286,7 +303,7 @@ export default function MobileDrawerMenu({
 }
 
 // ── כפתור "הצג הכל" — סוגר את המסלול ומוביל לעמוד הקטגוריה ─────────────────
-function SeeAll({ label, onClick }: { label: string; onClick: () => void }) {
+function SeeAll({ label, template, onClick }: { label: string; template: string; onClick: () => void }) {
   return (
     <div style={{ padding: '16px 20px' }}>
       <button
@@ -298,7 +315,7 @@ function SeeAll({ label, onClick }: { label: string; onClick: () => void }) {
           fontFamily: 'inherit',
         }}
       >
-        הצג את כל {label}
+        {template.replace('{x}', label)}
       </button>
     </div>
   );
