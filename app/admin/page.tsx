@@ -2490,14 +2490,20 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
 
       await updateDoc(doc(db, 'orders', o.id), updateData);
 
-      // Log edit history in subcollection
-      await addDoc(collection(db, 'orders', o.id, 'orderEditHistory'), {
-        editedAt: serverTimestamp(),
-        editedBy: user?.email ?? 'אדמין',
-        oldItems: o.items ?? [],
-        newItems: updatedItems,
-        note: '',
-      });
+      // Log edit history in subcollection.
+      // חייב להיות best-effort: ההזמנה כבר נשמרה למעלה, וכישלון ברישום ההיסטוריה
+      // (למשל חוקי Firestore שלא מכסים את תת־האוסף) לא אמור להיראות ככישלון שמירה.
+      try {
+        await addDoc(collection(db, 'orders', o.id, 'orderEditHistory'), {
+          editedAt: serverTimestamp(),
+          editedBy: user?.email ?? 'אדמין',
+          oldItems: o.items ?? [],
+          newItems: updatedItems,
+          note: '',
+        });
+      } catch (histErr) {
+        console.warn('[admin] order saved, but edit-history log failed:', histErr);
+      }
 
       const newTotal = editDraft.overrideTotal
         ? editDraft.totalOverride
@@ -2522,7 +2528,8 @@ function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrd
       cancelEdit();
     } catch (e) {
       console.error(e);
-      alert('שגיאה בשמירת ההזמנה');
+      const msg = e instanceof Error ? e.message : String(e);
+      alert(`שגיאה בשמירת ההזמנה:\n${msg}`);
     } finally {
       setSavingEdit(false);
     }

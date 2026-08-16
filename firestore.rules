@@ -426,6 +426,13 @@ service cloud.firestore {
 
       allow update: if isAdmin() || resource.data.guestId is string;
       allow delete: if isAdmin();
+
+      // היסטוריית עריכות של הזמנה — נכתבת מטאב ההזמנות באדמין.
+      // חוקי Firestore לא יורדים לתת־אוספים, ולכן בלי ה-match הזה כל שמירת
+      // עריכה נכשלה ב-"Missing or insufficient permissions" אחרי שההזמנה כבר עודכנה.
+      match /orderEditHistory/{entryId} {
+        allow read, write: if isAdmin();
+      }
     }
   }
 }
