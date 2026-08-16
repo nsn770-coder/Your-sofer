@@ -444,8 +444,13 @@ function NavBarContent() {
             הקיפול וכפלה תוכן שכבר קיים כרצועת באנרים בעמוד הבית.
             הניווט לאירועים נשאר דרך /moment/[id] ודרך התפריט במובייל. */}
 
-        {!isMobile && (
-          <div style={{ background: "var(--ys-page)", borderTop: "1px solid #E9E4DC", position: "relative" }}>
+        {/* CLS FIX (08/2026): הרצועה מוסתרת ב-CSS ולא דרך isMobile.
+            isMobile הוא false ב-SSR, ולכן הרצועה נשלחה ב-HTML גם לטלפונים ונמחקה
+            אחרי hydration — הכותרת קפצה מ-122px ל-51px וכל העמוד נמשך למעלה, בכל
+            עמוד באתר. lg = 1024px, בדיוק ה-breakpoint של isMobile, ולכן המראה
+            בדסקטופ ובמובייל זהה לחלוטין — רק בלי הקפיצה.
+            אותו דפוס כבר בשימוש למעלה עבור תיבת החיפוש. */}
+        <div className="hidden lg:block" style={{ background: "var(--ys-page)", borderTop: "1px solid #E9E4DC", position: "relative" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 12px", display: "flex", alignItems: "center" }}>
               <button
                 onClick={() => router.push('/sale')}
@@ -494,7 +499,6 @@ function NavBarContent() {
               </button>
             </div>
           </div>
-        )}
       </header>
 
       <MobileDrawerMenu

@@ -853,7 +853,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
     >
       <style>{`
         /* הגדרות הכפתורים הועברו ל-globals.css (08/2026).
-           הן היו כאן בכפילות, ובלוק <style> מקומי נטען אחרי הגיליון הגלובלי
+           הן היו כאן בכפילות, ובלוק סגנון מקומי נטען אחרי הגיליון הגלובלי
            ולכן דרס אותו — הכפתורים נשארו מרובעים למרות השינוי הגלובלי. */
         .ys-hscroll::-webkit-scrollbar { display: none; }
         /* CLS FIX: layout-critical responsive values live in CSS media queries, NOT in

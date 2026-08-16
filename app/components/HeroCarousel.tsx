@@ -14,6 +14,33 @@ export interface HeroSlide {
   scrim?: string;
 }
 
+/**
+ * PERF (08/2026): כתובות הבאנרים נשמרות ב-Firestore כקישור Cloudinary גולמי,
+ * ולכן הדפדפן מקבל את **קובץ המקור** — PNG של ~1MB לכל שקופית (ארבע השקופיות
+ * הפעילות ≈ 4.2MB, והראשונה היא ה-LCP במובייל).
+ *
+ * כאן מוסיפים f_auto,q_auto בלבד — בלי w_, בלי c_, בלי שום שינוי ממדים:
+ * אותה תמונה בדיוק, אותו רוחב וגובה, אותו crop, אותו יחס. רק הפורמט והדחיסה
+ * נבחרים אוטומטית (WebP/AVIF בדפדפנים שתומכים).
+ * נמדד מול Cloudinary: 988KB→65KB במובייל, 830KB→53KB בדסקטופ,
+ * באותם 1080×810 / 1400×480 בדיוק.
+ *
+ * שמרנות בכוונה: נוגעים אך ורק בכתובת בצורה
+ *   https://res.cloudinary.com/<cloud>/image/upload/v<digits>/<path>
+ * כלומר כתובת שאין בה כבר טרנספורמציה. כל צורה אחרת — תיקייה ללא גרסה,
+ * כתובת שכבר עברה אופטימיזציה, או דומיין אחר — מוחזרת כמו שהיא, כדי
+ * שלעולם לא תישבר תמונה.
+ */
+const CLD_RAW_RE = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/;
+
+export function heroSrc(url: string): string;
+export function heroSrc(url: string | undefined): string | undefined;
+export function heroSrc(url: string | undefined): string | undefined {
+  if (!url) return url;
+  const m = CLD_RAW_RE.exec(url);
+  return m ? `${m[1]}f_auto,q_auto/${m[2]}` : url;
+}
+
 // 5 שניות — נמדד מ-NOTHS (האנימציה שלהם היא 5s linear forwards)
 const INTERVAL_MS = 5000;
 const SWIPE_THRESHOLD = 50; // פיקסלים לפני שנחשב החלקה ולא נגיעה
@@ -119,10 +146,10 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
               style={{ position: 'relative', flex: '0 0 100%', width: '100%' }}
             >
               <picture>
-                {s.imgUrlMobile && <source media="(max-width: 767px)" srcSet={s.imgUrlMobile} />}
+                {s.imgUrlMobile && <source media="(max-width: 767px)" srcSet={heroSrc(s.imgUrlMobile)} />}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={s.imgUrl}
+                  src={heroSrc(s.imgUrl)}
                   alt=""
                   fetchPriority={i === 0 ? 'high' : 'auto'}
                   loading={i === 0 ? 'eager' : 'lazy'}

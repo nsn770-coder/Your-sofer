@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from 'next';
 import HomePageClient from './HomePageClient';
 import PageFaqSection from '@/app/components/faq/PageFaqSection';
+import { heroSrc } from '@/app/components/HeroCarousel';
 
 /**
  * סדר השאלות בדף הבית — מפורש בכוונה.
@@ -159,14 +160,28 @@ export default async function HomePage() {
   ]);
 
   // ה-LCP הוא השקופית הראשונה אם הוגדרה קרוסלה, אחרת פוסטר הווידאו הישן
-  const lcpImage = heroSlides[0]
-    ? (heroSlides[0].imgUrlMobile || heroSlides[0].imgUrl)
-    : HERO_POSTER;
+  // חייב להיות זהה בייט-בייט למה ש-HeroCarousel מבקש בפועל (heroSrc), אחרת
+  // ה-preload לא ינוצל והדפדפן יוריד את התמונה פעמיים.
+  const hasSlides = heroSlides.length > 0;
+  const lcpMobile = hasSlides ? heroSrc(heroSlides[0].imgUrlMobile || heroSlides[0].imgUrl) : HERO_POSTER;
+  const lcpDesktop = hasSlides ? heroSrc(heroSlides[0].imgUrl) : HERO_POSTER;
 
   return (
     <>
       {/* React hoists this into <head> of the prerendered HTML */}
-      <link rel="preload" as="image" href={lcpImage} fetchPriority="high" />
+      {/* PERF (08/2026): ל-preload נוסף media. בלעדיו הדסקטופ הוריד ב-priority
+          גבוה את באנר המובייל, לא השתמש בו כלל, ובמקביל הוריד את באנר הדסקטופ.
+          ה-media תואם בדיוק ל-<source media="(max-width: 767px)"> ב-HeroCarousel.
+          מסלול הפולבק (אין שקופיות ב-Firestore) מרנדר <img> יחיד לכל הרוחבים,
+          ולכן ה-preload שלו נשאר בלי media — בדיוק כמו קודם. */}
+      {hasSlides ? (
+        <>
+          <link rel="preload" as="image" href={lcpMobile} fetchPriority="high" media="(max-width: 767px)" />
+          <link rel="preload" as="image" href={lcpDesktop} fetchPriority="high" media="(min-width: 768px)" />
+        </>
+      ) : (
+        <link rel="preload" as="image" href={HERO_POSTER} fetchPriority="high" />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
