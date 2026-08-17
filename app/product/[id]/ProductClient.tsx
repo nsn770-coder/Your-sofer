@@ -23,6 +23,7 @@ const MezuzahUpsellPopup = dynamic(() => import('@/components/MezuzahUpsellPopup
 // עורך כיפה מותאמת אישית — Modal, נטען רק בלחיצה (ssr:false — משתמש ב-canvas)
 const KippaDesignModal = dynamic(() => import('@/app/designer/components/KippaDesignModal'), { ssr: false });
 import type { KippaDesign } from '@/app/designer/utils/types';
+import { useT } from '@/app/lib/i18n/useT';
 
 /** 'YYYY-MM-DD' → 'DD/MM/YYYY' — תאריך צפי הגעה ("מגיע בקרוב") */
 function formatArrivalDate(iso?: string | null): string {
@@ -273,13 +274,14 @@ function Stars({ n = 4.5, size = 14 }: { n?: number; size?: number }) {
 // ─── Installment Badge ────────────────────────────────────────────────────────
 
 function InstallmentBadge({ price }: { price: number }) {
+  const { t } = useT();
   if (price <= 99) return null;
   const monthly3 = Math.ceil(price / 3);
   return (
     <div style={{ background: '#f0f7ff', border: '1px solid #bde0ff', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: 'var(--ys-text)', display: 'flex', alignItems: 'center', gap: 8 }}>
       <span style={{ color: '#0e6ba8', flexShrink: 0 }}><Icon.CreditCard /></span>
-      <span><strong>3 תשלומים של {formatPrice(monthly3)}</strong> ללא ריבית</span>
-      {price >= 400 && <span style={{ color: '#888', fontSize: 11, marginRight: 'auto' }}>· עד 12 תשלומים בתוספת ריבית</span>}
+      <span><strong>{t('pd.installments3').replace('{x}', formatPrice(monthly3))}</strong> {t('pd.noInterest')}</span>
+      {price >= 400 && <span style={{ color: '#888', fontSize: 11, marginRight: 'auto' }}>{t('pd.upTo12')}</span>}
     </div>
   );
 }
@@ -417,6 +419,7 @@ function SoferCard({ soferId }: { soferId?: string }) {
 // ─── Klaf Gallery ─────────────────────────────────────────────────────────────
 
 function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (ids: string[], names: string[]) => void }) {
+  const { t } = useT();
   const [klafImages, setKlafImages] = useState<KlafItem[]>([]);
   const [loading, setLoading]       = useState(true);
   const [selected, setSelected]     = useState<string[]>([]);
@@ -458,7 +461,7 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Icon.Scroll />
-          <span style={{ fontWeight: 800, fontSize: 15, color: '#0f1111' }}>בחר את הקלף שלך</span>
+          <span style={{ fontWeight: 800, fontSize: 15, color: '#0f1111' }}>{t('card.chooseKlaf').replace('✦ ','')}</span>
         </div>
         <span style={{ fontSize: 12, fontWeight: 700, color: selected.length > 0 ? '#1a6b3c' : '#888' }}>
           נבחרו {selected.length} קלפים
@@ -506,7 +509,7 @@ function KlafGallery({ productId, onSelect }: { productId: string; onSelect: (id
       )}
       {zoomImg && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setZoomImg(null)}>
-          <NextImage src={zoomImg} alt="קלף" width={600} height={800} style={{ maxWidth: '90vw', maxHeight: '90vh', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: 8 }} />
+          <NextImage src={zoomImg} alt={t('pd.klafAlt')} width={600} height={800} style={{ maxWidth: '90vw', maxHeight: '90vh', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: 8 }} />
           <button onClick={() => setZoomImg(null)} style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon.X size={18} />
           </button>
@@ -528,6 +531,7 @@ function EventKippotCalculator({
   product: { id: string; name: string; price: number; imgUrl?: string; image_url?: string; outOfStock?: boolean };
   onAddToCart: (qty: number, withPrinting: boolean, printFileUrl: string) => void;
 }) {
+  const { t } = useT();
   const [qty, setQty]                 = useState(100);
   const [withPrinting, setWithPrinting] = useState(false);
   const [printFileUrl, setPrintFileUrl] = useState('');
@@ -561,7 +565,7 @@ function EventKippotCalculator({
     <div dir="rtl" style={{ fontFamily: 'Heebo, Arial, sans-serif' }}>
       {/* Quantity steps */}
       <div style={{ marginBottom: 14 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 6 }}>כמות כיפות:</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 6 }}>{t('pd.kippotQty')}</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {EVENT_QTY_STEPS.map(n => (
             <button key={n} onClick={() => setQty(n)}
@@ -571,7 +575,7 @@ function EventKippotCalculator({
           ))}
         </div>
         <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 12, color: '#888' }}>כמות מותאמת:</span>
+          <span style={{ fontSize: 12, color: '#888' }}>{t('pd.customQty')}</span>
           <input type="number" min={1} step={10} value={qty}
             onChange={e => { const v = parseInt(e.target.value) || 1; setQty(Math.max(1, v)); }}
             style={{ width: 80, border: '1px solid #e0e0e0', borderRadius: 8, padding: '5px 8px', fontSize: 13, textAlign: 'center' }} />
@@ -595,8 +599,8 @@ function EventKippotCalculator({
             </label>
             {printFileUrl && (
               <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <img src={printFileUrl} alt="עיצוב" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd' }} onError={e => (e.currentTarget.style.display='none')} />
-                <button onClick={() => setPrintFileUrl('')} style={{ background: 'none', border: 'none', color: '#c0392b', cursor: 'pointer', fontSize: 12 }}>הסר</button>
+                <img src={printFileUrl} alt={t('pd.designAlt')} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd' }} onError={e => (e.currentTarget.style.display='none')} />
+                <button onClick={() => setPrintFileUrl('')} style={{ background: 'none', border: 'none', color: '#c0392b', cursor: 'pointer', fontSize: 12 }}>{t('pd.remove')}</button>
               </div>
             )}
           </div>
@@ -612,11 +616,11 @@ function EventKippotCalculator({
         {withPrinting && (
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#1a6b3c', marginBottom: 5 }}>
             <span>הדפסה אישית × {qty}</span>
-            <span style={{ fontWeight: 700 }}>כלול במחיר</span>
+            <span style={{ fontWeight: 700 }}>{t('pd.includedInPrice')}</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16, fontWeight: 900, color: 'var(--ys-text)', borderTop: '1px solid #f0f0f0', paddingTop: 8, marginTop: 4 }}>
-          <span>סה"כ</span>
+          <span>{t('pd.total')}</span>
           <span>₪{grandTotal.toLocaleString()}</span>
         </div>
       </div>
@@ -640,9 +644,9 @@ function EventKippotCalculator({
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: 'var(--ys-dark-surface)', color: 'var(--ys-accent)' }}>
-                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>כמות</th>
-                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>מחיר לכיפה</th>
-                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>סה"כ (כולל הדפסה)</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>{t('pd.tblQty')}</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>{t('pd.tblPricePerKippa')}</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 800 }}>{t('pd.tblTotalWithPrint')}</th>
               </tr>
             </thead>
             <tbody>
@@ -1258,6 +1262,7 @@ function ReviewStars({ value, onChange, hover, onHover }: { value: number; onCha
 // ─── Reviews Section ──────────────────────────────────────────────────────────
 
 function ReviewsSection({ productId, productName, cat }: { productId: string; productName: string; cat: string }) {
+  const { t } = useT();
   const [reviews, setReviews]           = useState<ReviewItem[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [showForm, setShowForm]         = useState(false);
@@ -1326,7 +1331,7 @@ function ReviewsSection({ productId, productName, cat }: { productId: string; pr
       <div style={{ marginTop: 28, background: '#fff', borderRadius: 14, border: '1px solid #e8e8e8', padding: '24px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
           <div>
-            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f1111', marginBottom: 6, margin: '0 0 6px' }}>ביקורות לקוחות</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f1111', marginBottom: 6, margin: '0 0 6px' }}>{t('pd.reviews')}</h2>
             {reviews.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Stars n={avgStars} size={16} />
@@ -1350,14 +1355,14 @@ function ReviewsSection({ productId, productName, cat }: { productId: string; pr
               <Icon.Coupon /> תודה על הביקורת! קיבלת קוד הנחה:
             </div>
             <div style={{ background: 'var(--ys-dark-surface)', color: 'var(--ys-accent)', fontFamily: 'monospace', fontSize: 22, fontWeight: 900, letterSpacing: 3, padding: '10px 16px', borderRadius: 8, display: 'inline-block', marginBottom: 8 }}>{earnedCoupon}</div>
-            <div style={{ fontSize: 13, color: '#555' }}>5% הנחה על הזמנה הבאה · הזן את הקוד בעמוד התשלום</div>
+            <div style={{ fontSize: 13, color: '#555' }}>{t('pd.reviewDiscount')}</div>
           </div>
         )}
 
         {loadingReviews ? (
-          <div style={{ color: '#888', fontSize: 13, padding: '12px 0', display: 'flex', alignItems: 'center', gap: 8 }}><Icon.Loader /> טוען ביקורות...</div>
+          <div style={{ color: '#888', fontSize: 13, padding: '12px 0', display: 'flex', alignItems: 'center', gap: 8 }}><Icon.Loader /> {t('pd.loadingReviews')}</div>
         ) : reviews.length === 0 ? (
-          <div style={{ color: '#aaa', fontSize: 13, textAlign: 'center', padding: '24px 0' }}>עדיין אין ביקורות - היה הראשון!</div>
+          <div style={{ color: '#aaa', fontSize: 13, textAlign: 'center', padding: '24px 0' }}>{t('pd.noReviews')}</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {reviews.map(r => (
@@ -1378,7 +1383,7 @@ function ReviewsSection({ productId, productName, cat }: { productId: string; pr
                 {r.mediaUrl && (
                   r.mediaType === 'video'
                     ? <video controls style={{ maxWidth: '100%', maxHeight: 240, borderRadius: 8, border: '1px solid #eee' }}><source src={r.mediaUrl} /></video>
-                    : <img src={r.mediaUrl} alt="ביקורת" style={{ maxWidth: '100%', maxHeight: 240, borderRadius: 8, objectFit: 'cover', border: '1px solid #eee' }} />
+                    : <img src={r.mediaUrl} alt={t('pd.reviewAlt')} style={{ maxWidth: '100%', maxHeight: 240, borderRadius: 8, objectFit: 'cover', border: '1px solid #eee' }} />
                 )}
               </div>
             ))}
@@ -1391,31 +1396,31 @@ function ReviewsSection({ productId, productName, cat }: { productId: string; pr
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--ys-dark-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ys-accent)' }}><Icon.Pen /></div>
-                  <h2 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: 0 }}>כתוב ביקורת</h2>
+                  <h2 style={{ fontSize: 18, fontWeight: 900, color: 'var(--ys-text)', margin: 0 }}>{t('pd.writeReview')}</h2>
                 </div>
                 <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', display: 'flex' }}><Icon.X size={20} /></button>
               </div>
               <div style={{ display: 'grid', gap: 16 }}>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>שמך *</label>
-                  <input value={name} onChange={e => setName(e.target.value)} placeholder="ישראל ישראלי" style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box', fontFamily: 'inherit' }} />
+                  <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>{t('pd.yourName')}</label>
+                  <input value={name} onChange={e => setName(e.target.value)} placeholder={t('pd.namePh')} style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '10px 12px', fontSize: 14, boxSizing: 'border-box', fontFamily: 'inherit' }} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>דירוג *</label>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 8 }}>{t('pd.rating')}</label>
                   <ReviewStars value={stars} onChange={setStars} hover={hoverStar} onHover={setHoverStar} />
                   <span style={{ fontSize: 12, color: '#888', marginRight: 8 }}>{['', 'גרוע', 'לא טוב', 'סביר', 'טוב', 'מצוין'][stars]}</span>
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>הביקורת שלך *</label>
-                  <textarea value={text} onChange={e => setText(e.target.value)} rows={4} placeholder="שתף את חוויתך עם המוצר..." style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '10px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+                  <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>{t('pd.yourReview')}</label>
+                  <textarea value={text} onChange={e => setText(e.target.value)} rows={4} placeholder={t('pd.reviewPh')} style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '10px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
                 </div>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#555', display: 'block', marginBottom: 4 }}>
                     תמונה או סרטון
-                    <span style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 600, marginRight: 6 }}>(מקבלים קוד הנחה 5%)</span>
+                    <span style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 600, marginRight: 6 }}>{t('pd.getDiscountCode')}</span>
                   </label>
                   <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#f5f5f5', border: '1.5px dashed #ccc', borderRadius: 10, padding: '10px 14px', cursor: 'pointer', fontSize: 13, color: '#555' }}>
-                    {uploading ? <><Icon.Loader /> מעלה...</> : mediaUrl ? <><Icon.Check size={13} color="#27ae60" /> הועלה בהצלחה</> : <><Icon.Camera /> בחר קובץ</>}
+                    {uploading ? <><Icon.Loader /> {t('pd.uploading')}</> : mediaUrl ? <><Icon.Check size={13} color="#27ae60" /> {t('pd.uploaded')}</> : <><Icon.Camera /> {t('pd.chooseFile')}</>}
                     <input type="file" accept="image/*,video/*" style={{ display: 'none' }} onChange={handleMediaUpload} disabled={uploading} />
                   </label>
                   {mediaUrl && (
@@ -1435,7 +1440,7 @@ function ReviewsSection({ productId, productName, cat }: { productId: string; pr
                 </div>
               </div>
               <button onClick={handleSubmit} disabled={submitting || uploading} style={{ width: '100%', background: submitting ? '#aaa' : '#1a1a1a', color: '#fff', border: 'none', borderRadius: 24, padding: '13px', fontSize: 15, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                {submitting ? <><Icon.Loader /> שולח...</> : <><Icon.Send /> שלח ביקורת</>}
+                {submitting ? <><Icon.Loader /> {t('pd.submitting')}</> : <><Icon.Send /> {t('pd.submitReview')}</>}
               </button>
             </div>
           </div>
@@ -1449,6 +1454,7 @@ function ReviewsSection({ productId, productName, cat }: { productId: string; pr
 // ─── Product Content Sections ────────────────────────────────────────────────
 
 function ProductContentSections({ product, pageDefaults }: { product: Product; pageDefaults: PageDefaults | null }) {
+  const { t } = useT();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const isStam = !!product.cat && STAM_CATEGORIES.includes(product.cat);
   const hardcoded = isStam ? getStamDefaults(product.cat) : HARDCODED_NON_STAM_DEFAULTS;
@@ -1516,7 +1522,7 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
 
       {/* Benefits */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)', marginBottom: 10, margin: '0 0 10px' }}>מה מקבלים עם המוצר</h3>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)', marginBottom: 10, margin: '0 0 10px' }}>{t('pd.whatYouGet')}</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px' }}>
           {displayBenefits.map((b, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: 12, color: '#444' }}>
@@ -1529,7 +1535,7 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
 
       {/* FAQ accordion */}
       <div>
-        <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)', marginBottom: 10, margin: '0 0 10px' }}>שאלות נפוצות</h3>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)', marginBottom: 10, margin: '0 0 10px' }}>{t('pd.faq')}</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {faqs.map((faq, i) => (
             <div key={i} style={{ border: '1px solid #e8e8e8', borderRadius: 8, overflow: 'hidden' }}>
@@ -1557,6 +1563,7 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ProductClient({ initialProduct = null }: { initialProduct?: Partial<Product> | null }) {
+  const { t } = useT();
   const { id } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1828,7 +1835,7 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', fontFamily: 'Heebo, Arial, sans-serif' }}>
         <div style={{ textAlign: 'center' }}>
           <Icon.Loader />
-          <div style={{ fontSize: 15, color: '#888', marginTop: 12 }}>טוען מוצר...</div>
+          <div style={{ fontSize: 15, color: '#888', marginTop: 12 }}>{t('pd.loading')}</div>
         </div>
       </div>
     );
@@ -1838,7 +1845,7 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', fontFamily: 'Heebo, Arial, sans-serif' }}>
       <div style={{ textAlign: 'center' }}>
         <Icon.Loader />
-        <div style={{ fontSize: 15, color: '#888', marginTop: 12 }}>טוען מוצר...</div>
+        <div style={{ fontSize: 15, color: '#888', marginTop: 12 }}>{t('pd.loading')}</div>
       </div>
     </div>
   );
@@ -1846,8 +1853,8 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   if (!product) return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16, fontFamily: 'Heebo, Arial, sans-serif' }}>
       <Icon.Sad />
-      <div style={{ fontSize: 20, fontWeight: 700, color: '#333' }}>מוצר לא נמצא</div>
-      <button onClick={() => router.push('/')} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>חזרה לחנות</button>
+      <div style={{ fontSize: 20, fontWeight: 700, color: '#333' }}>{t('pd.notFound')}</div>
+      <button onClick={() => router.push('/')} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>{t('pd.backToStore')}</button>
     </div>
   );
 
@@ -2147,7 +2154,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
                 <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--ys-text)' }}>₪{product.price} / כיפה</span>
               </div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>כולל מע״מ · משלוח לכל הארץ</div>
+              <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>{t('pd.inclVatShip')}</div>
             </div>
           )}
           <EventKippotCalculator product={product} onAddToCart={handleEventKippotAddToCart} />
@@ -2230,13 +2237,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
       {!compact && selectedKlafIds.length === 0 && (
         <div style={{ marginBottom: 12 }}>
-          <label style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 4 }}>כמות:</label>
+          <label style={{ fontSize: 12, color: '#555', display: 'block', marginBottom: 4 }}>{t('pd.qty')}</label>
           {isCheapProduct && (
             <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginBottom: 4 }}>
               ⚠️ מוצר זה נמכר החל מ־5 יחידות
             </div>
           )}
-          <select value={qty} onChange={e => setQty(Number(e.target.value))} aria-label="בחירת כמות" style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#f8f9fa', cursor: 'pointer' }}>
+          <select value={qty} onChange={e => setQty(Number(e.target.value))} aria-label={t('pd.qtyAria')} style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 8, padding: '8px 10px', fontSize: 13, background: '#f8f9fa', cursor: 'pointer' }}>
             {qtyOptions.map(v => (
               <option key={v} value={v}>{v}</option>
             ))}
@@ -2270,7 +2277,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {/* ── תוספות בתשלום (הטבעת הקדשה / הטבעת שם / אריזת מתנה) ─────────────── */}
       {productAddons.length > 0 && (
         <div style={{ marginBottom: 12, padding: '12px 14px', background: '#fff', border: '1px solid #e5d9c3', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--ys-text)' }}>✨ תוספות למוצר</span>
+          <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--ys-text)' }}>✨ {t('pd.addons').replace('✨ ','')}</span>
           {productAddons.map(a => {
             const st = addonState[a.id] ?? { enabled: false, text: '' };
             const locked = !!a.minQty && qty < a.minQty;
@@ -2293,7 +2300,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                 {a.requiresText && st.enabled && !locked && (
                   <input type="text" defaultValue={st.text} maxLength={60}
                     ref={el => { addonTextRefs.current[a.id] = el; }}
-                    placeholder={a.id === 'dedication' ? 'נוסח ההקדשה — לדוגמה: לעילוי נשמת...' : 'הטקסט להטבעה'}
+                    placeholder={a.id === 'dedication' ? t('pd.dedicationPh') : t('pd.embossTextPh')}
                     onBlur={e => setAddonState(prev => ({ ...prev, [a.id]: { ...(prev[a.id] ?? st), text: e.target.value } }))}
                     style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif', marginTop: 6 }} />
                 )}
@@ -2325,12 +2332,12 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </div>
           {embEnabled && (
             <>
-              <input type="text" ref={embroideryTextRef} defaultValue={embroideryText} placeholder="לדוגמה: אליהו בן יוסף" maxLength={30}
+              <input type="text" ref={embroideryTextRef} defaultValue={embroideryText} placeholder={t('pd.embroideryPh')} maxLength={30}
                 style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
                 onFocus={e => (e.target.style.borderColor = 'var(--ys-accent)')} onBlur={e => { setEmbroideryText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
-              <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>הטקסט יירקם על המוצר - עד 30 תווים</p>
+              <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>{t('pd.embroideryHint')}</p>
               {!embroideryText.trim() && (
-                <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginTop: 3 }}>יש להזין את הטקסט לרקמה</div>
+                <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginTop: 3 }}>{t('pd.embroideryRequired')}</div>
               )}
               {embroiderySurcharge > 0 && (
                 <div style={{ fontSize: 12, color: '#C9A227', fontWeight: 700, marginTop: 4 }}>
@@ -2368,7 +2375,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           {embossingEnabled && (
             <div style={{ marginTop: 12 }}>
               {/* בחירת אופן חיוב: ליחידה או גלופה חד־פעמית לכל הכמות */}
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 6 }}>אופן החיוב:</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 6 }}>{t('pd.billingMode')}</div>
               <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
                 <button type="button" onClick={() => setEmbossingBulkMode(false)}
                   style={{ flex: 1, padding: '9px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif', textAlign: 'center', border: !embossingBulkMode ? '1.5px solid #C9A227' : '1.5px solid #e0e0e0', background: !embossingBulkMode ? '#FDF8EC' : '#fff', color: !embossingBulkMode ? '#8a6d0f' : '#555' }}>
@@ -2384,13 +2391,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   💡 משתלם בהזמנת כמות: גלופה אחת לכל היחידות — אותה הטבעה על כולן, ₪{EMBOSSING_BULK_PRICE} סה&quot;כ במקום ₪{EMBOSSING_PRICE} ליחידה.
                 </div>
               )}
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#444', display: 'block', marginBottom: 4 }}>האותיות שיופיעו בהטבעה:</label>
-              <input type="text" ref={embossingTextRef} defaultValue={embossingText} placeholder="לדוגמה: משפחת כהן" maxLength={30}
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#444', display: 'block', marginBottom: 4 }}>{t('pd.embossLetters')}</label>
+              <input type="text" ref={embossingTextRef} defaultValue={embossingText} placeholder={t('pd.embossPh')} maxLength={30}
                 style={{ width: '100%', border: '1px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 13, textAlign: 'right', direction: 'rtl', outline: 'none', boxSizing: 'border-box', fontFamily: 'Heebo, Arial, sans-serif' }}
                 onFocus={e => (e.target.style.borderColor = 'var(--ys-accent)')} onBlur={e => { setEmbossingText(e.target.value); e.target.style.borderColor = '#e0e0e0'; }} />
-              <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>עד 30 תווים</p>
+              <p style={{ fontSize: 11, color: '#999', marginTop: 3 }}>{t('pd.max30')}</p>
 
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginTop: 10, marginBottom: 6 }}>צבע ההטבעה:</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginTop: 10, marginBottom: 6 }}>{t('pd.embossColor')}</div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button type="button" onClick={() => setEmbossingColor('gold')}
                   style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Heebo, Arial, sans-serif', border: embossingColor === 'gold' ? '1.5px solid #C9A227' : '1.5px solid #e0e0e0', background: embossingColor === 'gold' ? '#FDF8EC' : '#fff', color: embossingColor === 'gold' ? '#8a6d0f' : '#555' }}>
@@ -2405,7 +2412,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               </div>
 
               {!embossingText.trim() && (
-                <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginTop: 6 }}>יש להזין את האותיות להטבעה</div>
+                <div style={{ fontSize: 11, color: '#c0392b', fontWeight: 600, marginTop: 6 }}>{t('pd.embossRequired')}</div>
               )}
               {embossingSurcharge > 0 && (
                 <div style={{ fontSize: 12, color: '#C9A227', fontWeight: 700, marginTop: 6 }}>תוספת הטבעה: +₪{EMBOSSING_PRICE} ליחידה</div>
@@ -2421,7 +2428,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {/* Cover selector — bar mitzvah sets */}
       {product.cat?.includes('בר מצווה') && (
         <div style={{ marginBottom: 12, padding: '10px 12px', background: '#f8f5ef', border: '1px solid #e5d9c3', borderRadius: 10 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 6 }}>כיסוי תפילין בסט:</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#444', marginBottom: 6 }}>{t('pd.setCover')}</div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
               {selectedCover ? (
@@ -2431,7 +2438,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   <span style={{ fontSize: 12, color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedCover.name}</span>
                 </>
               ) : (
-                <span style={{ fontSize: 12, color: '#888' }}>ברירת מחדל – כיסוי הסט</span>
+                <span style={{ fontSize: 12, color: '#888' }}>{t('pd.setCoverDefault')}</span>
               )}
             </div>
             <button onClick={() => { setTempCover(selectedCover); setShowCoverModal(true); }}
@@ -2542,7 +2549,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               <span aria-hidden="true" style={{ fontSize: 14, lineHeight: 1 }}>{eligible ? '✓' : '🚚'}</span>
               <span>
                 {eligible
-                  ? 'ההזמנה זכאית למשלוח חינם'
+                  ? t('pd.freeShipEligible')
                   : `הוסיפו עוד ${formatPrice(remaining)} למשלוח חינם`}
               </span>
             </div>
@@ -2615,7 +2622,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             ✍️
           </div>
           <div>
-            <div style={{ fontSize: 11, color: '#888', fontWeight: 600 }}>נכתב על ידי הסופר</div>
+            <div style={{ fontSize: 11, color: '#888', fontWeight: 600 }}>{t('pd.writtenByScribe')}</div>
             <a href={`/soferim/${product.soferId}`} style={{ fontSize: 13, fontWeight: 800, color: 'var(--ys-text)', textDecoration: 'none' }}>
               {product.sofer}
             </a>
@@ -2705,7 +2712,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {/* Bar Mitzva wizard context banner */}
       {(fromWizardParam || fromWizardLS) && (
         <div style={{ background: 'var(--ys-dark-surface)', color: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', direction: 'rtl', position: 'sticky', top: 0, zIndex: 40 }}>
-          <span style={{ fontSize: 13, fontWeight: 600 }}>אתה במדריך בר מצווה</span>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>{t('pd.inBarMitzvahGuide')}</span>
           <button
             onClick={() => router.back()}
             style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 0, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
@@ -2749,7 +2756,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               ) : (
                 <img src={allMediaOptimized[activeImg] || '/placeholder.png'} alt={product.name} onClick={() => setZoomVisible(true)}
                   /* נגישות: הגדלת תמונה גם במקלדת */
-                  role="button" tabIndex={0} aria-label={`הגדלת תמונה: ${product.name}`}
+                  role="button" tabIndex={0} aria-label={t('pd.zoomAria').replace('{x}', product.name)}
                   onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setZoomVisible(true); } }}
                   /* LCP: main product image — eager + high priority (preloaded in page.tsx) */
                   loading="eager"
@@ -2773,17 +2780,17 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             <div style={{ display: 'flex', gap: 8, padding: '10px 12px', overflowX: 'auto', scrollbarWidth: 'none', borderTop: '1px solid #f0f0f0' }}>
               {allMedia.map((img, i) => (
                 <button key={i} onClick={() => { setActiveImg(i); setShowVideo(false); }}
-                  aria-label={`תמונה ${i + 1} מתוך ${allMedia.length}${activeImg === i && !showVideo ? ' (מוצגת)' : ''}`}
+                  aria-label={`${t('pd.imageNofM').replace('{n}', String(i + 1)).replace('{m}', String(allMedia.length))}${activeImg === i && !showVideo ? ` ${t('pd.shown')}` : ''}`}
                   aria-pressed={activeImg === i && !showVideo}
                   style={{ width: isMobile ? 52 : 60, height: isMobile ? 52 : 60, flexShrink: 0, borderRadius: 8, overflow: 'hidden', border: `2px solid ${activeImg === i && !showVideo ? 'var(--ys-accent)' : '#e0e0e0'}`, background: '#fff', cursor: 'pointer', padding: 2, transition: 'border-color 0.15s' }}>
                   <img src={allMediaThumb[i]} alt="" aria-hidden="true" style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={e => (e.currentTarget.style.display = 'none')} />
                 </button>
               ))}
               {hasVideo && (
-                <button onClick={() => setShowVideo(true)} aria-label="הצגת סרטון המוצר"
+                <button onClick={() => setShowVideo(true)} aria-label={t('pd.playVideo')}
                   style={{ width: isMobile ? 52 : 60, height: isMobile ? 52 : 60, flexShrink: 0, borderRadius: 8, border: `2px solid ${showVideo ? '#7c3aed' : '#e0e0e0'}`, background: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'border-color 0.15s', position: 'relative', overflow: 'hidden', padding: 0 }}>
                   {videoThumb && (
-                    <img src={videoThumb} alt="וידאו" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
+                    <img src={videoThumb} alt={t('pd.video')} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={e => (e.currentTarget.style.display = 'none')} />
                   )}
                   <span style={{ position: 'relative', zIndex: 1, width: 26, height: 26, borderRadius: '50%', background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.35)' }}>
                     <Icon.Play />
@@ -2843,7 +2850,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                     </div>
                   ) : null;
                 })()}
-                <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Truck /> כולל מע״מ · משלוח לכל הארץ</div>
+                <div style={{ fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Truck /> {t('pd.inclVatShip')}</div>
                 <InstallmentBadge price={displayedPrice} />
               </div>
             )}
@@ -2889,15 +2896,15 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                       </div>
                     );
                   })() : (
-                    <div style={{ fontSize: 13, color: '#aaa', fontStyle: 'italic' }}>אין תיאור למוצר זה.</div>
+                    <div style={{ fontSize: 13, color: '#aaa', fontStyle: 'italic' }}>{t('pd.noDescription')}</div>
                   )}
                   {product.extraDesc && (
                     <div style={{ fontSize: 13, color: '#555', lineHeight: 1.8, marginBottom: 12, fontStyle: 'italic', borderRight: '3px solid #e0d9c8', paddingRight: 10 }}>{product.extraDesc}</div>
                   )}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px', background: '#f8f9fa', borderRadius: 10, padding: '10px 14px', fontSize: 12 }}>
-                    <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Clock /> זמן אספקה</span>
+                    <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Clock /> {t('pd.deliveryTime')}</span>
                     <span style={{ fontWeight: 600 }}>{product.days || '7-10'} ימי עסקים</span>
-                    <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Tag /> קטגוריה</span>
+                    <span style={{ color: '#888', display: 'flex', alignItems: 'center', gap: 4 }}><Icon.Tag /> {t('pd.category')}</span>
                     <span style={{ fontWeight: 600 }}>{product.cat || '-'}</span>
                   </div>
                   <ProductContentSections product={product} pageDefaults={pageDefaults} />
@@ -2944,7 +2951,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
               {activeTab === 'closeup' && product.closeupImageUrl && (
                 <div style={{ textAlign: 'center' }}>
-                  <img src={product.closeupImageUrl} alt="תמונת מקרוב" style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid #e8e8e8' }} />
+                  <img src={product.closeupImageUrl} alt={t('pd.closeup')} style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid #e8e8e8' }} />
                 </div>
               )}
             </div>
@@ -2980,7 +2987,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
               <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: 'var(--ys-text)', margin: 0 }}>
                 השלם את המראה — קולקציית {product.collection}
               </h2>
-              <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>לקוחות שרכשו מוצר זה הוסיפו גם:</p>
+              <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>{t('pd.boughtTogether')}</p>
             </div>
             <div style={{ display: 'flex', gap: isMobile ? 10 : 14, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>
               {collectionProducts.map(cp => {
@@ -3093,8 +3100,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
       {lookProducts.length > 0 && (
         <div style={{ marginTop: 28, background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', borderTop: isMobile ? '8px solid #f3f4f4' : undefined }}>
           <div style={{ marginBottom: 16 }}>
-            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: 'var(--ys-text)', margin: 0 }}>אולי תאהב גם</h2>
-            <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>מוצרים באותו סגנון מקטגוריות שונות</p>
+            <h2 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: 'var(--ys-text)', margin: 0 }}>{t('pd.youMayLike')}</h2>
+            <p style={{ fontSize: 12, color: '#888', margin: '4px 0 0' }}>{t('pd.sameStyle')}</p>
           </div>
           <div style={{ display: 'flex', gap: isMobile ? 10 : 14, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>
             {lookProducts.map(lp => {
@@ -3174,17 +3181,17 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
       {/* Zoom Modal */}
       {zoomVisible && allMedia.length > 0 && (
-        <div role="dialog" aria-modal="true" aria-label={`תצוגה מוגדלת: ${product.name}`}
+        <div role="dialog" aria-modal="true" aria-label={t('pd.zoomView').replace('{x}', product.name)}
           onKeyDown={e => { if (e.key === 'Escape') setZoomVisible(false); }}
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setZoomVisible(false)}>
           <img src={optimizeCloudinaryUrl(allMedia[activeImg], 1600)} alt={`${product.name} — תמונה ${activeImg + 1} מתוך ${allMedia.length}`} style={{ maxWidth: '92vw', maxHeight: '92vh', objectFit: 'contain', borderRadius: 8 }} />
-          <button onClick={() => setZoomVisible(false)} aria-label="סגירת תצוגה מוגדלת" autoFocus style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={() => setZoomVisible(false)} aria-label={t('pd.closeZoom')} autoFocus style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon.X size={18} />
           </button>
           {allMedia.length > 1 && (
             <>
-              <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i + 1) % allMedia.length); }} aria-label="התמונה הבאה" style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>‹</button>
-              <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i - 1 + allMedia.length) % allMedia.length); }} aria-label="התמונה הקודמת" style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>›</button>
+              <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i + 1) % allMedia.length); }} aria-label={t('pd.nextImage')} style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>‹</button>
+              <button onClick={e => { e.stopPropagation(); setActiveImg(i => (i - 1 + allMedia.length) % allMedia.length); }} aria-label={t('pd.prevImage')} style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>›</button>
             </>
           )}
         </div>
@@ -3195,7 +3202,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onClick={() => setShowWizardModal(false)}>
           <div style={{ background: '#fff', width: '100%', maxWidth: 380, padding: 28, direction: 'rtl', boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 36, textAlign: 'center', marginBottom: 12 }}>✅</div>
-            <h3 style={{ fontSize: 17, fontWeight: 900, color: 'var(--ys-text)', textAlign: 'center', marginBottom: 8 }}>נוסף לסל!</h3>
+            <h3 style={{ fontSize: 17, fontWeight: 900, color: 'var(--ys-text)', textAlign: 'center', marginBottom: 8 }}>{t('pd.addedToCart')}</h3>
             <p style={{ fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 24, lineHeight: 1.5 }}>רוצה לחזור למדריך בר המצווה לבחור את המוצר הבא?</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <button
@@ -3281,7 +3288,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         <button
           onClick={() => setAdminOpen(true)}
           style={{ position: 'fixed', bottom: 20, left: 16, zIndex: 1040, background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: '50%', width: 48, height: 48, fontSize: 18, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          title="עריכת מוצר"
+          title={t('pd.editProduct')}
         >
           ✏️
         </button>
@@ -3312,7 +3319,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #eee' }}>
-              <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--ys-text)' }}>בחר כיסוי לתפילין</span>
+              <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--ys-text)' }}>{t('pd.chooseCover')}</span>
               <button onClick={() => setShowCoverModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Icon.X size={18} />
               </button>
@@ -3338,7 +3345,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                 <>
                   <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
                     {filtered.length === 0 ? (
-                      <div style={{ textAlign: 'center', color: '#888', padding: '32px 0', fontSize: 14 }}>לא נמצאו כיסויים בצבע זה</div>
+                      <div style={{ textAlign: 'center', color: '#888', padding: '32px 0', fontSize: 14 }}>{t('pd.noCoversInColor')}</div>
                     ) : (
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                         {paginated.map(cover => {
@@ -3366,10 +3373,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   {totalPages > 1 && (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderTop: '1px solid #eee' }}>
                       <button onClick={() => setCoverPage(p => Math.max(0, p - 1))} disabled={coverPage === 0}
-                        style={{ background: 'none', border: 'none', color: coverPage === 0 ? '#ccc' : '#1a1a1a', fontSize: 13, fontWeight: 600, cursor: coverPage === 0 ? 'default' : 'pointer', padding: '4px 8px' }}>הקודם</button>
+                        style={{ background: 'none', border: 'none', color: coverPage === 0 ? '#ccc' : '#1a1a1a', fontSize: 13, fontWeight: 600, cursor: coverPage === 0 ? 'default' : 'pointer', padding: '4px 8px' }}>{t('pd.prev')}</button>
                       <span style={{ fontSize: 12, color: '#888' }}>{coverPage + 1} / {totalPages}</span>
                       <button onClick={() => setCoverPage(p => Math.min(totalPages - 1, p + 1))} disabled={coverPage === totalPages - 1}
-                        style={{ background: 'none', border: 'none', color: coverPage === totalPages - 1 ? '#ccc' : '#1a1a1a', fontSize: 13, fontWeight: 600, cursor: coverPage === totalPages - 1 ? 'default' : 'pointer', padding: '4px 8px' }}>הבא</button>
+                        style={{ background: 'none', border: 'none', color: coverPage === totalPages - 1 ? '#ccc' : '#1a1a1a', fontSize: 13, fontWeight: 600, cursor: coverPage === totalPages - 1 ? 'default' : 'pointer', padding: '4px 8px' }}>{t('pd.next')}</button>
                     </div>
                   )}
                 </>
