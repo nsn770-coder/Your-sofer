@@ -508,3 +508,17 @@ body.product-sticky-bar-active #tidio-chat {
 @font-face {
   font-display: optional; /* never cause reflow waiting for font */
 }
+
+/* ─── Language switcher sizing — CSS, not JS state ───────────────────────────
+   קודם הרוחב נקבע ע"י prop שתלוי ב-isMobile. isMobile הוא false ב-SSR, ולכן
+   הכפתור נצבע ברוחב הדסקטופ גם בטלפון, ואחרי hydration התווית נעלמה והריפוד
+   הצטמצם — כל שורת האייקונים בכותרת זזה אופקית (0.066 CLS בעגלה).
+   הכללים כאן מייצרים בדיוק את אותה תצוגה, רק בלי הקפיצה.
+   .ys-lang-btn          — מופע רגיל (עמודי /en וכו') — זהה בכל הרוחבים.
+   .ys-lang-btn-compact  — המופע שבכותרת — מלא בדסקטופ, מצומצם מתחת ל-1024px. */
+.ys-lang-btn { padding: 6px 10px; }
+.ys-lang-btn .ys-lang-label { display: inline; }
+@media (max-width: 1023px) {
+  .ys-lang-btn-compact { padding: 5px 8px; }
+  .ys-lang-btn-compact .ys-lang-label { display: none; }
+}

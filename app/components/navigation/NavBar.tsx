@@ -226,6 +226,19 @@ function NavBarContent() {
     <div dir={dir} style={{ fontFamily: "'Heebo', Arial, sans-serif" }}>
       <style>{`
         .ys-nav-logo { height: 32px; }
+        /* CLS FIX (08/2026): גודל הטקסט תחת הלוגו נקבע ב-CSS ולא דרך isMobile.
+           isMobile הוא false ב-SSR, ולכן הטקסט נצבע ב-10px גם בטלפון וקטן ל-9px
+           אחרי hydration — הפרש של 1px שהזיז את כל העמוד. אותם גדלים בדיוק. */
+        .ys-cart-icon { width: 30px; height: 30px; }
+        @media (max-width: 1023px) { .ys-cart-icon { width: 26px; height: 26px; } }
+        .ys-nav-row { gap: 12px; }
+        .ys-nav-actions { gap: 10px; }
+        @media (max-width: 1023px) {
+          .ys-nav-row { gap: 6px; }
+          .ys-nav-actions { gap: 6px; }
+        }
+        .ys-nav-brand { font-size: 10px; }
+        @media (max-width: 1023px) { .ys-nav-brand { font-size: 9px; } }
         @media (max-width: 1023px) { .ys-nav-logo { height: 26px; } }
         @keyframes ysUserMenuIn { from { opacity:0; transform:translateY(-6px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
         .ys-user-menu-item { display:flex; align-items:center; gap:8px; width:100%; padding:9px 16px; background:none; border:none; cursor:pointer; font-size:14px; color:#1a1a1a; text-align:start; font-family:inherit; text-decoration:none; transition:background 0.12s; }
@@ -258,7 +271,7 @@ function NavBarContent() {
 
       <header style={{ background: "var(--ys-page)", color: "var(--ys-ink)", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid #E9E4DC" }}>
         {/* CouponStrip הוסר — הקופון הוא כעת המסר השלישי ב-AnnouncementBar */}
-        <div style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center", gap: isMobile ? 6 : 12 }}>
+        <div className="ys-nav-row" style={{ maxWidth: 1400, margin: "0 auto", padding: "8px 12px", display: "flex", alignItems: "center" }}>
           <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", color: "var(--ys-ink)", padding: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }} aria-label={t("nav.openMenu")}>
             <div style={{ width: 20, height: 2, background: "var(--ys-plum)", borderRadius: 0 }} />
             <div style={{ width: 20, height: 2, background: "var(--ys-plum)", borderRadius: 0 }} />
@@ -269,7 +282,7 @@ function NavBarContent() {
               כך שהקופסה מתכווצת לרוחב הסמל האמיתי ולא "צפה" לכיוון מרכז המסך */}
           <div onClick={() => router.push("/")} style={{ cursor: "pointer", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
             <Image src="https://res.cloudinary.com/dyxzq3ucy/image/upload/e_trim/v1778746370/%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_%D7%A2%D7%95%D7%AA%D7%A7_%D7%A9%D7%9C_L_ecatchila_1_hrlkhj.png" alt="logo" width={200} height={48} className="ys-nav-logo" style={{ height: 48, width: "auto", objectFit: "contain" }} onError={(e) => (e.currentTarget.style.display = "none")} />
-            <div style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: "var(--ys-ink)", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
+            <div className="ys-nav-brand" style={{ fontWeight: 700, color: "var(--ys-ink)", letterSpacing: 0.5, whiteSpace: "nowrap" }}>Your Sofer</div>
           </div>
 
           {/* ── Search area (desktop only) ───────────────────────────── */}
@@ -281,10 +294,13 @@ function NavBarContent() {
           </div>
           <div className="lg:hidden" style={{ flex: 1 }} />
 
-          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexShrink: 0 }}>
+          <div className="ys-nav-actions" style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
 
             {/* ── בורר שפה (דגלים) ── */}
-            <LanguageSwitcher compact={isMobile} />
+            {/* CLS FIX (08/2026): compact הוא כעת קבוע — "המופע הזה מגיב לרוחב".
+                הרוחב עצמו נקבע ב-CSS (ys-lang-btn-compact ב-globals.css) ולא דרך
+                isMobile, שהיה false ב-SSR והזיז את כל שורת האייקונים אחרי hydration. */}
+            <LanguageSwitcher compact />
 
             {/* ── אייקון משתמש + תפריט נפתח ── */}
             <div ref={userMenuRef} style={{ position: "relative" }}>
@@ -298,9 +314,9 @@ function NavBarContent() {
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
-                {!isMobile && <span style={{ fontSize: 11, fontWeight: user ? 600 : 400, color: "var(--ys-ink)" }}>
+                <span className="hidden lg:inline" style={{ fontSize: 11, fontWeight: user ? 600 : 400, color: "var(--ys-ink)" }}>
                   {user ? (user.firstName || user.displayName?.split(" ")[0] || t("account.short")) : t("nav.login")}
-                </span>}
+                </span>
               </button>
 
               {/* ── דרופדאון ── */}
@@ -432,7 +448,7 @@ function NavBarContent() {
             <button onClick={() => router.push("/cart")} aria-label={t("nav.cartAria").replace("{n}", String(count))}
               style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", gap: 3, background: "none", border: "none", padding: 0, fontFamily: "inherit" }}>
               <div style={{ position: "relative" }}>
-                <svg width={isMobile ? 26 : 30} height={isMobile ? 26 : 30} viewBox="0 0 24 24" fill="none" stroke="#3B3B41" strokeWidth="1.8" aria-hidden="true" focusable="false"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                <svg className="ys-cart-icon" viewBox="0 0 24 24" fill="none" stroke="#3B3B41" strokeWidth="1.8" aria-hidden="true" focusable="false"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
                 {count > 0 && <span aria-hidden="true" style={{ position: "absolute", top: -4, left: -4, background: "var(--ys-purple)", color: "var(--ys-on-dark)", fontSize: 10, fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>}
               </div>
               <div style={{ fontSize: 11, color: "var(--ys-ink)", fontWeight: 700 }}>{t("nav.cart")} ({count})</div>

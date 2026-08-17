@@ -70,16 +70,17 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
         aria-expanded={open}
         aria-label={translate(current, 'lang.choose')}
         title={translate(current, 'lang.choose')}
+        className={compact ? 'ys-lang-btn ys-lang-btn-compact' : 'ys-lang-btn'}
         style={{
           display: 'flex', alignItems: 'center', gap: 6,
           background: 'transparent', border: '1px solid #E5E0D5', borderRadius: 8,
-          padding: compact ? '5px 8px' : '6px 10px', cursor: 'pointer',
+          cursor: 'pointer',
           fontFamily: 'inherit', fontSize: 13, fontWeight: 700, color: '#374151',
           lineHeight: 1, whiteSpace: 'nowrap',
         }}
       >
         <span style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>{currentDef.flag}</span>
-        {!compact && <span>{currentDef.label}</span>}
+        <span className="ys-lang-label">{currentDef.label}</span>
         <span aria-hidden style={{ fontSize: 9, opacity: 0.6 }}>▼</span>
       </button>
 

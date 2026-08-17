@@ -16,6 +16,9 @@ import { useCart } from '@/app/contexts/CartContext';
 import { formatPrice } from '@/app/lib/utils';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { findParentCat } from '@/app/constants/categories';
+import { useT } from '@/app/lib/i18n/useT';
+import { attrKeyLabel, attrValueLabel } from '@/app/lib/i18n/attributes';
+import type { DictKey } from '@/app/lib/i18n/dictionaries';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -193,6 +196,7 @@ const COLLECTION_DESC: Record<string, string> = {
 // ─── Look-break banner ────────────────────────────────────────────────────────
 
 function LookBreakBanner({ col, onSelect }: { col: string; onSelect: (c: string) => void }) {
+  const { t, tc, locale } = useT();
   const img  = COLLECTION_IMG[col];
   const desc = COLLECTION_DESC[col] ?? '';
   return (
@@ -223,7 +227,7 @@ function LookBreakBanner({ col, onSelect }: { col: string; onSelect: (c: string)
               cursor: 'pointer',
             }}
           >
-            צפה בעוד סגנונות
+            {t('cat.viewMoreStyles')}
           </button>
         </div>
       </div>
@@ -444,13 +448,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 type SetTab = '' | 'sets' | 'tefillin' | 'thermal' | 'batim' | 'rashitam';
 
-const SET_TABS: { id: SetTab; label: string }[] = [
-  { id: '',         label: 'הכל' },
-  { id: 'sets',     label: 'סט טלית תפילין' },
-  { id: 'tefillin', label: 'סט תפילין' },
-  { id: 'thermal',  label: 'סט תפילין תרמי' },
-  { id: 'batim',    label: 'בתי תפילין' },
-  { id: 'rashitam', label: 'רש"י ר"ת' },
+const SET_TABS: { id: SetTab; labelKey: DictKey }[] = [
+  { id: '',         labelKey: 'settab.all' },
+  { id: 'sets',     labelKey: 'settab.sets' },
+  { id: 'tefillin', labelKey: 'settab.tefillin' },
+  { id: 'thermal',  labelKey: 'settab.thermal' },
+  { id: 'batim',    labelKey: 'settab.batim' },
+  { id: 'rashitam', labelKey: 'settab.rashitam' },
 ];
 
 function applySetTabFilter(products: Product[], tab: SetTab): Product[] {
@@ -469,6 +473,7 @@ function applySetTabFilter(products: Product[], tab: SetTab): Product[] {
 }
 
 function SetTabBar({ active, onChange }: { active: SetTab; onChange: (t: SetTab) => void }) {
+  const { t } = useT();
   return (
     <div
       dir="rtl"
@@ -506,7 +511,7 @@ function SetTabBar({ active, onChange }: { active: SetTab; onChange: (t: SetTab)
                 flexShrink: 0,
               }}
             >
-              {tab.label}
+              {t(tab.labelKey)}
             </button>
           );
         })}
@@ -531,6 +536,7 @@ const CAT_SCROLL_ITEMS: { label: string; href?: string; imgKey?: string }[] = [
 ];
 
 function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<string, string>; currentCategory: string }) {
+  const { tc } = useT();
   return (
     <div
       className="hide-scrollbar"
@@ -554,14 +560,14 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
           >
-            {img && <img src={optimizeCloudinaryUrl(img, 200)} alt={label} width={88} height={114} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
+            {img && <img src={optimizeCloudinaryUrl(img, 200)} alt={tc(label)} width={88} height={114} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
             {isActive && (
               <div style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: '50%', background: 'var(--ys-accent)', boxShadow: '0 0 0 2px rgba(255,255,255,0.6)' }} />
             )}
             <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '8px 4px 7px', textAlign: 'center' }}>
               <span style={{ color: '#fff', fontSize: 10, fontWeight: 800, lineHeight: 1.3, display: 'block', textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}>
-                {label}
+                {tc(label)}
               </span>
             </div>
           </Link>
@@ -574,6 +580,7 @@ function CategoryScrollBar({ catImages, currentCategory }: { catImages: Record<s
 // ─── SizeRangeSlider ──────────────────────────────────────────────────────────
 
 function SizeRangeSlider({ sizeMin, sizeMax, onChange }: { sizeMin: number; sizeMax: number; onChange: (min: number, max: number) => void }) {
+  const { t, tc, locale } = useT();
   const MIN = 0, MAX = 100;
   const isActive = sizeMin > MIN || sizeMax < MAX;
   const leftPct  = (sizeMin / MAX) * 100;
@@ -582,8 +589,8 @@ function SizeRangeSlider({ sizeMin, sizeMax, onChange }: { sizeMin: number; size
     <>
       <style dangerouslySetInnerHTML={{ __html: `.size-range{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0}.size-range::-webkit-slider-thumb{appearance:none;width:18px;height:18px}.size-range::-moz-range-thumb{width:18px;height:18px;border:none;background:transparent}` }} />
       <div className="flex justify-between items-center mb-2" dir="rtl">
-        <span className="text-xs font-semibold text-[#1a1a1a]">{isActive ? `${sizeMin} ס״מ - ${sizeMax} ס״מ` : 'כל הגדלים'}</span>
-        {isActive && <button onClick={() => onChange(MIN, MAX)} className="text-[10px] text-red-400 hover:text-red-600">איפוס</button>}
+        <span className="text-xs font-semibold text-[#1a1a1a]">{isActive ? `${sizeMin}–${sizeMax} ${t('cat.sizeUnit')}` : t('cat.allSizes')}</span>
+        {isActive && <button onClick={() => onChange(MIN, MAX)} className="text-[10px] text-red-400 hover:text-red-600">{t('cat.reset')}</button>}
       </div>
       <div className="relative h-6 flex items-center mx-1" style={{ direction: 'ltr' }}>
         <div className="absolute w-full h-1.5 rounded-full bg-gray-200" />
@@ -618,6 +625,7 @@ interface SidebarProps {
 }
 
 function FilterSidebar({ filters, onChange, products, category, catFilter, onCatFilter, subCategoryFilter, onSubCategoryFilter, availableSubCategories, collectionFilter, onCollectionFilter, availableCollections }: SidebarProps) {
+  const { t, tc, locale } = useT();
   function set(partial: Partial<FilterState>) { onChange({ ...filters, ...partial }); }
   function setAttr(key: string, val: string) { onChange({ ...filters, attrFilters: { ...filters.attrFilters, [key]: val } }); }
   function setNameFilter(key: string, val: string) { onChange({ ...filters, nameFilters: { ...filters.nameFilters, [key]: val } }); }
@@ -642,20 +650,20 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
           <div className="w-7 h-7 rounded-none bg-[#1a1a1a] flex items-center justify-center">
             <IconFilter size={14} />
           </div>
-          <span className="font-bold text-gray-800 text-sm">סינון</span>
+          <span className="font-bold text-gray-800 text-sm">{t('cat.filter')}</span>
         </div>
         {active && (
           <button onClick={() => onChange(EMPTY_FILTERS)} className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-semibold transition-colors bg-red-50 hover:bg-red-100 px-2 py-1 rounded-none">
             <IconX size={10} />
-            נקה הכל
+            {t('cat.clearAll')}
           </button>
         )}
       </div>
 
       {/* Category filter (מתנות only) */}
       {category === 'מתנות' && onCatFilter && (
-        <Section title="קטגוריה">
-          {([{ value: 'הכל', label: 'הכל' }, { value: 'מתנות', label: 'מתנות לחתן ובר מצוה' }, { value: 'יודאיקה', label: 'יודאיקה' }] as { value: string; label: string }[]).map(({ value, label }) => (
+        <Section title={t('cat.category')}>
+          {([{ value: 'הכל', label: t('cat.all') }, { value: 'מתנות', label: t('cat.giftsForGroom') }, { value: 'יודאיקה', label: tc('יודאיקה') }] as { value: string; label: string }[]).map(({ value, label }) => (
             <label key={value} className="flex items-center gap-2 py-1 cursor-pointer group">
               <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${(catFilter ?? 'הכל') === value ? 'border-[#1a1a1a] bg-[#1a1a1a]' : 'border-gray-300 group-hover:border-gray-400'}`}>
                 {(catFilter ?? 'הכל') === value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -669,7 +677,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
 
       {/* SubCategory filter - shown when 2+ subCategories exist */}
       {onSubCategoryFilter && availableSubCategories && availableSubCategories.length >= 2 && (
-        <Section title="תת-קטגוריה">
+        <Section title={t('cat.subCategory')}>
           <div className="flex flex-wrap gap-1.5">
             {['הכל', ...availableSubCategories].map(opt => (
               <button
@@ -681,7 +689,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                     : 'bg-white text-gray-600 border-gray-200 hover:border-[#373A5A] hover:text-[#373A5A]'
                 }`}
               >
-                {opt}
+                {attrValueLabel(opt, locale)}
               </button>
             ))}
           </div>
@@ -690,7 +698,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
 
       {/* Collection filter — shown when 2+ distinct collections exist */}
       {onCollectionFilter && availableCollections && availableCollections.length >= 2 && (
-        <Section title="קולקציה">
+        <Section title={t('cat.collection')}>
           <div className="flex flex-wrap gap-2">
             {['הכל', ...COLLECTIONS_ORDER.filter(c => availableCollections.includes(c))].map(opt => {
               const isActive = (collectionFilter || '') === (opt === 'הכל' ? '' : opt);
@@ -725,7 +733,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                     padding: img ? '0 9px' : 0,
                     whiteSpace: 'nowrap',
                   }}>
-                    {opt}
+                    {attrValueLabel(opt, locale)}
                   </span>
                 </button>
               );
@@ -736,7 +744,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
 
       {/* STaM nusach filter */}
       {STAM_FILTER_CATS.has(category) && (
-        <Section title="נוסח">
+        <Section title={t('cat.nusach')}>
           <div className="flex flex-wrap gap-1.5">
             {['הכל', 'אשכנז', 'ספרד', 'חב"ד', 'תימני', 'עדות המזרח'].map(opt => (
               <button
@@ -748,7 +756,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                 }`}
               >
-                {opt}
+                {attrValueLabel(opt, locale)}
               </button>
             ))}
           </div>
@@ -757,7 +765,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
 
       {/* STaM kashrut level filter */}
       {STAM_FILTER_CATS.has(category) && (
-        <Section title="רמת כשרות">
+        <Section title={t('cat.kashrutLevel')}>
           <div className="flex flex-wrap gap-1.5">
             {['הכל', 'מהודר בתכלית', 'מהודר', 'כשר לכתחילה'].map(opt => (
               <button
@@ -769,7 +777,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                 }`}
               >
-                {opt}
+                {attrValueLabel(opt, locale)}
               </button>
             ))}
           </div>
@@ -778,25 +786,25 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
 
       {/* Size range */}
       {products.some(p => p.filterAttributes?.['גודל']) && (
-        <Section title="גודל (ס״מ)">
+        <Section title={t('cat.sizeCm')}>
           <SizeRangeSlider sizeMin={filters.sizeMin} sizeMax={filters.sizeMax} onChange={(min, max) => onChange({ ...filters, sizeMin: min, sizeMax: max })} />
         </Section>
       )}
 
       {/* Price range */}
-      <Section title="טווח מחיר">
+      <Section title={t('cat.priceRange')}>
         <div className="flex items-center gap-2">
-          <input type="number" min={0} placeholder="מינ׳" value={filters.minPrice} onChange={e => set({ minPrice: e.target.value })}
+          <input type="number" min={0} placeholder={t('cat.min')} value={filters.minPrice} onChange={e => set({ minPrice: e.target.value })}
             className="w-full border border-gray-200 rounded-none px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all" />
           <span className="text-gray-300">-</span>
-          <input type="number" min={0} placeholder="מקס׳" value={filters.maxPrice} onChange={e => set({ maxPrice: e.target.value })}
+          <input type="number" min={0} placeholder={t('cat.max')} value={filters.maxPrice} onChange={e => set({ maxPrice: e.target.value })}
             className="w-full border border-gray-200 rounded-none px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all" />
         </div>
       </Section>
 
       {/* Rating */}
-      <Section title="דירוג לקוחות">
-        {[{ label: 'הכל', value: 0 }, { label: '3 ★ ומעלה', value: 3 }, { label: '4 ★ ומעלה', value: 4 }].map(opt => (
+      <Section title={t('cat.rating')}>
+        {[{ label: t('cat.all'), value: 0 }, { label: t('cat.starsUp').replace('{n}', '3'), value: 3 }, { label: t('cat.starsUp').replace('{n}', '4'), value: 4 }].map(opt => (
           <label key={opt.value} className="flex items-center gap-2 py-1 cursor-pointer group">
             <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${filters.minRating === opt.value ? 'border-[#1a1a1a] bg-[#1a1a1a]' : 'border-gray-300 group-hover:border-gray-400'}`}>
               {filters.minRating === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -811,7 +819,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
       </Section>
 
       {/* Shipping */}
-      <Section title="משלוח">
+      <Section title={t('cat.shipping')}>
         <label className="flex items-center gap-2 cursor-pointer group">
           <div
             onClick={() => set({ freeShipping: !filters.freeShipping })}
@@ -821,7 +829,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
           </div>
           <span className={`text-xs flex items-center gap-1 ${filters.freeShipping ? 'font-bold text-[#1a1a1a]' : 'text-gray-600'}`}>
             <IconTruck size={12} />
-            משלוח ₪35
+            {t('cat.shipping35')}
           </span>
         </label>
       </Section>
@@ -830,7 +838,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
       {catNameFilters.map(spec => {
         const current = filters.nameFilters[spec.key] ?? 'הכל';
         return (
-          <Section key={`name-${spec.key}`} title={spec.label}>
+          <Section key={`name-${spec.key}`} title={attrKeyLabel(spec.key, locale)}>
             <div className="flex flex-wrap gap-1.5">
               {['הכל', ...spec.options].map(opt => (
                 <button
@@ -842,7 +850,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                   }`}
                 >
-                  {opt}
+                  {attrValueLabel(opt, locale)}
                 </button>
               ))}
             </div>
@@ -856,7 +864,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
         if (vals.length === 0) return null;
         const current = filters.attrFilters[key] ?? 'הכל';
         return (
-          <Section key={key} title={key}>
+          <Section key={key} title={attrKeyLabel(key, locale)}>
             <div className="flex flex-wrap gap-1.5">
               {['הכל', ...vals].map(opt => (
                 <button
@@ -868,7 +876,7 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
                   }`}
                 >
-                  {opt}
+                  {attrValueLabel(opt, locale)}
                 </button>
               ))}
             </div>
@@ -882,42 +890,43 @@ function FilterSidebar({ filters, onChange, products, category, catFilter, onCat
 // ─── Active filter pills (shown above product grid) ───────────────────────────
 
 function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategoryFilter, collectionFilter, onCollectionFilter }: { filters: FilterState; onChange: (f: FilterState) => void; subCategoryFilter?: string; onSubCategoryFilter?: (v: string) => void; collectionFilter?: string; onCollectionFilter?: (v: string) => void }) {
+  const { t, tc, locale } = useT();
   const pills: { label: string; onRemove: () => void }[] = [];
 
   if (collectionFilter && onCollectionFilter) {
-    pills.push({ label: `קולקציה: ${collectionFilter}`, onRemove: () => onCollectionFilter('') });
+    pills.push({ label: `${t('cat.pillCollection')}: ${collectionFilter}`, onRemove: () => onCollectionFilter('') });
   }
   if (subCategoryFilter && onSubCategoryFilter) {
     pills.push({ label: subCategoryFilter, onRemove: () => onSubCategoryFilter('') });
   }
   if (filters.minPrice || filters.maxPrice) {
     pills.push({
-      label: `מחיר: ${filters.minPrice || '0'} - ${filters.maxPrice || '∞'} ₪`,
+      label: `${t('cat.pillPrice')}: ${filters.minPrice || '0'} - ${filters.maxPrice || '∞'} ₪`,
       onRemove: () => onChange({ ...filters, minPrice: '', maxPrice: '' }),
     });
   }
   if (filters.level) {
     const levelLabel = filters.level === 'מהודר-בתכלית' ? 'מהודר בתכלית' : filters.level;
-    pills.push({ label: `רמה: ${levelLabel}`, onRemove: () => onChange({ ...filters, level: '' }) });
+    pills.push({ label: `${t('cat.pillLevel')}: ${attrValueLabel(levelLabel, locale)}`, onRemove: () => onChange({ ...filters, level: '' }) });
   }
   if (filters.nusachFilter) {
-    pills.push({ label: `נוסח: ${filters.nusachFilter}`, onRemove: () => onChange({ ...filters, nusachFilter: '' }) });
+    pills.push({ label: `${t('cat.nusach')}: ${attrValueLabel(filters.nusachFilter, locale)}`, onRemove: () => onChange({ ...filters, nusachFilter: '' }) });
   }
   if (filters.minRating > 0) {
-    pills.push({ label: `${filters.minRating}★ ומעלה`, onRemove: () => onChange({ ...filters, minRating: 0 }) });
+    pills.push({ label: t('cat.starsUp').replace('{n}', String(filters.minRating)), onRemove: () => onChange({ ...filters, minRating: 0 }) });
   }
   if (filters.freeShipping) {
-    pills.push({ label: 'משלוח ₪35', onRemove: () => onChange({ ...filters, freeShipping: false }) });
+    pills.push({ label: t('cat.shipping35'), onRemove: () => onChange({ ...filters, freeShipping: false }) });
   }
   if (filters.sizeMin > 0 || filters.sizeMax < 100) {
     pills.push({
-      label: `גודל: ${filters.sizeMin}–${filters.sizeMax} ס"מ`,
+      label: `${t('cat.pillSize')}: ${filters.sizeMin}–${filters.sizeMax} ${t('cat.sizeUnit')}`,
       onRemove: () => onChange({ ...filters, sizeMin: 0, sizeMax: 100 }),
     });
   }
   for (const [key, val] of Object.entries(filters.attrFilters)) {
     if (val && val !== 'הכל') {
-      pills.push({ label: `${key}: ${val}`, onRemove: () => onChange({ ...filters, attrFilters: { ...filters.attrFilters, [key]: 'הכל' } }) });
+      pills.push({ label: `${attrKeyLabel(key, locale)}: ${attrValueLabel(val, locale)}`, onRemove: () => onChange({ ...filters, attrFilters: { ...filters.attrFilters, [key]: 'הכל' } }) });
     }
   }
   for (const [key, val] of Object.entries(filters.nameFilters)) {
@@ -932,7 +941,7 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
     <div className="flex flex-wrap gap-2 mb-4 items-center" dir="rtl">
       <span className="text-xs text-gray-400 font-medium flex items-center gap-1">
         <IconTag size={11} />
-        פעיל:
+        {t('cat.activeFilters')}
       </span>
       {pills.map((pill, i) => (
         <span key={i} className="inline-flex items-center gap-1.5 bg-[#1a1a1a]/8 text-[#1a1a1a] text-xs font-semibold px-3 py-1 rounded-none border border-[#1a1a1a]/20">
@@ -943,7 +952,7 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
         </span>
       ))}
       <button onClick={() => onChange(EMPTY_FILTERS)} className="text-xs text-red-400 hover:text-red-600 font-semibold underline underline-offset-2 transition-colors">
-        נקה הכל
+        {t('cat.clearAll')}
       </button>
     </div>
   );
@@ -952,27 +961,28 @@ function ActiveFilterPills({ filters, onChange, subCategoryFilter, onSubCategory
 // ─── Empty state ──────────────────────────────────────────────────────────────
 
 function EmptyState({ active, onClear, relatedCats = [], message }: { active: boolean; onClear: () => void; relatedCats?: string[]; message?: string }) {
+  const { t, tc, locale } = useT();
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center px-6">
       <div className="w-20 h-20 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-5 text-gray-300">
         <IconSearch size={40} />
       </div>
       <h3 className="text-lg font-bold text-gray-700 mb-2">
-        {message ?? (active ? 'לא נמצאו מוצרים' : 'אין מוצרים בקטגוריה זו')}
+        {message ?? (active ? t('cat.noProducts') : t('cat.noProductsInCat'))}
       </h3>
       <p className="text-sm text-gray-400 mb-6 max-w-xs leading-relaxed">
         {active
-          ? 'נסה לשנות את הסינון או להרחיב את טווח החיפוש'
+          ? t('cat.tryChangeFilter')
           : relatedCats.length > 0
-            ? 'הקטגוריה אינה קיימת - נסה לחפש ב:'
-            : 'הקטגוריה הזו תתמלא בקרוב. בינתיים - עיין בשאר הקטגוריות'}
+            ? t('cat.catNotExist')
+            : t('cat.catComingSoon')}
       </p>
       {active ? (
         <button
           onClick={onClear}
           className="px-6 py-2.5 bg-[#1a1a1a] text-white rounded-none font-bold text-sm hover:bg-[#1a1a1a] transition-colors"
         >
-          נקה סינון
+          {t('cat.clearFilter')}
         </button>
       ) : relatedCats.length > 0 ? (
         <div className="flex flex-wrap gap-3 justify-center">
@@ -1006,6 +1016,7 @@ function StamCard({
   soferPhoto?: string;
   aboveFold?: boolean;
 }) {
+  const { t, tc, locale } = useT();
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
   const itemInCart = items.find(i => i.id === product.id);
@@ -1067,7 +1078,7 @@ function StamCard({
             </span>
           )}
           {hasSale && (
-            <span style={{ background: 'var(--ys-accent)', color: '#FEFBF7', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 8px' }}>מבצע</span>
+            <span style={{ background: 'var(--ys-accent)', color: '#FEFBF7', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 8px' }}>{t('card.sale')}</span>
           )}
         </div>
 
@@ -1083,13 +1094,13 @@ function StamCard({
         {(soferName || soferPhoto || product.soferId) && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {soferPhoto ? (
-              <img src={soferPhoto} alt={soferName ?? 'סופר'}
+              <img src={soferPhoto} alt={soferName ?? t('card.scribe')}
                 style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid #C9A227', objectFit: 'cover', flexShrink: 0 }} />
             ) : (
               <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#EEF3FF', border: '2px solid #C9A227', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>✍</div>
             )}
             <span style={{ fontSize: 13, color: '#6B7280' }}>
-              נכתב ע״י {soferName ?? 'סופר מוסמך'}
+              {t('card.writtenBy').replace('{x}', soferName ?? t('card.certifiedScribe'))}
             </span>
           </div>
         )}
@@ -1102,7 +1113,7 @@ function StamCard({
           {hasSale && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
               <span style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'line-through' }}>{formatPrice(product.was!)}</span>
-              <span style={{ background: '#111111', color: '#FFFFFF', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 6px' }}>{savePct}% הנחה</span>
+              <span style={{ background: '#111111', color: '#FFFFFF', fontSize: 11, fontWeight: 600, borderRadius: 0, padding: '2px 6px' }}>{savePct}% {t('card.off')}ה</span>
             </div>
           )}
         </div>
@@ -1121,7 +1132,7 @@ function StamCard({
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}
             >
-              הוספה לסל
+              {t('action.addToCart')}
             </button>
           ) : (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 0, height: 30, marginTop: 8 }}>
@@ -1139,6 +1150,7 @@ function StamCard({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function CategoryClient({ category }: { category: string }) {
+  const { t, tc, locale } = useT();
   const searchParams = useSearchParams();
   const urlFilter     = searchParams.get('filter')     ?? null;
   const urlLevel      = searchParams.get('level')      ?? null;
@@ -1552,8 +1564,8 @@ export default function CategoryClient({ category }: { category: string }) {
   }, [paginated]);
 
   const SORT_LABELS: Record<SortBy, string> = {
-    popular: 'הכי נמכר', newest: 'חדש לישן', oldest: 'ישן לחדש',
-    price_asc: 'מחיר: נמוך לגבוה', price_desc: 'מחיר: גבוה לנמוך',
+    popular: t('sort.popular'), newest: t('sort.newest'), oldest: t('sort.oldest'),
+    price_asc: t('sort.priceAsc'), price_desc: t('sort.priceDesc'),
   };
 
   return (
@@ -1564,7 +1576,7 @@ export default function CategoryClient({ category }: { category: string }) {
         <div className="max-w-7xl mx-auto flex items-center gap-2 text-xs text-gray-400">
           <Link href="/" className="hover:text-[#1a1a1a] flex items-center gap-1 transition-colors font-medium">
             <IconHome size={12} />
-            דף הבית
+            {t('cat.home')}
           </Link>
           <IconChevronLeft size={11} />
           <span className="text-[#1a1a1a] font-semibold">{category}</span>
@@ -1575,11 +1587,11 @@ export default function CategoryClient({ category }: { category: string }) {
       <div style={{ background: '#FFFFFF', padding: '40px 20px 24px' }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'baseline', gap: 8 }} dir="rtl">
           <h1 style={{ fontSize: 26, fontWeight: 400, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>
-            {category === 'מתנות' ? 'מתנות ומוצרי בית' : category}
+            {category === 'מתנות' ? t('cat.giftsTitle') : tc(category)}
           </h1>
           {!loading && (
             <span style={{ fontSize: 13, color: '#6B7280', marginRight: 8 }}>
-              נמצאו {filtered.length.toLocaleString('he-IL')} מוצרים
+              {t('cat.foundN').replace('{n}', filtered.length.toLocaleString(locale))}
             </span>
           )}
         </div>
@@ -1606,7 +1618,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
           <div style={{ maxWidth: '80rem', margin: '0 auto', position: 'relative', zIndex: 2 }}>
             <div style={{ fontSize: 20, fontWeight: 900, color: '#FFF', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10, letterSpacing: '-0.5px', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-              🎁 <span>מבצע כיפות נוסף</span>
+              🎁 <span>{t('cat.kippotBundle')}</span>
             </div>
             <div style={{ fontSize: 14, color: '#FFF', lineHeight: 1.7 }}>
               <p style={{ margin: '0 0 14px 0', fontWeight: 500, textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
@@ -1614,16 +1626,16 @@ export default function CategoryClient({ category }: { category: string }) {
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
                 <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', backdropFilter: 'blur(10px)' }}>
-                  <div style={{ fontSize: 11, color: '#666', marginBottom: 4, fontWeight: 600 }}>מוצר 1</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>מחיר מלא</div>
+                  <div style={{ fontSize: 11, color: '#666', marginBottom: 4, fontWeight: 600 }}>{t('cat.product1')}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>{t('cat.fullPrice')}</div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', border: '2px solid var(--ys-accent)', backdropFilter: 'blur(10px)' }}>
-                  <div style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 700, marginBottom: 4 }}>מוצר 2</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>10% הנחה</div>
+                  <div style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 700, marginBottom: 4 }}>{t('cat.product2')}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>{t('cat.off10')}</div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '12px 14px', textAlign: 'center', border: '2px solid var(--ys-accent)', backdropFilter: 'blur(10px)' }}>
-                  <div style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 700, marginBottom: 4 }}>מוצר 3+</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>15% הנחה</div>
+                  <div style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 700, marginBottom: 4 }}>{t('cat.product3plus')}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-text)' }}>{t('cat.off15')}</div>
                 </div>
               </div>
               <p style={{ margin: '0', color: '#FFF', fontSize: 13, fontStyle: 'italic', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
@@ -1741,8 +1753,8 @@ export default function CategoryClient({ category }: { category: string }) {
           >
             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5 lg:hidden" />
             <div className="hidden lg:flex items-center justify-between mb-4">
-              <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--ys-ink)' }}>סינון</span>
-              <button onClick={() => setDrawerOpen(false)} aria-label="סגור סינון"
+              <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--ys-ink)' }}>{t('cat.filter')}</span>
+              <button onClick={() => setDrawerOpen(false)} aria-label={t('cat.closeFilter')}
                 style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888', lineHeight: 1 }}>✕</button>
             </div>
             <FilterSidebar filters={filters} onChange={setFilters} products={allLoaded} category={category} catFilter={catFilter} onCatFilter={setCatFilter} subCategoryFilter={subCategoryFilter} onSubCategoryFilter={setSubCategoryFilter} availableSubCategories={availableSubCategories} collectionFilter={collectionFilter} onCollectionFilter={setCollectionFilter} availableCollections={availableCollections} />
@@ -1815,7 +1827,7 @@ export default function CategoryClient({ category }: { category: string }) {
                                 style={{ background: 'none', border: 'none', padding: 0, color: '#111111', fontSize: 13, fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: 4, cursor: 'pointer', fontFamily: 'inherit', transition: 'color 0.2s' }}
                                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
                                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}>
-                                הוספה לסל
+                                {t('action.addToCart')}
                               </button>
                             </div>
                           </>
@@ -1894,7 +1906,7 @@ export default function CategoryClient({ category }: { category: string }) {
                       className="appearance-none border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all pr-7"
                       style={{ direction: 'rtl', borderColor: isActive ? '#1a1a1a' : '#e5e7eb', color: isActive ? '#1a1a1a' : '#6b7280', background: isActive ? '#f0f4ff' : '#fff' }}
                     >
-                      <option value="הכל">{spec.label}: הכל</option>
+                      <option value="הכל">{attrKeyLabel(spec.key, locale)}: {t('cat.all')}</option>
                       {spec.options.map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
                   </button>
@@ -1909,7 +1921,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   className="flex-shrink-0 border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
                   style={{ direction: 'rtl', borderColor: filters.nusachFilter ? '#1a1a1a' : '#e5e7eb', color: filters.nusachFilter ? '#1a1a1a' : '#6b7280', background: filters.nusachFilter ? '#f0f4ff' : '#fff' }}
                 >
-                  <option value="הכל">נוסח: הכל</option>
+                  <option value="הכל">{t('cat.nusach')}: {t('cat.all')}</option>
                   {['אשכנז', 'ספרד', 'חב"ד', 'תימני', 'עדות המזרח'].map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
               )}
@@ -1922,7 +1934,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   className="flex-shrink-0 border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
                   style={{ direction: 'rtl', borderColor: filters.level ? '#1a1a1a' : '#e5e7eb', color: filters.level ? '#1a1a1a' : '#6b7280', background: filters.level ? '#f0f4ff' : '#fff' }}
                 >
-                  <option value="הכל">רמת כשרות: הכל</option>
+                  <option value="הכל">{t('cat.kashrutLevel')}: {t('cat.all')}</option>
                   {['מהודר בתכלית', 'מהודר', 'כשר לכתחילה'].map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
               )}
@@ -1934,9 +1946,9 @@ export default function CategoryClient({ category }: { category: string }) {
                 className="flex-shrink-0 border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
                 style={{ direction: 'rtl', borderColor: filters.minRating > 0 ? '#1a1a1a' : '#e5e7eb', color: filters.minRating > 0 ? '#1a1a1a' : '#6b7280', background: filters.minRating > 0 ? '#f0f4ff' : '#fff' }}
               >
-                <option value={0}>דירוג: הכל</option>
-                <option value={3}>3★ ומעלה</option>
-                <option value={4}>4★ ומעלה</option>
+                <option value={0}>{t('cat.ratingLabel')}: {t('cat.all')}</option>
+                <option value={3}>{t('cat.starsUp').replace('{n}', '3')}</option>
+                <option value={4}>{t('cat.starsUp').replace('{n}', '4')}</option>
               </select>
 
               {/* Dynamic attribute filters */}
@@ -1975,7 +1987,7 @@ export default function CategoryClient({ category }: { category: string }) {
                 className="flex-shrink-0 border rounded-none px-3 py-1.5 text-xs font-semibold cursor-pointer focus:outline-none transition-all"
                 style={{ direction: 'rtl', borderColor: collectionFilter ? '#1a1a1a' : '#e5e7eb', color: collectionFilter ? '#1a1a1a' : '#6b7280', background: collectionFilter ? '#f0f4ff' : '#fff' }}
               >
-                <option value="הכל">קולקציה: הכל</option>
+                <option value="הכל">{t('cat.collection')}: {t('cat.all')}</option>
                 {COLLECTIONS_ORDER.filter(c => availableCollections.includes(c)).map(c => (
                   <option key={c} value={c}>{c}</option>
                 ))}
@@ -2148,7 +2160,7 @@ export default function CategoryClient({ category }: { category: string }) {
                       {rest.length > 0 && (
                         <div style={{ marginBottom: 40 }}>
                           <div style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: 10, marginBottom: 16 }}>
-                            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#374151', margin: 0 }}>מוצרים נוספים</h2>
+                            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#374151', margin: 0 }}>{t('cat.moreProducts')}</h2>
                           </div>
                           <div className={gridCls}>
                             {rest.map((p, idx) => renderCard(p, idx))}
@@ -2320,7 +2332,7 @@ export default function CategoryClient({ category }: { category: string }) {
               {hasMore ? (
                 <div ref={sentinelRef} className="flex justify-center items-center py-10 gap-2 text-gray-400">
                   <div className="w-5 h-5 rounded-full border-2 border-gray-300 border-t-[#1a1a1a] animate-spin" />
-                  <span className="text-sm">טוען עוד מוצרים...</span>
+                  <span className="text-sm">{t('cat.loadingMore')}</span>
                 </div>
               ) : (
                 <div className="text-center py-8 text-xs text-gray-400 font-medium">

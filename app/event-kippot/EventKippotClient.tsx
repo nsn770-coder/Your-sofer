@@ -248,7 +248,14 @@ export default function EventKippotClient() {
             <img
               src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_840/v1784837677/ChatGPT_Image_Jul_23_2026_11_14_21_PM_c4gm6t.png"
               alt="מבצע SIMCHA — הנחה על מזכרות לאירועים"
-              style={{ width: '100%', display: 'block' }}
+              /* CLS FIX (08/2026): התמונה היא 840×840 (ריבועית). בלי width/height
+                 הדפדפן לא יודע לשריין לה מקום, והפופאפ גדל מ-307px ל-687px ברגע
+                 שהיא נטענת — 0.371 CLS, כמעט כל ה-CLS של העמוד. עם המידות
+                 הדפדפן מחשב aspect-ratio ושומר את המקום מראש.
+                 width:100% + height:auto שומרים על תצוגה זהה לחלוטין. */
+              width={840}
+              height={840}
+              style={{ width: '100%', height: 'auto', display: 'block' }}
             />
             <div style={{ padding: '12px 16px 16px' }}>
               <div style={{ fontSize: 12.5, color: '#555', lineHeight: 1.7, marginBottom: 10 }}>
