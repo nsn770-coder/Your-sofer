@@ -8,6 +8,13 @@ export interface Product {
   name: string;
   price: number;
 
+  /**
+   * תרגומי שם ותיאור לשפות הנוספות, נכתבים ע"י scripts/translateProducts.mjs.
+   * ⚠️ name / desc / description נשארים המקור בעברית ולא משתנים לעולם —
+   * הם משמשים את האדמין, פיד המרצ'נט, ההזמנות והחיפוש.
+   */
+  translations?: Record<string, { name?: string; description?: string } | undefined>;
+
   // Images
   imgUrl?: string;
   image_url?: string;

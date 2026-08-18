@@ -22,7 +22,6 @@ export const LOCALES: LocaleDef[] = [
   { code: 'en', label: 'English',  flag: '🇺🇸', dir: 'ltr', htmlLang: 'en', ogLocale: 'en_US' },
   { code: 'fr', label: 'Français', flag: '🇫🇷', dir: 'ltr', htmlLang: 'fr', ogLocale: 'fr_FR' },
   { code: 'es', label: 'Español',  flag: '🇪🇸', dir: 'ltr', htmlLang: 'es', ogLocale: 'es_ES' },
-  { code: 'ar', label: 'العربية',  flag: '🇦🇪', dir: 'rtl', htmlLang: 'ar', ogLocale: 'ar_AE' },
   { code: 'ru', label: 'Русский',  flag: '🇷🇺', dir: 'ltr', htmlLang: 'ru', ogLocale: 'ru_RU' },
 ];
 
@@ -62,9 +61,9 @@ export const COUNTRY_TO_LOCALE: Record<string, string> = {
   ES: 'es', MX: 'es', AR: 'es', CL: 'es', CO: 'es', PE: 'es', VE: 'es', EC: 'es',
   UY: 'es', BO: 'es', PY: 'es', CR: 'es', PA: 'es', DO: 'es', GT: 'es', HN: 'es',
   SV: 'es', NI: 'es', CU: 'es', PR: 'es',
-  // Arabic
-  AE: 'ar', SA: 'ar', EG: 'ar', MA: 'ar', JO: 'ar', QA: 'ar', KW: 'ar', BH: 'ar',
-  OM: 'ar', TN: 'ar', DZ: 'ar', LB: 'ar', IQ: 'ar', LY: 'ar', YE: 'ar', SD: 'ar',
+  // המזרח התיכון וצפון אפריקה — אנגלית (ערבית הוסרה מהאתר 08/2026)
+  AE: 'en', SA: 'en', EG: 'en', MA: 'fr', JO: 'en', QA: 'en', KW: 'en', BH: 'en',
+  OM: 'en', TN: 'fr', DZ: 'fr', LB: 'fr', IQ: 'en', LY: 'en', YE: 'en', SD: 'en',
   // Russian
   RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru', AM: 'ru', AZ: 'ru', MD: 'ru', UZ: 'ru',
 };

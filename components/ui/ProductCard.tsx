@@ -9,6 +9,7 @@ import { db } from '@/app/firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice, effectivePrice as computeEffectivePrice, type EffectivePriceFields } from '@/app/lib/utils';
 import { useT } from '@/app/lib/i18n/useT';
+import { productName } from '@/app/lib/i18n/productText';
 import PriceApprox from '@/app/components/PriceApprox';
 
 interface Props {
@@ -48,7 +49,10 @@ interface Props {
    * saleEndsAt) ומציג מחיר מלא בזמן שעמוד המוצר מציג מחיר מבצע.
    * העברה: productDoc={p}.
    */
-  productDoc?: EffectivePriceFields;
+  productDoc?: EffectivePriceFields & {
+    name?: string;
+    translations?: Record<string, { name?: string; description?: string } | undefined>;
+  };
   /** מוצר מארז — מציג באדג' "מארז מהודר" */
   isBundle?: boolean;
 }
@@ -120,7 +124,9 @@ export default function ProductCard({
   comingSoon, expectedArrivalDate, productDoc, isBundle,
   partnerId, partnerName, warehouseType,
 }: Props) {
-  const { t, dir } = useT();
+  const { t, dir, locale } = useT();
+  // שם מתורגם כשקיים; אחרת השם העברי המקורי
+  const displayName = productName({ ...productDoc, name: productDoc?.name ?? name }, locale) || name;
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
   const { user } = useAuth();
@@ -280,7 +286,7 @@ export default function ProductCard({
       <div className={`relative w-full overflow-hidden rounded-none${horizontal ? ' pc-img' : ''}`} style={{ aspectRatio: '1 / 1', background: '#FFFFFF' }}>
         {imgSrc ? (
           <img
-            src={imgSrc} alt={name}
+            src={imgSrc} alt={displayName}
             width={400} height={400}
             loading={aboveFold ? 'eager' : 'lazy'}
             fetchPriority={aboveFold ? 'high' : 'auto'}
@@ -348,7 +354,7 @@ export default function ProductCard({
           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
           overflow: 'hidden', minHeight: '40px',
         } as React.CSSProperties}>
-          {name}
+          {displayName}
         </h3>
 
         {(soferId || soferName || (cat && SOFER_CATS.has(cat))) && (

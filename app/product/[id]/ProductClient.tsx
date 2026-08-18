@@ -24,6 +24,7 @@ const MezuzahUpsellPopup = dynamic(() => import('@/components/MezuzahUpsellPopup
 const KippaDesignModal = dynamic(() => import('@/app/designer/components/KippaDesignModal'), { ssr: false });
 import type { KippaDesign } from '@/app/designer/utils/types';
 import { useT } from '@/app/lib/i18n/useT';
+import { productName, productDescription } from '@/app/lib/i18n/productText';
 
 /** 'YYYY-MM-DD' → 'DD/MM/YYYY' — תאריך צפי הגעה ("מגיע בקרוב") */
 function formatArrivalDate(iso?: string | null): string {
@@ -1563,7 +1564,7 @@ function ProductContentSections({ product, pageDefaults }: { product: Product; p
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ProductClient({ initialProduct = null }: { initialProduct?: Partial<Product> | null }) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const { id } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1857,6 +1858,12 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
       <button onClick={() => router.push('/')} style={{ background: 'var(--ys-accent)', color: '#FEFBF7', border: 'none', borderRadius: 10, padding: '10px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>{t('pd.backToStore')}</button>
     </div>
   );
+
+  // ── שם ותיאור בשפת המשתמש ────────────────────────────────────────────────
+  // נופלים לעברית כשאין תרגום למוצר הזה, כך שהעמוד תמיד מלא.
+  // ⚠️ אלה לתצוגה בלבד — product.name נשאר בשימוש בכל מה שנשמר להזמנה.
+  const displayName = productName(product, locale);
+  const displayDesc = productDescription(product, locale);
 
   const allMediaRaw = [product.imgUrl || product.image_url, product.imgUrl2 || product.img1, product.imgUrl3 || product.img2, product.imgUrl4 || product.img3, product.imgUrl5].filter(Boolean) as string[];
   const allMediaDeduped = [...new Set(allMediaRaw)];
@@ -2733,7 +2740,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             {product.cat && (
               <><span onClick={() => router.push(`/category/${encodeURIComponent(product.cat!)}`)} style={{ cursor: 'pointer', color: 'var(--ys-text)', fontWeight: 500 }}>{product.cat}</span><Icon.Chevron /></>
             )}
-            <span style={{ color: '#555', fontWeight: 500 }}>{product.name.slice(0, isMobile ? 28 : 48)}{product.name.length > (isMobile ? 28 : 48) ? '…' : ''}</span>
+            <span style={{ color: '#555', fontWeight: 500 }}>{displayName.slice(0, isMobile ? 28 : 48)}{displayName.length > (isMobile ? 28 : 48) ? '…' : ''}</span>
           </div>
           {user?.role === 'admin' && (
             <button onClick={() => setAdminOpen(prev => !prev)} style={{ background: adminOpen ? 'var(--ys-accent)' : '#1a1a1a', color: adminOpen ? '#1a1a1a' : '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
@@ -2754,9 +2761,9 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
                   <source src={product.videoUrl} />
                 </video>
               ) : (
-                <img src={allMediaOptimized[activeImg] || '/placeholder.png'} alt={product.name} onClick={() => setZoomVisible(true)}
+                <img src={allMediaOptimized[activeImg] || '/placeholder.png'} alt={displayName} onClick={() => setZoomVisible(true)}
                   /* נגישות: הגדלת תמונה גם במקלדת */
-                  role="button" tabIndex={0} aria-label={t('pd.zoomAria').replace('{x}', product.name)}
+                  role="button" tabIndex={0} aria-label={t('pd.zoomAria').replace('{x}', displayName)}
                   onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setZoomVisible(true); } }}
                   /* LCP: main product image — eager + high priority (preloaded in page.tsx) */
                   loading="eager"
@@ -2802,7 +2809,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
           {/* ── Column 2: Details ── */}
           <div style={{ background: '#fff', borderRadius: isMobile ? 0 : 12, border: isMobile ? 'none' : '1px solid #e8e8e8', padding: isMobile ? '16px 14px' : '24px 20px', marginTop: isMobile ? 8 : 0 }}>
-            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1F2937', lineHeight: 1.4, marginBottom: 10 }}>{product.name}</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1F2937', lineHeight: 1.4, marginBottom: 10 }}>{displayName}</h1>
 
             {/* הבאדג' "ניתן להוסיף רקמת שם אישית" הוסר (07/2026) — אפשרויות
                 הרקמה/ההטבעה/ההקדשה מוצגות ממילא בתוך ה-BuyBox ליד כפתור
@@ -2880,8 +2887,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
               {activeTab === 'details' && (
                 <div>
-                  {(product.desc || product.description) ? (() => {
-                    const fullDesc = (product.desc || product.description) as string;
+                  {displayDesc ? (() => {
+                    const fullDesc = displayDesc;
                     const SHORT_LEN = 120;
                     const isLong = fullDesc.length > SHORT_LEN;
                     const displayText = isLong && !descExpanded ? fullDesc.slice(0, SHORT_LEN) + '…' : fullDesc;
@@ -3181,10 +3188,10 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
 
       {/* Zoom Modal */}
       {zoomVisible && allMedia.length > 0 && (
-        <div role="dialog" aria-modal="true" aria-label={t('pd.zoomView').replace('{x}', product.name)}
+        <div role="dialog" aria-modal="true" aria-label={t('pd.zoomView').replace('{x}', displayName)}
           onKeyDown={e => { if (e.key === 'Escape') setZoomVisible(false); }}
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setZoomVisible(false)}>
-          <img src={optimizeCloudinaryUrl(allMedia[activeImg], 1600)} alt={`${product.name} — תמונה ${activeImg + 1} מתוך ${allMedia.length}`} style={{ maxWidth: '92vw', maxHeight: '92vh', objectFit: 'contain', borderRadius: 8 }} />
+          <img src={optimizeCloudinaryUrl(allMedia[activeImg], 1600)} alt={`${displayName} — ${t('pd.imageNofM').replace('{n}', String(activeImg + 1)).replace('{m}', String(allMedia.length))}`} style={{ maxWidth: '92vw', maxHeight: '92vh', objectFit: 'contain', borderRadius: 8 }} />
           <button onClick={() => setZoomVisible(false)} aria-label={t('pd.closeZoom')} autoFocus style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon.X size={18} />
           </button>

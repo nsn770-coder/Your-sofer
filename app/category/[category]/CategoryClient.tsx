@@ -17,6 +17,7 @@ import { formatPrice } from '@/app/lib/utils';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { findParentCat } from '@/app/constants/categories';
 import { useT } from '@/app/lib/i18n/useT';
+import { productName } from '@/app/lib/i18n/productText';
 import { attrKeyLabel, attrValueLabel } from '@/app/lib/i18n/attributes';
 import type { DictKey } from '@/app/lib/i18n/dictionaries';
 
@@ -1017,6 +1018,8 @@ function StamCard({
   aboveFold?: boolean;
 }) {
   const { t, tc, locale } = useT();
+  // ⚠️ לתצוגה בלבד — ה-addItem למטה שומר את product.name העברי בעגלה ובהזמנה
+  const displayName = productName(product, locale);
   const router = useRouter();
   const { items, addItem, updateQty } = useCart();
   const itemInCart = items.find(i => i.id === product.id);
@@ -1049,7 +1052,7 @@ function StamCard({
       <div style={{ width: 110, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
         <div style={{ width: 110, height: 110, borderRadius: 0, overflow: 'hidden', background: '#F8F6F1' }}>
           {imgSrc ? (
-            <img src={imgSrc} alt={product.name} loading={aboveFold ? 'eager' : 'lazy'}
+            <img src={imgSrc} alt={displayName} loading={aboveFold ? 'eager' : 'lazy'}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, color: '#d1d5db' }}>✍</div>
@@ -1087,7 +1090,7 @@ function StamCard({
           fontSize: 16, fontWeight: 700, color: '#1F2937', lineHeight: 1.4, margin: 0,
           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
         } as React.CSSProperties}>
-          {product.name}
+          {displayName}
         </p>
 
         {/* Sofer row */}

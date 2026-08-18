@@ -16,7 +16,6 @@ export const CURRENCY_BY_LOCALE: Record<string, CurrencyCode | null> = {
   fr: 'EUR',
   es: 'EUR',
   ru: 'RUB',
-  ar: 'USD',
 };
 
 /**
