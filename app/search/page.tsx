@@ -4,6 +4,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { algoliasearch } from 'algoliasearch';
 import ProductCard from '@/components/ui/ProductCard';
 import { search as pixelSearch } from '@/lib/metaPixel';
+import { useT } from '@/app/lib/i18n/useT';
+import type { DictKey } from '@/app/lib/i18n/dictionaries';
 
 // ── Algolia client ─────────────────────────────────────────────────────────────
 
@@ -28,6 +30,8 @@ interface AlgoliaHit {
   badge?: string | null;
   was?: number | null;
   priority?: number;
+  /** שמות מתורגמים מהאינדקס — ProductCard קורא אותם לבד */
+  translations?: Record<string, { name?: string; description?: string } | undefined>;
 }
 
 interface SearchState {
@@ -43,11 +47,11 @@ interface SearchState {
 
 const PAGE_SIZE = 24;
 
-const SORT_OPTIONS: { value: SortIndex; label: string }[] = [
-  { value: 'products',           label: 'רלוונטיות' },
-  { value: 'products_price_asc', label: 'מחיר: נמוך לגבוה' },
-  { value: 'products_price_desc',label: 'מחיר: גבוה לנמוך' },
-  { value: 'products_newest',    label: 'חדש באתר' },
+const SORT_OPTIONS: { value: SortIndex; labelKey: DictKey }[] = [
+  { value: 'products',           labelKey: 'search.sortRelevance' },
+  { value: 'products_price_asc', labelKey: 'search.sortPriceAsc' },
+  { value: 'products_price_desc',labelKey: 'search.sortPriceDesc' },
+  { value: 'products_newest',    labelKey: 'search.sortNewest' },
 ];
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────────
@@ -103,6 +107,7 @@ function buildParams(s: SearchState): URLSearchParams {
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function SearchPage() {
+  const { t, tc, dir, def, href } = useT();
   const rawParams   = useSearchParams();
   const router      = useRouter();
   const [state, setStateRaw] = useState<SearchState>(() => stateFromParams(rawParams));
@@ -119,10 +124,11 @@ export default function SearchPage() {
     setStateRaw(prev => {
       const s = typeof next === 'function' ? next(prev) : next;
       const params = buildParams(s);
-      router.replace(`/search?${params.toString()}`, { scroll: false });
+      // ⚠️ href() — בלעדיו הדפדוף והסינון היו זורקים משתמש מ-/en/search לעברית
+      router.replace(href(`/search?${params.toString()}`), { scroll: false });
       return s;
     });
-  }, [router]);
+  }, [router, href]);
 
   // sync URL → state when user presses back/forward
   useEffect(() => {
@@ -161,6 +167,8 @@ export default function SearchPage() {
         attributesToRetrieve: [
           'id', 'name', 'price', 'image', 'cat', 'subCategory',
           'createdAt', 'isBestSeller', 'badge', 'was', 'priority',
+          // בלי זה ProductCard לא רואה את השם המתורגם ונופל לעברית
+          'translations',
         ],
       },
     }).then(res => {
@@ -200,14 +208,14 @@ export default function SearchPage() {
   // ── Sidebar ──────────────────────────────────────────────────────────────────
 
   const sidebar = (
-    <div dir="rtl" className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-sm">
+    <div dir={dir} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-[#1a1a1a] flex items-center justify-center">
             <IconFilter size={14} />
           </div>
-          <span className="font-bold text-gray-800 text-sm">סינון</span>
+          <span className="font-bold text-gray-800 text-sm">{t('search.filter')}</span>
         </div>
         {hasActiveFilters && (
           <button
@@ -215,17 +223,19 @@ export default function SearchPage() {
             className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-semibold transition-colors bg-red-50 hover:bg-red-100 px-2 py-1 rounded-lg"
           >
             <IconX size={10} />
-            נקה הכל
+            {t('search.clearAll')}
           </button>
         )}
       </div>
 
       {/* Category facets */}
       {facetCats.length > 1 && (
-        <SidebarSection title="קטגוריה">
+        <SidebarSection title={t('search.category')}>
           <div className="flex flex-wrap gap-1.5">
             {[{ value: '', count: totalHits }, ...facetCats].map(opt => {
-              const label = opt.value === '' ? 'הכל' : opt.value;
+              // ⚠️ opt.value הוא ערך ה-facet האמיתי ונשלח כמו שהוא ל-Algolia;
+              // רק התווית עוברת תרגום.
+              const label = opt.value === '' ? t('search.all') : tc(opt.value);
               const active = (state.cat || '') === opt.value;
               return (
                 <button
@@ -251,20 +261,20 @@ export default function SearchPage() {
       )}
 
       {/* Price range */}
-      <SidebarSection title="טווח מחיר">
+      <SidebarSection title={t('search.priceRange')}>
         <div className="flex items-center gap-2">
           <input
-            type="number" min={0} placeholder="מינ׳"
+            type="number" min={0} placeholder={t('search.min')}
             value={state.minPrice}
             onChange={e => setState(s => ({ ...s, minPrice: e.target.value, page: 1 }))}
-            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all"
+            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-start focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all"
           />
           <span className="text-gray-300">-</span>
           <input
-            type="number" min={0} placeholder="מקס׳"
+            type="number" min={0} placeholder={t('search.max')}
             value={state.maxPrice}
             onChange={e => setState(s => ({ ...s, maxPrice: e.target.value, page: 1 }))}
-            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all"
+            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-start focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-[#1a1a1a]/20 transition-all"
           />
         </div>
       </SidebarSection>
@@ -275,20 +285,25 @@ export default function SearchPage() {
   // ── Active filter pills ───────────────────────────────────────────────────────
 
   const pills: { label: string; onRemove: () => void }[] = [];
-  if (state.cat)     pills.push({ label: `קטגוריה: ${state.cat}`, onRemove: () => setState(s => ({ ...s, cat: '', page: 1 })) });
+  if (state.cat) pills.push({
+    label: t('search.pillCategory').replace('{x}', tc(state.cat)),
+    onRemove: () => setState(s => ({ ...s, cat: '', page: 1 })),
+  });
   if (state.minPrice || state.maxPrice) pills.push({
-    label: `מחיר: ${state.minPrice || '0'} - ${state.maxPrice || '∞'} ₪`,
+    label: t('search.pillPrice')
+      .replace('{min}', state.minPrice || '0')
+      .replace('{max}', state.maxPrice || '∞'),
     onRemove: () => setState(s => ({ ...s, minPrice: '', maxPrice: '', page: 1 })),
   });
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
-    <main className="max-w-7xl mx-auto px-3 sm:px-6 py-8" dir="rtl">
+    <main className="max-w-7xl mx-auto px-3 sm:px-6 py-8" dir={dir}>
 
       {/* Title row */}
       <div className="flex items-start justify-between gap-4 mb-1">
-        <h1 className="text-xl sm:text-2xl font-black text-[#1a1a1a]">תוצאות חיפוש</h1>
+        <h1 className="text-xl sm:text-2xl font-black text-[#1a1a1a]">{t('search.title')}</h1>
 
         {/* Sort dropdown */}
         {state.query && (
@@ -297,10 +312,10 @@ export default function SearchPage() {
               value={state.sort}
               onChange={e => setState(s => ({ ...s, sort: e.target.value as SortIndex, page: 1 }))}
               className="appearance-none text-xs font-semibold border border-gray-200 rounded-lg px-3 py-2 pr-8 bg-white text-gray-700 cursor-pointer focus:outline-none focus:border-[#1a1a1a] hover:border-gray-400 transition-all"
-              style={{ direction: 'rtl' }}
+              style={{ direction: dir }}
             >
               {SORT_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
+                <option key={o.value} value={o.value}>{t(o.labelKey)}</option>
               ))}
             </select>
             <div className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-gray-400">
@@ -313,9 +328,11 @@ export default function SearchPage() {
       {/* Subtitle */}
       {state.query && (
         <p className="text-sm text-gray-500 mb-4">
-          חיפוש: <span className="font-bold text-[#1a1a1a]">{state.query}</span>
+          {t('search.queryLabel')} <span className="font-bold text-[#1a1a1a]">{state.query}</span>
           {!loading && (
-            <span className="mr-2 text-gray-400">({totalHits.toLocaleString('he-IL')} תוצאות)</span>
+            <span className="ms-2 text-gray-400">
+              {t('search.nResults').replace('{n}', totalHits.toLocaleString(def.htmlLang))}
+            </span>
           )}
         </p>
       )}
@@ -346,7 +363,7 @@ export default function SearchPage() {
           <div className="w-5 h-5 rounded bg-[#1a1a1a] flex items-center justify-center">
             <IconFilter size={11} />
           </div>
-          סינון
+          {t('search.filter')}
           {hasActiveFilters && (
             <span className="w-2 h-2 rounded-full bg-[var(--ys-accent)]" />
           )}
@@ -357,9 +374,9 @@ export default function SearchPage() {
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white overflow-y-auto p-4">
+          <div className={`absolute ${dir === 'rtl' ? 'right-0' : 'left-0'} top-0 bottom-0 w-72 bg-white overflow-y-auto p-4`}>
             <div className="flex items-center justify-between mb-4">
-              <span className="font-bold text-gray-800">סינון</span>
+              <span className="font-bold text-gray-800">{t('search.filter')}</span>
               <button onClick={() => setSidebarOpen(false)} className="p-1 rounded hover:bg-gray-100">
                 <IconX size={16} />
               </button>
@@ -373,7 +390,7 @@ export default function SearchPage() {
       {!state.query && (
         <div className="text-center py-20">
           <p className="text-4xl mb-4">🔍</p>
-          <p className="text-lg font-bold text-gray-600">הקלד מילת חיפוש כדי להתחיל</p>
+          <p className="text-lg font-bold text-gray-600">{t('search.typeToStart')}</p>
         </div>
       )}
 
@@ -388,10 +405,12 @@ export default function SearchPage() {
       {!loading && state.query && hits.length === 0 && (
         <div className="text-center py-20">
           <p className="text-4xl mb-4">🔍</p>
-          <p className="text-lg font-bold text-gray-600">לא נמצאו תוצאות עבור &ldquo;{state.query}&rdquo;</p>
+          <p className="text-lg font-bold text-gray-600">
+            {t('search.noResultsFor').replace('{q}', state.query)}
+          </p>
           {hasActiveFilters
-            ? <p className="text-sm text-gray-400 mt-2">נסה לנקות את הסינון</p>
-            : <p className="text-sm text-gray-400 mt-2">נסה מילת חיפוש אחרת</p>
+            ? <p className="text-sm text-gray-400 mt-2">{t('search.tryClearFilters')}</p>
+            : <p className="text-sm text-gray-400 mt-2">{t('search.tryAnotherWord')}</p>
           }
         </div>
       )}
@@ -431,11 +450,11 @@ export default function SearchPage() {
                   disabled={state.page === 1}
                   className="px-5 py-2 rounded-lg border border-[#1a1a1a] text-[#1a1a1a] font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#1a1a1a] hover:text-white transition-colors"
                 >
-                  ← הקודם
+                  ← {t('search.prev')}
                 </button>
 
                 <span className="text-sm font-semibold text-gray-600">
-                  עמוד {state.page} מתוך {totalPages}
+                  {t('search.pageOf').replace('{n}', String(state.page)).replace('{total}', String(totalPages))}
                 </span>
 
                 <button
@@ -443,7 +462,8 @@ export default function SearchPage() {
                   disabled={state.page === totalPages}
                   className="px-5 py-2 rounded-lg border border-[#1a1a1a] text-[#1a1a1a] font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#1a1a1a] hover:text-white transition-colors"
                 >
-                  הבא ←
+                  {/* בעברית נשמר בדיוק המראה הקודם: "הבא ←" */}
+                  {t('search.next')} {dir === 'rtl' ? '←' : '→'}
                 </button>
               </div>
             )}

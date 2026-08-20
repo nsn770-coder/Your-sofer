@@ -136,7 +136,7 @@ export function localizePath(path: string, locale: string): string {
  * ה-middleware מפנה אוטומטית רק לנתיבים שברשימה — כדי שלקוח מחו"ל
  * לא יינחת על 404. מרחיבים אותה בכל פעם שעמוד נוסף מתורגם.
  */
-export const TRANSLATED_PATHS: string[] = ['/', '/cart', '/checkout', '/category', '/product'];
+export const TRANSLATED_PATHS: string[] = ['/', '/cart', '/checkout', '/category', '/product', '/search'];
 
 export function hasTranslation(path: string): boolean {
   // '/category' תופס גם את '/category/כיפות' — ההתאמה היא על תחילת הנתיב,

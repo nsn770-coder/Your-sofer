@@ -2,6 +2,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { algoliasearch } from 'algoliasearch';
+import { useT } from '@/app/lib/i18n/useT';
+import { productName } from '@/app/lib/i18n/productText';
 
 const APP_ID     = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID     ?? '';
 const SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY ?? '';
@@ -17,6 +19,8 @@ interface ProductHit {
   price:    number | null;
   cat:      string;
   image:    string;
+  /** נכתב לאינדקס ע"י scripts/syncAlgolia.mjs — שמות בלבד, בלי תיאורים */
+  translations?: Record<string, { name?: string } | undefined>;
 }
 
 interface CategoryHit {
@@ -34,6 +38,7 @@ interface Props {
 }
 
 export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
+  const { t, tc, dir, locale, href } = useT();
   const [query,      setQuery]      = useState('');
   const [products,   setProducts]   = useState<ProductHit[]>([]);
   const [categories, setCategories] = useState<CategoryHit[]>([]);
@@ -91,15 +96,16 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
     if (e.key === 'Escape') { setOpen(false); setQuery(''); }
     if (e.key === 'Enter' && query.trim().length >= 3) {
       setOpen(false);
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+      router.push(href(`/search?q=${encodeURIComponent(query.trim())}`));
       onNavigate?.();
     }
   };
 
+  /** ⚠️ מקבל נתיב בסיס ללא קידומת — href() מוסיף אותה לפי השפה הנוכחית */
   const navigate = (path: string) => {
     setOpen(false);
     setQuery('');
-    router.push(path);
+    router.push(href(path));
     onNavigate?.();
   };
 
@@ -117,9 +123,9 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={() => { if (query.length >= 3 && hasResults) setOpen(true); }}
-          placeholder='חיפוש סת"מ ויודאיקה...'
+          placeholder={t('search.placeholder')}
           autoComplete="off"
-          dir="rtl"
+          dir={dir}
           style={{
             flex:       1,
             border:     'none',
@@ -129,19 +135,19 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
             background: 'var(--ys-surface)',
             outline:    'none',
             minWidth:   0,
-            textAlign:  'right',
+            textAlign:  'start',
           }}
         />
         <button
           onClick={() => {
             if (query.trim().length >= 3) {
               setOpen(false);
-              router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+              router.push(href(`/search?q=${encodeURIComponent(query.trim())}`));
               onNavigate?.();
             }
           }}
           style={{ background: '#373A5A', border: 'none', padding: '0 14px', cursor: 'pointer', flexShrink: 0 }}
-          aria-label="חפש"
+          aria-label={t('search.submit')}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FEFBF7" strokeWidth="2.5">
             <circle cx="11" cy="11" r="8" />
@@ -164,17 +170,17 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
           zIndex:     300,
           maxHeight:  480,
           overflowY:  'auto',
-          direction:  'rtl',
+          direction:  dir,
         }}>
           {loading && (
-            <div style={{ padding: '14px 16px', color: '#999', fontSize: 13, textAlign: 'right' }}>
-              מחפש...
+            <div style={{ padding: '14px 16px', color: '#999', fontSize: 13, textAlign: 'start' }}>
+              {t('search.searching')}
             </div>
           )}
 
           {!loading && !hasResults && (
-            <div style={{ padding: '14px 16px', color: '#999', fontSize: 13, textAlign: 'right' }}>
-              לא נמצאו תוצאות
+            <div style={{ padding: '14px 16px', color: '#999', fontSize: 13, textAlign: 'start' }}>
+              {t('search.noResults')}
             </div>
           )}
 
@@ -183,8 +189,8 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
               {/* Categories */}
               {categories.length > 0 && (
                 <div>
-                  <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 700, color: 'var(--ys-purple)', letterSpacing: 1.5, textAlign: 'right', borderBottom: '1px solid #F0EDE8' }}>
-                    קטגוריות
+                  <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 700, color: 'var(--ys-purple)', letterSpacing: 1.5, textAlign: 'start', borderBottom: '1px solid #F0EDE8' }}>
+                    {t('search.categories')}
                   </div>
                   {categories.map(cat => (
                     <button
@@ -194,7 +200,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
                       onMouseEnter={e => { e.currentTarget.style.background = '#FBF9F4'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
                     >
-                      <span style={{ fontWeight: 600, fontSize: 13 }}>{cat.displayName || cat.name}</span>
+                      <span style={{ fontWeight: 600, fontSize: 13 }}>{tc(cat.displayName || cat.name)}</span>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#51285F" strokeWidth="2.5" style={{ flexShrink: 0 }}>
                         <polyline points="9 18 3 12 9 6" />
                       </svg>
@@ -206,8 +212,8 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
               {/* Products */}
               {products.length > 0 && (
                 <div>
-                  <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 700, color: 'var(--ys-purple)', letterSpacing: 1.5, textAlign: 'right', borderBottom: '1px solid #F0EDE8' }}>
-                    מוצרים
+                  <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 700, color: 'var(--ys-purple)', letterSpacing: 1.5, textAlign: 'start', borderBottom: '1px solid #F0EDE8' }}>
+                    {t('search.products')}
                   </div>
                   {products.map(p => (
                     <button
@@ -229,12 +235,12 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
                           />
                         )}
                       </div>
-                      <div style={{ flex: 1, textAlign: 'right', minWidth: 0 }}>
+                      <div style={{ flex: 1, textAlign: 'start', minWidth: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ys-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {p.name}
+                          {productName(p, locale)}
                         </div>
                         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 2 }}>
-                          {p.cat    && <span style={{ fontSize: 11, color: '#888' }}>{p.cat}</span>}
+                          {p.cat    && <span style={{ fontSize: 11, color: '#888' }}>{tc(p.cat)}</span>}
                           {p.price != null && <span style={{ fontSize: 12, fontWeight: 700, color: '#373A5A' }}>₪{p.price}</span>}
                         </div>
                       </div>
@@ -249,7 +255,7 @@ export default function AlgoliaSearch({ onNavigate, autoFocus, style }: Props) {
                   onClick={() => navigate(`/search?q=${encodeURIComponent(query)}`)}
                   style={{ background: 'none', border: 'none', color: '#373A5A', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
                 >
-                  הצג את כל התוצאות ←
+                  {t('search.showAll')}
                 </button>
               </div>
             </>

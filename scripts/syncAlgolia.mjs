@@ -55,6 +55,20 @@ if (!algoliaAppId || !algoliaAdminKey) {
 
 const client = algoliasearch(algoliaAppId, algoliaAdminKey);
 
+/**
+ * משאיר רק את שדה ה-name מכל שפה. undefined כשאין תרגומים בכלל, כדי לא
+ * לשלוח מפתח ריק על כל אחד מ-4,700 הרשומות.
+ */
+function pickNames(translations) {
+  if (!translations || typeof translations !== 'object') return undefined;
+  const out = {};
+  for (const [loc, v] of Object.entries(translations)) {
+    const name = v?.name;
+    if (typeof name === 'string' && name.trim()) out[loc] = { name: name.trim() };
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
 async function syncProducts() {
   console.log('\n📦 קורא מוצרים מ-Firestore...');
   const snap = await db.collection('products').get();
@@ -96,6 +110,11 @@ async function syncProducts() {
       was:          typeof d.was === 'number' ? d.was : null,
       priority:     typeof d.priority === 'number' ? d.priority : 0,
       outOfStock:   d.outOfStock === true,
+      // שמות מתורגמים — נכתבים ע"י scripts/translateProducts.mjs תחת
+      // translations.<locale>. שולחים רק את השם, בלי התיאור: התיאורים
+      // מנפחים את האינדקס פי כמה והחיפוש בהם ממילא רועש.
+      // ProductCard קורא את translations ישירות, ולכן דף התוצאות מתורגם מעצמו.
+      translations: pickNames(d.translations),
     });
   }
 
@@ -109,11 +128,19 @@ async function syncProducts() {
   await client.setSettings({
     indexName: 'products',
     indexSettings: {
-      searchableAttributes: ['name', 'cat', 'subCategory', 'sku', 'styleTag', 'lookTag', 'collection', 'description'],
+      // השמות המתורגמים אחרי 'name' ולפני השאר: לקוח שמחפש "kippah" חייב
+      // למצוא, אבל שאילתה עברית עדיין צריכה להעדיף התאמה בשם המקורי.
+      searchableAttributes: [
+        'name',
+        'translations.en.name', 'translations.fr.name', 'translations.es.name', 'translations.ru.name',
+        'cat', 'subCategory', 'sku', 'styleTag', 'lookTag', 'collection', 'description',
+      ],
       attributesForFaceting: ['cat', 'subCategory', 'filterOnly(inStock)', 'price'],
       attributesToRetrieve:  ['*'],
-      queryLanguages:        ['he'],
-      indexLanguages:        ['he'],
+      // עברית ראשונה — היא עדיין שפת הרוב ורוב השאילתות. שאר השפות נוספו
+      // כדי ש-ignorePlurals ועצירת מילים יעבדו גם על "kippahs"/"kippot".
+      queryLanguages:        ['he', 'en', 'fr', 'es', 'ru'],
+      indexLanguages:        ['he', 'en', 'fr', 'es', 'ru'],
       ignorePlurals:         true,
       removeWordsIfNoResults: 'allOptional',
       minWordSizefor1Typo:   3,
