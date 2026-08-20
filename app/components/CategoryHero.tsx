@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { useT } from '@/app/lib/i18n/useT';
 
 interface CatDoc {
   displayName?: string;
@@ -25,6 +26,7 @@ interface CatDoc {
  * ומנועי חיפוש רואים רק רשת מוצרים.
  */
 export default function CategoryHero({ category }: { category: string }) {
+  const { tc, dir, isTranslated } = useT();
   const [doc, setDoc] = useState<CatDoc | null>(null);
 
   useEffect(() => {
@@ -42,16 +44,19 @@ export default function CategoryHero({ category }: { category: string }) {
     return () => { cancelled = true; };
   }, [category]);
 
-  const title = doc?.displayName || doc?.name || category;
+  const title = tc(doc?.displayName || doc?.name || category);
   const image = doc?.imageUrl || doc?.imgUrl;
-  const desc  = doc?.description;
+  // ⚠️ ה-description ב-Firestore הוא פסקה שיווקית בעברית בלבד. עדיף לא להציג
+  // אותה בכלל בעמוד אנגלי מאשר לתקוע פסקה עברית באמצע טקסט לטיני; התמונה
+  // והכותרת המתורגמת נשארות. כשיהיו תיאורי קטגוריה מתורגמים — כאן מחברים אותם.
+  const desc  = isTranslated ? undefined : doc?.description;
 
   // בלי תמונה וגם בלי תיאור אין מה להציג — הכותרת לבדה כבר קיימת בעמוד
   if (!image && !desc) return null;
 
   return (
     <section
-      dir="rtl"
+      dir={dir}
       aria-labelledby="cat-hero-title"
       style={{
         background: 'color-mix(in srgb, var(--ys-purple) 10%, var(--ys-page))',

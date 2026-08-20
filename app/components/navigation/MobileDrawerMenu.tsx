@@ -113,7 +113,8 @@ export default function MobileDrawerMenu({
   const col  = dept && path.colIndex !== undefined ? dept.columns[path.colIndex] : undefined;
 
   const atRoot = !dept;
-  const title  = col ? col.title : dept ? dept.label : t('nav.shopByCategory');
+  // dept.label כבר מתורגם ב-NavBar (menuData); col.title מגיע גולמי מהתפריט
+  const title  = col ? label(col.title, col.title) : dept ? dept.label : t('nav.shopByCategory');
   // מפתח ייחודי לרמה — מאלץ React לרנדר מחדש ולהפעיל את האנימציה
   const levelKey = `${path.deptId ?? ''}-${path.colIndex ?? ''}`;
 

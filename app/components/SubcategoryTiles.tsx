@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { useT } from '@/app/lib/i18n/useT';
 
 interface Subcat {
   slug: string;
@@ -24,6 +25,11 @@ interface Subcat {
  * זה עובד הרבה יותר טוב מפילטר בסרגל הצד, כי הלקוח לא תמיד יודע איך
  * תת-הקטגוריה נקראת, אבל הוא מזהה אותה בתמונה.
  */
+/*
+ * ⚠️ תרגום: רק התווית הנראית עוברת ב-tc(). s.slug / s.filterValue הם ערכי
+ * subCategory אמיתיים מ-Firestore והם נשלחים בפרמטר ?filter= — אסור לגעת בהם.
+ * תת-קטגוריה שאין לה ערך ב-app/lib/i18n/categories.ts תוצג בעברית כמו שהיא.
+ */
 export default function SubcategoryTiles({ category, activeFilter, variant = 'full' }: {
   category: string;
   /** תת-הקטגוריה שכבר נבחרה — אם יש, לא מציגים את הרצועה */
@@ -31,6 +37,7 @@ export default function SubcategoryTiles({ category, activeFilter, variant = 'fu
   /** 'compact' — החזרה השנייה בעמוד ארוך: בלי כותרת, אריחים קטנים יותר */
   variant?: 'full' | 'compact';
 }) {
+  const { t, tc, dir, href } = useT();
   const [subcats, setSubcats] = useState<Subcat[]>([]);
 
   useEffect(() => {
@@ -66,12 +73,12 @@ export default function SubcategoryTiles({ category, activeFilter, variant = 'fu
   // האריח הפעיל מסומן, ונוספת כניסה שמחזירה לכל הקטגוריה.
   const isFiltered = !!activeFilter;
   const heading = isFiltered
-    ? 'מעבר לסוג אחר'
-    : variant === 'compact' ? 'עדיין מחפשים? צמצמו לפי סוג' : 'לפי סוג';
+    ? t('subcat.switch')
+    : variant === 'compact' ? t('subcat.narrow') : t('subcat.byType');
 
   return (
     <section
-      dir="rtl"
+      dir={dir}
       aria-labelledby="subcat-tiles-title"
       style={{ margin: '40px 0' }}
     >
@@ -93,7 +100,7 @@ export default function SubcategoryTiles({ category, activeFilter, variant = 'fu
           /* חזרה לכל הקטגוריה — בלי זה אפשר להיכנס לתת-קטגוריה ולא לצאת
              ממנה בלי סרגל הסינון */
           <a
-            href={`/category/${encodeURIComponent(category)}`}
+            href={href(`/category/${encodeURIComponent(category)}`)}
             style={{ textDecoration: 'none', display: 'block' }}
           >
             <div style={{
@@ -106,7 +113,7 @@ export default function SubcategoryTiles({ category, activeFilter, variant = 'fu
               ⌂
             </div>
             <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--ys-ink)', margin: '10px 0 0', lineHeight: 1.4 }}>
-              כל {category}
+              {t('subcat.all').replace('{x}', tc(category))}
             </p>
           </a>
         )}
@@ -116,7 +123,7 @@ export default function SubcategoryTiles({ category, activeFilter, variant = 'fu
           return (
           <a
             key={s.slug}
-            href={`/category/${encodeURIComponent(category)}?filter=${encodeURIComponent(value)}`}
+            href={href(`/category/${encodeURIComponent(category)}?filter=${encodeURIComponent(value)}`)}
             aria-current={active ? 'true' : undefined}
             style={{ textDecoration: 'none', display: 'block' }}
           >
@@ -132,7 +139,7 @@ export default function SubcategoryTiles({ category, activeFilter, variant = 'fu
             }}>
               <img
                 src={optimizeCloudinaryUrl(s.imageUrl!, 400)}
-                alt={s.displayName}
+                alt={tc(s.displayName)}
                 loading="lazy"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
@@ -142,7 +149,7 @@ export default function SubcategoryTiles({ category, activeFilter, variant = 'fu
               color: active ? 'var(--ys-purple)' : 'var(--ys-ink)',
               margin: '10px 0 0', lineHeight: 1.4,
             }}>
-              {s.displayName}
+              {tc(s.displayName)}
             </p>
           </a>
           );
