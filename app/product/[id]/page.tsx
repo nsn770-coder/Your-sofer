@@ -58,10 +58,20 @@ interface ReviewItem {
   createdAt?: string;
 }
 
+// ⚠️ חלק מהמוצרים שיובאו מספקים (simchonim ועוד) נשמרו ב-Firestore עם doc ID
+// שהוא ה-slug של הספק *כשהוא כבר מקודד* — למשל:
+//   simchonim_%d7%91%d7%a8%d7%9b%d7%aa-%d7%94%d7%9e%d7%96%d7%95%d7%9f
+// Next מפענח את הפרמטר בכתובת, ולכן `id` מגיע לכאן כעברית ואינו תואם למזהה
+// האמיתי. הפונקציה מחזירה את הווריאנט המקודד-מחדש (hex קטן) לניסיון שני.
+function reEncodedId(id: string): string | null {
+  const enc = encodeURIComponent(id).replace(/%[0-9A-F]{2}/g, (m) => m.toLowerCase());
+  return enc === id ? null : enc;
+}
+
 async function fetchReviews(id: string): Promise<ReviewItem[]> {
   try {
     const res = await fetch(
-      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/products/${id}/reviews?key=${FIREBASE_API_KEY}`,
+      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/products/${encodeURIComponent(id)}/reviews?key=${FIREBASE_API_KEY}`,
       { next: { revalidate: 3600 } },
     );
     if (!res.ok) return [];
@@ -75,10 +85,10 @@ async function fetchReviews(id: string): Promise<ReviewItem[]> {
   }
 }
 
-async function fetchProduct(id: string): Promise<ProductData | null> {
+async function fetchProductByDocId(docId: string): Promise<ProductData | null> {
   try {
     const res = await fetch(
-      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/products/${id}?key=${FIREBASE_API_KEY}`,
+      `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents/products/${encodeURIComponent(docId)}?key=${FIREBASE_API_KEY}`,
       { next: { revalidate: 3600 } },
     );
     if (!res.ok) return null;
@@ -88,6 +98,13 @@ async function fetchProduct(id: string): Promise<ProductData | null> {
   } catch {
     return null;
   }
+}
+
+async function fetchProduct(id: string): Promise<ProductData | null> {
+  const direct = await fetchProductByDocId(id);
+  if (direct) return direct;
+  const alt = reEncodedId(id);
+  return alt ? fetchProductByDocId(alt) : null;
 }
 
 // ── generateMetadata ────────────────────────────────────────────────────────

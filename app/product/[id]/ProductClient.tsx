@@ -1709,9 +1709,23 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
   useEffect(() => {
     async function load() {
       try {
-        const snap = await getDoc(doc(db, 'products', String(id)));
+        // ⚠️ חלק מהמוצרים שיובאו מספקים (simchonim ועוד) נשמרו ב-Firestore עם
+        // doc ID שהוא ה-slug של הספק *כשהוא כבר מקודד* — לדוגמה:
+        //   simchonim_%d7%91%d7%a8%d7%9b%d7%aa-%d7%94%d7%9e%d7%96%d7%95%d7%9f
+        // Next מפענח את הפרמטר בכתובת, ולכן `id` מגיע לכאן כעברית
+        // ("simchonim_ברכת-המזון") ואינו תואם למזהה האמיתי → "מוצר לא נמצא".
+        // לכן: אם החיפוש הישיר נכשל — מנסים שוב עם המזהה מקודד מחדש (hex קטן).
+        const rawId = String(id);
+        let snap = await getDoc(doc(db, 'products', rawId));
+        if (!snap.exists()) {
+          const reEncoded = encodeURIComponent(rawId)
+            .replace(/%[0-9A-F]{2}/g, (m) => m.toLowerCase());
+          if (reEncoded !== rawId) snap = await getDoc(doc(db, 'products', reEncoded));
+        }
         if (snap.exists()) {
-          const p = { id: snap.id, ...snap.data() } as Product;
+          // ⚠️ ה-spread לפני ה-id בכוונה: מוצרי ספק עלולים לשאת שדה `id` משלהם,
+          // ואסור שהוא ידרוס את מזהה המסמך האמיתי.
+          const p = { ...snap.data(), id: snap.id } as Product;
           setProduct(p);
           trackViewItem({ item_id: p.id, item_name: p.name, price: p.price, item_category: p.cat });
           pixel.viewContent({ id: p.id, name: p.name, price: p.price, category: p.cat });
