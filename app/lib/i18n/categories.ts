@@ -55,6 +55,7 @@ const CATEGORY_LABELS: Record<string, LabelSet> = {
   'סיכות לכיפה':          { en: 'Kippah clips',               fr: 'Pinces à kippa',           es: 'Clips para kipá',          ru: 'Заколки для кипы' },
   'כיפות ומזכרות':        { en: 'Kippot & favors',            fr: 'Kippot et souvenirs',      es: 'Kipot y recuerdos',        ru: 'Кипы и сувениры' },
   'מזכרות לאירועים':      { en: 'Event favors',               fr: 'Souvenirs d’événements',   es: 'Recuerdos para eventos',   ru: 'Сувениры для торжеств' },
+  'כיפות לאירועים':       { en: 'Event kippot',               fr: 'Kippot pour événements',   es: 'Kipot para eventos',       ru: 'Кипы для торжеств' },
 
   // ── תת-קטגוריות: מזוזות ותפילין ──
   'מזוזות פולימר': { en: 'Polymer mezuzah cases', fr: 'Étuis de mezouza en polymère',  es: 'Estuches de mezuzá de polímero', ru: 'Полимерные футляры для мезузы' },
