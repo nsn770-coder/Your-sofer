@@ -15,7 +15,7 @@ import { useChatPersona } from '@/app/components/chat/ChatPersonaContext';
 import { useCart } from '@/app/contexts/CartContext';
 import { formatPrice } from '@/app/lib/utils';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { findParentCat } from '@/app/constants/categories';
+import { findParentCat, EVENT_KIPPOT_SUBCAT } from '@/app/constants/categories';
 import { useT } from '@/app/lib/i18n/useT';
 import { productName } from '@/app/lib/i18n/productText';
 import { attrKeyLabel, attrValueLabel } from '@/app/lib/i18n/attributes';
@@ -49,6 +49,8 @@ interface Product {
   createdAt?: { seconds: number };
   hidden?: boolean;
   eventsOnly?: boolean;
+  isEventProduct?: boolean;
+  isEventKippot?: boolean;
   cat?: string;
   subCategory?: string;
   nusach?: string;
@@ -162,6 +164,20 @@ const CAT_NAME_FILTERS: Record<string, NameFilterSpec[]> = {
     { key: 'חומר', label: 'חומר', options: ['בד', 'זמש', 'פשתן', 'ארטמן', 'משי', 'סרוגות'] },
   ],
 };
+
+/**
+ * "כיפות לאירועים" — תת-קטגוריה וירטואלית תחת כיפות.
+ * לא דורסת את ה-subCategory האמיתי (סאטן / סרוגות / מיוחדות), אלא נגזרת
+ * מהדגלים שכבר מסמנים את המוצר כמופיע ב-/event-kippot. מוצרים המשויכים
+ * לסקרולי המזכרות (eventScrollSection — מטפחות, ברכונים וכו') אינם כיפות
+ * ולכן מוחרגים.
+ */
+function isEventKippah(p: Product): boolean {
+  if (p.cat !== 'כיפות') return false;
+  if (p.subCategory === EVENT_KIPPOT_SUBCAT) return true;
+  if ((p as { eventScrollSection?: string }).eventScrollSection) return false;
+  return p.isEventKippot === true || p.isEventProduct === true || p.eventsOnly === true;
+}
 
 // Maps URL ?filter= values to subCategory values for specific categories.
 // Prevents unmatched filters from falling through and showing all products.
@@ -1358,7 +1374,13 @@ export default function CategoryClient({ category }: { category: string }) {
     } else {
       snap = await getDocs(query(collection(db, 'products'), where('cat', '==', category), orderBy('priority', 'desc'), limit(1000)));
     }
-    setAllLoaded(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)).filter(p => p.hidden !== true && !p.eventsOnly));
+    // "כיפות לאירועים": מוצרים עם eventsOnly מוסתרים בכל האתר, אבל בתת-הקטגוריה
+    // הזו הם כן אמורים להופיע — לכן נטענים כאן ומסוננים בשלב התצוגה (filtered).
+    setAllLoaded(
+      snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as Product))
+        .filter(p => p.hidden !== true && (!p.eventsOnly || isEventKippah(p)))
+    );
   }
 
   useEffect(() => {
@@ -1429,6 +1451,8 @@ export default function CategoryClient({ category }: { category: string }) {
     // Check category-specific filter→subCategory aliases first (e.g. "סרוגות" → "כיפות סרוגות")
     const subcatAlias = FILTER_TO_SUBCAT[category]?.[urlFilter];
     if (subcatAlias) { setSubCategoryFilter(subcatAlias); return; }
+    // תת-הקטגוריה הווירטואלית "כיפות לאירועים" אינה קיימת כערך subCategory אצל כל המוצרים
+    if (urlFilter === EVENT_KIPPOT_SUBCAT) { setSubCategoryFilter(EVENT_KIPPOT_SUBCAT); return; }
     // Check exact subCategory match
     const subCatSet = new Set(allLoaded.map(p => p.subCategory).filter(Boolean) as string[]);
     if (subCatSet.has(urlFilter)) { setSubCategoryFilter(urlFilter); return; }
@@ -1488,9 +1512,13 @@ export default function CategoryClient({ category }: { category: string }) {
     for (const p of allLoaded) {
       if (p.subCategory) counts[p.subCategory] = (counts[p.subCategory] ?? 0) + 1;
     }
-    return Object.entries(counts)
+    const subs = Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
-      .map(([sub]) => sub);
+      .map(([sub]) => sub)
+      .filter(sub => sub !== EVENT_KIPPOT_SUBCAT);
+    // שבב וירטואלי: מוצג כשיש בקטגוריה כיפות המסומנות לעמוד האירועים
+    if (allLoaded.some(isEventKippah)) subs.unshift(EVENT_KIPPOT_SUBCAT);
+    return subs;
   }, [allLoaded]);
 
   // Compute distinct collections from loaded products (in canonical order)
@@ -1502,7 +1530,10 @@ export default function CategoryClient({ category }: { category: string }) {
 
   const filtered = useMemo(() => {
     let result = applyFilters(allLoaded, filters);
-    if (subCategoryFilter) result = result.filter(p => p.subCategory === subCategoryFilter);
+    // מוצרי eventsOnly שנטענו עבור "כיפות לאירועים" מוצגים רק כשתת-הקטגוריה פעילה
+    if (subCategoryFilter !== EVENT_KIPPOT_SUBCAT) result = result.filter(p => !p.eventsOnly);
+    if (subCategoryFilter === EVENT_KIPPOT_SUBCAT) result = result.filter(isEventKippah);
+    else if (subCategoryFilter) result = result.filter(p => p.subCategory === subCategoryFilter);
     if (category === 'מתנות' && catFilter !== 'הכל') result = result.filter(p => p.cat === catFilter);
     if (collectionFilter) result = result.filter(p => p.collection === collectionFilter);
     if (category === 'סט טלית תפילין' && setTabFilter) result = applySetTabFilter(result, setTabFilter);

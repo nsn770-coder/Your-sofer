@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { CATS, getSubCats } from '@/app/constants/categories';
+import { CATS, getSubCats, EVENT_KIPPOT_SUBCAT } from '@/app/constants/categories';
 
 const STAM_ADMIN_CATS = new Set([
   'קלפי מזוזה', 'קלפי תפילין', 'תפילין קומפלט', 'מגילות', 'ספרי תורה', 'בר מצווה',
@@ -21,7 +21,10 @@ export default function AdminNewProductPage() {
   const [price, setPrice]                                 = useState('');
   const [was, setWas]                                     = useState('');
   const [cat, setCat]                                      = useState(searchParams.get('cat') ?? '');
-  const [subCategory, setSubCategory]                      = useState(searchParams.get('subCategory') ?? '');
+  // כניסה מהכפתור ב-/event-kippot (?isEventKippot=true) משייכת אוטומטית לתת-קטגוריה
+  const [subCategory, setSubCategory]                      = useState(
+    searchParams.get('subCategory') ?? (searchParams.get('isEventKippot') === 'true' ? EVENT_KIPPOT_SUBCAT : '')
+  );
   const [days, setDays]                                   = useState('7-10');
   const [size, setSize]                                   = useState('');
   const [badge, setBadge]                                 = useState('');
@@ -205,6 +208,7 @@ export default function AdminNewProductPage() {
                 <label style={lS}>תת-קטגוריה <span style={{ fontWeight: 300, opacity: 0.7 }}>(אופציונלי)</span></label>
                 <select value={subCategory} onChange={e => setSubCategory(e.target.value)} style={{ ...iS, background: 'var(--ys-dark-surface)' }}>
                   <option value="">-- ללא תת-קטגוריה --</option>
+                  {subCategory && !getSubCats(cat).includes(subCategory) && <option value={subCategory}>{subCategory} (legacy)</option>}
                   {getSubCats(cat).map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>

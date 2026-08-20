@@ -41,6 +41,7 @@ export const MEGA_MENU_DATA: NavMenuItem[] = [
         title: "כיפות ומזכרות",
         items: [
           { label: "כל הכיפות", cat: "כיפות" },
+          { label: "כיפות לאירועים", cat: "כיפות", filter: "כיפות לאירועים" },
           { label: "מזכרות לאירועים", cat: "מזכרות לאירועים" },
         ],
       },
@@ -141,7 +142,12 @@ export const MEGA_MENU_DATA: NavMenuItem[] = [
       {
         title: "כיפות",
         items: [
-          { label: "כל הכיפות", cat: "כיפות" },
+          { label: "כל הכיפות",      cat: "כיפות" },
+          { label: "כיפות לאירועים", cat: "כיפות", filter: "כיפות לאירועים" },
+          { label: "כיפות סרוגות",   cat: "כיפות", filter: "כיפות סרוגות" },
+          { label: "כיפות סאטן וטרילין", cat: "כיפות", filter: "כיפות סאטן וטרילין" },
+          { label: "כיפות קטיפה",    cat: "כיפות", filter: "כיפות קטיפה" },
+          { label: "כיפות עור",      cat: "כיפות", filter: "כיפות עור" },
         ],
       },
     ],

@@ -632,6 +632,7 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
               <select value={subCategory} onChange={e => setSubCategory(e.target.value)}
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
                 <option value="">-- ללא תת-קטגוריה --</option>
+                {subCategory && !getSubCats(cat).includes(subCategory) && <option value={subCategory}>{subCategory} (legacy)</option>}
                 {getSubCats(cat).map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
@@ -1081,6 +1082,7 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               <select value={subCategory} onChange={e => setSubCategory(e.target.value)}
                 style={{ ...inputStyle, background: '#fff' }}>
                 <option value="">-- ללא תת-קטגוריה --</option>
+                {subCategory && !getSubCats(cat).includes(subCategory) && <option value={subCategory}>{subCategory} (legacy)</option>}
                 {getSubCats(cat).map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
