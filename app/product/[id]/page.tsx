@@ -59,13 +59,28 @@ interface ReviewItem {
 }
 
 // ⚠️ חלק מהמוצרים שיובאו מספקים (simchonim ועוד) נשמרו ב-Firestore עם doc ID
-// שהוא ה-slug של הספק *כשהוא כבר מקודד* — למשל:
+// שהוא ה-slug של הספק *כשהוא כבר מקודד באחוזים ובאותיות קטנות* — למשל:
 //   simchonim_%d7%91%d7%a8%d7%9b%d7%aa-%d7%94%d7%9e%d7%96%d7%95%d7%9f
-// Next מפענח את הפרמטר בכתובת, ולכן `id` מגיע לכאן כעברית ואינו תואם למזהה
-// האמיתי. הפונקציה מחזירה את הווריאנט המקודד-מחדש (hex קטן) לניסיון שני.
-function reEncodedId(id: string): string | null {
-  const enc = encodeURIComponent(id).replace(/%[0-9A-F]{2}/g, (m) => m.toLowerCase());
-  return enc === id ? null : enc;
+// כשמנווטים לכתובת כזו, הדפדפן מנרמל את רצפי האחוזים לאותיות גדולות
+// (%D7%91) לפי RFC 3986, ו-Next מעביר את המקטע כמו שהוא. התוצאה: המזהה
+// שמגיע לקוד שונה באותיות מהמזהה שבפועל ב-Firestore → "מוצר לא נמצא".
+// לכן מנסים כמה וריאנטים סבירים של אותו מזהה, לפי הסדר.
+function docIdCandidates(raw: string): string[] {
+  const out = [raw];
+  const lowerHex = raw.replace(/%[0-9A-Fa-f]{2}/g, (m) => m.toLowerCase());
+  if (!out.includes(lowerHex)) out.push(lowerHex);
+  try {
+    const decoded = decodeURIComponent(raw);
+    if (decoded !== raw) {
+      if (!out.includes(decoded)) out.push(decoded);
+      const reEncoded = encodeURIComponent(decoded)
+        .replace(/%[0-9A-Fa-f]{2}/g, (m) => m.toLowerCase());
+      if (!out.includes(reEncoded)) out.push(reEncoded);
+    }
+  } catch {
+    // מזהה עם % שאינו קידוד תקין — מדלגים על הווריאנט המפוענח
+  }
+  return out;
 }
 
 async function fetchReviews(id: string): Promise<ReviewItem[]> {
@@ -101,10 +116,11 @@ async function fetchProductByDocId(docId: string): Promise<ProductData | null> {
 }
 
 async function fetchProduct(id: string): Promise<ProductData | null> {
-  const direct = await fetchProductByDocId(id);
-  if (direct) return direct;
-  const alt = reEncodedId(id);
-  return alt ? fetchProductByDocId(alt) : null;
+  for (const candidate of docIdCandidates(id)) {
+    const found = await fetchProductByDocId(candidate);
+    if (found) return found;
+  }
+  return null;
 }
 
 // ── generateMetadata ────────────────────────────────────────────────────────

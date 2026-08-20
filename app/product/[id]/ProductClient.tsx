@@ -1710,17 +1710,29 @@ export default function ProductClient({ initialProduct = null }: { initialProduc
     async function load() {
       try {
         // ⚠️ חלק מהמוצרים שיובאו מספקים (simchonim ועוד) נשמרו ב-Firestore עם
-        // doc ID שהוא ה-slug של הספק *כשהוא כבר מקודד* — לדוגמה:
+        // doc ID שהוא ה-slug של הספק *כשהוא כבר מקודד באחוזים ובאותיות קטנות*:
         //   simchonim_%d7%91%d7%a8%d7%9b%d7%aa-%d7%94%d7%9e%d7%96%d7%95%d7%9f
-        // Next מפענח את הפרמטר בכתובת, ולכן `id` מגיע לכאן כעברית
-        // ("simchonim_ברכת-המזון") ואינו תואם למזהה האמיתי → "מוצר לא נמצא".
-        // לכן: אם החיפוש הישיר נכשל — מנסים שוב עם המזהה מקודד מחדש (hex קטן).
+        // הדפדפן מנרמל רצפי אחוזים לאותיות גדולות (%D7%91) לפי RFC 3986, ולכן
+        // ה-id שמגיע מ-useParams שונה באותיות מהמזהה האמיתי → "מוצר לא נמצא".
+        // לכן מנסים כמה וריאנטים של אותו מזהה, לפי הסדר.
         const rawId = String(id);
-        let snap = await getDoc(doc(db, 'products', rawId));
-        if (!snap.exists()) {
-          const reEncoded = encodeURIComponent(rawId)
-            .replace(/%[0-9A-F]{2}/g, (m) => m.toLowerCase());
-          if (reEncoded !== rawId) snap = await getDoc(doc(db, 'products', reEncoded));
+        const candidates = [rawId];
+        const lowerHex = rawId.replace(/%[0-9A-Fa-f]{2}/g, (m) => m.toLowerCase());
+        if (!candidates.includes(lowerHex)) candidates.push(lowerHex);
+        try {
+          const decoded = decodeURIComponent(rawId);
+          if (decoded !== rawId) {
+            if (!candidates.includes(decoded)) candidates.push(decoded);
+            const reEncoded = encodeURIComponent(decoded)
+              .replace(/%[0-9A-Fa-f]{2}/g, (m) => m.toLowerCase());
+            if (!candidates.includes(reEncoded)) candidates.push(reEncoded);
+          }
+        } catch {
+          // מזהה עם % שאינו קידוד תקין — מדלגים על הווריאנט המפוענח
+        }
+        let snap = await getDoc(doc(db, 'products', candidates[0]));
+        for (let i = 1; i < candidates.length && !snap.exists(); i++) {
+          snap = await getDoc(doc(db, 'products', candidates[i]));
         }
         if (snap.exists()) {
           // ⚠️ ה-spread לפני ה-id בכוונה: מוצרי ספק עלולים לשאת שדה `id` משלהם,
