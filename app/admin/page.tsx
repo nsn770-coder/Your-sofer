@@ -29,6 +29,7 @@ import { type AccountEra, isOrderInEra } from '@/app/lib/accountEra';
 import EraToggle from '@/app/components/EraToggle';
 import { SendToLionWheelButton } from '@/components/admin/SendToLionWheelButton';
 import { CRAFTS } from '@/app/lib/crafts';
+import { PAID_STATUSES, isPaidRevenueOrder } from '@/app/lib/orderStatus';
 
 interface OrderItem {
   id: string;
@@ -632,7 +633,6 @@ function AddProductModal({ soferim, soferimFull, onClose, onSave }: {
               <select value={subCategory} onChange={e => setSubCategory(e.target.value)}
                 style={{ width: '100%', border: '1px solid #ddd', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#fff', boxSizing: 'border-box' }}>
                 <option value="">-- ללא תת-קטגוריה --</option>
-                {subCategory && !getSubCats(cat).includes(subCategory) && <option value={subCategory}>{subCategory} (legacy)</option>}
                 {getSubCats(cat).map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
@@ -1082,7 +1082,6 @@ function EditProductModal({ product, soferim, soferimFull, onClose, onSave }: {
               <select value={subCategory} onChange={e => setSubCategory(e.target.value)}
                 style={{ ...inputStyle, background: '#fff' }}>
                 <option value="">-- ללא תת-קטגוריה --</option>
-                {subCategory && !getSubCats(cat).includes(subCategory) && <option value={subCategory}>{subCategory} (legacy)</option>}
                 {getSubCats(cat).map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
@@ -3738,7 +3737,6 @@ export default function AdminPage() {
   }
 
   async function loadCustomers() {
-    const PAID_STATUSES = ['paid', 'completed', 'shipped', 'packing', 'magiah'];
     try {
       // 1. Registered buyers: users with totalSpent > 0
       const usersSnap = await getDocs(collection(db, 'users'));
@@ -4772,7 +4770,9 @@ export default function AdminPage() {
   if (loading || ordersLoading) return <div className="flex items-center justify-center min-h-screen"><div className="text-2xl">טוען...</div></div>;
   if (!user || user.role !== 'admin') return null;
 
-  const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+  // ⚠️ עד 08/2026 השורה הזו סכמה *כל* הזמנה, כולל נטושות ומבוטלות, והציגה
+  // אותן כ"סה\"כ הכנסות" בכותרת הדשבורד. עכשיו נספרות רק הזמנות ששולמו.
+  const totalRevenue = orders.filter(isPaidRevenueOrder).reduce((sum, o) => sum + (o.total || 0), 0);
   const shaliachOrders = orders.filter(o => o.shaliachName);
   const pendingApps = applications.filter(a => a.status === 'pending');
   const pendingShluchimApps = shluchimApps.filter(a => a.status === 'pending');

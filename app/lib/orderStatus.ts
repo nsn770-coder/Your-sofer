@@ -112,3 +112,43 @@ export function getStatusLabel(status: string | undefined): string {
   if (!status) return '—';
   return STATUS_LABELS[status] ?? status;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// רשימת הסטטוסים ששולמו — לדוחות הכספיים (08/2026)
+//
+// נוסף אחרי שהתגלו שלוש הגדרות שונות של "שולם" בשלושה קבצים:
+//   ProfitabilityTab   paid completed shipped packing magiah
+//   BestSellersTab     paid completed shipped packing delivered needs_care
+//   admin/page.tsx     עותק שלישי, זהה לראשון
+// כתוצאה מכך הזמנות שנמסרו ללקוח לא נספרו כהכנסה, ושלושת הדוחות הציגו
+// סכומי הכנסות שונים זה מזה.
+//
+// ⚠️ שים לב שזו רשימת-היתר מפורשת, והיא *לא* זהה ל-isPaidOrder שמעליה.
+// isPaidOrder הוא רשימת-איסור (הכול חוץ מ-pending_payment ו-cancelled) ומשמש
+// את עמוד ה-analytics. שתי ההגדרות נבדלות ב-abandoned וב-pending. אין לאחד
+// ביניהן בלי החלטה מפורשת — הן נותנות מספרי הכנסות שונים.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** סטטוסים שנספרים כהכנסה בדוחות הכספיים (אושר ע"י נסים, 08/2026) */
+export const PAID_STATUSES: string[] = [
+  'paid',        // ⏳ חדש
+  'magiah',      // ✅ מגיע
+  'sofer',       // ✍️ אצל הסופר
+  'packing',     // 📦 באריזה
+  'shipped',     // 🚚 נשלח
+  'delivered',   // ✅ נמסר
+  'completed',   // 🏁 הושלם
+  'needs_care',  // ⚠️ דורש טיפול — שולם, רק דורש התייחסות
+];
+
+const PAID_SET: ReadonlySet<string> = new Set(PAID_STATUSES);
+
+/** האם הסטטוס נספר כהכנסה. הזמנה בלי סטטוס — לא נספרת. */
+export function isPaidStatus(status: string | undefined | null): boolean {
+  return !!status && PAID_SET.has(status);
+}
+
+/** אותו כלל, על אובייקט הזמנה */
+export function isPaidRevenueOrder(order: { status?: string | null } | undefined | null): boolean {
+  return isPaidStatus(order?.status);
+}

@@ -3,9 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { formatPrice } from '@/app/lib/utils';
-
-// Orders with these statuses represent real payments
-const PAID_STATUSES = new Set(['paid', 'packing', 'shipped', 'delivered', 'completed', 'needs_care']);
+import { isPaidStatus } from '@/app/lib/orderStatus';
 
 interface OrderItem {
   id: string;
@@ -208,7 +206,7 @@ export default function BestSellersTab({
     const agg: Record<string, AggRow> = {};
 
     for (const order of orders) {
-      if (!PAID_STATUSES.has(order.status)) continue;
+      if (!isPaidStatus(order.status)) continue;
       for (const item of order.items ?? []) {
         const pid = item.productId || item.id;
         if (!pid) continue;
@@ -258,7 +256,7 @@ export default function BestSellersTab({
       .slice(0, 8);
   }, [searchQuery, products, manualIds]);
 
-  const paidOrderCount = orders.filter(o => PAID_STATUSES.has(o.status)).length;
+  const paidOrderCount = orders.filter(o => isPaidStatus(o.status)).length;
 
   // Reorder helper for drag & drop
   function moveItem(from: number, to: number) {

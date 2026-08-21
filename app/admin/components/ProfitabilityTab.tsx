@@ -8,10 +8,10 @@ import { Product } from '@/app/lib/types';
 import { Order } from '@/app/lib/types';
 import { type AccountEra, isOrderInEra, isDateInEra } from '@/app/lib/accountEra';
 import EraToggle from '@/app/components/EraToggle';
+import { isPaidRevenueOrder } from '@/app/lib/orderStatus';
 
 // ── קבועים ────────────────────────────────────────────────────────────────────
 const CLOUDINARY_RECEIPT_UPLOAD = 'https://api.cloudinary.com/v1_1/dyxzq3ucy/auto/upload';
-const PAID_STATUSES = ['paid', 'completed', 'shipped', 'packing', 'magiah'];
 const VAT = 1.18;
 
 export const EXPENSE_CATEGORIES = [
@@ -238,7 +238,9 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
       noCost: boolean;
     }> = {};
 
-    getFilteredOrders().forEach(order => {
+    // ⚠️ עד 08/2026 לא היה כאן סינון סטטוס, והזמנות נטושות/מבוטלות נספרו
+    // גם כהכנסה וגם כעלות בדוח הרווחיות.
+    getFilteredOrders().filter(isPaidRevenueOrder).forEach(order => {
       (order.items ?? []).forEach(item => {
         const anyItem = item as { productId?: string; id?: string; productName?: string; name?: string };
         const pid = anyItem.productId ?? anyItem.id;
@@ -300,7 +302,7 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
   const allManualExpensesTotal   = inventoryExpensesTotal + operationalExpensesTotal;
 
   // ── עמלת סליקה — % מהזמנות ששולמו בכרטיס אשראי (לא ביט) בטווח ──
-  const paidOrdersInRange = getFilteredOrders().filter(o => PAID_STATUSES.includes(o.status ?? ''));
+  const paidOrdersInRange = getFilteredOrders().filter(isPaidRevenueOrder);
   const creditCardGross   = paidOrdersInRange
     .filter(o => (o as { paymentMethod?: string }).paymentMethod !== 'bit')
     .reduce((s, o) => s + (o.total || 0), 0);
@@ -594,7 +596,7 @@ export default function ProfitabilityTab({ products, orders }: ProfitabilityTabP
       const exOrders = orders.filter(o => {
         const d = getOrderDateOf(o);
         if (!isOrderInEra(o as { account?: string }, d, era)) return false;
-        return PAID_STATUSES.includes(o.status ?? '') && d >= from && d <= to;
+        return isPaidRevenueOrder(o) && d >= from && d <= to;
       });
       const exIncomes = incomes.filter(i => {
         const d = new Date(i.date + 'T12:00:00');
