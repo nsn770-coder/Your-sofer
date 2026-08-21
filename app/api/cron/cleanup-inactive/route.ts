@@ -3,11 +3,25 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// ── Cron: מחיקה אוטומטית של מוצרים שהוסרו ─────────────────────────────────────
-// רץ יומית (מוגדר ב-vercel.json). מוחק לצמיתות מוצרים בסטטוס 'inactive' בלבד:
-//  - drafts לא נמחקים (ייבואים חדשים נוצרים כ-draft וממתינים להפעלה)
-//  - hidden עם status=active לא נמחקים (הסתרה זמנית מכוונת)
-// כלומר: כדי שמוצר יימחק אוטומטית — סמן אותו status='inactive' באדמין/סקריפט.
+// ── Cron: ארכוב מוצרים שהוסרו ─────────────────────────────────────────────────
+// רץ יומית (מוגדר ב-vercel.json). מטפל במוצרים בסטטוס 'inactive' בלבד:
+//  - drafts לא נוגעים בהם (ייבואים חדשים נוצרים כ-draft וממתינים להפעלה)
+//  - hidden עם status=active לא נוגעים בהם (הסתרה זמנית מכוונת)
+//
+// ⚠️ עד 08/2026 הקרון *מחק לצמיתות* את המסמכים מ-Firestore. זה שבר את
+// היסטוריית ההזמנות: שורת פריט בהזמנה מצביעה ל-productId, וכשהמוצר נמחק
+// דוח הרווחיות עושה `if (!product) return` ומעלים את השורה. נמצאו 34 שורות
+// כאלה ששוות ₪5,910 הכנסה שפשוט נעלמה מהדוחות.
+//
+// עכשיו המסמך נשאר ב-Firestore ומסומן ב-archivedAt, ורק נמחק מאינדקס
+// Algolia. הלקוחות לא רואים אותו כך או כך — כל מסכי החנות מסננים
+// status='inactive' ממילא — אבל ההזמנות הישנות ממשיכות להתחשבן נכון.
+//
+// למה נשאר status='inactive' ולא סטטוס 'archived' חדש: חמישה מסכי חנות
+// מסננים ברשימת-איסור (`p.status !== 'inactive'`) ולא ברשימת-היתר —
+// EventSouvenirsBrowser · EventKippotClient · ShabbatHolidaysClient ·
+// ChatCartBridge · api/chat/_lib/serialize. סטטוס חדש היה *מחזיר אותם
+// לתצוגה* בדיוק במקומות האלה. אל תשנה את זה בלי לעבור על חמשתם.
 export async function GET(req: NextRequest) {
   const auth = req.headers.get('authorization');
   if (!process.env.CRON_SECRET) {
@@ -31,15 +45,21 @@ export async function GET(req: NextRequest) {
   }
   const db = getFirestore();
 
+  const { FieldValue } = await import('firebase-admin/firestore');
+
   // שליפה ממוקדת — רק inactive (בלי סריקת כל הקולקציה)
   const snap = await db.collection('products').where('status', '==', 'inactive').get();
-  const ids = snap.docs.map(d => d.id);
+  // מי שכבר אורכב בריצה קודמת — מדלגים. אי אפשר לשאול על שדה חסר ב-Firestore,
+  // ולכן מסננים כאן; קבוצת ה-inactive קטנה (עשרות) והקריאה זולה.
+  const ids = snap.docs.filter(d => !d.data().archivedAt).map(d => d.id);
 
-  // מחיקה ב-batches של 500
+  // סימון כמאורכב — בלי למחוק. ב-batches של 500.
   for (let i = 0; i < ids.length; i += 500) {
     const batch = db.batch();
     for (const id of ids.slice(i, i + 500)) {
-      batch.delete(db.collection('products').doc(id));
+      batch.update(db.collection('products').doc(id), {
+        archivedAt: FieldValue.serverTimestamp(),
+      });
     }
     await batch.commit();
   }
@@ -52,6 +72,7 @@ export async function GET(req: NextRequest) {
     if (appId && key && ids.length) {
       const { algoliasearch } = await import('algoliasearch');
       const client = algoliasearch(appId, key);
+      // מ-Algolia כן מוחקים — שם אין ערך היסטורי, רק חיפוש חי
       await client.deleteObjects({ indexName: 'products', objectIDs: ids });
       algoliaCleaned = ids.length;
     }
@@ -59,10 +80,10 @@ export async function GET(req: NextRequest) {
     console.warn('[cleanup-inactive] Algolia warn:', err);
   }
 
-  console.log(`[cleanup-inactive] deleted ${ids.length} inactive products (algolia: ${algoliaCleaned})`);
+  console.log(`[cleanup-inactive] archived ${ids.length} inactive products (algolia: ${algoliaCleaned})`);
   return NextResponse.json({
-    deleted: ids.length,
-    deletedIds: ids.slice(0, 100),
+    archived: ids.length,
+    archivedIds: ids.slice(0, 100),
     algoliaCleaned,
     ranAt: new Date().toISOString(),
   });
