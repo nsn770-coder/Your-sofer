@@ -1,10 +1,4 @@
 {
-  "env": {
-    "SUMIT_COMPANY_ID": "2129858517",
-    "SUMIT_API_PRIVATE_KEY": "VmmrkWkubMGrdTJm0322mba4NHEsmeZ4TX4dAZkes8jAlNWLUL",
-    "NEXT_PUBLIC_SUMIT_COMPANY_ID": "2129858517",
-    "NEXT_PUBLIC_SUMIT_API_PUBLIC_KEY": "m2D3M94Lx4nsgocMu04WTamUYMuxUqr0YDZxcZt6dlm7GaxXLT"
-  },
   "crons": [
     {
       "path": "/api/cron/cleanup-inactive",
