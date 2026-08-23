@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { PREFIXED_LOCALES, getLocale } from '@/app/lib/i18n/config';
+import { PREFIXED_LOCALES, getLocale, localizePath } from '@/app/lib/i18n/config';
 import { getDictionary } from '@/app/lib/i18n/dictionaries';
 import LanguageSwitcher from '@/app/components/LanguageSwitcher';
 
@@ -28,6 +28,10 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
   const t = getDictionary(locale);
   const def = getLocale(locale);
   const align = def.dir === 'rtl' ? 'right' : 'left';
+  // ⚠️ בלי זה כל קישור כאן הוביל לכתובת העברית הלא-מקודמת, והלקוח שבחר
+  // אנגלית הוחזר לעברית בלחיצה הראשונה. הקטגוריות עצמן מתורגמות מאז
+  // שלב 3ג, אז אין סיבה לזרוק אותו החוצה.
+  const L = (path: string) => localizePath(path, locale);
 
   return (
     <div
@@ -55,7 +59,7 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
         </p>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 22 }}>
           <Link
-            href="/category/%D7%94%D7%9B%D7%9C"
+            href={L('/category/%D7%94%D7%9B%D7%9C')}
             style={{
               background: GOLD, color: '#FEFBF7', fontWeight: 900, fontSize: 16,
               padding: '15px 30px', textDecoration: 'none', display: 'inline-block',
@@ -99,7 +103,7 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
         {CATEGORY_LINKS.map(c => (
           <Link
             key={c.key}
-            href={c.href}
+            href={L(c.href)}
             style={{
               display: 'block', textDecoration: 'none', border: '1px solid #E5E0D5',
               background: '#fff', overflow: 'hidden',
