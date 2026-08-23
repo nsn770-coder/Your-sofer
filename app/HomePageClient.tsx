@@ -33,6 +33,7 @@ import type { HomepageCategoryItem, HomepageCategorySections } from './constants
 import lifeEvents from '@/data/lifeEvents';
 import AlgoliaSearch from '@/app/components/search/AlgoliaSearch';
 import ProductCardVideo from '@/app/components/ProductCardVideo';
+import { useT } from '@/app/lib/i18n/useT';
 
 // Activity bar icons
 function IconActivityCheck() {
@@ -244,10 +245,12 @@ function HomeCategoryTile({ item, img, isMobile, onNav }: {
   isMobile: boolean;
   onNav: (href: string) => void;
 }) {
+  const { t, tc } = useT();
   const full = item.width === 'full';
-  // אריח כיפות ומזכרות לאירועים — שם מלא + כותרת גדולה משאר הקטגוריות
+  // ⚠️ הבדיקה נשארת על item.label העברי — זה הערך שמגיע מהאדמין.
+  // רק התווית המוצגת עוברת תרגום.
   const isEventTile = item.label.includes('כיפות לאירועים') || item.label.includes('כיפות ומזכרות');
-  const displayLabel = isEventTile ? 'כיפות ומזכרות לאירועים' : item.label;
+  const displayLabel = isEventTile ? t('home.eventKippotAlt') : tc(item.label);
   return (
     <div
       onClick={() => onNav(buildCategoryHref(item))}
@@ -269,7 +272,7 @@ function HomeCategoryTile({ item, img, isMobile, onNav }: {
       </div>
       <div style={{ marginTop: 12, textAlign: 'center' }}>
         <h3 style={{ fontSize: isEventTile ? 21 : 16, fontWeight: isEventTile ? 700 : 500, color: '#373A5A', margin: 0 }}>{displayLabel}</h3>
-        <span className="underline underline-offset-4" style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: '#111111' }}>לצפייה</span>
+        <span className="underline underline-offset-4" style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: '#111111' }}>{t('home.view')}</span>
       </div>
     </div>
   );
@@ -304,17 +307,21 @@ function SkeletonCategoryCard() {
 
 // ── Static data (outside component - never re-created on render) ───────────────
 
+// ⚠️ מפתחות מילון, לא טקסט. הטקסט עצמו ב-app/lib/i18n/dictionaries.ts.
+// הקבועים האלה יושבים מחוץ לקומפוננטה ואין להם גישה ל-useT, ולכן הם
+// מחזיקים מפתחות והתרגום נעשה בזמן הרינדור.
 const STATIC_QUOTES = [
-  { name: 'מיכל כהן',    city: 'תל אביב',  stars: 5, text: 'הזמנתי מזוזה לבית החדש - קיבלתי תמונה של הקלף לפני המשלוח. לא ציפיתי לרמת שירות כזו.' },
-  { name: 'יוסף לוי',    city: 'ירושלים',  stars: 5, text: 'קניתי תפילין לבן שלי לבר מצווה. הסופר פנה אלינו אישית כדי לוודא שהכל מתאים. מרגש.' },
-  { name: 'שרה אברמוב',  city: 'חיפה',     stars: 5, text: 'מתנה לאמא שלי - היא בכתה מרוב שמחה. האריזה הייתה מהממת והיא בכתה מרוב התרגשות. מתנה מושלמת שהגיעה במארז מהמם!' },
-  { name: 'דוד נחמיאס',  city: 'באר שבע',  stars: 5, text: 'ראיתי הרבה חנויות אונליין. כאן היחיד שמציג צילום אמיתי של הקלף. זה ההבדל כולו.' },
+  { nameKey: 'home.t1name', cityKey: 'home.t1city', stars: 5, textKey: 'home.t1text' },
+  { nameKey: 'home.t2name', cityKey: 'home.t2city', stars: 5, textKey: 'home.t2text' },
+  { nameKey: 'home.t3name', cityKey: 'home.t3city', stars: 5, textKey: 'home.t3text' },
+  { nameKey: 'home.t4name', cityKey: 'home.t4city', stars: 5, textKey: 'home.t4text' },
 ] as const;
 
+// ⚠️ ה-href נשאר עברי — הוא ערך cat אמיתי ב-Firestore ובכתובת ה-URL.
 const CLEAR_PATH_ITEMS = [
-  { label: 'מצא מזוזה לבית',  href: '/category/בתי מזוזה' },
-  { label: 'מצא מתנה לשבת',   href: '/category/שבתות וחגים' },
-  { label: 'צפה בכל המוצרים', href: '/category/יודאיקה' },
+  { labelKey: 'home.q.mezuzah', href: '/category/בתי מזוזה' },
+  { labelKey: 'home.q.shabbat', href: '/category/שבתות וחגים' },
+  { labelKey: 'home.q.all',     href: '/category/יודאיקה' },
 ] as const;
 
 // "עוד קטגוריות" strip — admin-controlled via דשבורד ← קטגוריות (section: more).
@@ -329,6 +336,7 @@ const ActivityBar = memo(function ActivityBar({
   weeklyProducts: number;
   isMobile: boolean;
 }) {
+  const { t } = useT();
   const [activityIdx, setActivityIdx] = useState(0);
 
   useEffect(() => {
@@ -341,11 +349,11 @@ const ActivityBar = memo(function ActivityBar({
 
   const weeklyVisitors = (3196).toLocaleString('en-US');
   const messages = [
-    { icon: <IconActivityCheck />, text: 'לקוח מתל אביב הוסיף מזוזה לסל לפני 5 דקות' },
-    { icon: <IconActivityPen />,   text: 'סופר חדש נרשם מירושלים השבוע' },
-    { icon: <IconActivityBox />,   text: `${weeklyProducts || '12'} מוצרים נוספו השבוע` },
-    { icon: <IconActivityUsers />, text: `${weeklyVisitors} לקוחות ביקרו השבוע` },
-    { icon: <IconActivityShield />, text: 'מוצרי סת"מ נבדקים ע"י מגיה מוסמך' },
+    { icon: <IconActivityCheck />, text: t('home.act.cart') },
+    { icon: <IconActivityPen />,   text: t('home.act.scribe') },
+    { icon: <IconActivityBox />,   text: t('home.act.products').replace('{n}', String(weeklyProducts || 12)) },
+    { icon: <IconActivityUsers />, text: t('home.act.visitors').replace('{n}', weeklyVisitors) },
+    { icon: <IconActivityShield />, text: t('home.act.checked') },
   ];
   const msg = messages[activityIdx % messages.length];
 
@@ -367,6 +375,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
   /** נטען בשרת ב-page.tsx כדי שתמונת השקופית הראשונה תקבל preload ותישאר ה-LCP */
   heroSlides?: HeroSlideType[];
 }) {
+  const { t, tc, def } = useT();
   const [isMobile, setIsMobile]       = useState(false);
   const [catImages, setCatImages]     = useState<Record<string, string>>({});
   const [catSections, setCatSections] = useState<HomepageCategorySections>(DEFAULT_SECTIONS);
@@ -679,7 +688,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         const tiles = (d.tiles ?? []) as { label: string; imgUrl: string; href: string }[];
         if (!d.enabled || tiles.length === 0) return;
         setSeasonal({
-          eyebrow:  d.eyebrow  ?? 'עכשיו בעונה',
+          eyebrow:  d.eyebrow  ?? '',
           title:    d.title    ?? '',
           subtitle: d.subtitle ?? '',
           tiles,
@@ -930,13 +939,13 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             <div style={{ background: 'var(--ys-dark-surface)', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontSize: 11, color: 'var(--ys-accent)', fontWeight: 700, marginBottom: 2 }}>
-                  {wizardStep < 3 ? `שאלה ${wizardStep + 1} מתוך 3` : '✨ ההמלצות שלנו'}
+                  {wizardStep < 3 ? t('home.wiz.step').replace('{n}', String(wizardStep + 1)) : t('home.wiz.ourPicks')}
                 </div>
                 <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>
-                  {wizardStep === 0 && 'עזרה בבחירה'}
-                  {wizardStep === 1 && 'מה התקציב?'}
-                  {wizardStep === 2 && 'רמת כשרות?'}
-                  {wizardStep === 3 && 'מצאנו בשבילך!'}
+                  {wizardStep === 0 && t('home.wiz.help')}
+                  {wizardStep === 1 && t('home.wiz.budget')}
+                  {wizardStep === 2 && t('home.wiz.kashrut')}
+                  {wizardStep === 3 && t('home.wiz.found')}
                 </div>
               </div>
               <button onClick={closeWizard} style={{ background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', width: 34, height: 34, borderRadius: '50%', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
@@ -949,9 +958,9 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             <div style={{ padding: 24 }}>
               {wizardStep === 0 && (
                 <>
-                  <p style={{ fontSize: 15, color: '#555', marginBottom: 20, textAlign: 'center' }}>למי זה מיועד?</p>
+                  <p style={{ fontSize: 15, color: '#555', marginBottom: 20, textAlign: 'center' }}>{t('home.wiz.forWhom')}</p>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    {[{ val: 'self' as const, label: '👤 לי עצמי' }, { val: 'gift' as const, label: '🎁 מתנה לאחר' }].map(opt => (
+                    {[{ val: 'self' as const, label: t('home.wiz.self') }, { val: 'gift' as const, label: t('home.wiz.gift') }].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardFor(opt.val); setWizardStep(1); }}
                         style={{ padding: '18px 12px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', cursor: 'pointer', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
@@ -964,12 +973,12 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               )}
               {wizardStep === 1 && (
                 <>
-                  <p style={{ fontSize: 15, color: '#555', marginBottom: 20, textAlign: 'center' }}>מה התקציב?</p>
+                  <p style={{ fontSize: 15, color: '#555', marginBottom: 20, textAlign: 'center' }}>{t('home.wiz.budget')}</p>
                   <div style={{ display: 'grid', gap: 10 }}>
                     {[
-                      { val: 'low'  as const, label: 'עד 400 ₪',     sub: 'מוצרים בסיסיים כשרים' },
-                      { val: 'mid'  as const, label: '400 – 1,000 ₪', sub: 'מוצרים מהודרים' },
-                      { val: 'high' as const, label: 'מעל 1,000 ₪',  sub: 'מוצרים מהדרין מובחרים' },
+                      { val: 'low'  as const, label: t('home.wiz.low'),  sub: t('home.wiz.lowSub') },
+                      { val: 'mid'  as const, label: t('home.wiz.mid'),  sub: t('home.wiz.midSub') },
+                      { val: 'high' as const, label: t('home.wiz.high'), sub: t('home.wiz.highSub') },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardBudget(opt.val); setWizardStep(2); }}
                         style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
@@ -984,12 +993,12 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               )}
               {wizardStep === 2 && (
                 <>
-                  <p style={{ fontSize: 15, color: '#555', marginBottom: 20, textAlign: 'center' }}>רמת כשרות?</p>
+                  <p style={{ fontSize: 15, color: '#555', marginBottom: 20, textAlign: 'center' }}>{t('home.wiz.kashrut')}</p>
                   <div style={{ display: 'grid', gap: 10 }}>
                     {[
-                      { val: 'regular'      as const, label: 'רגיל',         sub: 'כשר לכתחילה לפי כל הדעות' },
-                      { val: 'mehudar'      as const, label: 'מהודר',        sub: 'רמה גבוהה מעל הרגיל' },
-                      { val: 'mehudar_plus' as const, label: 'מהודר בתכלית', sub: 'רמת הכשרות הגבוהה ביותר' },
+                      { val: 'regular'      as const, label: t('home.wiz.regular'),     sub: t('home.wiz.regularSub') },
+                      { val: 'mehudar'      as const, label: t('home.wiz.mehudar'),     sub: t('home.wiz.mehudarSub') },
+                      { val: 'mehudar_plus' as const, label: t('home.wiz.mehudarPlus'), sub: t('home.wiz.mehudarPlusSub') },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardKashrut(opt.val); setWizardStep(3); fetchWizardResults(wizardBudget, opt.val); }}
                         style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
@@ -1004,13 +1013,13 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               )}
               {wizardStep === 3 && (
                 wizardLoading ? (
-                  <div style={{ textAlign: 'center', padding: '32px 0', color: '#888', fontSize: 15 }}>מחפש עבורך את הכי מתאים...</div>
+                  <div style={{ textAlign: 'center', padding: '32px 0', color: '#888', fontSize: 15 }}>{t('home.wiz.searching')}</div>
                 ) : wizardResults.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '24px 0', color: '#888' }}>
                     <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-                    לא נמצאו מוצרים מתאימים לפי הסינון.
+                    {t('home.wiz.noResults')}
                     <br />
-                    <button onClick={() => router.push('/category/הכל')} style={{ marginTop: 16, background: '#373A5A', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>לכל המוצרים</button>
+                    <button onClick={() => router.push('/category/הכל')} style={{ marginTop: 16, background: '#373A5A', color: '#fff', border: 'none', borderRadius: 0, padding: '10px 24px', fontWeight: 700, cursor: 'pointer' }}>{t('home.allProducts')}</button>
                   </div>
                 ) : (
                   <>
@@ -1032,14 +1041,14 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                       ))}
                     </div>
                     <button onClick={closeWizard} style={{ width: '100%', background: '#373A5A', color: '#fff', border: 'none', borderRadius: 0, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                      המשך לגלישה
+                      {t('home.continueBrowsing')}
                     </button>
                   </>
                 )
               )}
               {wizardStep > 0 && wizardStep < 3 && (
                 <button onClick={() => setWizardStep(s => s - 1)} style={{ marginTop: 16, background: 'none', border: 'none', color: '#888', fontSize: 13, cursor: 'pointer', display: 'block', width: '100%', textAlign: 'center' }}>
-                  ← חזרה
+                  {t('home.back')}
                 </button>
               )}
             </div>
@@ -1055,7 +1064,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       {/* h1 — נשאר מחוץ לתנאי כדי שיתקיים בשני המצבים. קודם הוא ישב בתוך
           בלוק הווידאו, וברגע שהקרוסלה מחליפה אותו העמוד היה נשאר בלי h1. */}
       <h1 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
-        אתר היודאיקה הגדול בישראל - כיפות, מתנות ומזכרות לאירועים
+        {t('home.hero.h1')}
       </h1>
 
       {heroSlides.length > 0 ? (
@@ -1126,7 +1135,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             margin: '0 0 16px',
             letterSpacing: '-0.01em',
           }}>
-            כל עולם היודאיקה במקום אחד
+            {t('home.hero.title')}
           </p>
 
           <p className="ys-hero-sub" style={{
@@ -1135,7 +1144,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             marginTop: 0,
             lineHeight: 1.7,
           }}>
-            המבחר הגדול בישראל למוצרי יודאיקה — לבית, לבית הכנסת, לאירועים ולמתנות
+            {t('home.hero.sub')}
           </p>
 
         </div>
@@ -1158,32 +1167,32 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         <section aria-labelledby="seasonal-title" className="px-5 py-10 md:px-8 md:py-14" style={{ background: 'var(--ys-bg-warm)', direction: 'rtl', borderBottom: '1px solid #F0EDE8' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
-              {seasonal.eyebrow && <p className="ys-section-eyebrow">{seasonal.eyebrow}</p>}
+              <p className="ys-section-eyebrow">{seasonal.eyebrow || t('home.seasonDefault')}</p>
               <h2 id="seasonal-title" className="ys-section-title">{seasonal.title}</h2>
               {seasonal.subtitle && <p className="ys-section-sub">{seasonal.subtitle}</p>}
             </div>
             {/* מרווח עמודות/שורות מהטוקנים — אווירי אנכית, צפוף אופקית */}
             <div className="grid grid-cols-2 md:grid-cols-4"
               style={{ columnGap: 'var(--ys-col-gap)', rowGap: 'var(--ys-row-gap)' }}>
-              {seasonal.tiles.map((t, i) => (
+              {seasonal.tiles.map((tile, i) => (
                 <a
-                  key={`${t.href}-${i}`}
-                  href={t.href}
+                  key={`${tile.href}-${i}`}
+                  href={tile.href}
                   style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', background: '#FFFFFF', border: '1px solid #EDEDEF', overflow: 'hidden', transition: 'border-color 0.2s ease' }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--ys-accent)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = '#EDEDEF'; }}
                 >
                   <div style={{ width: '100%', aspectRatio: 'var(--ys-seasonal-ratio)', overflow: 'hidden', flexShrink: 0 }}>
                     <img
-                      src={optimizeCloudinaryUrl(t.imgUrl, 400)}
-                      alt={t.label}
+                      src={optimizeCloudinaryUrl(tile.imgUrl, 400)}
+                      alt={tile.label}
                       loading="lazy"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                     />
                   </div>
                   <div style={{ padding: '12px 16px 16px' }}>
-                    <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--ys-text)', margin: 0, lineHeight: 1.4, letterSpacing: '-0.01em' }}>{t.label}</p>
-                    <span style={{ fontSize: 11, color: '#888', display: 'block', marginTop: 4 }}>לצפייה ←</span>
+                    <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--ys-text)', margin: 0, lineHeight: 1.4, letterSpacing: '-0.01em' }}>{tc(tile.label)}</p>
+                    <span style={{ fontSize: 11, color: '#888', display: 'block', marginTop: 4 }}>{t('home.viewArrow')}</span>
                   </div>
                 </a>
               ))}
@@ -1201,13 +1210,13 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 24 : 32, flexWrap: 'wrap', gap: 10 }}>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A227', letterSpacing: '0.16em', textTransform: 'uppercase', margin: '0 0 6px' }}>מבצע מיוחד</p>
-                <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 300, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>קנו 3, שלמו על 2</h2>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A227', letterSpacing: '0.16em', textTransform: 'uppercase', margin: '0 0 6px' }}>{t('home.specialOffer')}</p>
+                <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 300, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>{t('home.buy3pay2')}</h2>
               </div>
               <a href="/promo/2plus1" style={{ fontSize: 13, fontWeight: 500, color: '#FFFFFF', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.5)', borderRadius: 0, padding: '9px 20px', whiteSpace: 'nowrap', transition: 'all 0.2s ease' }}
                 onMouseEnter={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#1a1a1a'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#fff'; }}>
-                לכל המבצעים ←
+                {t('home.allPromosArrow')}
               </a>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 14 : 20 }}>
@@ -1231,9 +1240,9 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                       <span style={{ fontSize: 12, fontWeight: 600, color: '#e5e7eb', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>
                         {p.name}
                       </span>
-                      <span style={{ fontSize: 11, color: '#9ca3af' }}>יחיד: {formatPrice(p.price)}</span>
+                      <span style={{ fontSize: 11, color: '#9ca3af' }}>{t('home.single')} {formatPrice(p.price)}</span>
                       {promoPrice && (
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#C9A227' }}>3 ב-{formatPrice(Math.round(p.price * 2 * 100) / 100)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#C9A227' }}>{t('home.threeFor')}{formatPrice(Math.round(p.price * 2 * 100) / 100)}</span>
                       )}
                     </div>
                   </a>
@@ -1252,11 +1261,11 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         style={{ background: '#FFFFFF', direction: 'rtl' }}
       >
         <div className="mb-6 md:mb-9" style={{ textAlign: 'center', padding: '0 20px' }}>
-          <p className="ys-section-eyebrow">רגעי חיים</p>
+          <p className="ys-section-eyebrow">{t('home.lifeMoments')}</p>
           {/* לקוחות לא מחפשים "בתי מזוזה" — הם עוברים דירה. הכותרת ממסגרת
               את הקטלוג לפי הסיבה שבגללה מגיעים, לא לפי סוג המוצר. */}
-          <h2 className="ys-section-title">מה מביא אתכם אלינו?</h2>
-          <p className="ys-section-sub">כל רגע בבית היהודי — וכל מה שצריך אליו</p>
+          <h2 className="ys-section-title">{t('home.whatBringsYou')}</h2>
+          <p className="ys-section-sub">{t('home.everyMoment')}</p>
         </div>
 
         {/* חזרה לגלילה אופקית (08/2026) — שורה אחת. הגריד תפס גובה רב מדי
@@ -1310,7 +1319,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                 <p style={{ fontSize: 13, color: '#4B5563', margin: '4px 0 0', lineHeight: 1.5 }}>
                   {ev.emotionalTitle}
                 </p>
-                <span style={{ fontSize: 11, color: '#888', display: 'block', marginTop: 6 }}>לכל המוצרים ←</span>
+                <span style={{ fontSize: 11, color: '#888', display: 'block', marginTop: 6 }}>{t('home.allProductsArrow')}</span>
               </div>
             </a>
           ))}
@@ -1325,9 +1334,9 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       {(featuredProducts.length > 0 || !featuredLoaded) && (
         <div ref={bsSectionRef} className="py-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
           <div className="mb-4 md:mb-6" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-            <h2 className="text-[22px] md:text-[28px]" style={{ fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>הכי נמכרים השבוע</h2>
+            <h2 className="text-[22px] md:text-[28px]" style={{ fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>{t('home.bestsellersWeek')}</h2>
             <Link href="/category/%D7%94%D7%9B%D7%9C" className="underline underline-offset-4" style={{ fontSize: 13, color: '#111111', textDecoration: 'underline', whiteSpace: 'nowrap' }}>
-              לכל המוצרים
+              {t('home.allProducts')}
             </Link>
           </div>
           {/* Horizontal scroll strip (RTL) — same card design as category pages */}
@@ -1370,12 +1379,12 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                   <ProductCardVideo imgSrc={imgSrc} alt={p.name} videoUrl={p.videoUrl} index={idx} preloadTrigger={bsVisible}>
                     {p.isBestSeller && (
                       <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 1, background: '#373A5A', borderRadius: 0, fontSize: 11, fontWeight: 600, color: '#FFFFFF', padding: '3px 8px', letterSpacing: '0.01em' }}>
-                        הכי נמכר
+                        {t('home.bestseller')}
                       </div>
                     )}
                     {hasSale && (
                       <span style={{ position: 'absolute', top: 8, left: 8, zIndex: 1, background: '#373A5A', color: '#FFFFFF', fontSize: 11, fontWeight: 600, padding: '4px 8px', lineHeight: 1.2, borderRadius: 0 }}>
-                        {savePct}% הנחה
+                        {t('home.discountPct').replace('{n}', String(savePct))}
                       </span>
                     )}
                   </ProductCardVideo>
@@ -1396,7 +1405,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                       onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#373A5A'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#111111'; }}
                     >
-                      הוספה לסל
+                      {t('home.addToCart')}
                     </button>
                   </div>
                 </div>
@@ -1412,8 +1421,8 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           כך שהמשתמש עבר שמונה סקשנים לפני שראה פריט אחד למכירה. */}
       <div id="categories" className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>קטגוריות נבחרות</h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>גלה עוד מגוון מוצרים</p>
+          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>{t('home.selectedCategories')}</h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>{t('home.discoverMore')}</p>
           {/* Admin-controlled via דשבורד ← קטגוריות ← תצוגת קטגוריות בדף הבית */}
           <div className="grid grid-cols-2 gap-4 md:gap-7">
             {catSections.top.map(item => (
@@ -1431,7 +1440,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               onClick={() => window.dispatchEvent(new Event("openMobileMenu"))}
               className="ys-outline-btn"
             >
-              לכל הקטגוריות ←
+              {t('home.allCategoriesArrow')}
             </button>
           </div>
         </div>
@@ -1460,7 +1469,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             {/* Designed banner — text is baked into the image, no overlay needed */}
             <Image
               src="https://res.cloudinary.com/dyxzq3ucy/image/upload/f_auto,q_auto,w_1280/v1783054967/%D7%91%D7%90%D7%A0%D7%A8_%D7%9B%D7%99%D7%A4%D7%95%D7%AA_%D7%95%D7%9E%D7%96%D7%9B%D7%A8%D7%95%D7%AA_%D7%9C%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D_%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D_rrjg06.png"
-              alt="כיפות ומזכרות לאירועים"
+              alt={t('home.eventKippotAlt')}
               fill
               unoptimized
               loading="lazy"
@@ -1480,7 +1489,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               borderRadius: 0,
               whiteSpace: 'nowrap',
             }}>
-              כנסו לכיפות ומזכרות ←
+              {t('home.enterEventKippot')}
             </div>
           </a>
         </div>
@@ -1489,7 +1498,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       {/* ── 6. More categories horizontal scroll ── */}
       <div className="py-10 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
-          <h2 className="text-[22px] md:text-[26px]" style={{ fontWeight: 300, color: '#111111', marginBottom: 20, letterSpacing: '-0.01em' }}>עוד קטגוריות</h2>
+          <h2 className="text-[22px] md:text-[26px]" style={{ fontWeight: 300, color: '#111111', marginBottom: 20, letterSpacing: '-0.01em' }}>{t('home.moreCategories')}</h2>
         </div>
         <div
           className="no-scrollbar"
@@ -1562,18 +1571,17 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         />
         <div style={{ position: 'relative', zIndex: 2, maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ys-accent)', letterSpacing: 2.5, margin: '0 0 10px' }}>
-            חדש
+            {t('home.new')}
           </p>
           <h2
             id="build-bundle-title"
             className="text-2xl md:text-[32px]"
             style={{ fontWeight: 300, color: '#FFFFFF', letterSpacing: '-0.01em', margin: '0 0 12px', lineHeight: 1.3 }}
           >
-            בנו את מארז החתנים שלכם
+            {t('home.buildBundleTitle')}
           </h2>
           <p style={{ fontSize: 15, lineHeight: 1.7, color: 'rgba(255,255,255,0.82)', margin: '0 auto 24px', maxWidth: 560 }}>
-            כיסוי לטלית ותפילין, רקמת שם, טלית וסידור — אתם בוחרים כל פריט,
-            אנחנו אורזים מארז אחד מהודר. עם הנחת מארז אוטומטית.
+            {t('home.buildBundleBody')}
           </p>
           <a
             href="/build"
@@ -1583,7 +1591,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               height: 50, padding: '0 38px', fontSize: 15, fontWeight: 700,
             }}
           >
-            התחילו לבנות ←
+            {t('home.startBuilding')}
           </a>
         </div>
       </section>
@@ -1597,14 +1605,13 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 0 24px' : '56px 0 32px', direction: 'rtl' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24, textAlign: 'center' }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
-              מי עומד מאחורי המוצרים
+              {t('home.whoIsBehind')}
             </p>
             <h2 className="text-[26px] md:text-[34px]" style={{ fontWeight: 300, color: '#1F2937', margin: '0 0 8px', letterSpacing: '-0.01em' }}>
-              הסופרים והיוצרים שלנו
+              {t('home.ourScribes')}
             </h2>
             <p style={{ fontSize: 15, color: '#9CA3AF', margin: 0, fontWeight: 400, maxWidth: 620, marginInline: 'auto', lineHeight: 1.7 }}>
-              כל סופר וכל יוצר עבר בדיקה ואימות. לחצו על שם כדי לראות את הסיפור,
-              את דוגמאות העבודה ואת המוצרים שלו.
+              {t('home.scribesBody')}
             </p>
           </div>
           <div
@@ -1642,7 +1649,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       {/* ── CTA למאגר היוצרים — צמוד לשורת היוצרים שמעליו ── */}
       <div className="pb-10 md:pb-14" style={{ background: '#FFFFFF', paddingLeft: 16, paddingRight: 16, direction: 'rtl', textAlign: 'center' }}>
         <button onClick={() => router.push('/soferim')} className="ys-hero-btn-primary">
-          לצפייה במאגר הסופרים והיוצרים ←
+          {t('home.scribesCta')}
         </button>
       </div>
 
@@ -1651,8 +1658,8 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           הסופרים וניתק את שורת האווטרים מכפתור ה-CTA שלה. */}
       <div className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>עוד קטגוריות נבחרות</h2>
-          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>גלו עוד ממגוון המוצרים באתר</p>
+          <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>{t('home.moreSelectedCategories')}</h2>
+          <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>{t('home.discoverMoreSite')}</p>
           {/* Admin-controlled via דשבורד ← קטגוריות ← תצוגת קטגוריות בדף הבית */}
           <div className="grid grid-cols-2 gap-4 md:gap-7">
             {catSections.stam.map(item => (
@@ -1678,10 +1685,10 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         >
           {/* קורא מסך מקבל את המשפט השלם פעם אחת, בלי הקראה של כל שלב בספירה */}
           <span className="sr-only">
-            האתר הכי גדול בישראל עם {productCount.toLocaleString('he-IL')} מוצרים לבית היהודי
+            {t('home.biggestSite').replace('{n}', productCount.toLocaleString(def.htmlLang))}
           </span>
           <span aria-hidden="true">
-            האתר הכי גדול בישראל עם{' '}
+            {t('home.biggestSitePrefix')}{' '}
             <span
               ref={countValueRef}
               style={{
@@ -1697,7 +1704,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             >
               0
             </span>
-            {' '}מוצרים לבית היהודי
+            {t('home.productsSuffix')}
           </span>
         </p>
       </div>
@@ -1709,24 +1716,24 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       <section aria-labelledby="why-us-title" className="px-5 py-12 md:px-8 md:py-16" style={{ background: 'var(--ys-bg-warm)', direction: 'rtl', borderTop: '1px solid #F0EDE8' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <h2 id="why-us-title" className="text-[24px] md:text-[32px]" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 8, letterSpacing: '-0.01em' }}>
-            למה לקנות אצלנו
+            {t('home.whyBuy')}
           </h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 36, fontWeight: 400 }}>
-            כל מוצר עובר דרכנו לפני שהוא מגיע אליכם
+            {t('home.whyBuySub')}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
             {[
               {
-                t: 'סופרים ויוצרים מאומתים',
-                d: 'כל סופר וכל יוצר עובר בדיקה ואימות לפני שהוא מעלה מוצר. אתם יודעים מי יצר את מה שקניתם — ויכולים לראות את הפרופיל שלו.',
+                t: t('home.why1t'),
+                d: t('home.why1d'),
               },
               {
-                t: 'כשרות ובדיקה',
-                d: 'מוצרי סת"ם נכתבים בכתב יד על קלף כשר ועוברים הגהה. רמת הכשרות והנוסח מופיעים על כל מוצר.',
+                t: t('home.why2t'),
+                d: t('home.why2d'),
               },
               {
-                t: 'משלוח לכל הארץ ושירות אישי',
-                d: 'משלוח עד הבית לכל הארץ, איסוף עצמי ללא עלות, ומענה אישי בוואטסאפ לכל שאלה לפני ואחרי הקנייה.',
+                t: t('home.why3t'),
+                d: t('home.why3d'),
               },
             ].map(item => (
               <div key={item.t} style={{ textAlign: 'center' }}>
@@ -1744,10 +1751,10 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 0 32px' : '64px 0 56px', direction: 'rtl' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
             <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 8, letterSpacing: '-0.01em' }}>
-              מה הלקוחות אומרים
+              {t('home.whatCustomersSay')}
             </h2>
             <p style={{ textAlign: 'center', fontSize: isMobile ? 13 : 15, color: '#9CA3AF', marginBottom: isMobile ? 20 : 28, fontWeight: 400 }}>
-              אלפי לקוחות מרוצים ברחבי הארץ
+              {t('home.thousandsHappy')}
             </p>
           </div>
           {/* Mobile: card width matches the category-grid rhythm (2 cards per viewport,
@@ -1807,7 +1814,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             ))}
           </div>
           <div style={{ textAlign: 'center', marginTop: isMobile ? 20 : 32, padding: '0 20px' }}>
-            <a href="/reviews" className="ys-outline-btn">לכל הביקורות ←</a>
+            <a href="/reviews" className="ys-outline-btn">{t('home.allReviews')}</a>
           </div>
         </div>
       )}
@@ -1824,7 +1831,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       >
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
-            עלינו
+            {t('home.aboutEyebrow')}
           </p>
 
           <h2
@@ -1832,17 +1839,14 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             className="text-2xl md:text-[32px]"
             style={{ fontWeight: 300, color: '#373A5A', letterSpacing: '-0.01em', margin: '0 0 18px', lineHeight: 1.3 }}
           >
-            הסיפור של YourSofer
+            {t('home.aboutTitle')}
           </h2>
 
           <p style={{ fontSize: 15.5, lineHeight: 1.85, color: '#4B5563', margin: '0 0 26px' }}>
-            YourSofer נולד מתוך אהבה לעולם היודאיקה ורצון להנגיש מתנות מהודרות עם נשמה — תכשיטים
-            בעיצוב אישי, כיפות מעוצבות לאירועים ותשמישי קדושה מוקפדים. אנחנו עובדים מדימונה, ישירות
-            מול סופרים ויוצרים מוסמכים, ומאמינים שמתנה טובה היא כזו שנושאת שם, תאריך או הקדשה —
-            ונשארת שנים.
+            {t('home.aboutBody')}
           </p>
 
-          <a href="/about" className="ys-outline-btn">קראו עוד ←</a>
+          <a href="/about" className="ys-outline-btn">{t('home.readMore')}</a>
         </div>
       </section>
 

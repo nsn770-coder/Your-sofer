@@ -2,6 +2,7 @@
 
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { useState, useEffect } from 'react';
+import { useT } from '@/app/lib/i18n/useT';
 
 interface Testimonial {
   id: string;
@@ -19,6 +20,8 @@ interface Props {
 }
 
 export default function TestimonialsCarousel({ testimonials, isMobile }: Props) {
+  // ⚠️ tr ולא t — t כבר תפוס כאן לעדות הנוכחית מתוך המערך.
+  const { t: tr, dir } = useT();
   const [testIdx, setTestIdx] = useState(0);
 
   useEffect(() => {
@@ -31,10 +34,10 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
   if (!t) return null;
 
   return (
-    <div style={{ background: '#FAF8F4', padding: isMobile ? '72px 20px' : '96px 24px', direction: 'rtl' }}>
+    <div style={{ background: '#FAF8F4', padding: isMobile ? '72px 20px' : '96px 24px', direction: dir }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
-        <h2 style={{ textAlign: 'center', fontSize: isMobile ? 24 : 32, fontWeight: 300, color: 'var(--ys-text)', marginBottom: 10, letterSpacing: '-0.01em' }}>מה הלקוחות אומרים</h2>
-        <p style={{ textAlign: 'center', fontSize: 14, color: '#9CA3AF', marginBottom: 48 }}>אלפי לקוחות מרוצים ברחבי הארץ</p>
+        <h2 style={{ textAlign: 'center', fontSize: isMobile ? 24 : 32, fontWeight: 300, color: 'var(--ys-text)', marginBottom: 10, letterSpacing: '-0.01em' }}>{tr('home.whatCustomersSay')}</h2>
+        <p style={{ textAlign: 'center', fontSize: 14, color: '#9CA3AF', marginBottom: 48 }}>{tr('home.thousandsHappy')}</p>
         <div key={testIdx} style={{ background: '#fff', borderRadius: 0, boxShadow: '0 4px 32px rgba(0,0,0,0.07)', padding: isMobile ? '36px 24px' : '48px 56px', display: 'flex', alignItems: 'flex-start', gap: 32, flexDirection: isMobile ? 'column' : 'row', animation: 'testFadeIn 0.55s ease' }}>
           <div style={{ flexShrink: 0, alignSelf: isMobile ? 'center' : 'flex-start' }}>
             {t.imageUrl ? (
@@ -45,7 +48,7 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
               </div>
             )}
           </div>
-          <div style={{ flex: 1, textAlign: 'right' }}>
+          <div style={{ flex: 1, textAlign: 'start' }}>
             <div style={{ marginBottom: 10 }}>
               {Array.from({ length: 5 }).map((_, si) => (
                 <span key={si} style={{ color: si < (t.rating ?? 5) ? 'var(--ys-accent)' : '#ddd', fontSize: 18 }}>★</span>
@@ -60,11 +63,11 @@ export default function TestimonialsCarousel({ testimonials, isMobile }: Props) 
         </div>
         {testimonials.length > 1 && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 20 }}>
-            <button onClick={() => setTestIdx(i => (i - 1 + testimonials.length) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: 'var(--ys-accent)', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label="הקודם">‹</button>
+            <button onClick={() => setTestIdx(i => (i - 1 + testimonials.length) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: 'var(--ys-accent)', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label={tr('search.prev')}>‹</button>
             {testimonials.map((_, i) => (
               <button key={i} onClick={() => setTestIdx(i)} style={{ width: i === testIdx ? 24 : 10, height: 10, borderRadius: 0, border: 'none', cursor: 'pointer', background: i === testIdx ? 'var(--ys-accent)' : '#ccc', padding: 0, transition: 'width 0.3s, background 0.3s' }} />
             ))}
-            <button onClick={() => setTestIdx(i => (i + 1) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: 'var(--ys-accent)', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label="הבא">›</button>
+            <button onClick={() => setTestIdx(i => (i + 1) % testimonials.length)} style={{ background: 'none', border: 'none', fontSize: 20, color: 'var(--ys-accent)', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }} aria-label={tr('search.next')}>›</button>
           </div>
         )}
       </div>
