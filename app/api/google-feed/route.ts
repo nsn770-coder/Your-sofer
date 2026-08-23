@@ -53,6 +53,28 @@ function getGender(_cat: string): string {
   return 'male';
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// "כיפות לאירועים" — סימון ייעודי לקמפיין PMax.
+//
+// custom_label_0 כבר תפוס (הוא נושא את `badge`), ולכן הסימון יושב על
+// custom_label_1 = "event_kippot". הערך הזה ניתן אך ורק למוצרים שמופיעים
+// בפילטר /category/כיפות?filter=כיפות לאירועים.
+//
+// ⚠️ הלוגיקה כאן חייבת להישאר זהה ל-isEventKippah() ב-
+//    app/category/[category]/CategoryClient.tsx ול-scripts/tagEventKippotSubcategory.mjs.
+// ─────────────────────────────────────────────────────────────────────────────
+const EVENT_KIPPOT_CAT    = 'כיפות';
+const EVENT_KIPPOT_SUBCAT = 'כיפות לאירועים';
+const EVENT_KIPPOT_LABEL = 'event_kippot';
+
+function isEventKippah(d: Record<string, unknown>, cat: string): boolean {
+  if (cat !== EVENT_KIPPOT_CAT) return false;
+  if (d.subCategory === EVENT_KIPPOT_SUBCAT) return true;
+  // סקרולי המזכרות בעמוד האירועים (מטפחות, ברכונים, הבדלה) אינם כיפות
+  if (d.eventScrollSection) return false;
+  return d.isEventKippot === true || d.isEventProduct === true || d.eventsOnly === true;
+}
+
 export async function GET(req: Request) {
   try {
     const db = getAdminDb();
@@ -63,6 +85,7 @@ export async function GET(req: Request) {
     const skipped: Record<string, number> = {};
     const seenIds = new Set<string>();
     let duplicateIds = 0;
+    let eventKippotLabeled = 0;
     const skip = (reason: string) => { skipped[reason] = (skipped[reason] ?? 0) + 1; };
 
     snap.forEach(doc => {
@@ -98,6 +121,9 @@ export async function GET(req: Request) {
       const material: string = d.material ?? '';
       const color: string = d.color ?? '';
 
+      // סימון "כיפות לאירועים" עבור קמפיין ה-PMax הייעודי
+      const isEventKippot = isEventKippah(d, cat);
+
       const link = `${SITE}/product/${id}`;
 
       // Build ordered image list from all known image fields
@@ -115,6 +141,8 @@ export async function GET(req: Request) {
 
       // Skip products with no image
       if (allImages.length === 0) return skip('missing_image');
+
+      if (isEventKippot) eventKippotLabeled++;
 
       const imageLink = allImages[0];
       const additionalImages: string[] = allImages.slice(1);
@@ -140,6 +168,7 @@ export async function GET(req: Request) {
       ${APPAREL_CATS.has(cat) ? `<g:gender>${getGender(cat)}</g:gender>` : ''}
       ${APPAREL_CATS.has(cat) ? `<g:age_group>adult</g:age_group>` : ''}
       ${badge ? `<g:custom_label_0>${esc(badge)}</g:custom_label_0>` : ''}
+      ${isEventKippot ? `<g:custom_label_1>${EVENT_KIPPOT_LABEL}</g:custom_label_1>` : ''}
       <g:shipping>
         <g:country>IL</g:country>
         <g:service>משלוח עד הבית</g:service>
@@ -170,6 +199,8 @@ export async function GET(req: Request) {
         skipped,
         skippedTotal: Object.values(skipped).reduce((a, b) => a + b, 0),
         duplicateIds,
+        // כמה פריטים בפיד נושאים custom_label_1="event_kippot"
+        eventKippotLabeled,
         generatedAt: new Date().toISOString(),
       });
     }

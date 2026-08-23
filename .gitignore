@@ -58,3 +58,8 @@ backups/
 .fuse_hidden*
 
 Your-sofer/
+
+# PMax "כיפות לאירועים" — פלטי הרצה (רשימות מוצרים, דוחות אימות)
+scripts/google-ads/pmax-event-kippot/out/
+# התבנית עצמה כן נכנסת לגיט (שמות משתנים בלבד, בלי ערכים)
+!scripts/google-ads/pmax-event-kippot/.env.example
