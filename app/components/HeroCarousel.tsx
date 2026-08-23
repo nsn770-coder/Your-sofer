@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { heroSrc } from '@/lib/cloudinary';
+import { useT } from '@/app/lib/i18n/useT';
 
 export interface HeroSlide {
   imgUrl: string;
@@ -41,6 +42,7 @@ const SCRIMS: Record<string, string> = {
  * במובייל אפשר להחליק באצבע; בדסקטופ ההחלפה אוטומטית ונעצרת בריחוף.
  */
 export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
+  const { dir } = useT();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [drag, setDrag] = useState(0);           // היסט חי בזמן גרירה
@@ -86,7 +88,7 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
   return (
     <section
-      dir="rtl"
+      dir={dir}
       aria-roledescription="carousel"
       aria-label="באנרים ראשיים"
       onMouseEnter={() => setPaused(true)}

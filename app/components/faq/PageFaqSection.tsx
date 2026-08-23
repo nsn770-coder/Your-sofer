@@ -13,6 +13,7 @@ import { getFaqForPage, getFaqByIds, type FaqPageKey } from '@/data/faq';
 import { buildWhatsAppLink, WA_PREFILL } from '@/lib/whatsapp';
 import { trackFaqEvent } from '@/lib/faqAnalytics';
 import FaqAccordion from './FaqAccordion';
+import { useT } from '@/app/lib/i18n/useT';
 
 export default function PageFaqSection({
   pageKey,
@@ -38,6 +39,7 @@ export default function PageFaqSection({
   /** CTA משני לוואטסאפ */
   showWhatsAppCta?: boolean;
 }) {
+  const { dir } = useT();
   const pathname = usePathname();
   const items = ids?.length ? getFaqByIds(ids) : getFaqForPage(pageKey, max);
   if (items.length === 0) return null;
@@ -56,7 +58,7 @@ export default function PageFaqSection({
 
   return (
     <section
-      dir="rtl"
+      dir={dir}
       aria-label={title}
       style={{
         maxWidth: 800,

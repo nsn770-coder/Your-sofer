@@ -56,6 +56,9 @@ const CATEGORY_LABELS: Record<string, LabelSet> = {
   'כיפות ומזכרות':        { en: 'Kippot & favors',            fr: 'Kippot et souvenirs',      es: 'Kipot y recuerdos',        ru: 'Кипы и сувениры' },
   'מזכרות לאירועים':      { en: 'Event favors',               fr: 'Souvenirs d’événements',   es: 'Recuerdos para eventos',   ru: 'Сувениры для торжеств' },
   'כיפות לאירועים':       { en: 'Event kippot',               fr: 'Kippot pour événements',   es: 'Kipot para eventos',       ru: 'Кипы для торжеств' },
+  'כיפות ומזכרות לאירועים': { en: 'Event kippot & favors',   fr: 'Kippot et souvenirs',      es: 'Kipot y recuerdos',        ru: 'Кипы и сувениры для торжеств' },
+  'סט בר מצווה':          { en: 'Bar Mitzvah set',            fr: 'Ensemble Bar Mitsva',      es: 'Set de Bar Mitzvá',        ru: 'Набор для бар-мицвы' },
+  'טליתות (כללי)':        { en: 'Tallitot (general)',         fr: 'Talitot (général)',        es: 'Talitot (general)',        ru: 'Талиты (общее)' },
 
   // ── תת-קטגוריות: מזוזות ותפילין ──
   'מזוזות פולימר': { en: 'Polymer mezuzah cases', fr: 'Étuis de mezouza en polymère',  es: 'Estuches de mezuzá de polímero', ru: 'Полимерные футляры для мезузы' },

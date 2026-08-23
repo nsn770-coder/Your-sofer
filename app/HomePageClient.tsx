@@ -34,6 +34,7 @@ import lifeEvents from '@/data/lifeEvents';
 import AlgoliaSearch from '@/app/components/search/AlgoliaSearch';
 import ProductCardVideo from '@/app/components/ProductCardVideo';
 import { useT } from '@/app/lib/i18n/useT';
+import { productName } from '@/app/lib/i18n/productText';
 
 // Activity bar icons
 function IconActivityCheck() {
@@ -150,6 +151,7 @@ function formatHeDate(seconds: number): string {
 // ── Sub-image slot ─────────────────────────────────────────────────────────────
 
 function SubSlot({ imgUrl, label, href }: { imgUrl: string; label: string; href: string }) {
+  const { dir, tc } = useT();
   return (
     <Link href={href} className="block group">
       <div
@@ -176,10 +178,10 @@ function SubSlot({ imgUrl, label, href }: { imgUrl: string; label: string; href:
         )}
       </div>
       <p
-        className="text-right leading-tight line-clamp-2 group-hover:underline"
-        style={{ fontSize: 11, color: '#555', direction: 'rtl' }}
+        className="text-start leading-tight line-clamp-2 group-hover:underline"
+        style={{ fontSize: 11, color: '#555', direction: dir }}
       >
-        {label}
+        {tc(label)}
       </p>
     </Link>
   );
@@ -196,9 +198,10 @@ function CategoryCard({
   catImages: Record<string, string>;
   slotImages: Record<string, string>;
 }) {
+  const { dir, tc } = useT();
   return (
     <div
-      dir="rtl"
+      dir={dir}
       className="flex flex-col"
       style={{
         background: '#ffffff',
@@ -209,7 +212,7 @@ function CategoryCard({
       }}
     >
       <h3
-        className="text-right mb-3"
+        className="text-start mb-3"
         style={{ fontSize: 17, fontWeight: 900, color: 'var(--ys-text)', lineHeight: 1.2 }}
       >
         {card.title}
@@ -226,7 +229,7 @@ function CategoryCard({
       </div>
       <Link
         href={card.href}
-        className="mt-4 block text-right hover:underline"
+        className="mt-4 block text-start hover:underline"
         style={{ fontSize: 13, fontWeight: 700, color: 'var(--ys-accent)' }}
       >
         {card.ctaLabel}
@@ -375,7 +378,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
   /** נטען בשרת ב-page.tsx כדי שתמונת השקופית הראשונה תקבל preload ותישאר ה-LCP */
   heroSlides?: HeroSlideType[];
 }) {
-  const { t, tc, def } = useT();
+  const { t, tc, def, dir, locale } = useT();
   const [isMobile, setIsMobile]       = useState(false);
   const [catImages, setCatImages]     = useState<Record<string, string>>({});
   const [catSections, setCatSections] = useState<HomepageCategorySections>(DEFAULT_SECTIONS);
@@ -852,7 +855,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
 
   return (
     <div
-      dir="rtl"
+      dir={dir}
       style={{
         background: '#FFFFFF',
         fontFamily: "var(--font-heebo), 'Heebo', Arial, sans-serif",
@@ -981,7 +984,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                       { val: 'high' as const, label: t('home.wiz.high'), sub: t('home.wiz.highSub') },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardBudget(opt.val); setWizardStep(2); }}
-                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', cursor: 'pointer', textAlign: 'start', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
@@ -1001,7 +1004,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                       { val: 'mehudar_plus' as const, label: t('home.wiz.mehudarPlus'), sub: t('home.wiz.mehudarPlusSub') },
                     ].map(opt => (
                       <button key={opt.val} onClick={() => { setWizardKashrut(opt.val); setWizardStep(3); fetchWizardResults(wizardBudget, opt.val); }}
-                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', cursor: 'pointer', textAlign: 'right', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
+                        style={{ padding: '14px 18px', borderRadius: 0, border: '2px solid #e0e0e0', background: '#fff', fontSize: 15, fontWeight: 700, color: 'var(--ys-text)', cursor: 'pointer', textAlign: 'start', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#373A5A'; (e.currentTarget as HTMLButtonElement).style.background = '#F3F4F9'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#e0e0e0'; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}>
                         <span>{opt.label}</span>
@@ -1071,7 +1074,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         <HeroCarousel slides={heroSlides} />
       ) : (
       <div
-        dir="rtl"
+        dir={dir}
         className="ys-hero-box"
         style={{
           position: 'relative',
@@ -1164,7 +1167,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           היהדות עונתית בעוצמה — אלול, חנוכה, פסח, פורים — ולא הייתה לזה
           שום נוכחות בעמוד הבית. אין שריון מקום: כשכבוי הסקשן פשוט לא קיים. */}
       {seasonal && (
-        <section aria-labelledby="seasonal-title" className="px-5 py-10 md:px-8 md:py-14" style={{ background: 'var(--ys-bg-warm)', direction: 'rtl', borderBottom: '1px solid #F0EDE8' }}>
+        <section aria-labelledby="seasonal-title" className="px-5 py-10 md:px-8 md:py-14" style={{ background: 'var(--ys-bg-warm)', direction: dir, borderBottom: '1px solid #F0EDE8' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
               <p className="ys-section-eyebrow">{seasonal.eyebrow || t('home.seasonDefault')}</p>
@@ -1206,7 +1209,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           jump when the dark section appears; collapses only if there are no promos. */}
       <div className={promoLoaded && promoProducts.length === 0 ? undefined : 'ys-promo-reserve'} style={{ background: promoProducts.length === 0 ? '#FFFFFF' : undefined }}>
       {promoProducts.length > 0 && (
-        <section style={{ background: 'var(--ys-dark-surface)', padding: isMobile ? '40px 16px' : '64px 32px', direction: 'rtl' }}>
+        <section style={{ background: 'var(--ys-dark-surface)', padding: isMobile ? '40px 16px' : '64px 32px', direction: dir }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 24 : 32, flexWrap: 'wrap', gap: 10 }}>
               <div>
@@ -1258,7 +1261,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       <section
         id="life-events"
         className="pt-10 pb-9 md:pt-16 md:pb-12"
-        style={{ background: '#FFFFFF', direction: 'rtl' }}
+        style={{ background: '#FFFFFF', direction: dir }}
       >
         <div className="mb-6 md:mb-9" style={{ textAlign: 'center', padding: '0 20px' }}>
           <p className="ys-section-eyebrow">{t('home.lifeMoments')}</p>
@@ -1276,7 +1279,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           style={{
             display: 'flex', overflowX: 'auto', gap: 'var(--ys-col-gap)',
             padding: '4px 20px 16px', scrollbarWidth: 'none',
-            direction: 'rtl', scrollSnapType: 'x mandatory',
+            direction: dir, scrollSnapType: 'x mandatory',
           } as React.CSSProperties}>
           {lifeEvents.map((ev, evIdx) => (
             <a
@@ -1332,7 +1335,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           swap in without shifting anything below. Collapses only if truly empty. */}
       <div>
       {(featuredProducts.length > 0 || !featuredLoaded) && (
-        <div ref={bsSectionRef} className="py-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
+        <div ref={bsSectionRef} className="py-8 md:py-16" style={{ background: '#FFFFFF', direction: dir }}>
           <div className="mb-4 md:mb-6" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
             <h2 className="text-[22px] md:text-[28px]" style={{ fontWeight: 300, color: '#111111', margin: 0, letterSpacing: '-0.01em' }}>{t('home.bestsellersWeek')}</h2>
             <Link href="/category/%D7%94%D7%9B%D7%9C" className="underline underline-offset-4" style={{ fontSize: 13, color: '#111111', textDecoration: 'underline', whiteSpace: 'nowrap' }}>
@@ -1348,7 +1351,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               gap: 12,
               padding: '0 20px 8px',
               scrollbarWidth: 'none',
-              direction: 'rtl',
+              direction: dir,
               scrollSnapType: 'x mandatory',
             } as React.CSSProperties}
           >
@@ -1389,7 +1392,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
                     )}
                   </ProductCardVideo>
                   <div style={{ padding: '8px 2px 2px' }}>
-                    <p style={{ fontSize: 14, fontWeight: 500, color: '#373A5A', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 40, marginBottom: 5, textAlign: 'right' } as React.CSSProperties}>{p.name}</p>
+                    <p style={{ fontSize: 14, fontWeight: 500, color: '#373A5A', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 40, marginBottom: 5, textAlign: 'start' } as React.CSSProperties}>{productName(p, locale)}</p>
                     <p style={{ fontSize: 17, fontWeight: 700, color: '#111111', marginBottom: 8, display: 'flex', alignItems: 'baseline', gap: 6 }}>
                       {formatPrice(p.price)}
                       {hasSale && (
@@ -1419,7 +1422,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       {/* ── Category grid ──
           הועבר לכאן מתחת ל"הכי נמכרים" (08/2026). קודם הוא ישב לפני המוצרים,
           כך שהמשתמש עבר שמונה סקשנים לפני שראה פריט אחד למכירה. */}
-      <div id="categories" className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
+      <div id="categories" className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: dir }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>{t('home.selectedCategories')}</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>{t('home.discoverMore')}</p>
@@ -1449,7 +1452,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       {/* ── Bar-Mitzvah Kippot CTA ──
           הועבר אל מתחת למוצרים ולקטגוריות (08/2026): באנר ליעד יחיד חסם
           את הדרך אל הקטלוג עוד לפני שהוצג מוצר אחד. */}
-      <div className="px-5 pb-12 md:px-8 md:pb-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
+      <div className="px-5 pb-12 md:px-8 md:pb-16" style={{ background: '#FFFFFF', direction: dir }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <a
             href="/event-kippot"
@@ -1496,7 +1499,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       </div>
 
       {/* ── 6. More categories horizontal scroll ── */}
-      <div className="py-10 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
+      <div className="py-10 md:py-16" style={{ background: '#FFFFFF', direction: dir }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
           <h2 className="text-[22px] md:text-[26px]" style={{ fontWeight: 300, color: '#111111', marginBottom: 20, letterSpacing: '-0.01em' }}>{t('home.moreCategories')}</h2>
         </div>
@@ -1508,7 +1511,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
             gap: 12,
             padding: '0 20px 8px',
             scrollbarWidth: 'none',
-            direction: 'rtl',
+            direction: dir,
             scrollSnapType: 'x mandatory',
           } as React.CSSProperties}
         >
@@ -1549,7 +1552,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
         aria-labelledby="build-bundle-title"
         // NAVY_BUILD נשאר כרקע גיבוי — נצבע מיד, כך שאין הבזק לבן לפני
         // שהתמונה נטענת, וגם אם היא נכשלת הטקסט הלבן נשאר קריא.
-        style={{ background: NAVY_BUILD, direction: 'rtl', position: 'relative', overflow: 'hidden' }}
+        style={{ background: NAVY_BUILD, direction: dir, position: 'relative', overflow: 'hidden' }}
         className="px-5 py-14 md:px-8 md:py-20"
       >
         {/* תמונת הרקע — position:absolute כדי שלא תשפיע על גובה הסקשן (אפס CLS).
@@ -1602,7 +1605,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           וכל אחד לבדו היה חלש. היוצרים הם הבידול שרשת גדולה לא יכולה להעתיק,
           ולכן הם מקבלים סקשן אחד עם כותרת, הסבר וקריאה לפעולה. */}
       {soferimList.length > 0 && (
-        <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 0 24px' : '56px 0 32px', direction: 'rtl' }}>
+        <div style={{ background: '#FFFFFF', padding: isMobile ? '40px 0 24px' : '56px 0 32px', direction: dir }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px', marginBottom: 24, textAlign: 'center' }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', letterSpacing: 2.5, textTransform: 'uppercase', margin: '0 0 10px' }}>
               {t('home.whoIsBehind')}
@@ -1616,7 +1619,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           </div>
           <div
             className="ys-hscroll"
-            style={{ display: 'flex', overflowX: 'auto', gap: 20, padding: '0 20px 8px', scrollbarWidth: 'none', direction: 'rtl' } as React.CSSProperties}
+            style={{ display: 'flex', overflowX: 'auto', gap: 20, padding: '0 20px 8px', scrollbarWidth: 'none', direction: dir } as React.CSSProperties}
           >
             {soferimList.map(sofer => {
               const img = optimizeCloudinaryUrl(sofer.profileImage || '', 200);
@@ -1647,7 +1650,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       )}
 
       {/* ── CTA למאגר היוצרים — צמוד לשורת היוצרים שמעליו ── */}
-      <div className="pb-10 md:pb-14" style={{ background: '#FFFFFF', paddingLeft: 16, paddingRight: 16, direction: 'rtl', textAlign: 'center' }}>
+      <div className="pb-10 md:pb-14" style={{ background: '#FFFFFF', paddingLeft: 16, paddingRight: 16, direction: dir, textAlign: 'center' }}>
         <button onClick={() => router.push('/soferim')} className="ys-hero-btn-primary">
           {t('home.scribesCta')}
         </button>
@@ -1656,7 +1659,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       {/* ── קטגוריות סת"ם ──
           הופרד מסקשן היוצרים (08/2026): קודם הוא ישב באמצע שלושת סקשני
           הסופרים וניתק את שורת האווטרים מכפתור ה-CTA שלה. */}
-      <div className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: 'rtl' }}>
+      <div className="px-5 py-10 md:px-8 md:py-16" style={{ background: '#FFFFFF', direction: dir }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <h2 className="text-[28px] md:text-4xl" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 10, letterSpacing: '-0.01em' }}>{t('home.moreSelectedCategories')}</h2>
           <p style={{ textAlign: 'center', fontSize: 15, color: '#9CA3AF', marginBottom: 28, fontWeight: 400 }}>{t('home.discoverMoreSite')}</p>
@@ -1678,7 +1681,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
       {/* ── שורת הבידול, עם מונה עולה ──
           החליפה את פס ארבעת המונים (משפחות / סופרים / מוצרים / דירוג), 07/2026.
           הועברה לכאן (08/2026) — קודם ישבה בין רגעי החיים למוצרים וחצצה ביניהם. */}
-      <div ref={countRowRef} className="px-4 pt-2 pb-9 md:px-8 md:pt-4 md:pb-14" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4', direction: 'rtl' }}>
+      <div ref={countRowRef} className="px-4 pt-2 pb-9 md:px-8 md:pt-4 md:pb-14" style={{ background: '#FFFFFF', borderBottom: '1px solid #f0ece4', direction: dir }}>
         <p
           className="text-xl md:text-[26px]"
           style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center', fontWeight: 300, color: '#373A5A', lineHeight: 1.4, letterSpacing: '-0.01em' }}
@@ -1713,7 +1716,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           הועבר לכאן ממקום 3 (07/2026). בראש העמוד השורה הגיעה לפני שלמשתמש
           היה על מה להחליט; כאן היא נוחתת בדיוק בשלב ההערכה, אחרי שראה מוצרים
           ואת היוצרים. הורחבה משורת ✓ דקה לסקשן שנושא את טענת הכשרות בפועל. */}
-      <section aria-labelledby="why-us-title" className="px-5 py-12 md:px-8 md:py-16" style={{ background: 'var(--ys-bg-warm)', direction: 'rtl', borderTop: '1px solid #F0EDE8' }}>
+      <section aria-labelledby="why-us-title" className="px-5 py-12 md:px-8 md:py-16" style={{ background: 'var(--ys-bg-warm)', direction: dir, borderTop: '1px solid #F0EDE8' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <h2 id="why-us-title" className="text-[24px] md:text-[32px]" style={{ textAlign: 'center', fontWeight: 300, color: '#1F2937', marginBottom: 8, letterSpacing: '-0.01em' }}>
             {t('home.whyBuy')}
@@ -1748,7 +1751,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
 
       {/* ── Live Reviews Carousel ── */}
       {liveReviews.length > 0 && (
-        <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 0 32px' : '64px 0 56px', direction: 'rtl' }}>
+        <div style={{ background: '#FFFFFF', padding: isMobile ? '32px 0 32px' : '64px 0 56px', direction: dir }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
             <h2 style={{ textAlign: 'center', fontSize: isMobile ? 22 : 36, fontWeight: 300, color: '#1F2937', marginBottom: 8, letterSpacing: '-0.01em' }}>
               {t('home.whatCustomersSay')}
@@ -1761,7 +1764,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
               same width as a category product card). Desktop unchanged. */}
           <div
             className="ys-hscroll"
-            style={{ display: 'flex', overflowX: 'auto', gap: isMobile ? 12 : 16, padding: isMobile ? '4px 20px 12px' : '4px 20px 16px', scrollbarWidth: 'none', direction: 'rtl', scrollSnapType: 'x mandatory' } as React.CSSProperties}
+            style={{ display: 'flex', overflowX: 'auto', gap: isMobile ? 12 : 16, padding: isMobile ? '4px 20px 12px' : '4px 20px 16px', scrollbarWidth: 'none', direction: dir, scrollSnapType: 'x mandatory' } as React.CSSProperties}
           >
             {liveReviews.map(r => (
               <div
@@ -1826,7 +1829,7 @@ export default function HomePageClient({ productCount, heroSlides = [] }: {
           למטה, אחרי המוצרים, עם קישור "קראו עוד" לעמוד אודות. */}
       <section
         aria-labelledby="our-story-title"
-        style={{ background: 'var(--ys-bg-warm)', borderTop: '1px solid #EDEDEF', direction: 'rtl' }}
+        style={{ background: 'var(--ys-bg-warm)', borderTop: '1px solid #EDEDEF', direction: dir }}
         className="px-5 py-12 md:px-8 md:py-16"
       >
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
