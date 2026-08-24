@@ -30,6 +30,7 @@ import EraToggle from '@/app/components/EraToggle';
 import { SendToLionWheelButton } from '@/components/admin/SendToLionWheelButton';
 import { CRAFTS } from '@/app/lib/crafts';
 import { PAID_STATUSES, isPaidRevenueOrder } from '@/app/lib/orderStatus';
+import ManualOrderModal, { PAYMENT_METHOD_LABELS } from './components/ManualOrderModal';
 
 interface OrderItem {
   id: string;
@@ -85,6 +86,18 @@ interface Order {
   commissionAmount?: number;
   createdAt?: { seconds: number };
   items?: OrderItem[];
+  // ── הזמנות ידניות (וואטסאפ / ביט / העברה בנקאית / מזומן) ─────────────────
+  /** 'manual' = נוצרה באדמין ולא עברה בצ'קאאוט. חסר/undefined = הזמנת אתר. */
+  source?: 'manual' | 'online';
+  /** 'bit' | 'bank_transfer' | 'cash' | 'credit' | 'other' */
+  paymentMethod?: string;
+  /** 'whatsapp' | 'phone' | 'in_person' | 'other' */
+  channel?: string;
+  paymentReference?: string | null;
+  /** Sumit מנפיק קבלה אוטומטית רק בחיוב אשראי — בהזמנה ידנית צריך להנפיק בנפרד */
+  receiptIssued?: boolean;
+  receiptNumber?: string | null;
+  manualCreatedBy?: string;
   /** משלוח שנוצר ב-LionWheel — נשמר בהזמנה כדי לשרוד רענון ולמנוע כפילות */
   lionwheel?: {
     taskId?: string | null;
@@ -2208,9 +2221,11 @@ function KippaDesignView({ cd }: { cd: KippaDesignData }) {
   );
 }
 
-function OrdersTab({ orders, setOrders, ordersError }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>>; ordersError?: string | null; }) {
+function OrdersTab({ orders, setOrders, ordersError, reloadOrders }: { orders: Order[]; setOrders: React.Dispatch<React.SetStateAction<Order[]>>; ordersError?: string | null; reloadOrders?: () => Promise<void> | void; }) {
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  // הזמנה ידנית — וואטסאפ / ביט / העברה בנקאית / מזומן
+  const [manualOpen, setManualOpen] = useState(false);
   // פתיחה מרובה: אפשר להרחיב כמה הזמנות במקביל (Set של מזהים)
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [cancellingId, setCancellingId] = useState<string | null>(null);
@@ -2772,7 +2787,23 @@ ${visibleOrders.map(orderBlock).join('\n')}
         >
           🖨️ הדפס דף אריזה ({visibleOrders.length})
         </button>
+        <button
+          onClick={() => setManualOpen(true)}
+          className="px-4 py-2 rounded-xl text-sm font-bold border border-emerald-700 bg-emerald-700 text-white hover:bg-emerald-800"
+          title="הזמנה שהתקבלה בוואטסאפ/טלפון ושולמה בביט, בהעברה בנקאית או במזומן"
+        >
+          ➕ הזמנה ידנית
+        </button>
       </div>
+
+      <ManualOrderModal
+        open={manualOpen}
+        onClose={() => setManualOpen(false)}
+        onCreated={async ({ orderNumber, total }) => {
+          await reloadOrders?.();
+          alert(`✅ נוצרה הזמנה ${orderNumber} על סך ₪${total.toLocaleString('he-IL')}.\n\nזכור להנפיק קבלה ב-Sumit — היא לא מונפקת אוטומטית בתשלום שאינו אשראי.`);
+        }}
+      />
 
       <div className="bg-white rounded-xl shadow overflow-hidden">
         <table className="w-full text-sm">
@@ -2818,6 +2849,30 @@ ${visibleOrders.map(orderBlock).join('\n')}
                       {o.orderNumber}
                       {(o.items ?? []).some(it => it.customDesign) && (
                         <span className="mr-1" title="הזמנה עם עיצוב כיפה מותאם אישית">🎨</span>
+                      )}
+                      {o.source === 'manual' && (
+                        <span
+                          className="mr-2 inline-block bg-emerald-100 text-emerald-700 text-[11px] font-bold px-2 py-0.5 rounded-full align-middle"
+                          title={`הזמנה ידנית${o.channel === 'whatsapp' ? ' — וואטסאפ' : ''}${o.manualCreatedBy ? ` · נוצרה ע"י ${o.manualCreatedBy}` : ''}`}
+                        >
+                          ידנית
+                        </span>
+                      )}
+                      {o.paymentMethod && o.paymentMethod !== 'credit' && (
+                        <span
+                          className="mr-1 inline-block bg-gray-100 text-gray-700 text-[11px] font-bold px-2 py-0.5 rounded-full align-middle"
+                          title={o.paymentReference ? `אסמכתא: ${o.paymentReference}` : undefined}
+                        >
+                          {PAYMENT_METHOD_LABELS[o.paymentMethod] ?? o.paymentMethod}
+                        </span>
+                      )}
+                      {o.source === 'manual' && o.receiptIssued === false && (
+                        <span
+                          className="mr-1 inline-block bg-amber-100 text-amber-800 text-[11px] font-bold px-2 py-0.5 rounded-full align-middle"
+                          title="לא הונפקה קבלה ב-Sumit להזמנה הזו"
+                        >
+                          ללא קבלה
+                        </span>
                       )}
                       {isCancelled && (
                         <span className="mr-2 inline-block bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">בוטל</span>
@@ -5062,7 +5117,7 @@ export default function AdminPage() {
       )}
 
       {activeTab === 'orders' && (
-        <OrdersTab orders={orders} setOrders={setOrders} ordersError={ordersError} />
+        <OrdersTab orders={orders} setOrders={setOrders} ordersError={ordersError} reloadOrders={loadOrders} />
       )}
 
       {activeTab === 'commissions' && (
