@@ -31,6 +31,7 @@ import { SendToLionWheelButton } from '@/components/admin/SendToLionWheelButton'
 import { CRAFTS } from '@/app/lib/crafts';
 import { PAID_STATUSES, isPaidRevenueOrder } from '@/app/lib/orderStatus';
 import ManualOrderModal, { PAYMENT_METHOD_LABELS } from './components/ManualOrderModal';
+import OrderNoteButton from './components/OrderNoteButton';
 
 interface OrderItem {
   id: string;
@@ -98,6 +99,13 @@ interface Order {
   receiptIssued?: boolean;
   receiptNumber?: string | null;
   manualCreatedBy?: string;
+  // ── פתקית הערה פנימית ────────────────────────────────────────────────────
+  // ⚠️ נפרד לגמרי מ-notes, שהוא ההערה שהלקוח כתב בצ'קאאוט.
+  adminNote?: string;
+  adminNoteUrgent?: boolean;
+  adminNoteDueDate?: string | null;
+  adminNoteUpdatedAt?: { seconds: number } | null;
+  adminNoteBy?: string;
   /** משלוח שנוצר ב-LionWheel — נשמר בהזמנה כדי לשרוד רענון ולמנוע כפילות */
   lionwheel?: {
     taskId?: string | null;
@@ -2834,7 +2842,13 @@ ${visibleOrders.map(orderBlock).join('\n')}
               return (
                 <React.Fragment key={o.id}>
                   <tr
-                    className={`border-t cursor-pointer ${isCancelled ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+                    className={`border-t cursor-pointer ${
+                      isCancelled
+                        ? 'bg-gray-100'
+                        : o.adminNoteUrgent && (o.adminNote ?? '').trim()
+                          ? 'bg-red-50 hover:bg-red-100 border-r-4 border-r-red-500'
+                          : 'hover:bg-gray-50'
+                    }`}
                     onClick={() => {
                       if (isEditing) return;
                       setExpandedIds(prev => {
@@ -2881,7 +2895,18 @@ ${visibleOrders.map(orderBlock).join('\n')}
                     <td className="p-3 text-xs text-gray-500">
                       {formatOrderDate(o)}
                     </td>
-                    <td className={`p-3 font-bold ${isCancelled ? 'text-gray-400' : ''}`}>{o.customerName}</td>
+                    <td className={`p-3 font-bold ${isCancelled ? 'text-gray-400' : ''}`}>
+                      {o.customerName}
+                      {(o.adminNote ?? '').trim() && (
+                        <div
+                          className={`font-normal text-[11px] mt-0.5 max-w-[220px] truncate ${o.adminNoteUrgent ? 'text-red-700' : 'text-amber-800'}`}
+                          title={o.adminNote}
+                        >
+                          {o.adminNoteUrgent ? '🔴' : '📝'} {o.adminNote!.split('\n')[0]}
+                          {o.adminNoteDueDate ? ` · עד ${o.adminNoteDueDate.slice(5).split('-').reverse().join('/')}` : ''}
+                        </div>
+                      )}
+                    </td>
                     <td className={`p-3 font-bold ${isCancelled ? 'text-gray-400 line-through' : 'text-green-700'}`}>{formatPrice(o.total)}</td>
                     <td className="p-3 text-blue-600">{o.shaliachName || '-'}</td>
                     <td className="p-3" onClick={e => e.stopPropagation()}>
@@ -2900,6 +2925,12 @@ ${visibleOrders.map(orderBlock).join('\n')}
                     </td>
                     <td className="p-3" onClick={e => e.stopPropagation()}>
                       <div className="flex gap-1 flex-wrap">
+                        <OrderNoteButton
+                          orderId={o.id}
+                          value={o}
+                          editorName={user?.email ?? undefined}
+                          onSaved={patch => setOrders(prev => prev.map(ord => ord.id === o.id ? { ...ord, ...patch } : ord))}
+                        />
                         <button
                           onClick={() => isEditing ? cancelEdit() : startEdit(o)}
                           className={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap ${isEditing ? 'border-gray-300 text-gray-600 bg-gray-50 hover:bg-gray-100' : 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'}`}
