@@ -382,7 +382,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
   const {
-    items, total, bundleDiscountAmount,
+    items, total, bundleDiscountAmount, clearCart,
     giftEnabled, giftThreshold, giftEligible, amountToGift, selectedGift, setSelectedGift,
     appliedCoupon, setAppliedCoupon, couponInput, setCouponInput, applyCoupon, couponLoading, couponError,
     discountAmount, simchaResult,
@@ -391,6 +391,21 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [bitLoading, setBitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // ── אדמין: יצירת הזמנה ידנית מתוך העגלה ──────────────────────────────────
+  // במקום להקליד כל פריט מחדש בלוח הבקרה — בונים את העגלה כמו לקוח, ממלאים
+  // כאן את פרטי המשלוח, בוחרים איך התשלום התקבל בפועל וההזמנה נשמרת
+  // ב-orders בדיוק כמו הזמנת אתר (בלי חיוב אשראי ובלי דיווח קונברז'ן).
+  const isAdmin = user?.role === 'admin';
+  const [adminOpen, setAdminOpen]         = useState(false);
+  const [manualMethod, setManualMethod]   = useState<'bit' | 'bank_transfer' | 'cash' | 'credit' | 'other'>('bit');
+  const [manualChannel, setManualChannel] = useState<'site' | 'whatsapp' | 'phone' | 'in_person' | 'other'>('phone');
+  const [manualRef, setManualRef]         = useState('');
+  const [manualIsPaid, setManualIsPaid]   = useState(true);
+  const [manualSendEmail, setManualSendEmail] = useState(true);
+  const [manualLoading, setManualLoading] = useState(false);
+  const [manualError, setManualError]     = useState<string | null>(null);
+  const [manualDone, setManualDone]       = useState<{ orderId: string; orderNumber: string; total: number } | null>(null);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ checkoutEnabled: true, checkoutDisabledMessage: '' });
   // ── מימוש נקודות מועדון — נקודה = ₪1, עד 50% מסכום העגלה (אחרי הנחות, לפני משלוח)
   const [pointsToUse, setPointsToUse] = useState(0);
@@ -609,6 +624,86 @@ export default function CheckoutPage() {
       }, { merge: true }).catch(e => console.error('[checkout] abandoned_cart save FAILED:', e));
     } catch (e) {
       console.error('[checkout] abandoned_cart save threw (non-fatal):', e);
+    }
+  }
+
+  // ── אדמין: שמירת ההזמנה בלי לחייב כרטיס ─────────────────────────────────
+  async function handleManualOrder() {
+    setManualError(null);
+    if (!form.name.trim())  { setManualError('חסר שם לקוח'); return; }
+    if (!form.phone.trim()) { setManualError('חסר טלפון'); return; }
+    setManualLoading(true);
+    try {
+      const { getAuthLazy } = await import('@/lib/authLazy');
+      const auth = await getAuthLazy();
+      const idToken = await auth.currentUser?.getIdToken(true);
+      if (!idToken) throw new Error('לא מחובר — התחבר מחדש');
+
+      const gift = selectedGift ? giftOptions.find(g => g.id === selectedGift) : null;
+
+      const res = await fetch('/api/admin/manual-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({
+          customerName: form.name.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+          address:     deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : buildAddressString(form),
+          city:        deliveryMethod === 'pickup' ? '' : form.city.trim(),
+          street:      deliveryMethod === 'pickup' ? '' : form.street.trim(),
+          houseNumber: deliveryMethod === 'pickup' ? '' : form.houseNumber.trim(),
+          apartment:   deliveryMethod === 'pickup' ? '' : form.apartment.trim(),
+          zipCode:     deliveryMethod === 'pickup' ? '' : form.zipCode.trim(),
+          notes: form.notes || '',
+          items: [
+            ...items.map(i => ({
+              ...i,
+              printCustomization: i.printCustomization ? slimPrintCustomization(i.printCustomization) : null,
+            })),
+            // תוספות חד־פעמיות (הטבעת הקדשה וכד') — שורה נפרדת, כמו בחשבונית
+            ...items.flatMap(i => (i.selectedAddons ?? [])
+              .filter(a => a.pricing === 'flat')
+              .map(a => ({ name: `${a.label} — ${i.name}`, price: a.price, quantity: 1 }))),
+            ...(gift ? [{ productId: gift.productId || gift.id, name: `מתנה: ${gift.name}`, price: 0, quantity: 1 }] : []),
+          ],
+          shippingCost,
+          shippingType: deliveryMethod === 'pickup' ? 'pickup' : isIntl ? 'international' : 'regular',
+          // ההנחות (קופון / נקודות / מבצע חבילות) כבר מגולמות ב-finalTotal
+          totalOverride: Math.round(finalTotal * 100) / 100,
+          couponCode: appliedCoupon?.code || null,
+          couponDiscount: discountAmount || null,
+          paymentMethod: manualMethod,
+          paymentReference: manualRef.trim(),
+          channel: manualChannel,
+          isPaid: manualIsPaid,
+          uid: user?.uid || null,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'שגיאה ביצירת ההזמנה');
+
+      // מייל אישור ללקוח — אותו מייל בדיוק של הזמנת אתר
+      if (manualSendEmail && form.email.trim()) {
+        fetch('/api/send-order-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerEmail: form.email.trim(),
+            customerName: form.name.trim(),
+            orderNumber: data.orderNumber,
+            items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+            total: data.total,
+            address: deliveryMethod === 'pickup' ? 'איסוף עצמי — האורן 18' : buildAddressString(form),
+          }),
+        }).catch(e => console.error('[checkout] manual order email failed:', e));
+      }
+
+      setManualDone({ orderId: data.orderId, orderNumber: data.orderNumber, total: data.total });
+    } catch (e: any) {
+      setManualError(e?.message || 'שגיאה ביצירת ההזמנה');
+    } finally {
+      setManualLoading(false);
     }
   }
 
@@ -957,6 +1052,109 @@ export default function CheckoutPage() {
               <div role="alert" style={{ background: '#fef2f2', border: '1.5px solid #fca5a5', borderRadius: 12, padding: '12px 16px', marginBottom: 14, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }} aria-hidden="true">⚠️</span>
                 <div style={{ fontSize: 13, color: '#b91c1c', fontWeight: 600, lineHeight: 1.5 }}>{submitError}</div>
+              </div>
+            )}
+
+            {/* ── אדמין: הזמנה ידנית מתוך העגלה ─────────────────────────────── */}
+            {isAdmin && (
+              <div style={{ border: '2px dashed #6d28d9', background: '#faf5ff', borderRadius: 14, padding: 14, marginBottom: 16 }}>
+                {manualDone ? (
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 900, color: '#166534', marginBottom: 6 }}>
+                      ✅ ההזמנה נוצרה — {manualDone.orderNumber}
+                    </div>
+                    <div style={{ fontSize: 13, color: '#4b5563', marginBottom: 12 }}>
+                      סה״כ ₪{manualDone.total.toLocaleString('he-IL')} · נשמרה כהזמנה רגילה בלוח הבקרה
+                      {manualIsPaid ? ' (סטטוס שולם)' : ' (סטטוס ממתין לתשלום)'}.
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <button type="button" onClick={() => { clearCart(); router.push('/admin'); }}
+                        style={{ background: '#6d28d9', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>
+                        רוקן עגלה ועבור לניהול
+                      </button>
+                      <button type="button" onClick={() => { setManualDone(null); }}
+                        style={{ background: '#fff', color: '#6d28d9', border: '1.5px solid #ddd6fe', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>
+                        הישאר כאן
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setAdminOpen(o => !o)}
+                      style={{ width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}
+                    >
+                      <span style={{ fontSize: 14, fontWeight: 900, color: '#6d28d9' }}>🧾 [אדמין] צור הזמנה ידנית מהעגלה</span>
+                      <span style={{ fontSize: 12, color: '#7c3aed', fontWeight: 700 }}>{adminOpen ? 'סגור ▲' : 'פתח ▼'}</span>
+                    </button>
+                    <div style={{ fontSize: 11, color: '#7c3aed', marginTop: 4, lineHeight: 1.6 }}>
+                      שומר את כל פריטי העגלה כהזמנה רגילה, בלי לחייב כרטיס ובלי דיווח קונברז׳ן לגוגל.
+                    </div>
+
+                    {adminOpen && (
+                      <div style={{ marginTop: 12 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                          <label style={{ fontSize: 12, fontWeight: 800, color: '#4b5563' }}>
+                            איך שולם
+                            <select value={manualMethod} onChange={e => setManualMethod(e.target.value as typeof manualMethod)}
+                              style={{ width: '100%', marginTop: 4, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 14, background: '#fff', color: 'var(--ys-text)' }}>
+                              <option value="bit">📱 ביט</option>
+                              <option value="bank_transfer">🏦 העברה בנקאית</option>
+                              <option value="cash">💵 מזומן</option>
+                              <option value="credit">💳 אשראי (סליקה חיצונית)</option>
+                              <option value="other">אחר</option>
+                            </select>
+                          </label>
+                          <label style={{ fontSize: 12, fontWeight: 800, color: '#4b5563' }}>
+                            מאיפה הגיעה ההזמנה
+                            <select value={manualChannel} onChange={e => setManualChannel(e.target.value as typeof manualChannel)}
+                              style={{ width: '100%', marginTop: 4, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 14, background: '#fff', color: 'var(--ys-text)' }}>
+                              <option value="phone">📞 טלפון</option>
+                              <option value="whatsapp">💬 וואטסאפ</option>
+                              <option value="in_person">🤝 פנים מול פנים</option>
+                              <option value="site">🖥️ הוזן באתר</option>
+                              <option value="other">אחר</option>
+                            </select>
+                          </label>
+                        </div>
+
+                        <label style={{ fontSize: 12, fontWeight: 800, color: '#4b5563', display: 'block', marginBottom: 10 }}>
+                          אסמכתא (4 ספרות / מס׳ העברה)
+                          <input value={manualRef} onChange={e => setManualRef(e.target.value)}
+                            style={{ width: '100%', marginTop: 4, border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '9px 12px', fontSize: 14, boxSizing: 'border-box', background: '#fff', color: 'var(--ys-text)' }} />
+                        </label>
+
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: '#4b5563', marginBottom: 6, cursor: 'pointer' }}>
+                          <input type="checkbox" checked={manualIsPaid} onChange={e => setManualIsPaid(e.target.checked)} style={{ width: 16, height: 16 }} />
+                          התשלום כבר התקבל {manualIsPaid ? '(סטטוס שולם — נספר בהכנסות)' : '(סטטוס ממתין — לא נספר עד שתסמן)'}
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: '#4b5563', marginBottom: 12, cursor: 'pointer' }}>
+                          <input type="checkbox" checked={manualSendEmail} onChange={e => setManualSendEmail(e.target.checked)} style={{ width: 16, height: 16 }} />
+                          שלח ללקוח מייל אישור הזמנה
+                        </label>
+
+                        {manualError && (
+                          <div role="alert" style={{ background: '#fef2f2', border: '1.5px solid #fca5a5', borderRadius: 10, padding: '10px 12px', marginBottom: 10, fontSize: 13, color: '#b91c1c', fontWeight: 700 }}>
+                            ⚠️ {manualError}
+                          </div>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={handleManualOrder}
+                          disabled={manualLoading}
+                          style={{ width: '100%', background: manualLoading ? '#9ca3af' : '#6d28d9', color: '#fff', border: 'none', borderRadius: 12, height: 48, fontSize: 15, fontWeight: 800, cursor: manualLoading ? 'not-allowed' : 'pointer' }}
+                        >
+                          {manualLoading ? 'שומר…' : `צור הזמנה — ₪${Math.round(finalTotal).toLocaleString('he-IL')}`}
+                        </button>
+                        <div style={{ fontSize: 11, color: '#7c3aed', marginTop: 8, lineHeight: 1.6 }}>
+                          ⚠️ Sumit לא מנפיק קבלה על הזמנה כזו — צריך להנפיק ידנית.
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
 

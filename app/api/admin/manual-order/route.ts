@@ -29,15 +29,46 @@ import { closeLeadForOrder } from '@/lib/crm';
 
 export const dynamic = 'force-dynamic';
 
-const PAYMENT_METHODS = new Set(['bit', 'bank_transfer', 'cash', 'other']);
-const CHANNELS        = new Set(['whatsapp', 'phone', 'in_person', 'other']);
+const PAYMENT_METHODS = new Set(['bit', 'bank_transfer', 'cash', 'credit', 'other']);
+// 'site' — הזמנה שנבנתה בעגלה של האתר ע"י אדמין (כפתור "צור הזמנה ידנית" בעמוד התשלום)
+const CHANNELS        = new Set(['whatsapp', 'phone', 'in_person', 'site', 'other']);
+
+/** Firestore זורק על undefined מקונן — כל שדה אופציונלי עובר דרך כאן. */
+function nn<T>(v: T | null | undefined): T | null {
+  if (v === undefined || v === null) return null;
+  if (typeof v !== 'object') return v;
+  try { return JSON.parse(JSON.stringify(v)) as T; } catch { return null; }
+}
 
 interface ManualItemInput {
+  id?: string | null;
   productId?: string | null;
   name?: string;
   price?: number;
   quantity?: number;
   notes?: string | null;
+  // ── שדות עגלה מלאים (כשההזמנה נבנית בעגלת האתר ע"י אדמין) ────────────────
+  cat?: string | null;
+  imgUrl?: string | null;
+  partnerId?: string | null;
+  partnerName?: string | null;
+  warehouseType?: string | null;
+  selectedKlafId?: string | null;
+  selectedKlafName?: string | null;
+  embroideryText?: string | null;
+  embroideryOptions?: string[] | null;
+  embroiderySurcharge?: number | null;
+  threadColor?: unknown;
+  embossingText?: string | null;
+  embossingColor?: string | null;
+  embossingSurcharge?: number | null;
+  selectedVariants?: unknown;
+  selectedAddons?: unknown;
+  selectedCover?: unknown;
+  printCustomization?: unknown;
+  customDesign?: unknown;
+  bundleComponentCodes?: string[] | null;
+  bundlePromo?: string | null;
 }
 
 interface ManualOrderInput {
@@ -60,6 +91,11 @@ interface ManualOrderInput {
   paidAt?: string;
   isPaid?: boolean;
   totalOverride?: number | null;
+  /** נשמר לתיעוד בלבד — ההנחה כבר מגולמת ב-totalOverride */
+  couponCode?: string | null;
+  couponDiscount?: number | null;
+  /** משמש כשההזמנה נוצרת עבור לקוח מחובר */
+  uid?: string | null;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -90,15 +126,39 @@ export async function POST(req: NextRequest) {
     }
 
     const rawItems = Array.isArray(body.items) ? body.items : [];
+    // מבנה הפריט זהה לזה שהזמנת אתר יוצרת (app/api/payment/route.ts) — כדי
+    // שליקוט, רווחיות, מלאי ותצוגת ההזמנה יעבדו בדיוק אותו דבר.
     const items = rawItems
       .map(i => ({
-        id:          (i.productId ?? '').trim() || `manual-${Math.random().toString(36).slice(2, 10)}`,
-        productId:   (i.productId ?? '').trim() || null,
+        id:          (i.id ?? i.productId ?? '').trim() || `manual-${Math.random().toString(36).slice(2, 10)}`,
+        productId:   (i.productId ?? i.id ?? '').trim() || null,
         name:        (i.name ?? '').trim(),
         productName: (i.name ?? '').trim(),
         price:       Number(i.price) || 0,
         quantity:    Math.max(1, Math.floor(Number(i.quantity) || 1)),
         itemNotes:   (i.notes ?? '').trim() || null,
+
+        cat:                  nn(i.cat),
+        imgUrl:               nn(i.imgUrl),
+        partnerId:            nn(i.partnerId),
+        partnerName:          nn(i.partnerName),
+        warehouseType:        nn(i.warehouseType),
+        selectedKlafId:       nn(i.selectedKlafId),
+        selectedKlafName:     nn(i.selectedKlafName),
+        embroideryText:       nn(i.embroideryText),
+        embroideryOptions:    nn(i.embroideryOptions),
+        embroiderySurcharge:  nn(i.embroiderySurcharge),
+        threadColor:          nn(i.threadColor),
+        embossingText:        nn(i.embossingText),
+        embossingColor:       nn(i.embossingColor),
+        embossingSurcharge:   nn(i.embossingSurcharge),
+        selectedVariants:     nn(i.selectedVariants),
+        selectedAddons:       nn(i.selectedAddons),
+        selectedCover:        nn(i.selectedCover),
+        printCustomization:   nn(i.printCustomization),
+        customDesign:         nn(i.customDesign),
+        bundleComponentCodes: nn(i.bundleComponentCodes),
+        bundlePromo:          nn(i.bundlePromo),
       }))
       .filter(i => i.name && i.price >= 0);
 
@@ -218,10 +278,12 @@ export async function POST(req: NextRequest) {
       account: 'business',
 
       // שדות שהזמנת אתר ממלאת — נשמרים ריקים כדי שהטיפוסים יישארו עקביים
-      couponCode: null, couponDiscount: null, totalDiscount: null,
+      couponCode: (body.couponCode ?? '').trim() || null,
+      couponDiscount: body.couponDiscount ? Math.round(Number(body.couponDiscount)) : null,
+      totalDiscount: body.couponDiscount ? Math.round(Number(body.couponDiscount)) : null,
       shaliachRef: null, shaliachId: null, shaliachName: null,
       commissionPercent: 0, commissionAmount: 0,
-      uid: null, guestId: null, sessionId: null, isGuest: true,
+      uid: (body.uid ?? '').trim() || null, guestId: null, sessionId: null, isGuest: !(body.uid ?? '').trim(),
       loyaltyProcessed: false,
       pointsUsed: null, pointsDiscount: null, pointsRedeemed: false,
       attribution: null,
