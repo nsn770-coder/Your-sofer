@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   collection, getDocs, orderBy, query, where,
-  doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, getCountFromServer, limit,
+  doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, getCountFromServer, limit, arrayUnion,
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { formatPrice } from '@/app/lib/utils';
@@ -1967,19 +1967,51 @@ function EditShaliachStoreModal({ shaliachId, onClose, onSave }: { shaliachId: s
   );
 }
 
-const ORDER_STATUSES: { value: string; label: string; color: string }[] = [
-  { value: 'paid',       label: '⏳ חדש',            color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'pending',    label: '🕐 ממתין',           color: 'bg-orange-100 text-orange-700' },
-  { value: 'magiah',     label: '✅ מגיע',             color: 'bg-teal-100 text-teal-700' },
-  { value: 'sofer',      label: '✍️ אצל הסופר',       color: 'bg-blue-100 text-blue-700' },
-  { value: 'packing',    label: '📦 באריזה',           color: 'bg-purple-100 text-purple-700' },
-  { value: 'shipped',    label: '🚚 נשלח',             color: 'bg-indigo-100 text-indigo-700' },
-  { value: 'delivered',  label: '✅ נמסר',             color: 'bg-green-100 text-green-700' },
-  { value: 'completed',  label: '🏁 הושלם',            color: 'bg-green-200 text-green-800' },
-  { value: 'needs_care', label: '⚠️ דורש טיפול',      color: 'bg-red-100 text-red-700' },
-  { value: 'abandoned',  label: '🚫 נטוש',             color: 'bg-gray-200 text-gray-600' },
-  { value: 'cancelled',  label: '❌ בוטל',             color: 'bg-red-100 text-red-500' },
+// שלבי טיפול בהזמנה (עודכן 09/2026)
+// הרשימה משקפת את תהליך הייצור בפועל: הדמיה -> בית דפוס -> ייצור אישי ->
+// אריזה -> משלוח. הסדר כאן הוא הסדר שמוצג בדרופדאון, ולכן הוא סדר התהליך.
+//
+// ⚠️ אין לשנות את ה-value של סטטוסים קיימים ('paid', 'shipped', 'completed',
+// 'cancelled', 'needs_care', 'abandoned') — הן שמורות ב-Firestore על הזמנות
+// היסטוריות ומשמשות את חישובי ההכנסות ב-app/lib/orderStatus.ts.
+//
+// סטטוסים עם legacy:true הם השלבים הישנים (מהתקופה שהאתר היה סת"ם).
+// הם לא מוצגים לבחירה בהזמנות חדשות, אבל כן מוצגים אם הזמנה ישנה
+// עדיין נמצאת בהם, כדי שלא תיווצר תיבה ריקה.
+const ORDER_STATUSES: { value: string; label: string; color: string; legacy?: boolean }[] = [
+  // ── שלבי התהליך ──
+  { value: 'paid',             label: '⏳ הזמנה חדשה',            color: 'bg-yellow-100 text-yellow-800' },
+  { value: 'proof_sent',       label: '🎨 הדמיה נשלחה',            color: 'bg-amber-100 text-amber-800' },
+  { value: 'proof_approved',   label: '👍 הדמיה אושרה',            color: 'bg-lime-100 text-lime-800' },
+  { value: 'print_file_ready', label: '📄 קובץ לדפוס מוכן',        color: 'bg-teal-100 text-teal-800' },
+  { value: 'at_printer',       label: '🖨️ נשלח לבית דפוס',        color: 'bg-cyan-100 text-cyan-800' },
+  { value: 'from_printer',     label: '📥 נאסף מבית דפוס',        color: 'bg-sky-100 text-sky-800' },
+  { value: 'personalization',  label: '✍️ ייצור אישי הסתיים',     color: 'bg-blue-100 text-blue-800' },
+  { value: 'counted',          label: '🔢 נספרו כמויות בשקית',    color: 'bg-indigo-100 text-indigo-800' },
+  { value: 'bagged',           label: '🎒 השקית נסגרה',            color: 'bg-violet-100 text-violet-800' },
+  { value: 'label_printed',    label: '🏷️ מדבקת משלוח הודפסה', color: 'bg-purple-100 text-purple-800' },
+  { value: 'ready_to_ship',    label: '📦 מוכן למשלוח',            color: 'bg-fuchsia-100 text-fuchsia-800' },
+  { value: 'shipped',          label: '🚚 יצא במשלוח',            color: 'bg-emerald-100 text-emerald-800' },
+  { value: 'completed',        label: '🏁 הושלם',               color: 'bg-green-200 text-green-900' },
+  // ── מחוץ לתהליך ──
+  { value: 'needs_care',       label: '⚠️ דורש טיפול',            color: 'bg-red-100 text-red-700' },
+  { value: 'abandoned',        label: '🚫 נטוש',                 color: 'bg-gray-200 text-gray-600' },
+  { value: 'cancelled',        label: '❌ בוטל',                 color: 'bg-red-100 text-red-500' },
+  // ── ישנים (הזמנות היסטוריות בלבד) ──
+  { value: 'pending',          label: '🕐 ממתין (ישן)',          color: 'bg-orange-100 text-orange-700', legacy: true },
+  { value: 'magiah',           label: '✅ מגיה (ישן)',            color: 'bg-teal-100 text-teal-700',     legacy: true },
+  { value: 'sofer',            label: '✍️ אצל הסופר (ישן)',      color: 'bg-blue-100 text-blue-700',     legacy: true },
+  { value: 'packing',          label: '📦 באריזה (ישן)',          color: 'bg-purple-100 text-purple-700', legacy: true },
+  { value: 'delivered',        label: '✅ נמסר (ישן)',            color: 'bg-green-100 text-green-700',   legacy: true },
 ];
+
+/** השלבים שמוצגים לבחירה — הישנים מופיעים רק אם ההזמנה כבר באחד מהם. */
+const ACTIVE_ORDER_STATUSES = ORDER_STATUSES.filter(s => !s.legacy);
+function statusOptionsFor(current: string) {
+  if (ACTIVE_ORDER_STATUSES.some(s => s.value === current)) return ACTIVE_ORDER_STATUSES;
+  const legacy = ORDER_STATUSES.find(s => s.value === current);
+  return legacy ? [legacy, ...ACTIVE_ORDER_STATUSES] : ACTIVE_ORDER_STATUSES;
+}
 
 // ── Shared print-customization display block ─────────────────────────────────
 // Used by both OrdersTab and AbandonedCartsTab so the UI stays in sync.
@@ -2320,7 +2352,12 @@ function OrdersTab({ orders, setOrders, ordersError, reloadOrders }: { orders: O
   async function handleStatusChange(orderId: string, newStatus: string) {
     setUpdatingId(orderId);
     try {
-      await updateDoc(doc(db, 'orders', orderId), { status: newStatus });
+      // נשמר גם חותם זמן לכל מעבר שלב — כדי לדעת כמה זמן הזמנה תקועה בשלב
+      await updateDoc(doc(db, 'orders', orderId), {
+        status: newStatus,
+        statusUpdatedAt: new Date().toISOString(),
+        statusHistory: arrayUnion({ status: newStatus, at: new Date().toISOString(), by: user?.email ?? 'admin' }),
+      });
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
     } catch (e) { console.error(e); }
     finally { setUpdatingId(null); }
@@ -2917,7 +2954,7 @@ ${visibleOrders.map(orderBlock).join('\n')}
                         className={`text-xs font-bold px-2 py-1 rounded-full border-0 cursor-pointer outline-none ${meta.color}`}
                         style={{ fontFamily: 'inherit' }}
                       >
-                        {ORDER_STATUSES.map(s => (
+                        {statusOptionsFor(o.status).map(s => (
                           <option key={s.value} value={s.value}>{s.label}</option>
                         ))}
                       </select>

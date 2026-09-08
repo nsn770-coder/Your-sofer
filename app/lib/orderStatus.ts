@@ -93,19 +93,32 @@ function minutesSince(date: Date): number {
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  paid: '✅ שולם',
-  magiah: '✅ מגיע',
-  sofer: '✍️ אצל הסופר',
-  packing: '📦 באריזה',
-  shipped: '🚚 נשלח',
-  delivered: '📦 נמסר',
+  // שלבי הטיפול בהזמנה (09/2026) — חייב להישאר תואם ל-ORDER_STATUSES ב-app/admin/page.tsx
+  paid: '⏳ הזמנה חדשה',
+  proof_sent: '🎨 הדמיה נשלחה',
+  proof_approved: '👍 הדמיה אושרה',
+  print_file_ready: '📄 קובץ לדפוס מוכן',
+  at_printer: '🖨️ נשלח לבית דפוס',
+  from_printer: '📥 נאסף מבית דפוס',
+  personalization: '✍️ ייצור אישי הסתיים',
+  counted: '🔢 נספרו כמויות בשקית',
+  bagged: '🎒 השקית נסגרה',
+  label_printed: '🏷️ מדבקת משלוח הודפסה',
+  ready_to_ship: '📦 מוכן למשלוח',
+  shipped: '🚚 יצא במשלוח',
   completed: '🏁 הושלם',
+  // מחוץ לתהליך
   needs_care: '⚠️ דורש טיפול',
   abandoned: '🚫 נטוש (טיפול)',
   cancelled: '❌ בוטל',
   pending_payment: '⏳ ממתין לתשלום',
-  new: '⏳ חדש',
-  pending: '🕐 ממתין',
+  // סטטוסים ישנים — הזמנות היסטוריות בלבד
+  magiah: '✅ מגיה (ישן)',
+  sofer: '✍️ אצל הסופר (ישן)',
+  packing: '📦 באריזה (ישן)',
+  delivered: '✅ נמסר (ישן)',
+  new: '⏳ חדש (ישן)',
+  pending: '🕐 ממתין (ישן)',
 };
 
 export function getStatusLabel(status: string | undefined): string {
@@ -131,14 +144,27 @@ export function getStatusLabel(status: string | undefined): string {
 
 /** סטטוסים שנספרים כהכנסה בדוחות הכספיים (אושר ע"י נסים, 08/2026) */
 export const PAID_STATUSES: string[] = [
-  'paid',        // ⏳ חדש
-  'magiah',      // ✅ מגיע
-  'sofer',       // ✍️ אצל הסופר
-  'packing',     // 📦 באריזה
-  'shipped',     // 🚚 נשלח
-  'delivered',   // ✅ נמסר
-  'completed',   // 🏁 הושלם
-  'needs_care',  // ⚠️ דורש טיפול — שולם, רק דורש התייחסות
+  // שלבי הטיפול החדשים (09/2026) — כולם אחרי תשלום, ולכן כולם הכנסה
+  'paid',              // ⏳ הזמנה חדשה
+  'proof_sent',        // 🎨 הדמיה נשלחה
+  'proof_approved',    // 👍 הדמיה אושרה
+  'print_file_ready',  // 📄 קובץ לדפוס מוכן
+  'at_printer',        // 🖨️ נשלח לבית דפוס
+  'from_printer',      // 📥 נאסף מבית דפוס
+  'personalization',   // ✍️ ייצור אישי הסתיים
+  'counted',           // 🔢 נספרו כמויות בשקית
+  'bagged',            // 🎒 השקית נסגרה
+  'label_printed',     // 🏷️ מדבקת משלוח הודפסה
+  'ready_to_ship',     // 📦 מוכן למשלוח
+  'shipped',           // 🚚 יצא במשלוח
+  'completed',         // 🏁 הושלם
+  'needs_care',        // ⚠️ דורש טיפול — שולם, רק דורש התייחסות
+  // סטטוסים ישנים — הזמנות היסטוריות שכבר שולמו. חובה להשאיר, אחרת
+  // ההכנסות ההיסטוריות יקטנו רטרואקטיבית.
+  'magiah',
+  'sofer',
+  'packing',
+  'delivered',
 ];
 
 const PAID_SET: ReadonlySet<string> = new Set(PAID_STATUSES);

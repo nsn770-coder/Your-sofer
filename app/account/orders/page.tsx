@@ -24,12 +24,30 @@ interface Order {
   shippingType?: string;
 }
 
+// הלקוח לא צריך לראות את שלבי הייצור הפנימיים (בית דפוס, שקיות, מדבקות) —
+// כל שלבי הטיפול מקובצים כאן לארבעה מצבים שמובנים ללקוח.
 const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
-  paid:       { label: 'ממתין לטיפול', color: '#92400e', bg: '#FEF3C7' },
-  processing: { label: 'בטיפול',        color: '#1e3a8a', bg: '#DBEAFE' },
-  shipped:    { label: 'במשלוח',        color: '#065f46', bg: '#D1FAE5' },
-  delivered:  { label: 'נמסר',          color: '#166534', bg: '#DCFCE7' },
-  cancelled:  { label: 'בוטל',          color: '#991b1b', bg: '#FEE2E2' },
+  paid:             { label: 'התקבלה',  color: '#92400e', bg: '#FEF3C7' },
+  proof_sent:       { label: 'ממתינה לאישור הדמיה', color: '#92400e', bg: '#FEF3C7' },
+  proof_approved:   { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  print_file_ready: { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  at_printer:       { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  from_printer:     { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  personalization:  { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  counted:          { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  bagged:           { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  label_printed:    { label: 'מוכנה למשלוח', color: '#1e3a8a', bg: '#DBEAFE' },
+  ready_to_ship:    { label: 'מוכנה למשלוח', color: '#1e3a8a', bg: '#DBEAFE' },
+  shipped:          { label: 'במשלוח',  color: '#065f46', bg: '#D1FAE5' },
+  completed:        { label: 'הושלמה',  color: '#166534', bg: '#DCFCE7' },
+  needs_care:       { label: 'בטיפול',  color: '#1e3a8a', bg: '#DBEAFE' },
+  cancelled:        { label: 'בוטלה',   color: '#991b1b', bg: '#FEE2E2' },
+  // סטטוסים ישנים
+  processing:       { label: 'בטיפול',  color: '#1e3a8a', bg: '#DBEAFE' },
+  magiah:           { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  sofer:            { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  packing:          { label: 'בהכנה',   color: '#1e3a8a', bg: '#DBEAFE' },
+  delivered:        { label: 'נמסרה',   color: '#166534', bg: '#DCFCE7' },
 };
 
 function OrderCard({ order }: { order: Order }) {
