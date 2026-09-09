@@ -2013,6 +2013,80 @@ function statusOptionsFor(current: string) {
   return legacy ? [legacy, ...ACTIVE_ORDER_STATUSES] : ACTIVE_ORDER_STATUSES;
 }
 
+// ── יעדי זמן לטיפול (SLA) ────────────────────────────────────────────────────
+// כמה ימים *מיום ההזמנה* יש לכל אבן דרך. אלה המספרים היחידים שצריך לשנות
+// אם לוחות הזמנים משתנים — כל הספירה בטבלה נגזרת מהם.
+const SLA_MILESTONES: { key: string; label: string; days: number; doneFrom: string }[] = [
+  { key: 'proof',      label: 'הדמיה',           days: 2,  doneFrom: 'proof_approved' },
+  { key: 'printer',    label: 'שליחה לבית דפוס', days: 4,  doneFrom: 'at_printer' },
+  { key: 'production',  label: 'ייצור הכיפות',    days: 8,  doneFrom: 'bagged' },
+  { key: 'ship',       label: 'יציאת משלוח',     days: 10, doneFrom: 'shipped' },
+];
+
+/** סדר השלבים בקו הייצור — משמש לקבוע איזו אבן דרך עדיין פתוחה. */
+const PIPELINE_ORDER = [
+  'paid', 'proof_sent', 'proof_approved', 'print_file_ready', 'at_printer', 'from_printer',
+  'personalization', 'counted', 'bagged', 'label_printed', 'ready_to_ship', 'shipped', 'completed',
+];
+
+/** סטטוסים שיצאו מהתהליך — לא סופרים להם ימים. */
+const SLA_EXCLUDED_STATUSES = ['cancelled', 'abandoned'];
+
+function slaRank(status: string): number {
+  const i = PIPELINE_ORDER.indexOf(status);
+  return i === -1 ? 0 : i; // 'needs_care' וסטטוסים ישנים נחשבים כתחילת התהליך
+}
+
+function slaDaysLeft(createdAtSeconds: number, days: number): number {
+  const start = new Date(createdAtSeconds * 1000);
+  start.setHours(0, 0, 0, 0);
+  const due = new Date(start);
+  due.setDate(due.getDate() + days);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.round((due.getTime() - today.getTime()) / 86400000);
+}
+
+interface OrderSla {
+  /** ימים שנשארו ליציאת המשלוח — המספר הגדול והקבוע */
+  shipDaysLeft: number;
+  /** ההזמנה כבר יצאה במשלוח / הושלמה */
+  shipped: boolean;
+  /** השלב הפתוח כרגע לפי הסטטוס — המספר הקטן */
+  stage: { label: string; daysLeft: number } | null;
+}
+
+function getOrderSla(o: { status: string; createdAt?: { seconds: number } }): OrderSla | null {
+  if (!o.createdAt?.seconds) return null;
+  if (SLA_EXCLUDED_STATUSES.includes(o.status)) return null;
+  const rank = slaRank(o.status);
+  const shipMilestone = SLA_MILESTONES[SLA_MILESTONES.length - 1];
+  const shipped = rank >= PIPELINE_ORDER.indexOf(shipMilestone.doneFrom);
+  const open = SLA_MILESTONES.find(m => rank < PIPELINE_ORDER.indexOf(m.doneFrom));
+  return {
+    shipDaysLeft: slaDaysLeft(o.createdAt.seconds, shipMilestone.days),
+    shipped,
+    stage: open && open.key !== 'ship'
+      ? { label: open.label, daysLeft: slaDaysLeft(o.createdAt.seconds, open.days) }
+      : null,
+  };
+}
+
+/** טקסט קצר: "3 ימים" / "היום" / "באיחור 2 ימים" */
+function slaText(daysLeft: number): string {
+  if (daysLeft > 1) return `${daysLeft} ימים`;
+  if (daysLeft === 1) return 'מחר';
+  if (daysLeft === 0) return 'היום';
+  return `באיחור ${Math.abs(daysLeft)} ${Math.abs(daysLeft) === 1 ? 'יום' : 'ימים'}`;
+}
+
+function slaColor(daysLeft: number): string {
+  if (daysLeft < 0) return 'text-red-600';
+  if (daysLeft === 0) return 'text-orange-600';
+  if (daysLeft <= 2) return 'text-amber-600';
+  return 'text-emerald-700';
+}
+
 // ── Shared print-customization display block ─────────────────────────────────
 // Used by both OrdersTab and AbandonedCartsTab so the UI stays in sync.
 
@@ -2275,6 +2349,10 @@ function OrdersTab({ orders, setOrders, ordersError, reloadOrders }: { orders: O
   const [era, setEra] = useState<AccountEra>('business');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  // חיפוש חופשי מעל העמודות — מספר הזמנה / תאריך / שם לקוח
+  const [searchOrderNumber, setSearchOrderNumber] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [searchCustomer, setSearchCustomer] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<{
     customerName: string; phone: string; email: string;
@@ -2615,9 +2693,13 @@ function OrdersTab({ orders, setOrders, ordersError, reloadOrders }: { orders: O
 
   const cancelledCount = eraOrders.filter(o => o.status === 'cancelled').length;
   const activeCount = eraOrders.filter(o => o.status !== 'cancelled').length;
-  const filtersActive = statusFilter !== 'all' || !!dateFrom || !!dateTo;
+  const filtersActive = statusFilter !== 'all' || !!dateFrom || !!dateTo
+    || !!searchOrderNumber.trim() || !!searchDate.trim() || !!searchCustomer.trim();
   const fromDateObj = dateFrom ? new Date(`${dateFrom}T00:00:00`) : null;
   const toDateObj = dateTo ? new Date(`${dateTo}T23:59:59.999`) : null;
+  const qOrder = searchOrderNumber.trim().toLowerCase();
+  const qDate = searchDate.trim();
+  const qCustomer = searchCustomer.trim().toLowerCase();
   const visibleOrders = eraOrders
     .filter(o => showCancelled ? o.status === 'cancelled' : o.status !== 'cancelled')
     .filter(o => statusFilter === 'all' || o.status === statusFilter)
@@ -2628,7 +2710,14 @@ function OrdersTab({ orders, setOrders, ordersError, reloadOrders }: { orders: O
       if (fromDateObj && d < fromDateObj) return false;
       if (toDateObj && d > toDateObj) return false;
       return true;
-    });
+    })
+    // ── חיפוש חופשי לפי עמודה ──
+    .filter(o => !qOrder || (o.orderNumber ?? '').toLowerCase().includes(qOrder))
+    .filter(o => !qCustomer
+      || (o.customerName ?? '').toLowerCase().includes(qCustomer)
+      || (o.phone ?? '').includes(qCustomer)
+      || (o.email ?? '').toLowerCase().includes(qCustomer))
+    .filter(o => !qDate || formatOrderDate(o).includes(qDate));
 
   // ── דף אריזה להדפסה: כל ההזמנות המסוננות, הזמנה לעמוד — פרטי לקוח, כתובת ופריטים ──
   async function printPackingSheet() {
@@ -2859,14 +2948,52 @@ ${visibleOrders.map(orderBlock).join('\n')}
               <th className="p-3 text-right">לקוח</th>
               <th className="p-3 text-right">סכום</th>
               <th className="p-3 text-right">שליח</th>
+              <th className="p-3 text-right">ימים לטיפול</th>
               <th className="p-3 text-right">סטטוס</th>
               <th className="p-3 text-right">פעולות</th>
+            </tr>
+            {/* ── שורת חיפוש מעל העמודות ── */}
+            <tr className="bg-gray-50 border-t border-gray-200">
+              <th className="px-2 pb-2">
+                <input
+                  value={searchOrderNumber}
+                  onChange={e => setSearchOrderNumber(e.target.value)}
+                  placeholder="🔍 מספר הזמנה"
+                  className="w-full border border-gray-200 rounded-lg px-2 py-1 text-xs font-normal bg-white focus:outline-none focus:border-blue-400"
+                />
+              </th>
+              <th className="px-2 pb-2">
+                <input
+                  value={searchDate}
+                  onChange={e => setSearchDate(e.target.value)}
+                  placeholder="🔍 תאריך (08/09)"
+                  className="w-full border border-gray-200 rounded-lg px-2 py-1 text-xs font-normal bg-white focus:outline-none focus:border-blue-400"
+                />
+              </th>
+              <th className="px-2 pb-2">
+                <input
+                  value={searchCustomer}
+                  onChange={e => setSearchCustomer(e.target.value)}
+                  placeholder="🔍 שם לקוח / טלפון"
+                  className="w-full border border-gray-200 rounded-lg px-2 py-1 text-xs font-normal bg-white focus:outline-none focus:border-blue-400"
+                />
+              </th>
+              <th className="px-2 pb-2" colSpan={5}>
+                {(searchOrderNumber || searchDate || searchCustomer) && (
+                  <button
+                    onClick={() => { setSearchOrderNumber(''); setSearchDate(''); setSearchCustomer(''); }}
+                    className="text-xs font-bold px-3 py-1 rounded-lg border border-gray-300 text-gray-600 bg-white hover:bg-gray-100"
+                  >
+                    נקה חיפוש
+                  </button>
+                )}
+              </th>
             </tr>
           </thead>
           <tbody>
             {visibleOrders.length === 0 && (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-gray-400">
+                <td colSpan={8} className="p-8 text-center text-gray-400">
                   {filtersActive ? 'אין הזמנות התואמות לסינון' : (showCancelled ? 'אין הזמנות מבוטלות' : 'אין הזמנות פעילות')}
                 </td>
               </tr>
@@ -2946,6 +3073,26 @@ ${visibleOrders.map(orderBlock).join('\n')}
                     </td>
                     <td className={`p-3 font-bold ${isCancelled ? 'text-gray-400 line-through' : 'text-green-700'}`}>{formatPrice(o.total)}</td>
                     <td className="p-3 text-blue-600">{o.shaliachName || '-'}</td>
+                    <td className="p-3 whitespace-nowrap">
+                      {(() => {
+                        const sla = getOrderSla(o);
+                        if (!sla) return <span className="text-gray-300">—</span>;
+                        if (sla.shipped) return <span className="text-xs font-bold text-green-700">✓ יצא</span>;
+                        return (
+                          <div className="leading-tight">
+                            <div className={`text-2xl font-black ${slaColor(sla.shipDaysLeft)}`}>
+                              {sla.shipDaysLeft < 0 ? `-${Math.abs(sla.shipDaysLeft)}` : sla.shipDaysLeft}
+                            </div>
+                            <div className="text-[10px] text-gray-500 font-bold">ימים ליציאת משלוח</div>
+                            {sla.stage && (
+                              <div className={`text-[11px] font-bold mt-1 ${slaColor(sla.stage.daysLeft)}`}>
+                                {sla.stage.label}: {slaText(sla.stage.daysLeft)}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
+                    </td>
                     <td className="p-3" onClick={e => e.stopPropagation()}>
                       <select
                         value={o.status}
@@ -3056,7 +3203,7 @@ ${visibleOrders.map(orderBlock).join('\n')}
                   </tr>
                   {isExpanded && (
                     <tr className="bg-blue-50 border-t border-blue-100">
-                      <td colSpan={7} className="px-5 py-4" dir="rtl">
+                      <td colSpan={8} className="px-5 py-4" dir="rtl">
                         {isEditing && editDraft ? (
                           <div className="space-y-3">
                             {/* ── Feature 4: payment lock warning ── */}
