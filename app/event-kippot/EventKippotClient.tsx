@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { collection, getDocs, query, where, doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc, setDoc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { getKipaUnitPrice, getKipaMaterial, KIPA_MATERIAL_LABELS, KIPA_EXTRA_SIDE_PRICE, DEFAULT_STYLE_PRODUCT_MAP } from '@/app/lib/kippot';
 import { useAuth } from '@/app/contexts/AuthContext';
@@ -57,6 +57,7 @@ export default function EventKippotClient() {
   const [styleMap, setStyleMap] = useState<Record<string, { productId: string; sku: string; name: string }>>({});
   const [styleProducts, setStyleProducts] = useState<Record<string, Product>>({});
   const [assigning, setAssigning] = useState<string | null>(null);
+  const [savingStock, setSavingStock] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -109,6 +110,58 @@ export default function EventKippotClient() {
     } catch (e) {
       alert('שגיאה בשיוך'); console.error(e);
     } finally { setAssigning(null); }
+  }
+
+  // ── אדמין: עדכון מלאי ישירות מהעמוד ────────────────────────────────────────
+  // מה שנכתב כאן הוא המלאי בפועל של הכיפה (inStock על מסמך המוצר). מרגע
+  // השמירה, כל הזמנה משולמת מורידה מהמספר הזה אוטומטית בשרת
+  // (lib/inventoryStock.ts), לפי הדגם שהלקוח בחר.
+  // כשמגיעה סחורה חדשה — כותבים כאן את הסכום המעודכן, או מקלידים ‎+50‎
+  // כדי להוסיף למלאי הקיים בלי לחשב בראש.
+  async function updateStyleStock(styleId: string, styleLabel: string) {
+    const mapped  = styleMap[styleId];
+    const product = styleProducts[styleId];
+    if (!mapped?.productId || !product) {
+      alert('הדגם אינו משויך למוצר — יש לשייך מוצר לפני עדכון מלאי.');
+      return;
+    }
+    const current = typeof product.inStock === 'number' ? product.inStock : 0;
+    const input = window.prompt(
+      `מלאי לדגם "${styleLabel}" (${mapped.sku})\n` +
+      `כרגע במלאי: ${current}\n\n` +
+      `כתוב מספר חדש (למשל 120) או תוספת (למשל +50 לסחורה שהגיעה):`,
+      String(current),
+    );
+    if (input == null) return;
+    const raw = input.trim();
+    if (!raw) return;
+
+    const isDelta = /^[+-]/.test(raw);
+    const num     = parseInt(raw, 10);
+    if (!Number.isFinite(num)) { alert('מספר לא תקין'); return; }
+    const next = Math.max(0, isDelta ? current + num : num);
+
+    setSavingStock(styleId);
+    try {
+      await updateDoc(doc(db, 'products', mapped.productId), {
+        inStock:    next,
+        outOfStock: next === 0,
+      });
+      // תיעוד הספירה — כדי שיהיה אפשר לראות מתי ואיך המלאי השתנה ידנית
+      addDoc(collection(db, 'inventory_counts'), {
+        productId:     mapped.productId,
+        sku:           mapped.sku,
+        productName:   product.name ?? styleLabel,
+        countedStock:  next,
+        previousStock: current,
+        source:        'event-kippot-page',
+        createdAt:     serverTimestamp(),
+      }).catch(err => console.error('[EventKippot] inventory_counts log failed (non-fatal):', err));
+
+      setStyleProducts(prev => ({ ...prev, [styleId]: { ...prev[styleId], inStock: next, outOfStock: next === 0 } }));
+    } catch (e) {
+      alert('שגיאה בעדכון המלאי'); console.error(e);
+    } finally { setSavingStock(null); }
   }
 
   // ── פופאפ מבצע SIMCHA — פעם אחת לסשן ─────────────────────────────────────
@@ -432,14 +485,21 @@ export default function EventKippotClient() {
                     {mapped ? (
                       <div style={{ color: '#374151' }}>
                         🔗 {mapped.sku}
-                        {stock != null && (
-                          <span style={{ fontWeight: 800, color: stock <= 0 ? '#dc2626' : stock < 50 ? '#d97706' : '#16a34a' }}>
-                            {' '}· במלאי: {stock}
-                          </span>
-                        )}
+                        <span style={{ fontWeight: 800, color: stock == null ? '#6b7280' : stock <= 0 ? '#dc2626' : stock < 50 ? '#d97706' : '#16a34a' }}>
+                          {' '}· במלאי: {stock ?? '—'}
+                        </span>
                       </div>
                     ) : (
                       <div style={{ color: '#dc2626', fontWeight: 700 }}>לא משויך למוצר</div>
+                    )}
+                    {mapped && (
+                      <button
+                        onClick={() => updateStyleStock(s.id, s.label)}
+                        disabled={savingStock === s.id}
+                        style={{ background: '#16a34a', border: 'none', color: '#fff', fontWeight: 800, fontSize: 10.5, cursor: 'pointer', fontFamily: 'inherit', padding: '3px 8px', borderRadius: 5, marginBottom: 3, width: '100%' }}
+                      >
+                        {savingStock === s.id ? '⏳ שומר...' : '📦 עדכן מלאי'}
+                      </button>
                     )}
                     <button
                       onClick={() => assignStyleProduct(s.id, s.label)}

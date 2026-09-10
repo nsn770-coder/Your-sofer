@@ -6,6 +6,7 @@ import { getTier } from '@/app/lib/loyalty';
 import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
 import { isBulkEventKippotLine } from '@/app/lib/kippot';
 import { closeLeadForOrder, type OrderAttribution } from '@/lib/crm';
+import { applyOrderStock } from '@/lib/inventoryStock';
 import { calculateFulfillmentPlan } from '@/app/lib/fulfillment';
 import { sendPartnerNewOrderEmail } from '@/app/lib/send-notification';
 import type { Order } from '@/app/lib/types';
@@ -595,6 +596,15 @@ export async function POST(req: NextRequest) {
       results.forEach((r, i) => {
         if (r.status === 'rejected') console.error(`[payment] side-effect[${i}] failed:`, r.reason);
       });
+
+      // ── ניכוי מלאי אוטומטי — inStock יורד לפי מה שנרכש ─────────────────────
+      // שורת כיפות אירועים נושאת productId של הדגם שנבחר, ולכן הניכוי מזהה
+      // לבד איזו כיפה נמכרה. אידמפוטנטי (stockApplied) ולא-פטאלי.
+      try {
+        await applyOrderStock(adminDb, orderRef.id);
+      } catch (stockErr) {
+        console.error('[payment] stock deduction failed (non-fatal):', stockErr);
+      }
 
       // ── Loyalty redemption — deduct the points that paid for this order ──────
       // (before accrual, so the new balance already reflects the deduction)

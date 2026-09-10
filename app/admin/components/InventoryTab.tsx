@@ -100,6 +100,8 @@ function needsCompletion(p: Product): boolean {
 interface EditState {
   soferBasePrice: string;
   receivedFromSupplier: string;
+  /** ספירת מלאי בפועל — נכתבת ישירות ל-inStock (מקור האמת) */
+  inStock: string;
 }
 
 interface ParsedItem {
@@ -221,8 +223,16 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
 
   const getSold = (productId: string) => soldMap[productId] ?? 0;
 
+  // ── מקור האמת למלאי: השדה inStock על המוצר ────────────────────────────────
+  // עד 09/2026 המלאי חושב כאן מחדש בכל טעינה (קבלנו − נמכר-מאז-ומעולם), ולכן
+  // מוצר שמגיע מכמה ספקים או שנספר ידנית במחסן אף פעם לא הראה מספר נכון.
+  // מהיום inStock הוא מונה אמיתי: הזמנה משולמת מורידה אותו אוטומטית בשרת
+  // (lib/inventoryStock.ts), קליטת סחורה מוסיפה לו, וספירת מלאי כותבת עליו.
+  // הנוסחה הישנה נשארת רק כערך התחלתי למוצר שמעולם לא נוהל לו inStock.
   const getInventory = (product: Product) =>
-    (product.receivedFromSupplier ?? 0) - getSold(product.id);
+    typeof product.inStock === 'number'
+      ? product.inStock
+      : (product.receivedFromSupplier ?? 0) - getSold(product.id);
 
   const pendingProducts = allProducts.filter(needsCompletion);
   const pendingCount = pendingProducts.length;
@@ -239,7 +249,8 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
       }
       return searchTerm
         ? p.name?.toLowerCase().includes(searchTerm.toLowerCase())
-        : (p.receivedFromSupplier ?? 0) > 0;
+        // מוצר נכנס לרשימת המלאי אם קיבלנו אותו מספק או אם נוהל לו מלאי ידנית
+        : (p.receivedFromSupplier ?? 0) > 0 || typeof p.inStock === 'number';
     })
     .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
 
@@ -256,6 +267,7 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
       [p.id]: {
         soferBasePrice: String(p.soferBasePrice ?? ''),
         receivedFromSupplier: String(p.receivedFromSupplier ?? ''),
+        inStock: String(p.computedInStock),
       },
     }));
   }
@@ -344,8 +356,9 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
         const prevReceived = product.receivedFromSupplier ?? 0;
         const qty          = Number(item.quantity) || 0;
         const newReceived  = prevReceived + qty;
-        const sold         = getSold(product.id);
-        const newInStock   = Math.max(0, newReceived - sold);
+        // קליטת סחורה מוסיפה למלאי הקיים — לא מחשבת אותו מחדש.
+        // כך סחורה מספק שני מצטברת לאותה כיפה במקום לדרוס את הספירה.
+        const newInStock   = Math.max(0, getInventory(product) + qty);
         await onSave(product.id, {
           receivedFromSupplier: newReceived,
           soferBasePrice:        item.unitPrice,
@@ -595,8 +608,8 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
 
         const prevReceived = product.receivedFromSupplier ?? 0;
         const newReceived  = prevReceived + qty;
-        const sold         = getSold(product.id);
-        const newInStock   = Math.max(0, newReceived - sold);
+        // הזנה ידנית של סחורה שהגיעה — מוסיפה למלאי הקיים (ראו הערה בקליטת קבלה)
+        const newInStock   = Math.max(0, getInventory(product) + qty);
 
         await onSave(product.id, {
           receivedFromSupplier: newReceived,
@@ -661,13 +674,29 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
     const data: Partial<Product> = {};
     if (e.soferBasePrice !== '') data.soferBasePrice = parseFloat(e.soferBasePrice);
     if (e.receivedFromSupplier !== '') data.receivedFromSupplier = parseInt(e.receivedFromSupplier);
-    // inStock = receivedFromSupplier - sold (numeric, not boolean)
-    if (data.receivedFromSupplier !== undefined) {
-      const newInStock = Math.max(0, data.receivedFromSupplier - getSold(id));
-      data.inStock = newInStock;
-      data.outOfStock = newInStock === 0;
+    // ── ספירת מלאי — מה שנכתב בשדה "במלאי" הוא המספר האמיתי ─────────────────
+    // אין כאן יותר חישוב מ"קבלנו − נמכר": האדמין סופר במחסן וכותב, ומהרגע הזה
+    // ההזמנות מורידות מהמספר הזה. זו הדרך לתקן מוצר שהגיע מכמה ספקים.
+    if (e.inStock !== '' && Number.isFinite(parseInt(e.inStock))) {
+      const counted = Math.max(0, parseInt(e.inStock));
+      data.inStock    = counted;
+      data.outOfStock = counted === 0;
     }
     await onSave(id, data);
+
+    // רישום ספירה לתיעוד — מאפשר לראות מתי ואיך המלאי תוקן ידנית
+    if (data.inStock !== undefined) {
+      const prev = allProducts.find(p => p.id === id);
+      addDoc(collection(db, 'inventory_counts'), {
+        productId:     id,
+        sku:           prev?.sku ?? null,
+        productName:   prev?.name ?? null,
+        countedStock:  data.inStock,
+        previousStock: typeof prev?.inStock === 'number' ? prev.inStock : null,
+        source:        'admin-inventory-tab',
+        createdAt:     serverTimestamp(),
+      }).catch(err => console.error('[InventoryTab] inventory_counts log failed (non-fatal):', err));
+    }
     setSaving(null);
     cancelEdit(id);
   }
@@ -1008,7 +1037,7 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
               const e = editing[p.id];
               const sold = getSold(p.id);
               const displayStock = e
-                ? parseInt(e.receivedFromSupplier || '0') - sold
+                ? (Number.isFinite(parseInt(e.inStock)) ? parseInt(e.inStock) : 0)
                 : p.computedInStock;
               const stockBg = displayStock < 0 ? '#fee2e2' : displayStock === 0 ? '#fee2e2' : displayStock < 5 ? '#fef3c7' : '#ecfdf5';
               const pending = needsCompletion(p);
@@ -1051,9 +1080,18 @@ export default function InventoryTab({ products, orders, onSave, onEditProduct }
 
                   <td style={{ padding: 10, textAlign: 'center' }}>{sold}</td>
 
-                  {/* במלאי */}
+                  {/* במלאי — ניתן לעריכה ישירה: מה שנכתב כאן הוא המלאי בפועל */}
                   <td style={{ padding: 10, textAlign: 'center', fontWeight: 700, background: stockBg }}>
-                    {displayStock < 0
+                    {e ? (
+                      <input
+                        type="number"
+                        min={0}
+                        value={e.inStock}
+                        onChange={ev => setEditing(prev => ({ ...prev, [p.id]: { ...prev[p.id], inStock: ev.target.value } }))}
+                        title="כמה יחידות יש בפועל במחסן — ההזמנות ירדו מהמספר הזה"
+                        style={{ width: 64, padding: '2px 4px', border: '2px solid #16a34a', borderRadius: 4, textAlign: 'center', fontWeight: 800 }}
+                      />
+                    ) : displayStock < 0
                       ? <span style={{ color: '#dc2626' }}>⚠️ {displayStock}</span>
                       : displayStock}
                   </td>

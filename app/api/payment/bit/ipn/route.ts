@@ -5,6 +5,7 @@ import { createHash } from 'crypto';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
 import { closeLeadForOrder } from '@/lib/crm';
+import { applyOrderStock } from '@/lib/inventoryStock';
 import { calculateFulfillmentPlan } from '@/app/lib/fulfillment';
 import type { Order } from '@/app/lib/types';
 
@@ -184,6 +185,14 @@ export async function POST(req: NextRequest) {
       opsSynced: true,
     });
     console.log('[bit-ipn] order confirmed paid:', orderId, order.orderNumber, 'doc:', documentId);
+
+    // ── ניכוי מלאי אוטומטי — אותה פונקציה כמו ב-/api/payment ─────────────────
+    // אידמפוטנטי (stockApplied), ולכן IPN חוזר לא ינכה פעמיים.
+    try {
+      await applyOrderStock(adminDb, orderId);
+    } catch (stockErr) {
+      console.error('[bit-ipn] stock deduction failed (non-fatal):', stockErr);
+    }
 
     // ── CRM: auto-close a matching lead now that this phone has ordered ────────
     try {
