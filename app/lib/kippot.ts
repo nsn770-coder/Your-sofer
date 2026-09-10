@@ -43,4 +43,5 @@ export const getKipaUnitPrice = (q: number, material: KipaMaterial = 'linen'): n
 export const DEFAULT_STYLE_PRODUCT_MAP: Record<string, { productId: string; sku: string; name: string }> = {
   'satin-white':    { productId: 'GA6IaHppba8peGVGHGud', sku: 'UK00321', name: 'כיפת סאטן' },
   'satin-white-18': { productId: 'qcGTjNpP2eoqyxM6Ns4L', sku: 'UK11889', name: 'כיפה סטן לבן 18 ס"מ' },
+  'linen-tchelet':  { productId: 'rKF1knFcF2jmzEwzZG5B', sku: 'ys112',   name: 'כיפה פשתן תכלת' },
 };
