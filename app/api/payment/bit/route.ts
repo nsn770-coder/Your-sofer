@@ -6,6 +6,7 @@ import type { CartItem } from '@/app/contexts/CartContext';
 import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
 import { isBulkEventKippotLine } from '@/app/lib/kippot';
 import type { OrderAttribution } from '@/lib/crm';
+import { getShabbatStatus } from '@/app/lib/shabbatClock';
 
 // ── תשלום בביט דרך Sumit — Redirect API ──────────────────────────────────────
 // זרימה (זהה לפלאגין הרשמי של Sumit ל-WooCommerce):
@@ -78,11 +79,13 @@ function calcTieredKippotDiscount(prices: number[]): number {
 export async function POST(req: NextRequest) {
   try {
     // ── server-side checkout gate ─────────────────────────────────────────────
+    let shabbatAutoClose = true;
     try {
       const adminDb = getAdminDb();
       const settingsSnap = await adminDb.collection('siteSettings').doc('global').get();
       if (settingsSnap.exists) {
         const settings = settingsSnap.data()!;
+        if (settings.shabbatAutoClose === false) shabbatAutoClose = false;
         if (settings.checkoutEnabled === false) {
           console.warn('[payment-bit] checkout disabled by siteSettings');
           return NextResponse.json(
@@ -93,6 +96,18 @@ export async function POST(req: NextRequest) {
       }
     } catch (settingsErr) {
       console.error('[payment-bit] siteSettings check failed (non-fatal):', settingsErr);
+    }
+
+    // ── שבת וחג: סגירה אוטומטית לפי זמני כניסת/צאת השבת (דימונה) ─────────────
+    if (shabbatAutoClose) {
+      const shabbat = getShabbatStatus();
+      if (shabbat.closed) {
+        console.warn('[payment-bit] blocked — Shabbat/Chag until', shabbat.opensAt);
+        return NextResponse.json(
+          { error: shabbat.message, shabbat: true, opensAt: shabbat.opensAt },
+          { status: 503 },
+        );
+      }
     }
 
     const {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
+import { getShabbatStatus } from '@/app/lib/shabbatClock';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
@@ -181,11 +182,13 @@ async function redeemPoints(
 export async function POST(req: NextRequest) {
   try {
     // ── Feature 1: server-side checkout gate ─────────────────────────────────
+    let shabbatAutoClose = true;
     try {
       const adminDb = getAdminDb();
       const settingsSnap = await adminDb.collection('siteSettings').doc('global').get();
       if (settingsSnap.exists) {
         const settings = settingsSnap.data()!;
+        if (settings.shabbatAutoClose === false) shabbatAutoClose = false;
         if (settings.checkoutEnabled === false) {
           console.warn('[payment] checkout disabled by siteSettings');
           return NextResponse.json(
@@ -197,6 +200,19 @@ export async function POST(req: NextRequest) {
     } catch (settingsErr) {
       // Non-fatal — if Firebase Admin is unavailable, allow payment to proceed
       console.error('[payment] siteSettings check failed (non-fatal):', settingsErr);
+    }
+
+    // ── שבת וחג: סגירה אוטומטית לפי זמני כניסת/צאת השבת (דימונה) ─────────────
+    // אכיפה בצד שרת — גם קריאה ישירה ל-API תיחסם.
+    if (shabbatAutoClose) {
+      const shabbat = getShabbatStatus();
+      if (shabbat.closed) {
+        console.warn('[payment] blocked — Shabbat/Chag until', shabbat.opensAt);
+        return NextResponse.json(
+          { error: shabbat.message, shabbat: true, opensAt: shabbat.opensAt },
+          { status: 503 },
+        );
+      }
     }
 
     const {

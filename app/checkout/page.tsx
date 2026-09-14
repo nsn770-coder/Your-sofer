@@ -407,6 +407,8 @@ export default function CheckoutPage() {
   const [manualError, setManualError]     = useState<string | null>(null);
   const [manualDone, setManualDone]       = useState<{ orderId: string; orderNumber: string; total: number } | null>(null);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ checkoutEnabled: true, checkoutDisabledMessage: '' });
+  // ── שבת/חג: סגירה אוטומטית של הסליקה (הזמנים מחושבים בצד שרת) ─────────────
+  const [shabbat, setShabbat] = useState<{ closed: boolean; message: string; opensAt: string | null } | null>(null);
   // ── מימוש נקודות מועדון — נקודה = ₪1, עד 50% מסכום העגלה (אחרי הנחות, לפני משלוח)
   const [pointsToUse, setPointsToUse] = useState(0);
   const pointsAvailable = user?.loyaltyPoints ?? 0;
@@ -465,6 +467,32 @@ export default function CheckoutPage() {
       })
       .catch(() => {});
   }, []);
+
+  // מצב שבת/חג — נטען מהשרת ומתרענן אוטומטית ברגע הפתיחה
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    let cancelled = false;
+    const load = () => {
+      fetch('/api/shabbat-status')
+        .then(r => r.json())
+        .then((d: { closed: boolean; message: string; opensAt: string | null; nextCloseAt?: string | null }) => {
+          if (cancelled) return;
+          setShabbat({ closed: !!d.closed, message: d.message ?? '', opensAt: d.opensAt ?? null });
+          // רענון בדיוק ברגע שבו המצב משתנה (פתיחה במוצ"ש / סגירה בכניסת שבת)
+          const boundary = d.closed ? d.opensAt : d.nextCloseAt;
+          if (boundary) {
+            const ms = new Date(boundary).getTime() - Date.now() + 5_000;
+            if (ms > 0 && ms < 2_147_000_000) timer = setTimeout(load, ms);
+          }
+        })
+        .catch(() => {});
+    };
+    load();
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, []);
+
+  /** פתוח לרכישה = המתג הידני דלוק וגם לא שבת/חג */
+  const checkoutOpen = siteSettings.checkoutEnabled && !shabbat?.closed;
 
   // Read isMobile before first paint to prevent the false→true CLS flip on mobile
   useLayoutEffect(() => { setIsMobile(window.innerWidth < 768); }, []);
@@ -1158,6 +1186,18 @@ export default function CheckoutPage() {
               </div>
             )}
 
+            {/* ── שבת / חג — סגירה אוטומטית ──────────────────────────────────── */}
+            {shabbat?.closed && siteSettings.checkoutEnabled && (
+              <div style={{ background: '#eef2ff', border: '1.5px solid #c7d2fe', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
+                <div style={{ fontSize: 14, color: '#3730a3', fontWeight: 800, marginBottom: 4 }}>
+                  🕯️ שבת שלום — הרכישות סגורות
+                </div>
+                <div style={{ fontSize: 13, color: '#3730a3', lineHeight: 1.6 }}>
+                  {shabbat.message}
+                </div>
+              </div>
+            )}
+
             {/* ── Checkout disabled banner ─────────────────────────────────── */}
             {!siteSettings.checkoutEnabled && (
               <div style={{ background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
@@ -1177,21 +1217,21 @@ export default function CheckoutPage() {
             )}
 
             {/* Security notice */}
-            {siteSettings.checkoutEnabled && (
+            {checkoutOpen && (
               <div style={{ marginBottom: 16 }}>
                 <SecurePaymentNotice />
               </div>
             )}
 
             {/* Delivery estimate */}
-            {siteSettings.checkoutEnabled && (
+            {checkoutOpen && (
               <div style={{ marginBottom: 16 }}>
                 <DeliveryEstimate customMade={hasCustomMadeItem} />
               </div>
             )}
 
             {/* מוצרים בהתאמה אישית — תנאי ביטול שונים (לפי מדיניות האתר) */}
-            {siteSettings.checkoutEnabled && hasCustomMadeItem && (
+            {checkoutOpen && hasCustomMadeItem && (
               <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#92400e', lineHeight: 1.6 }}>
                 {t('checkout.customItemNotice')}
                 {' '}
@@ -1200,7 +1240,7 @@ export default function CheckoutPage() {
             )}
 
             {/* Call-to-action heading above card form */}
-            {siteSettings.checkoutEnabled && (
+            {checkoutOpen && (
               <div style={{ marginBottom: 14 }}>
                 <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--ys-heading)', textAlign: 'center', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <IconCreditCard size={16} color="var(--ys-heading)" /> {t('checkout.paymentDetails')}
@@ -1211,7 +1251,7 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {siteSettings.checkoutEnabled && (
+            {checkoutOpen && (
               !isFormValid ? (
                 <div style={{ textAlign: 'center', fontSize: 13, color: '#9ca3af', padding: '12px 0' }}>
                   {t('checkout.fillToContinue')}
@@ -1262,7 +1302,7 @@ export default function CheckoutPage() {
                 </>
               )
             )}
-            {siteSettings.checkoutEnabled && (
+            {checkoutOpen && (
               <div style={{ fontSize: 12, color: '#6b7280', textAlign: 'center', marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                 <IconLock size={12} color="#6b7280" /> {t('checkout.secureFooter')}
               </div>

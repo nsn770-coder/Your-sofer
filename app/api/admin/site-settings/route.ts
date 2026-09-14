@@ -4,6 +4,8 @@ import { verifyAdminToken } from '@/lib/verifyAdmin';
 
 const DEFAULTS = {
   checkoutEnabled: true,
+  /** סגירה אוטומטית של הסליקה בשבת ובחג לפי זמני כניסת/צאת השבת */
+  shabbatAutoClose: true,
   checkoutDisabledMessage:
     'הרכישות באתר אינן זמינות כעת. ניתן לעיין במוצרים, והאפשרות להזמנה תחזור בקרוב.',
 };
@@ -34,10 +36,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { checkoutEnabled, checkoutDisabledMessage } = await req.json();
+    const { checkoutEnabled, checkoutDisabledMessage, shabbatAutoClose } = await req.json();
     await db.collection('siteSettings').doc('global').set(
       {
         checkoutEnabled: Boolean(checkoutEnabled),
+        shabbatAutoClose: shabbatAutoClose !== false,
         checkoutDisabledMessage: checkoutDisabledMessage ?? DEFAULTS.checkoutDisabledMessage,
         updatedAt: new Date().toISOString(),
         updatedBy: decoded.email ?? decoded.uid,

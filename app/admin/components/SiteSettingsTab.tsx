@@ -9,6 +9,8 @@ const DEFAULT_MSG =
 
 export default function SiteSettingsTab() {
   const [checkoutEnabled, setCheckoutEnabled] = useState(true);
+  const [shabbatAutoClose, setShabbatAutoClose] = useState(true);
+  const [shabbatStatus, setShabbatStatus] = useState<{ closed: boolean; message: string; label: string; nextCloseAt: string | null; opensAt: string | null } | null>(null);
   const [message, setMessage] = useState(DEFAULT_MSG);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -24,6 +26,7 @@ export default function SiteSettingsTab() {
         if (snap.exists()) {
           const d = snap.data();
           setCheckoutEnabled(d.checkoutEnabled ?? true);
+          setShabbatAutoClose(d.shabbatAutoClose ?? true);
           setMessage(d.checkoutDisabledMessage ?? DEFAULT_MSG);
           if (d.updatedAt) setSavedInfo({ at: d.updatedAt, by: d.updatedBy ?? '' });
         }
@@ -33,6 +36,14 @@ export default function SiteSettingsTab() {
         setLoading(false);
       }
     })();
+  }, []);
+
+  // מצב שבת/חג נוכחי — לתצוגה בלבד
+  useEffect(() => {
+    fetch('/api/shabbat-status')
+      .then(r => r.json())
+      .then(setShabbatStatus)
+      .catch(() => {});
   }, []);
 
   async function handleSave() {
@@ -45,6 +56,7 @@ export default function SiteSettingsTab() {
         doc(db, 'siteSettings', 'global'),
         {
           checkoutEnabled,
+          shabbatAutoClose,
           checkoutDisabledMessage: message,
           updatedAt: now,
           updatedBy: email,
@@ -106,6 +118,47 @@ export default function SiteSettingsTab() {
               className="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none bg-white"
               placeholder={DEFAULT_MSG}
             />
+          </div>
+        )}
+      </div>
+
+      {/* ── shabbat auto-close ── */}
+      <div className={`rounded-xl border-2 p-5 ${shabbatAutoClose ? 'border-indigo-300 bg-indigo-50' : 'border-gray-200 bg-gray-50'}`}>
+        <div className="flex items-center justify-between mb-1">
+          <div>
+            <div className="text-base font-black">
+              {shabbatAutoClose ? '🕯️ סגירה אוטומטית בשבת ובחג — פעילה' : '⚪ סגירה אוטומטית בשבת ובחג — כבויה'}
+            </div>
+            <div className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+              הסליקה נסגרת מ-10 דק׳ לפני הדלקת נרות ועד 5 דק׳ אחרי צאת השבת/החג,
+              לפי זמני דימונה (נרות 20 דק׳ לפני השקיעה, צאת השבת 42 דק׳ אחרי).
+              החסימה נאכפת גם ב-API — אין צורך לכבות ידנית.
+            </div>
+          </div>
+          <button
+            onClick={() => setShabbatAutoClose(v => !v)}
+            className={`relative inline-flex h-8 w-14 shrink-0 items-center rounded-full transition-colors focus:outline-none ${
+              shabbatAutoClose ? 'bg-indigo-500' : 'bg-gray-300'
+            }`}
+            aria-label="החלף סגירה אוטומטית בשבת"
+          >
+            <span
+              className={`inline-block h-6 w-6 transform rounded-full bg-white shadow transition-transform ${
+                shabbatAutoClose ? 'translate-x-7' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+
+        {shabbatStatus && (
+          <div className="mt-3 text-xs font-bold text-indigo-900">
+            {shabbatStatus.closed
+              ? `🔴 כרגע סגור (${shabbatStatus.label}) — ${shabbatStatus.message}`
+              : `🟢 כרגע פתוח — הסגירה הבאה: ${
+                  shabbatStatus.nextCloseAt
+                    ? new Date(shabbatStatus.nextCloseAt).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' })
+                    : '—'
+                }`}
           </div>
         )}
       </div>
@@ -175,6 +228,7 @@ export default function SiteSettingsTab() {
           <li>כניסה לאתר, עיון במוצרים, הוספה לעגלה — ממשיכות לעבוד.</li>
           <li>כפתור "מעבר לתשלום" מושבת עם הודעה ללקוח.</li>
           <li>ה-API <code>/api/payment</code> מחזיר 503 גם אם מתקשרים ישירות — אי אפשר לעקוף.</li>
+          <li>בשבת ובחג החסימה אוטומטית — לפי זמני הדלקת נרות וצאת השבת, ללא התערבות ידנית.</li>
         </ul>
       </div>
     </div>
