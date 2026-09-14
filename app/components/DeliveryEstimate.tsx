@@ -2,10 +2,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { POLICY_URLS, SHIPPING } from '@/app/config/siteTrust';
+import { addBusinessDays } from '@/app/lib/israeliBusinessDays';
 
 /**
  * DeliveryEstimate — תיבת צפי משלוח.
- * ברירת מחדל: היום + 7 ימים (משלוח רגיל). אם התאריך נופל בשבת — נדחה ליום ראשון.
+ * ברירת מחדל: 12 ימי עסקים מהיום (רוב ההזמנות הן כיפות בעיצוב אישי עם הדפסה,
+ * שדורשות זמן עיצוב והכנה). הספירה מדלגת על שישי־שבת ועל חגי ישראל,
+ * ערבי חג וחול המועד — ראה app/lib/israeliBusinessDays.ts.
  * ניתן להעביר daysRange פר-מוצר (למשל product.days = '7-10') — אז מוצג טווח
  * ימי עסקים אמיתי במקום תאריך יחיד, כדי לא להציג צפי אחיד למוצרים שונים.
  * מוצגת בדף העגלה ובדף התשלום (אזור התשלום).
@@ -14,11 +17,11 @@ import { POLICY_URLS, SHIPPING } from '@/app/config/siteTrust';
 
 const HEBREW_DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
-function getDeliveryEstimate(): { dayName: string; dateStr: string } {
-  const d = new Date();
-  d.setDate(d.getDate() + 7);
-  // אם יוצא שבת — דוחים ליום ראשון
-  if (d.getDay() === 6) d.setDate(d.getDate() + 1);
+/** ימי עסקים לצפי ברירת המחדל (מוצרים בעיצוב אישי / הדפסה) */
+export const DEFAULT_BUSINESS_DAYS = 12;
+
+function getDeliveryEstimate(businessDays: number): { dayName: string; dateStr: string } {
+  const d = addBusinessDays(new Date(), businessDays);
   return {
     dayName: HEBREW_DAYS[d.getDay()],
     dateStr: `${d.getDate()}.${d.getMonth() + 1}`,
@@ -42,14 +45,21 @@ interface Props {
   daysRange?: string;
   /** מוצר בהתאמה אישית — מציג הערת זמן הכנה */
   customMade?: boolean;
+  /** דריסת מספר ימי העסקים לצפי (ברירת מחדל: 12) */
+  businessDays?: number;
 }
 
-export default function DeliveryEstimate({ compact = false, daysRange, customMade = false }: Props) {
+export default function DeliveryEstimate({
+  compact = false,
+  daysRange,
+  customMade = false,
+  businessDays = DEFAULT_BUSINESS_DAYS,
+}: Props) {
   const [est, setEst] = useState<{ dayName: string; dateStr: string } | null>(null);
 
   useEffect(() => {
-    setEst(getDeliveryEstimate());
-  }, []);
+    setEst(getDeliveryEstimate(businessDays));
+  }, [businessDays]);
 
   if (!est) return null;
 
@@ -79,14 +89,24 @@ export default function DeliveryEstimate({ compact = false, daysRange, customMad
         <div style={{ fontSize: compact ? 12 : 13, fontWeight: 800, color: 'var(--ys-heading)' }}>
           {daysRange
             ? `זמן אספקה משוער: ${daysRange} ימי עסקים`
-            : `צפי משלוח: יום ${est.dayName}, ${est.dateStr} בשעות הצהריים`}
+            : `צפי משלוח: עד יום ${est.dayName}, ${est.dateStr}`}
         </div>
+        {!daysRange && (
+          <div style={{ fontSize: compact ? 10.5 : 11, color: '#555', marginTop: 2 }}>
+            {businessDays} ימי עסקים — הספירה מדלגת על שישי־שבת, חגי ישראל וחול המועד.
+          </div>
+        )}
         <div style={{ fontSize: compact ? 11 : 11.5, color: '#15803d', fontWeight: 700, marginTop: 2 }}>
           🚚 {SHIPPING.freeShippingText}
         </div>
         {customMade && (
           <div style={{ fontSize: compact ? 10.5 : 11, color: '#555', marginTop: 2 }}>
             מוצר בהתאמה אישית — זמן ההכנה כלול בצפי האספקה
+          </div>
+        )}
+        {!daysRange && (
+          <div style={{ fontSize: compact ? 10.5 : 11, color: '#555', marginTop: 2 }}>
+            הצפי מבוסס על מוצרים בעיצוב אישי והדפסה — מוצרים ללא עיצוב אישי ייתכן שיגיעו מוקדם יותר.
           </div>
         )}
         <div style={{ fontSize: compact ? 10.5 : 11, color: '#555', marginTop: 2 }}>

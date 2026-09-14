@@ -34,6 +34,11 @@ export default function CartPage() {
   } = useCart();
   const { user } = useAuth();
   const { addItem } = useCart();
+  // מוצר בהתאמה אישית (רקמה / הטבעה / הדפסה / עיצוב כיפה) — משפיע על נוסח צפי המשלוח
+  const hasCustomMadeItem = items.some(i =>
+    !!i.embroideryText || !!i.embossingText || !!i.printCustomization || !!i.customDesign ||
+    (i.embroideryOptions && i.embroideryOptions.length > 0)
+  );
   const [isMobile, setIsMobile] = useState(false);
   // עריכת עיצוב כיפה קיים מהסל (תוספת אדיטיבית)
   const [editingDesignItem, setEditingDesignItem] = useState<CartItem | null>(null);
@@ -482,7 +487,7 @@ export default function CartPage() {
 
               {/* Delivery estimate */}
               <div style={{ marginBottom: 16 }}>
-                <DeliveryEstimate />
+                <DeliveryEstimate customMade={hasCustomMadeItem} />
               </div>
 
               {/* Coupon section */}
