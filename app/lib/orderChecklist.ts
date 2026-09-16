@@ -12,6 +12,8 @@
  *    ול-STATUS_LABELS ב-app/lib/orderStatus.ts.
  */
 
+import { KIPA_MIN_QTY } from './kippot';
+
 export interface ChecklistStep {
   value: string;
   label: string;
@@ -48,9 +50,19 @@ const SIMPLE_KEYS = new Set([
 
 export const SIMPLE_FLOW: ChecklistStep[] = FULL_FLOW.filter(s => SIMPLE_KEYS.has(s.value));
 
+/** שלבים שקיימים רק במסלול המלא — נוכחות שלהם מעידה על הזמנה בעיצוב אישי */
+const FULL_ONLY_KEYS = new Set(
+  FULL_FLOW.filter(s => !SIMPLE_KEYS.has(s.value)).map(s => s.value),
+);
+
+/** שמות פריטים שמעידים על עיצוב/הדפסה גם כשאין שדה מובנה בשורה */
+const CUSTOM_NAME_RE = /עיצוב אישי|הדפסה|מודפס|הדמיה|רקמה|הטבעה/;
+
 export interface ChecklistOrderLike {
   status?: string;
   items?: Array<{
+    name?: string | null;
+    quantity?: number;
     cat?: string | null;
     printCustomization?: unknown;
     customDesign?: unknown;
@@ -60,7 +72,11 @@ export interface ChecklistOrderLike {
   }>;
 }
 
-/** הזמנה עם עיצוב אישי / הדפסה — מזוהה לפי הפריטים עצמם */
+/**
+ * הזמנה עם עיצוב אישי / הדפסה. הזיהוי מצטבר בכוונה — שורות כיפות לאירועים
+ * לא תמיד נושאות שדה printCustomization (לפעמים ההדפסה היא שורה נפרדת,
+ * ולפעמים העיצוב מגיע בשם המוצר בלבד), ולכן נבדקים גם הקטגוריה, הכמות והשם.
+ */
 export function isCustomOrder(order: ChecklistOrderLike): boolean {
   return (order.items ?? []).some(it =>
     !!it.printCustomization ||
@@ -68,13 +84,22 @@ export function isCustomOrder(order: ChecklistOrderLike): boolean {
     !!it.embroideryText ||
     !!it.embossingText ||
     (it.embroideryOptions?.length ?? 0) > 0 ||
-    it.cat === 'הדפסה',
+    it.cat === 'הדפסה' ||
+    // כיפות לאירועים בכמות — תמיד עוברות עיצוב והדפסה
+    (it.cat === 'כיפות' && (it.quantity ?? 0) >= KIPA_MIN_QTY) ||
+    CUSTOM_NAME_RE.test(it.name ?? ''),
   );
 }
 
-/** רשימת השלבים הרלוונטית להזמנה הזו */
+/**
+ * רשימת השלבים הרלוונטית להזמנה הזו.
+ * הזמנה שכבר נמצאת באחד משלבי ההדמיה/דפוס מקבלת את המסלול המלא בכל מקרה —
+ * כך שגם זיהוי שגוי או מעבר ידני למסלול המלא לא "מאבד" את ההזמנה.
+ */
 export function stepsForOrder(order: ChecklistOrderLike): ChecklistStep[] {
-  return isCustomOrder(order) ? FULL_FLOW : SIMPLE_FLOW;
+  if (isCustomOrder(order)) return FULL_FLOW;
+  if (order.status && FULL_ONLY_KEYS.has(order.status)) return FULL_FLOW;
+  return SIMPLE_FLOW;
 }
 
 /** האם הסטטוס נמצא מחוץ לתהליך (דורש טיפול / נטוש / בוטל) */

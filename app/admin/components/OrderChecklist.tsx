@@ -8,6 +8,7 @@ import {
   isOutOfFlow,
   isKnownFlowStatus,
   isCustomOrder,
+  FULL_FLOW,
   START_STATUS,
   type ChecklistOrderLike,
   type ChecklistStep,
@@ -54,8 +55,10 @@ export default function OrderChecklist({
   order, updating, colorClass, currentLabel, onChange, legacyControl,
 }: Props) {
   const [open, setOpen] = useState(false);
+  // מעבר ידני למסלול המלא, למקרה שהזיהוי האוטומטי פספס הזמנה עם עיצוב
+  const [forceFull, setForceFull] = useState(false);
 
-  const steps = stepsForOrder(order);
+  const steps = forceFull ? FULL_FLOW : stepsForOrder(order);
   const outOfFlow = isOutOfFlow(order.status);
   const known = isKnownFlowStatus(steps, order.status);
 
@@ -174,6 +177,16 @@ export default function OrderChecklist({
                   );
                 })}
               </ol>
+            )}
+
+            {!outOfFlow && steps.length < FULL_FLOW.length && (
+              <button
+                type="button"
+                onClick={() => setForceFull(true)}
+                className="mt-2 w-full text-[11px] font-bold text-blue-700 bg-blue-50 rounded-lg py-1.5 hover:bg-blue-100"
+              >
+                זו הזמנה עם עיצוב — הצג את כל השלבים
+              </button>
             )}
 
             {!outOfFlow && (
