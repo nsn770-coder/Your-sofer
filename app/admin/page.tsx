@@ -32,6 +32,7 @@ import { CRAFTS } from '@/app/lib/crafts';
 import { PAID_STATUSES, isPaidRevenueOrder } from '@/app/lib/orderStatus';
 import ManualOrderModal, { PAYMENT_METHOD_LABELS } from './components/ManualOrderModal';
 import OrderNoteButton from './components/OrderNoteButton';
+import OrderChecklist from './components/OrderChecklist';
 
 interface OrderItem {
   id: string;
@@ -3094,18 +3095,28 @@ ${visibleOrders.map(orderBlock).join('\n')}
                       })()}
                     </td>
                     <td className="p-3" onClick={e => e.stopPropagation()}>
-                      <select
-                        value={o.status}
-                        disabled={updatingId === o.id}
-                        onChange={e => handleStatusChange(o.id, e.target.value)}
-                        className={`text-xs font-bold px-2 py-1 rounded-full border-0 cursor-pointer outline-none ${meta.color}`}
-                        style={{ fontFamily: 'inherit' }}
-                      >
-                        {statusOptionsFor(o.status).map(s => (
-                          <option key={s.value} value={s.value}>{s.label}</option>
-                        ))}
-                      </select>
-                      {updatingId === o.id && <span className="ml-2 text-xs text-gray-400">שומר...</span>}
+                      {/* צ'קליסט שלבים — אי אפשר לדלג שלב. הרשימה הנפתחת נשמרת
+                          כגיבוי להזמנות היסטוריות בסטטוס ישן. */}
+                      <OrderChecklist
+                        order={o}
+                        updating={updatingId === o.id}
+                        colorClass={meta.color}
+                        currentLabel={meta.label}
+                        onChange={handleStatusChange}
+                        legacyControl={
+                          <select
+                            value={o.status}
+                            disabled={updatingId === o.id}
+                            onChange={e => handleStatusChange(o.id, e.target.value)}
+                            className={`text-xs font-bold px-2 py-1 rounded-full border-0 cursor-pointer outline-none ${meta.color}`}
+                            style={{ fontFamily: 'inherit' }}
+                          >
+                            {statusOptionsFor(o.status).map(s => (
+                              <option key={s.value} value={s.value}>{s.label}</option>
+                            ))}
+                          </select>
+                        }
+                      />
                     </td>
                     <td className="p-3" onClick={e => e.stopPropagation()}>
                       <div className="flex gap-1 flex-wrap">
