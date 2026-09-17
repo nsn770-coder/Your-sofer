@@ -1,6 +1,7 @@
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { searchAiKnowledge, type SearchResult } from '@/lib/aiProductSearch';
 import { AI_TEMPS, type AiTemp } from '@/lib/crm';
+import { recordInboundMessage } from '@/lib/services/whatsappMessageStore';
 
 // Present only when the customer tapped a Click-to-WhatsApp ad (Facebook/Instagram).
 export interface WaReferral {
@@ -146,6 +147,7 @@ interface ConvMessage {
 export async function handleIncomingMessage(
   senderId: string,
   messageText: string,
+  messageId: string,
   contactName: string | null = null,
   referral: WaReferral | null = null,
 ): Promise<string | null> {
@@ -155,6 +157,17 @@ export async function handleIncomingMessage(
   const convRef = db.collection('whatsappConversations').doc(senderId);
 
   await upsertCrmLead(db, senderId, contactName, referral);
+
+  // Phase 1 message-storage foundation: dual-write this inbound message into
+  // the new whatsappConversations/{id}/messages subcollection, in addition
+  // to (never instead of) the legacy messages[] array below. Doc ID = wamid,
+  // so a Meta webhook retry for the same message is a safe no-op here too.
+  // Never allowed to affect the existing reply flow — failures are logged
+  // and swallowed.
+  recordInboundMessage(db, { conversationId: senderId, wamid: messageId, text: messageText }).catch((err) => {
+    console.error('[whatsapp handler] recordInboundMessage error (non-fatal):', err);
+    return logEvent(db, 'record_inbound_message_error', senderId, String(err));
+  });
 
   // 1. Load conversation history + mute state
   let history: ConvMessage[] = [];

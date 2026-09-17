@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { verifyAdminToken } from '@/lib/verifyAdmin';
 import { sendWhatsAppMessage } from '@/lib/whatsappSend';
+import { recordOutboundMessagePending } from '@/lib/services/whatsappMessageStore';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,9 +28,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    const db = getAdminDb();
+
+    // Phase 1 message-storage foundation: create the outbound message record
+    // in `pending` status before sending. Step 3 wires the actual wamid
+    // capture once lib/whatsappSend.ts returns it — does not affect the
+    // existing send/array-append behavior below.
+    await recordOutboundMessagePending(db, {
+      conversationId: phone,
+      senderType: 'AGENT',
+      text: message,
+    }).catch((err) => {
+      console.error('[admin-reply] recordOutboundMessagePending error (non-fatal):', err);
+    });
+
     await sendWhatsAppMessage(phone, message);
 
-    const db = getAdminDb();
     const convRef = db.collection('whatsappConversations').doc(phone);
     const snap = await convRef.get();
     const history = (snap.exists ? (snap.data()?.messages as ConvMessage[] | undefined) : []) ?? [];

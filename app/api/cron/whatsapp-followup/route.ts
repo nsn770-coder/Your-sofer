@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { sendWhatsAppMessage } from '@/lib/whatsappSend';
+import { recordOutboundMessagePending } from '@/lib/services/whatsappMessageStore';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -146,6 +147,19 @@ export async function GET(req: NextRequest) {
       if (lead.aiTemp !== 'חם' && lead.aiTemp !== 'פושר') continue; // excludes קר, לא מעוניין, and unscored leads
 
       const followupText = await generateFollowup(messages, lead.aiIntent as string | undefined);
+
+      // Phase 1 message-storage foundation: create the outbound message
+      // record in `pending` status before sending. Step 3 wires the actual
+      // wamid capture once lib/whatsappSend.ts returns it — does not affect
+      // the existing send/array-append behavior below.
+      await recordOutboundMessagePending(db, {
+        conversationId: convoDoc.id,
+        senderType: 'BOT',
+        text: followupText,
+      }).catch((err) => {
+        console.error('[cron/whatsapp-followup] recordOutboundMessagePending error (non-fatal):', err);
+      });
+
       await sendWhatsAppMessage(phone, followupText);
 
       const updatedMessages: ConvMessage[] = [

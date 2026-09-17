@@ -3,6 +3,10 @@ import { waitUntil } from '@vercel/functions';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { handleIncomingMessage, scoreConversation } from './handler';
 import { sendWhatsAppMessage } from '@/lib/whatsappSend';
+import {
+  recordEchoedOutboundMessage,
+  recordOutboundMessagePending,
+} from '@/lib/services/whatsappMessageStore';
 
 // How long the bot stays quiet after the owner answers by hand. Matches
 // AUTO_MUTE_MS in /api/whatsapp/admin-reply so both routes behave the same.
@@ -116,6 +120,19 @@ async function handleMessageEchoes(echoes: MetaMessageEcho[]): Promise<void> {
         .add({ type: 'echo_error', to: phone, error: String(err), timestamp: new Date() })
         .catch(() => {});
     }
+
+    // Phase 1 message-storage foundation: dual-write into the new
+    // whatsappConversations/{id}/messages subcollection, kept intentionally
+    // separate from the try/catch above so a failure here is never
+    // misattributed to (or able to break) the existing echo-handling flow.
+    recordEchoedOutboundMessage(db, {
+      conversationId: phone,
+      wamid: echo.id,
+      text: content,
+      metaTimestamp: echo.timestamp ? Number(echo.timestamp) : null,
+    }).catch((err) => {
+      console.error('[whatsapp webhook] recordEchoedOutboundMessage error (non-fatal):', err);
+    });
   }
 }
 
@@ -201,11 +218,24 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // waitUntil keeps the Vercel function alive after the response is sent,
   // so Claude + Meta send complete even though we return 200 immediately.
   waitUntil(
-    handleIncomingMessage(from, text, contactName, referral)
+    handleIncomingMessage(from, text, messageId, contactName, referral)
       .then(async (reply) => {
         // Send the customer-facing reply first — scoring is a background
         // enrichment step and must never delay message delivery.
         if (reply) {
+          // Phase 1 message-storage foundation: create the outbound message
+          // record in `pending` status before sending. Step 3 wires the
+          // actual wamid capture (markOutboundMessageSent/Failed) once
+          // lib/whatsappSend.ts returns it — until then this stays pending,
+          // which does not affect the existing send/array-append behavior
+          // below at all.
+          await recordOutboundMessagePending(db, {
+            conversationId: from,
+            senderType: 'BOT',
+            text: reply,
+          }).catch((err) => {
+            console.error('[whatsapp webhook] recordOutboundMessagePending error (non-fatal):', err);
+          });
           await sendWhatsAppMessage(from, reply);
         }
         await scoreConversation(from).catch((err) => {
