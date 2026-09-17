@@ -1,3 +1,13 @@
+// Canonical E.164 phone normalizer (Phase 1 foundation) — re-exported here so
+// existing importers of this module can reach it as `normalizePhoneE164`
+// without a new import path. Deliberately NOT replacing the `normalizePhone`
+// export below: that function's last-9-digits-suffix behavior is what every
+// existing call site (closeLeadForOrder in this file, admin/crm/page.tsx)
+// already relies on for matching, and changing its output shape mid-phase
+// would change live CRM/order-matching behavior — out of scope here. New
+// code should prefer `normalizePhoneE164`.
+export { normalizePhone as normalizePhoneE164 } from './phone';
+
 export type CrmStatus = 'חדש' | 'בטיפול' | 'ממתין ללקוח' | 'הצעת מחיר' | 'עסקה נסגרה' | 'לא רלוונטי';
 // 'google' and 'facebook' are auto-detected from ad referrals / UTM attribution.
 // Existing stored leads with the older 4-value set remain valid — this is purely additive.
