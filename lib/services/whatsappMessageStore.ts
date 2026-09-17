@@ -261,3 +261,98 @@ export async function markOutboundMessageFailed(
     errorMessage,
   });
 }
+
+// ── Status webhooks (Phase 1 Step 4) ────────────────────────────────────────
+// Meta's status webhooks only ever carry a wamid, never our internal message
+// doc ID — so every status event is resolved via the whatsappProcessed
+// pointer registered by markOutboundMessageSent/recordEchoedOutboundMessage.
+
+const STATUS_RANK: Record<'sent' | 'delivered' | 'read', number> = {
+  sent: 1,
+  delivered: 2,
+  read: 3,
+};
+
+export type InboundStatusEvent = 'sent' | 'delivered' | 'read' | 'failed';
+
+export type ApplyStatusEventReason =
+  | 'unknown_wamid'
+  | 'malformed_pointer'
+  | 'message_not_found'
+  | 'not_monotonic'
+  | 'stale_failed_after_success'
+  | 'failed_recorded'
+  | 'updated_to_sent'
+  | 'updated_to_delivered'
+  | 'updated_to_read';
+
+export interface ApplyStatusEventResult {
+  applied: boolean;
+  reason: ApplyStatusEventReason;
+}
+
+/**
+ * Applies a single Meta status webhook event (sent/delivered/read/failed)
+ * for the given wamid, enforcing monotonic status ordering:
+ * pending < sent < delivered < read. A status event that would move the
+ * stored status backward (e.g. a late "delivered" arriving after "read" was
+ * already recorded) is recognized and ignored rather than applied — this
+ * also makes a duplicate/retried webhook for the same status a safe no-op.
+ *
+ * Never throws on an unknown/unresolvable wamid — the webhook route must be
+ * able to call this for every status event Meta sends without risking the
+ * request handler itself.
+ */
+export async function applyInboundStatusEvent(
+  db: MessageStoreFirestoreLike,
+  wamid: string,
+  status: InboundStatusEvent,
+  opts: { errorCode?: string | null; errorMessage?: string | null } = {},
+): Promise<ApplyStatusEventResult> {
+  const pointerSnap = await db.collection(PROCESSED).doc(wamid).get();
+  if (!pointerSnap.exists) {
+    return { applied: false, reason: 'unknown_wamid' };
+  }
+
+  const pointer = pointerSnap.data() ?? {};
+  const conversationId = pointer.conversationId as string | undefined;
+  const messageId = pointer.messageId as string | undefined;
+  if (!conversationId || !messageId) {
+    return { applied: false, reason: 'malformed_pointer' };
+  }
+
+  const msgRef = messagesCollection(db, conversationId).doc(messageId);
+  const msgSnap = await msgRef.get();
+  if (!msgSnap.exists) {
+    return { applied: false, reason: 'message_not_found' };
+  }
+
+  const current = msgSnap.data() ?? {};
+  const currentStatus = (current.status as string | null) ?? 'pending';
+
+  if (status === 'failed') {
+    // A failure notification arriving after the message was already
+    // confirmed delivered/read is treated as stale — never regress a
+    // successful terminal-ish state back to failed.
+    if (currentStatus === 'delivered' || currentStatus === 'read') {
+      return { applied: false, reason: 'stale_failed_after_success' };
+    }
+    await msgRef.update({
+      status: 'failed' as MessageStatus,
+      failedAt: new Date(),
+      errorCode: opts.errorCode ?? null,
+      errorMessage: opts.errorMessage ?? null,
+    });
+    return { applied: true, reason: 'failed_recorded' };
+  }
+
+  const newRank = STATUS_RANK[status];
+  const currentRank = STATUS_RANK[currentStatus as 'sent' | 'delivered' | 'read'] ?? 0; // pending/failed/unknown => 0
+  if (newRank <= currentRank) {
+    return { applied: false, reason: 'not_monotonic' };
+  }
+
+  const timestampField = status === 'sent' ? 'sentAt' : status === 'delivered' ? 'deliveredAt' : 'readAt';
+  await msgRef.update({ status, [timestampField]: new Date() });
+  return { applied: true, reason: `updated_to_${status}` as ApplyStatusEventReason };
+}

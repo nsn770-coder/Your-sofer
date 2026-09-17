@@ -8,6 +8,7 @@ import {
   recordOutboundMessagePending,
   markOutboundMessageSent,
   markOutboundMessageFailed,
+  applyInboundStatusEvent,
 } from '@/lib/services/whatsappMessageStore';
 
 // How long the bot stays quiet after the owner answers by hand. Matches
@@ -50,6 +51,15 @@ interface ConvMessage {
   ts: number;
 }
 
+// A delivery-status update for a message WE sent — arrives as its own
+// change alongside (never combined with) `messages`/`message_echoes`.
+interface MetaMessageStatus {
+  id: string; // wamid
+  status: string; // 'sent' | 'delivered' | 'read' | 'failed', per Meta
+  timestamp?: string;
+  errors?: Array<{ code?: number | string; title?: string; message?: string }>;
+}
+
 interface MetaWebhookPayload {
   object: string;
   entry?: Array<{
@@ -59,13 +69,15 @@ interface MetaWebhookPayload {
       value: {
         messages?: Array<MetaTextMessage & { type: string }>;
         message_echoes?: MetaMessageEcho[];
-        statuses?: unknown[];
+        statuses?: MetaMessageStatus[];
         contacts?: Array<{ wa_id: string; profile?: { name?: string } }>;
         metadata?: { phone_number_id: string; display_phone_number: string };
       };
     }>;
   }>;
 }
+
+const KNOWN_STATUS_EVENTS = new Set(['sent', 'delivered', 'read', 'failed']);
 
 // ── GET — Meta webhook verification ──────────────────────────────────────────
 
@@ -138,6 +150,45 @@ async function handleMessageEchoes(echoes: MetaMessageEcho[]): Promise<void> {
   }
 }
 
+// ── Status webhooks (Phase 1 Step 4) ─────────────────────────────────────────
+// Meta's webhook retries are not idempotent by themselves for status events —
+// applyInboundStatusEvent's monotonic rank check is what makes a duplicate or
+// out-of-order delivery a safe no-op. This function must never throw: an
+// unresolvable wamid or a malformed status entry is logged and skipped, never
+// allowed to fail the webhook request.
+async function handleStatusEvents(statuses: MetaMessageStatus[]): Promise<void> {
+  const db = getAdminDb();
+
+  for (const s of statuses) {
+    if (!s?.id || !KNOWN_STATUS_EVENTS.has(s.status)) continue;
+
+    const firstError = s.errors?.[0];
+    // Never log the full error object verbatim — only the plain fields Meta
+    // documents (code/title/message), never headers/tokens.
+    const errorCode = firstError?.code != null ? String(firstError.code) : null;
+    const errorMessage = firstError?.message ?? firstError?.title ?? null;
+
+    try {
+      const result = await applyInboundStatusEvent(
+        db,
+        s.id,
+        s.status as 'sent' | 'delivered' | 'read' | 'failed',
+        { errorCode, errorMessage },
+      );
+      console.error(`[whatsapp webhook] status wamid=${s.id} status=${s.status} applied=${result.applied} reason=${result.reason}`);
+    } catch (err) {
+      console.error('[whatsapp webhook] applyInboundStatusEvent error (non-fatal):', err);
+      await db.collection('whatsappLogs').add({
+        type: 'status_webhook_error',
+        wamid: s.id,
+        status: s.status,
+        error: String(err),
+        timestamp: new Date(),
+      }).catch(() => {});
+    }
+  }
+}
+
 // ── POST — Incoming message handler ──────────────────────────────────────────
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -160,6 +211,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (echoes.length > 0) {
     waitUntil(handleMessageEchoes(echoes));
     return NextResponse.json({});
+  }
+
+  // Status updates (sent/delivered/read/failed) for messages we sent. In
+  // practice Meta never combines these with `messages` in the same payload,
+  // but handling them here (rather than an early return) means that even if
+  // it did, the message-extraction loop below still runs normally afterward.
+  const statuses = changes.flatMap((c) => c.value?.statuses ?? []);
+  if (statuses.length > 0) {
+    waitUntil(handleStatusEvents(statuses));
   }
 
   // Extract the first text message (skip status updates, media, reactions)
