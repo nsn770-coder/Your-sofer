@@ -4,6 +4,7 @@ import { getAdminDb } from '@/lib/firebaseAdmin';
 import { handleIncomingMessage, scoreConversation } from './handler';
 import { sendWhatsAppMessage } from '@/lib/whatsappSend';
 import { verifyMetaSignature } from '@/lib/metaWebhookSignature';
+import { normalizePhone as normalizePhoneE164 } from '@/lib/phone';
 import {
   recordEchoedOutboundMessage,
   recordOutboundMessagePending,
@@ -121,6 +122,8 @@ async function handleMessageEchoes(echoes: MetaMessageEcho[]): Promise<void> {
         {
           messages: updated,
           phone,
+          // Phase 1 phone-normalization foundation — additive field.
+          phoneE164: normalizePhoneE164(phone),
           updatedAt: new Date(),
           botMutedUntil: Date.now() + AUTO_MUTE_MS,
         },

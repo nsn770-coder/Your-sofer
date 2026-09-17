@@ -3,6 +3,7 @@ import { createFakeFirestore } from './helpers/fakeFirestore';
 import {
   recordOutboundMessagePending,
   markOutboundMessageSent,
+  recordEchoedOutboundMessage,
   applyInboundStatusEvent,
 } from '@/lib/services/whatsappMessageStore';
 
@@ -90,5 +91,81 @@ describe('applyInboundStatusEvent', () => {
     const db = createFakeFirestore();
     const result = await applyInboundStatusEvent(db, 'wamid.NEVERSEEN', 'delivered');
     expect(result).toEqual({ applied: false, reason: 'unknown_wamid' });
+  });
+});
+
+describe('applyInboundStatusEvent — race guard (status arrives before the wamid pointer)', () => {
+  it('does not permanently lose a "sent" status that races ahead of markOutboundMessageSent', async () => {
+    const db = createFakeFirestore();
+    const { messageId } = await recordOutboundMessagePending(db, {
+      conversationId: '972501234567',
+      senderType: 'BOT',
+      text: 'hello',
+    });
+
+    // Simulates Meta's status webhook arriving before our own code has
+    // finished writing the whatsappProcessed/{wamid} pointer.
+    const raced = await applyInboundStatusEvent(db, 'wamid.RACE1', 'sent');
+    expect(raced).toEqual({ applied: false, reason: 'unknown_wamid' });
+    expect(db._get(`whatsappConversations/972501234567/messages/${messageId}`)?.status).toBe('pending');
+
+    // The pointer is registered afterward, as normal — reconciliation should
+    // replay the orphaned "sent" event automatically.
+    await markOutboundMessageSent(db, '972501234567', messageId, 'wamid.RACE1');
+
+    const stored = db._get(`whatsappConversations/972501234567/messages/${messageId}`);
+    expect(stored?.status).toBe('sent');
+    expect(stored?.sentAt).toBeInstanceOf(Date);
+  });
+
+  it('reconciles a raced "delivered" event that arrived after "sent" but before the pointer existed', async () => {
+    const db = createFakeFirestore();
+    const { messageId } = await recordOutboundMessagePending(db, {
+      conversationId: '972501234567',
+      senderType: 'BOT',
+      text: 'hello',
+    });
+
+    const raced = await applyInboundStatusEvent(db, 'wamid.RACE2', 'delivered');
+    expect(raced.reason).toBe('unknown_wamid');
+
+    await markOutboundMessageSent(db, '972501234567', messageId, 'wamid.RACE2');
+
+    // Reconciliation applies the orphaned "delivered" directly from pending —
+    // correct even though it skips the intermediate "sent" timestamp.
+    const stored = db._get(`whatsappConversations/972501234567/messages/${messageId}`);
+    expect(stored?.status).toBe('delivered');
+  });
+
+  it('reconciles a raced status for a coexistence echo the same way', async () => {
+    const db = createFakeFirestore();
+
+    const raced = await applyInboundStatusEvent(db, 'wamid.RACEECHO1', 'delivered');
+    expect(raced.reason).toBe('unknown_wamid');
+
+    await recordEchoedOutboundMessage(db, {
+      conversationId: '972501234567',
+      wamid: 'wamid.RACEECHO1',
+      text: 'ענינו ידנית',
+    });
+
+    const stored = db._get('whatsappConversations/972501234567/messages/wamid.RACEECHO1');
+    expect(stored?.status).toBe('delivered');
+  });
+
+  it('is a safe no-op when no orphaned event exists for the wamid', async () => {
+    const db = createFakeFirestore();
+    const { messageId } = await recordOutboundMessagePending(db, {
+      conversationId: '972501234567',
+      senderType: 'BOT',
+      text: 'hello',
+    });
+
+    // No prior orphan for this wamid — markOutboundMessageSent's
+    // reconciliation call must not throw or alter status.
+    await markOutboundMessageSent(db, '972501234567', messageId, 'wamid.NOORPHAN1');
+
+    const stored = db._get(`whatsappConversations/972501234567/messages/${messageId}`);
+    expect(stored?.status).toBe('sent');
   });
 });

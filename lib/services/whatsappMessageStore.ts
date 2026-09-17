@@ -59,6 +59,7 @@ export interface MessageStoreFirestoreLike {
 const CONVERSATIONS = 'whatsappConversations';
 const MESSAGES = 'messages';
 const PROCESSED = 'whatsappProcessed';
+const ORPHANED_STATUSES = 'whatsappOrphanedStatuses';
 
 function messagesCollection(db: MessageStoreFirestoreLike, conversationId: string): CollectionRefLike {
   return db.collection(CONVERSATIONS).doc(conversationId).collection(MESSAGES);
@@ -174,6 +175,10 @@ export async function recordEchoedOutboundMessage(
     { merge: true },
   );
 
+  // Race guard (see applyInboundStatusEvent): replay a status event that may
+  // have arrived for this wamid before the pointer above existed.
+  await reconcileOrphanedStatusEvent(db, input.wamid);
+
   return { created: true, messageId: input.wamid };
 }
 
@@ -243,6 +248,10 @@ export async function markOutboundMessageSent(
     { direction: 'outbound', conversationId, messageId, registeredAt: new Date() },
     { merge: true },
   );
+
+  // Race guard (see applyInboundStatusEvent): replay a status event that may
+  // have arrived for this wamid before the pointer above existed.
+  await reconcileOrphanedStatusEvent(db, wamid);
 }
 
 /** Marks a pending (or otherwise not-yet-successful) outbound message as failed. */
@@ -311,6 +320,24 @@ export async function applyInboundStatusEvent(
 ): Promise<ApplyStatusEventResult> {
   const pointerSnap = await db.collection(PROCESSED).doc(wamid).get();
   if (!pointerSnap.exists) {
+    // Race guard: Meta can fire a "sent" status webhook almost immediately
+    // after accepting a send — sometimes before our own markOutboundMessageSent
+    // call finishes writing the whatsappProcessed/{wamid} pointer (the send
+    // HTTP call and our pointer write are sequential in our code, but Meta's
+    // webhook delivery is a separate, concurrent process). Rather than drop
+    // this event, preserve it here; markOutboundMessageSent and
+    // recordEchoedOutboundMessage replay it via reconcileOrphanedStatusEvent
+    // right after they register the pointer. Overwritten (not merged) on
+    // each arrival — reconciliation only needs the latest status, and
+    // applying it directly from `pending` is correct even if it skips an
+    // intermediate one (e.g. "sent" superseded by "delivered" before the
+    // pointer existed).
+    await db.collection(ORPHANED_STATUSES).doc(wamid).set({
+      status,
+      errorCode: opts.errorCode ?? null,
+      errorMessage: opts.errorMessage ?? null,
+      receivedAt: new Date(),
+    });
     return { applied: false, reason: 'unknown_wamid' };
   }
 
@@ -355,4 +382,31 @@ export async function applyInboundStatusEvent(
   const timestampField = status === 'sent' ? 'sentAt' : status === 'delivered' ? 'deliveredAt' : 'readAt';
   await msgRef.update({ status, [timestampField]: new Date() });
   return { applied: true, reason: `updated_to_${status}` as ApplyStatusEventReason };
+}
+
+/**
+ * Call immediately after registering a wamid -> message pointer
+ * (markOutboundMessageSent / recordEchoedOutboundMessage) to replay a status
+ * event that raced ahead of the pointer write and was preserved as an orphan
+ * by applyInboundStatusEvent. A safe no-op if no orphan exists. Re-applying
+ * is inherently safe even if called more than once — applyInboundStatusEvent's
+ * own monotonic check makes a repeat application a no-op.
+ */
+export async function reconcileOrphanedStatusEvent(
+  db: MessageStoreFirestoreLike,
+  wamid: string,
+): Promise<void> {
+  const orphanRef = db.collection(ORPHANED_STATUSES).doc(wamid);
+  const snap = await orphanRef.get();
+  if (!snap.exists) return;
+
+  const data = snap.data() ?? {};
+  const status = data.status as InboundStatusEvent | undefined;
+  if (status) {
+    await applyInboundStatusEvent(db, wamid, status, {
+      errorCode: (data.errorCode as string | null) ?? null,
+      errorMessage: (data.errorMessage as string | null) ?? null,
+    });
+  }
+  await orphanRef.set({ resolvedAt: new Date() }, { merge: true });
 }
