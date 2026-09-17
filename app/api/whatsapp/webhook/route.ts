@@ -3,6 +3,7 @@ import { waitUntil } from '@vercel/functions';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { handleIncomingMessage, scoreConversation } from './handler';
 import { sendWhatsAppMessage } from '@/lib/whatsappSend';
+import { verifyMetaSignature } from '@/lib/metaWebhookSignature';
 import {
   recordEchoedOutboundMessage,
   recordOutboundMessagePending,
@@ -192,10 +193,39 @@ async function handleStatusEvents(statuses: MetaMessageStatus[]): Promise<void> 
 // ── POST — Incoming message handler ──────────────────────────────────────────
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  // Read the raw body once — signature verification needs the exact bytes
+  // Meta signed, which re-serializing parsed JSON would not reliably match.
+  // Always return 200 to Meta — any non-200 triggers infinite retries, so a
+  // stream-read failure here gets the same graceful fallback as a JSON
+  // parse failure did before this change.
+  let rawBody: string;
+  try {
+    rawBody = await req.text();
+  } catch {
+    return NextResponse.json({});
+  }
+
+  // Phase 1 Step 5 — LOG-ONLY signature verification. This NEVER rejects a
+  // request in Phase 1, regardless of the result — it exists purely to
+  // observe real Meta traffic before enforcement is deliberately enabled in
+  // a later phase. Never log the secret, the header value, or the digest —
+  // only the categorical status.
+  const sigResult = verifyMetaSignature(rawBody, req.headers.get('x-hub-signature-256'), process.env.META_APP_SECRET);
+  if (sigResult.status === 'valid') {
+    console.error('[whatsapp webhook] signature: valid');
+  } else {
+    console.error(`[whatsapp webhook] signature: ${sigResult.status} (log-only, request still processed)`);
+    getAdminDb().collection('whatsappLogs').add({
+      type: 'webhook_signature',
+      status: sigResult.status,
+      timestamp: new Date(),
+    }).catch(() => {});
+  }
+
   // Always return 200 to Meta — any non-200 triggers infinite retries
   let body: MetaWebhookPayload;
   try {
-    body = (await req.json()) as MetaWebhookPayload;
+    body = JSON.parse(rawBody) as MetaWebhookPayload;
   } catch {
     return NextResponse.json({});
   }
