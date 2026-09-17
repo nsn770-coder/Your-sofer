@@ -6,6 +6,8 @@ import { sendWhatsAppMessage } from '@/lib/whatsappSend';
 import {
   recordEchoedOutboundMessage,
   recordOutboundMessagePending,
+  markOutboundMessageSent,
+  markOutboundMessageFailed,
 } from '@/lib/services/whatsappMessageStore';
 
 // How long the bot stays quiet after the owner answers by hand. Matches
@@ -224,19 +226,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         // enrichment step and must never delay message delivery.
         if (reply) {
           // Phase 1 message-storage foundation: create the outbound message
-          // record in `pending` status before sending. Step 3 wires the
-          // actual wamid capture (markOutboundMessageSent/Failed) once
-          // lib/whatsappSend.ts returns it — until then this stays pending,
-          // which does not affect the existing send/array-append behavior
-          // below at all.
-          await recordOutboundMessagePending(db, {
+          // record in `pending` status before sending, then capture the
+          // wamid the send call returns (or mark the message failed) —
+          // never allowed to affect the existing send/array-append flow.
+          const pending = await recordOutboundMessagePending(db, {
             conversationId: from,
             senderType: 'BOT',
             text: reply,
           }).catch((err) => {
             console.error('[whatsapp webhook] recordOutboundMessagePending error (non-fatal):', err);
+            return null;
           });
-          await sendWhatsAppMessage(from, reply);
+
+          const sendResult = await sendWhatsAppMessage(from, reply);
+
+          if (pending) {
+            const markStatus = sendResult.ok && sendResult.wamid
+              ? markOutboundMessageSent(db, from, pending.messageId, sendResult.wamid)
+              : markOutboundMessageFailed(db, from, pending.messageId, null, sendResult.error ?? 'send failed, no wamid returned');
+            await markStatus.catch((err) => {
+              console.error('[whatsapp webhook] mark outbound message status error (non-fatal):', err);
+            });
+          }
         }
         await scoreConversation(from).catch((err) => {
           console.error('[whatsapp webhook] scoreConversation failed (non-fatal):', err);

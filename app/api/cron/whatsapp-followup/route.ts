@@ -8,7 +8,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { sendWhatsAppMessage } from '@/lib/whatsappSend';
-import { recordOutboundMessagePending } from '@/lib/services/whatsappMessageStore';
+import {
+  recordOutboundMessagePending,
+  markOutboundMessageSent,
+  markOutboundMessageFailed,
+} from '@/lib/services/whatsappMessageStore';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -149,18 +153,28 @@ export async function GET(req: NextRequest) {
       const followupText = await generateFollowup(messages, lead.aiIntent as string | undefined);
 
       // Phase 1 message-storage foundation: create the outbound message
-      // record in `pending` status before sending. Step 3 wires the actual
-      // wamid capture once lib/whatsappSend.ts returns it — does not affect
-      // the existing send/array-append behavior below.
-      await recordOutboundMessagePending(db, {
+      // record in `pending` status before sending, then capture the wamid
+      // the send call returns (or mark the message failed) — never allowed
+      // to affect the existing send/array-append behavior below.
+      const pending = await recordOutboundMessagePending(db, {
         conversationId: convoDoc.id,
         senderType: 'BOT',
         text: followupText,
       }).catch((err) => {
         console.error('[cron/whatsapp-followup] recordOutboundMessagePending error (non-fatal):', err);
+        return null;
       });
 
-      await sendWhatsAppMessage(phone, followupText);
+      const sendResult = await sendWhatsAppMessage(phone, followupText);
+
+      if (pending) {
+        const markStatus = sendResult.ok && sendResult.wamid
+          ? markOutboundMessageSent(db, convoDoc.id, pending.messageId, sendResult.wamid)
+          : markOutboundMessageFailed(db, convoDoc.id, pending.messageId, null, sendResult.error ?? 'send failed, no wamid returned');
+        await markStatus.catch((err) => {
+          console.error('[cron/whatsapp-followup] mark outbound message status error (non-fatal):', err);
+        });
+      }
 
       const updatedMessages: ConvMessage[] = [
         ...messages,

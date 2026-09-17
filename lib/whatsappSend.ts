@@ -9,7 +9,21 @@ import { getAdminDb } from '@/lib/firebaseAdmin';
 const GRAPH_API_VERSION = 'v21.0';
 const D360_BASE_URL = 'https://waba-v2.360dialog.io';
 
-export async function sendWhatsAppMessage(to: string, body: string): Promise<void> {
+// Phase 1 Step 3: the send result now carries the WhatsApp message ID
+// (wamid) Meta/360dialog assigns on success, so callers can attach it to the
+// message-store record created for this send. `ok: false` callers should
+// treat the message as failed to send; existing callers that only `await`
+// this function and ignore the return value are unaffected (this was
+// `Promise<void>` before — ignoring a return value is always safe in TS/JS,
+// and every current call site does exactly that except where Step 3 wires
+// them up below).
+export interface SendWhatsAppMessageResult {
+  ok: boolean;
+  wamid: string | null;
+  error?: string;
+}
+
+export async function sendWhatsAppMessage(to: string, body: string): Promise<SendWhatsAppMessageResult> {
   const d360Key = process.env.D360_API_KEY;
 
   let url: string;
@@ -28,13 +42,9 @@ export async function sendWhatsAppMessage(to: string, body: string): Promise<voi
     const accessToken = process.env.WHATSAPP_API_TOKEN;
 
     if (!phoneNumberId || !accessToken) {
-      await logError(
-        'send_error',
-        to,
-        'No transport configured: set D360_API_KEY, or WHATSAPP_PHONE_NUMBER_ID + WHATSAPP_API_TOKEN',
-        body,
-      );
-      return;
+      const error = 'No transport configured: set D360_API_KEY, or WHATSAPP_PHONE_NUMBER_ID + WHATSAPP_API_TOKEN';
+      await logError('send_error', to, error, body);
+      return { ok: false, wamid: null, error };
     }
 
     url = `https://graph.facebook.com/${GRAPH_API_VERSION}/${phoneNumberId}/messages`;
@@ -63,8 +73,16 @@ export async function sendWhatsAppMessage(to: string, body: string): Promise<voi
         `${d360Key ? '360dialog' : 'Meta Graph API'} ${res.status}: ${errBody.slice(0, 300)}`,
       );
     }
+
+    // Meta and 360dialog both respond with { messages: [{ id: "wamid...." }] }
+    // on success — 360dialog proxies Meta's Cloud API response shape verbatim,
+    // same as it does for the request body (see the transport comment above).
+    const data = (await res.json().catch(() => null)) as { messages?: { id?: string }[] } | null;
+    const wamid = data?.messages?.[0]?.id ?? null;
+    return { ok: true, wamid };
   } catch (err) {
     await logError('send_error', to, String(err), body);
+    return { ok: false, wamid: null, error: String(err) };
   }
 }
 

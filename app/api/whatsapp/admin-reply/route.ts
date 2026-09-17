@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { verifyAdminToken } from '@/lib/verifyAdmin';
 import { sendWhatsAppMessage } from '@/lib/whatsappSend';
-import { recordOutboundMessagePending } from '@/lib/services/whatsappMessageStore';
+import {
+  recordOutboundMessagePending,
+  markOutboundMessageSent,
+  markOutboundMessageFailed,
+} from '@/lib/services/whatsappMessageStore';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,18 +35,28 @@ export async function POST(req: NextRequest) {
     const db = getAdminDb();
 
     // Phase 1 message-storage foundation: create the outbound message record
-    // in `pending` status before sending. Step 3 wires the actual wamid
-    // capture once lib/whatsappSend.ts returns it — does not affect the
-    // existing send/array-append behavior below.
-    await recordOutboundMessagePending(db, {
+    // in `pending` status before sending, then capture the wamid the send
+    // call returns (or mark the message failed) — never allowed to affect
+    // the existing send/array-append behavior below.
+    const pending = await recordOutboundMessagePending(db, {
       conversationId: phone,
       senderType: 'AGENT',
       text: message,
     }).catch((err) => {
       console.error('[admin-reply] recordOutboundMessagePending error (non-fatal):', err);
+      return null;
     });
 
-    await sendWhatsAppMessage(phone, message);
+    const sendResult = await sendWhatsAppMessage(phone, message);
+
+    if (pending) {
+      const markStatus = sendResult.ok && sendResult.wamid
+        ? markOutboundMessageSent(db, phone, pending.messageId, sendResult.wamid)
+        : markOutboundMessageFailed(db, phone, pending.messageId, null, sendResult.error ?? 'send failed, no wamid returned');
+      await markStatus.catch((err) => {
+        console.error('[admin-reply] mark outbound message status error (non-fatal):', err);
+      });
+    }
 
     const convRef = db.collection('whatsappConversations').doc(phone);
     const snap = await convRef.get();
