@@ -4,6 +4,10 @@ import { getAdminDb } from '@/lib/firebaseAdmin';
 import { handleIncomingMessage, scoreConversation } from './handler';
 import { sendWhatsAppMessage } from '@/lib/whatsappSend';
 
+// How long the bot stays quiet after the owner answers by hand. Matches
+// AUTO_MUTE_MS in /api/whatsapp/admin-reply so both routes behave the same.
+const AUTO_MUTE_MS = 60 * 60 * 1000; // 1 hour
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface MetaReferral {
@@ -23,6 +27,23 @@ interface MetaTextMessage {
   referral?: MetaReferral;
 }
 
+// Coexistence: a message the owner typed in the WhatsApp Business app on the
+// phone is echoed back to us. `to` is the customer, `from` is our own number.
+interface MetaMessageEcho {
+  id: string;
+  from?: string;
+  to?: string;
+  type: string;
+  text?: { body: string };
+  timestamp?: string;
+}
+
+interface ConvMessage {
+  role: 'user' | 'assistant' | 'admin';
+  content: string;
+  ts: number;
+}
+
 interface MetaWebhookPayload {
   object: string;
   entry?: Array<{
@@ -31,6 +52,7 @@ interface MetaWebhookPayload {
       field: string;
       value: {
         messages?: Array<MetaTextMessage & { type: string }>;
+        message_echoes?: MetaMessageEcho[];
         statuses?: unknown[];
         contacts?: Array<{ wa_id: string; profile?: { name?: string } }>;
         metadata?: { phone_number_id: string; display_phone_number: string };
@@ -53,6 +75,50 @@ export async function GET(req: NextRequest): Promise<Response> {
   return new Response('Forbidden', { status: 403 });
 }
 
+// ── Coexistence — owner replied from the phone ───────────────────────────────
+
+// Records the owner's manual reply in the conversation and mutes the bot, so
+// the customer never gets two answers to the same question.
+async function handleMessageEchoes(echoes: MetaMessageEcho[]): Promise<void> {
+  const db = getAdminDb();
+
+  for (const echo of echoes) {
+    const phone = echo.to;
+    if (!phone) continue;
+
+    const content = echo.type === 'text' ? (echo.text?.body ?? '') : `[${echo.type}]`;
+
+    try {
+      const convRef = db.collection('whatsappConversations').doc(phone);
+      const snap = await convRef.get();
+      const history = (snap.exists ? (snap.data()?.messages as ConvMessage[] | undefined) : []) ?? [];
+
+      const updated: ConvMessage[] = [
+        ...history,
+        { role: 'admin' as const, content, ts: Date.now() },
+      ].slice(-30);
+
+      await convRef.set(
+        {
+          messages: updated,
+          phone,
+          updatedAt: new Date(),
+          botMutedUntil: Date.now() + AUTO_MUTE_MS,
+        },
+        { merge: true },
+      );
+
+      console.error(`[whatsapp webhook] echo from business app to=${phone}, bot muted 1h`);
+    } catch (err) {
+      console.error('[whatsapp webhook] echo handling error:', err);
+      await db
+        .collection('whatsappLogs')
+        .add({ type: 'echo_error', to: phone, error: String(err), timestamp: new Date() })
+        .catch(() => {});
+    }
+  }
+}
+
 // ── POST — Incoming message handler ──────────────────────────────────────────
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -64,8 +130,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({});
   }
 
-  // Extract the first text message (skip status updates, media, reactions)
   const changes = body.entry?.[0]?.changes ?? [];
+
+  // Coexistence echoes come on their own field. Handle them and stop — an echo
+  // is our own outgoing message, never something to answer.
+  const echoes = changes
+    .filter((c) => c.field === 'smb_message_echoes')
+    .flatMap((c) => c.value?.message_echoes ?? []);
+
+  if (echoes.length > 0) {
+    waitUntil(handleMessageEchoes(echoes));
+    return NextResponse.json({});
+  }
+
+  // Extract the first text message (skip status updates, media, reactions)
   let from = '';
   let text = '';
   let messageId = '';
