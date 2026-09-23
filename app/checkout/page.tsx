@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart, CartItem, SHIPPING_REGULAR, SHIPPING_INTERNATIONAL, FREE_SHIPPING_THRESHOLD } from '../contexts/CartContext';
+import { useCart, CartItem, SHIPPING_REGULAR, SHIPPING_INTERNATIONAL } from '../contexts/CartContext';
 import { DEFAULT_COUNTRY, isInternational, sortedCountries, countryName } from '@/app/lib/i18n/countries';
 import { useT } from '@/app/lib/i18n/useT';
 import type { SimchaResult } from '../lib/promoRules';
@@ -611,14 +611,11 @@ export default function CheckoutPage() {
   // ── משלוח בינלאומי ──────────────────────────────────────────────────────
   const isIntl = isInternational(form.country);
 
-  // משלוח חינם אוטומטי: הזמנות מעל FREE_SHIPPING_THRESHOLD (אחרי הנחת קופון).
-  // ⚠️ ישראל בלבד — הזמנה בינלאומית משלמת תעריף אחיד תמיד, כי עלות המשלוח
-  //    בפועל גבוהה מהתעריף, ו"חינם מעל הסף" היה הפסד ישיר בכל הזמנה כזו.
-  const freeShippingEligible = !isIntl && total - discountAmount >= FREE_SHIPPING_THRESHOLD;
+  // משלוח חינם מעל סף בוטל (09/2026) — ₪35 אחיד לכל הזמנה בישראל.
+  const freeShippingEligible = false;
   const shippingCost =
     deliveryMethod === 'pickup' ? 0
     : isIntl                    ? SHIPPING_INTERNATIONAL
-    : freeShippingEligible      ? 0
     : SHIPPING_REGULAR;
   const finalTotal = total - discountAmount - pointsToUse + shippingCost;
 
@@ -1028,13 +1025,8 @@ export default function CheckoutPage() {
                   borderRadius: 12, padding: '12px 10px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center',
                 }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--ys-heading)' }}>{t('checkout.toDoorTitle')}</div>
-                <div style={{ fontSize: 12, color: freeShippingEligible ? '#1a6b3c' : '#777', fontWeight: freeShippingEligible ? 700 : 400, marginTop: 3 }}>
-                  {/* הסף נקרא מהקבוע — היה כאן ₪600 קשיח שנשאר מאחור בכל שינוי מדיניות */}
-                  {isIntl
-                    ? formatPrice(SHIPPING_INTERNATIONAL)
-                    : freeShippingEligible
-                      ? t('checkout.freeOver').replace('{x}', formatPrice(FREE_SHIPPING_THRESHOLD))
-                      : formatPrice(SHIPPING_REGULAR)}
+                <div style={{ fontSize: 12, color: '#777', fontWeight: 400, marginTop: 3 }}>
+                  {isIntl ? formatPrice(SHIPPING_INTERNATIONAL) : formatPrice(SHIPPING_REGULAR)}
                 </div>
               </button>
               {!isIntl && (

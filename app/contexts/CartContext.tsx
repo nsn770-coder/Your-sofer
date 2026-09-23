@@ -7,17 +7,14 @@ import { calcSimchaDiscount, PROMO_ACTIVE, SIMCHA_CODE, type SimchaResult } from
 
 // ── Shipping constants — single source of truth used in cart + checkout ───────
 export const SHIPPING_REGULAR = 35;
-/**
- * משלוח בינלאומי — תעריף אחיד לכל יעד מחוץ לישראל.
- * ⚠️ סף המשלוח החינם (FREE_SHIPPING_THRESHOLD) חל על ישראל בלבד: הזמנה
- * בינלאומית משלמת את התעריף הזה תמיד, ללא קשר לסכום.
- */
+/** משלוח בינלאומי — תעריף אחיד לכל יעד מחוץ לישראל. */
 export const SHIPPING_INTERNATIONAL = 50;
-/** סף משלוח חינם: הזמנות מעל סכום זה (אחרי הנחות קופון) — משלוח חינם אוטומטי (ישראל בלבד) */
-export const FREE_SHIPPING_THRESHOLD = 500;
-/** עלות משלוח בפועל לפי סכום המוצרים אחרי הנחה */
-export function getShippingCost(productsTotalAfterDiscount: number): number {
-  return productsTotalAfterDiscount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_REGULAR;
+/**
+ * עלות משלוח בפועל — ₪35 אחיד לכל הזמנה בישראל, ללא קשר לסכום.
+ * (משלוח חינם מעל ₪500 בוטל ב-09/2026.)
+ */
+export function getShippingCost(_productsTotalAfterDiscount?: number): number {
+  return SHIPPING_REGULAR;
 }
 
 // ── Event print tiered pricing (A1) ──────────────────────────────────────────

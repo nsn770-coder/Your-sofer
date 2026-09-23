@@ -95,9 +95,8 @@ export const REVIEWS = {
 export const SHIPPING = {
   /** עלות משלוח רגיל — חייב להתאים ל-SHIPPING_REGULAR ב-CartContext */
   regularCost: 35,
-  /** סף משלוח חינם — חייב להתאים ל-FREE_SHIPPING_THRESHOLD ב-CartContext */
-  freeShippingThreshold: 500,
-  freeShippingText: 'משלוח חינם בהזמנה מעל ₪500',
+  /** טקסט משלוח לתצוגה (משלוח חינם מעל ₪500 בוטל ב-09/2026) */
+  shippingText: 'משלוח עד הבית ₪35 לכל הארץ',
   carrierName: 'Sendit',
   trackingAvailable: true,
   standardDeliveryText: 'משלוח לכל הארץ עם מספר מעקב',
