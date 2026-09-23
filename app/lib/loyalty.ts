@@ -59,7 +59,6 @@ export const TIER_CONFIG: Record<Tier, TierDefinition> = {
     accrualRate: 12,
     benefits: [
       'צבירת 12% נקודות על כל קנייה',
-      'משלוח חינם בהזמנות מעל ₪100',
       'גישה מוקדמת למבצעים ומוצרים חדשים',
       'מבצעי מועדון בלעדיים',
     ],

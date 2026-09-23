@@ -97,7 +97,7 @@ export default function DeliveryEstimate({
           </div>
         )}
         <div style={{ fontSize: compact ? 11 : 11.5, color: '#15803d', fontWeight: 700, marginTop: 2 }}>
-          🚚 {SHIPPING.freeShippingText}
+          🚚 {SHIPPING.shippingText}
         </div>
         {customMade && (
           <div style={{ fontSize: compact ? 10.5 : 11, color: '#555', marginTop: 2 }}>

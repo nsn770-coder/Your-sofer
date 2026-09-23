@@ -1,15 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SHIPPING } from '@/app/config/siteTrust';
 
 /**
  * AnnouncementBar — פס הטבה דק וקבוע בראש האתר, מעל ה-NavBar.
  *
  * • שני מסרים מתחלפים כל 4 שניות עם fade עדין.
  * • ללא כפתור סגירה (מוצג תמיד, בכל העמודים, גם במובייל).
- * • סף המשלוח נקרא מ-siteTrust (SHIPPING.freeShippingThreshold) — מקור אמת יחיד
- *   שמסונכרן עם FREE_SHIPPING_THRESHOLD ב-CartContext. אין לכתוב כאן מספר קשיח.
+ * • מסר "משלוח חינם מעל ₪500" הוסר (09/2026) — המשלוח ₪35 אחיד לכולם.
  * • המסר השני פותח את ClubPopup הקיים דרך אירוע window ('ys:open-club').
  *
  * CLS: הגובה קבוע (36px) ומוצהר גם ב-SSR, והפס נמצא בזרימת המסמך מעל
@@ -41,9 +39,6 @@ export default function AnnouncementBar() {
   }
 
   const messages: Msg[] = [
-    {
-      text: `🚚 משלוח חינם בהזמנה מעל ₪${SHIPPING.freeShippingThreshold}`,
-    },
     {
       text: '🎁 5% הנחה + 10% בנקודות למצטרפים למועדון — לחצו כאן',
       ariaLabel: 'הצטרפות למועדון הלקוחות — פתיחת טופס ההרשמה',
@@ -116,7 +111,7 @@ export default function AnnouncementBar() {
     >
       {/* קוראי מסך: מקבלים את שני המסרים פעם אחת, בלי הכרזה חוזרת כל 4 שניות */}
       <span className="sr-only">
-        משלוח חינם בהזמנה מעל ₪{SHIPPING.freeShippingThreshold}. 5% הנחה ו-10% בנקודות למצטרפים למועדון. קוד קופון {COUPON_CODE} להנחה של 5%.
+        5% הנחה ו-10% בנקודות למצטרפים למועדון. קוד קופון {COUPON_CODE} להנחה של 5%.
       </span>
 
       <span aria-hidden="true" style={{ display: 'flex', alignItems: 'center', maxWidth: '100%' }}>

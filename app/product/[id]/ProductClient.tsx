@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import { doc, getDoc, updateDoc, setDoc, addDoc, collection, getDocs, query, where, limit, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useCart, getEventKippahPricePerUnit, FREE_SHIPPING_THRESHOLD, SHIPPING_REGULAR } from '../../contexts/CartContext';
+import { useCart, getEventKippahPricePerUnit, SHIPPING_REGULAR } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
 import { EVENT_SCROLL_SECTIONS } from '../../constants/eventScrollSections';
@@ -2563,31 +2563,6 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           </div>
         ))}
 
-        {/* ── מחוון משלוח חינם ──
-            הסף והסכום נקראים מ-CartContext (FREE_SHIPPING_THRESHOLD + total) —
-            אותו מקור בדיוק שמזין את העגלה, הצ'קאאוט ו-GiftProgressBar.
-            החישוב הוא על העגלה **אחרי** הוספת המוצר הזה, כי הסף חל על סכום
-            ההזמנה ולא על מוצר בודד — הצגה לפי מחיר המוצר בלבד הייתה מטעה. */}
-        {(() => {
-          const projected = cartTotal + effectivePrice * qty;
-          const remaining = Math.round(FREE_SHIPPING_THRESHOLD - projected);
-          const eligible  = remaining <= 0;
-          return (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              marginTop: 4, paddingTop: 10, borderTop: '1px dashed #E5E0D3',
-              fontSize: 12, fontWeight: 700,
-              color: eligible ? '#1a6b3c' : '#8a6d0f',
-            }}>
-              <span aria-hidden="true" style={{ fontSize: 14, lineHeight: 1 }}>{eligible ? '✓' : '🚚'}</span>
-              <span>
-                {eligible
-                  ? t('pd.freeShipEligible')
-                  : `הוסיפו עוד ${formatPrice(remaining)} למשלוח חינם`}
-              </span>
-            </div>
-          );
-        })()}
       </div>
 
       {/* אמצעי תשלום — שורה עדינה ליד פעולת הרכישה */}
@@ -2719,8 +2694,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   ];
 
   const shippingRows = [
-    // הסף ועלות המשלוח נקראים מהקבועים — היו כאן ₪600/₪35 קשיחים
-    { icon: <Icon.Truck />,   k: 'משלוח',  v: `${formatPrice(SHIPPING_REGULAR)} עד הבית · חינם בהזמנה מעל ${formatPrice(FREE_SHIPPING_THRESHOLD)} · ${product.days || '7-10'} ימי עסקים · עם מספר מעקב` },
+    // עלות המשלוח נקראת מהקבוע SHIPPING_REGULAR
+    { icon: <Icon.Truck />,   k: 'משלוח',  v: `${formatPrice(SHIPPING_REGULAR)} עד הבית · ${product.days || '7-10'} ימי עסקים · עם מספר מעקב` },
     { icon: <Icon.Package />, k: 'אריזה',  v: 'אריזה מוגנת ומהודרת לכל הזמנה' },
     { icon: <Icon.Return />,  k: 'החזרות', v: 'עד 14 יום ממועד הקבלה, למוצרים שלא נפתחו ולא נעשה בהם שימוש — בהתאם למדיניות האתר' },
     { icon: <Icon.X size={14} />, k: 'ביטול', v: 'ביטול והחזרה בהתאם למדיניות האתר ולחוק הגנת הצרכן' },
