@@ -195,11 +195,12 @@ function calcTotals(items: CartItem[]) {
     if (isKippot) {
       const orig = item.price * item.quantity;
       kippotSubtotal += orig;
-      // כיפות לאירועים בכמויות (30+) — מחיר מדרגות מלא, בלי הנחת מדרגות ובלי קופון.
+      // כיפות לאירועים בכמויות (30+) — מחיר מדרגות מלא, בלי הנחת מדרגות, אבל זכאיות לקופון.
       // כיפות רגילות מטופלות אך ורק בבלוק הנחת המדרגות למטה —
       // אסור להוסיף אותן כאן ל-total (ספירה כפולה שגרמה לדחיית תשלום בשרת).
       if (isBulkEventKippotLine(item)) {
-        total += orig;
+        total        += orig;
+        discountable += orig;
       }
 
     } else if (isPrintService) {

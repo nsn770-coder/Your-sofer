@@ -386,8 +386,6 @@ export async function POST(req: NextRequest) {
           if (item.bundlePromo) continue; // already counted in bundleDiscountedTotal
           if (item.cat === 'הדפסה') continue;
           if (item.cat === 'כיפות' && kippotDiscountActive) continue;
-          // כיפות לאירועים בכמויות (30+) — לא זכאיות לקופון
-          if (isBulkEventKippotLine(item)) continue;
           serverDiscountableTotal += item.price * item.quantity;
         }
 

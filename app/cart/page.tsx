@@ -11,7 +11,6 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import { formatPrice } from '@/app/lib/utils';
-import { isBulkEventKippotLine } from '@/app/lib/kippot';
 import DeliveryEstimate from '../components/DeliveryEstimate';
 import PaymentMethodsRow from '../components/trust/PaymentMethodsRow';
 import TrustCluster from '../components/trust/TrustCluster';
@@ -337,12 +336,6 @@ export default function CartPage() {
                             {item.name}
                           </div>
                           <div style={{ fontSize: 12, color: '#1a6b3c', marginBottom: item.embroideryText || item.embossingText || item.selectedCover ? 4 : 10 }}>✓ {t('cart.inStock')}</div>
-                          {/* כיפות לאירועים בכמויות — מחיר מדרגות; קופונים לא חלים */}
-                          {isBulkEventKippotLine(item) && (
-                            <div style={{ fontSize: 11.5, color: '#92400e', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 6, padding: '3px 8px', display: 'inline-block', fontWeight: 700, marginBottom: 6 }}>
-                              {t('cart.qtyDiscountNote')}
-                            </div>
-                          )}
                           {item.embroideryText && (
                             <div style={{ fontSize: 12, color: '#92400e', marginBottom: 6 }}>✍️ {t('cart.embroidery')}: {item.embroideryText}</div>
                           )}
@@ -542,12 +535,6 @@ export default function CartPage() {
                   </div>
                 )}
                 {couponError && <div style={{ fontSize: 11, color: '#dc2626', marginTop: 5 }}>{couponError}</div>}
-                {/* כיפות לאירועים בכמויות — כבר במחירי מדרגות; קופונים לא חלים עליהן */}
-                {appliedCoupon && appliedCoupon.type !== 'simcha' && items.some(isBulkEventKippotLine) && (
-                  <div style={{ marginTop: 8, background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 10, padding: '8px 12px', fontSize: 11.5, fontWeight: 700, lineHeight: 1.6, color: '#92400e' }}>
-                    {t('cart.kippotCouponNote')}
-                  </div>
-                )}
                 {!appliedCoupon && (
                   <div style={{ fontSize: 11, color: '#888', marginTop: 6, lineHeight: 1.5 }}>
                     {t('cart.clubCodeNote')}

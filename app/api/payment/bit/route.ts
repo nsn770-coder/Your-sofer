@@ -273,8 +273,6 @@ export async function POST(req: NextRequest) {
         for (const item of productItems) {
           if (item.bundlePromo) continue;
           if (item.cat === 'הדפסה') continue;
-          // כיפות לאירועים בכמויות (30+) לא זכאיות לקופון
-          if (isBulkEventKippotLine(item)) continue;
           serverDiscountableTotal += item.price * item.quantity;
         }
 
