@@ -3,6 +3,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { verifyAdminToken } from '@/lib/verifyAdmin';
 import { closeLeadForOrder } from '@/lib/crm';
+import { reportOrderToMeta } from '@/lib/orderMetaCapi';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/admin/manual-order
@@ -291,7 +292,17 @@ export async function POST(req: NextRequest) {
 
     // ── CRM: סגירת ליד תואם (לא קריטי — לא מפיל את ההזמנה) ───────────────
     try {
-      await closeLeadForOrder(db, phone, orderNumber, null);
+      const lead = await closeLeadForOrder(db, phone, orderNumber, null, {
+        name: customerName, email: (body.email ?? '').trim() || null, total,
+      });
+      // הזמנה ידנית מדווחת למטא רק אם היא שולמה והלקוח הגיע ממודעת Click-to-WhatsApp
+      // (יש ctwa_clid) — אז זו רכישה שהמודעה באמת הביאה.
+      if (isPaid) {
+        await reportOrderToMeta(db, orderRef.id, {
+          orderNumber, total, email: (body.email ?? '').trim() || null, phone, customerName,
+          items: items as Array<{ id?: string; productId?: string; quantity?: number; price?: number }>,
+        }, lead, { onlyMessaging: true });
+      }
     } catch (crmErr) {
       console.error('[manual-order] CRM lead close failed (non-fatal):', crmErr);
     }

@@ -311,12 +311,27 @@ service cloud.firestore {
     // ── WhatsApp conversations (admin chat viewer at /admin/whatsapp) ───────
     match /whatsappConversations/{id} {
       allow read, write: if isAdmin();
+
+      // Phase 1 message-storage foundation (whatsappConversations/{id}/messages/{messageId}).
+      // Same admin-only permission model as the parent conversation doc —
+      // not yet read by any admin UI, but the rule follows the same pattern
+      // so it's ready when it is.
+      match /messages/{messageId} {
+        allow read, write: if isAdmin();
+      }
     }
 
     // ── CRM leads (admin-only, /admin/crm) ──────────────────────────────────
     match /crmLeads/{id} {
       allow read, write: if isAdmin();
     }
+
+    // ── phoneIndex (Phase 1 foundation) ─────────────────────────────────────
+    // Intentionally NO rule block here — same as whatsappProcessed/whatsappLogs
+    // above, this collection is written/read only via the Admin SDK (server
+    // code, which bypasses these rules entirely). Firestore's default-deny
+    // for unmatched paths means no client can read or write it. Add an
+    // explicit rule here if a genuine client-side read need ever arises.
 
     // ── Partner data (new Partner Stores system) ────────────────────────────
 

@@ -1,6 +1,9 @@
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { searchAiKnowledge, type SearchResult } from '@/lib/aiProductSearch';
 import { AI_TEMPS, type AiTemp } from '@/lib/crm';
+import { recordInboundMessage } from '@/lib/services/whatsappMessageStore';
+import { normalizePhone as normalizePhoneE164 } from '@/lib/phone';
+import { upsertPhoneIndexEntry } from '@/lib/phoneIndex';
 
 // Present only when the customer tapped a Click-to-WhatsApp ad (Facebook/Instagram).
 export interface WaReferral {
@@ -23,12 +26,32 @@ async function upsertCrmLead(
   referral: WaReferral | null,
 ): Promise<void> {
   const leadRef = db.collection('crmLeads').doc(phone);
+  // Phase 1 phone-normalization foundation: computed once and merged onto
+  // both the lead doc and phoneIndex, additive to every existing field.
+  // Doc ID scheme (raw phone as doc id) is intentionally left as-is — see
+  // lib/crm.ts's normalizePhone/closeLeadForOrder comments.
+  const phoneE164 = normalizePhoneE164(phone);
+
   try {
     const snap = await leadRef.get();
+    // Click-to-WhatsApp ad click — persisted so a later purchase can be
+    // reported back to Meta (Conversions API for Business Messaging) and
+    // credited to the exact ad the customer clicked. Latest click wins.
+    const adFields: Record<string, unknown> = referral?.ctwa_clid
+      ? {
+          ctwaClid: referral.ctwa_clid,
+          ctwaAt: new Date(),
+          adId: referral.source_id ?? null,
+          adHeadline: referral.headline ?? null,
+          adSourceUrl: referral.source_url ?? null,
+        }
+      : {};
     if (!snap.exists) {
       const fromAd = !!referral;
       await leadRef.set({
+        ...adFields,
         phone,
+        phoneE164,
         name: name ?? null,
         source: fromAd ? 'facebook' : 'whatsapp',
         sourceDetail: fromAd ? [referral!.headline, referral!.source_id].filter(Boolean).join(' — ') || null : null,
@@ -41,12 +64,21 @@ async function upsertCrmLead(
         lastContactAt: new Date(),
       });
     } else {
-      const updates: Record<string, unknown> = { lastContactAt: new Date() };
+      const updates: Record<string, unknown> = { lastContactAt: new Date(), ...adFields };
       if (name && !snap.data()?.name) updates.name = name;
+      if (phoneE164 && snap.data()?.phoneE164 !== phoneE164) updates.phoneE164 = phoneE164;
       await leadRef.set(updates, { merge: true });
     }
   } catch (err) {
     console.error('[whatsapp handler] upsertCrmLead error:', err);
+  }
+
+  // phoneIndex linkage — independent of the try/catch above so a failure
+  // here can never be misattributed to (or block) the lead upsert itself.
+  if (phoneE164) {
+    upsertPhoneIndexEntry(db, phoneE164, { leadId: phone, conversationId: phone }).catch((err) => {
+      console.error('[whatsapp handler] upsertPhoneIndexEntry error (non-fatal):', err);
+    });
   }
 }
 
@@ -146,6 +178,7 @@ interface ConvMessage {
 export async function handleIncomingMessage(
   senderId: string,
   messageText: string,
+  messageId: string,
   contactName: string | null = null,
   referral: WaReferral | null = null,
 ): Promise<string | null> {
@@ -153,8 +186,22 @@ export async function handleIncomingMessage(
 
   const db = getAdminDb();
   const convRef = db.collection('whatsappConversations').doc(senderId);
+  // Phase 1 phone-normalization foundation — additive field on the
+  // conversation doc, computed once and reused below.
+  const conversationPhoneE164 = normalizePhoneE164(senderId);
 
   await upsertCrmLead(db, senderId, contactName, referral);
+
+  // Phase 1 message-storage foundation: dual-write this inbound message into
+  // the new whatsappConversations/{id}/messages subcollection, in addition
+  // to (never instead of) the legacy messages[] array below. Doc ID = wamid,
+  // so a Meta webhook retry for the same message is a safe no-op here too.
+  // Never allowed to affect the existing reply flow — failures are logged
+  // and swallowed.
+  recordInboundMessage(db, { conversationId: senderId, wamid: messageId, text: messageText }).catch((err) => {
+    console.error('[whatsapp handler] recordInboundMessage error (non-fatal):', err);
+    return logEvent(db, 'record_inbound_message_error', senderId, String(err));
+  });
 
   // 1. Load conversation history + mute state
   let history: ConvMessage[] = [];
@@ -186,7 +233,10 @@ export async function handleIncomingMessage(
     ].slice(-30);
 
     await convRef
-      .set({ messages: updated, phone: senderId, updatedAt: new Date(), ...(referral ? { referral } : {}) }, { merge: true })
+      .set(
+        { messages: updated, phone: senderId, phoneE164: conversationPhoneE164, updatedAt: new Date(), ...(referral ? { referral } : {}) },
+        { merge: true },
+      )
       .catch((err) => {
         console.error('[whatsapp handler] save muted history error:', err);
         return logEvent(db, 'save_history_error', senderId, String(err));
@@ -263,7 +313,10 @@ export async function handleIncomingMessage(
   ].slice(-30);
 
   await convRef
-    .set({ messages: updated, phone: senderId, updatedAt: new Date(), ...(referral ? { referral } : {}) }, { merge: true })
+    .set(
+      { messages: updated, phone: senderId, phoneE164: conversationPhoneE164, updatedAt: new Date(), ...(referral ? { referral } : {}) },
+      { merge: true },
+    )
     .then(() => console.error('[whatsapp handler] conversation saved'))
     .catch((err) => {
       console.error('[whatsapp handler] save history error:', err);

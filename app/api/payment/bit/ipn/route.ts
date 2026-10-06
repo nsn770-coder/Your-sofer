@@ -5,6 +5,7 @@ import { createHash } from 'crypto';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { getTier } from '@/app/lib/loyalty';
 import { closeLeadForOrder } from '@/lib/crm';
+import { reportOrderToMeta } from '@/lib/orderMetaCapi';
 import { applyOrderStock } from '@/lib/inventoryStock';
 import { calculateFulfillmentPlan } from '@/app/lib/fulfillment';
 import type { Order } from '@/app/lib/types';
@@ -196,7 +197,11 @@ export async function POST(req: NextRequest) {
 
     // ── CRM: auto-close a matching lead now that this phone has ordered ────────
     try {
-      await closeLeadForOrder(adminDb, order.phone, order.orderNumber, order.attribution);
+      const lead = await closeLeadForOrder(adminDb, order.phone, order.orderNumber, order.attribution, {
+        name: order.customerName, email: order.email, total: order.total,
+      });
+      // Meta CAPI — idempotent via order.metaCapi.sentAt
+      await reportOrderToMeta(adminDb, orderId, order as Parameters<typeof reportOrderToMeta>[2], lead);
     } catch (crmErr) {
       console.error('[bit-ipn] CRM lead close failed (non-fatal):', crmErr);
     }
