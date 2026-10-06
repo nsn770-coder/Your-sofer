@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requestClientInfo } from '@/lib/metaCapi';
 import { getAdminDb, getAdminAuth } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { createHash, randomUUID } from 'crypto';
@@ -396,6 +397,9 @@ export async function POST(req: NextRequest) {
       pointsDiscount: requestedPoints > 0 ? requestedPoints : null,
       pointsRedeemed: false,
       attribution: attribution ?? null,
+      // Customer's IP/UA for Meta CAPI — the IPN that confirms payment comes
+      // from Sumit's server, not the customer, so capture them here.
+      metaClient: requestClientInfo(req.headers),
     });
 
     // ── beginredirect — קבלת דף תשלום ביט מאובטח מ-Sumit ──────────────────────

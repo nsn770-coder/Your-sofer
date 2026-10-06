@@ -9,9 +9,10 @@ declare global {
   }
 }
 
-function fbq(command: string, event: string, params?: Record<string, unknown>) {
+function fbq(command: string, event: string, params?: Record<string, unknown>, opts?: { eventID?: string }) {
   if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
-    window.fbq(command, event, params);
+    if (opts) window.fbq(command, event, params, opts);
+    else window.fbq(command, event, params);
   }
 }
 
@@ -82,7 +83,7 @@ export function purchase(orderId: string, items: PixelCartItem[], total: number)
     value: total,
     currency: 'ILS',
     order_id: orderId,
-  });
+  }, { eventID: orderId }); // = server CAPI event_id (lib/metaCapi.ts) → Meta de-duplicates
 }
 
 // ── Lead & Search ─────────────────────────────────────────────────────────────

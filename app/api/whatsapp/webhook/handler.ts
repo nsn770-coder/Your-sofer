@@ -34,9 +34,22 @@ async function upsertCrmLead(
 
   try {
     const snap = await leadRef.get();
+    // Click-to-WhatsApp ad click — persisted so a later purchase can be
+    // reported back to Meta (Conversions API for Business Messaging) and
+    // credited to the exact ad the customer clicked. Latest click wins.
+    const adFields: Record<string, unknown> = referral?.ctwa_clid
+      ? {
+          ctwaClid: referral.ctwa_clid,
+          ctwaAt: new Date(),
+          adId: referral.source_id ?? null,
+          adHeadline: referral.headline ?? null,
+          adSourceUrl: referral.source_url ?? null,
+        }
+      : {};
     if (!snap.exists) {
       const fromAd = !!referral;
       await leadRef.set({
+        ...adFields,
         phone,
         phoneE164,
         name: name ?? null,
@@ -51,7 +64,7 @@ async function upsertCrmLead(
         lastContactAt: new Date(),
       });
     } else {
-      const updates: Record<string, unknown> = { lastContactAt: new Date() };
+      const updates: Record<string, unknown> = { lastContactAt: new Date(), ...adFields };
       if (name && !snap.data()?.name) updates.name = name;
       if (phoneE164 && snap.data()?.phoneE164 !== phoneE164) updates.phoneE164 = phoneE164;
       await leadRef.set(updates, { merge: true });

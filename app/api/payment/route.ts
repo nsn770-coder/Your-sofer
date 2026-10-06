@@ -7,6 +7,8 @@ import { getTier } from '@/app/lib/loyalty';
 import { calcSimchaDiscount, SIMCHA_CODE } from '@/app/lib/promoRules';
 import { isBulkEventKippotLine } from '@/app/lib/kippot';
 import { closeLeadForOrder, type OrderAttribution } from '@/lib/crm';
+import { requestClientInfo } from '@/lib/metaCapi';
+import { reportOrderToMeta } from '@/lib/orderMetaCapi';
 import { applyOrderStock } from '@/lib/inventoryStock';
 import { calculateFulfillmentPlan } from '@/app/lib/fulfillment';
 import { sendPartnerNewOrderEmail } from '@/app/lib/send-notification';
@@ -594,6 +596,7 @@ export async function POST(req: NextRequest) {
         pointsDiscount: requestedPoints > 0 ? requestedPoints : null,
         pointsRedeemed: false,
         attribution: attribution ?? null,
+        metaClient: requestClientInfo(req.headers),
       });
 
       const sideEffects: Promise<unknown>[] = [];
@@ -639,10 +642,22 @@ export async function POST(req: NextRequest) {
       }
 
       // ── CRM: auto-close a matching lead now that this phone has ordered ──────
+      // + Meta Conversions API: report the sale back to the ad that brought it
+      //   (Click-to-WhatsApp lead → business_messaging, else website + dedup).
       try {
-        await closeLeadForOrder(adminDb, customer.phone, orderNumber, attribution);
+        const lead = await closeLeadForOrder(adminDb, customer.phone, orderNumber, attribution, {
+          name: customer.name, email: customer.email, total: chargedTotal,
+        });
+        await reportOrderToMeta(adminDb, orderRef.id, {
+          orderNumber, total: chargedTotal,
+          email: customer.email, phone: customer.phone, customerName: customer.name, city: city || null,
+          uid: uid || null,
+          items: cartItems.map(i => ({ id: i.id, productId: i.productId || i.id, quantity: i.quantity, price: i.price })),
+          attribution: attribution ?? null,
+          metaClient: requestClientInfo(req.headers),
+        }, lead);
       } catch (crmErr) {
-        console.error('[payment] CRM lead close failed (non-fatal):', crmErr);
+        console.error('[payment] CRM lead close / Meta CAPI failed (non-fatal):', crmErr);
       }
 
       // ── Partner notifications: notify each partner whose products were ordered ──

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, setDoc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/app/firebase';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { getAuthLazy } from '@/lib/authLazy';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
@@ -36,6 +37,11 @@ interface CrmLeadRow {
   assignedTo?: string | null;
   createdAt?: unknown;
   lastContactAt?: unknown;
+  email?: string | null;
+  ordersCount?: number;
+  totalSpent?: number;
+  ctwaClid?: string | null;
+  adHeadline?: string | null;
   aiTemp?: AiTemp | null;
   aiIntent?: string | null;
   needsHuman?: boolean;
@@ -47,6 +53,7 @@ interface OrderRow {
   orderNumber?: string;
   customerName?: string;
   phone?: string;
+  email?: string;
   total?: number;
   status?: string;
   createdAt?: unknown;
@@ -548,6 +555,51 @@ export default function CrmPage() {
     }).catch((e) => console.error('[admin/crm] load conversations error', e));
   }, [user]);
 
+  // ── Buyers: name + purchase totals per phone, from orders ─────────────────
+  // Leads created by checkout before names were saved show "—"; fall back to
+  // the name on their order so the table is readable right away.
+  const buyerByPhone = useMemo(() => {
+    const m = new Map<string, { name: string | null; count: number; spent: number }>();
+    for (const o of orders) {
+      if (!o.phone || o.status === 'pending_payment' || o.status === 'cancelled') continue;
+      const k = normalizePhone(o.phone);
+      if (!k) continue;
+      const cur = m.get(k) ?? { name: null, count: 0, spent: 0 };
+      cur.count += 1;
+      cur.spent += Number(o.total) || 0;
+      if (!cur.name && o.customerName) cur.name = o.customerName;
+      m.set(k, cur);
+    }
+    return m;
+  }, [orders]);
+
+  const [syncing, setSyncing] = useState(false);
+  async function syncBuyersToMeta() {
+    if (!confirm('לסנכרן רוכשים: להשלים שמות חסרים ולשלוח למטא רכישות מ-7 הימים האחרונים שעוד לא דווחו?')) return;
+    setSyncing(true);
+    try {
+      const auth = await getAuthLazy();
+      const token = await auth.currentUser?.getIdToken(true);
+      const res = await fetch('/api/admin/crm-backfill', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error || res.statusText);
+      alert(
+        `הסנכרון הושלם ✓\n` +
+        `שמות שהושלמו: ${j.namesFilled}\n` +
+        `לידים שקושרו למודעה (ctwa): ${j.ctwaLinked}\n` +
+        `רכישות שדווחו למטא — וואטסאפ (מודעה): ${j.sentMessaging}, אתר: ${j.sentWebsite}\n` +
+        (j.errors?.length ? `שגיאות: ${j.errors.join(' | ')}` : ''),
+      );
+    } catch (e) {
+      alert('שגיאה בסנכרון: ' + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setSyncing(false);
+    }
+  }
+
   // ── Dashboard stats (over ALL leads, not the filtered table) ────────────────
 
   const stats = useMemo(() => {
@@ -717,10 +769,16 @@ export default function CrmPage() {
             <a href="/admin" style={{ color: navy, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>← חזרה לניהול</a>
             <h1 style={{ fontSize: 24, fontWeight: 900, color: navy, margin: 0 }}>📇 CRM לקוחות</h1>
           </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button onClick={syncBuyersToMeta} disabled={syncing}
+            style={{ background: '#fff', color: navy, border: `1px solid ${navy}`, borderRadius: 8, padding: '10px 14px', fontSize: 14, fontWeight: 700, cursor: syncing ? 'wait' : 'pointer' }}>
+            {syncing ? 'מסנכרן...' : '🔄 סנכרון רוכשים למטא'}
+          </button>
           <button onClick={() => setShowNewLead(true)}
             style={{ background: navy, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 18px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             ➕ ליד חדש
           </button>
+          </div>
         </div>
 
         {/* המשימות שלי להיום */}
@@ -863,7 +921,26 @@ export default function CrmPage() {
                   return (
                   <tr key={l.id} style={{ borderTop: '1px solid #f0f0f0', background: isStale ? '#fffbeb' : undefined }}>
                     <td style={{ padding: '8px 14px', fontWeight: 600, color: navy }}>
-                      {l.name || '—'}
+                      {(() => {
+                        const buyer = buyerByPhone.get(normalizePhone(l.phone));
+                        const count = l.ordersCount ?? buyer?.count ?? 0;
+                        const spent = l.totalSpent ?? buyer?.spent ?? 0;
+                        return (
+                          <>
+                            {l.name || buyer?.name || '—'}
+                            {count > 0 && (
+                              <span title="רכש באתר" style={{ marginRight: 8, fontSize: 10, fontWeight: 700, color: '#065f46', background: '#d1fae5', borderRadius: 5, padding: '2px 6px' }}>
+                                🛒 {count > 1 ? `${count} הזמנות · ` : ''}₪{Math.round(spent).toLocaleString('he-IL')}
+                              </span>
+                            )}
+                            {l.ctwaClid && (
+                              <span title={l.adHeadline ? `מודעה: ${l.adHeadline}` : 'הגיע ממודעת Click-to-WhatsApp'} style={{ marginRight: 6, fontSize: 10, fontWeight: 700, color: '#3730a3', background: '#e0e7ff', borderRadius: 5, padding: '2px 6px' }}>
+                                📣 מודעה
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
                       {isStale && (
                         <span style={{ marginRight: 8, fontSize: 10, fontWeight: 700, color: '#b45309', background: '#fef3c7', borderRadius: 5, padding: '2px 6px' }}>
                           ⏳ ממתין זמן רב

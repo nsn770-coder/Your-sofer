@@ -4,7 +4,20 @@ export interface StoredAttribution {
   utm_campaign?: string;
   gclid?: string;
   fbclid?: string;
+  // Meta browser ids, read fresh from cookies on every call (not stored) —
+  // sent with the order so the server-side Conversions API can match the buyer.
+  fbp?: string;
+  fbc?: string;
   capturedAt: number;
+}
+
+function readCookie(name: string): string | undefined {
+  try {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 const STORAGE_KEY = 'ys_attribution';
@@ -36,10 +49,20 @@ export function captureAttributionFromUrl(): void {
 
 export function getStoredAttribution(): StoredAttribution | null {
   if (typeof window === 'undefined') return null;
+  let stored: StoredAttribution | null = null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    stored = raw ? JSON.parse(raw) : null;
   } catch {
-    return null;
+    stored = null;
   }
+  const fbp = readCookie('_fbp');
+  let fbc = readCookie('_fbc');
+  if (!fbc && stored?.fbclid) fbc = `fb.1.${stored.capturedAt || Date.now()}.${stored.fbclid}`;
+  if (!stored && !fbp && !fbc) return null;
+  return {
+    ...(stored ?? { capturedAt: Date.now() }),
+    ...(fbp ? { fbp } : {}),
+    ...(fbc ? { fbc } : {}),
+  };
 }
