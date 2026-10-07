@@ -123,6 +123,21 @@ export interface CartItem {
     quantity: number;
     previewImageUrl: string;
     createdAt: string;
+    /** לוגו אישי מסטודיו הלוגו (/logo-studio) — הפניה לתמונת המצב הקבועה שאושרה */
+    logoStudio?: {
+      approvalId: string;
+      projectId: string;
+      versionId: string;
+      versionNumber: number;
+      logoUrl: string;
+      mockupUrl: string;
+      finish: 'print' | 'embroidery';
+      placement: { x: number; y: number; w: number };
+      variantsLabel?: string;
+      printWidthMm?: number | null;
+      printHeightMm?: number | null;
+      productionReady?: boolean;
+    };
   };
 }
 

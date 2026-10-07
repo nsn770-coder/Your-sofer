@@ -2169,6 +2169,16 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
   ];
 
   const BuyBox = ({ compact = false }: { compact?: boolean }) => {
+    // סטודיו לוגו אישי (AI) — עובר עם המוצר והווריאציה שנבחרה (סוג בד / צבע)
+    const logoStudioCTA = (product.customDesign === true || product.isEventKippot === true) ? (
+      <button
+        type="button"
+        onClick={() => router.push(`/logo-studio?productId=${encodeURIComponent(product.id)}&v=${encodeURIComponent(JSON.stringify(selectedVariants))}`)}
+        style={{ width: '100%', height: 52, background: '#51285F', color: '#fff', border: 'none', borderRadius: 14, fontSize: compact ? 14 : 15, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 2px 10px rgba(81,40,95,0.25)' }}>
+        ✨ עצבו לוגו אישי לכיפה (3 ניסיונות חינם)
+      </button>
+    ) : null;
+
     // customDesign: prominent CTA to the kippah design page (visible to all users)
     const customDesignCTA = product.customDesign === true ? (
       <button
@@ -2197,6 +2207,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
             style={{ width: '100%', height: 52, background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: '#fff', border: 'none', borderRadius: 14, fontSize: compact ? 14 : 15, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.01em', boxShadow: '0 2px 10px rgba(124,58,237,0.25)' }}>
             ✨ עיצוב כיפה מותאמת אישית
           </button>
+          {logoStudioCTA}
           {customDesignCTA}
           <a href={`https://wa.me/972587479933?text=${encodeURIComponent('שלום, אני מתעניין בהזמנת כיפות: ' + (product.name || ''))}`} target="_blank" rel="noopener noreferrer"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#25D366', fontSize: 13, fontWeight: 600, textDecoration: 'none', marginTop: 10 }}>
@@ -2539,6 +2550,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         </div>
       ))}
 
+      {logoStudioCTA}
       {customDesignCTA}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '4px 0 12px', padding: '12px 14px', background: '#FAFAF8', border: '1px solid #EDE9DF', borderRadius: 12, direction: 'rtl' }}>

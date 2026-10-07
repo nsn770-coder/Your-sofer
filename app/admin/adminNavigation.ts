@@ -77,6 +77,7 @@ export const ADMIN_NAVIGATION: AdminNavGroup[] = [
       { tab: 'seasonal', label: 'עכשיו בעונה', icon: '🍂' },
       { tab: 'gifts', label: 'מתנות VIP', icon: '🎁' },
       { tab: 'stickers', label: 'מדבקות QR', icon: '🔖' },
+      { href: '/admin/logo-studio', label: 'סטודיו לוגו וקודים', icon: '✨' },
     ],
   },
   {

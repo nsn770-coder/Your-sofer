@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Logo Studio renders exact text from the font files at runtime (opentype.js
+  // reads them with fs) — make sure they ship inside the serverless functions.
+  outputFileTracingIncludes: {
+    '/api/logo-studio/**/*': ['./public/fonts/logo-studio/**/*'],
+  },
   images: {
     remotePatterns: [
       { hostname: 'firebasestorage.googleapis.com' },

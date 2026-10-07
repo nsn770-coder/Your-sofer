@@ -238,7 +238,7 @@ export default function CartPage() {
                               <div style={{ fontSize: 11, color: '#5b21b6', fontWeight: 700, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 🎨 {t('cart.customDesign')}: „{item.customDesign.text}"
                               </div>
-                              <button onClick={() => setEditingDesignItem(item)}
+                              <button onClick={() => (item.customDesign?.logoStudio ? router.push(`/logo-studio?project=${item.customDesign.logoStudio.projectId}`) : setEditingDesignItem(item))}
                                 style={{ background: 'none', border: '1px solid #8b5cf6', color: '#6d28d9', fontSize: 11, fontWeight: 700, borderRadius: 6, padding: '3px 8px', cursor: 'pointer', flexShrink: 0 }}>
                                 {t('cart.editDesign')}
                               </button>
@@ -345,7 +345,7 @@ export default function CartPage() {
                               <div style={{ fontSize: 12, color: '#5b21b6', fontWeight: 700, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 🎨 {t('cart.customDesign')}: „{item.customDesign.text}"
                               </div>
-                              <button onClick={() => setEditingDesignItem(item)}
+                              <button onClick={() => (item.customDesign?.logoStudio ? router.push(`/logo-studio?project=${item.customDesign.logoStudio.projectId}`) : setEditingDesignItem(item))}
                                 style={{ background: 'none', border: '1px solid #8b5cf6', color: '#6d28d9', fontSize: 12, fontWeight: 700, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', flexShrink: 0 }}>
                                 {t('cart.editDesign')}
                               </button>

@@ -33,6 +33,7 @@ import { PAID_STATUSES, isPaidRevenueOrder } from '@/app/lib/orderStatus';
 import ManualOrderModal, { PAYMENT_METHOD_LABELS } from './components/ManualOrderModal';
 import OrderNoteButton from './components/OrderNoteButton';
 import OrderChecklist from './components/OrderChecklist';
+import LogoStudioOrderPanel from './components/LogoStudioOrderPanel';
 
 interface OrderItem {
   id: string;
@@ -62,6 +63,8 @@ interface OrderItem {
     quantity: number;
     previewImageUrl: string;
     createdAt: string;
+    /** לוגו מסטודיו הלוגו — הפניה לתמונת מצב מאושרת (logoApprovals) */
+    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number } | null;
   } | null;
 }
 
@@ -443,6 +446,8 @@ interface AbandonedCartItem {
     quantity: number;
     previewImageUrl: string;
     createdAt: string;
+    /** לוגו מסטודיו הלוגו — הפניה לתמונת מצב מאושרת (logoApprovals) */
+    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number } | null;
   } | null;
 }
 
@@ -2294,6 +2299,8 @@ const KIPPA_DESIGN_LABELS: Record<string, string> = {
 };
 
 function KippaDesignView({ cd }: { cd: KippaDesignData }) {
+  // עיצוב מסטודיו הלוגו — פאנל ייעודי שטוען את תמונת המצב המאושרת (לוגו, הדמיה, מידות)
+  if (cd.logoStudio?.approvalId) return <LogoStudioOrderPanel approvalId={cd.logoStudio.approvalId} />;
   const downloadUrl = attachmentUrl(cd.previewImageUrl);
   return (
     <div className="mt-1 flex flex-col gap-1.5 rounded-lg border border-purple-200 bg-purple-50/50 p-2">

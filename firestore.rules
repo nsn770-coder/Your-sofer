@@ -118,6 +118,21 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── Logo Studio (AI logo designer) ───────────────────────────────────────
+    // All access goes through the API routes with the Admin SDK, which verify
+    // ownership / admin rights and enforce the attempt quota atomically.
+    // The client SDK must never read or write these (quota, codes, files).
+    match /logoProjects/{projectId}/{rest=**} { allow read, write: if false; }
+    match /logoProjects/{projectId} { allow read, write: if false; }
+    match /logoApprovals/{id} { allow read, write: if false; }
+    match /logoStudioUsers/{uid}/{rest=**} { allow read, write: if false; }
+    match /logoStudioUsers/{uid} { allow read, write: if false; }
+    match /logoStudioOps/{id} { allow read, write: if false; }
+    match /logoStudioCodes/{id}/{rest=**} { allow read, write: if false; }
+    match /logoStudioCodes/{id} { allow read, write: if false; }
+    match /logoStudioRate/{id} { allow read, write: if false; }
+    match /logoStudioAssets/{id} { allow read, write: if false; }
+
     // ── Site settings (checkout kill switch — public read) ────────────────────
 
     match /siteSettings/{id} {

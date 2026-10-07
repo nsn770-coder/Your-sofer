@@ -6,7 +6,7 @@ import path from 'path';
 // can import the same way application code does.
 export default defineConfig({
   test: {
-    include: ['**/__phase1tests__/**/*.test.ts'],
+    include: ['**/__phase1tests__/**/*.test.ts', 'lib/logoStudio/__tests__/**/*.test.ts'],
     // app/__tests__/partner-integration.test.ts predates Phase 1: it's a
     // documentation-style file (no vitest imports, hits live endpoints via
     // fetch) rather than a runnable suite. tsconfig.json already excludes it
