@@ -1,6 +1,5 @@
 'use client';
-import Script from 'next/script';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 declare global {
   interface Window {
@@ -22,6 +21,56 @@ declare global {
 
 const PAYMENTS_COUNT_OPTIONS = [1, 2, 3, 4, 6, 8, 10, 12];
 
+// ── טעינת סקריפטים חיצוניים (jQuery + Sumit) ─────────────────────────────────
+// ⚠️ באג שתוקן (10/2026): הטעינה נעשתה עם next/script ו-onLoad. next/script טוען
+// כל src פעם אחת בלבד לכל הסשן, ו-onLoad לא נקרא שוב כשהקומפוננטה עולה מחדש.
+// בצ'קאאוט הטופס מוצג רק כש-isFormValid, כך שלקוח שמחק/תיקן שדה (טלפון, שם,
+// רחוב) גרם לטופס לרדת ולעלות מחדש — ואז הכפתור נתקע לתמיד על
+// "טוען מודול תשלום...". כאן הטעינה בודקת קודם אם הסקריפט כבר קיים בחלון,
+// מנסה כתובת גיבוי, מגבילה בזמן, ומאפשרת ניסיון חוזר.
+const JQUERY_SRCS = [
+  'https://code.jquery.com/jquery-3.7.1.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js',
+];
+const SUMIT_SRC = 'https://app.sumit.co.il/scripts/payments.js';
+const LOAD_TIMEOUT_MS = 20_000;
+
+const inflight: Record<string, Promise<void> | undefined> = {};
+
+function injectScript(src: string, isReady: () => boolean): Promise<void> {
+  if (isReady()) return Promise.resolve();
+  const existing = inflight[src];
+  if (existing) return existing;
+  const p = new Promise<void>((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = src;
+    el.async = true;
+    const timer = window.setTimeout(() => reject(new Error(`timeout:${src}`)), LOAD_TIMEOUT_MS);
+    el.onload = () => {
+      window.clearTimeout(timer);
+      if (isReady()) resolve(); else reject(new Error(`no_global:${src}`));
+    };
+    el.onerror = () => { window.clearTimeout(timer); reject(new Error(`error:${src}`)); };
+    document.body.appendChild(el);
+  });
+  // כשל — מוחקים מהמטמון כדי שניסיון חוזר יטען מחדש
+  inflight[src] = p.catch(e => { inflight[src] = undefined; throw e; });
+  return inflight[src]!;
+}
+
+async function loadPaymentScripts(): Promise<void> {
+  const hasJq = () => typeof window.jQuery === 'function';
+  const hasSumit = () => !!window.OfficeGuy?.Payments;
+  if (!hasJq()) {
+    let lastErr: unknown;
+    for (const src of JQUERY_SRCS) {
+      try { await injectScript(src, hasJq); lastErr = null; break; } catch (e) { lastErr = e; }
+    }
+    if (lastErr) throw lastErr;
+  }
+  await injectScript(SUMIT_SRC, hasSumit);
+}
+
 interface Props {
   companyId: number;
   apiPublicKey: string;
@@ -32,12 +81,33 @@ interface Props {
 
 export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, onToken, onError }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [jqueryReady, setJqueryReady] = useState(false);
   const [sumitReady, setSumitReady] = useState(false);
+  const [scriptError, setScriptError] = useState<string | null>(null);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [tokenizing, setTokenizing] = useState(false);
   const [paymentsCount, setPaymentsCount] = useState(1);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
+
+  // טעינה בכל עלייה של הקומפוננטה — מיידית אם הסקריפטים כבר בחלון
+  useEffect(() => {
+    let cancelled = false;
+    loadPaymentScripts()
+      .then(() => { if (!cancelled) setSumitReady(true); })
+      .catch(err => {
+        console.error('[SumitPaymentForm] script load failed:', err);
+        if (cancelled) return;
+        setScriptError('load');
+        try {
+          (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.('event', 'payment_module_error', {
+            reason: err instanceof Error ? err.message.slice(0, 90) : 'unknown',
+          });
+        } catch { /* analytics is best-effort */ }
+      });
+    return () => { cancelled = true; };
+  }, [loadAttempt]);
+
+  const retryLoad = useCallback(() => { setScriptError(null); setSumitReady(false); setLoadAttempt(n => n + 1); }, []);
 
   useEffect(() => {
     console.log('[SumitPaymentForm] sumitReady:', sumitReady, 'OfficeGuy:', !!window.OfficeGuy);
@@ -103,7 +173,6 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
   const labelStyle: React.CSSProperties = { display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 5 };
 
   const busy = disabled || tokenizing;
-  const [scriptError, setScriptError] = useState<string | null>(null);
 
   return (
     <>
@@ -114,7 +183,12 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
         }}>
           <span style={{ fontSize: 16, flexShrink: 0 }} aria-hidden="true">⚠️</span>
           <div style={{ fontSize: 13, color: '#b91c1c', fontWeight: 600, lineHeight: 1.5 }}>
-            שגיאה בטעינת מודול התשלום. אנא רענן את הדף ונסה שוב. אם הבעיה נמשכת, אנא צור קשר: 058-747-9933
+            מודול התשלום לא נטען. ייתכן שחוסם פרסומות או חיבור איטי חוסמים אותו.
+            <button type="button" onClick={retryLoad}
+              style={{ display: 'block', marginTop: 8, background: '#b91c1c', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 14px', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+              נסו לטעון שוב
+            </button>
+            <span style={{ display: 'block', marginTop: 6, fontWeight: 500 }}>אם הבעיה נמשכת: כבו חוסם פרסומות, נסו דפדפן אחר, או צרו קשר 058-747-9933</span>
           </div>
         </div>
       )}
@@ -163,21 +237,6 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
             </div>
           </div>
         </div>
-      )}
-
-      <Script
-        src="https://code.jquery.com/jquery-3.7.1.min.js"
-        strategy="afterInteractive"
-        onLoad={() => setJqueryReady(true)}
-        onError={() => setScriptError('jQuery')}
-      />
-      {jqueryReady && (
-        <Script
-          src="https://app.sumit.co.il/scripts/payments.js"
-          strategy="afterInteractive"
-          onLoad={() => setSumitReady(true)}
-          onError={() => setScriptError('Sumit')}
-        />
       )}
 
       <form ref={formRef} onSubmit={handleSubmit} dir="rtl">
@@ -272,7 +331,7 @@ export default function SumitPaymentForm({ companyId, apiPublicKey, disabled, on
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}
         >
-          {!sumitReady ? 'טוען מודול תשלום...' : busy ? 'מבצע תשלום...' : (
+          {!sumitReady ? (scriptError ? 'מודול התשלום לא נטען' : 'טוען מודול תשלום...') : busy ? 'מבצע תשלום...' : (
             <>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
