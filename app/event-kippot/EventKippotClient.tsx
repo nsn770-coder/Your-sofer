@@ -515,38 +515,6 @@ export default function EventKippotClient() {
         </div>
       </div>
 
-      {/* CTA — פעיל תמיד: אם לא נבחר דגם, ממשיכים אוטומטית עם הדגם הראשון בקרוסלה */}
-      <a
-        href={`/kippot-order?qty=${qty}&type=${printType}&style=${style ?? KIPPOT_STYLES[0].id}`}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 10,
-          background: GOLD,
-          color: '#FEFBF7',
-          fontWeight: 900,
-          fontSize: 17,
-          padding: '18px 32px',
-          textDecoration: 'none',
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          transition: 'opacity 0.15s',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
-        onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-      >
-        המשך לעיצוב ←
-      </a>
-      {!style && (
-        <div style={{ textAlign: 'center', fontSize: 12, color: '#9C7B3F', marginTop: 8 }}>
-          לא בחרתם דגם? נמשיך עם {KIPPOT_STYLES[0].label} — אפשר לשנות בכל שלב
-        </div>
-      )}
-      <div style={{ textAlign: 'center', fontSize: 13, color: '#9C7B3F', marginTop: 10, fontWeight: 600 }}>
-        ✨ בשלב הבא: מעלים לוגו ומקבלים הדמיית AI של הכיפה שלכם — חינם
-      </div>
-
       {/* ── סטודיו לוגו AI — לוגו אישי + תיקונים בשיחה + הדמיה על הדגם שנבחר ── */}
       <a
         href={`/logo-studio?style=${encodeURIComponent(selectedStyleId)}&qty=${qty}&side=${printType === 'print-bottom' ? 'bottom' : 'top'}`}
@@ -562,22 +530,6 @@ export default function EventKippotClient() {
         <span>🎨 עצבו לוגו אישי ב-AI על הכיפה שבחרתם</span>
         <span style={{ fontSize: 12.5, fontWeight: 600, opacity: 0.9 }}>תיקונים בשיחה · הדמיה על הכיפה · 3 ניסיונות חינם</span>
       </a>
-
-      {/* ── עורך כיפה עצמאי — למי שאין לוגו (תוספת אדיטיבית) ── */}
-      <button
-        type="button"
-        onClick={() => setDesignerOpen(true)}
-        style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-          width: '100%', marginTop: 14,
-          background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: '#fff',
-          fontWeight: 900, fontSize: 15.5, padding: '15px 24px',
-          border: 'none', borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit',
-          boxShadow: '0 2px 12px rgba(124,58,237,0.3)',
-        }}
-      >
-        🎨 אין לכם לוגו? עצבו כיפה בעצמכם — עורך חינם
-      </button>
 
       {/* ── מזכרות לאירוע — באנרים לפי קטגוריה + סינון ומיון ── */}
       <EventSouvenirsBrowser products={eventProducts} />
