@@ -124,21 +124,28 @@ export interface CartItem {
     previewImageUrl: string;
     createdAt: string;
     /** לוגו אישי מסטודיו הלוגו (/logo-studio) — הפניה לתמונת המצב הקבועה שאושרה */
-    logoStudio?: {
-      approvalId: string;
-      projectId: string;
-      versionId: string;
-      versionNumber: number;
-      logoUrl: string;
-      mockupUrl: string;
-      finish: 'print' | 'embroidery';
-      placement: { x: number; y: number; w: number };
-      variantsLabel?: string;
-      printWidthMm?: number | null;
-      printHeightMm?: number | null;
-      productionReady?: boolean;
-    };
+    logoStudio?: LogoStudioCartDesign;
+    /** עיצוב לצד השני של אותן כיפות (עליון/תחתון) — +₪1.5 לכיפה כלול במחיר השורה */
+    logoStudioSecond?: LogoStudioCartDesign;
   };
+}
+
+/** עיצוב מאושר מסטודיו הלוגו — לצד אחד של הכיפה */
+export interface LogoStudioCartDesign {
+  approvalId: string;
+  projectId: string;
+  versionId: string;
+  versionNumber: number;
+  /** צד הכיפה — חסר בעיצובים ישנים = עליון */
+  side?: 'top' | 'bottom';
+  logoUrl: string;
+  mockupUrl: string;
+  finish: 'print' | 'embroidery';
+  placement: { x: number; y: number; w: number };
+  variantsLabel?: string;
+  printWidthMm?: number | null;
+  printHeightMm?: number | null;
+  productionReady?: boolean;
 }
 
 interface CartContextType {

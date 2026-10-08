@@ -395,6 +395,22 @@ function KippotOrderInner() {
         </div>
       </div>
 
+      {/* ── סטודיו לוגו AI — יוצרים לוגו אישי, מתקנים בשיחה ומקבלים הדמיה על הדגם שנבחר ── */}
+      <a
+        href={`/logo-studio?style=${encodeURIComponent(style)}&qty=${qty}&side=${type === 'print-bottom' ? 'bottom' : 'top'}`}
+        style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+          width: '100%', marginBottom: 12, boxSizing: 'border-box',
+          background: '#51285F', color: '#fff', textDecoration: 'none',
+          fontWeight: 900, fontSize: 16, padding: '14px 20px',
+          borderRadius: 12, fontFamily: 'inherit',
+          boxShadow: '0 2px 12px rgba(81,40,95,0.3)',
+        }}
+      >
+        <span>🎨 אין לכם לוגו? עצבו לוגו אישי ב-AI</span>
+        <span style={{ fontSize: 12.5, fontWeight: 600, opacity: 0.9 }}>שמות, תאריך, גופן וצבע · תיקונים בשיחה · הדמיה על הכיפה · 3 ניסיונות חינם</span>
+      </a>
+
       {/* ── עורך חי — עיצוב טקסט ישירות על הכיפה (תוספת אדיטיבית) ── */}
       <button
         type="button"

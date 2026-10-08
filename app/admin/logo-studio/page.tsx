@@ -1,9 +1,10 @@
 'use client';
 /* eslint-disable @next/next/no-img-element */
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { getAuthLazy } from '@/lib/authLazy';
+import { uploadToCloudinary } from '@/app/lib/cloudinary';
 import { variantImageKey, isVisualOption, DEFAULT_PRINT_AREA, type LogoStudioProductConfig } from '@/lib/logoStudio/catalog';
 
 // ── admin fetch helper (Firebase ID token → server verifies admin) ──────────
@@ -216,7 +217,7 @@ function CustomersTab() {
 }
 
 // ── Products (variant images, print area, mm, finishes) ─────────────────────
-interface AdminProduct { id: string; name: string; imgUrl: string | null; images: string[]; variantOptions: { name: string; values: string[] }[]; filterAttributes: Record<string, string>; hidden: boolean; logoStudio: LogoStudioProductConfig }
+interface AdminProduct { id: string; name: string; imgUrl: string | null; images: string[]; variantOptions: { name: string; values: string[] }[]; filterAttributes: Record<string, string>; hidden: boolean; logoStudio: LogoStudioProductConfig; isStyle?: boolean; inventoryProductId?: string | null }
 
 function ProductsTab() {
   const [products, setProducts] = useState<AdminProduct[] | null>(null);
@@ -226,7 +227,7 @@ function ProductsTab() {
   useEffect(() => { load(); }, [load]);
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 10 }}>כיפות שמסומנות לעיצוב אישי (customDesign) או לאירועים (isEventKippot). לכל וריאציה של צבע או בד צריך לשייך תמונה, אחרת לא תוצג עליה הדמיה. כדי שקובץ הלוגו יסומן „מוכן לייצור”, הגדירו את רוחב ההדפסה במ״מ.</p>
+      <p style={{ fontSize: 13, color: '#666', marginBottom: 10 }}>דגמי כיפות לאירועים (מדף /event-kippot) וכיפות שמסומנות לעיצוב אישי (customDesign / isEventKippot). לכל כיפה אפשר להעלות גם תמונה של הצד התחתון. לכל וריאציה של צבע או בד צריך לשייך תמונה, אחרת לא תוצג עליה הדמיה. כדי שקובץ הלוגו יסומן „מוכן לייצור”, הגדירו את רוחב ההדפסה במ״מ.</p>
       {err && <div style={{ color: '#9b2c22' }}>{err}</div>}
       {!products && <div>טוען…</div>}
       {products?.map(p => (
@@ -236,7 +237,8 @@ function ProductsTab() {
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 800 }}>{p.name} {p.hidden && <span style={{ color: '#999' }}>(מוסתר)</span>}</div>
               <div style={{ fontSize: 12, color: '#777' }}>
-                {p.variantOptions.filter(o => isVisualOption(o.name)).length ? `${Object.keys(p.logoStudio.variantImages ?? {}).length} תמונות וריאציה משויכות` : 'ללא וריאציות צבע/בד — תמונת המוצר משמשת להדמיה'}
+                {p.isStyle ? '🎉 דגם כיפות לאירועים' : p.variantOptions.filter(o => isVisualOption(o.name)).length ? `${Object.keys(p.logoStudio.variantImages ?? {}).length} תמונות וריאציה משויכות` : 'ללא וריאציות צבע/בד'}
+                {' · '}{(p.logoStudio.bottomImage || Object.keys(p.logoStudio.bottomVariantImages ?? {}).length) ? 'יש תמונת צד תחתון' : 'אין תמונת צד תחתון'}
                 {' · '}{p.logoStudio.maxPrintWidthMm ? `רוחב הדפסה ${p.logoStudio.maxPrintWidthMm} מ״מ` : 'רוחב הדפסה לא הוגדר'}
                 {p.logoStudio.disabled ? ' · מושבת בסטודיו' : ''}
               </div>
@@ -250,13 +252,75 @@ function ProductsTab() {
   );
 }
 
+type Area = NonNullable<LogoStudioProductConfig['printArea']>;
+
+/** Uploads an image to our Cloudinary (public delivery — product photos only). */
+function UploadButton({ onUploaded, label = 'העלאת תמונה' }: { onUploaded: (url: string) => void; label?: string }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+      <input ref={ref} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={async e => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        setErr(null);
+        if (!/^image\/(png|jpeg|webp)$/.test(f.type) || f.size > 10 * 1024 * 1024) { setErr('PNG/JPG/WEBP עד 10MB'); return; }
+        setBusy(true);
+        try { onUploaded(await uploadToCloudinary(f)); }
+        catch { setErr('ההעלאה נכשלה'); }
+        finally { setBusy(false); if (ref.current) ref.current.value = ''; }
+      }} />
+      <button type="button" style={btn2} disabled={busy} onClick={() => ref.current?.click()}>{busy ? 'מעלה…' : `⬆️ ${label}`}</button>
+      {err && <span style={{ color: '#9b2c22', fontSize: 11 }}>{err}</span>}
+    </span>
+  );
+}
+
+function ImageRow({ label, value, images, onChange }: { label: string; value: string; images: string[]; onChange: (v: string) => void }) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(110px, 160px) 1fr 56px', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+      <span style={{ fontSize: 13, fontWeight: 700 }}>{label}</span>
+      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+        {images.length > 0 && (
+          <select style={{ ...inp, width: 140 }} value={images.includes(value) ? value : ''} onChange={e => onChange(e.target.value)}>
+            <option value="">— מתמונות המוצר —</option>
+            {images.map((u, i) => <option key={u} value={u}>תמונה {i + 1}</option>)}
+          </select>
+        )}
+        <input style={{ ...inp, flex: 1, minWidth: 160 }} dir="ltr" value={value} onChange={e => onChange(e.target.value.trim())} placeholder="https://res.cloudinary.com/dyxzq3ucy/..." />
+        <UploadButton onUploaded={onChange} label="העלאה" />
+        {value && <button type="button" style={{ ...btn2, padding: '4px 8px' }} onClick={() => onChange('')}>✕</button>}
+      </div>
+      {value ? <img src={value} alt="" style={{ width: 52, height: 52, objectFit: 'contain', border: '1px solid #eee', borderRadius: 6 }} /> : <span style={{ fontSize: 11, color: '#c0392b' }}>חסר</span>}
+    </div>
+  );
+}
+
+function AreaFields({ area, setArea }: { area: Area; setArea: (fn: (a: Area) => Area) => void }) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 8 }}>
+      {(['cx', 'cy', 'minW', 'maxW', 'defaultW', 'maxShift'] as const).map(k => (
+        <label key={k}><span style={lbl}>{({ cx: 'מרכז X', cy: 'מרכז Y', minW: 'רוחב מינ׳', maxW: 'רוחב מקס׳', defaultW: 'רוחב ברירת מחדל', maxShift: 'תזוזה מרבית' } as const)[k]}</span>
+          <input style={inp} type="number" step={0.01} min={0} max={1} value={area[k]} onChange={e => setArea(a => ({ ...a, [k]: Number(e.target.value) }))} /></label>
+      ))}
+    </div>
+  );
+}
+
 function ProductEditor({ p, onSaved }: { p: AdminProduct; onSaved: () => void }) {
   const visual = p.variantOptions.filter(o => isVisualOption(o.name));
-  const [vi, setVi] = useState<Record<string, string>>(p.logoStudio.variantImages ?? {});
-  const [area, setArea] = useState(p.logoStudio.printArea ?? DEFAULT_PRINT_AREA);
-  const [mm, setMm] = useState<string>(p.logoStudio.maxPrintWidthMm ? String(p.logoStudio.maxPrintWidthMm) : '');
-  const [finishes, setFinishes] = useState<('print' | 'embroidery')[]>(p.logoStudio.finishes ?? ['print']);
-  const [disabled, setDisabled] = useState(!!p.logoStudio.disabled);
+  const cfg = p.logoStudio;
+  const [vi, setVi] = useState<Record<string, string>>(cfg.variantImages ?? {});
+  const [bvi, setBvi] = useState<Record<string, string>>(cfg.bottomVariantImages ?? {});
+  const [bottomImage, setBottomImage] = useState<string>(cfg.bottomImage ?? '');
+  const [area, setArea] = useState<Area>(cfg.printArea ?? DEFAULT_PRINT_AREA);
+  const [bArea, setBArea] = useState<Area>(cfg.bottomPrintArea ?? DEFAULT_PRINT_AREA);
+  const [mm, setMm] = useState<string>(cfg.maxPrintWidthMm ? String(cfg.maxPrintWidthMm) : '');
+  const [bMm, setBMm] = useState<string>(cfg.bottomMaxPrintWidthMm ? String(cfg.bottomMaxPrintWidthMm) : '');
+  const [finishes, setFinishes] = useState<('print' | 'embroidery')[]>(cfg.finishes ?? ['print']);
+  const [disabled, setDisabled] = useState(!!cfg.disabled);
+  const [tab, setTab] = useState<'top' | 'bottom'>('top');
   const [msg, setMsg] = useState<string | null>(null);
 
   // keys: one per single option value; combined keys when there are two visual options
@@ -270,7 +334,19 @@ function ProductEditor({ p, onSaved }: { p: AdminProduct; onSaved: () => void })
   async function save() {
     setMsg(null);
     try {
-      await adminFetch('/api/admin/logo-studio/products', { method: 'PATCH', body: JSON.stringify({ productId: p.id, logoStudio: { variantImages: vi, printArea: area, maxPrintWidthMm: mm ? Number(mm) : null, finishes, disabled } }) });
+      await adminFetch('/api/admin/logo-studio/products', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          productId: p.id,
+          logoStudio: {
+            ...(p.isStyle ? {} : { variantImages: vi }),
+            bottomVariantImages: bvi, bottomImage: bottomImage || null,
+            printArea: area, bottomPrintArea: bArea,
+            maxPrintWidthMm: mm ? Number(mm) : null, bottomMaxPrintWidthMm: bMm ? Number(bMm) : null,
+            finishes, disabled,
+          },
+        }),
+      });
       setMsg('נשמר ✓'); onSaved();
     } catch (e) { setMsg((e as Error).message); }
   }
@@ -278,35 +354,43 @@ function ProductEditor({ p, onSaved }: { p: AdminProduct; onSaved: () => void })
   return (
     <div style={{ marginTop: 12, borderTop: '1px solid #eee', paddingTop: 12 }}>
       {Object.keys(p.filterAttributes).length > 0 && <div style={{ fontSize: 12, color: '#777', marginBottom: 8 }}>מאפייני קטלוג: {Object.entries(p.filterAttributes).map(([k, v]) => `${k}: ${v}`).join(' · ')}</div>}
-      {visual.length > 0 && (
+      {p.isStyle && <div style={{ fontSize: 12, color: '#777', marginBottom: 8 }}>דגם מדף כיפות לאירועים · מוצר מלאי משויך: {p.inventoryProductId ?? 'לא משויך (שיוך נעשה בדף /event-kippot)'}</div>}
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+        <button type="button" style={{ ...btn2, ...(tab === 'top' ? { background: '#51285F', color: '#fff' } : {}) }} onClick={() => setTab('top')}>צד עליון</button>
+        <button type="button" style={{ ...btn2, ...(tab === 'bottom' ? { background: '#51285F', color: '#fff' } : {}) }} onClick={() => setTab('bottom')}>צד תחתון (פנים הכיפה)</button>
+      </div>
+
+      {tab === 'top' && (
         <>
-          <h3 style={{ fontWeight: 800, fontSize: 14 }}>תמונה לכל וריאציה</h3>
-          <p style={{ fontSize: 12, color: '#777' }}>בחרו מתמונות המוצר או הדביקו כתובת Cloudinary של הענן שלנו או של israel-judaica.com.</p>
-          {keys.map(k => (
-            <div key={k} style={{ display: 'grid', gridTemplateColumns: '140px 1fr 56px', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 700 }}>{k.replace(/\|/g, ' · ')}</span>
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <select style={{ ...inp, width: 150 }} value={p.images.includes(vi[k] ?? '') ? vi[k] : ''} onChange={e => setVi(prev => ({ ...prev, [k]: e.target.value }))}>
-                  <option value="">— בחירה מתמונות המוצר —</option>
-                  {p.images.map((u, i) => <option key={u} value={u}>תמונה {i + 1}</option>)}
-                </select>
-                <input style={inp} dir="ltr" value={vi[k] ?? ''} onChange={e => setVi(prev => ({ ...prev, [k]: e.target.value.trim() }))} placeholder="https://res.cloudinary.com/dyxzq3ucy/..." />
-              </div>
-              {vi[k] ? <img src={vi[k]} alt="" style={{ width: 52, height: 52, objectFit: 'contain', border: '1px solid #eee', borderRadius: 6 }} /> : <span style={{ fontSize: 11, color: '#c0392b' }}>חסר</span>}
-            </div>
-          ))}
+          {p.isStyle && <p style={{ fontSize: 12, color: '#777' }}>תמונת הצד העליון של הדגם היא התמונה שמוצגת בדף כיפות לאירועים.</p>}
+          {!p.isStyle && visual.length > 0 && (
+            <>
+              <h3 style={{ fontWeight: 800, fontSize: 14 }}>תמונה עליונה לכל וריאציה</h3>
+              {keys.map(k => <ImageRow key={k} label={k.replace(/\|/g, ' · ')} value={vi[k] ?? ''} images={p.images} onChange={v => setVi(prev => ({ ...prev, [k]: v }))} />)}
+            </>
+          )}
+          {!p.isStyle && visual.length === 0 && <p style={{ fontSize: 12, color: '#777' }}>אין וריאציות צבע/בד — תמונת המוצר הראשית משמשת לצד העליון.</p>}
+          <h3 style={{ fontWeight: 800, fontSize: 14, marginTop: 12 }}>אזור הדפסה עליון (יחסי 0–1)</h3>
+          <AreaFields area={area} setArea={setArea} />
+          <label><span style={lbl}>רוחב הדפסה פיזי עליון (מ״מ) ברוחב המקסימלי</span><input style={{ ...inp, maxWidth: 200 }} type="number" min={5} max={500} value={mm} onChange={e => setMm(e.target.value)} placeholder="לדוגמה 70" /></label>
         </>
       )}
 
-      <h3 style={{ fontWeight: 800, fontSize: 14, marginTop: 12 }}>אזור הדפסה על תמונת המוצר (יחסי 0–1)</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 8 }}>
-        {(['cx', 'cy', 'minW', 'maxW', 'defaultW', 'maxShift'] as const).map(k => (
-          <label key={k}><span style={lbl}>{({ cx: 'מרכז X', cy: 'מרכז Y', minW: 'רוחב מינ׳', maxW: 'רוחב מקס׳', defaultW: 'רוחב ברירת מחדל', maxShift: 'תזוזה מרבית' } as const)[k]}</span>
-            <input style={inp} type="number" step={0.01} min={0} max={1} value={area[k]} onChange={e => setArea(a => ({ ...a, [k]: Number(e.target.value) }))} /></label>
-        ))}
-      </div>
-      <label><span style={lbl}>רוחב הדפסה פיזי (מ״מ) כשהלוגו ברוחב המקסימלי</span><input style={{ ...inp, maxWidth: 200 }} type="number" min={5} max={500} value={mm} onChange={e => setMm(e.target.value)} placeholder="לדוגמה 70" /></label>
-      <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 13 }}>
+      {tab === 'bottom' && (
+        <>
+          <h3 style={{ fontWeight: 800, fontSize: 14 }}>תמונת הצד התחתון</h3>
+          <p style={{ fontSize: 12, color: '#777' }}>צלמו את פנים הכיפה מלמעלה, על רקע נקי. בלי תמונה — הלקוח יוכל לעצב לצד התחתון, אבל לא יקבל עליו הדמיה.</p>
+          {visual.length === 0
+            ? <ImageRow label="תמונה" value={bottomImage} images={p.images} onChange={setBottomImage} />
+            : keys.map(k => <ImageRow key={k} label={k.replace(/\|/g, ' · ')} value={bvi[k] ?? ''} images={p.images} onChange={v => setBvi(prev => ({ ...prev, [k]: v }))} />)}
+          <h3 style={{ fontWeight: 800, fontSize: 14, marginTop: 12 }}>אזור הדפסה תחתון (יחסי 0–1)</h3>
+          <AreaFields area={bArea} setArea={setBArea} />
+          <label><span style={lbl}>רוחב הדפסה פיזי תחתון (מ״מ) — ריק = כמו העליון</span><input style={{ ...inp, maxWidth: 200 }} type="number" min={5} max={500} value={bMm} onChange={e => setBMm(e.target.value)} placeholder={mm || 'לדוגמה 50'} /></label>
+        </>
+      )}
+
+      <div style={{ display: 'flex', gap: 12, marginTop: 12, fontSize: 13, flexWrap: 'wrap' }}>
         <label><input type="checkbox" checked={finishes.includes('print')} onChange={e => setFinishes(f => e.target.checked ? [...new Set([...f, 'print' as const])] : f.filter(x => x !== 'print'))} /> הדפסה</label>
         <label><input type="checkbox" checked={finishes.includes('embroidery')} onChange={e => setFinishes(f => e.target.checked ? [...new Set([...f, 'embroidery' as const])] : f.filter(x => x !== 'embroidery'))} /> רקמה</label>
         <label><input type="checkbox" checked={disabled} onChange={e => setDisabled(e.target.checked)} /> להסתיר מהסטודיו</label>

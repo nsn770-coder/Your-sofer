@@ -34,6 +34,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       spec: a.spec,
       details: a.details,
       versionNumber: a.versionNumber,
+      side: a.side ?? 'top',
       production: a.production,
       placement: a.mockup.placement,
       finish: a.mockup.finish,

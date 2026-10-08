@@ -547,6 +547,22 @@ export default function EventKippotClient() {
         ✨ בשלב הבא: מעלים לוגו ומקבלים הדמיית AI של הכיפה שלכם — חינם
       </div>
 
+      {/* ── סטודיו לוגו AI — לוגו אישי + תיקונים בשיחה + הדמיה על הדגם שנבחר ── */}
+      <a
+        href={`/logo-studio?style=${encodeURIComponent(selectedStyleId)}&qty=${qty}&side=${printType === 'print-bottom' ? 'bottom' : 'top'}`}
+        style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+          width: '100%', marginTop: 14, boxSizing: 'border-box',
+          background: '#51285F', color: '#fff', textDecoration: 'none',
+          fontWeight: 900, fontSize: 15.5, padding: '14px 24px',
+          borderRadius: 12, fontFamily: 'inherit',
+          boxShadow: '0 2px 12px rgba(81,40,95,0.3)',
+        }}
+      >
+        <span>🎨 עצבו לוגו אישי ב-AI על הכיפה שבחרתם</span>
+        <span style={{ fontSize: 12.5, fontWeight: 600, opacity: 0.9 }}>תיקונים בשיחה · הדמיה על הכיפה · 3 ניסיונות חינם</span>
+      </a>
+
       {/* ── עורך כיפה עצמאי — למי שאין לוגו (תוספת אדיטיבית) ── */}
       <button
         type="button"

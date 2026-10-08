@@ -18,7 +18,17 @@ export interface LogoStudioProductConfig {
   maxPrintWidthMm?: number | null;
   finishes?: ('print' | 'embroidery')[];
   disabled?: boolean;
+  // ── bottom (inner) side of the kippah — separate photo, area and size ──
+  /** Bottom-side photo per visual variant (same keys as variantImages). */
+  bottomVariantImages?: Record<string, string>;
+  /** Bottom-side photo for a product WITHOUT colour/fabric variants. */
+  bottomImage?: string | null;
+  bottomPrintArea?: { cx: number; cy: number; minW: number; maxW: number; defaultW: number; maxShift: number };
+  bottomMaxPrintWidthMm?: number | null;
 }
+
+export type KippahSide = 'top' | 'bottom';
+export const SIDE_LABELS: Record<KippahSide, string> = { top: 'צד עליון', bottom: 'צד תחתון (פנים הכיפה)' };
 
 export interface RawProduct {
   id: string;
@@ -42,6 +52,9 @@ export interface RawProduct {
 export type Sourced = { value: string; source: 'variant' | 'catalog' | 'name' } | null;
 
 export interface ResolvedSelection {
+  side: KippahSide;
+  /** Which sides have a usable photo for the current selection. */
+  sidesAvailable: Record<KippahSide, boolean>;
   productId: string;
   productName: string;
   selectedVariants: Record<string, string>;
@@ -49,7 +62,7 @@ export interface ResolvedSelection {
   materialKind: 'satin' | 'linen' | 'other' | null;
   color: Sourced;
   image: { url: string; source: 'variant' | 'product' } | null;
-  imageStatus: 'ok' | 'choose_variant' | 'missing_variant_image' | 'no_image';
+  imageStatus: 'ok' | 'choose_variant' | 'missing_variant_image' | 'no_image' | 'no_bottom_image';
   missingOptions: string[];
   finishes: ('print' | 'embroidery')[];
   printArea: NonNullable<LogoStudioProductConfig['printArea']>;
@@ -78,7 +91,7 @@ export function materialKindOf(text: string | null | undefined): 'satin' | 'line
 
 const NAME_COLORS = ['לבן', 'שחור', 'בז\'', 'בז', 'תכלת', 'כחול', 'אפור', 'שמנת', 'ורוד', 'סגול', 'ירוק', 'חום', 'בורדו', 'זהב', 'כסף', 'קרם'];
 
-export function resolveSelection(p: RawProduct, requested: Record<string, string> = {}): ResolvedSelection {
+export function resolveSelection(p: RawProduct, requested: Record<string, string> = {}, side: KippahSide = 'top'): ResolvedSelection {
   const opts = (p.variantOptions ?? []).filter(o => o && typeof o.name === 'string' && Array.isArray(o.values));
   // keep only valid selections
   const selected: Record<string, string> = {};
@@ -112,30 +125,38 @@ export function resolveSelection(p: RawProduct, requested: Record<string, string
   const cfg = p.logoStudio ?? {};
   const mainImg = p.imgUrl || p.image_url || null;
 
-  let image: ResolvedSelection['image'] = null;
-  let imageStatus: ResolvedSelection['imageStatus'];
-  if (visualOpts.length === 0) {
-    image = mainImg ? { url: mainImg, source: 'product' } : null;
-    imageStatus = image ? 'ok' : 'no_image';
-  } else if (missingOptions.length) {
-    imageStatus = 'choose_variant';
-  } else {
-    const names = visualOpts.map(o => o.name);
-    const map = cfg.variantImages ?? {};
-    const combined = map[variantImageKey(selected, names)];
-    const single = names.map(n => map[`${n}=${selected[n]}`]).find(Boolean);
-    const url = combined || single;
-    image = url ? { url, source: 'variant' } : null;
-    imageStatus = image ? 'ok' : 'missing_variant_image';
-  }
+  const validArea = (pa: LogoStudioProductConfig['printArea'] | undefined) =>
+    !!pa && [pa.cx, pa.cy, pa.minW, pa.maxW, pa.defaultW, pa.maxShift].every(n => typeof n === 'number' && n >= 0 && n <= 1) && pa.minW < pa.maxW;
 
-  const pa = cfg.printArea;
-  const printArea = pa && [pa.cx, pa.cy, pa.minW, pa.maxW, pa.defaultW, pa.maxShift].every(n => typeof n === 'number' && n >= 0 && n <= 1) && pa.minW < pa.maxW
-    ? pa : DEFAULT_PRINT_AREA;
+  /** Photo for one side of the current selection — never another variant's photo. */
+  const photoFor = (which: KippahSide): { image: ResolvedSelection['image']; status: ResolvedSelection['imageStatus'] } => {
+    const map = which === 'top' ? cfg.variantImages ?? {} : cfg.bottomVariantImages ?? {};
+    if (visualOpts.length === 0) {
+      const url = which === 'top' ? mainImg : (cfg.bottomImage || null);
+      if (url) return { image: { url, source: 'product' }, status: 'ok' };
+      return { image: null, status: which === 'top' ? 'no_image' : 'no_bottom_image' };
+    }
+    if (missingOptions.length) return { image: null, status: 'choose_variant' };
+    const names = visualOpts.map(o => o.name);
+    const url = map[variantImageKey(selected, names)] || names.map(n => map[`${n}=${selected[n]}`]).find(Boolean);
+    if (url) return { image: { url, source: 'variant' }, status: 'ok' };
+    return { image: null, status: which === 'top' ? 'missing_variant_image' : 'no_bottom_image' };
+  };
+  const top = photoFor('top');
+  const bottom = photoFor('bottom');
+  const current = side === 'bottom' ? bottom : top;
+  const image = current.image;
+  const imageStatus = current.status;
+
+  const areaCfg = side === 'bottom' ? cfg.bottomPrintArea : cfg.printArea;
+  const printArea = validArea(areaCfg) ? areaCfg! : DEFAULT_PRINT_AREA;
+  const mmCfg = side === 'bottom' ? (cfg.bottomMaxPrintWidthMm ?? cfg.maxPrintWidthMm) : cfg.maxPrintWidthMm;
 
   const finishes = (cfg.finishes?.length ? cfg.finishes : ['print']).filter(f => f === 'print' || f === 'embroidery');
 
   return {
+    side,
+    sidesAvailable: { top: top.status === 'ok', bottom: bottom.status === 'ok' },
     productId: p.id,
     productName: p.name ?? '',
     selectedVariants: selected,
@@ -147,7 +168,7 @@ export function resolveSelection(p: RawProduct, requested: Record<string, string
     missingOptions,
     finishes: finishes.length ? finishes : ['print'],
     printArea,
-    maxPrintWidthMm: typeof cfg.maxPrintWidthMm === 'number' && cfg.maxPrintWidthMm > 0 ? cfg.maxPrintWidthMm : null,
+    maxPrintWidthMm: typeof mmCfg === 'number' && mmCfg > 0 ? mmCfg : null,
   };
 }
 

@@ -9,6 +9,7 @@ interface ApprovalView {
   email: string | null;
   ownerMatchesOrder: boolean | null;
   versionNumber: number;
+  side?: 'top' | 'bottom';
   product: { id: string; name: string; selectedVariants: Record<string, string>; material: { value: string; source: string } | null; color: { value: string; source: string } | null };
   spec: { primaryText: string; secondaryText: string; date: string; color: string; monogramLetters: string; notes: string };
   details: { font: string; style: string; symbol: string; event: string; aiLayers: string[]; warnings: string[] };
@@ -54,7 +55,7 @@ export default function LogoStudioOrderPanel({ approvalId, orderUid }: { approva
 
   return (
     <div className="mt-1 flex flex-col gap-2 rounded-lg border border-purple-200 bg-purple-50/50 p-2 text-xs">
-      <span className="font-bold text-purple-800">✨ לוגו מסטודיו הלוגו · גרסה {a.versionNumber} · אושר {new Date(a.createdAt).toLocaleString('he-IL')}</span>
+      <span className="font-bold text-purple-800">✨ לוגו מסטודיו הלוגו · {a.side === 'bottom' ? 'צד תחתון (פנים הכיפה)' : 'צד עליון'} · גרסה {a.versionNumber} · אושר {new Date(a.createdAt).toLocaleString('he-IL')}</span>
       {a.ownerMatchesOrder === false && <span className="font-bold text-red-700">⚠️ העיצוב אושר בחשבון אחר מזה של ההזמנה ({a.email}) — לבדוק מול הלקוח.</span>}
       <div className="flex flex-wrap gap-3">
         <div>

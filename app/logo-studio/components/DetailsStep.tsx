@@ -4,12 +4,13 @@ import { useRef, useState } from 'react';
 import s from '../LogoStudio.module.css';
 import { LOGO_FONTS, getLogoFont } from '@/lib/logoStudio/fonts';
 import {
-  LOGO_STYLES, LOGO_EVENTS, LOGO_SYMBOLS, SYMBOL_POSITIONS, PRESET_COLORS, LIMITS,
+  LOGO_STYLES, LOGO_EVENTS, LOGO_SYMBOLS, SYMBOL_POSITIONS, LIMITS,
   effectiveMonogramLetters, needsAiDecoration, needsAiMonogram, type LogoSpec,
 } from '@/lib/logoStudio/types';
 import { getSymbolShape, getDividerShape } from '@/lib/logoStudio/symbols';
 import { relativeLuminance } from '@/lib/logoStudio/color';
 import { studioApi, ApiError } from '../studioApi';
+import ColorPalette from './ColorPalette';
 
 interface Props {
   spec: LogoSpec;
@@ -122,15 +123,7 @@ export default function DetailsStep({ spec, onChange, errors, signedIn, onRequir
 
         <div className={s.card}>
           <p className={s.cardTitle}>צבע</p>
-          <div className={s.swatches}>
-            {PRESET_COLORS.map(c => (
-              <button key={c.hex} type="button" className={s.swatch} data-active={spec.color === c.hex} style={{ background: c.hex }} title={c.name} aria-label={c.name} onClick={() => onChange({ color: c.hex })} />
-            ))}
-            <label className={s.row} style={{ gap: 4, fontSize: 12 }}>
-              <input type="color" className={s.colorInput} value={spec.color.toLowerCase()} onChange={e => onChange({ color: e.target.value.toUpperCase() })} aria-label="בורר צבעים" />
-              צבע אחר
-            </label>
-          </div>
+          <ColorPalette value={spec.color} onChange={hex => onChange({ color: hex })} />
           <div className={s.hint}>הצבע שנבחר: <b dir="ltr">{spec.color}</b></div>
         </div>
 

@@ -5,7 +5,7 @@ import s from '../LogoStudio.module.css';
 import type { ProjectView, MockupView, CatalogProduct } from '../studioApi';
 import { getLogoFont } from '@/lib/logoStudio/fonts';
 import { LOGO_STYLES, LOGO_SYMBOLS, LOGO_EVENTS } from '@/lib/logoStudio/types';
-import { KIPA_MIN_QTY, getKipaUnitPrice } from '@/app/lib/kippot';
+import { KIPA_MIN_QTY, KIPA_EXTRA_SIDE_PRICE, getKipaUnitPrice } from '@/app/lib/kippot';
 import { MOCKUP_DISCLAIMER } from './MockupStep';
 
 const QTY_OPTIONS = [30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 120, 150, 200, 250, 300, 400, 500];
@@ -16,16 +16,22 @@ interface Props {
   mockup: MockupView | null;
   busy: boolean;
   error: string | null;
+  /** quantity carried from /kippot-order or /event-kippot */
+  initialQty?: number;
+  /** set when this design will be added as the second side of a line already in the cart */
+  secondSideOf?: { quantity: number; sides: ('top' | 'bottom')[] } | null;
   onApprove: (qty: number) => void;
   onBack: () => void;
 }
 
-export default function ApproveStep({ project, product, mockup, busy, error, onApprove, onBack }: Props) {
-  const [qty, setQty] = useState(KIPA_MIN_QTY);
+export default function ApproveStep({ project, product, mockup, busy, error, initialQty, secondSideOf, onApprove, onBack }: Props) {
+  const [qtyState, setQty] = useState(initialQty && initialQty >= KIPA_MIN_QTY ? initialQty : KIPA_MIN_QTY);
+  const qty = secondSideOf ? secondSideOf.quantity : qtyState;
+  const qtyOptions = QTY_OPTIONS.includes(qty) ? QTY_OPTIONS : [...QTY_OPTIONS, qty].sort((a, b) => a - b);
   const version = project.versions.find(v => v.id === project.currentVersionId) ?? project.versions[0];
   const sel = project.selection;
   const material = sel.materialKind === 'satin' ? 'satin' : 'linen';
-  const unit = getKipaUnitPrice(qty, material);
+  const unit = getKipaUnitPrice(qty, material) + (secondSideOf ? KIPA_EXTRA_SIDE_PRICE : 0);
   const mockupOk = !!mockup && mockup.versionId === version?.id && !mockup.stale;
   const spec = version?.spec;
 
@@ -48,6 +54,7 @@ export default function ApproveStep({ project, product, mockup, busy, error, onA
           <p className={s.disclaimer}>{MOCKUP_DISCLAIMER}</p>
           <dl className={s.kv} style={{ marginTop: 10 }}>
             <dt>כיפה</dt><dd>{product?.name ?? ''}{Object.values(project.selectedVariants).length ? ` · ${Object.values(project.selectedVariants).join(' · ')}` : ''}</dd>
+            <dt>צד</dt><dd>{project.side === 'bottom' ? 'תחתון (פנים הכיפה)' : 'עליון'}</dd>
             <dt>גרסה</dt><dd>{version.n}</dd>
             <dt>טקסט</dt><dd dir="auto">{spec.primaryText || '—'}</dd>
             {spec.secondaryText && <><dt>טקסט משני</dt><dd dir="auto">{spec.secondaryText}</dd></>}
@@ -65,9 +72,13 @@ export default function ApproveStep({ project, product, mockup, busy, error, onA
         <div className={s.card}>
           <p className={s.cardTitle}>כמות והוספה לסל</p>
           <label className={s.label} htmlFor="ls-qty">כמות כיפות (מינימום {KIPA_MIN_QTY})</label>
-          <select id="ls-qty" className={s.select} value={qty} onChange={e => setQty(Number(e.target.value))}>
-            {QTY_OPTIONS.map(q => <option key={q} value={q}>{q}</option>)}
-          </select>
+          {secondSideOf ? (
+            <div className={s.ok}>העיצוב יתווסף כצד השני של {secondSideOf.quantity} הכיפות שכבר בסל (+₪{KIPA_EXTRA_SIDE_PRICE} לכיפה, כלול במחיר).</div>
+          ) : (
+            <select id="ls-qty" className={s.select} value={qty} onChange={e => setQty(Number(e.target.value))}>
+              {qtyOptions.map(q => <option key={q} value={q}>{q}</option>)}
+            </select>
+          )}
           <div style={{ fontSize: 15, marginTop: 10 }}>₪{unit} לכיפה · סה״כ <b>₪{(unit * qty).toLocaleString('he-IL')}</b></div>
           <div className={s.hint}>המחיר לפי מדרגות הכמות של כיפות לאירועים, כולל ההדפסה.</div>
           <div className={s.hint}>באישור נשמר עותק קבוע של הגרסה וההדמיה האלה להזמנה. שינויים עתידיים בפרויקט לא ישנו אותו.</div>

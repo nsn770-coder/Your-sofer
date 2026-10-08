@@ -44,6 +44,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
       update.selectedVariants = sanitizeVariants(body.selectedVariants);
     }
     if (body.finish === 'print' || body.finish === 'embroidery') update.finish = body.finish;
+    if (body.side === 'top' || body.side === 'bottom') update.side = body.side;
     if (typeof body.currentVersionId === 'string') {
       const v = await getVersion(id, body.currentVersionId); // 404 if not in this project
       update.currentVersionId = v.id;

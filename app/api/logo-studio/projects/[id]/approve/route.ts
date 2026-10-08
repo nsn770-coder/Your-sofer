@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'node:crypto';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { requireUser, errorResponse, readJson, HttpError } from '@/lib/logoStudio/auth.server';
-import { getOwnedProject, getVersion, resolveForProject, selectionKey, computeProduction, getSettings, type MockupDoc } from '@/lib/logoStudio/projects.server';
+import { getOwnedProject, getVersion, resolveForProject, selectionKey, computeProduction, getSettings, isStyleId, styleInventoryProductId, STYLE_PREFIX, type MockupDoc } from '@/lib/logoStudio/projects.server';
 import { signedUrl } from '@/lib/logoStudio/storage.server';
 import { COL } from '@/lib/logoStudio/db';
 import { LOGO_STYLES, LOGO_SYMBOLS, LOGO_EVENTS } from '@/lib/logoStudio/types';
@@ -31,9 +31,12 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     if (!mSnap.exists) throw new HttpError(404, 'mockup_not_found');
     const mockup = mSnap.data() as MockupDoc;
     if (mockup.versionId !== version.id) throw new HttpError(409, 'mockup_outdated', 'ההדמיה שייכת לגרסה אחרת של הלוגו. צרו הדמיה לגרסה שנבחרה.');
-    if (mockup.selectionKey !== selectionKey(proj.productId, proj.selectedVariants)) throw new HttpError(409, 'mockup_other_product', 'ההדמיה נוצרה על כיפה או צבע אחרים. צרו הדמיה מחדש.');
+    const side = proj.side === 'bottom' ? 'bottom' : 'top';
+    if (mockup.selectionKey !== selectionKey(proj.productId, proj.selectedVariants, side)) throw new HttpError(409, 'mockup_other_product', 'ההדמיה נוצרה על כיפה או צבע אחרים. צרו הדמיה מחדש.');
 
-    const { product, sel } = await resolveForProject(proj.productId, proj.selectedVariants);
+    const { product, sel } = await resolveForProject(proj.productId, proj.selectedVariants, side);
+    const styleId = isStyleId(product.id) ? product.id.slice(STYLE_PREFIX.length) : null;
+    const inventoryProductId = styleId ? await styleInventoryProductId(styleId) : product.id;
     const settings = await getSettings();
     const production = computeProduction(version, mockup.placement, sel, settings.minDpi);
     const s = version.spec;
@@ -48,7 +51,9 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       versionNumber: version.n,
       mockupId,
       createdAt: now,
+      side,
       product: {
+        styleId, inventoryProductId,
         id: product.id, name: product.name ?? '', selectedVariants: proj.selectedVariants,
         material: sel.material, color: sel.color, materialKind: sel.materialKind, imageUrl: mockup.imageUrl,
       },
@@ -76,6 +81,9 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     return NextResponse.json({
       approvalId,
       productId: product.id,
+      inventoryProductId,
+      styleId,
+      side,
       productName: product.name ?? '',
       productImageUrl: mockup.imageUrl,
       materialKind: sel.materialKind,

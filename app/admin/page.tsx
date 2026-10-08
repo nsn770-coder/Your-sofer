@@ -64,7 +64,8 @@ interface OrderItem {
     previewImageUrl: string;
     createdAt: string;
     /** לוגו מסטודיו הלוגו — הפניה לתמונת מצב מאושרת (logoApprovals) */
-    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number } | null;
+    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom' } | null;
+    logoStudioSecond?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom' } | null;
   } | null;
 }
 
@@ -447,7 +448,8 @@ interface AbandonedCartItem {
     previewImageUrl: string;
     createdAt: string;
     /** לוגו מסטודיו הלוגו — הפניה לתמונת מצב מאושרת (logoApprovals) */
-    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number } | null;
+    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom' } | null;
+    logoStudioSecond?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom' } | null;
   } | null;
 }
 
@@ -2300,7 +2302,14 @@ const KIPPA_DESIGN_LABELS: Record<string, string> = {
 
 function KippaDesignView({ cd }: { cd: KippaDesignData }) {
   // עיצוב מסטודיו הלוגו — פאנל ייעודי שטוען את תמונת המצב המאושרת (לוגו, הדמיה, מידות)
-  if (cd.logoStudio?.approvalId) return <LogoStudioOrderPanel approvalId={cd.logoStudio.approvalId} />;
+  if (cd.logoStudio?.approvalId) {
+    return (
+      <>
+        <LogoStudioOrderPanel approvalId={cd.logoStudio.approvalId} />
+        {cd.logoStudioSecond?.approvalId && <LogoStudioOrderPanel approvalId={cd.logoStudioSecond.approvalId} />}
+      </>
+    );
+  }
   const downloadUrl = attachmentUrl(cd.previewImageUrl);
   return (
     <div className="mt-1 flex flex-col gap-1.5 rounded-lg border border-purple-200 bg-purple-50/50 p-2">

@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     await consumeRate(db(), 'create', user.uid);
     const productId = typeof body.productId === 'string' ? body.productId : '';
     if (!productId) throw new HttpError(400, 'product_required', 'נא לבחור כיפה.');
-    const id = await createProject(user.uid, user.email, productId, sanitizeVariants(body.selectedVariants), body.draftSpec);
+    const id = await createProject(user.uid, user.email, productId, sanitizeVariants(body.selectedVariants), body.draftSpec, body.side === 'bottom' ? 'bottom' : 'top');
     const proj = await getOwnedProject(id, user.uid);
     return NextResponse.json({ project: await serializeProject(id, proj) });
   } catch (e) {

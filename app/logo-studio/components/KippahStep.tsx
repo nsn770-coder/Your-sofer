@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import s from '../LogoStudio.module.css';
 import { studioApi, ApiError, type CatalogProduct } from '../studioApi';
-import type { ResolvedSelection } from '@/lib/logoStudio/catalog';
+import type { ResolvedSelection, KippahSide } from '@/lib/logoStudio/catalog';
 import { isVisualOption } from '@/lib/logoStudio/catalog';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
@@ -11,8 +11,9 @@ const SOURCE_LABEL: Record<string, string> = { variant: 'לפי הווריאצי
 
 export function selectionStatusText(sel: ResolvedSelection): { kind: 'ok' | 'warn' | 'error'; text: string } {
   switch (sel.imageStatus) {
-    case 'ok': return { kind: 'ok', text: sel.image?.source === 'variant' ? 'תמונת הווריאציה שבחרתם תשמש להדמיה.' : 'תמונת המוצר תשמש להדמיה.' };
+    case 'ok': return { kind: 'ok', text: `${sel.side === 'bottom' ? 'תמונת הצד התחתון' : sel.image?.source === 'variant' ? 'תמונת הווריאציה שבחרתם' : 'תמונת המוצר'} תשמש להדמיה.` };
     case 'choose_variant': return { kind: 'warn', text: `נא לבחור ${sel.missingOptions.join(' ו')} כדי שנציג את הכיפה המדויקת.` };
+    case 'no_bottom_image': return { kind: 'warn', text: 'לכיפה זו עדיין אין תמונה של הצד התחתון, ולכן אי אפשר להציג עליו הדמיה. אפשר לעצב לצד העליון, או לעצב עכשיו ולפנות אלינו לגבי ההדמיה.' };
     case 'missing_variant_image': return { kind: 'warn', text: 'לווריאציה שבחרתם אין עדיין תמונה מתאימה, ולכן לא נוכל להציג עליה הדמיה מדויקת. אפשר להמשיך לעצב את הלוגו, לבחור צבע אחר, או לפנות אלינו.' };
     default: return { kind: 'error', text: 'למוצר זה אין תמונה מתאימה להדמיה.' };
   }
@@ -22,6 +23,8 @@ interface Props {
   product: CatalogProduct | null;
   selection: ResolvedSelection | null;
   selectedVariants: Record<string, string>;
+  side: KippahSide;
+  onChangeSide: (s: KippahSide) => void;
   loading: boolean;
   error: string | null;
   onChooseProduct: (productId: string) => void;
@@ -71,6 +74,17 @@ export default function KippahStep(p: Props) {
               </div>
             </div>
           ))}
+
+          <span className={s.label}>איפה יודפס הלוגו?</span>
+          <div className={s.chips}>
+            {(['top', 'bottom'] as KippahSide[]).map(sd => (
+              <button key={sd} type="button" className={s.chip} data-active={p.side === sd} onClick={() => p.onChangeSide(sd)}>
+                {sd === 'top' ? 'צד עליון' : 'צד תחתון (פנים הכיפה)'}
+                {p.selection && !p.selection.sidesAvailable[sd] && p.selection.imageStatus !== 'choose_variant' ? ' · אין תמונה' : ''}
+              </button>
+            ))}
+          </div>
+          <div className={s.hint}>רוצים גם וגם? מעצבים צד אחד, מאשרים, ואז מוסיפים עיצוב לצד השני (+₪1.5 לכיפה).</div>
 
           {status && <div className={status.kind === 'ok' ? s.ok : status.kind === 'warn' ? s.warn : s.error}>{status.text}</div>}
           <div className={s.row} style={{ marginTop: 10 }}>

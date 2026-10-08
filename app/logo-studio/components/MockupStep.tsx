@@ -71,7 +71,7 @@ export default function MockupStep(p: Props) {
     <div className={s.twoCol}>
       <div>
         <div className={s.card}>
-          <p className={s.cardTitle}>מיקום וגודל על הכיפה</p>
+          <p className={s.cardTitle}>מיקום וגודל — {sel.side === 'bottom' ? 'צד תחתון (פנים הכיפה)' : 'צד עליון'}</p>
           {!canMock && (
             <>
               <div className={status.kind === 'error' ? s.error : s.warn}>{status.text}</div>

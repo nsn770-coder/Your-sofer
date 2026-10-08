@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 import { errorResponse, HttpError } from '@/lib/logoStudio/auth.server';
 import { isStudioKippah, resolveSelection, type RawProduct } from '@/lib/logoStudio/catalog';
-import { getSettings, loadProduct, sanitizeVariants } from '@/lib/logoStudio/projects.server';
+import { getSettings, loadProduct, sanitizeVariants, listStyleProducts, isStyleId, styleInventoryProductId, STYLE_PREFIX } from '@/lib/logoStudio/projects.server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,11 +29,13 @@ export async function GET(req: NextRequest) {
     if (productId) {
       let variants: Record<string, string> = {};
       try { variants = sanitizeVariants(JSON.parse(sp.get('v') || '{}')); } catch { /* ignore */ }
+      const side = sp.get('side') === 'bottom' ? 'bottom' : 'top';
       const product = await loadProduct(productId);
       const settings = await getSettings();
-      const selection = resolveSelection(product, variants);
+      const selection = resolveSelection(product, variants, side);
       if (!selection.maxPrintWidthMm && settings.defaultMaxPrintWidthMm) selection.maxPrintWidthMm = settings.defaultMaxPrintWidthMm;
-      return NextResponse.json({ product: publicProduct(product), selection, studioEnabled: isStudioKippah(product) });
+      const inventoryProductId = isStyleId(product.id) ? await styleInventoryProductId(product.id.slice(STYLE_PREFIX.length)) : product.id;
+      return NextResponse.json({ product: publicProduct(product), selection, studioEnabled: isStudioKippah(product), inventoryProductId });
     }
     const col = getAdminDb().collection('products');
     const [a, b] = await Promise.all([
@@ -41,7 +43,8 @@ export async function GET(req: NextRequest) {
       col.where('isEventKippot', '==', true).limit(60).get(),
     ]);
     const seen = new Set<string>();
-    const products: ReturnType<typeof publicProduct>[] = [];
+    // event-kippot styles first — these are the main printed kippot
+    const products: ReturnType<typeof publicProduct>[] = (await listStyleProducts()).filter(isStudioKippah).map(publicProduct);
     for (const d of [...a.docs, ...b.docs]) {
       if (seen.has(d.id)) continue;
       seen.add(d.id);

@@ -103,3 +103,10 @@
 .kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
 .kv dt { color: #7a7a83; }
 .kv dd { margin: 0; font-weight: 700; }
+
+/* Canva-style colour board */
+.paletteBox { margin-top: 10px; border: 1px solid #ece6da; border-radius: 12px; padding: 10px; background: #fff; }
+.paletteTitle { font-size: 12px; font-weight: 700; color: #6b6b74; margin: 8px 0 6px; }
+.paletteGrid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; margin-bottom: 4px; }
+.paletteSwatch { aspect-ratio: 1 / 1; width: 100%; border-radius: 6px; border: 1px solid rgba(0,0,0,.08); cursor: pointer; padding: 0; }
+.paletteSwatch[data-active='true'] { outline: 2.5px solid #51285F; outline-offset: 1px; }

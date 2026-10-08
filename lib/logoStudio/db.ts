@@ -31,4 +31,6 @@ export const COL = {
   approvals: 'logoApprovals',
   assets: 'logoStudioAssets',
   settingsDoc: 'settings/logoStudio',
+  /** studio config per event-kippot style id (bottom photo, print area, mm) */
+  styleConfigDoc: 'settings/logoStudioStyles',
 } as const;

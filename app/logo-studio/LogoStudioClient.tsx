@@ -6,7 +6,9 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import { useCart, getEventKippahPricePerUnit } from '@/app/contexts/CartContext';
 import { logoFontFaceCss } from '@/lib/logoStudio/fonts';
 import { DEFAULT_SPEC, validateSpec, type LogoSpec } from '@/lib/logoStudio/types';
-import type { ResolvedSelection, Placement } from '@/lib/logoStudio/catalog';
+import type { ResolvedSelection, Placement, KippahSide } from '@/lib/logoStudio/catalog';
+import { KIPA_EXTRA_SIDE_PRICE, KIPA_MIN_QTY } from '@/app/lib/kippot';
+import type { CartItem } from '@/app/contexts/CartContext';
 import { studioApi, ApiError, newOpId, type ProjectView, type QuotaView, type CatalogProduct, type MessageView } from './studioApi';
 import KippahStep from './components/KippahStep';
 import DetailsStep from './components/DetailsStep';
@@ -26,7 +28,7 @@ const STEPS: { id: StepId; label: string }[] = [
 
 /** Local draft — ONLY to protect the customer's choices from refresh/redirect loss. Never used for identity or quota. */
 const DRAFT_KEY = 'ls:draft:v1';
-interface Draft { productId: string | null; selectedVariants: Record<string, string>; spec: LogoSpec; projectId: string | null; step: StepId }
+interface Draft { productId: string | null; selectedVariants: Record<string, string>; spec: LogoSpec; projectId: string | null; step: StepId; side?: KippahSide; qty?: number }
 function readDraft(): Draft | null {
   try { const raw = localStorage.getItem(DRAFT_KEY); return raw ? JSON.parse(raw) as Draft : null; } catch { return null; }
 }
@@ -47,11 +49,14 @@ export default function LogoStudioClient() {
   const router = useRouter();
   const params = useSearchParams();
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
-  const { addItem, removeItem } = useCart();
+  const { items: cartItems, addItem, removeItem } = useCart();
 
   const [step, setStep] = useState<StepId>('kippah');
   const [productId, setProductId] = useState<string | null>(null);
   const [variants, setVariants] = useState<Record<string, string>>({});
+  const [side, setSide] = useState<KippahSide>('top');
+  const [initialQty, setInitialQty] = useState<number>(KIPA_MIN_QTY);
+  const [otherSideOffer, setOtherSideOffer] = useState<null | { side: KippahSide; spec: LogoSpec }>(null);
   const [product, setProduct] = useState<CatalogProduct | null>(null);
   const [selection, setSelection] = useState<ResolvedSelection | null>(null);
   const [catalogLoading, setCatalogLoading] = useState(false);
@@ -77,20 +82,31 @@ export default function LogoStudioClient() {
   const exhausted = signedIn && quota !== null && quota.remaining < 1;
 
   // ── init from URL / draft ──────────────────────────────────────────────────
+  const initRan = useRef(false);
   useEffect(() => {
+    if (initRan.current) return; // run once — later URL changes (e.g. starting the other side) must not re-apply the draft
+    initRan.current = true;
     const draft = readDraft();
-    const qpProduct = params.get('productId');
+    // from /kippot-order or /event-kippot: ?style=<id>&qty=<n>&side=top|bottom
+    const qpStyle = params.get('style');
+    const qpProduct = params.get('productId') || (qpStyle && /^[a-z0-9-]{1,40}$/.test(qpStyle) ? `style:${qpStyle}` : null);
     const qpProject = params.get('project');
     const qpVariants = parseVariants(params.get('v'));
+    const qpQty = Number(params.get('qty'));
+    const qpSide = params.get('side');
     if (qpProduct) {
       setProductId(qpProduct);
       setVariants(qpVariants);
       if (draft?.spec) setSpec(validateSpec(draft.spec).spec);
+      setSide(qpSide === 'bottom' ? 'bottom' : 'top');
+      if (Number.isFinite(qpQty) && qpQty >= KIPA_MIN_QTY) setInitialQty(Math.min(5000, Math.round(qpQty)));
       setStep('kippah');
     } else if (draft) {
       setProductId(draft.productId);
       setVariants(draft.selectedVariants ?? {});
       setSpec(validateSpec(draft.spec).spec);
+      setSide(draft.side === 'bottom' ? 'bottom' : 'top');
+      if (draft.qty && draft.qty >= KIPA_MIN_QTY) setInitialQty(draft.qty);
       setStep(draft.step ?? 'kippah');
     }
     const pid = qpProject || (!qpProduct ? draft?.projectId : null) || null;
@@ -101,15 +117,15 @@ export default function LogoStudioClient() {
   // persist draft
   useEffect(() => {
     if (!initDone) return;
-    writeDraft({ productId, selectedVariants: variants, spec, projectId, step });
-  }, [initDone, productId, variants, spec, projectId, step]);
+    writeDraft({ productId, selectedVariants: variants, spec, projectId, step, side, qty: initialQty });
+  }, [initDone, productId, variants, spec, projectId, step, side, initialQty]);
 
   // ── catalog item ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (!productId) { setProduct(null); setSelection(null); return; }
     let cancelled = false;
     setCatalogLoading(true); setCatalogErr(null);
-    studioApi.catalogItem(productId, variants)
+    studioApi.catalogItem(productId, variants, side)
       .then(r => {
         if (cancelled) return;
         setProduct(r.product); setSelection(r.selection);
@@ -118,7 +134,7 @@ export default function LogoStudioClient() {
       .catch(e => { if (!cancelled) setCatalogErr(errText(e, 'טעינת הכיפה נכשלה.')); })
       .finally(() => { if (!cancelled) setCatalogLoading(false); });
     return () => { cancelled = true; };
-  }, [productId, variants]);
+  }, [productId, variants, side]);
 
   // ── signed-in: quota + project ─────────────────────────────────────────────
   const refreshMe = useCallback(async () => {
@@ -138,6 +154,7 @@ export default function LogoStudioClient() {
         setProject(r.project);
         setProductId(r.project.productId);
         setVariants(r.project.selectedVariants);
+        setSide(r.project.side ?? 'top');
         setSpec(r.project.draftSpec);
         setInspirationThumb(r.project.inspiration?.thumb ?? null);
         if (params.get('project')) setStep(r.project.currentVersionId ? 'design' : 'details');
@@ -187,6 +204,14 @@ export default function LogoStudioClient() {
       catch (e) { setError(errText(e)); }
     }
   }
+  async function changeSide(next: KippahSide) {
+    if (next === side) return;
+    setSide(next); setSelectedMockupId(null);
+    if (projectId && user) {
+      try { const r = await studioApi.patchProject(projectId, { side: next }); setProject(r.project); }
+      catch (e) { setError(errText(e)); }
+    }
+  }
   async function changeVariant(name: string, value: string) {
     const next = { ...variants, [name]: value };
     setVariants(next); setSelectedMockupId(null);
@@ -200,7 +225,7 @@ export default function LogoStudioClient() {
   async function ensureProject(): Promise<string> {
     if (projectId && project) return projectId;
     if (!productId) throw new ApiError(400, 'product_required', 'נא לבחור כיפה.', {});
-    const r = await studioApi.createProject(productId, variants, spec);
+    const r = await studioApi.createProject(productId, variants, spec, side);
     setProjectId(r.project.id); setProject(r.project);
     return r.project.id;
   }
@@ -284,76 +309,133 @@ export default function LogoStudioClient() {
   }, [project, currentVersion, selectedMockupId]);
 
   // ── approve → cart ─────────────────────────────────────────────────────────
+  // One kippah line per product/style. A design for the OTHER side of a line
+  // that is already in the cart is added to that line as its second side
+  // (+₪KIPA_EXTRA_SIDE_PRICE per kippah, like "print-both" on /kippot-order).
+  const cartLineIdFor = (p: { styleId: string | null; inventoryProductId: string | null; productId: string }) =>
+    p.styleId ? (p.inventoryProductId ?? `event-logo-${p.styleId}`) : p.productId;
+  const pendingLineId = project ? cartLineIdFor({ styleId: project.isStyle ? project.productId.replace(/^style:/, '') : null, inventoryProductId: project.inventoryProductId, productId: project.productId }) : null;
+  const existingLine: CartItem | undefined = pendingLineId ? cartItems.find(i => i.id === pendingLineId && i.customDesign?.logoStudio) : undefined;
+  const existingSides: KippahSide[] = existingLine?.customDesign?.logoStudio
+    ? [existingLine.customDesign.logoStudio.side ?? 'top', ...(existingLine.customDesign.logoStudioSecond ? [existingLine.customDesign.logoStudioSecond.side ?? 'bottom'] : [])]
+    : [];
+  const addsSecondSide = !!existingLine && existingSides.length > 0 && !existingSides.includes(side) && existingSides.length < 2;
+
   async function approve(qty: number) {
     if (!projectId || !currentVersion || !approveMockup) return;
     setBusy('approve'); setError(null);
     try {
       const a = await studioApi.approve(projectId, currentVersion.id, approveMockup.id);
       const material = a.materialKind === 'satin' ? 'satin' as const : 'linen' as const;
-      const unitPrice = getEventKippahPricePerUnit(product?.price ?? 0, qty, material);
       const label = a.spec.primaryText || a.spec.monogramLetters || 'לוגו אישי';
       const variantsLabel = Object.values(a.selectedVariants).join(' · ');
-      removeItem(a.productId);
-      removeItem(`print-${a.productId}`);
-      addItem({
-        id: a.productId,
-        productId: a.productId,
-        name: a.productName,
-        price: unitPrice,
-        imgUrl: a.mockupThumbUrl,
-        quantity: qty,
-        cat: 'כיפות',
-        ...(Object.keys(a.selectedVariants).length ? { selectedVariants: a.selectedVariants } : {}),
-        // existing order/admin/email pipelines already carry `customDesign`
-        customDesign: {
-          designId: a.approvalId,
-          baseColor: '',
-          productImageUrl: a.productImageUrl,
-          text: label,
-          textColor: a.spec.color,
-          fontSize: 0,
-          fontFamily: a.font,
-          position: 'center',
-          quantity: qty,
-          previewImageUrl: a.mockupThumbUrl,
-          createdAt: new Date().toISOString(),
-          logoStudio: {
-            approvalId: a.approvalId,
-            projectId,
-            versionId: currentVersion.id,
-            versionNumber: currentVersion.n,
-            logoUrl: a.logoUrl,
-            mockupUrl: a.mockupUrl,
-            finish: a.finish,
-            placement: a.placement,
-            variantsLabel,
-            printWidthMm: a.production.printWidthMm,
-            printHeightMm: a.production.printHeightMm,
-            productionReady: a.production.ready,
-          },
-        },
-      });
-      addItem({
-        id: `print-${a.productId}`,
-        name: `${a.finish === 'embroidery' ? 'רקמה' : 'הדפסה'} לכיפות — לוגו אישי מהסטודיו (כלול במחיר)`,
-        price: 0,
-        quantity: qty,
-        cat: 'הדפסה',
-        imgUrl: a.logoThumbUrl,
+      const lineId = cartLineIdFor(a);
+      const design = {
+        approvalId: a.approvalId,
+        projectId,
+        versionId: currentVersion.id,
+        versionNumber: currentVersion.n,
+        side: a.side,
+        logoUrl: a.logoUrl,
+        mockupUrl: a.mockupUrl,
+        finish: a.finish,
+        placement: a.placement,
+        variantsLabel,
+        printWidthMm: a.production.printWidthMm,
+        printHeightMm: a.production.printHeightMm,
+        productionReady: a.production.ready,
+      };
+      const sideLabel = a.side === 'bottom' ? 'צד תחתון' : 'צד עליון';
+      const printLine = (id: string, quantity: number) => ({
+        id, name: `${a.finish === 'embroidery' ? 'רקמה' : 'הדפסה'} לכיפות — ${sideLabel} — לוגו אישי מהסטודיו (כלול במחיר)`,
+        price: 0, quantity, cat: 'הדפסה', imgUrl: a.logoThumbUrl,
         printCustomization: {
           uploadedImageUrl: a.logoUrl, originalImageUrl: a.logoUrl,
-          productType: 'כיפות', side: 'front', bgRemoved: true,
+          productType: 'כיפות', side: a.side, bgRemoved: true,
           designText: label, mockupUrl: a.mockupUrl,
           selectedFontLabel: a.font, printType: a.finish,
+          ...(a.styleId ? { kippahStyle: a.styleId } : {}),
         },
       });
-      window.gtag?.('event', 'add_to_cart', { currency: 'ILS', value: unitPrice * qty, items: [{ item_id: a.productId, item_name: a.productName, price: unitPrice, quantity: qty }] });
-      router.push('/cart');
+
+      const existing = cartItems.find(i => i.id === lineId && i.customDesign?.logoStudio);
+      const exPrimary = existing?.customDesign?.logoStudio;
+      const exSecond = existing?.customDesign?.logoStudioSecond;
+      const asSecond = !!exPrimary && (exPrimary.side ?? 'top') !== a.side;
+
+      if (existing && asSecond) {
+        // add / replace the second side on the line that is already in the cart
+        const quantity = existing.quantity;
+        const unit = getEventKippahPricePerUnit(0, quantity, material) + KIPA_EXTRA_SIDE_PRICE;
+        removeItem(lineId);
+        addItem({ ...existing, price: unit, customDesign: { ...existing.customDesign!, logoStudioSecond: design } });
+        removeItem(`print-side2-${lineId}`);
+        addItem(printLine(`print-side2-${lineId}`, quantity));
+      } else {
+        const keepSecond = exSecond && (exSecond.side ?? 'bottom') !== a.side ? exSecond : undefined;
+        const unit = getEventKippahPricePerUnit(0, qty, material) + (keepSecond ? KIPA_EXTRA_SIDE_PRICE : 0);
+        removeItem(lineId);
+        removeItem(`print-${lineId}`);
+        if (!keepSecond) removeItem(`print-side2-${lineId}`);
+        addItem({
+          id: lineId,
+          ...(a.inventoryProductId ? { productId: a.inventoryProductId } : {}),
+          name: a.styleId ? `כיפות ${a.productName.replace(/^כיפה (פשתן|סאטן) — /, '')} — לוגו אישי מהסטודיו` : a.productName,
+          price: unit,
+          imgUrl: a.mockupThumbUrl,
+          quantity: qty,
+          cat: 'כיפות',
+          ...(Object.keys(a.selectedVariants).length ? { selectedVariants: a.selectedVariants } : {}),
+          // existing order/admin/email pipelines already carry `customDesign`
+          customDesign: {
+            designId: a.approvalId,
+            baseColor: '',
+            productImageUrl: a.productImageUrl,
+            text: label,
+            textColor: a.spec.color,
+            fontSize: 0,
+            fontFamily: a.font,
+            position: 'center',
+            quantity: qty,
+            previewImageUrl: a.mockupThumbUrl,
+            createdAt: new Date().toISOString(),
+            logoStudio: design,
+            ...(keepSecond ? { logoStudioSecond: keepSecond } : {}),
+          },
+        });
+        addItem(printLine(`print-${lineId}`, qty));
+        if (keepSecond) {
+          removeItem(`print-side2-${lineId}`);
+          addItem({ ...printLine(`print-side2-${lineId}`, qty), imgUrl: undefined, printCustomization: { uploadedImageUrl: keepSecond.logoUrl, originalImageUrl: keepSecond.logoUrl, productType: 'כיפות', side: keepSecond.side ?? 'bottom', bgRemoved: true, mockupUrl: keepSecond.mockupUrl } });
+        }
+      }
+      window.gtag?.('event', 'add_to_cart', { currency: 'ILS', items: [{ item_id: a.inventoryProductId ?? a.productId, item_name: a.productName, quantity: qty }] });
+
+      // offer the other side when it has a photo and is not designed yet
+      const other: KippahSide = a.side === 'top' ? 'bottom' : 'top';
+      const hasOtherAlready = asSecond || !!(existing && !asSecond && exSecond && (exSecond.side ?? 'bottom') === other);
+      if (project?.selection.sidesAvailable[other] && !hasOtherAlready) {
+        setOtherSideOffer({ side: other, spec: a.spec });
+      } else {
+        router.push('/cart');
+      }
     } catch (e) {
       setError(errText(e, 'האישור נכשל. נסו שוב.'));
     } finally {
       setBusy(null);
     }
+  }
+
+  function startOtherSide(next: KippahSide, baseSpec: LogoSpec) {
+    // new project for the other side, same kippah; the texts carry over as a starting point
+    setOtherSideOffer(null);
+    setProject(null); setProjectId(null); setSelectedMockupId(null);
+    setSide(next);
+    setSpec({ ...baseSpec, inspirationAssetId: null });
+    setInspirationThumb(null);
+    router.replace('/logo-studio');
+    setStep('details');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // ── navigation guards ──────────────────────────────────────────────────────
@@ -396,6 +478,7 @@ export default function LogoStudioClient() {
 
         {step === 'kippah' && (
           <KippahStep product={product} selection={selection} selectedVariants={variants} loading={catalogLoading} error={catalogErr}
+            side={side} onChangeSide={changeSide}
             onChooseProduct={chooseProduct} onChangeVariant={changeVariant} onNext={() => go('details')} />
         )}
 
@@ -434,7 +517,26 @@ export default function LogoStudioClient() {
 
         {step === 'approve' && project && (
           <ApproveStep project={project} product={product} mockup={approveMockup} busy={busy === 'approve'} error={null}
+            initialQty={initialQty} secondSideOf={addsSecondSide && existingLine ? { quantity: existingLine.quantity, sides: existingSides } : null}
             onApprove={approve} onBack={() => go('mockup')} />
+        )}
+
+        {otherSideOffer && (
+          <div className={s.modalBack} role="dialog" aria-modal="true">
+            <div className={s.modal}>
+              <p className={s.cardTitle}>✓ העיצוב נשמר בסל</p>
+              <p style={{ fontSize: 14, lineHeight: 1.6 }}>
+                רוצים לעצב גם את {otherSideOffer.side === 'bottom' ? 'הצד התחתון (פנים הכיפה)' : 'הצד העליון'}?
+                הוא יתווסף לאותן כיפות בסל (+₪{KIPA_EXTRA_SIDE_PRICE} לכיפה). הטקסטים יועתקו כנקודת התחלה ואפשר לשנות אותם.
+              </p>
+              <div className={s.row}>
+                <button type="button" className={s.primary} style={{ flex: 1 }} onClick={() => startOtherSide(otherSideOffer.side, otherSideOffer.spec)}>
+                  עיצוב ל{otherSideOffer.side === 'bottom' ? 'צד התחתון' : 'צד העליון'}
+                </button>
+                <button type="button" className={s.secondary} onClick={() => { setOtherSideOffer(null); router.push('/cart'); }}>לסל</button>
+              </div>
+            </div>
+          </div>
         )}
 
         {signedIn && !exhausted && step === 'design' && (

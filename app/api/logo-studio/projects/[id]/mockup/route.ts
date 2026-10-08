@@ -48,13 +48,16 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     const finish = body.finish === 'embroidery' ? 'embroidery' : 'print';
     if (!storageConfigured()) throw new HttpError(503, 'storage_not_configured', 'שמירת הקבצים אינה מוגדרת כרגע.');
 
-    const { sel } = await resolveForProject(proj.productId, proj.selectedVariants);
+    const side = proj.side === 'bottom' ? 'bottom' : 'top';
+    const { sel } = await resolveForProject(proj.productId, proj.selectedVariants, side);
     if (sel.imageStatus !== 'ok' || !sel.image) {
       const msg = sel.imageStatus === 'choose_variant'
         ? `נא לבחור ${sel.missingOptions.join(' ו')} לפני יצירת ההדמיה.`
         : sel.imageStatus === 'missing_variant_image'
           ? 'אין עדיין תמונה לווריאציה שבחרתם, ולכן אי אפשר להציג הדמיה מדויקת. אפשר לבחור צבע אחר או לפנות אלינו.'
-          : 'למוצר זה אין תמונה מתאימה להדמיה.';
+          : sel.imageStatus === 'no_bottom_image'
+            ? 'לכיפה זו עדיין אין תמונה של הצד התחתון, ולכן אי אפשר להציג עליו הדמיה. אפשר לעצב לצד העליון או לפנות אלינו.'
+            : 'למוצר זה אין תמונה מתאימה להדמיה.';
       throw new HttpError(409, `image_${sel.imageStatus}`, msg);
     }
     if (!sel.finishes.includes(finish)) throw new HttpError(400, 'finish_not_available', 'הגימור שנבחר אינו זמין לכיפה זו.');
@@ -105,7 +108,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     const mockupId = crypto.randomBytes(8).toString('hex');
     const doc: MockupDoc = {
       versionId: version.id, kind, placement, finish, asset, box: comp.box, productId: proj.productId,
-      selectionKey: selectionKey(proj.productId, proj.selectedVariants), imageUrl: sel.image.url, charged, createdAt: Date.now(),
+      selectionKey: selectionKey(proj.productId, proj.selectedVariants, side), imageUrl: sel.image.url, charged, createdAt: Date.now(), side,
     };
     await getAdminDb().collection(COL.projects).doc(id).collection('mockups').doc(mockupId).set(doc);
     await getAdminDb().collection(COL.projects).doc(id).update({ finish, updatedAt: Date.now() });

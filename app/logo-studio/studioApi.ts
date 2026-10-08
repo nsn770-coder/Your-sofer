@@ -4,7 +4,7 @@
 
 import { getAuthLazy } from '@/lib/authLazy';
 import type { LogoSpec } from '@/lib/logoStudio/types';
-import type { ResolvedSelection, Placement } from '@/lib/logoStudio/catalog';
+import type { ResolvedSelection, Placement, KippahSide } from '@/lib/logoStudio/catalog';
 import type { ProductionInfo } from '@/lib/logoStudio/production';
 
 export interface QuotaView { freeGranted: number; bonusGranted: number; used: number; pending: number; remaining: number }
@@ -20,7 +20,7 @@ export interface VersionView {
 }
 export interface MockupView extends AssetUrls {
   id: string; versionId: string; kind: 'composite' | 'ai'; placement: Placement; finish: 'print' | 'embroidery';
-  createdAt: number; charged: boolean; stale: boolean;
+  createdAt: number; charged: boolean; stale: boolean; side: KippahSide;
 }
 export interface MessageView {
   id: string; role: 'user' | 'assistant'; text: string; createdAt: number; versionId: string | null;
@@ -28,6 +28,7 @@ export interface MessageView {
 }
 export interface ProjectView {
   id: string; productId: string; selectedVariants: Record<string, string>; finish: 'print' | 'embroidery';
+  side: KippahSide; inventoryProductId: string | null; isStyle: boolean;
   draftSpec: LogoSpec; currentVersionId: string | null;
   approval: { approvalId: string; versionId: string; mockupId: string; at: number } | null;
   selection: ResolvedSelection; minDpi: number;
@@ -36,6 +37,7 @@ export interface ProjectView {
 }
 export interface ApproveResult {
   approvalId: string; productId: string; productName: string; productImageUrl: string;
+  inventoryProductId: string | null; styleId: string | null; side: KippahSide;
   materialKind: 'satin' | 'linen' | 'other' | null; selectedVariants: Record<string, string>;
   spec: LogoSpec; font: string; logoUrl: string; logoThumbUrl: string; mockupUrl: string; mockupThumbUrl: string;
   finish: 'print' | 'embroidery'; placement: Placement; production: ProductionInfo;
@@ -79,10 +81,10 @@ export const newOpId = () =>
 export const studioApi = {
   me: () => call<{ quota: QuotaView; projects: { id: string; updatedAt: number; productId: string; primaryText: string; versionCount: number; approved: boolean }[]; contactWhatsapp: string; services: { storage: boolean; ai: boolean } }>('/api/logo-studio/me'),
   catalogList: () => call<{ products: CatalogProduct[] }>('/api/logo-studio/catalog', { auth: false }),
-  catalogItem: (productId: string, v: Record<string, string>) =>
-    call<{ product: CatalogProduct; selection: ResolvedSelection; studioEnabled: boolean }>(`/api/logo-studio/catalog?productId=${encodeURIComponent(productId)}&v=${encodeURIComponent(JSON.stringify(v))}`, { auth: false }),
-  createProject: (productId: string, selectedVariants: Record<string, string>, draftSpec: LogoSpec) =>
-    call<{ project: ProjectView }>('/api/logo-studio/projects', { method: 'POST', body: JSON.stringify({ productId, selectedVariants, draftSpec }) }),
+  catalogItem: (productId: string, v: Record<string, string>, side: KippahSide = 'top') =>
+    call<{ product: CatalogProduct; selection: ResolvedSelection; studioEnabled: boolean; inventoryProductId: string | null }>(`/api/logo-studio/catalog?productId=${encodeURIComponent(productId)}&v=${encodeURIComponent(JSON.stringify(v))}&side=${side}`, { auth: false }),
+  createProject: (productId: string, selectedVariants: Record<string, string>, draftSpec: LogoSpec, side: KippahSide = 'top') =>
+    call<{ project: ProjectView }>('/api/logo-studio/projects', { method: 'POST', body: JSON.stringify({ productId, selectedVariants, draftSpec, side }) }),
   getProject: (id: string) => call<{ project: ProjectView }>(`/api/logo-studio/projects/${id}`),
   patchProject: (id: string, patch: Record<string, unknown>) =>
     call<{ project: ProjectView }>(`/api/logo-studio/projects/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),

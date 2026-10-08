@@ -8,7 +8,9 @@ import type { DbLike } from './db';
 import { COL } from './db';
 import { HttpError } from './auth.server';
 import { DEFAULT_SPEC, validateSpec, describeSpecChanges, needsAiDecoration, needsAiMonogram, decorationKey, monogramKey, type LogoSpec } from './types';
-import { resolveSelection, clampPlacement, type RawProduct, type ResolvedSelection, type Placement } from './catalog';
+import { resolveSelection, clampPlacement, type RawProduct, type ResolvedSelection, type Placement, type KippahSide, type LogoStudioProductConfig } from './catalog';
+import { EVENT_KIPPOT_STYLES, getEventKippahStyle } from '@/app/lib/eventKippotStyles';
+import { DEFAULT_STYLE_PRODUCT_MAP, getKipaMaterial } from '@/app/lib/kippot';
 import { composeLogo, type RasterLayer } from './compose.server';
 import { uploadPrivate, downloadPrivate, signedUrl, type StoredAsset } from './storage.server';
 import { generateFrame, generateDivider, generateMonogram } from './aiLayers.server';
@@ -48,16 +50,62 @@ export async function getSettings(): Promise<StudioSettings> {
 export function invalidateSettingsCache() { settingsCache = null; }
 
 // ── products ────────────────────────────────────────────────────────────────
+// Event-kippot styles (/event-kippot → /kippot-order) are offered in the studio
+// as virtual products "style:<id>". Their colour and fabric come from the style
+// definition (structured), their photo from the style, and their studio config
+// (bottom photo, print area, mm) from settings/logoStudioStyles.
+export const STYLE_PREFIX = 'style:';
+export const isStyleId = (id: string) => id.startsWith(STYLE_PREFIX);
+export const PRODUCT_ID_RE = /^(?:[A-Za-z0-9_-]{1,128}|style:[a-z0-9-]{1,40})$/;
+
+export async function getStyleConfigs(): Promise<Record<string, LogoStudioProductConfig>> {
+  const snap = await fs().doc(COL.styleConfigDoc).get();
+  return (snap.exists ? snap.data() ?? {} : {}) as Record<string, LogoStudioProductConfig>;
+}
+
+/** Real catalog product mapped to an event style (stock / profitability), if any. */
+export async function styleInventoryProductId(styleId: string): Promise<string | null> {
+  const snap = await fs().doc('settings/eventKippotStyles').get().catch(() => null);
+  const map = { ...DEFAULT_STYLE_PRODUCT_MAP, ...((snap?.exists ? snap.data() : {}) as Record<string, { productId?: string }>) };
+  return map[styleId]?.productId ?? null;
+}
+
+export function styleProduct(styleId: string, cfg: LogoStudioProductConfig | undefined): RawProduct | null {
+  const st = getEventKippahStyle(styleId);
+  if (!st) return null;
+  const material = getKipaMaterial(styleId) === 'satin' ? 'סאטן' : 'פשתן';
+  return {
+    id: `${STYLE_PREFIX}${styleId}`,
+    name: `כיפה ${material} — ${st.label}`,
+    imgUrl: st.img,
+    filterAttributes: { 'חומר': material, 'צבע': st.label },
+    customDesign: true,
+    isEventKippot: true,
+    logoStudio: cfg ?? {},
+  };
+}
+
+export async function listStyleProducts(): Promise<RawProduct[]> {
+  const cfgs = await getStyleConfigs();
+  return EVENT_KIPPOT_STYLES.map(s => styleProduct(s.id, cfgs[s.id])!).filter(Boolean);
+}
+
 export async function loadProduct(productId: string): Promise<RawProduct> {
-  if (!/^[A-Za-z0-9_-]{1,128}$/.test(productId)) throw new HttpError(400, 'invalid_product');
+  if (!PRODUCT_ID_RE.test(productId)) throw new HttpError(400, 'invalid_product');
+  if (isStyleId(productId)) {
+    const styleId = productId.slice(STYLE_PREFIX.length);
+    const p = styleProduct(styleId, (await getStyleConfigs())[styleId]);
+    if (!p) throw new HttpError(404, 'product_not_found', 'דגם הכיפה לא נמצא.');
+    return p;
+  }
   const snap = await fs().collection('products').doc(productId).get();
   if (!snap.exists) throw new HttpError(404, 'product_not_found', 'המוצר לא נמצא.');
   return { id: snap.id, ...(snap.data() as Omit<RawProduct, 'id'>) };
 }
 
-export async function resolveForProject(productId: string, variants: Record<string, string>): Promise<{ product: RawProduct; sel: ResolvedSelection }> {
+export async function resolveForProject(productId: string, variants: Record<string, string>, side: KippahSide = 'top'): Promise<{ product: RawProduct; sel: ResolvedSelection }> {
   const product = await loadProduct(productId);
-  const sel = resolveSelection(product, variants);
+  const sel = resolveSelection(product, variants, side);
   const settings = await getSettings();
   if (!sel.maxPrintWidthMm && settings.defaultMaxPrintWidthMm) sel.maxPrintWidthMm = settings.defaultMaxPrintWidthMm;
   return { product, sel };
@@ -81,6 +129,8 @@ export interface ProjectDoc {
   productId: string;
   selectedVariants: Record<string, string>;
   finish: 'print' | 'embroidery';
+  /** Which side of the kippah this design is for (default top). */
+  side?: KippahSide;
   draftSpec: LogoSpec;
   currentVersionId: string | null;
   versionCount: number;
@@ -95,13 +145,13 @@ export async function getOwnedProject(projectId: string, uid: string): Promise<P
   return snap.data() as ProjectDoc;
 }
 
-export async function createProject(uid: string, email: string | null, productId: string, variants: Record<string, string>, draft: unknown): Promise<string> {
+export async function createProject(uid: string, email: string | null, productId: string, variants: Record<string, string>, draft: unknown, side: KippahSide = 'top'): Promise<string> {
   await loadProduct(productId); // must exist
   const { spec } = validateSpec({ ...DEFAULT_SPEC, ...(draft && typeof draft === 'object' ? draft : {}) });
   const id = crypto.randomBytes(10).toString('hex');
   const now = Date.now();
   const doc: ProjectDoc = {
-    uid, email, createdAt: now, updatedAt: now, productId, selectedVariants: variants, finish: 'print',
+    uid, email, createdAt: now, updatedAt: now, productId, selectedVariants: variants, finish: 'print', side,
     draftSpec: spec, currentVersionId: null, versionCount: 0, approval: null,
   };
   await fs().collection(COL.projects).doc(id).set(doc);
@@ -139,10 +189,13 @@ export interface MockupDoc {
   imageUrl: string;
   charged: boolean;
   createdAt: number;
+  side?: KippahSide;
 }
 
-export function selectionKey(productId: string, variants: Record<string, string>): string {
-  return `${productId}|${Object.keys(variants).sort().map(k => `${k}=${variants[k]}`).join('|')}`;
+/** Identifies product + variant + side; a mockup made for another key is stale. */
+export function selectionKey(productId: string, variants: Record<string, string>, side: KippahSide = 'top'): string {
+  const base = `${productId}|${Object.keys(variants).sort().map(k => `${k}=${variants[k]}`).join('|')}`;
+  return side === 'bottom' ? `${base}|side=bottom` : base; // top keeps the original format
 }
 
 async function loadInspiration(uid: string, assetId: string | null): Promise<InlineImage | null> {
@@ -276,9 +329,11 @@ export async function serializeProject(projectId: string, proj: ProjectDoc) {
     ref.collection('mockups').orderBy('createdAt', 'desc').limit(60).get(),
     ref.collection('messages').orderBy('createdAt', 'asc').limit(200).get(),
   ]);
-  const { sel } = await resolveForProject(proj.productId, proj.selectedVariants);
+  const side: KippahSide = proj.side === 'bottom' ? 'bottom' : 'top';
+  const { sel } = await resolveForProject(proj.productId, proj.selectedVariants, side);
   const settings = await getSettings();
-  const currentSelKey = selectionKey(proj.productId, proj.selectedVariants);
+  const currentSelKey = selectionKey(proj.productId, proj.selectedVariants, side);
+  const inventoryProductId = isStyleId(proj.productId) ? await styleInventoryProductId(proj.productId.slice(STYLE_PREFIX.length)) : proj.productId;
   let inspiration: { assetId: string; thumb: string } | null = null;
   if (proj.draftSpec?.inspirationAssetId) {
     const a = await fs().collection(COL.assets).doc(proj.draftSpec.inspirationAssetId).get();
@@ -289,6 +344,9 @@ export async function serializeProject(projectId: string, proj: ProjectDoc) {
     productId: proj.productId,
     selectedVariants: proj.selectedVariants,
     finish: proj.finish,
+    side,
+    inventoryProductId,
+    isStyle: isStyleId(proj.productId),
     draftSpec: proj.draftSpec,
     currentVersionId: proj.currentVersionId,
     approval: proj.approval,
@@ -308,7 +366,7 @@ export async function serializeProject(projectId: string, proj: ProjectDoc) {
       const m = d.data() as MockupDoc;
       return {
         id: d.id, versionId: m.versionId, kind: m.kind, placement: m.placement, finish: m.finish,
-        createdAt: m.createdAt, charged: m.charged, ...assetUrls(m.asset, 1000),
+        createdAt: m.createdAt, charged: m.charged, side: m.side ?? 'top', ...assetUrls(m.asset, 1000),
         stale: m.selectionKey !== currentSelKey,
       };
     }),
