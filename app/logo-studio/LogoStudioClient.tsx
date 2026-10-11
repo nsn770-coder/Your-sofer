@@ -29,9 +29,12 @@ const STEPS: { id: StepId; label: string }[] = [
   { id: 'approve', label: 'אישור ושמירה' },
 ];
 
+/** Each side of the kippah has its OWN design (own project, texts and mode). */
+type SideWork = Partial<Record<KippahSide, { projectId: string | null; spec: LogoSpec; mode: LogoMode }>>;
+
 /** Local draft — ONLY to protect the customer's choices from refresh/redirect loss. Never used for identity or quota. */
 const DRAFT_KEY = 'ls:draft:v1';
-interface Draft { productId: string | null; selectedVariants: Record<string, string>; spec: LogoSpec; projectId: string | null; step: StepId; side?: KippahSide; qty?: number; mode?: LogoMode; bothSides?: boolean; doneSides?: KippahSide[] }
+interface Draft { productId: string | null; selectedVariants: Record<string, string>; spec: LogoSpec; projectId: string | null; step: StepId; side?: KippahSide; qty?: number; mode?: LogoMode; bothSides?: boolean; doneSides?: KippahSide[]; sideWork?: SideWork }
 function readDraft(): Draft | null {
   try { const raw = localStorage.getItem(DRAFT_KEY); return raw ? JSON.parse(raw) as Draft : null; } catch { return null; }
 }
@@ -64,6 +67,8 @@ export default function LogoStudioClient() {
   const [bothSides, setBothSides] = useState(false);
   /** sides already approved in this both-sides session */
   const [doneSides, setDoneSides] = useState<KippahSide[]>([]);
+  /** the parked design of the side that is NOT on screen right now */
+  const [sideWork, setSideWork] = useState<SideWork>({});
   const [initialQty, setInitialQty] = useState<number>(KIPA_MIN_QTY);
   const [otherSideOffer, setOtherSideOffer] = useState<null | { side: KippahSide; spec: LogoSpec }>(null);
   const [product, setProduct] = useState<CatalogProduct | null>(null);
@@ -121,6 +126,7 @@ export default function LogoStudioClient() {
       setSpec(validateSpec(draft.spec).spec);
       setSide(draft.side === 'bottom' ? 'bottom' : 'top');
       setBothSides(!!draft.bothSides); setDoneSides(Array.isArray(draft.doneSides) ? draft.doneSides.filter(x => x === 'top' || x === 'bottom') : []);
+      setSideWork(draft.sideWork && typeof draft.sideWork === 'object' ? draft.sideWork : {});
       if (draft.qty && draft.qty >= KIPA_MIN_QTY) setInitialQty(draft.qty);
       setStep(draft.step ?? 'kippah');
     }
@@ -132,8 +138,8 @@ export default function LogoStudioClient() {
   // persist draft
   useEffect(() => {
     if (!initDone) return;
-    writeDraft({ productId, selectedVariants: variants, spec, projectId, step, side, qty: initialQty, mode, bothSides, doneSides });
-  }, [initDone, productId, variants, spec, projectId, step, side, initialQty, mode, bothSides, doneSides]);
+    writeDraft({ productId, selectedVariants: variants, spec, projectId, step, side, qty: initialQty, mode, bothSides, doneSides, sideWork });
+  }, [initDone, productId, variants, spec, projectId, step, side, initialQty, mode, bothSides, doneSides, sideWork]);
 
   // ── catalog item ───────────────────────────────────────────────────────────
   useEffect(() => {
@@ -215,7 +221,7 @@ export default function LogoStudioClient() {
 
   // ── selection changes ──────────────────────────────────────────────────────
   async function chooseProduct(id: string) {
-    setProductId(id); setVariants({}); setSelectedMockupId(null);
+    setProductId(id); setVariants({}); setSelectedMockupId(null); setSideWork({});
     if (projectId && user) {
       try { const r = await studioApi.patchProject(projectId, { productId: id, selectedVariants: {} }); setProject(r.project); }
       catch (e) { setError(errText(e)); }
@@ -224,11 +230,11 @@ export default function LogoStudioClient() {
   /** side chips on step 1: top / bottom / both (both starts with the top, then the bottom) */
   async function chooseSide(choice: KippahSide | 'both') {
     if (choice === 'both') {
-      setBothSides(true); setDoneSides([]);
+      setBothSides(true); setDoneSides([]); setSideWork({});
       await changeSide('top'); // the top first, then the bottom
       return;
     }
-    setBothSides(false); setDoneSides([]);
+    setBothSides(false); setDoneSides([]); setSideWork({});
     await changeSide(choice);
   }
   async function changeSide(next: KippahSide) {
@@ -484,9 +490,9 @@ export default function LogoStudioClient() {
         setDoneSides(done);
         if (!done.includes(other)) {
           setNotice(`✓ ${a.side === 'top' ? 'הצד העליון' : 'הצד התחתון'} נשמר בסל. עכשיו מעצבים את ${other === 'top' ? 'הצד העליון' : 'הצד התחתון (פנים הכיפה)'}.`);
-          await startOtherSide(other, a.spec, currentVersion?.upload ?? null);
+          openSide(other);
         } else {
-          setBothSides(false); setDoneSides([]);
+          setBothSides(false); setDoneSides([]); setSideWork({});
           router.push('/cart');
         }
         return;
@@ -505,41 +511,38 @@ export default function LogoStudioClient() {
     }
   }
 
-  async function startOtherSide(next: KippahSide, baseSpec: LogoSpec, reuseUpload: { assetId: string; bgRemoved: boolean } | null = null) {
-    // new project for the other side, same kippah; the texts carry over as a starting point
+  /**
+   * Show the other side of the kippah. Each side keeps its OWN design: the side
+   * we leave is parked (project + texts + mode) and the side we open is restored,
+   * or starts empty — never a copy of the other side's logo.
+   */
+  function openSide(next: KippahSide) {
+    const parked = { ...sideWork, [side]: { projectId, spec, mode } };
+    const target = parked[next];
+    setSideWork(parked);
     setOtherSideOffer(null);
-    setProject(null); setProjectId(null); setSelectedMockupId(null);
+    setProject(null); setSelectedMockupId(null);
+    setInspirationThumb(null); setUploadErr(null);
     setSide(next);
-    const nextSpec = { ...baseSpec, inspirationAssetId: null };
-    setSpec(nextSpec);
-    setInspirationThumb(null);
+    if (target) {
+      setProjectId(target.projectId);
+      setSpec(target.spec);
+      setMode(target.mode);
+    } else {
+      setProjectId(null);
+      // fresh design for this side; only the event type, font and colour carry over as a convenience
+      setSpec({ ...DEFAULT_SPEC, eventType: spec.eventType, fontId: spec.fontId, color: spec.color });
+    }
     router.replace('/logo-studio');
     setStep('details');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // uploaded logo → put the same file on the other side right away (can be replaced)
-    if (reuseUpload && productId) {
-      setMode('upload');
-      try {
-        const c = await studioApi.createProject(productId, variants, nextSpec, next);
-        setProjectId(c.project.id); setProject(c.project);
-        const r = await studioApi.uploadLogoVersion(c.project.id, reuseUpload.assetId, reuseUpload.bgRemoved);
-        setProject(r.project);
-      } catch (e) { setUploadErr(errText(e, 'לא הצלחנו להעתיק את הלוגו לצד השני — העלו אותו שוב.')); }
-    }
   }
 
   /** both-sides mode: jump to the other side at any time (e.g. start with the bottom) */
-  async function switchBothSide(next: KippahSide) {
+  function switchBothSide(next: KippahSide) {
     if (next === side || busy) return;
     setError(null); setNotice(null);
-    if (doneSides.includes(side)) {
-      // the current side is already approved in the cart → keep it, start a fresh design for the other side
-      await startOtherSide(next, spec, currentVersion?.upload ?? null);
-    } else {
-      // nothing approved yet for this side → simply move the current design to the other side
-      await changeSide(next);
-      if (step === 'approve') setStep('mockup');
-    }
+    openSide(next);
   }
 
   // ── navigation guards ──────────────────────────────────────────────────────
@@ -674,10 +677,10 @@ export default function LogoStudioClient() {
               <p className={s.cardTitle}>✓ העיצוב נשמר בסל</p>
               <p style={{ fontSize: 14, lineHeight: 1.6 }}>
                 רוצים לעצב גם את {otherSideOffer.side === 'bottom' ? 'הצד התחתון (פנים הכיפה)' : 'הצד העליון'}?
-                הוא יתווסף לאותן כיפות בסל (+₪{KIPA_EXTRA_SIDE_PRICE} לכיפה). הטקסטים יועתקו כנקודת התחלה ואפשר לשנות אותם.
+                הוא יתווסף לאותן כיפות בסל (+₪{KIPA_EXTRA_SIDE_PRICE} לכיפה). לצד הזה מעצבים לוגו נפרד משלו.
               </p>
               <div className={s.row}>
-                <button type="button" className={s.primary} style={{ flex: 1 }} onClick={() => startOtherSide(otherSideOffer.side, otherSideOffer.spec)}>
+                <button type="button" className={s.primary} style={{ flex: 1 }} onClick={() => openSide(otherSideOffer.side)}>
                   עיצוב ל{otherSideOffer.side === 'bottom' ? 'צד התחתון' : 'צד העליון'}
                 </button>
                 <button type="button" className={s.secondary} onClick={() => { setOtherSideOffer(null); router.push('/cart'); }}>לסל</button>

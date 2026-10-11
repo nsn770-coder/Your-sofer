@@ -89,9 +89,22 @@ function lettersDescription(letters: string): string {
   return Array.from(letters).map(ch => HEB_NAMES[ch] ? `the Hebrew letter ${HEB_NAMES[ch]} (${ch})` : `the Latin capital letter ${ch.toUpperCase()}`).join(', then ');
 }
 
-function sameLetters(a: string, b: string): boolean {
-  const n = (s: string) => Array.from(s.replace(/[^א-תA-Za-z]/g, '').toUpperCase()).sort().join('');
-  return n(a) === n(b);
+const FINAL_FORMS: Record<string, string> = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+const normLetters = (s: string) => Array.from(s.replace(/[^א-תA-Za-z]/g, '').toUpperCase()).map(c => FINAL_FORMS[c] ?? c);
+
+/**
+ * Do the letters read back from the image contain every requested letter?
+ * Interlocking strokes often make the vision model report an extra letter, the
+ * wrong order, or a final form — those are fine. A MISSING letter is not.
+ */
+export function monogramLettersOk(read: string, expected: string): boolean {
+  const pool = normLetters(read);
+  for (const ch of normLetters(expected)) {
+    const i = pool.indexOf(ch);
+    if (i < 0) return false;
+    pool.splice(i, 1);
+  }
+  return pool.length <= 1;
 }
 
 /**
@@ -110,23 +123,30 @@ export async function generateMonogram(spec: LogoSpec, inspiration: InlineImage 
     inspiration ? 'The attached image is ONLY a loose style reference. Do not copy letters from it.' : '',
   ].filter(Boolean).join(' ');
 
+  let unchecked: { layer: RasterLayer; model: string } | null = null;
   for (let i = 0; i < 2; i++) {
-    if (remaining(deadline) < (i === 0 ? 15_000 : 28_000)) break;
+    if (remaining(deadline) < (i === 0 ? 15_000 : 26_000)) break;
     let r: { layer: RasterLayer; model: string };
     try { r = await attempt(prompt, inspiration ? [inspiration] : [], spec.color, false, deadline, 1); }
-    catch (e) { if (e instanceof KeyingError || e instanceof AiResponseError || e instanceof DeadlineError) continue; throw e; }
+    catch (e) {
+      if (e instanceof KeyingError || e instanceof AiResponseError || e instanceof DeadlineError) { console.warn('[logo-studio/monogram] image attempt failed', (e as Error).message); continue; }
+      throw e;
+    }
     try {
       const { data } = await generateJson<{ letters?: string }>(
-        'This image is a monogram. List the individual letters you can clearly read in it. Return JSON {"letters":"<letters>"} using Hebrew characters for Hebrew letters. If unsure, return what you see.',
+        `This image is an artistic interlocking monogram that should contain the letters "${letters}". List every individual letter you can read in it (any order). Return JSON {"letters":"<letters>"} using Hebrew characters for Hebrew letters.`,
         [{ mimeType: 'image/png', data: (await flattenForCheck(r.layer.png)).toString('base64') }],
-        Math.max(4_000, Math.min(15_000, remaining(deadline) - 6_000)),
+        Math.max(4_000, Math.min(12_000, remaining(deadline) - 6_000)),
       );
-      if (data?.letters && sameLetters(data.letters, letters)) return { ...r, verified: true };
-    } catch {
-      // verification unavailable → treat as unverified
+      if (data?.letters && monogramLettersOk(data.letters, letters)) return { ...r, verified: true };
+      console.warn('[logo-studio/monogram] letters check failed', { expected: letters, read: data?.letters ?? null });
+    } catch (e) {
+      // the CHECK itself is unavailable (not a wrong result) → keep the artwork, the customer reviews it
+      console.warn('[logo-studio/monogram] letters check unavailable', (e as Error).message);
+      unchecked = unchecked ?? r;
     }
   }
-  return null;
+  return unchecked ? { ...unchecked, verified: false } : null;
 }
 
 async function flattenForCheck(png: Buffer): Promise<Buffer> {

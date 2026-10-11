@@ -253,15 +253,16 @@ export async function buildVersion(p: {
   const mKey = monogramKey(spec);
   if (needsAiMonogram(spec) && mKey) {
     const reuse = parent?.ai.monogram;
-    if (reuse && reuse.key === mKey && reuse.verified) {
+    if (reuse && reuse.key === mKey) {
       layers.monogram = await recolor(await layerFromAsset(reuse), spec.color);
       ai.monogram = reuse;
     } else {
       const r = await generateMonogram(spec, inspiration, p.deadline);
       if (r) {
         const asset = await uploadPrivate(r.layer.png, `${folder}/layers`, 'png');
-        ai.monogram = { ...asset, key: mKey, model: r.model, verified: true };
+        ai.monogram = { ...asset, key: mKey, model: r.model, verified: r.verified !== false };
         layers.monogram = r.layer;
+        if (r.verified === false) warnings.push('לא הצלחנו לבדוק אוטומטית את אותיות המונוגרמה — בדקו שכל האותיות נכונות לפני האישור.');
       } else {
         warnings.push('המונוגרמה האמנותית לא עברה את בדיקת האותיות, ולכן הוצגה מונוגרמה בגופן שבחרתם. אפשר לבקש בשיחה לנסות שוב.');
       }
