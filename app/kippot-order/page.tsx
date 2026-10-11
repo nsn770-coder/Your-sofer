@@ -397,7 +397,7 @@ function KippotOrderInner() {
 
       {/* ── סטודיו לוגו AI — יוצרים לוגו אישי, מתקנים בשיחה ומקבלים הדמיה על הדגם שנבחר ── */}
       <a
-        href={`/logo-studio?style=${encodeURIComponent(style)}&qty=${qty}&side=${type === 'print-bottom' ? 'bottom' : 'top'}`}
+        href={`/logo-studio?style=${encodeURIComponent(style)}&qty=${qty}&side=${type === 'print-bottom' ? 'bottom' : 'top'}${type === 'print-both' || addSide ? '&sides=both' : ''}`}
         style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
           width: '100%', marginBottom: 12, boxSizing: 'border-box',

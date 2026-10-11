@@ -31,7 +31,7 @@ const STEPS: { id: StepId; label: string }[] = [
 
 /** Local draft — ONLY to protect the customer's choices from refresh/redirect loss. Never used for identity or quota. */
 const DRAFT_KEY = 'ls:draft:v1';
-interface Draft { productId: string | null; selectedVariants: Record<string, string>; spec: LogoSpec; projectId: string | null; step: StepId; side?: KippahSide; qty?: number; mode?: LogoMode }
+interface Draft { productId: string | null; selectedVariants: Record<string, string>; spec: LogoSpec; projectId: string | null; step: StepId; side?: KippahSide; qty?: number; mode?: LogoMode; bothSides?: boolean; doneSides?: KippahSide[] }
 function readDraft(): Draft | null {
   try { const raw = localStorage.getItem(DRAFT_KEY); return raw ? JSON.parse(raw) as Draft : null; } catch { return null; }
 }
@@ -60,6 +60,10 @@ export default function LogoStudioClient() {
   const [productId, setProductId] = useState<string | null>(null);
   const [variants, setVariants] = useState<Record<string, string>>({});
   const [side, setSide] = useState<KippahSide>('top');
+  /** "print both sides": the customer designs the top AND the bottom, one after the other */
+  const [bothSides, setBothSides] = useState(false);
+  /** sides already approved in this both-sides session */
+  const [doneSides, setDoneSides] = useState<KippahSide[]>([]);
   const [initialQty, setInitialQty] = useState<number>(KIPA_MIN_QTY);
   const [otherSideOffer, setOtherSideOffer] = useState<null | { side: KippahSide; spec: LogoSpec }>(null);
   const [product, setProduct] = useState<CatalogProduct | null>(null);
@@ -100,6 +104,7 @@ export default function LogoStudioClient() {
     const qpQty = Number(params.get('qty'));
     const qpSide = params.get('side');
     const qpMode = params.get('mode');
+    const qpBoth = params.get('sides') === 'both';
     if (qpMode === 'upload' || qpMode === 'ai') setMode(qpMode);
     else if (draft?.mode === 'upload' || draft?.mode === 'ai') setMode(draft.mode);
     if (qpProduct) {
@@ -107,6 +112,7 @@ export default function LogoStudioClient() {
       setVariants(qpVariants);
       if (draft?.spec) setSpec(validateSpec(draft.spec).spec);
       setSide(qpSide === 'bottom' ? 'bottom' : 'top');
+      setBothSides(qpBoth); setDoneSides([]);
       if (Number.isFinite(qpQty) && qpQty >= KIPA_MIN_QTY) setInitialQty(Math.min(5000, Math.round(qpQty)));
       setStep('kippah');
     } else if (draft) {
@@ -114,6 +120,7 @@ export default function LogoStudioClient() {
       setVariants(draft.selectedVariants ?? {});
       setSpec(validateSpec(draft.spec).spec);
       setSide(draft.side === 'bottom' ? 'bottom' : 'top');
+      setBothSides(!!draft.bothSides); setDoneSides(Array.isArray(draft.doneSides) ? draft.doneSides.filter(x => x === 'top' || x === 'bottom') : []);
       if (draft.qty && draft.qty >= KIPA_MIN_QTY) setInitialQty(draft.qty);
       setStep(draft.step ?? 'kippah');
     }
@@ -125,8 +132,8 @@ export default function LogoStudioClient() {
   // persist draft
   useEffect(() => {
     if (!initDone) return;
-    writeDraft({ productId, selectedVariants: variants, spec, projectId, step, side, qty: initialQty, mode });
-  }, [initDone, productId, variants, spec, projectId, step, side, initialQty, mode]);
+    writeDraft({ productId, selectedVariants: variants, spec, projectId, step, side, qty: initialQty, mode, bothSides, doneSides });
+  }, [initDone, productId, variants, spec, projectId, step, side, initialQty, mode, bothSides, doneSides]);
 
   // ── catalog item ───────────────────────────────────────────────────────────
   useEffect(() => {
@@ -213,6 +220,16 @@ export default function LogoStudioClient() {
       try { const r = await studioApi.patchProject(projectId, { productId: id, selectedVariants: {} }); setProject(r.project); }
       catch (e) { setError(errText(e)); }
     }
+  }
+  /** side chips on step 1: top / bottom / both (both starts with the top, then the bottom) */
+  async function chooseSide(choice: KippahSide | 'both') {
+    if (choice === 'both') {
+      setBothSides(true); setDoneSides([]);
+      await changeSide('top'); // the top first, then the bottom
+      return;
+    }
+    setBothSides(false); setDoneSides([]);
+    await changeSide(choice);
   }
   async function changeSide(next: KippahSide) {
     if (next === side) return;
@@ -460,8 +477,21 @@ export default function LogoStudioClient() {
       }
       window.gtag?.('event', 'add_to_cart', { currency: 'ILS', items: [{ item_id: a.inventoryProductId ?? a.productId, item_name: a.productName, quantity: qty }] });
 
-      // offer the other side when it has a photo and is not designed yet
       const other: KippahSide = a.side === 'top' ? 'bottom' : 'top';
+      // both sides ordered → continue straight to the other side; after the second one → cart
+      if (bothSides) {
+        const done = [...new Set([...doneSides, a.side])];
+        setDoneSides(done);
+        if (!done.includes(other)) {
+          setNotice(`✓ ${a.side === 'top' ? 'הצד העליון' : 'הצד התחתון'} נשמר בסל. עכשיו מעצבים את ${other === 'top' ? 'הצד העליון' : 'הצד התחתון (פנים הכיפה)'}.`);
+          await startOtherSide(other, a.spec, currentVersion?.upload ?? null);
+        } else {
+          setBothSides(false); setDoneSides([]);
+          router.push('/cart');
+        }
+        return;
+      }
+      // offer the other side when it has a photo and is not designed yet
       const hasOtherAlready = asSecond || !!(existing && !asSecond && exSecond && (exSecond.side ?? 'bottom') === other);
       if (project?.selection.sidesAvailable[other] && !hasOtherAlready) {
         setOtherSideOffer({ side: other, spec: a.spec });
@@ -475,16 +505,27 @@ export default function LogoStudioClient() {
     }
   }
 
-  function startOtherSide(next: KippahSide, baseSpec: LogoSpec) {
+  async function startOtherSide(next: KippahSide, baseSpec: LogoSpec, reuseUpload: { assetId: string; bgRemoved: boolean } | null = null) {
     // new project for the other side, same kippah; the texts carry over as a starting point
     setOtherSideOffer(null);
     setProject(null); setProjectId(null); setSelectedMockupId(null);
     setSide(next);
-    setSpec({ ...baseSpec, inspirationAssetId: null });
+    const nextSpec = { ...baseSpec, inspirationAssetId: null };
+    setSpec(nextSpec);
     setInspirationThumb(null);
     router.replace('/logo-studio');
     setStep('details');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    // uploaded logo → put the same file on the other side right away (can be replaced)
+    if (reuseUpload && productId) {
+      setMode('upload');
+      try {
+        const c = await studioApi.createProject(productId, variants, nextSpec, next);
+        setProjectId(c.project.id); setProject(c.project);
+        const r = await studioApi.uploadLogoVersion(c.project.id, reuseUpload.assetId, reuseUpload.bgRemoved);
+        setProject(r.project);
+      } catch (e) { setUploadErr(errText(e, 'לא הצלחנו להעתיק את הלוגו לצד השני — העלו אותו שוב.')); }
+    }
   }
 
   // ── navigation guards ──────────────────────────────────────────────────────
@@ -521,13 +562,27 @@ export default function LogoStudioClient() {
         {notice && <div className={s.ok}>{notice}</div>}
         {busy === 'project' && <div className={s.card}><div className={s.loadingCard}><span className={`${s.spinner} ${s.spinnerDark}`} /> טוען את העיצוב שלך…</div></div>}
 
+        {bothSides && step !== 'kippah' && (
+          <div className={s.sidesBar}>
+            <span style={{ fontWeight: 800 }}>הדפסה משני הצדדים:</span>
+            {(['top', 'bottom'] as KippahSide[]).map(sd => (
+              <span key={sd} className={s.sidePill} data-active={sd === side} data-done={doneSides.includes(sd)}>
+                {doneSides.includes(sd) ? '✓ ' : ''}{sd === 'top' ? 'צד עליון' : 'צד תחתון (פנים)'}{sd === side ? ' · עכשיו' : ''}
+              </span>
+            ))}
+            {selection && !selection.sidesAvailable[side === 'top' ? 'bottom' : 'top'] && !doneSides.includes(side === 'top' ? 'bottom' : 'top') && (
+              <span className={s.hint} style={{ width: '100%' }}>לצד השני עדיין אין תמונה לכיפה זו, ולכן לא ניתן ליצור עליו הדמיה. אפשר לפנות אלינו בוואטסאפ.</span>
+            )}
+          </div>
+        )}
+
         {exhausted && step !== 'kippah' && !(step === 'details' && mode === 'upload') && !uploadedCurrent && (
           <CodeRedeem exhausted whatsapp={whatsapp} onRedeemed={(q, msg) => { setQuota(q); setNotice(msg); }} />
         )}
 
         {step === 'kippah' && (
           <KippahStep product={product} selection={selection} selectedVariants={variants} loading={catalogLoading} error={catalogErr}
-            side={side} onChangeSide={changeSide}
+            side={side} bothSides={bothSides} onChangeSide={chooseSide}
             onChooseProduct={chooseProduct} onChangeVariant={changeVariant} onNext={() => go('details')} />
         )}
 

@@ -6,6 +6,7 @@ import { studioApi, ApiError, type CatalogProduct } from '../studioApi';
 import type { ResolvedSelection, KippahSide } from '@/lib/logoStudio/catalog';
 import { isVisualOption } from '@/lib/logoStudio/catalog';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import { KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
 
 const SOURCE_LABEL: Record<string, string> = { variant: 'לפי הווריאציה שבחרתם', catalog: 'לפי נתוני הקטלוג', name: 'לפי שם המוצר' };
 
@@ -24,7 +25,8 @@ interface Props {
   selection: ResolvedSelection | null;
   selectedVariants: Record<string, string>;
   side: KippahSide;
-  onChangeSide: (s: KippahSide) => void;
+  bothSides: boolean;
+  onChangeSide: (s: KippahSide | 'both') => void;
   loading: boolean;
   error: string | null;
   onChooseProduct: (productId: string) => void;
@@ -78,13 +80,20 @@ export default function KippahStep(p: Props) {
           <span className={s.label}>איפה יודפס הלוגו?</span>
           <div className={s.chips}>
             {(['top', 'bottom'] as KippahSide[]).map(sd => (
-              <button key={sd} type="button" className={s.chip} data-active={p.side === sd} onClick={() => p.onChangeSide(sd)}>
+              <button key={sd} type="button" className={s.chip} data-active={!p.bothSides && p.side === sd} onClick={() => p.onChangeSide(sd)}>
                 {sd === 'top' ? 'צד עליון' : 'צד תחתון (פנים הכיפה)'}
                 {p.selection && !p.selection.sidesAvailable[sd] && p.selection.imageStatus !== 'choose_variant' ? ' · אין תמונה' : ''}
               </button>
             ))}
+            <button type="button" className={s.chip} data-active={p.bothSides} onClick={() => p.onChangeSide('both')}>
+              שני הצדדים (+₪{KIPA_EXTRA_SIDE_PRICE} לכיפה)
+            </button>
           </div>
-          <div className={s.hint}>רוצים גם וגם? מעצבים צד אחד, מאשרים, ואז מוסיפים עיצוב לצד השני (+₪1.5 לכיפה).</div>
+          <div className={s.hint}>
+            {p.bothSides
+              ? 'מעצבים קודם את הצד העליון, מאשרים — ומיד ממשיכים לעיצוב הצד התחתון. שני הצדדים יתווספו לאותן כיפות בסל.'
+              : 'רוצים גם וגם? בחרו „שני הצדדים”.'}
+          </div>
 
           {status && <div className={status.kind === 'ok' ? s.ok : status.kind === 'warn' ? s.warn : s.error}>{status.text}</div>}
           <div className={s.row} style={{ marginTop: 10 }}>

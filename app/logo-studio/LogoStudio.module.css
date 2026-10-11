@@ -121,3 +121,9 @@
 .dropZone[data-drag='true'] { border-color: #51285F; background: #F1E8F7; }
 .bgBtn { width: 100%; min-height: 48px; border: 1.5px solid #C9A227; border-radius: 12px; background: #FDF8EC; color: #7a5d0b; font-size: 15px; font-weight: 900; cursor: pointer; font-family: inherit; }
 .bgBtn:disabled { opacity: .55; cursor: default; }
+
+/* ── both-sides progress ── */
+.sidesBar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: #FDF8EC; border: 1px solid #f0e2b6; border-radius: 12px; padding: 8px 12px; font-size: 13px; margin-bottom: 12px; }
+.sidePill { border: 1.5px solid #e2dccf; background: #fff; border-radius: 999px; padding: 4px 11px; font-weight: 700; color: #6b6b74; }
+.sidePill[data-active='true'] { border-color: #51285F; color: #51285F; }
+.sidePill[data-done='true'] { border-color: #b9dcc2; color: #2f6b3c; background: #f0f8f2; }
