@@ -41,6 +41,14 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       mockupKind: a.mockup.kind,
       logo: { view: signedUrl(logo, { width: 1200 }), download: signedUrl(logo, { attachment: safeName }), width: logo.width, height: logo.height, bytes: logo.bytes },
       mockup: { view: signedUrl(mockupAsset, { width: 1200 }), download: signedUrl(mockupAsset, { attachment: `${safeName}-mockup` }) },
+      upload: a.upload ? {
+        bgRemoved: !!a.upload.bgRemoved,
+        original: {
+          view: signedUrl(a.upload.original as StoredAsset, { width: 1200 }),
+          download: signedUrl(a.upload.original as StoredAsset, { attachment: `${safeName}-original` }),
+          width: (a.upload.original as StoredAsset).width, height: (a.upload.original as StoredAsset).height,
+        },
+      } : null,
     });
   } catch (e) {
     return errorResponse(e, 'admin:approval');

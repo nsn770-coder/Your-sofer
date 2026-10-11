@@ -114,7 +114,7 @@ export default function KippahStep(p: Props) {
 
       <div className={s.sticky}>
         <div className={s.stickyInner}>
-          <button type="button" className={s.primary} disabled={!p.product || p.loading} onClick={p.onNext}>המשך להתאמת הלוגו ←</button>
+          <button type="button" className={s.primary} disabled={!p.product || p.loading} onClick={p.onNext}>המשך לעיצוב ←</button>
         </div>
       </div>
     </div>

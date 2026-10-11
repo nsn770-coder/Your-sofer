@@ -15,9 +15,12 @@ import DetailsStep from './components/DetailsStep';
 import DesignStep from './components/DesignStep';
 import MockupStep from './components/MockupStep';
 import ApproveStep from './components/ApproveStep';
+import UploadLogoStep, { prepareLogoFile } from './components/UploadLogoStep';
 import { QuotaBadge, CodeRedeem } from './components/QuotaPanel';
 
 type StepId = 'kippah' | 'details' | 'design' | 'mockup' | 'approve';
+/** upload = the customer already has a logo; ai = design one here */
+type LogoMode = 'upload' | 'ai';
 const STEPS: { id: StepId; label: string }[] = [
   { id: 'kippah', label: 'בחירת כיפה' },
   { id: 'details', label: 'התאמת הלוגו' },
@@ -28,7 +31,7 @@ const STEPS: { id: StepId; label: string }[] = [
 
 /** Local draft — ONLY to protect the customer's choices from refresh/redirect loss. Never used for identity or quota. */
 const DRAFT_KEY = 'ls:draft:v1';
-interface Draft { productId: string | null; selectedVariants: Record<string, string>; spec: LogoSpec; projectId: string | null; step: StepId; side?: KippahSide; qty?: number }
+interface Draft { productId: string | null; selectedVariants: Record<string, string>; spec: LogoSpec; projectId: string | null; step: StepId; side?: KippahSide; qty?: number; mode?: LogoMode }
 function readDraft(): Draft | null {
   try { const raw = localStorage.getItem(DRAFT_KEY); return raw ? JSON.parse(raw) as Draft : null; } catch { return null; }
 }
@@ -52,6 +55,8 @@ export default function LogoStudioClient() {
   const { items: cartItems, addItem, removeItem } = useCart();
 
   const [step, setStep] = useState<StepId>('kippah');
+  const [mode, setMode] = useState<LogoMode>('ai');
+  const [uploadErr, setUploadErr] = useState<string | null>(null);
   const [productId, setProductId] = useState<string | null>(null);
   const [variants, setVariants] = useState<Record<string, string>>({});
   const [side, setSide] = useState<KippahSide>('top');
@@ -67,7 +72,7 @@ export default function LogoStudioClient() {
   const [project, setProject] = useState<ProjectView | null>(null);
   const [quota, setQuota] = useState<QuotaView | null>(null);
   const [whatsapp, setWhatsapp] = useState<string | null>(null);
-  const [busy, setBusy] = useState<null | 'generate' | 'chat' | 'select' | 'mockup' | 'aiMockup' | 'approve' | 'project'>(null);
+  const [busy, setBusy] = useState<null | 'generate' | 'chat' | 'select' | 'mockup' | 'aiMockup' | 'approve' | 'project' | 'uploadLogo' | 'bg'>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [selectedMockupId, setSelectedMockupId] = useState<string | null>(null);
@@ -94,6 +99,9 @@ export default function LogoStudioClient() {
     const qpVariants = parseVariants(params.get('v'));
     const qpQty = Number(params.get('qty'));
     const qpSide = params.get('side');
+    const qpMode = params.get('mode');
+    if (qpMode === 'upload' || qpMode === 'ai') setMode(qpMode);
+    else if (draft?.mode === 'upload' || draft?.mode === 'ai') setMode(draft.mode);
     if (qpProduct) {
       setProductId(qpProduct);
       setVariants(qpVariants);
@@ -117,8 +125,8 @@ export default function LogoStudioClient() {
   // persist draft
   useEffect(() => {
     if (!initDone) return;
-    writeDraft({ productId, selectedVariants: variants, spec, projectId, step, side, qty: initialQty });
-  }, [initDone, productId, variants, spec, projectId, step, side, initialQty]);
+    writeDraft({ productId, selectedVariants: variants, spec, projectId, step, side, qty: initialQty, mode });
+  }, [initDone, productId, variants, spec, projectId, step, side, initialQty, mode]);
 
   // ── catalog item ───────────────────────────────────────────────────────────
   useEffect(() => {
@@ -157,7 +165,9 @@ export default function LogoStudioClient() {
         setSide(r.project.side ?? 'top');
         setSpec(r.project.draftSpec);
         setInspirationThumb(r.project.inspiration?.thumb ?? null);
-        if (params.get('project')) setStep(r.project.currentVersionId ? 'design' : 'details');
+        const cur = r.project.versions.find(v => v.id === r.project.currentVersionId);
+        if (cur?.upload) setMode('upload');
+        if (params.get('project')) setStep(r.project.currentVersionId ? (cur?.upload ? 'details' : 'design') : 'details');
       })
       .catch(e => {
         if (e instanceof ApiError && e.status === 404) { setProjectId(null); return; }
@@ -278,6 +288,44 @@ export default function LogoStudioClient() {
     generate(p.spec, p.baseVersionId, 'revision');
   }
 
+  // ── ready logo upload (free — no AI, no attempt) ───────────────────────────
+  async function uploadLogo(file: File) {
+    if (busy) return;
+    if (!userRef.current) { requireSignIn(() => uploadLogo(file)); return; }
+    setBusy('uploadLogo'); setUploadErr(null); setError(null); setNotice(null);
+    try {
+      let f: File;
+      try { f = await prepareLogoFile(file); }
+      catch { throw new ApiError(413, 'too_large', 'הקובץ גדול מדי. נסו קובץ קטן יותר (עד 4MB) או שלחו לנו אותו בוואטסאפ.', {}); }
+      const pid = await ensureProject();
+      const up = await studioApi.upload(f, 'logo');
+      const r = await studioApi.uploadLogoVersion(pid, up.assetId, false);
+      setProject(r.project); setSelectedMockupId(null);
+    } catch (e) {
+      setUploadErr(errText(e, 'העלאת הלוגו נכשלה. נסו שוב.'));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function setLogoBackground(remove: boolean) {
+    const cur = project?.versions.find(v => v.id === project.currentVersionId);
+    if (!projectId || !cur?.upload || busy) return;
+    setBusy('bg'); setUploadErr(null);
+    try {
+      // the same file was already processed this way → just switch back to it (instant)
+      const existing = project!.versions.find(v => v.upload?.assetId === cur.upload!.assetId && v.upload.bgRemoved === remove);
+      const r = existing
+        ? await studioApi.patchProject(projectId, { currentVersionId: existing.id })
+        : await studioApi.uploadLogoVersion(projectId, cur.upload.assetId, remove);
+      setProject(r.project); setSelectedMockupId(null);
+    } catch (e) {
+      setUploadErr(errText(e, remove ? 'הסרת הרקע נכשלה. נסו שוב.' : 'הפעולה נכשלה. נסו שוב.'));
+    } finally {
+      setBusy(null);
+    }
+  }
+
   // ── mockups ────────────────────────────────────────────────────────────────
   async function compose(placement: Placement, finish: 'print' | 'embroidery') {
     if (!projectId || !project?.currentVersionId) return;
@@ -302,6 +350,7 @@ export default function LogoStudioClient() {
   }
 
   const currentVersion = project?.versions.find(v => v.id === project.currentVersionId) ?? null;
+  const uploadedCurrent = currentVersion?.upload ? currentVersion : null;
   const approveMockup = useMemo(() => {
     if (!project || !currentVersion) return null;
     const own = project.mockups.filter(m => m.versionId === currentVersion.id && !m.stale);
@@ -327,7 +376,7 @@ export default function LogoStudioClient() {
     try {
       const a = await studioApi.approve(projectId, currentVersion.id, approveMockup.id);
       const material = a.materialKind === 'satin' ? 'satin' as const : 'linen' as const;
-      const label = a.spec.primaryText || a.spec.monogramLetters || 'לוגו אישי';
+      const label = a.uploaded ? 'הלוגו שהעליתם' : (a.spec.primaryText || a.spec.monogramLetters || 'לוגו אישי');
       const variantsLabel = Object.values(a.selectedVariants).join(' · ');
       const lineId = cartLineIdFor(a);
       const design = {
@@ -347,11 +396,11 @@ export default function LogoStudioClient() {
       };
       const sideLabel = a.side === 'bottom' ? 'צד תחתון' : 'צד עליון';
       const printLine = (id: string, quantity: number) => ({
-        id, name: `${a.finish === 'embroidery' ? 'רקמה' : 'הדפסה'} לכיפות — ${sideLabel} — לוגו אישי מהסטודיו (כלול במחיר)`,
+        id, name: `${a.finish === 'embroidery' ? 'רקמה' : 'הדפסה'} לכיפות — ${sideLabel} — ${a.uploaded ? 'הלוגו שהעליתם' : 'לוגו אישי מהסטודיו'} (כלול במחיר)`,
         price: 0, quantity, cat: 'הדפסה', imgUrl: a.logoThumbUrl,
         printCustomization: {
           uploadedImageUrl: a.logoUrl, originalImageUrl: a.logoUrl,
-          productType: 'כיפות', side: a.side, bgRemoved: true,
+          productType: 'כיפות', side: a.side, bgRemoved: a.bgRemoved ?? true,
           designText: label, mockupUrl: a.mockupUrl,
           selectedFontLabel: a.font, printType: a.finish,
           ...(a.styleId ? { kippahStyle: a.styleId } : {}),
@@ -380,7 +429,7 @@ export default function LogoStudioClient() {
         addItem({
           id: lineId,
           ...(a.inventoryProductId ? { productId: a.inventoryProductId } : {}),
-          name: a.styleId ? `כיפות ${a.productName.replace(/^כיפה (פשתן|סאטן) — /, '')} — לוגו אישי מהסטודיו` : a.productName,
+          name: a.styleId ? `כיפות ${a.productName.replace(/^כיפה (פשתן|סאטן) — /, '')} — ${a.uploaded ? 'הלוגו שלכם' : 'לוגו אישי מהסטודיו'}` : a.productName,
           price: unit,
           imgUrl: a.mockupThumbUrl,
           quantity: qty,
@@ -472,7 +521,7 @@ export default function LogoStudioClient() {
         {notice && <div className={s.ok}>{notice}</div>}
         {busy === 'project' && <div className={s.card}><div className={s.loadingCard}><span className={`${s.spinner} ${s.spinnerDark}`} /> טוען את העיצוב שלך…</div></div>}
 
-        {exhausted && step !== 'kippah' && (
+        {exhausted && step !== 'kippah' && !(step === 'details' && mode === 'upload') && !uploadedCurrent && (
           <CodeRedeem exhausted whatsapp={whatsapp} onRedeemed={(q, msg) => { setQuota(q); setNotice(msg); }} />
         )}
 
@@ -483,6 +532,34 @@ export default function LogoStudioClient() {
         )}
 
         {step === 'details' && (
+          <div className={s.modeTabs} role="tablist" aria-label="איך יוצרים את הלוגו">
+            <button type="button" role="tab" aria-selected={mode === 'upload'} className={s.modeTab} data-active={mode === 'upload'} onClick={() => { setMode('upload'); setError(null); }}>
+              <span className={s.modeTabTitle}>⬆️ יש לי לוגו מוכן</span>
+              <span className={s.modeTabSub}>העלאת קובץ · הסרת רקע · ללא עלות</span>
+            </button>
+            <button type="button" role="tab" aria-selected={mode === 'ai'} className={s.modeTab} data-active={mode === 'ai'} onClick={() => { setMode('ai'); setUploadErr(null); }}>
+              <span className={s.modeTabTitle}>✨ עיצוב לוגו ב-AI</span>
+              <span className={s.modeTabSub}>שמות, תאריך, גופן וצבע · תיקונים בשיחה</span>
+            </button>
+          </div>
+        )}
+
+        {step === 'details' && mode === 'upload' && (
+          <>
+            <UploadLogoStep current={uploadedCurrent} signedIn={signedIn} busy={busy === 'uploadLogo' || busy === 'bg' ? busy : null} error={uploadErr}
+              onRequireSignIn={() => requireSignIn()} onUpload={uploadLogo} onSetBackground={setLogoBackground} />
+            <div className={s.sticky}>
+              <div className={s.stickyInner}>
+                {!uploadedCurrent && <div className={s.costNote}>העלאת לוגו מוכן לא צורכת ניסיונות עיצוב.</div>}
+                <button type="button" className={s.primary} disabled={!!busy || !uploadedCurrent || !productId} onClick={() => go('mockup')}>
+                  המשך להדמיה על הכיפה ←
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {step === 'details' && mode === 'ai' && (
           <>
             <DetailsStep spec={spec} onChange={updateSpec} errors={specErrors} signedIn={signedIn}
               onRequireSignIn={() => requireSignIn()}
@@ -505,7 +582,7 @@ export default function LogoStudioClient() {
         {step === 'design' && project && (
           <DesignStep project={project} quota={quota} busy={busy === 'generate' || busy === 'chat' || busy === 'select' ? busy : null}
             onSelectVersion={selectVersion} onSendChat={sendChat} onApplyProposal={applyProposal}
-            onEditDetails={() => { if (currentVersion) setSpec(currentVersion.spec); go('details'); }}
+            onEditDetails={() => { if (currentVersion) setSpec(currentVersion.spec); setMode(currentVersion?.upload ? 'upload' : 'ai'); go('details'); }}
             onNext={() => go('mockup')} blocked={exhausted} />
         )}
 

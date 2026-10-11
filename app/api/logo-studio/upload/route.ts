@@ -14,7 +14,8 @@ export const dynamic = 'force-dynamic';
 const MAX_BYTES = 6 * 1024 * 1024;
 
 /**
- * Inspiration image upload. Accepts a FILE only (no URLs → no SSRF). The type
+ * Image upload — an inspiration image (default) or the customer's READY logo
+ * (form field kind=logo; kept at a higher resolution for print). Accepts a FILE only (no URLs → no SSRF). The type
  * is checked by magic bytes, size is capped, and the image is re-encoded
  * (EXIF and any trailing payload removed) before private storage.
  */
@@ -29,16 +30,17 @@ export async function POST(req: NextRequest) {
     const file = form.get('file');
     if (!(file instanceof Blob)) throw new HttpError(400, 'no_file', 'לא נבחר קובץ.');
     if (file.size > MAX_BYTES) throw new HttpError(413, 'too_large', 'הקובץ גדול מדי (עד 6MB).');
+    const kind = form.get('kind') === 'logo' ? 'logo_upload' : 'inspiration';
     let clean;
-    try { clean = await sanitizeUpload(Buffer.from(await file.arrayBuffer())); }
+    try { clean = await sanitizeUpload(Buffer.from(await file.arrayBuffer()), { maxSide: kind === 'logo_upload' ? 3000 : 1600 }); }
     catch (e) {
       if (e instanceof ImageFetchError) throw new HttpError(415, 'bad_type', 'אפשר להעלות רק תמונות JPG, PNG או WEBP.');
       throw e;
     }
-    const asset = await uploadPrivate(clean.png, `logo-studio/${user.uid}/inspiration`, 'png');
+    const asset = await uploadPrivate(clean.png, `logo-studio/${user.uid}/${kind === 'logo_upload' ? 'logo-uploads' : 'inspiration'}`, 'png');
     const assetId = crypto.randomBytes(10).toString('hex');
-    await getAdminDb().collection(COL.assets).doc(assetId).set({ ...asset, uid: user.uid, kind: 'inspiration', createdAt: Date.now() });
-    return NextResponse.json({ assetId, thumb: signedUrl(asset, { width: 300 }) });
+    await getAdminDb().collection(COL.assets).doc(assetId).set({ ...asset, uid: user.uid, kind, createdAt: Date.now() });
+    return NextResponse.json({ assetId, thumb: signedUrl(asset, { width: 300 }), width: asset.width, height: asset.height });
   } catch (e) {
     return errorResponse(e, 'upload');
   }

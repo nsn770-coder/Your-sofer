@@ -11,6 +11,8 @@ export const RATE_LIMITS = {
   mockup:    { max: 30, windowMs: 10 * 60_000 },
   aiMockup:  { max: 6,  windowMs: 10 * 60_000 },
   upload:    { max: 10, windowMs: 10 * 60_000 },
+  /** creating a version from an uploaded logo (incl. background removal) — free, no attempt */
+  logoVersion: { max: 30, windowMs: 10 * 60_000 },
   redeem:    { max: 5,  windowMs: 15 * 60_000 },
   redeemFail:{ max: 10, windowMs: 24 * 60 * 60_000 },
   create:    { max: 20, windowMs: 60 * 60_000 },

@@ -17,6 +17,8 @@ export interface VersionView {
   source: string; createdAt: number; includedAiMockupUsed: boolean;
   logo: AssetUrls & { width: number; height: number; rasterScale: number };
   aiLayers: string[];
+  /** set when this version is a logo the customer uploaded (not designed here) */
+  upload: { assetId: string; bgRemoved: boolean; originalThumb: string } | null;
 }
 export interface MockupView extends AssetUrls {
   id: string; versionId: string; kind: 'composite' | 'ai'; placement: Placement; finish: 'print' | 'embroidery';
@@ -39,7 +41,7 @@ export interface ApproveResult {
   approvalId: string; productId: string; productName: string; productImageUrl: string;
   inventoryProductId: string | null; styleId: string | null; side: KippahSide;
   materialKind: 'satin' | 'linen' | 'other' | null; selectedVariants: Record<string, string>;
-  spec: LogoSpec; font: string; logoUrl: string; logoThumbUrl: string; mockupUrl: string; mockupThumbUrl: string;
+  spec: LogoSpec; uploaded?: boolean; bgRemoved?: boolean; font: string; logoUrl: string; logoThumbUrl: string; mockupUrl: string; mockupThumbUrl: string;
   finish: 'print' | 'embroidery'; placement: Placement; production: ProductionInfo;
 }
 
@@ -97,9 +99,13 @@ export const studioApi = {
   approve: (id: string, versionId: string, mockupId: string) =>
     call<ApproveResult>(`/api/logo-studio/projects/${id}/approve`, { method: 'POST', body: JSON.stringify({ versionId, mockupId }) }),
   redeem: (code: string) => call<{ granted: number; quota: QuotaView; message: string }>('/api/logo-studio/redeem', { method: 'POST', body: JSON.stringify({ code }) }),
-  upload: async (file: File) => {
+  upload: async (file: File, kind: 'inspiration' | 'logo' = 'inspiration') => {
     const fd = new FormData();
     fd.append('file', file);
-    return call<{ assetId: string; thumb: string }>('/api/logo-studio/upload', { method: 'POST', body: fd });
+    if (kind === 'logo') fd.append('kind', 'logo');
+    return call<{ assetId: string; thumb: string; width?: number; height?: number }>('/api/logo-studio/upload', { method: 'POST', body: fd });
   },
+  /** ready logo → project version (free). removeBg makes a transparent copy of the original upload. */
+  uploadLogoVersion: (id: string, assetId: string, removeBg: boolean) =>
+    call<{ versionId: string; warnings: string[]; project: ProjectView }>(`/api/logo-studio/projects/${id}/upload-logo`, { method: 'POST', body: JSON.stringify({ assetId, removeBg }) }),
 };

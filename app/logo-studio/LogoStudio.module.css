@@ -110,3 +110,14 @@
 .paletteGrid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; margin-bottom: 4px; }
 .paletteSwatch { aspect-ratio: 1 / 1; width: 100%; border-radius: 6px; border: 1px solid rgba(0,0,0,.08); cursor: pointer; padding: 0; }
 .paletteSwatch[data-active='true'] { outline: 2.5px solid #51285F; outline-offset: 1px; }
+
+/* ── mode switch: upload a ready logo / design with AI ── */
+.modeTabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.modeTab { border: 2px solid #e2dccf; background: #fff; border-radius: 14px; padding: 12px 10px; cursor: pointer; text-align: center; color: #3B3B41; font-family: inherit; }
+.modeTab[data-active='true'] { border-color: #51285F; background: #F6F1FA; box-shadow: 0 0 0 2px rgba(81,40,95,.12); }
+.modeTabTitle { display: block; font-size: 15px; font-weight: 900; }
+.modeTabSub { display: block; font-size: 11.5px; color: #7a7a83; margin-top: 3px; line-height: 1.4; }
+.dropZone { border: 2px dashed #cdbfd8; border-radius: 14px; background: #FBF8FD; padding: 22px 14px; text-align: center; cursor: pointer; }
+.dropZone[data-drag='true'] { border-color: #51285F; background: #F1E8F7; }
+.bgBtn { width: 100%; min-height: 48px; border: 1.5px solid #C9A227; border-radius: 12px; background: #FDF8EC; color: #7a5d0b; font-size: 15px; font-weight: 900; cursor: pointer; font-family: inherit; }
+.bgBtn:disabled { opacity: .55; cursor: default; }

@@ -19,6 +19,8 @@ interface ApprovalView {
   mockupKind: 'composite' | 'ai';
   logo: { view: string; download: string; width: number; height: number; bytes: number };
   mockup: { view: string; download: string };
+  /** present when the customer uploaded a ready logo instead of designing one */
+  upload?: { bgRemoved: boolean; original: { view: string; download: string; width: number; height: number } } | null;
 }
 
 /**
@@ -55,14 +57,22 @@ export default function LogoStudioOrderPanel({ approvalId, orderUid }: { approva
 
   return (
     <div className="mt-1 flex flex-col gap-2 rounded-lg border border-purple-200 bg-purple-50/50 p-2 text-xs">
-      <span className="font-bold text-purple-800">✨ לוגו מסטודיו הלוגו · {a.side === 'bottom' ? 'צד תחתון (פנים הכיפה)' : 'צד עליון'} · גרסה {a.versionNumber} · אושר {new Date(a.createdAt).toLocaleString('he-IL')}</span>
+      <span className="font-bold text-purple-800">{a.upload ? '⬆️ לוגו שהלקוח העלה' : '✨ לוגו מסטודיו הלוגו'} · {a.side === 'bottom' ? 'צד תחתון (פנים הכיפה)' : 'צד עליון'} · גרסה {a.versionNumber} · אושר {new Date(a.createdAt).toLocaleString('he-IL')}</span>
       {a.ownerMatchesOrder === false && <span className="font-bold text-red-700">⚠️ העיצוב אושר בחשבון אחר מזה של ההזמנה ({a.email}) — לבדוק מול הלקוח.</span>}
       <div className="flex flex-wrap gap-3">
         <div>
-          <div className="font-bold mb-1">לוגו מאושר (PNG שקוף)</div>
+          <div className="font-bold mb-1">{a.upload && !a.upload.bgRemoved ? 'לוגו מאושר (הקובץ שהלקוח העלה)' : 'לוגו מאושר (PNG שקוף)'}</div>
           <img src={a.logo.view} alt="לוגו מאושר" style={{ maxWidth: 200, display: 'block', borderRadius: 6, border: '1px solid #ddd6fe', background: 'repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 16px 16px' }} />
           <a href={a.logo.download} target="_blank" rel="noopener noreferrer" className="inline-flex mt-1 items-center gap-1 text-purple-700 bg-white border border-purple-300 rounded-full px-2.5 py-1 hover:underline font-bold">⬇️ הורדת הלוגו</a>
         </div>
+        {a.upload?.bgRemoved && (
+          <div>
+            <div className="font-bold mb-1">הקובץ המקורי שהלקוח העלה (לפני הסרת רקע)</div>
+            <img src={a.upload.original.view} alt="לוגו מקורי" style={{ maxWidth: 200, display: 'block', borderRadius: 6, border: '1px solid #ddd6fe', background: 'repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 16px 16px' }} />
+            <a href={a.upload.original.download} target="_blank" rel="noopener noreferrer" className="inline-flex mt-1 items-center gap-1 text-purple-700 bg-white border border-purple-300 rounded-full px-2.5 py-1 hover:underline font-bold">⬇️ הורדת המקור</a>
+            <div className="text-gray-500 mt-1">{a.upload.original.width}×{a.upload.original.height} פיקסלים</div>
+          </div>
+        )}
         <div>
           <div className="font-bold mb-1">ההדמיה שהלקוח אישר</div>
           <img src={a.mockup.view} alt="הדמיה מאושרת" style={{ maxWidth: 200, display: 'block', borderRadius: 6, border: '1px solid #ddd6fe' }} />
@@ -71,10 +81,16 @@ export default function LogoStudioOrderPanel({ approvalId, orderUid }: { approva
         </div>
       </div>
       <div className="text-gray-700 leading-6">
-        <div><b>פרטי העיצוב:</b> „{a.spec.primaryText}”{a.spec.secondaryText ? ` · „${a.spec.secondaryText}”` : ''}{a.spec.date ? ` · ${a.spec.date}` : ''}{a.spec.monogramLetters ? ` · מונוגרמה: ${a.spec.monogramLetters}` : ''}</div>
-        <div>גופן: {a.details.font} · סגנון: {a.details.style} · סמל: {a.details.symbol} · אירוע: {a.details.event} · צבע: <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: a.spec.color, border: '1px solid #ccc' }} /> <span dir="ltr">{a.spec.color}</span></div>
+        {a.upload ? (
+          <div><b>מקור הלוגו:</b> הלקוח העלה קובץ מוכן{a.upload.bgRemoved ? ' · הרקע הוסר באתר (המקור זמין להורדה למעלה)' : ' · ללא הסרת רקע'}</div>
+        ) : (
+          <>
+            <div><b>פרטי העיצוב:</b> „{a.spec.primaryText}”{a.spec.secondaryText ? ` · „${a.spec.secondaryText}”` : ''}{a.spec.date ? ` · ${a.spec.date}` : ''}{a.spec.monogramLetters ? ` · מונוגרמה: ${a.spec.monogramLetters}` : ''}</div>
+            <div>גופן: {a.details.font} · סגנון: {a.details.style} · סמל: {a.details.symbol} · אירוע: {a.details.event} · צבע: <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: a.spec.color, border: '1px solid #ccc' }} /> <span dir="ltr">{a.spec.color}</span></div>
+          </>
+        )}
         {a.details.aiLayers.length > 0 && <div>שכבות AI: {a.details.aiLayers.join(', ')}</div>}
-        {a.spec.notes && <div>הערות הלקוח: {a.spec.notes}</div>}
+        {!a.upload && a.spec.notes && <div>הערות הלקוח: {a.spec.notes}</div>}
         <div>כיפה: {a.product.name}{Object.keys(a.product.selectedVariants).length ? ` · ${Object.entries(a.product.selectedVariants).map(([k, v]) => `${k}: ${v}`).join(' · ')}` : ''}</div>
         <div><b>גימור:</b> {a.finish === 'embroidery' ? 'רקמה' : 'הדפסה'} · <b>מיקום מיועד:</b> מרכז {Math.round(a.placement.x * 100)}% / {Math.round(a.placement.y * 100)}% מהתמונה, רוחב {Math.round(a.placement.w * 100)}% מרוחב התמונה</div>
         <div><b>קובץ:</b> {p.pixelWidth}×{p.pixelHeight} פיקסלים{p.printWidthMm ? ` · הדפסה מתוכננת ${p.printWidthMm}×${p.printHeightMm} מ״מ · ${p.effectiveDpi} DPI אפקטיבי` : ''}</div>

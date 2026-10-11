@@ -515,7 +515,7 @@ export default function EventKippotClient() {
         </div>
       </div>
 
-      {/* ── סטודיו לוגו AI — לוגו אישי + תיקונים בשיחה + הדמיה על הדגם שנבחר ── */}
+      {/* ── סטודיו לוגו — העלאת לוגו מוכן (עם הסרת רקע) או עיצוב ב-AI + הדמיה על הדגם שנבחר ── */}
       <a
         href={`/logo-studio?style=${encodeURIComponent(selectedStyleId)}&qty=${qty}&side=${printType === 'print-bottom' ? 'bottom' : 'top'}`}
         style={{
@@ -527,8 +527,8 @@ export default function EventKippotClient() {
           boxShadow: '0 2px 12px rgba(81,40,95,0.3)',
         }}
       >
-        <span>🎨 עצבו לוגו אישי ב-AI על הכיפה שבחרתם</span>
-        <span style={{ fontSize: 12.5, fontWeight: 600, opacity: 0.9 }}>תיקונים בשיחה · הדמיה על הכיפה · 3 ניסיונות חינם</span>
+        <span>🎨 העלו לוגו או עצבו לוגו אישי ב-AI על הכיפה</span>
+        <span style={{ fontSize: 12.5, fontWeight: 600, opacity: 0.9 }}>העלאת לוגו מוכן + הסרת רקע · או עיצוב ב-AI עם 3 ניסיונות חינם · הדמיה על הכיפה</span>
       </a>
 
       {/* ── מזכרות לאירוע — באנרים לפי קטגוריה + סינון ומיון ── */}

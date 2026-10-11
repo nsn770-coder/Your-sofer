@@ -68,7 +68,8 @@ export async function fetchCatalogImage(url: string): Promise<Buffer> {
 }
 
 /** Validate an uploaded file by its CONTENT (not the declared type) and re-encode it. */
-export async function sanitizeUpload(buf: Buffer): Promise<{ png: Buffer; width: number; height: number }> {
+export async function sanitizeUpload(buf: Buffer, opts: { maxSide?: number } = {}): Promise<{ png: Buffer; width: number; height: number }> {
+  const maxSide = opts.maxSide ?? 1600;
   const sig = buf.subarray(0, 12);
   const isPng = sig[0] === 0x89 && sig[1] === 0x50 && sig[2] === 0x4e && sig[3] === 0x47;
   const isJpg = sig[0] === 0xff && sig[1] === 0xd8 && sig[2] === 0xff;
@@ -79,7 +80,7 @@ export async function sanitizeUpload(buf: Buffer): Promise<{ png: Buffer; width:
   // re-encode: strips metadata/EXIF and anything appended to the file
   const out = await sharp(buf, { limitInputPixels: 40_000_000 })
     .rotate()
-    .resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true })
+    .resize({ width: maxSide, height: maxSide, fit: 'inside', withoutEnlargement: true })
     .png()
     .toBuffer({ resolveWithObject: true });
   return { png: out.data, width: out.info.width, height: out.info.height };

@@ -64,7 +64,7 @@ export default function DesignStep(p: Props) {
           {current.warnings.map((w, i) => <div key={i} className={s.warn}>{w}</div>)}
           <div className={s.row} style={{ marginTop: 8 }}>
             <a className={s.secondary} style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }} href={current.logo.url} target="_blank" rel="noopener noreferrer">⬇️ הורדת PNG</a>
-            <button type="button" className={s.secondary} onClick={p.onEditDetails}>✏️ עריכת הפרטים</button>
+            <button type="button" className={s.secondary} onClick={p.onEditDetails}>{current.upload ? '🔄 החלפת קובץ / הסרת רקע' : '✏️ עריכת הפרטים'}</button>
           </div>
         </div>
 
@@ -83,6 +83,17 @@ export default function DesignStep(p: Props) {
         </div>
       </div>
 
+      {current.upload ? (
+        <div>
+          <div className={s.card}>
+            <p className={s.cardTitle}>⬆️ הלוגו שהעליתם</p>
+            <div className={s.hint}>
+              זה הקובץ שהעליתם{current.upload.bgRemoved ? ' (אחרי הסרת רקע)' : ''}. הוא יודפס כפי שהוא — תיקונים בשיחה זמינים רק ללוגו שעוצב כאן בסטודיו.
+              אפשר לבחור למעלה גרסה אחרת, להחליף קובץ, או לעבור לעיצוב ב-AI.
+            </div>
+          </div>
+        </div>
+      ) : (
       <div>
         <div className={s.card}>
           <p className={s.cardTitle}>💬 בקשת תיקונים</p>
@@ -115,6 +126,7 @@ export default function DesignStep(p: Props) {
           </div>
         </div>
       </div>
+      )}
 
       <div className={s.sticky}>
         <div className={s.stickyInner}>

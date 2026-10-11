@@ -18,6 +18,7 @@ import { MissingGlyphError, unsupportedChars } from './textRender.server';
 import { productionInfo, type ProductionInfo } from './production';
 import { DEFAULT_FREE_ATTEMPTS } from './quota.server';
 import type { InlineImage } from './gemini.server';
+import { removeLogoBackground, BgRemovalError } from './removeBg.server';
 
 export const db = (): DbLike => getAdminDb() as unknown as DbLike;
 const fs = () => getAdminDb();
@@ -171,7 +172,9 @@ export interface VersionDoc {
   };
   summary: string[];
   warnings: string[];
-  source: 'initial' | 'revision' | 'edit';
+  source: 'initial' | 'revision' | 'edit' | 'upload';
+  /** Only for source "upload": the customer's own file and whether its background was removed. */
+  upload?: { assetId: string; original: StoredAsset; bgRemoved: boolean };
   opId: string;
   createdAt: number;
   includedAiMockupUsed: boolean;
@@ -300,6 +303,65 @@ export async function buildVersion(p: {
   return { id: versionId, version };
 }
 
+/**
+ * Version from a logo the customer UPLOADED (no AI, no attempt). The original
+ * file stays untouched; with removeBg=true a transparent copy is made from it.
+ * Toggling the background always starts from the original upload.
+ */
+export async function buildUploadedVersion(p: {
+  projectId: string; uid: string; assetId: string; removeBg: boolean;
+}): Promise<{ id: string; version: VersionDoc }> {
+  if (!/^[a-f0-9]{20}$/.test(p.assetId)) throw new HttpError(400, 'invalid_asset', 'הקובץ לא נמצא. העלו את הלוגו מחדש.');
+  const snap = await fs().collection(COL.assets).doc(p.assetId).get();
+  const meta = snap.data();
+  if (!snap.exists || meta?.uid !== p.uid || meta?.kind !== 'logo_upload') throw new HttpError(404, 'asset_not_found', 'הקובץ לא נמצא. העלו את הלוגו מחדש.');
+  const original: StoredAsset = { publicId: meta.publicId, version: meta.version, format: meta.format, width: meta.width, height: meta.height, bytes: meta.bytes };
+
+  const warnings: string[] = [];
+  let logoAsset: StoredAsset = original;
+  let bgRemoved = false;
+  if (p.removeBg) {
+    const buf = await downloadPrivate(original);
+    let r;
+    try { r = await removeLogoBackground(buf); }
+    catch (e) {
+      if (e instanceof BgRemovalError) throw new HttpError(422, 'bg_removal_failed', 'לא הצלחנו להסיר את הרקע מהקובץ הזה. אפשר להמשיך עם הקובץ המקורי או להעלות קובץ PNG עם רקע שקוף.');
+      throw e;
+    }
+    if (r.alreadyTransparent) warnings.push('לקובץ כבר היה רקע שקוף — רק נחתכו השוליים הריקים.');
+    else if (r.busyBackground) warnings.push('הרקע בקובץ אינו בצבע אחיד, ולכן ייתכן שההסרה חלקית. בדקו את התוצאה על הרקע הכהה, או העלו קובץ PNG שקוף.');
+    else if (r.removedRatio < 0.03) warnings.push('כמעט לא נמצא רקע להסרה בקובץ הזה.');
+    logoAsset = await uploadPrivate(r.png, `logo-studio/${p.uid}/${p.projectId}`, 'png');
+    bgRemoved = true;
+  }
+
+  const ref = fs().collection(COL.projects).doc(p.projectId);
+  const versionId = crypto.randomBytes(8).toString('hex');
+  const version = await fs().runTransaction(async tx => {
+    const ps = await tx.get(ref);
+    const proj = ps.data() as ProjectDoc;
+    const v: VersionDoc = {
+      n: (proj.versionCount ?? 0) + 1,
+      parentVersionId: null,
+      spec: proj.draftSpec,
+      logo: { ...logoAsset, rasterScale: 1 },
+      layers: ['upload'],
+      ai: {},
+      summary: [bgRemoved ? 'לוגו שהעליתם · הרקע הוסר' : 'לוגו שהעליתם · קובץ מקורי'],
+      warnings,
+      source: 'upload',
+      upload: { assetId: p.assetId, original, bgRemoved },
+      opId: `upload-${versionId}`,
+      createdAt: Date.now(),
+      includedAiMockupUsed: false,
+    };
+    tx.set(ref.collection('versions').doc(versionId), v);
+    tx.update(ref, { versionCount: v.n, currentVersionId: versionId, updatedAt: Date.now() });
+    return v;
+  });
+  return { id: versionId, version };
+}
+
 async function recolor(layer: RasterLayer, color: string): Promise<RasterLayer> {
   const sharp = (await import('sharp')).default;
   const { hexToRgb } = await import('./color');
@@ -360,6 +422,7 @@ export async function serializeProject(projectId: string, proj: ProjectDoc) {
         source: v.source, createdAt: v.createdAt, includedAiMockupUsed: v.includedAiMockupUsed,
         logo: { ...assetUrls(v.logo, 900), width: v.logo.width, height: v.logo.height, rasterScale: v.logo.rasterScale },
         aiLayers: Object.keys(v.ai ?? {}),
+        upload: v.upload ? { assetId: v.upload.assetId, bgRemoved: v.upload.bgRemoved, originalThumb: signedUrl(v.upload.original, { width: 900 }) } : null,
       };
     }),
     mockups: ms.docs.map(d => {

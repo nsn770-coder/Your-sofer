@@ -40,6 +40,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     const settings = await getSettings();
     const production = computeProduction(version, mockup.placement, sel, settings.minDpi);
     const s = version.spec;
+    const uploaded = version.source === 'upload' && !!version.upload;
 
     const approvalId = crypto.randomBytes(10).toString('hex');
     const now = Date.now();
@@ -58,7 +59,14 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         material: sel.material, color: sel.color, materialKind: sel.materialKind, imageUrl: mockup.imageUrl,
       },
       spec: s,
-      details: {
+      details: uploaded ? {
+        font: '—',
+        style: 'לוגו שהלקוח העלה',
+        symbol: '—',
+        event: LOGO_EVENTS.find(x => x.id === s.eventType)?.label ?? s.eventType,
+        aiLayers: [],
+        warnings: version.warnings,
+      } : {
         font: getLogoFont(s.fontId).label,
         style: LOGO_STYLES.find(x => x.id === s.style)?.label ?? s.style,
         symbol: LOGO_SYMBOLS.find(x => x.id === s.symbol)?.label ?? s.symbol,
@@ -67,6 +75,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         warnings: version.warnings,
       },
       logo: version.logo,
+      upload: uploaded ? { original: version.upload!.original, bgRemoved: version.upload!.bgRemoved } : null,
       mockup: { asset: mockup.asset, kind: mockup.kind, placement: mockup.placement, finish: mockup.finish, box: mockup.box },
       production,
     };
@@ -89,6 +98,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       materialKind: sel.materialKind,
       selectedVariants: proj.selectedVariants,
       spec: s,
+      uploaded,
+      bgRemoved: uploaded ? version.upload!.bgRemoved : true,
       font: snapshot.details.font,
       logoUrl: signedUrl(version.logo),
       logoThumbUrl: signedUrl(version.logo, { width: 600 }),

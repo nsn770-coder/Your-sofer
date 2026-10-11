@@ -2175,7 +2175,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
         type="button"
         onClick={() => router.push(`/logo-studio?productId=${encodeURIComponent(product.id)}&v=${encodeURIComponent(JSON.stringify(selectedVariants))}`)}
         style={{ width: '100%', height: 52, background: '#51285F', color: '#fff', border: 'none', borderRadius: 14, fontSize: compact ? 14 : 15, fontWeight: 900, cursor: 'pointer', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 2px 10px rgba(81,40,95,0.25)' }}>
-        ✨ עצבו לוגו אישי לכיפה (3 ניסיונות חינם)
+        ✨ העלו לוגו או עצבו לוגו אישי לכיפה
       </button>
     ) : null;
 
