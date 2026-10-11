@@ -14,7 +14,7 @@ interface ApprovalView {
   spec: { primaryText: string; secondaryText: string; date: string; color: string; monogramLetters: string; notes: string };
   details: { font: string; style: string; symbol: string; event: string; aiLayers: string[]; warnings: string[] };
   production: { pixelWidth: number; pixelHeight: number; printWidthMm: number | null; printHeightMm: number | null; effectiveDpi: number | null; minDpi: number; ready: boolean; issues: string[] };
-  placement: { x: number; y: number; w: number };
+  placement: { x: number; y: number; w: number; r?: number };
   finish: 'print' | 'embroidery';
   mockupKind: 'composite' | 'ai';
   logo: { view: string; download: string; width: number; height: number; bytes: number };
@@ -92,7 +92,7 @@ export default function LogoStudioOrderPanel({ approvalId, orderUid }: { approva
         {a.details.aiLayers.length > 0 && <div>שכבות AI: {a.details.aiLayers.join(', ')}</div>}
         {!a.upload && a.spec.notes && <div>הערות הלקוח: {a.spec.notes}</div>}
         <div>כיפה: {a.product.name}{Object.keys(a.product.selectedVariants).length ? ` · ${Object.entries(a.product.selectedVariants).map(([k, v]) => `${k}: ${v}`).join(' · ')}` : ''}</div>
-        <div><b>גימור:</b> {a.finish === 'embroidery' ? 'רקמה' : 'הדפסה'} · <b>מיקום מיועד:</b> מרכז {Math.round(a.placement.x * 100)}% / {Math.round(a.placement.y * 100)}% מהתמונה, רוחב {Math.round(a.placement.w * 100)}% מרוחב התמונה</div>
+        <div><b>גימור:</b> {a.finish === 'embroidery' ? 'רקמה' : 'הדפסה'} · <b>מיקום מיועד:</b> מרכז {Math.round(a.placement.x * 100)}% / {Math.round(a.placement.y * 100)}% מהתמונה, רוחב {Math.round(a.placement.w * 100)}% מרוחב התמונה{a.placement.r ? ` · סיבוב ${Math.abs(a.placement.r)}° ${a.placement.r > 0 ? 'עם כיוון השעון' : 'נגד כיוון השעון'}` : ''}</div>
         <div><b>קובץ:</b> {p.pixelWidth}×{p.pixelHeight} פיקסלים{p.printWidthMm ? ` · הדפסה מתוכננת ${p.printWidthMm}×${p.printHeightMm} מ״מ · ${p.effectiveDpi} DPI אפקטיבי` : ''}</div>
         {p.ready
           ? <div className="font-bold text-green-700">✓ הקובץ עומד בדרישות הרזולוציה למידות שהוגדרו (מינימום {p.minDpi} DPI)</div>

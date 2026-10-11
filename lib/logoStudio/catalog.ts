@@ -172,14 +172,16 @@ export function resolveSelection(p: RawProduct, requested: Record<string, string
   };
 }
 
-export interface Placement { x: number; y: number; w: number } // relative to image (centre x/y, width)
+/** relative to image (centre x/y, width before rotation); r = rotation in degrees, clockwise (−180…180) */
+export interface Placement { x: number; y: number; w: number; r?: number }
 
 export function clampPlacement(pl: Partial<Placement> | null | undefined, area: ResolvedSelection['printArea']): Placement {
   const num = (v: unknown, d: number) => (typeof v === 'number' && Number.isFinite(v) ? v : d);
   const w = Math.min(area.maxW, Math.max(area.minW, num(pl?.w, area.defaultW)));
   const x = Math.min(area.cx + area.maxShift, Math.max(area.cx - area.maxShift, num(pl?.x, area.cx)));
   const y = Math.min(area.cy + area.maxShift, Math.max(area.cy - area.maxShift, num(pl?.y, area.cy)));
-  return { x, y, w };
+  const r = Math.round(Math.min(180, Math.max(-180, num(pl?.r, 0))) * 2) / 2;
+  return r ? { x, y, w, r } : { x, y, w };
 }
 
 /** Is this a kippah the studio can design for? */

@@ -65,6 +65,14 @@ export default function MockupStep(p: Props) {
   }
   function onPointerUp() { drag.current = null; }
 
+  const rotation = placement.r ?? 0;
+  function rotateBy(deg: number) {
+    let r = rotation + deg;
+    if (r > 180) r -= 360;
+    if (r < -180) r += 360;
+    setPlacement(clampPlacement({ ...placement, r }, area));
+  }
+
   if (!version) return <div className={s.card}>צרו קודם לוגו.</div>;
 
   return (
@@ -91,14 +99,26 @@ export default function MockupStep(p: Props) {
                     if (m[e.key]) { e.preventDefault(); setPlacement(clampPlacement({ ...placement, x: placement.x + m[e.key][0], y: placement.y + m[e.key][1] }, area)); }
                   }}
                   onPointerDown={onPointerDown}
-                  style={{ left: `${placement.x * 100}%`, top: `${placement.y * 100}%`, width: `${placement.w * 100}%` }}>
+                  style={{ left: `${placement.x * 100}%`, top: `${placement.y * 100}%`, width: `${placement.w * 100}%`, transform: `translate(-50%, -50%) rotate(${rotation}deg)` }}>
                   <img src={version.logo.thumb} alt="" />
                 </div>
               </div>
               <label className={s.label} htmlFor="ls-size">גודל הלוגו</label>
               <input id="ls-size" type="range" min={area.minW} max={area.maxW} step={0.005} value={placement.w}
                 onChange={e => setPlacement(clampPlacement({ ...placement, w: Number(e.target.value) }, area))} style={{ width: '100%' }} />
-              <div className={s.hint}>גררו את הלוגו בתוך האזור המסומן. השינוי כאן מקומי ולא צורך ניסיון.</div>
+              <label className={s.label} htmlFor="ls-rot">סיבוב הלוגו · {rotation > 0 ? `${rotation}° ימינה` : rotation < 0 ? `${-rotation}° שמאלה` : 'ישר'}</label>
+              <div className={s.row}>
+                <button type="button" className={s.secondary} aria-label="סיבוב שמאלה" onClick={() => rotateBy(-5)}>↺ 5°</button>
+                <input id="ls-rot" type="range" min={-180} max={180} step={1} value={rotation} className={s.grow}
+                  onChange={e => setPlacement(clampPlacement({ ...placement, r: Number(e.target.value) }, area))} />
+                <button type="button" className={s.secondary} aria-label="סיבוב ימינה" onClick={() => rotateBy(5)}>↻ 5°</button>
+              </div>
+              <div className={s.row} style={{ marginTop: 6 }}>
+                <button type="button" className={s.chip} onClick={() => rotateBy(-90)}>↺ 90°</button>
+                <button type="button" className={s.chip} onClick={() => rotateBy(90)}>↻ 90°</button>
+                {rotation !== 0 && <button type="button" className={s.ghost} onClick={() => setPlacement(clampPlacement({ ...placement, r: 0 }, area))}>איפוס סיבוב</button>}
+              </div>
+              <div className={s.hint}>גררו את הלוגו בתוך האזור המסומן, הגדילו/הקטינו וסובבו לשני הכיוונים. השינוי כאן מקומי ולא צורך ניסיון.</div>
               {production
                 ? <div className={s.hint}>גודל הדפסה מתוכנן: כ-{production.w}×{production.h} מ״מ · רזולוציה אפקטיבית {production.dpi} DPI</div>
                 : <div className={s.hint}>מידות ההדפסה המדויקות ייקבעו על ידי הצוות שלנו.</div>}

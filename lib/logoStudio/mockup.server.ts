@@ -38,7 +38,10 @@ export async function composeMockup(productImage: Buffer, logoPng: Buffer, place
 
   // logo at target size
   const targetW = Math.max(16, Math.round(placement.w * W));
-  const logoRes = await sharp(logoPng).ensureAlpha().resize({ width: targetW }).raw().toBuffer({ resolveWithObject: true });
+  let sized = await sharp(logoPng).ensureAlpha().resize({ width: targetW }).png().toBuffer();
+  // rotation (clockwise, around the logo centre) — the canvas grows to fit, centre stays at placement x/y
+  if (placement.r) sized = await sharp(sized).rotate(placement.r, { background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
+  const logoRes = await sharp(sized).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const lw = logoRes.info.width, lh = logoRes.info.height;
   const logo = logoRes.data;
 
