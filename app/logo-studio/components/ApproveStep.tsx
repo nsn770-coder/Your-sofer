@@ -40,33 +40,7 @@ export default function ApproveStep({ project, product, mockup, busy, error, ini
   return (
     <div className={s.twoCol}>
       <div>
-        <div className={s.card}>
-          <p className={s.cardTitle}>סיכום העיצוב</p>
-          <div className={s.row} style={{ alignItems: 'stretch' }}>
-            <div className={`${s.canvasWrap} ${s.checker}`} style={{ flex: 1, minWidth: 140 }}>
-              <img className={s.logoImg} src={version.logo.thumb} alt={`לוגו גרסה ${version.n}`} />
-            </div>
-            <div className={s.canvasWrap} style={{ flex: 1, minWidth: 140 }}>
-              {mockup && <img className={s.logoImg} src={mockup.thumb} alt="ההדמיה שתאושר" />}
-              {!mockupOk && <div className={s.stale}>יש ליצור הדמיה לגרסה {version.n}</div>}
-            </div>
-          </div>
-          <p className={s.disclaimer}>{MOCKUP_DISCLAIMER}</p>
-          <dl className={s.kv} style={{ marginTop: 10 }}>
-            <dt>כיפה</dt><dd>{product?.name ?? ''}{Object.values(project.selectedVariants).length ? ` · ${Object.values(project.selectedVariants).join(' · ')}` : ''}</dd>
-            <dt>צד</dt><dd>{project.side === 'bottom' ? 'תחתון (פנים הכיפה)' : 'עליון'}</dd>
-            <dt>גרסה</dt><dd>{version.n}</dd>
-            <dt>טקסט</dt><dd dir="auto">{spec.primaryText || '—'}</dd>
-            {spec.secondaryText && <><dt>טקסט משני</dt><dd dir="auto">{spec.secondaryText}</dd></>}
-            {spec.date && <><dt>תאריך</dt><dd dir="auto">{spec.date}</dd></>}
-            <dt>גופן</dt><dd>{getLogoFont(spec.fontId).label}</dd>
-            <dt>צבע</dt><dd><span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', background: spec.color, border: '1px solid #ccc', verticalAlign: 'middle' }} /> <span dir="ltr">{spec.color}</span></dd>
-            <dt>סגנון</dt><dd>{LOGO_STYLES.find(x => x.id === spec.style)?.label}</dd>
-            <dt>סמל</dt><dd>{LOGO_SYMBOLS.find(x => x.id === spec.symbol)?.label}</dd>
-            <dt>אירוע</dt><dd>{LOGO_EVENTS.find(x => x.id === spec.eventType)?.label}</dd>
-            {mockup && <><dt>גימור</dt><dd>{mockup.finish === 'embroidery' ? 'רקמה' : 'הדפסה'}</dd></>}
-          </dl>
-        </div>
+        <ApproveSummary project={project} product={product} mockup={mockup} />
       </div>
       <div>
         <div className={s.card}>
@@ -87,6 +61,95 @@ export default function ApproveStep({ project, product, mockup, busy, error, ini
             {busy ? <span className={s.spinner} /> : 'אישור והוספה לסל'}
           </button>
           {!mockupOk && <button type="button" className={s.ghost} onClick={onBack}>חזרה ליצירת הדמיה</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Logo + mockup + design details of ONE side (used alone, or twice for both sides). */
+export function ApproveSummary({ project, product, mockup, title }: { project: ProjectView; product: CatalogProduct | null; mockup: MockupView | null; title?: string }) {
+  const version = project.versions.find(v => v.id === project.currentVersionId) ?? project.versions[0];
+  const mockupOk = !!mockup && mockup.versionId === version?.id && !mockup.stale;
+  const spec = version?.spec;
+  if (!version || !spec) return <div className={s.card}>צרו קודם לוגו.</div>;
+  const uploaded = !!version.upload;
+  return (
+        <div className={s.card}>
+          <p className={s.cardTitle}>{title ?? 'סיכום העיצוב'}</p>
+          <div className={s.row} style={{ alignItems: 'stretch' }}>
+            <div className={`${s.canvasWrap} ${s.checker}`} style={{ flex: 1, minWidth: 140 }}>
+              <img className={s.logoImg} src={version.logo.thumb} alt={`לוגו גרסה ${version.n}`} />
+            </div>
+            <div className={s.canvasWrap} style={{ flex: 1, minWidth: 140 }}>
+              {mockup && <img className={s.logoImg} src={mockup.thumb} alt="ההדמיה שתאושר" />}
+              {!mockupOk && <div className={s.stale}>יש ליצור הדמיה לגרסה {version.n}</div>}
+            </div>
+          </div>
+          <p className={s.disclaimer}>{MOCKUP_DISCLAIMER}</p>
+          <dl className={s.kv} style={{ marginTop: 10 }}>
+            <dt>כיפה</dt><dd>{product?.name ?? ''}{Object.values(project.selectedVariants).length ? ` · ${Object.values(project.selectedVariants).join(' · ')}` : ''}</dd>
+            <dt>צד</dt><dd>{project.side === 'bottom' ? 'תחתון (פנים הכיפה)' : 'עליון'}</dd>
+            <dt>גרסה</dt><dd>{version.n}</dd>
+            {uploaded ? (
+              <><dt>לוגו</dt><dd>הלוגו שהעליתם{version.upload?.bgRemoved ? ' · הרקע הוסר' : ''}</dd></>
+            ) : (
+              <>
+                <dt>טקסט</dt><dd dir="auto">{spec.primaryText || '—'}</dd>
+                {spec.secondaryText && <><dt>טקסט משני</dt><dd dir="auto">{spec.secondaryText}</dd></>}
+                {spec.date && <><dt>תאריך</dt><dd dir="auto">{spec.date}</dd></>}
+                <dt>גופן</dt><dd>{getLogoFont(spec.fontId).label}</dd>
+                <dt>צבע</dt><dd><span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', background: spec.color, border: '1px solid #ccc', verticalAlign: 'middle' }} /> <span dir="ltr">{spec.color}</span></dd>
+                <dt>סגנון</dt><dd>{LOGO_STYLES.find(x => x.id === spec.style)?.label}</dd>
+                <dt>סמל</dt><dd>{LOGO_SYMBOLS.find(x => x.id === spec.symbol)?.label}</dd>
+                <dt>אירוע</dt><dd>{LOGO_EVENTS.find(x => x.id === spec.eventType)?.label}</dd>
+              </>
+            )}
+            {mockup && <><dt>גימור</dt><dd>{mockup.finish === 'embroidery' ? 'רקמה' : 'הדפסה'}</dd></>}
+          </dl>
+        </div>
+  );
+}
+
+/** Both sides at once: one summary per side + one quantity / approval for the same kippot. */
+export function ApproveBothStep({ sides, product, busy, error, initialQty, onApprove, onBack }: {
+  sides: { title: string; project: ProjectView; mockup: MockupView | null }[];
+  product: CatalogProduct | null;
+  busy: boolean;
+  error: string | null;
+  initialQty?: number;
+  onApprove: (qty: number) => void;
+  onBack: () => void;
+}) {
+  const [qty, setQty] = useState(initialQty && initialQty >= KIPA_MIN_QTY ? initialQty : KIPA_MIN_QTY);
+  const qtyOptions = QTY_OPTIONS.includes(qty) ? QTY_OPTIONS : [...QTY_OPTIONS, qty].sort((a, b) => a - b);
+  const sel = sides[0]?.project.selection;
+  const material = sel?.materialKind === 'satin' ? 'satin' : 'linen';
+  const unit = getKipaUnitPrice(qty, material) + KIPA_EXTRA_SIDE_PRICE;
+  const allOk = sides.every(sd => {
+    const v = sd.project.versions.find(x => x.id === sd.project.currentVersionId);
+    return !!sd.mockup && !!v && sd.mockup.versionId === v.id && !sd.mockup.stale;
+  });
+  return (
+    <div className={s.twoCol}>
+      <div>
+        {sides.map(sd => <ApproveSummary key={sd.title} title={sd.title} project={sd.project} product={product} mockup={sd.mockup} />)}
+      </div>
+      <div>
+        <div className={s.card} style={{ position: 'sticky', top: 70 }}>
+          <p className={s.cardTitle}>כמות והוספה לסל — שני הצדדים</p>
+          <label className={s.label} htmlFor="ls-qty2">כמות כיפות (מינימום {KIPA_MIN_QTY})</label>
+          <select id="ls-qty2" className={s.select} value={qty} onChange={e => setQty(Number(e.target.value))}>
+            {qtyOptions.map(q => <option key={q} value={q}>{q}</option>)}
+          </select>
+          <div style={{ fontSize: 15, marginTop: 10 }}>₪{unit} לכיפה · סה״כ <b>₪{(unit * qty).toLocaleString('he-IL')}</b></div>
+          <div className={s.hint}>כולל הדפסה בשני הצדדים (+₪{KIPA_EXTRA_SIDE_PRICE} לכיפה על הצד השני).</div>
+          <div className={s.hint}>באישור נשמר עותק קבוע של שני העיצובים וההדמיות להזמנה.</div>
+          {error && <div className={s.error} role="alert">{error}</div>}
+          <button type="button" className={s.primary} style={{ marginTop: 12 }} disabled={!allOk || busy} onClick={() => onApprove(qty)}>
+            {busy ? <span className={s.spinner} /> : 'אישור שני הצדדים והוספה לסל'}
+          </button>
+          {!allOk && <button type="button" className={s.ghost} onClick={onBack}>חסרה הדמיה לאחד הצדדים — חזרה להדמיה</button>}
         </div>
       </div>
     </div>

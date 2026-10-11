@@ -130,3 +130,7 @@
 button.sidePill { cursor: pointer; font-family: inherit; font-size: 13px; }
 button.sidePill:disabled { cursor: default; }
 button.sidePill:not(:disabled):hover { border-color: #51285F; color: #51285F; }
+
+/* ── both sides on one page ── */
+.sideSection { border: 2px solid #ece6da; border-radius: 18px; padding: 12px 12px 2px; margin-bottom: 16px; background: rgba(255,255,255,.5); }
+.sideTitle { font-size: 17px; font-weight: 900; color: #51285F; margin: 0 0 10px; }

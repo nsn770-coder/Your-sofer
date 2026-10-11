@@ -20,6 +20,8 @@ interface Props {
   onBackToKippah: () => void;
   onNext: () => void;
   blocked: boolean;
+  /** the page renders its own navigation bar (both-sides mode) */
+  hideNav?: boolean;
 }
 
 export default function MockupStep(p: Props) {
@@ -191,13 +193,15 @@ export default function MockupStep(p: Props) {
         </div>
       )}
 
-      <div className={s.sticky}>
-        <div className={s.stickyInner}>
-          <button type="button" className={s.primary} disabled={!lastForVersion || !!p.busy} onClick={p.onNext}>
-            {lastForVersion ? 'לאישור ושמירה להזמנה ←' : 'צרו הדמיה לגרסה הנוכחית כדי להמשיך'}
-          </button>
+      {!p.hideNav && (
+        <div className={s.sticky}>
+          <div className={s.stickyInner}>
+            <button type="button" className={s.primary} disabled={!lastForVersion || !!p.busy} onClick={p.onNext}>
+              {lastForVersion ? 'לאישור ושמירה להזמנה ←' : 'צרו הדמיה לגרסה הנוכחית כדי להמשיך'}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

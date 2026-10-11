@@ -14,6 +14,8 @@ interface Props {
   onEditDetails: () => void;
   onNext: () => void;
   blocked: boolean;
+  /** the page renders its own navigation bar (both-sides mode) */
+  hideNav?: boolean;
 }
 
 const SUGGESTIONS = ['תעשה את הצבע מעט כהה יותר', 'תגדיל את האותיות', 'תוריד את העיטור', 'שים מגן דוד מעל האותיות', 'תשאיר הכול ורק תשנה את השם ל…'];
@@ -128,11 +130,13 @@ export default function DesignStep(p: Props) {
       </div>
       )}
 
-      <div className={s.sticky}>
-        <div className={s.stickyInner}>
-          <button type="button" className={s.primary} disabled={!!p.busy} onClick={p.onNext}>הלוגו מוכן — להדמיה על הכיפה ←</button>
+      {!p.hideNav && (
+        <div className={s.sticky}>
+          <div className={s.stickyInner}>
+            <button type="button" className={s.primary} disabled={!!p.busy} onClick={p.onNext}>הלוגו מוכן — להדמיה על הכיפה ←</button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
