@@ -528,6 +528,20 @@ export default function LogoStudioClient() {
     }
   }
 
+  /** both-sides mode: jump to the other side at any time (e.g. start with the bottom) */
+  async function switchBothSide(next: KippahSide) {
+    if (next === side || busy) return;
+    setError(null); setNotice(null);
+    if (doneSides.includes(side)) {
+      // the current side is already approved in the cart → keep it, start a fresh design for the other side
+      await startOtherSide(next, spec, currentVersion?.upload ?? null);
+    } else {
+      // nothing approved yet for this side → simply move the current design to the other side
+      await changeSide(next);
+      if (step === 'approve') setStep('mockup');
+    }
+  }
+
   // ── navigation guards ──────────────────────────────────────────────────────
   const hasVersion = !!project?.versions.length;
   const stepEnabled: Record<StepId, boolean> = {
@@ -566,9 +580,10 @@ export default function LogoStudioClient() {
           <div className={s.sidesBar}>
             <span style={{ fontWeight: 800 }}>הדפסה משני הצדדים:</span>
             {(['top', 'bottom'] as KippahSide[]).map(sd => (
-              <span key={sd} className={s.sidePill} data-active={sd === side} data-done={doneSides.includes(sd)}>
-                {doneSides.includes(sd) ? '✓ ' : ''}{sd === 'top' ? 'צד עליון' : 'צד תחתון (פנים)'}{sd === side ? ' · עכשיו' : ''}
-              </span>
+              <button key={sd} type="button" className={s.sidePill} data-active={sd === side} data-done={doneSides.includes(sd)}
+                disabled={!!busy || sd === side} onClick={() => switchBothSide(sd)} aria-pressed={sd === side}>
+                {doneSides.includes(sd) ? '✓ ' : ''}{sd === 'top' ? 'צד עליון' : 'צד תחתון (פנים)'}{sd === side ? ' · עכשיו' : ' · לעיצוב'}
+              </button>
             ))}
             {selection && !selection.sidesAvailable[side === 'top' ? 'bottom' : 'top'] && !doneSides.includes(side === 'top' ? 'bottom' : 'top') && (
               <span className={s.hint} style={{ width: '100%' }}>לצד השני עדיין אין תמונה לכיפה זו, ולכן לא ניתן ליצור עליו הדמיה. אפשר לפנות אלינו בוואטסאפ.</span>

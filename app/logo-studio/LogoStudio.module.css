@@ -127,3 +127,6 @@
 .sidePill { border: 1.5px solid #e2dccf; background: #fff; border-radius: 999px; padding: 4px 11px; font-weight: 700; color: #6b6b74; }
 .sidePill[data-active='true'] { border-color: #51285F; color: #51285F; }
 .sidePill[data-done='true'] { border-color: #b9dcc2; color: #2f6b3c; background: #f0f8f2; }
+button.sidePill { cursor: pointer; font-family: inherit; font-size: 13px; }
+button.sidePill:disabled { cursor: default; }
+button.sidePill:not(:disabled):hover { border-color: #51285F; color: #51285F; }
