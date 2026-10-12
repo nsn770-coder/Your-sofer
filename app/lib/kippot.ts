@@ -32,6 +32,11 @@ export const KIPA_MATERIAL_LABELS: Record<KipaMaterial, string> = {
 export const isBulkEventKippotLine = (i: { cat?: string; quantity: number }): boolean =>
   i.cat === 'כיפות' && i.quantity >= KIPA_MIN_QTY;
 
+/** תוספת לכל כיפה בדגמי רקמה (שם המוצר מכיל "רקמה"): פשתן 19/17/15 במקום 14/12/10 */
+export const KIPA_EMBROIDERY_SURCHARGE = 5;
+
+export const isEmbroideredKipaName = (name?: string | null): boolean => /רקמה/.test(name || '');
+
 export const getKipaUnitPrice = (q: number, material: KipaMaterial = 'linen'): number =>
   material === 'satin'
     ? (q < 50 ? 8 : 6)

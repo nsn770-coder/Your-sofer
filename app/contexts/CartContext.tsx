@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { getKipaUnitPrice, isBulkEventKippotLine } from '../lib/kippot';
+import { getKipaUnitPrice, isBulkEventKippotLine, isEmbroideredKipaName, KIPA_EMBROIDERY_SURCHARGE } from '../lib/kippot';
 import { calcSimchaDiscount, PROMO_ACTIVE, SIMCHA_CODE, type SimchaResult } from '../lib/promoRules';
 
 // ── Shipping constants — single source of truth used in cart + checkout ───────
@@ -30,8 +30,9 @@ export function getEventPrintPricePerUnit(qty: number): number {
 //   פשתן: 30–49 → ₪14 | 50–99 → ₪12 | 100+ → ₪10 (הדפסת לוגו כלולה)
 //   סאטן: 30–49 → ₪8  | 50+  → ₪6 (עיצוב אישי כלול)
 // basePrice נשמר בחתימה לתאימות לאחור אך אינו משפיע — התמחור לפי כמות וחומר.
-export function getEventKippahPricePerUnit(_basePrice: number, qty: number, material: 'linen' | 'satin' = 'linen'): number {
-  return getKipaUnitPrice(qty, material);
+// דגמי רקמה (שם המוצר מכיל "רקמה") — תוספת ₪5 לכל כיפה בכל המדרגות.
+export function getEventKippahPricePerUnit(_basePrice: number, qty: number, material: 'linen' | 'satin' = 'linen', productName?: string): number {
+  return getKipaUnitPrice(qty, material) + (isEmbroideredKipaName(productName) ? KIPA_EMBROIDERY_SURCHARGE : 0);
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────

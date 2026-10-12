@@ -542,7 +542,7 @@ function EventKippotCalculator({
   // Tiered per-unit price by quantity — logo printing included in the price
   // חומר לפי שם המוצר: "סאטן" → מדרגות סאטן (8/6), אחרת פשתן (14/12/10)
   const kipaMaterial: 'linen' | 'satin' = /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen';
-  const unitPrice   = getEventKippahPricePerUnit(product.price, qty, kipaMaterial);
+  const unitPrice   = getEventKippahPricePerUnit(product.price, qty, kipaMaterial, product.name);
   const kippotTotal = unitPrice * qty;
   const grandTotal  = kippotTotal;
 
@@ -652,7 +652,7 @@ function EventKippotCalculator({
             </thead>
             <tbody>
               {TABLE_QTYS.map((n, i) => {
-                const ppu = getEventKippahPricePerUnit(product.price, n, kipaMaterial);
+                const ppu = getEventKippahPricePerUnit(product.price, n, kipaMaterial, product.name);
                 const rowTotal = ppu * n;
                 const isActive = n === qty;
                 return (
@@ -2018,7 +2018,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     removeItem(`print-${product.id}`);
     // Tiered per-unit price by quantity — logo printing included in the price
     // חומר לפי שם המוצר — כמו ב-EventKippotBox (סאטן → 8/6, פשתן → 14/12/10)
-    const unitPrice = getEventKippahPricePerUnit(product.price, eventQty, /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen');
+    const unitPrice = getEventKippahPricePerUnit(product.price, eventQty, /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen', product.name);
     addItem({ id: product.id, name: product.name, price: unitPrice, imgUrl: product.imgUrl || product.image_url, quantity: eventQty, cat: 'כיפות' });
     if (withPrinting) {
       // Print item carries the design file at ₪0 — cost is embedded in the kippah price
@@ -2038,7 +2038,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     removeItem(product.id);
     removeItem(`print-${product.id}`);
     const material = /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' as const : 'linen' as const;
-    const unitPrice = getEventKippahPricePerUnit(product.price, design.quantity, material);
+    const unitPrice = getEventKippahPricePerUnit(product.price, design.quantity, material, product.name);
     addItem({
       id: product.id, name: product.name, price: unitPrice,
       imgUrl: product.imgUrl || product.image_url,
@@ -2195,7 +2195,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           {!compact && (
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-                <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--ys-text)' }}>₪{product.price} / כיפה</span>
+                <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--ys-text)' }}>החל מ-₪{getEventKippahPricePerUnit(product.price, 100, /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen', product.name)} / כיפה</span>
               </div>
               <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>{t('pd.inclVatShip')}</div>
             </div>
