@@ -48,7 +48,7 @@ export default function CartPage() {
     removeItem(item.id);
     removeItem(`print-${item.id}`);
     const material = /סאטן|סטאן|סטן/.test(item.name || '') ? 'satin' as const : 'linen' as const;
-    const unitPrice = getEventKippahPricePerUnit(item.price, design.quantity, material, item.name);
+    const unitPrice = getEventKippahPricePerUnit(item.price, design.quantity, material, item);
     addItem({ ...item, price: unitPrice, quantity: design.quantity, customDesign: design });
     addItem({
       id: `print-${item.id}`, name: 'הדפסה לכיפות — עיצוב מהעורך (כלול במחיר)', price: 0,

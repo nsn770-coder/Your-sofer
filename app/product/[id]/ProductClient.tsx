@@ -4,6 +4,7 @@ import { doc, getDoc, updateDoc, setDoc, addDoc, collection, getDocs, query, whe
 import { db } from '../../firebase';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCart, getEventKippahPricePerUnit, SHIPPING_REGULAR } from '../../contexts/CartContext';
+import { isEmbroideredKippah } from '@/app/lib/kippot';
 import { useAuth } from '../../contexts/AuthContext';
 import { CATS } from '../../constants/categories';
 import { EVENT_SCROLL_SECTIONS } from '../../constants/eventScrollSections';
@@ -77,6 +78,7 @@ interface Product {
   variantOptions?: { name: string; values: string[]; surcharges?: Record<string, number> }[];
   minOrderQty?: number;
   customDesign?: boolean;
+  embroideredKippah?: boolean;
   marketingIntro?: string;
   whoIsItFor?: { emoji: string; text: string }[];
   whyUs?: string[];
@@ -529,7 +531,7 @@ function EventKippotCalculator({
   product,
   onAddToCart,
 }: {
-  product: { id: string; name: string; price: number; imgUrl?: string; image_url?: string; outOfStock?: boolean };
+  product: { id: string; name: string; price: number; imgUrl?: string; image_url?: string; outOfStock?: boolean; embroideredKippah?: boolean };
   onAddToCart: (qty: number, withPrinting: boolean, printFileUrl: string) => void;
 }) {
   const { t } = useT();
@@ -542,7 +544,7 @@ function EventKippotCalculator({
   // Tiered per-unit price by quantity — logo printing included in the price
   // חומר לפי שם המוצר: "סאטן" → מדרגות סאטן (8/6), אחרת פשתן (14/12/10)
   const kipaMaterial: 'linen' | 'satin' = /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen';
-  const unitPrice   = getEventKippahPricePerUnit(product.price, qty, kipaMaterial, product.name);
+  const unitPrice   = getEventKippahPricePerUnit(product.price, qty, kipaMaterial, product);
   const kippotTotal = unitPrice * qty;
   const grandTotal  = kippotTotal;
 
@@ -652,7 +654,7 @@ function EventKippotCalculator({
             </thead>
             <tbody>
               {TABLE_QTYS.map((n, i) => {
-                const ppu = getEventKippahPricePerUnit(product.price, n, kipaMaterial, product.name);
+                const ppu = getEventKippahPricePerUnit(product.price, n, kipaMaterial, product);
                 const rowTotal = ppu * n;
                 const isActive = n === qty;
                 return (
@@ -718,6 +720,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
   const [isEventKippot, setIsEventKippot]             = useState(product.isEventKippot ?? false);
   const [isEventProduct, setIsEventProduct]           = useState(product.isEventProduct ?? false);
   const [customDesign, setCustomDesign]               = useState(product.customDesign ?? false);
+  const [embroideredKippah, setEmbroideredKippah]     = useState(isEmbroideredKippah(product));
   const [eventScrollSection, setEventScrollSection]   = useState(product.eventScrollSection ?? '');
   const [bundleCodes, setBundleCodes] = useState<string[]>(() => {
     const arr = product.bundleComponentCodes ?? [];
@@ -838,6 +841,7 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
         isEventKippot: isEventKippot,
         isEventProduct: isEventProduct,
         customDesign: customDesign,
+        embroideredKippah: embroideredKippah,
         eventScrollSection: eventScrollSection || null,
         bundleComponentCodes: (() => {
           const codes = bundleCodes.map(c => c.trim()).filter(Boolean);
@@ -1102,6 +1106,11 @@ function AdminPanel({ product, onSave, onSaveGlobal, pageDefaults, isMobile, onC
             <input type="checkbox" checked={customDesign} onChange={e => setCustomDesign(e.target.checked)} />
             🎨 אפשר עיצוב אישי למוצר זה
             <span style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>customDesign</span>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
+            <input type="checkbox" checked={embroideredKippah} onChange={e => setEmbroideredKippah(e.target.checked)} />
+            🧵 כיפה עם רקמה — תוספת ₪5 לכיפה (19/17/15)
+            <span style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>embroideredKippah</span>
           </label>
           <div>
             <label style={lS}>שיוך לסקרול בדף &quot;כיפות לאירועים&quot;</label>
@@ -2018,8 +2027,8 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     removeItem(`print-${product.id}`);
     // Tiered per-unit price by quantity — logo printing included in the price
     // חומר לפי שם המוצר — כמו ב-EventKippotBox (סאטן → 8/6, פשתן → 14/12/10)
-    const unitPrice = getEventKippahPricePerUnit(product.price, eventQty, /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen', product.name);
-    addItem({ id: product.id, name: product.name, price: unitPrice, imgUrl: product.imgUrl || product.image_url, quantity: eventQty, cat: 'כיפות' });
+    const unitPrice = getEventKippahPricePerUnit(product.price, eventQty, /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen', product);
+    addItem({ id: product.id, name: product.name, price: unitPrice, imgUrl: product.imgUrl || product.image_url, quantity: eventQty, cat: 'כיפות', embroideredKippah: isEmbroideredKippah(product) });
     if (withPrinting) {
       // Print item carries the design file at ₪0 — cost is embedded in the kippah price
       addItem({ id: `print-${product.id}`, name: `הדפסה לכיפות — כלול במחיר`, price: 0, quantity: eventQty, cat: 'הדפסה', imgUrl: product.imgUrl || product.image_url, printCustomization: { uploadedImageUrl: printFileUrl, originalImageUrl: printFileUrl, productType: 'כיפות', side: 'front', bgRemoved: false } });
@@ -2038,12 +2047,13 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
     removeItem(product.id);
     removeItem(`print-${product.id}`);
     const material = /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' as const : 'linen' as const;
-    const unitPrice = getEventKippahPricePerUnit(product.price, design.quantity, material, product.name);
+    const unitPrice = getEventKippahPricePerUnit(product.price, design.quantity, material, product);
     addItem({
       id: product.id, name: product.name, price: unitPrice,
       imgUrl: product.imgUrl || product.image_url,
       quantity: design.quantity, cat: 'כיפות',
       customDesign: design,
+      embroideredKippah: isEmbroideredKippah(product),
     });
     // קובץ ההדפסה זורם בצינור הקיים (מופיע באדמין בתצוגת ההדפסות)
     addItem({
@@ -2195,7 +2205,7 @@ const KASHRUT_CATEGORIES = ['קלפי מזוזה', 'קלפי תפילין', 'ת�
           {!compact && (
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-                <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--ys-text)' }}>החל מ-₪{getEventKippahPricePerUnit(product.price, 100, /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen', product.name)} / כיפה</span>
+                <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--ys-text)' }}>החל מ-₪{getEventKippahPricePerUnit(product.price, 100, /סאטן|סטאן|סטן/.test(product.name || '') ? 'satin' : 'linen', product)} / כיפה</span>
               </div>
               <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>{t('pd.inclVatShip')}</div>
             </div>

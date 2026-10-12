@@ -48,6 +48,7 @@ export default function AdminNewProductPage() {
   const [isExpertRecommended, setIsExpertRecommended]     = useState(false);
   const [isEventKippot, setIsEventKippot]                 = useState(searchParams.get('isEventKippot') === 'true');
   const [isEventProduct, setIsEventProduct]               = useState(searchParams.get('isEventProduct') === 'true');
+  const [embroideredKippah, setEmbroideredKippah]         = useState(false);
   const [priority, setPriority]                           = useState('50');
   const [soferId, setSoferId]                             = useState('');
   const [soferOptions, setSoferOptions]                   = useState<{ id: string; name: string }[]>([]);
@@ -135,6 +136,7 @@ export default function AdminNewProductPage() {
         isExpertRecommended,
         isEventKippot,
         isEventProduct,
+        ...(embroideredKippah ? { embroideredKippah: true } : {}),
         priority: Number(priority) || 0,
         ...(soferId ? { soferId } : {}),
         sku: sku.trim() || null,
@@ -341,6 +343,11 @@ export default function AdminNewProductPage() {
               <input type="checkbox" checked={isEventProduct} onChange={e => setIsEventProduct(e.target.checked)} />
               🎪 מוצר לאירועים
               <span style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>isEventProduct</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 11, color: '#ddd5c0' }}>
+              <input type="checkbox" checked={embroideredKippah} onChange={e => setEmbroideredKippah(e.target.checked)} />
+              🧵 כיפה עם רקמה — תוספת ₪5 לכיפה (19/17/15)
+              <span style={{ fontSize: 9, color: 'var(--ys-accent)', fontWeight: 700 }}>embroideredKippah</span>
             </label>
             {showSofer && (
               <div>
