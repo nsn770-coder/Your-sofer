@@ -63,6 +63,8 @@ export const PRESET_COLORS: { hex: string; name: string }[] = [
 ];
 
 export type MonogramMode = 'artistic' | 'font';
+/** Artistic monogram letters: solid filled strokes (default) or hollow outline only. */
+export type MonogramFill = 'solid' | 'outline';
 
 /** All customer choices — the single source of truth for rendering. */
 export interface LogoSpec {
@@ -80,6 +82,7 @@ export interface LogoSpec {
   /** Letters for the monogram style (1–3). Empty = derived from primaryText. */
   monogramLetters: string;
   monogramMode: MonogramMode;
+  monogramFill: MonogramFill;
   /** Free notes — only steer AI graphics, never the letters. */
   notes: string;
   /** Uploaded inspiration image (project-owned asset id) — optional. */
@@ -108,6 +111,7 @@ export const DEFAULT_SPEC: LogoSpec = {
   symbolPosition: 'above',
   monogramLetters: '',
   monogramMode: 'artistic',
+  monogramFill: 'solid',
   notes: '',
   inspirationAssetId: null,
   textScale: 1,
@@ -199,6 +203,7 @@ export function validateSpec(input: unknown): SpecValidation {
     symbolPosition: oneOf(raw.symbolPosition, SYMBOL_POSITIONS, 'above'),
     monogramLetters,
     monogramMode: raw.monogramMode === 'font' ? 'font' : 'artistic',
+    monogramFill: raw.monogramFill === 'outline' ? 'outline' : 'solid',
     notes: cleanFreeText(raw.notes, LIMITS.notes),
     inspirationAssetId: typeof raw.inspirationAssetId === 'string' && /^[A-Za-z0-9_-]{6,64}$/.test(raw.inspirationAssetId) ? raw.inspirationAssetId : null,
     textScale: clamp(raw.textScale, 0.6, 1.6, 1),
@@ -249,7 +254,8 @@ export function decorationKey(spec: LogoSpec): string | null {
 }
 export function monogramKey(spec: LogoSpec): string | null {
   if (!needsAiMonogram(spec)) return null;
-  return JSON.stringify([effectiveMonogramLetters(spec), spec.eventType, spec.notes, spec.decorationInstruction, spec.inspirationAssetId]);
+  // specs saved before the fill option have no monogramFill — their (hollow-looking) graphic is NOT reused for "solid"
+  return JSON.stringify([effectiveMonogramLetters(spec), spec.eventType, spec.notes, spec.decorationInstruction, spec.inspirationAssetId, spec.monogramFill ?? 'legacy']);
 }
 
 /** Human-readable Hebrew summary of differences between two specs (for version history). */
@@ -268,6 +274,7 @@ export function describeSpecChanges(prev: LogoSpec | null, next: LogoSpec): stri
     out.push(next.symbol === 'none' ? 'הוסר הסמל' : `סמל: ${lbl(LOGO_SYMBOLS, next.symbol)} ${lbl(SYMBOL_POSITIONS, next.symbolPosition)}`);
   }
   if (prev.monogramLetters !== next.monogramLetters) out.push(`אותיות המונוגרמה: ${next.monogramLetters}`);
+  if (prev.monogramFill !== next.monogramFill) out.push(next.monogramFill === 'solid' ? 'אותיות מלאות בצבע' : 'אותיות בקו מתאר בלבד');
   if (prev.textScale !== next.textScale) out.push(next.textScale > prev.textScale ? 'הגדלת האותיות' : 'הקטנת האותיות');
   if (prev.letterSpacing !== next.letterSpacing) out.push('שינוי מרווח בין האותיות');
   if (prev.symbolScale !== next.symbolScale) out.push('שינוי גודל הסמל');

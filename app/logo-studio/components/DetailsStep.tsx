@@ -145,6 +145,12 @@ export default function DetailsStep({ spec, onChange, errors, signedIn, onRequir
                 <button type="button" className={s.chip} data-active={spec.monogramMode === 'artistic'} onClick={() => onChange({ monogramMode: 'artistic' })}>אמנותית (AI)</button>
                 <button type="button" className={s.chip} data-active={spec.monogramMode === 'font'} onClick={() => onChange({ monogramMode: 'font' })}>בגופן שנבחר</button>
               </div>
+              {spec.monogramMode === 'artistic' && (
+                <div className={s.chips} style={{ marginTop: 8 }}>
+                  <button type="button" className={s.chip} data-active={spec.monogramFill !== 'outline'} onClick={() => onChange({ monogramFill: 'solid' })}>אותיות מלאות בצבע</button>
+                  <button type="button" className={s.chip} data-active={spec.monogramFill === 'outline'} onClick={() => onChange({ monogramFill: 'outline' })}>קו מתאר בלבד (חלול)</button>
+                </div>
+              )}
               <div className={s.hint}>מונוגרמה אמנותית נבדקת אוטומטית שהאותיות נכונות. אם הבדיקה נכשלת — תוצג מונוגרמה בגופן שבחרתם.</div>
             </>
           )}

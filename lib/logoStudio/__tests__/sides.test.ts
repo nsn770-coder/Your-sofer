@@ -137,3 +137,20 @@ describe('logo embroidery on studio kippot', () => {
     expect(resolveSelection(styleProduct({ ...k, sides: { top: false, bottom: true } }), {}, 'top').finishes).toEqual(['print']);
   });
 });
+
+describe('monogram fill (solid letters)', async () => {
+  const { validateSpec, monogramKey, describeSpecChanges, DEFAULT_SPEC } = await import('../types');
+  const { localInterpret } = await import('../interpret.server');
+  it('defaults to solid letters and regenerates monograms saved before the option', () => {
+    const base = { ...DEFAULT_SPEC, style: 'monogram' as const, monogramLetters: 'יל' };
+    expect(validateSpec(base).spec.monogramFill).toBe('solid');
+    const legacy = { ...base } as Record<string, unknown>; delete legacy.monogramFill;
+    expect(monogramKey(legacy as never)).not.toBe(monogramKey(validateSpec(base).spec));
+    expect(describeSpecChanges({ ...base, monogramFill: 'outline' }, { ...base, monogramFill: 'solid' })).toContain('אותיות מלאות בצבע');
+  });
+  it('understands "full letters" / "hollow" requests offline', () => {
+    expect(localInterpret('שהאותיות יהיו בצבע מלא, ללא חלל')?.monogramFill).toBe('solid');
+    expect(localInterpret('שהאות מלאה')?.monogramFill).toBe('solid');
+    expect(localInterpret('אותיות חלולות בקו מתאר')?.monogramFill).toBe('outline');
+  });
+});

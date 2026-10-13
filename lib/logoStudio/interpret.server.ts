@@ -35,6 +35,7 @@ export interface ChangeSet {
   decorationInstruction?: string | null;
   monogramLetters?: string;
   monogramMode?: string;
+  monogramFill?: string;
 }
 
 export type Interpretation =
@@ -86,6 +87,7 @@ export function applyChanges(base: LogoSpec, c: ChangeSet, userMessage: string):
     else rejected.push('monogramLetters');
   }
   if (c.monogramMode === 'font' || c.monogramMode === 'artistic') next.monogramMode = c.monogramMode;
+  if (c.monogramFill === 'solid' || c.monogramFill === 'outline') next.monogramFill = c.monogramFill;
 
   const { spec } = validateSpec(next); // clamps all numeric ranges
   return { spec, rejected };
@@ -99,7 +101,7 @@ The logo is rendered by software from structured fields; you do NOT draw anythin
 CURRENT DESIGN (JSON): ${JSON.stringify({
     primaryText: spec.primaryText, secondaryText: spec.secondaryText, date: spec.date, fontId: spec.fontId,
     color: spec.color, style: spec.style, symbol: spec.symbol, symbolPosition: spec.symbolPosition,
-    monogramLetters: spec.monogramLetters, showDecoration: spec.showDecoration, decorationInstruction: spec.decorationInstruction,
+    monogramLetters: spec.monogramLetters, monogramMode: spec.monogramMode, monogramFill: spec.monogramFill, showDecoration: spec.showDecoration, decorationInstruction: spec.decorationInstruction,
   })}
 
 ALLOWED VALUES:
@@ -121,7 +123,10 @@ colorLightnessDelta (number -0.3..0.3; "a bit darker" = -0.1, "darker" = -0.18, 
 style, symbol ("none" removes), symbolPosition, textScaleFactor (bigger letters ≈ 1.15, smaller ≈ 0.87),
 letterSpacingDelta (em, e.g. 0.05 wider), symbolScaleFactor, secondaryScaleFactor,
 showDecoration (false = remove ornament/divider), decorationInstruction (short English description of a
-requested graphic element such as "olive branch under the names"; null removes it), monogramLetters, monogramMode ("artistic"|"font").
+requested graphic element such as "olive branch under the names"; null removes it), monogramLetters, monogramMode ("artistic"|"font"),
+monogramFill ("solid" = monogram letters completely filled with the colour, no hollow/outlined strokes;
+"outline" = hollow letters drawn with contour lines only). Requests like "full letters", "filled", "solid colour",
+"no lines at the edges", "fill the empty space inside the letters" → monogramFill "solid"; "hollow", "outline only" → "outline".
 
 RULES:
 - Change only what the customer asked. "Keep everything and only change the name" → only primaryText.
@@ -140,6 +145,8 @@ export function localInterpret(message: string): ChangeSet | null {
   if (/(תגדיל|הגדל|גדולות|bigger|larger).*(אותיות|טקסט|letters|text)|(אותיות|letters).*(גדולות|bigger)/i.test(m)) c.textScaleFactor = 1.15;
   if (/(תקטין|הקטן|קטנות|smaller).*(אותיות|טקסט|letters|text)/i.test(m)) c.textScaleFactor = 0.87;
   if (/(תוריד|הסר|בלי|remove).*(עיטור|קישוט|ornament|decoration)/i.test(m)) c.showDecoration = false;
+  if (/חלול|קו(וי)? מתאר|outline|hollow/i.test(m)) c.monogramFill = 'outline';
+  else if (/(אות|אותיות|letters?).*(מל[אה]|מלאות|ממולא|בצבע מלא|solid|filled)|(מל[אה]|מלאות|ממולא|solid|filled).*(אות|אותיות|letters?)|חלל (ה)?ריק|בצבע מלא/i.test(m)) c.monogramFill = 'solid';
   if (/מגן ?דו?ד|star of david/i.test(m)) {
     if (/(תוריד|הסר|בלי|remove)/i.test(m)) c.symbol = 'none';
     else { c.symbol = 'star_of_david'; c.symbolPosition = /מתחת|below|under/i.test(m) ? 'below' : 'above'; }

@@ -20,6 +20,8 @@ const EVENT_MOTIFS: Record<LogoEventId, string> = {
 
 const NO_TEXT = 'Absolutely NO letters, NO words, NO numbers, NO Hebrew or any other script, NO monograms, NO signatures, NO watermark.';
 const LINE_ART = 'Pure solid black ink line art on a pure white background. No grey fills, no gradients, no shading, no shadows, no texture, no checkerboard pattern, no border around the image.';
+/** Monogram with SOLID letters: every stroke completely filled — no hollow / outlined / double-line letters. */
+const SOLID_INK = 'Pure solid black ink on a pure white background. Every letter is a SOLID, completely filled shape: bold filled calligraphic strokes of varying thickness, filled edge to edge with ink. The letters must NOT be outlined, hollow, double-lined or inlined — no empty white space inside any stroke, no contour-only strokes. No grey, no gradients, no shading, no shadows, no texture, no checkerboard pattern, no border around the image.';
 
 const HEB_NAMES: Record<string, string> = {
   'א': 'Alef', 'ב': 'Bet', 'ג': 'Gimel', 'ד': 'Dalet', 'ה': 'He', 'ו': 'Vav', 'ז': 'Zayin', 'ח': 'Het', 'ט': 'Tet', 'י': 'Yod',
@@ -117,9 +119,10 @@ export async function generateMonogram(spec: LogoSpec, inspiration: InlineImage 
   const prompt = [
     `Design an elegant artistic interlocking monogram made of EXACTLY these ${Array.from(letters).length} letters: ${lettersDescription(letters)}.`,
     rtl ? 'These are Hebrew letters, read right-to-left; draw each Hebrew letter in its correct standard shape — never mirrored.' : '',
-    `Style: ${spec.style === 'monogram' ? 'refined, balanced, intertwined strokes' : 'classic'}, suitable for a ${spec.eventType.replace('_', ' ')}.`,
+    `Style: ${spec.monogramFill === 'outline' ? 'refined, balanced, intertwined outlined strokes' : 'refined, balanced, intertwined bold solid-filled strokes'}, suitable for a ${spec.eventType.replace('_', ' ')}.`,
     'Each letter must remain clearly recognisable. No additional letters, no words, no numbers, no frame, no wreath.',
-    LINE_ART, extra(spec),
+    spec.monogramFill === 'outline' ? `${LINE_ART} The letters are drawn as elegant outlines (contour lines).` : SOLID_INK,
+    extra(spec),
     inspiration ? 'The attached image is ONLY a loose style reference. Do not copy letters from it.' : '',
   ].filter(Boolean).join(' ');
 
