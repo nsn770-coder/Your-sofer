@@ -64,8 +64,8 @@ interface OrderItem {
     previewImageUrl: string;
     createdAt: string;
     /** לוגו מסטודיו הלוגו — הפניה לתמונת מצב מאושרת (logoApprovals) */
-    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom' } | null;
-    logoStudioSecond?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom' } | null;
+    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom'; logoUrl?: string; mockupUrl?: string } | null;
+    logoStudioSecond?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom'; logoUrl?: string; mockupUrl?: string } | null;
   } | null;
 }
 
@@ -448,8 +448,8 @@ interface AbandonedCartItem {
     previewImageUrl: string;
     createdAt: string;
     /** לוגו מסטודיו הלוגו — הפניה לתמונת מצב מאושרת (logoApprovals) */
-    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom' } | null;
-    logoStudioSecond?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom' } | null;
+    logoStudio?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom'; logoUrl?: string; mockupUrl?: string } | null;
+    logoStudioSecond?: { approvalId: string; projectId: string; versionNumber?: number; side?: 'top' | 'bottom'; logoUrl?: string; mockupUrl?: string } | null;
   } | null;
 }
 
@@ -2764,8 +2764,36 @@ function OrdersTab({ orders, setOrders, ordersError, reloadOrders }: { orders: O
       ? url.replace('/upload/', '/upload/w_120,h_120,c_fill,q_auto,f_auto/')
       : (url || '');
 
+    // לוגו והדמיה של הלקוח — גדולים מספיק לזיהוי בזמן אריזה.
+    // כתובת Cloudinary ציבורית מוקטנת; כתובת חתומה (authenticated) נשארת כמו שהיא — שינוי ישבור את החתימה.
+    const designImg = (url: string) => url.includes('/image/upload/')
+      ? url.replace('/image/upload/', '/image/upload/w_420,c_limit,q_auto,f_auto/')
+      : url;
+    const sideHe = (side?: string) => (side === 'bottom' ? 'צד תחתון' : 'צד עליון');
+
     const orderBlock = (o: Order) => {
+      // אותה תמונה מופיעה גם בשורת הכיפה וגם בשורת ההדפסה — מציגים כל תמונה פעם אחת בהזמנה
+      const shownVisuals = new Set<string>();
       const items = (o.items ?? []).map(it => {
+        const visuals: { label: string; url: string }[] = [];
+        const addVisual = (label: string, url?: string | null) => {
+          if (!url || !/^https:\/\//.test(url) || shownVisuals.has(url)) return;
+          shownVisuals.add(url);
+          visuals.push({ label, url });
+        };
+        const cd = it.customDesign;
+        for (const d of [cd?.logoStudio, cd?.logoStudioSecond]) {
+          if (!d) continue;
+          addVisual(`לוגו · ${sideHe(d.side)}`, d.logoUrl);
+          addVisual(`הדמיה · ${sideHe(d.side)}`, d.mockupUrl);
+        }
+        if (it.printCustomization) {
+          const pc = it.printCustomization;
+          if (pc.uploadedImageUrl && pc.uploadedImageUrl !== pc.mockupUrl) addVisual(`לוגו · ${sideHe(pc.side)}`, pc.uploadedImageUrl);
+          addVisual(`הדמיה · ${sideHe(pc.side)}`, pc.mockupUrl);
+        }
+        if (cd && !cd.logoStudio && cd.previewImageUrl) addVisual('עיצוב מהעורך', cd.previewImageUrl);
+
         const pd = detail[it.productId ?? it.id];
         const imgSrc = thumb(pd?.imgUrl || (pd as unknown as { image_url?: string })?.image_url);
         const extras: string[] = [];
@@ -2793,6 +2821,7 @@ function OrdersTab({ orders, setOrders, ordersError, reloadOrders }: { orders: O
             <div class="iname">${esc(it.name)}</div>
             ${pd?.sku || pd?.warehouseBox ? `<div class="isku">${pd?.sku ? `מק"ט: ${esc(pd.sku)}` : ''}${pd?.sku && pd?.warehouseBox ? ' · ' : ''}${pd?.warehouseBox ? `📦 ארגז ${esc(pd.warehouseBox)}` : ''}</div>` : ''}
             ${extras.length ? `<div class="iextras">${extras.join(' · ')}</div>` : ''}
+            ${visuals.length ? `<div class="ivis">${visuals.map(v => `<figure><img src="${esc(designImg(v.url))}" alt="${esc(v.label)}" /><figcaption>${esc(v.label)}</figcaption></figure>`).join('')}</div>` : ''}
           </td>
           <td class="chk">☐</td>
         </tr>`;
@@ -2847,6 +2876,11 @@ function OrdersTab({ orders, setOrders, ordersError, reloadOrders }: { orders: O
   .isku { font-family: monospace; font-size: 8.5pt; color: #555; direction: ltr; text-align: right; margin-top: 0.5mm; }
   .pimg { width: 14mm; text-align: center !important; }
   .iextras { font-size: 8.5pt; color: #444; margin-top: 0.5mm; }
+  /* לוגו + הדמיה של הלקוח */
+  .ivis { display: flex; flex-wrap: wrap; gap: 3mm; margin-top: 2mm; }
+  .ivis figure { margin: 0; width: 34mm; text-align: center; break-inside: avoid; }
+  .ivis img { width: 34mm; height: 34mm; object-fit: contain; display: block; border: 0.5pt solid #bbb; border-radius: 1mm; background: #fff; }
+  .ivis figcaption { font-size: 7.5pt; font-weight: 700; color: #333; margin-top: 0.8mm; }
   .ototal { text-align: left; font-weight: 900; font-size: 10.5pt; margin-top: 2mm; }
   @media print { .no-print { display: none !important; } }
 </style></head>
