@@ -505,7 +505,7 @@ export default function EventKippotClient() {
 
       {/* ── סטודיו לוגו — העלאת לוגו מוכן (עם הסרת רקע) או עיצוב ב-AI + הדמיה על הדגם שנבחר ── */}
       <a
-        href={selectedStyleId ? `/logo-studio?style=${encodeURIComponent(selectedStyleId)}&qty=${qty}&side=${printType === 'print-bottom' ? 'bottom' : 'top'}${printType === 'print-both' ? '&sides=both' : ''}` : '/logo-studio'}
+        href={selectedStyleId ? `/logo-studio?style=${encodeURIComponent(selectedStyleId)}&qty=${qty}&side=${printType === 'print-bottom' ? 'bottom' : 'top'}${printType === 'print-both' ? '&sides=both' : ''}${printType === 'embroidery' ? '&finish=embroidery' : ''}` : '/logo-studio'}
         style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
           width: '100%', marginTop: 14, boxSizing: 'border-box',

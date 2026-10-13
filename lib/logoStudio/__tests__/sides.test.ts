@@ -129,3 +129,11 @@ describe('embroidered kippah (+₪5 per kippah at every tier)', () => {
     expect(normalizeStudioKippah('z', {}).embroidered).toBe(false);
   });
 });
+
+describe('logo embroidery on studio kippot', () => {
+  const k = normalizeStudioKippah('e', { label: 'לבן', listImage: 'https://res.cloudinary.com/dyxzq3ucy/e.png' });
+  it('offers embroidery when the kippah has a top side', () => {
+    expect(resolveSelection(styleProduct(k), {}, 'top').finishes).toEqual(['print', 'embroidery']);
+    expect(resolveSelection(styleProduct({ ...k, sides: { top: false, bottom: true } }), {}, 'top').finishes).toEqual(['print']);
+  });
+});

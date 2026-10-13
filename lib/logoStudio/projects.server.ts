@@ -68,6 +68,8 @@ export function styleProduct(k: StudioKippah): RawProduct {
   const material = k.material === 'satin' ? 'סאטן' : 'פשתן';
   const cfg: LogoStudioProductConfig = {
     ...k.studio,
+    // רקמה זמינה בצד העליון בכל כיפה שיש לה צד עליון (כמו "רקמה" בעמוד כיפות לאירועים)
+    finishes: k.sides.top ? ['print', 'embroidery'] : ['print'],
     topImage: k.topDesignImage,
     bottomImage: k.bottomDesignImage,
   };

@@ -6,7 +6,7 @@ import { studioApi, ApiError, type CatalogProduct } from '../studioApi';
 import type { ResolvedSelection, KippahSide } from '@/lib/logoStudio/catalog';
 import { isVisualOption } from '@/lib/logoStudio/catalog';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
-import { KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
+import { KIPA_EXTRA_SIDE_PRICE, KIPA_EMBROIDERY_SURCHARGE } from '@/app/lib/kippot';
 
 const SOURCE_LABEL: Record<string, string> = { variant: 'לפי הווריאציה שבחרתם', catalog: 'לפי נתוני הקטלוג', name: 'לפי שם המוצר' };
 
@@ -26,7 +26,9 @@ interface Props {
   selectedVariants: Record<string, string>;
   side: KippahSide;
   bothSides: boolean;
-  onChangeSide: (s: KippahSide | 'both') => void;
+  /** "רקמה — צד עליון" chosen (logo embroidered instead of printed) */
+  embroidery: boolean;
+  onChangeSide: (s: KippahSide | 'both' | 'embroidery') => void;
   loading: boolean;
   error: string | null;
   onChooseProduct: (productId: string) => void;
@@ -47,6 +49,9 @@ export default function KippahStep(p: Props) {
 
 
   const status = p.selection ? selectionStatusText(p.selection) : null;
+  // רקמה זמינה כשהכיפה תומכת בה בצד העליון (הבחירה נטענת לפי הצד העליון גם במצב רקמה)
+  const embroideryAvailable = !!p.selection?.finishes.includes('embroidery') || p.embroidery;
+  const embroideryOn = p.embroidery && !p.bothSides && p.side === 'top';
   const img = p.selection?.image?.url ?? p.product?.imgUrl ?? null;
 
   return (
@@ -77,10 +82,10 @@ export default function KippahStep(p: Props) {
             </div>
           ))}
 
-          <span className={s.label}>איפה יודפס הלוגו?</span>
+          <span className={s.label}>איפה יופיע הלוגו?</span>
           <div className={s.chips}>
             {(['top', 'bottom'] as KippahSide[]).map(sd => (
-              <button key={sd} type="button" className={s.chip} data-active={!p.bothSides && p.side === sd} onClick={() => p.onChangeSide(sd)}>
+              <button key={sd} type="button" className={s.chip} data-active={!p.bothSides && p.side === sd && !(sd === 'top' && embroideryOn)} onClick={() => p.onChangeSide(sd)}>
                 {sd === 'top' ? 'צד עליון' : 'צד תחתון (פנים הכיפה)'}
                 {p.selection && !p.selection.sidesAvailable[sd] && p.selection.imageStatus !== 'choose_variant' ? ' · אין תמונה' : ''}
               </button>
@@ -88,11 +93,18 @@ export default function KippahStep(p: Props) {
             <button type="button" className={s.chip} data-active={p.bothSides} onClick={() => p.onChangeSide('both')}>
               שני הצדדים (+₪{KIPA_EXTRA_SIDE_PRICE} לכיפה)
             </button>
+            {embroideryAvailable && (
+              <button type="button" className={s.chip} data-active={embroideryOn} onClick={() => p.onChangeSide('embroidery')}>
+                🧵 רקמה — צד עליון (+₪{KIPA_EMBROIDERY_SURCHARGE} לכיפה)
+              </button>
+            )}
           </div>
           <div className={s.hint}>
-            {p.bothSides
-              ? 'בכל שלב רואים את שני הצדדים יחד: לוגו נפרד לצד העליון ולצד התחתון, הדמיה לכל צד, ואישור אחד לשניהם.'
-              : 'רוצים גם וגם? בחרו „שני הצדדים”.'}
+            {embroideryOn
+              ? 'הלוגו ירקם בחוט על הצד העליון. אפשר להעלות לוגו מוכן לרקמה או לעצב לוגו ב-AI. לרקמה מומלץ לוגו פשוט: עד 5 צבעים, בלי מעברי צבע ובלי פרטים קטנים מאוד.'
+              : p.bothSides
+                ? 'בכל שלב רואים את שני הצדדים יחד: לוגו נפרד לצד העליון ולצד התחתון, הדמיה לכל צד, ואישור אחד לשניהם.'
+                : 'רוצים גם וגם? בחרו „שני הצדדים”.'}
           </div>
 
           {status && <div className={status.kind === 'ok' ? s.ok : status.kind === 'warn' ? s.warn : s.error}>{status.text}</div>}

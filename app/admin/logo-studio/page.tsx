@@ -465,7 +465,7 @@ function KippahForm({ initial, onSaved, onCancel }: { initial?: StudioKippah; on
   const [bArea, setBArea] = useState<Area>(st.bottomPrintArea ?? DEFAULT_PRINT_AREA);
   const [mm, setMm] = useState<string>(st.maxPrintWidthMm ? String(st.maxPrintWidthMm) : '');
   const [bMm, setBMm] = useState<string>(st.bottomMaxPrintWidthMm ? String(st.bottomMaxPrintWidthMm) : '');
-  const [finishes, setFinishes] = useState<('print' | 'embroidery')[]>(st.finishes ?? ['print']);
+  const finishes: ('print' | 'embroidery')[] = st.finishes ?? ['print'];
   const [sortOrder, setSortOrder] = useState<string>(initial ? String(initial.sortOrder) : '');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -564,10 +564,7 @@ function KippahForm({ initial, onSaved, onCancel }: { initial?: StudioKippah; on
           <h4 style={{ fontWeight: 800, fontSize: 13, marginTop: 10 }}>אזור הדפסה תחתון (יחסי 0–1)</h4>
           <AreaFields area={bArea} setArea={setBArea} />
           <label><span style={lbl}>רוחב הדפסה פיזי תחתון (מ״מ) — ריק = כמו העליון</span><input style={{ ...inp, maxWidth: 200 }} type="number" min={5} max={500} value={bMm} onChange={e => setBMm(e.target.value)} placeholder={mm || 'לדוגמה 50'} /></label>
-          <div style={{ display: 'flex', gap: 12, marginTop: 10, fontSize: 13, flexWrap: 'wrap' }}>
-            <label><input type="checkbox" checked={finishes.includes('print')} onChange={e => setFinishes(f => e.target.checked ? [...new Set([...f, 'print' as const])] : f.filter(x => x !== 'print'))} /> הדפסה</label>
-            <label><input type="checkbox" checked={finishes.includes('embroidery')} onChange={e => setFinishes(f => e.target.checked ? [...new Set([...f, 'embroidery' as const])] : f.filter(x => x !== 'embroidery'))} /> רקמה</label>
-          </div>
+          <p style={{ fontSize: 11.5, color: '#777', marginTop: 10 }}>רקמת לוגו (+₪5 לכיפה) זמינה ללקוח אוטומטית בצד העליון של כל כיפה שהצד העליון שלה מסומן.</p>
           <label><span style={lbl}>סדר תצוגה ברשימה (מספר קטן = מוקדם)</span><input style={{ ...inp, maxWidth: 160 }} type="number" min={0} value={sortOrder} onChange={e => setSortOrder(e.target.value)} placeholder="אוטומטי — בסוף" /></label>
         </div>
       )}

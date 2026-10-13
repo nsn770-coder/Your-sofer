@@ -22,6 +22,8 @@ interface Props {
   blocked: boolean;
   /** the page renders its own navigation bar (both-sides mode) */
   hideNav?: boolean;
+  /** finish chosen on the kippah step ("רקמה — צד עליון") */
+  preferredFinish?: 'print' | 'embroidery';
 }
 
 export default function MockupStep(p: Props) {
@@ -36,7 +38,12 @@ export default function MockupStep(p: Props) {
   const [rawPlacement, setPlacement] = useState<Placement>(() => clampPlacement(lastForVersion?.placement ?? null, sel.printArea));
   // always within the current product's print area (also after switching kippah)
   const placement = clampPlacement(rawPlacement, sel.printArea);
-  const [finish, setFinish] = useState<'print' | 'embroidery'>(p.project.finish && sel.finishes.includes(p.project.finish) ? p.project.finish : sel.finishes[0]);
+  // רקמה — רק בצד העליון; פנים הכיפה (צד תחתון) בהדפסה בלבד
+  const finishes: ('print' | 'embroidery')[] = sel.side === 'bottom' ? ['print'] : sel.finishes;
+  const [finish, setFinish] = useState<'print' | 'embroidery'>(
+    p.preferredFinish && finishes.includes(p.preferredFinish) ? p.preferredFinish
+      : p.project.finish && finishes.includes(p.project.finish) ? p.project.finish : finishes[0],
+  );
   const [confirmAi, setConfirmAi] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{ id: number; startX: number; startY: number; orig: Placement } | null>(null);
@@ -125,11 +132,12 @@ export default function MockupStep(p: Props) {
                 ? <div className={s.hint}>גודל הדפסה מתוכנן: כ-{production.w}×{production.h} מ״מ · רזולוציה אפקטיבית {production.dpi} DPI</div>
                 : <div className={s.hint}>מידות ההדפסה המדויקות ייקבעו על ידי הצוות שלנו.</div>}
 
-              {sel.finishes.length > 1 && (
+              {/* הגימור נבחר כבר בשלב בחירת הכיפה ("רקמה — צד עליון") — כאן רק כשלא נבחר */}
+              {!p.preferredFinish && finishes.length > 1 && (
                 <>
                   <span className={s.label}>גימור</span>
                   <div className={s.chips}>
-                    {sel.finishes.map(f => <button key={f} type="button" className={s.chip} data-active={finish === f} onClick={() => setFinish(f)}>{f === 'print' ? 'הדפסה' : 'רקמה'}</button>)}
+                    {finishes.map(f => <button key={f} type="button" className={s.chip} data-active={finish === f} onClick={() => setFinish(f)}>{f === 'print' ? 'הדפסה' : 'רקמה'}</button>)}
                   </div>
                 </>
               )}

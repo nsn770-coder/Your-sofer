@@ -60,7 +60,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
             : 'למוצר זה אין תמונה מתאימה להדמיה.';
       throw new HttpError(409, `image_${sel.imageStatus}`, msg);
     }
-    if (!sel.finishes.includes(finish)) throw new HttpError(400, 'finish_not_available', 'הגימור שנבחר אינו זמין לכיפה זו.');
+    if (!sel.finishes.includes(finish) || (side === 'bottom' && finish === 'embroidery')) throw new HttpError(400, 'finish_not_available', 'הגימור שנבחר אינו זמין לכיפה זו.');
     const placement = clampPlacement(body.placement as Record<string, number> | null, sel.printArea);
 
     await consumeRate(db(), kind === 'ai' ? 'aiMockup' : 'mockup', user.uid);

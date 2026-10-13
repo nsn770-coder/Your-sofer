@@ -7,7 +7,7 @@ import { useCart, getEventKippahPricePerUnit } from '@/app/contexts/CartContext'
 import { logoFontFaceCss } from '@/lib/logoStudio/fonts';
 import { DEFAULT_SPEC, type LogoSpec } from '@/lib/logoStudio/types';
 import type { ResolvedSelection, KippahSide } from '@/lib/logoStudio/catalog';
-import { KIPA_EXTRA_SIDE_PRICE, KIPA_MIN_QTY } from '@/app/lib/kippot';
+import { KIPA_EXTRA_SIDE_PRICE, KIPA_MIN_QTY, KIPA_EMBROIDERY_SURCHARGE } from '@/app/lib/kippot';
 import type { CartItem } from '@/app/contexts/CartContext';
 import { studioApi, ApiError, type QuotaView, type CatalogProduct, type ApproveResult } from './studioApi';
 import { useSideDesign, errText, type LogoMode, type SideDesign, type SideContext } from './useSideDesign';
@@ -36,6 +36,8 @@ interface SideDraft { projectId: string | null; spec: LogoSpec; mode: LogoMode }
 interface Draft {
   productId: string | null; selectedVariants: Record<string, string>; step: StepId;
   side: KippahSide; bothSides: boolean; qty: number;
+  /** "רקמה — צד עליון" */
+  embroidery?: boolean;
   sides: Partial<Record<KippahSide, SideDraft>>;
 }
 function readDraft(): Draft | null {
@@ -68,6 +70,8 @@ export default function LogoStudioClient() {
   const [side, setSide] = useState<KippahSide>('top');
   /** "print both sides": every step shows the top AND the bottom design together */
   const [bothSides, setBothSides] = useState(false);
+  /** "רקמה — צד עליון": the logo is embroidered (not printed) on the top side (+₪5 per kippah) */
+  const [embroidery, setEmbroidery] = useState(false);
   const [initialQty, setInitialQty] = useState<number>(KIPA_MIN_QTY);
   const [otherSideOffer, setOtherSideOffer] = useState<KippahSide | null>(null);
   const [product, setProduct] = useState<CatalogProduct | null>(null);
@@ -133,12 +137,15 @@ export default function LogoStudioClient() {
     const qpQty = Number(params.get('qty'));
     const qpSide = params.get('side');
     const qpBoth = params.get('sides') === 'both';
+    // from /event-kippot or /kippot-order with "רקמה": &finish=embroidery
+    const qpEmbroidery = params.get('finish') === 'embroidery';
     const qpModeValid = qpMode === 'upload' || qpMode === 'ai' ? qpMode : null;
     if (qpProduct) {
       setProductId(qpProduct);
       setVariants(parseVariants(params.get('v')));
       setSide(qpSide === 'bottom' ? 'bottom' : 'top');
       setBothSides(qpBoth);
+      setEmbroidery(qpEmbroidery && !qpBoth && qpSide !== 'bottom');
       if (Number.isFinite(qpQty) && qpQty >= KIPA_MIN_QTY) setInitialQty(Math.min(5000, Math.round(qpQty)));
       setStep('kippah');
       // keep the texts the customer typed before (not the projects — new kippah / new start)
@@ -151,6 +158,7 @@ export default function LogoStudioClient() {
       setVariants(draft.selectedVariants ?? {});
       setSide(draft.side === 'bottom' ? 'bottom' : 'top');
       setBothSides(!!draft.bothSides);
+      setEmbroidery(!!draft.embroidery && !draft.bothSides && draft.side !== 'bottom');
       if (draft.qty && draft.qty >= KIPA_MIN_QTY) setInitialQty(draft.qty);
       setStep(draft.step ?? 'kippah');
       for (const sd of SIDES) {
@@ -167,13 +175,13 @@ export default function LogoStudioClient() {
   useEffect(() => {
     if (!initDone) return;
     writeDraft({
-      productId, selectedVariants: variants, step, side, bothSides, qty: initialQty,
+      productId, selectedVariants: variants, step, side, bothSides, embroidery, qty: initialQty,
       sides: {
         top: { projectId: top.projectId, spec: top.spec, mode: top.mode },
         bottom: { projectId: bottom.projectId, spec: bottom.spec, mode: bottom.mode },
       },
     });
-  }, [initDone, productId, variants, step, side, bothSides, initialQty, top.projectId, top.spec, top.mode, bottom.projectId, bottom.spec, bottom.mode]);
+  }, [initDone, productId, variants, step, side, bothSides, embroidery, initialQty, top.projectId, top.spec, top.mode, bottom.projectId, bottom.spec, bottom.mode]);
 
   // ?project=<id> (link from "my designs"): open that project on its own side
   useEffect(() => {
@@ -186,6 +194,7 @@ export default function LogoStudioClient() {
         setProductId(r.project.productId);
         setVariants(r.project.selectedVariants);
         setBothSides(false); setSide(sd);
+        setEmbroidery(sd === 'top' && r.project.finish === 'embroidery');
         designs[sd].hydrate({ projectId: pid });
         setStep(r.project.currentVersionId ? 'design' : 'details');
       })
@@ -231,10 +240,14 @@ export default function LogoStudioClient() {
     setVariants(next);
     await Promise.all(SIDES.map(sd => designs[sd].patchSelection({ selectedVariants: next })));
   }
-  function chooseSide(choice: KippahSide | 'both') {
+  function chooseSide(choice: KippahSide | 'both' | 'embroidery') {
+    if (choice === 'embroidery') { setBothSides(false); setSide('top'); setEmbroidery(true); return; }
+    setEmbroidery(false);
     if (choice === 'both') { setBothSides(true); return; }
     setBothSides(false); setSide(choice);
   }
+  /** the finish the customer chose on the kippah step — locks the mockup finish */
+  const finishFor = (sd: KippahSide): 'print' | 'embroidery' => (embroidery && !bothSides && sd === 'top' ? 'embroidery' : 'print');
 
   // ── cart ───────────────────────────────────────────────────────────────────
   // One kippah line per product/style; the second side lives on the same line
@@ -302,6 +315,8 @@ export default function LogoStudioClient() {
   const materialOf = (a: ApproveResult) => (a.materialKind === 'satin' ? 'satin' as const : 'linen' as const);
   // דגם רקום (+₪5 לכיפה). embroideredKippah:false מונע זיהוי "רקמה" בשם כשהדגם אינו רקום
   const embroideredOf = (a: ApproveResult) => ({ embroideredKippah: a.embroidered === true });
+  // רקמת הלוגו (במקום הדפסה) — +₪5 לכיפה, כמו "רקמה" בעמוד כיפות לאירועים
+  const stitchExtra = (...finishes: (string | undefined)[]) => (finishes.includes('embroidery') ? KIPA_EMBROIDERY_SURCHARGE : 0);
 
   /** both sides: approve the two designs and add ONE kippah line carrying both */
   async function approveBoth(qty: number) {
@@ -313,7 +328,7 @@ export default function LogoStudioClient() {
       const aBottom = await bottom.approveSnapshot();
       if (!aBottom) return;
       const lineId = cartLineIdFor(aTop);
-      const unit = getEventKippahPricePerUnit(0, qty, materialOf(aTop), embroideredOf(aTop)) + KIPA_EXTRA_SIDE_PRICE;
+      const unit = getEventKippahPricePerUnit(0, qty, materialOf(aTop), embroideredOf(aTop)) + KIPA_EXTRA_SIDE_PRICE + stitchExtra(aTop.finish, aBottom.finish);
       removeItem(lineId); removeItem(`print-${lineId}`); removeItem(`print-side2-${lineId}`);
       addItem(kippahLine(aTop, qty, unit, designOf(aTop, top), designOf(aBottom, bottom)));
       addItem(printLine(aTop, `print-${lineId}`, qty));
@@ -349,14 +364,14 @@ export default function LogoStudioClient() {
 
       if (existing && asSecond) {
         const quantity = existing.quantity;
-        const unit = getEventKippahPricePerUnit(0, quantity, material, embroideredOf(a)) + KIPA_EXTRA_SIDE_PRICE;
+        const unit = getEventKippahPricePerUnit(0, quantity, material, embroideredOf(a)) + KIPA_EXTRA_SIDE_PRICE + stitchExtra(a.finish, exPrimary?.finish);
         removeItem(lineId);
         addItem({ ...existing, price: unit, customDesign: { ...existing.customDesign!, logoStudioSecond: design } });
         removeItem(`print-side2-${lineId}`);
         addItem(printLine(a, `print-side2-${lineId}`, quantity));
       } else {
         const keepSecond = exSecond && (exSecond.side ?? 'bottom') !== a.side ? exSecond : undefined;
-        const unit = getEventKippahPricePerUnit(0, qty, material, embroideredOf(a)) + (keepSecond ? KIPA_EXTRA_SIDE_PRICE : 0);
+        const unit = getEventKippahPricePerUnit(0, qty, material, embroideredOf(a)) + (keepSecond ? KIPA_EXTRA_SIDE_PRICE : 0) + stitchExtra(a.finish, keepSecond?.finish);
         removeItem(lineId); removeItem(`print-${lineId}`);
         if (!keepSecond) removeItem(`print-side2-${lineId}`);
         addItem(kippahLine(a, qty, unit, design, keepSecond));
@@ -501,10 +516,13 @@ export default function LogoStudioClient() {
 
         {step === 'kippah' && (
           <KippahStep product={product} selection={selection} selectedVariants={variants} loading={catalogLoading} error={catalogErr}
-            side={side} bothSides={bothSides} onChangeSide={chooseSide}
+            side={side} bothSides={bothSides} embroidery={embroidery} onChangeSide={chooseSide}
             onChooseProduct={chooseProduct} onChangeVariant={changeVariant} onNext={() => go('details')} />
         )}
 
+        {step === 'details' && finishFor(side) === 'embroidery' && (
+          <div className={s.ok}>🧵 עיצוב לרקמה על הצד העליון — העלו לוגו מוכן או עצבו לוגו ב-AI. לרקמה מומלץ לוגו פשוט: עד 5 צבעים, בלי מעברי צבע ובלי פרטים קטנים מאוד.</div>
+        )}
         {step === 'details' && active.map(d => sideBlock(d, detailsBody(d)))}
         {step === 'details' && bothSides && bothNav(
           anyAiVersion ? 'שני הלוגואים מוכנים — ליצירה ותיקונים ←' : 'שני הלוגואים מוכנים — להדמיה על הכיפה ←',
@@ -534,7 +552,8 @@ export default function LogoStudioClient() {
         {step === 'mockup' && active.map(d => sideBlock(d, d.project
           ? <MockupStep project={d.project} quota={quota} busy={d.busy === 'mockup' || d.busy === 'aiMockup' ? d.busy : null}
               selectedMockupId={d.selectedMockupId} onSelectMockup={d.setSelectedMockupId}
-              onCompose={d.compose} onAiMockup={d.aiMockup} onBackToKippah={() => go('kippah')} onNext={() => go('approve')} blocked={exhausted} hideNav={bothSides} />
+              onCompose={d.compose} onAiMockup={d.aiMockup} onBackToKippah={() => go('kippah')} onNext={() => go('approve')} blocked={exhausted} hideNav={bothSides}
+              preferredFinish={finishFor(d.side)} />
           : null))}
         {step === 'mockup' && bothSides && bothNav('לאישור שני הצדדים ←', allHaveMockup, () => go('approve'), `הדמיה ל${missingNames(d => !!d.approveMockup)}`)}
 

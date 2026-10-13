@@ -32,7 +32,8 @@ export default function ApproveStep({ project, product, mockup, busy, error, ini
   const sel = project.selection;
   const material = sel.materialKind === 'satin' ? 'satin' : 'linen';
   const embroideryExtra = sel.embroidered ? KIPA_EMBROIDERY_SURCHARGE : 0; // דגם רקום: +₪5 לכיפה
-  const unit = getKipaUnitPrice(qty, material) + embroideryExtra + (secondSideOf ? KIPA_EXTRA_SIDE_PRICE : 0);
+  const stitchExtra = mockup?.finish === 'embroidery' ? KIPA_EMBROIDERY_SURCHARGE : 0; // רקמת הלוגו: +₪5 לכיפה
+  const unit = getKipaUnitPrice(qty, material) + embroideryExtra + stitchExtra + (secondSideOf ? KIPA_EXTRA_SIDE_PRICE : 0);
   const mockupOk = !!mockup && mockup.versionId === version?.id && !mockup.stale;
   const spec = version?.spec;
 
@@ -55,7 +56,7 @@ export default function ApproveStep({ project, product, mockup, busy, error, ini
             </select>
           )}
           <div style={{ fontSize: 15, marginTop: 10 }}>₪{unit} לכיפה · סה״כ <b>₪{(unit * qty).toLocaleString('he-IL')}</b></div>
-          <div className={s.hint}>המחיר לפי מדרגות הכמות של כיפות לאירועים, כולל ההדפסה{embroideryExtra > 0 ? ` ותוספת רקמה (+₪${embroideryExtra} לכיפה)` : ''}.</div>
+          <div className={s.hint}>המחיר לפי מדרגות הכמות של כיפות לאירועים, {stitchExtra > 0 ? `כולל רקמת הלוגו (+₪${stitchExtra} לכיפה)` : 'כולל ההדפסה'}{embroideryExtra > 0 ? ` ותוספת כיפה עם רקמה (+₪${embroideryExtra} לכיפה)` : ''}.</div>
           <div className={s.hint}>באישור נשמר עותק קבוע של הגרסה וההדמיה האלה להזמנה. שינויים עתידיים בפרויקט לא ישנו אותו.</div>
           {error && <div className={s.error} role="alert">{error}</div>}
           <button type="button" className={s.primary} style={{ marginTop: 12 }} disabled={!mockupOk || busy} onClick={() => onApprove(qty)}>
@@ -127,7 +128,8 @@ export function ApproveBothStep({ sides, product, busy, error, initialQty, onApp
   const sel = sides[0]?.project.selection;
   const material = sel?.materialKind === 'satin' ? 'satin' : 'linen';
   const embroideryExtra = sel?.embroidered ? KIPA_EMBROIDERY_SURCHARGE : 0; // דגם רקום: +₪5 לכיפה
-  const unit = getKipaUnitPrice(qty, material) + embroideryExtra + KIPA_EXTRA_SIDE_PRICE;
+  const stitchExtra = sides.some(sd => sd.mockup?.finish === 'embroidery') ? KIPA_EMBROIDERY_SURCHARGE : 0; // רקמת לוגו
+  const unit = getKipaUnitPrice(qty, material) + embroideryExtra + stitchExtra + KIPA_EXTRA_SIDE_PRICE;
   const allOk = sides.every(sd => {
     const v = sd.project.versions.find(x => x.id === sd.project.currentVersionId);
     return !!sd.mockup && !!v && sd.mockup.versionId === v.id && !sd.mockup.stale;
