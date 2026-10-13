@@ -9,6 +9,8 @@
 // visual variant option at all — the product's own main image. We never fall
 // back silently to another product's image.
 
+import { isEmbroideredKippah } from '@/app/lib/kippot';
+
 export interface LogoStudioProductConfig {
   /** `${optionName}=${value}` (or several joined with '|', sorted) → image URL. */
   variantImages?: Record<string, string>;
@@ -18,6 +20,9 @@ export interface LogoStudioProductConfig {
   maxPrintWidthMm?: number | null;
   finishes?: ('print' | 'embroidery')[];
   disabled?: boolean;
+  /** Top-side design photo (studio canvas) for a product WITHOUT colour/fabric
+   *  variants. Empty → falls back to the product's main photo. */
+  topImage?: string | null;
   // ── bottom (inner) side of the kippah — separate photo, area and size ──
   /** Bottom-side photo per visual variant (same keys as variantImages). */
   bottomVariantImages?: Record<string, string>;
@@ -43,6 +48,8 @@ export interface RawProduct {
   filterAttributes?: Record<string, string>;
   customDesign?: boolean;
   isEventKippot?: boolean;
+  /** דגם רקום — תמחור +₪5 לכיפה (סימון באדמין; אם לא הוגדר — לפי "רקמה"/"רקמת" בשם) */
+  embroideredKippah?: boolean;
   hidden?: boolean;
   active?: boolean;
   outOfStock?: boolean;
@@ -60,6 +67,8 @@ export interface ResolvedSelection {
   selectedVariants: Record<string, string>;
   material: Sourced;
   materialKind: 'satin' | 'linen' | 'other' | null;
+  /** embroidered kippah model → +₪5 per kippah at every quantity tier */
+  embroidered: boolean;
   color: Sourced;
   image: { url: string; source: 'variant' | 'product' } | null;
   imageStatus: 'ok' | 'choose_variant' | 'missing_variant_image' | 'no_image' | 'no_bottom_image';
@@ -132,7 +141,8 @@ export function resolveSelection(p: RawProduct, requested: Record<string, string
   const photoFor = (which: KippahSide): { image: ResolvedSelection['image']; status: ResolvedSelection['imageStatus'] } => {
     const map = which === 'top' ? cfg.variantImages ?? {} : cfg.bottomVariantImages ?? {};
     if (visualOpts.length === 0) {
-      const url = which === 'top' ? mainImg : (cfg.bottomImage || null);
+      // top: design photo uploaded in admin, else the product photo (fallback)
+      const url = which === 'top' ? (cfg.topImage || mainImg) : (cfg.bottomImage || null);
       if (url) return { image: { url, source: 'product' }, status: 'ok' };
       return { image: null, status: which === 'top' ? 'no_image' : 'no_bottom_image' };
     }
@@ -162,6 +172,7 @@ export function resolveSelection(p: RawProduct, requested: Record<string, string
     selectedVariants: selected,
     material,
     materialKind: materialKindOf(material?.value),
+    embroidered: isEmbroideredKippah(p),
     color,
     image,
     imageStatus,

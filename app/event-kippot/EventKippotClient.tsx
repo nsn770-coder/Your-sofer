@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { collection, getDocs, query, where, doc, getDoc, setDoc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/app/firebase';
-import { getKipaUnitPrice, getKipaMaterial, KIPA_MATERIAL_LABELS, KIPA_EXTRA_SIDE_PRICE, DEFAULT_STYLE_PRODUCT_MAP } from '@/app/lib/kippot';
+import { KIPA_MATERIAL_LABELS, KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
+import { fetchStudioKippotClient, designImageFor, studioKippahUnitPrice, studioKippahSurcharge, type StudioKippah } from '@/app/lib/studioKippot';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useCart } from '@/app/contexts/CartContext';
 import { useRouter } from 'next/navigation';
@@ -19,17 +20,8 @@ import { PROMO_ACTIVE, MIN_KIPPOT_QTY, MIN_ADDON_QTY } from '@/app/lib/promoRule
 const GOLD = 'var(--ys-accent)';
 const NAVY = '#111d3a';
 
-const KIPPOT_STYLES = [
-  { id: 'lavan',       label: 'לבן ורדרד',    img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636051/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%9F_%D7%95%D7%A8%D7%93%D7%A8%D7%93_nauwhq.png' },
-  { id: 'beige',       label: "בז'",           img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_fhrr09.png' },
-  { id: 'linen-tchelet', label: 'תכלת',       img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1789036165/gpmma8td8rvvqvhyptel.png' },
-  { id: 'white',       label: 'לבן',           img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_25_PM_mcqhle.png' },
-  { id: 'beige-natural', label: "בז' טבעי",    img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_58_PM_wva57o.png' },
-  { id: 'beige-luxury', label: "בז' יוקרתי",   img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1787821187/yu4zdyfhd4leqe4h5l4b.png' },
-  { id: 'navy',        label: 'כחול כהה',      img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1787821093/kmmuycfw287ui8kcnyrs.png' },
-  { id: 'satin-white', label: 'סאטן',          img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781586601/a8c7n05vniv34n4qw44g.jpg' },
-  { id: 'satin-white-18', label: 'סאטן לבן 18 ס"מ', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781587426/eu12gjypbrxlyhfi40tk.jpg' },
-];
+// רשימת הכיפות נטענת מ-Firestore (studioKippot) — מנוהלת מהדשבורד:
+// /admin/logo-studio → "כיפות והדמיה". אין לשמור כאן רשימה קשיחה.
 
 const PRINT_TYPES = [
   { id: 'print-top',    label: 'הדפסה למעלה', desc: 'הדפסה על חלק עליון', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782638747/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_%D7%A2%D7%9D_%D7%94%D7%93%D7%A4%D7%A1_%D7%9C%D7%9E%D7%A2%D7%9C%D7%94_dh4nuv.png' },
@@ -39,6 +31,13 @@ const PRINT_TYPES = [
 ] as const;
 
 type PrintType = typeof PRINT_TYPES[number]['id'];
+
+/** האם הכיפה תומכת בסוג העיצוב (לפי צדדי ההדפסה שהוגדרו לה בדשבורד) */
+function supportsPrintType(k: StudioKippah, t: PrintType): boolean {
+  if (t === 'print-bottom') return k.sides.bottom;
+  if (t === 'print-both') return k.sides.top && k.sides.bottom;
+  return k.sides.top; // print-top / embroidery
+}
 
 export default function EventKippotClient() {
   const [qty, setQty]             = useState(30);
@@ -52,64 +51,30 @@ export default function EventKippotClient() {
   // עורך כיפה מותאמת אישית (Modal) — תוספת אדיטיבית
   const [designerOpen, setDesignerOpen] = useState(false);
 
-  // ── שיוך דגם ← מוצר בחנות (settings/eventKippotStyles) — מלאי ורווחיות ──
-  const [styleMap, setStyleMap] = useState<Record<string, { productId: string; sku: string; name: string }>>({});
+  // ── כיפות לעיצוב אישי — מקור יחיד: Firestore studioKippot (מנוהל מהדשבורד) ──
+  // לכל כיפה יכול להיות מוצר משויך בחנות (productId) — לניכוי מלאי ורווחיות.
+  const [kippot, setKippot] = useState<StudioKippah[] | null>(null);
   const [styleProducts, setStyleProducts] = useState<Record<string, Product>>({});
-  const [assigning, setAssigning] = useState<string | null>(null);
   const [savingStock, setSavingStock] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
+      const list = await fetchStudioKippotClient();
+      if (cancelled) return;
+      setKippot(list);
       try {
-        const snap = await getDoc(doc(db, 'settings', 'eventKippotStyles'));
-        // ברירת מחדל מהקוד (למשל סאטן ← UK00321); Firestore גובר עליה
-        const map = { ...DEFAULT_STYLE_PRODUCT_MAP, ...(snap.exists() ? snap.data() as Record<string, { productId: string; sku: string; name: string }> : {}) };
-        setStyleMap(map);
         const prods: Record<string, Product> = {};
-        await Promise.all(Object.entries(map).map(async ([styleId, m]) => {
-          if (!m?.productId) return;
-          const pSnap = await getDoc(doc(db, 'products', m.productId));
-          if (pSnap.exists()) prods[styleId] = { id: pSnap.id, ...pSnap.data() } as Product;
+        await Promise.all(list.map(async k => {
+          if (!k.productId) return;
+          const pSnap = await getDoc(doc(db, 'products', k.productId));
+          if (pSnap.exists()) prods[k.id] = { id: pSnap.id, ...pSnap.data() } as Product;
         }));
-        setStyleProducts(prods);
-      } catch (e) { console.error('[EventKippot] style map load:', e); }
+        if (!cancelled) setStyleProducts(prods);
+      } catch (e) { console.error('[EventKippot] linked products load:', e); }
     })();
+    return () => { cancelled = true; };
   }, []);
-
-  // אדמין: שיוך דגם לקוד מוצר (SKU) — חיפוש מדויק ואז לפי ספרות הקוד
-  async function assignStyleProduct(styleId: string, styleLabel: string) {
-    const input = window.prompt(`קוד מוצר (SKU) לשיוך לדגם "${styleLabel}":`, styleMap[styleId]?.sku ?? '');
-    if (!input || !input.trim()) return;
-    const code = input.trim();
-    setAssigning(styleId);
-    try {
-      let product: Product | null = null;
-      const exact = await getDocs(query(collection(db, 'products'), where('sku', '==', code)));
-      if (!exact.empty) {
-        product = { id: exact.docs[0].id, ...exact.docs[0].data() } as Product;
-      } else {
-        // התאמה לפי ספרות הקוד — כמו בטאב המלאי
-        const digits = code.replace(/^[A-Z]+/i, '');
-        if (digits) {
-          const snap = await getDocs(query(collection(db, 'products'), where('sku', '>=', ' ')));
-          snap.forEach(d => {
-            if (product) return;
-            const p = { id: d.id, ...d.data() } as Product;
-            if ((p.sku || '').replace(/^[A-Z]+/i, '') === digits) product = p;
-          });
-        }
-      }
-      if (!product) { alert(`לא נמצא מוצר עם קוד "${code}"`); return; }
-      const found: Product = product;
-      const entry = { productId: found.id, sku: found.sku || code, name: found.name || '' };
-      await setDoc(doc(db, 'settings', 'eventKippotStyles'), { [styleId]: entry }, { merge: true });
-      setStyleMap(prev => ({ ...prev, [styleId]: entry }));
-      setStyleProducts(prev => ({ ...prev, [styleId]: found }));
-      alert(`✅ הדגם "${styleLabel}" שויך למוצר: ${found.name}\nמהיום הזמנות כיפות מהדגם הזה יורדות מהמלאי שלו ונספרות ברווחיות.`);
-    } catch (e) {
-      alert('שגיאה בשיוך'); console.error(e);
-    } finally { setAssigning(null); }
-  }
 
   // ── אדמין: עדכון מלאי ישירות מהעמוד ────────────────────────────────────────
   // מה שנכתב כאן הוא המלאי בפועל של הכיפה (inStock על מסמך המוצר). מרגע
@@ -118,7 +83,7 @@ export default function EventKippotClient() {
   // כשמגיעה סחורה חדשה — כותבים כאן את הסכום המעודכן, או מקלידים ‎+50‎
   // כדי להוסיף למלאי הקיים בלי לחשב בראש.
   async function updateStyleStock(styleId: string, styleLabel: string) {
-    const mapped  = styleMap[styleId];
+    const mapped  = kippot?.find(k => k.id === styleId);
     const product = styleProducts[styleId];
     if (!mapped?.productId || !product) {
       alert('הדגם אינו משויך למוצר — יש לשייך מוצר לפני עדכון מלאי.');
@@ -126,7 +91,7 @@ export default function EventKippotClient() {
     }
     const current = typeof product.inStock === 'number' ? product.inStock : 0;
     const input = window.prompt(
-      `מלאי לדגם "${styleLabel}" (${mapped.sku})\n` +
+      `מלאי לדגם "${styleLabel}" (${mapped.sku ?? mapped.productId})\n` +
       `כרגע במלאי: ${current}\n\n` +
       `כתוב מספר חדש (למשל 120) או תוספת (למשל +50 לסחורה שהגיעה):`,
       String(current),
@@ -149,7 +114,7 @@ export default function EventKippotClient() {
       // תיעוד הספירה — כדי שיהיה אפשר לראות מתי ואיך המלאי השתנה ידנית
       addDoc(collection(db, 'inventory_counts'), {
         productId:     mapped.productId,
-        sku:           mapped.sku,
+        sku:           mapped.sku ?? '',
         productName:   product.name ?? styleLabel,
         countedStock:  next,
         previousStock: current,
@@ -229,17 +194,22 @@ export default function EventKippotClient() {
   const embroideryExtra = printType === 'embroidery' ? 5 : 0;
   const bothSidesExtra  = printType === 'print-both' ? KIPA_EXTRA_SIDE_PRICE : 0;
   // תמחור לפי חומר הדגם הנבחר: פשתן (ברירת מחדל) או סאטן
-  const selectedStyleId = style ?? KIPPOT_STYLES[0].id;
-  const material  = getKipaMaterial(selectedStyleId);
-  const unitPrice = getKipaUnitPrice(qty, material) + embroideryExtra + bothSidesExtra;
+  // הכיפה הנבחרת — ואם לא נבחרה (או שאינה תומכת בסוג העיצוב) הראשונה שתומכת
+  const availableKippot = (kippot ?? []).filter(k => supportsPrintType(k, printType));
+  const selectedKippah  = availableKippot.find(k => k.id === style) ?? availableKippot[0] ?? kippot?.[0] ?? null;
+  const selectedStyleId = selectedKippah?.id ?? '';
+  const material  = selectedKippah?.material ?? 'linen';
+  // דגם רקום (סימון "כיפה עם רקמה" בדשבורד) — +₪5 לכיפה בכל המדרגות
+  const modelExtra = studioKippahSurcharge(selectedKippah);
+  const unitPrice = studioKippahUnitPrice(selectedKippah, qty) + embroideryExtra + bothSidesExtra;
   const total = qty * unitPrice;
 
   // ── עורך כיפה מותאמת אישית — שמירה מוסיפה לסל עם תמחור המדרגות הקיים ──────
   function handleDesignerSave(design: KippaDesign) {
-    const styleLabel = KIPPOT_STYLES.find(s => s.id === selectedStyleId)?.label ?? '';
+    const styleLabel = selectedKippah?.label ?? '';
     const sp = styleProducts[selectedStyleId];
     const lineId = sp?.id ?? `event-designer-${selectedStyleId}`;
-    const unit = getKipaUnitPrice(design.quantity, material);
+    const unit = studioKippahUnitPrice(selectedKippah, design.quantity);
     removeItem(lineId);
     removeItem(`print-${lineId}`);
     addItem({
@@ -247,9 +217,10 @@ export default function EventKippotClient() {
       productId: sp?.id,
       name: sp?.name ?? `כיפות ${styleLabel} — עיצוב אישי`,
       price: unit,
-      imgUrl: sp?.imgUrl || KIPPOT_STYLES.find(s => s.id === selectedStyleId)?.img,
+      imgUrl: sp?.imgUrl || selectedKippah?.listImage,
       quantity: design.quantity,
       cat: 'כיפות',
+      embroideredKippah: !!selectedKippah?.embroidered,
       customDesign: design,
     });
     addItem({
@@ -341,7 +312,8 @@ export default function EventKippotClient() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 12 }}>1. בחר סוג עיצוב</div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          {PRINT_TYPES.map(opt => (
+          {/* רק סוגי עיצוב שיש להם לפחות כיפה אחת תומכת (לפי צדדי ההדפסה שהוגדרו בדשבורד) */}
+          {(kippot ? PRINT_TYPES.filter(t => kippot.some(k => supportsPrintType(k, t.id))) : PRINT_TYPES).map(opt => (
             <button
               key={opt.id}
               onClick={() => setPrintType(opt.id)}
@@ -416,6 +388,7 @@ export default function EventKippotClient() {
             <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>מחיר ליחידה</div>
             <div style={{ fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 900, color: GOLD }}>₪{unitPrice}</div>
             {embroideryExtra > 0 && <div style={{ fontSize: 10, color: '#9C7B3F' }}>כולל +₪{embroideryExtra} רקמה</div>}
+            {modelExtra > 0 && <div style={{ fontSize: 10, color: '#9C7B3F' }}>כולל +₪{modelExtra} כיפה עם רקמה</div>}
           </div>
           <div style={{ background: 'var(--ys-bg-warm)', padding: '12px 20px', minWidth: 130 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F', marginBottom: 4 }}>סה&quot;כ משוער</div>
@@ -426,7 +399,7 @@ export default function EventKippotClient() {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14, alignItems: 'center' }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F' }}>מדרגות ({KIPA_MATERIAL_LABELS[material]}):</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#9C7B3F' }}>מדרגות ({KIPA_MATERIAL_LABELS[material]}{modelExtra > 0 ? ' עם רקמה' : ''}):</span>
           {/* מדרגות תואמות למקור המרכזי app/lib/kippot.ts + data/faq.ts */}
           {(material === 'satin' ? [
             { range: '30–49',  price: 8,  active: qty >= 30 && qty <= 49 },
@@ -435,7 +408,7 @@ export default function EventKippotClient() {
             { range: '30–49',  price: 14, active: qty >= 30  && qty <= 49 },
             { range: '50–99',  price: 12, active: qty >= 50  && qty <= 99 },
             { range: '100+',   price: 10, active: qty >= 100             },
-          ] as { range: string; price: number; active: boolean }[]).map(({ range, price, active }) => (
+          ] as { range: string; price: number; active: boolean }[]).map(t => ({ ...t, price: t.price + modelExtra })).map(({ range, price, active }) => (
             <span key={range} style={{ fontSize: 11, fontWeight: active ? 800 : 400, color: active ? GOLD : '#9C7B3F', background: active ? 'rgba(197,160,40,0.10)' : 'transparent', padding: active ? '2px 8px' : '2px 0', transition: 'all 0.15s' }}>
               {range} = ₪{price}{printType === 'embroidery' ? '+₪5' : printType === 'print-both' ? `+₪${KIPA_EXTRA_SIDE_PRICE}` : ''}
             </span>
@@ -447,19 +420,29 @@ export default function EventKippotClient() {
       <div style={{ marginBottom: 28 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: '#3A2E1A', marginBottom: 12 }}>3. בחר סוג כיפה</div>
         <div className="ys-ekip-styles">
-          {KIPPOT_STYLES.map(s => {
-            const mapped  = styleMap[s.id];
-            const product = styleProducts[s.id];
-            const stock   = typeof product?.inStock === 'number' ? product.inStock : null;
+          {/* שלד טעינה — עד שהרשימה מגיעה מ-Firestore (שומר מקום, בלי קפיצה) */}
+          {kippot === null && Array.from({ length: 6 }).map((_, i) => (
+            <div key={`sk-${i}`} className="ys-ekip-card" aria-hidden style={{ border: '2px solid #F0ECE3', background: '#FAF8F4' }}>
+              <div style={{ width: '100%', aspectRatio: '1', background: '#F3EFE6' }} />
+              <div style={{ height: 40 }} />
+            </div>
+          ))}
+          {kippot?.map(s => {
+            const product   = styleProducts[s.id];
+            const stock     = typeof product?.inStock === 'number' ? product.inStock : null;
+            const supported = supportsPrintType(s, printType);
+            const selected  = supported && selectedStyleId === s.id && style === s.id;
             return (
-              <div key={s.id} className="ys-ekip-card" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div key={s.id} className="ys-ekip-card" style={{ display: 'flex', flexDirection: 'column', opacity: supported ? 1 : 0.45 }}>
                 <button
-                  onClick={() => setStyle(style === s.id ? null : s.id)}
+                  onClick={() => { if (supported) setStyle(style === s.id ? null : s.id); }}
+                  disabled={!supported}
+                  aria-pressed={selected}
                   style={{
-                    border: style === s.id ? `2px solid ${GOLD}` : '2px solid #E5E0D5',
+                    border: selected ? `2px solid ${GOLD}` : '2px solid #E5E0D5',
                     background: '#fff',
                     padding: 0,
-                    cursor: 'pointer',
+                    cursor: supported ? 'pointer' : 'not-allowed',
                     textAlign: 'center',
                     fontFamily: 'inherit',
                     position: 'relative',
@@ -467,23 +450,26 @@ export default function EventKippotClient() {
                     width: '100%',
                   }}
                 >
-                  {style === s.id && (
+                  {selected && (
                     <div style={{ position: 'absolute', top: 6, left: 6, background: GOLD, color: '#fff', borderRadius: '50%', width: 20, height: 20, fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>✓</div>
                   )}
-                  <img src={s.img} alt={`${s.label} — ${KIPA_MATERIAL_LABELS[getKipaMaterial(s.id)]}`} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+                  {/* תמונת המוצר לרשימת הבחירה (לא תמונת העיצוב של הסטודיו) */}
+                  <img src={s.listImage} alt={`${s.label} — ${KIPA_MATERIAL_LABELS[s.material]}`} loading="lazy" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
                   <div style={{ padding: '8px 10px 2px', fontSize: 13, fontWeight: 600, color: 'var(--ys-text)' }}>{s.label}</div>
                   {/* סוג הכיפה — מוצג מתחת לכל דגם */}
                   <div style={{ padding: '0 10px 8px', fontSize: 11, fontWeight: 600, color: '#9C7B3F' }}>
-                    {KIPA_MATERIAL_LABELS[getKipaMaterial(s.id)]}
-                    {getKipaMaterial(s.id) === 'satin' && <span style={{ color: GOLD, fontWeight: 800 }}> · מ-₪6 ליח'</span>}
+                    {KIPA_MATERIAL_LABELS[s.material]}
+                    {s.embroidered && <div style={{ color: GOLD, fontWeight: 800 }}>🧵 כיפה עם רקמה · +₪{studioKippahSurcharge(s)} ליחידה</div>}
+                    {s.material === 'satin' && <span style={{ color: GOLD, fontWeight: 800 }}> · מ-₪{6 + studioKippahSurcharge(s)} ליח'</span>}
+                    {!supported && <div style={{ color: '#6B7280', fontWeight: 600 }}>לא זמין לסוג העיצוב שנבחר</div>}
                   </div>
                 </button>
-                {/* אדמין: שיוך הדגם למוצר בחנות + תצוגת מלאי */}
+                {/* אדמין: מוצר משויך + תצוגת מלאי. שיוך ועריכה — בדשבורד */}
                 {isAdmin && (
                   <div style={{ padding: '4px 2px 0', fontSize: 10.5, lineHeight: 1.5, textAlign: 'center' }}>
-                    {mapped ? (
+                    {s.productId ? (
                       <div style={{ color: '#374151' }}>
-                        🔗 {mapped.sku}
+                        🔗 {s.sku ?? s.productId}
                         <span style={{ fontWeight: 800, color: stock == null ? '#6b7280' : stock <= 0 ? '#dc2626' : stock < 50 ? '#d97706' : '#16a34a' }}>
                           {' '}· במלאי: {stock ?? '—'}
                         </span>
@@ -491,7 +477,7 @@ export default function EventKippotClient() {
                     ) : (
                       <div style={{ color: '#dc2626', fontWeight: 700 }}>לא משויך למוצר</div>
                     )}
-                    {mapped && (
+                    {s.productId && (
                       <button
                         onClick={() => updateStyleStock(s.id, s.label)}
                         disabled={savingStock === s.id}
@@ -500,24 +486,26 @@ export default function EventKippotClient() {
                         {savingStock === s.id ? '⏳ שומר...' : '📦 עדכן מלאי'}
                       </button>
                     )}
-                    <button
-                      onClick={() => assignStyleProduct(s.id, s.label)}
-                      disabled={assigning === s.id}
-                      style={{ background: 'none', border: 'none', color: '#1d4ed8', fontWeight: 700, fontSize: 10.5, cursor: 'pointer', fontFamily: 'inherit', padding: 0, textDecoration: 'underline' }}
+                    <a
+                      href={`/admin/logo-studio?tab=products&kippah=${encodeURIComponent(s.id)}`}
+                      style={{ color: '#1d4ed8', fontWeight: 700, fontSize: 10.5, fontFamily: 'inherit', textDecoration: 'underline' }}
                     >
-                      {assigning === s.id ? '⏳ משייך...' : mapped ? 'שנה שיוך' : '🔗 שייך מוצר'}
-                    </button>
+                      ✏️ עריכה בדשבורד
+                    </a>
                   </div>
                 )}
               </div>
             );
           })}
+          {kippot?.length === 0 && (
+            <div style={{ fontSize: 13, color: '#6B7280' }}>אין כרגע כיפות זמינות לעיצוב. נשמח לעזור בוואטסאפ.</div>
+          )}
         </div>
       </div>
 
       {/* ── סטודיו לוגו — העלאת לוגו מוכן (עם הסרת רקע) או עיצוב ב-AI + הדמיה על הדגם שנבחר ── */}
       <a
-        href={`/logo-studio?style=${encodeURIComponent(selectedStyleId)}&qty=${qty}&side=${printType === 'print-bottom' ? 'bottom' : 'top'}${printType === 'print-both' ? '&sides=both' : ''}`}
+        href={selectedStyleId ? `/logo-studio?style=${encodeURIComponent(selectedStyleId)}&qty=${qty}&side=${printType === 'print-bottom' ? 'bottom' : 'top'}${printType === 'print-both' ? '&sides=both' : ''}` : '/logo-studio'}
         style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
           width: '100%', marginTop: 14, boxSizing: 'border-box',
@@ -568,7 +556,7 @@ export default function EventKippotClient() {
         <KippaDesignModal
           open={designerOpen}
           material={material}
-          productImageUrl={styleProducts[selectedStyleId]?.imgUrl || KIPPOT_STYLES.find(s => s.id === selectedStyleId)?.img}
+          productImageUrl={(selectedKippah && designImageFor(selectedKippah, 'top')) || styleProducts[selectedStyleId]?.imgUrl}
           onSave={handleDesignerSave}
           onClose={() => setDesignerOpen(false)}
         />

@@ -5,7 +5,7 @@ import s from '../LogoStudio.module.css';
 import type { ProjectView, MockupView, CatalogProduct } from '../studioApi';
 import { getLogoFont } from '@/lib/logoStudio/fonts';
 import { LOGO_STYLES, LOGO_SYMBOLS, LOGO_EVENTS } from '@/lib/logoStudio/types';
-import { KIPA_MIN_QTY, KIPA_EXTRA_SIDE_PRICE, getKipaUnitPrice } from '@/app/lib/kippot';
+import { KIPA_MIN_QTY, KIPA_EXTRA_SIDE_PRICE, KIPA_EMBROIDERY_SURCHARGE, getKipaUnitPrice } from '@/app/lib/kippot';
 import { MOCKUP_DISCLAIMER } from './MockupStep';
 
 const QTY_OPTIONS = [30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 120, 150, 200, 250, 300, 400, 500];
@@ -31,7 +31,8 @@ export default function ApproveStep({ project, product, mockup, busy, error, ini
   const version = project.versions.find(v => v.id === project.currentVersionId) ?? project.versions[0];
   const sel = project.selection;
   const material = sel.materialKind === 'satin' ? 'satin' : 'linen';
-  const unit = getKipaUnitPrice(qty, material) + (secondSideOf ? KIPA_EXTRA_SIDE_PRICE : 0);
+  const embroideryExtra = sel.embroidered ? KIPA_EMBROIDERY_SURCHARGE : 0; // דגם רקום: +₪5 לכיפה
+  const unit = getKipaUnitPrice(qty, material) + embroideryExtra + (secondSideOf ? KIPA_EXTRA_SIDE_PRICE : 0);
   const mockupOk = !!mockup && mockup.versionId === version?.id && !mockup.stale;
   const spec = version?.spec;
 
@@ -54,7 +55,7 @@ export default function ApproveStep({ project, product, mockup, busy, error, ini
             </select>
           )}
           <div style={{ fontSize: 15, marginTop: 10 }}>₪{unit} לכיפה · סה״כ <b>₪{(unit * qty).toLocaleString('he-IL')}</b></div>
-          <div className={s.hint}>המחיר לפי מדרגות הכמות של כיפות לאירועים, כולל ההדפסה.</div>
+          <div className={s.hint}>המחיר לפי מדרגות הכמות של כיפות לאירועים, כולל ההדפסה{embroideryExtra > 0 ? ` ותוספת רקמה (+₪${embroideryExtra} לכיפה)` : ''}.</div>
           <div className={s.hint}>באישור נשמר עותק קבוע של הגרסה וההדמיה האלה להזמנה. שינויים עתידיים בפרויקט לא ישנו אותו.</div>
           {error && <div className={s.error} role="alert">{error}</div>}
           <button type="button" className={s.primary} style={{ marginTop: 12 }} disabled={!mockupOk || busy} onClick={() => onApprove(qty)}>
@@ -125,7 +126,8 @@ export function ApproveBothStep({ sides, product, busy, error, initialQty, onApp
   const qtyOptions = QTY_OPTIONS.includes(qty) ? QTY_OPTIONS : [...QTY_OPTIONS, qty].sort((a, b) => a - b);
   const sel = sides[0]?.project.selection;
   const material = sel?.materialKind === 'satin' ? 'satin' : 'linen';
-  const unit = getKipaUnitPrice(qty, material) + KIPA_EXTRA_SIDE_PRICE;
+  const embroideryExtra = sel?.embroidered ? KIPA_EMBROIDERY_SURCHARGE : 0; // דגם רקום: +₪5 לכיפה
+  const unit = getKipaUnitPrice(qty, material) + embroideryExtra + KIPA_EXTRA_SIDE_PRICE;
   const allOk = sides.every(sd => {
     const v = sd.project.versions.find(x => x.id === sd.project.currentVersionId);
     return !!sd.mockup && !!v && sd.mockup.versionId === v.id && !sd.mockup.stale;
@@ -143,7 +145,7 @@ export function ApproveBothStep({ sides, product, busy, error, initialQty, onApp
             {qtyOptions.map(q => <option key={q} value={q}>{q}</option>)}
           </select>
           <div style={{ fontSize: 15, marginTop: 10 }}>₪{unit} לכיפה · סה״כ <b>₪{(unit * qty).toLocaleString('he-IL')}</b></div>
-          <div className={s.hint}>כולל הדפסה בשני הצדדים (+₪{KIPA_EXTRA_SIDE_PRICE} לכיפה על הצד השני).</div>
+          <div className={s.hint}>כולל הדפסה בשני הצדדים (+₪{KIPA_EXTRA_SIDE_PRICE} לכיפה על הצד השני){embroideryExtra > 0 ? ` ותוספת רקמה (+₪${embroideryExtra} לכיפה)` : ''}.</div>
           <div className={s.hint}>באישור נשמר עותק קבוע של שני העיצובים וההדמיות להזמנה.</div>
           {error && <div className={s.error} role="alert">{error}</div>}
           <button type="button" className={s.primary} style={{ marginTop: 12 }} disabled={!allOk || busy} onClick={() => onApprove(qty)}>

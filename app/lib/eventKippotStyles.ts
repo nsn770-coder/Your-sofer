@@ -1,6 +1,7 @@
-// דגמי כיפות האירועים לשימוש סטודיו הלוגו — זהה לרשימות שב-/event-kippot וב-/kippot-order.
-// (בעדכון דגם — לעדכן גם שם.)
-// id = מזהה הדגם ב-URL וב-settings/eventKippotStyles (שיוך למוצר אמיתי לניכוי מלאי).
+// ⚠️ רשימה היסטורית (Legacy) — הכיפות שהיו מוגדרות בקוד לפני המעבר ל-Firestore.
+// מקור האמת היום: Firestore studioKippot (app/lib/studioKippot.ts), מנוהל מהדשבורד.
+// הרשימה כאן משמשת רק כרשת ביטחון כשהאוסף ריק (לפני הרצת scripts/migrateStudioKippot.mjs)
+// ואין לעדכן אותה — כיפות חדשות מוסיפים מהדשבורד.
 import { getKipaMaterial, type KipaMaterial } from './kippot';
 
 export interface EventKippahStyle { id: string; label: string; img: string }

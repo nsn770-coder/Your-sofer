@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { resolveSelection, DEFAULT_PRINT_AREA, type RawProduct } from '../catalog';
+import { resolveSelection, isStudioKippah, DEFAULT_PRINT_AREA, type RawProduct } from '../catalog';
+import { normalizeStudioKippah, designImageFor, studioKippahUnitPrice, LEGACY_STUDIO_KIPPOT } from '@/app/lib/studioKippot';
+import { EVENT_KIPPOT_STYLES } from '@/app/lib/eventKippotStyles';
 import { styleProduct, selectionKey, PRODUCT_ID_RE } from '../projects.server';
 
 const withVariants: RawProduct = {
@@ -50,25 +52,80 @@ describe('bottom side of the kippah', () => {
   });
 });
 
-describe('event-kippot styles in the studio', () => {
-  it('builds a structured virtual product from the style', () => {
-    const p = styleProduct('satin-white', { bottomImage: 'https://res.cloudinary.com/dyxzq3ucy/s-b.png' })!;
+describe('studio kippot (Firestore studioKippot) in the studio', () => {
+  const satin = normalizeStudioKippah('satin-white', {
+    label: 'סאטן', material: 'satin',
+    listImage: 'https://res.cloudinary.com/dyxzq3ucy/list.png',
+    bottomDesignImage: 'https://res.cloudinary.com/dyxzq3ucy/s-b.png',
+  });
+
+  it('builds a structured virtual product from the kippah', () => {
+    const p = styleProduct(satin);
     expect(p.id).toBe('style:satin-white');
     expect(p.filterAttributes).toEqual({ 'חומר': 'סאטן', 'צבע': 'סאטן' });
     const s = resolveSelection(p, {}, 'top');
     expect(s.material).toEqual({ value: 'סאטן', source: 'catalog' });
     expect(s.materialKind).toBe('satin');
-    expect(s.image?.url).toContain('res.cloudinary.com/dyxzq3ucy');
     expect(resolveSelection(p, {}, 'bottom').image?.url).toContain('s-b.png');
-    const linen = resolveSelection(styleProduct('lavan', undefined)!, {});
+    const linen = resolveSelection(styleProduct(LEGACY_STUDIO_KIPPOT.find(k => k.id === 'lavan')!), {});
     expect(linen.materialKind).toBe('linen');
     expect(linen.color?.value).toBe('לבן ורדרד');
   });
 
-  it('unknown styles are rejected; ids are validated', () => {
-    expect(styleProduct('nope', undefined)).toBeNull();
+  it('studio canvas shows the TOP design photo, not the list photo', () => {
+    const p = styleProduct({ ...satin, topDesignImage: 'https://res.cloudinary.com/dyxzq3ucy/top-design.png' });
+    expect(resolveSelection(p, {}, 'top').image?.url).toContain('top-design.png');
+    expect(p.imgUrl).toContain('list.png'); // the list keeps the product photo
+  });
+
+  it('falls back to the list photo when there is no top design photo yet', () => {
+    expect(resolveSelection(styleProduct(satin), {}, 'top').image?.url).toContain('list.png');
+    expect(designImageFor(satin, 'top')).toContain('list.png');
+    expect(designImageFor({ ...satin, bottomDesignImage: null }, 'bottom')).toBeNull();
+  });
+
+  it('inactive kippot are not offered in the studio', () => {
+    expect(isStudioKippah(styleProduct({ ...satin, active: false }))).toBe(false);
+    expect(isStudioKippah(styleProduct(satin))).toBe(true);
+  });
+
+  it('normalizes missing fields safely', () => {
+    const k = normalizeStudioKippah('x', {});
+    expect(k).toMatchObject({ label: 'x', material: 'linen', active: true, sides: { top: true, bottom: true }, topDesignImage: null });
+    expect(normalizeStudioKippah('y', { sides: { top: false, bottom: false } }).sides).toEqual({ top: true, bottom: false });
+  });
+
+  it('legacy list covers every kippah that was hard-coded', () => {
+    expect(LEGACY_STUDIO_KIPPOT.map(k => k.id)).toEqual(EVENT_KIPPOT_STYLES.map(s => s.id));
+    expect(LEGACY_STUDIO_KIPPOT.find(k => k.id === 'satin-white-18')?.material).toBe('satin');
+  });
+
+  it('ids are validated', () => {
     expect(PRODUCT_ID_RE.test('style:lavan')).toBe(true);
+    expect(PRODUCT_ID_RE.test('style:k-mabc123')).toBe(true);
     expect(PRODUCT_ID_RE.test('style:../x')).toBe(false);
     expect(PRODUCT_ID_RE.test('GA6IaHppba8peGVGHGud')).toBe(true);
+  });
+});
+
+describe('catalog products: top design photo', () => {
+  it('uses logoStudio.topImage for the canvas, else the main photo', () => {
+    const p: RawProduct = { id: 'k9', imgUrl: 'https://res.cloudinary.com/dyxzq3ucy/main.png', logoStudio: { topImage: 'https://res.cloudinary.com/dyxzq3ucy/t.png' } };
+    expect(resolveSelection(p, {}, 'top').image?.url).toContain('/t.png');
+    expect(resolveSelection({ ...p, logoStudio: {} }, {}, 'top').image?.url).toContain('main.png');
+  });
+});
+
+describe('embroidered kippah (+₪5 per kippah at every tier)', () => {
+  const linen = normalizeStudioKippah('r', { label: 'רקמה', material: 'linen', embroidered: true, listImage: 'https://res.cloudinary.com/dyxzq3ucy/r.png' });
+  it('adds ₪5 to every linen / satin tier', () => {
+    expect([30, 50, 100].map(q => studioKippahUnitPrice(linen, q))).toEqual([19, 17, 15]);
+    expect([30, 50].map(q => studioKippahUnitPrice({ ...linen, material: 'satin' }, q))).toEqual([13, 11]);
+    expect([30, 50, 100].map(q => studioKippahUnitPrice({ ...linen, embroidered: false }, q))).toEqual([14, 12, 10]);
+  });
+  it('the studio selection carries the embroidered flag', () => {
+    expect(resolveSelection(styleProduct(linen), {}).embroidered).toBe(true);
+    expect(resolveSelection(styleProduct({ ...linen, embroidered: false }), {}).embroidered).toBe(false);
+    expect(normalizeStudioKippah('z', {}).embroidered).toBe(false);
   });
 });

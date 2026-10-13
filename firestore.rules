@@ -118,6 +118,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── Studio kippot (כיפות לעיצוב אישי) ────────────────────────────────────
+    // Single source for the kippot on /event-kippot, /kippot-order and the Logo
+    // Studio. Public read (catalog data); writes only by admins (the dashboard
+    // writes through /api/admin/studio-kippot with the Admin SDK).
+    match /studioKippot/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ── Logo Studio (AI logo designer) ───────────────────────────────────────
     // All access goes through the API routes with the Admin SDK, which verify
     // ownership / admin rights and enforce the attempt quota atomically.

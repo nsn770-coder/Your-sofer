@@ -40,7 +40,7 @@ export interface ProjectView {
 export interface ApproveResult {
   approvalId: string; productId: string; productName: string; productImageUrl: string;
   inventoryProductId: string | null; styleId: string | null; side: KippahSide;
-  materialKind: 'satin' | 'linen' | 'other' | null; selectedVariants: Record<string, string>;
+  materialKind: 'satin' | 'linen' | 'other' | null; embroidered?: boolean; selectedVariants: Record<string, string>;
   spec: LogoSpec; uploaded?: boolean; bgRemoved?: boolean; font: string; logoUrl: string; logoThumbUrl: string; mockupUrl: string; mockupThumbUrl: string;
   finish: 'print' | 'embroidery'; placement: Placement; production: ProductionInfo;
 }

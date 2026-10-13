@@ -279,6 +279,7 @@ export default function LogoStudioClient() {
       imgUrl: a.mockupThumbUrl,
       quantity: qty,
       cat: 'כיפות',
+      embroideredKippah: a.embroidered === true,
       ...(Object.keys(a.selectedVariants).length ? { selectedVariants: a.selectedVariants } : {}),
       // existing order/admin/email pipelines already carry `customDesign`
       customDesign: {
@@ -299,6 +300,8 @@ export default function LogoStudioClient() {
     };
   }
   const materialOf = (a: ApproveResult) => (a.materialKind === 'satin' ? 'satin' as const : 'linen' as const);
+  // דגם רקום (+₪5 לכיפה). embroideredKippah:false מונע זיהוי "רקמה" בשם כשהדגם אינו רקום
+  const embroideredOf = (a: ApproveResult) => ({ embroideredKippah: a.embroidered === true });
 
   /** both sides: approve the two designs and add ONE kippah line carrying both */
   async function approveBoth(qty: number) {
@@ -310,7 +313,7 @@ export default function LogoStudioClient() {
       const aBottom = await bottom.approveSnapshot();
       if (!aBottom) return;
       const lineId = cartLineIdFor(aTop);
-      const unit = getEventKippahPricePerUnit(0, qty, materialOf(aTop)) + KIPA_EXTRA_SIDE_PRICE;
+      const unit = getEventKippahPricePerUnit(0, qty, materialOf(aTop), embroideredOf(aTop)) + KIPA_EXTRA_SIDE_PRICE;
       removeItem(lineId); removeItem(`print-${lineId}`); removeItem(`print-side2-${lineId}`);
       addItem(kippahLine(aTop, qty, unit, designOf(aTop, top), designOf(aBottom, bottom)));
       addItem(printLine(aTop, `print-${lineId}`, qty));
@@ -346,14 +349,14 @@ export default function LogoStudioClient() {
 
       if (existing && asSecond) {
         const quantity = existing.quantity;
-        const unit = getEventKippahPricePerUnit(0, quantity, material) + KIPA_EXTRA_SIDE_PRICE;
+        const unit = getEventKippahPricePerUnit(0, quantity, material, embroideredOf(a)) + KIPA_EXTRA_SIDE_PRICE;
         removeItem(lineId);
         addItem({ ...existing, price: unit, customDesign: { ...existing.customDesign!, logoStudioSecond: design } });
         removeItem(`print-side2-${lineId}`);
         addItem(printLine(a, `print-side2-${lineId}`, quantity));
       } else {
         const keepSecond = exSecond && (exSecond.side ?? 'bottom') !== a.side ? exSecond : undefined;
-        const unit = getEventKippahPricePerUnit(0, qty, material) + (keepSecond ? KIPA_EXTRA_SIDE_PRICE : 0);
+        const unit = getEventKippahPricePerUnit(0, qty, material, embroideredOf(a)) + (keepSecond ? KIPA_EXTRA_SIDE_PRICE : 0);
         removeItem(lineId); removeItem(`print-${lineId}`);
         if (!keepSecond) removeItem(`print-side2-${lineId}`);
         addItem(kippahLine(a, qty, unit, design, keepSecond));

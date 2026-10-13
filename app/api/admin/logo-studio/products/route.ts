@@ -3,24 +3,23 @@ import { getAdminDb } from '@/lib/firebaseAdmin';
 import { requireAdmin, errorResponse, readJson, HttpError } from '@/lib/logoStudio/auth.server';
 import { isAllowedImageUrl } from '@/lib/logoStudio/fetchImage.server';
 import type { RawProduct, LogoStudioProductConfig } from '@/lib/logoStudio/catalog';
-import { listStyleProducts, isStyleId, STYLE_PREFIX, styleInventoryProductId } from '@/lib/logoStudio/projects.server';
-import { COL } from '@/lib/logoStudio/db';
+import { isStyleId, STYLE_PREFIX } from '@/lib/logoStudio/projects.server';
+import { STUDIO_KIPPOT_COLLECTION, normalizeStudioKippah } from '@/app/lib/studioKippot';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/** Studio kippot with their variant options, images and studio config. */
+/**
+ * Catalog products marked for custom design (customDesign / isEventKippot) with
+ * their variant options, images and studio config. The studio kippot of
+ * /event-kippot are managed separately: /api/admin/studio-kippot.
+ */
 export async function GET(req: NextRequest) {
   try {
     await requireAdmin(req);
     const col = getAdminDb().collection('products');
     const [a, b] = await Promise.all([col.where('customDesign', '==', true).limit(100).get(), col.where('isEventKippot', '==', true).limit(100).get()]);
     const seen = new Set<string>();
-    const styles = await Promise.all((await listStyleProducts()).map(async p => ({
-      id: p.id, name: p.name ?? '', imgUrl: p.imgUrl ?? null, images: [p.imgUrl].filter((x): x is string => !!x),
-      variantOptions: [], filterAttributes: p.filterAttributes ?? {}, hidden: false, logoStudio: p.logoStudio ?? {},
-      isStyle: true, inventoryProductId: await styleInventoryProductId(p.id.slice(STYLE_PREFIX.length)),
-    })));
     const products = [...a.docs, ...b.docs].filter(d => !seen.has(d.id) && seen.add(d.id)).map(d => {
       const p = d.data() as RawProduct;
       return {
@@ -30,7 +29,7 @@ export async function GET(req: NextRequest) {
         hidden: p.hidden === true, logoStudio: p.logoStudio ?? {},
       };
     });
-    return NextResponse.json({ products: [...styles, ...products] });
+    return NextResponse.json({ products });
   } catch (e) {
     return errorResponse(e, 'admin:products:get');
   }
@@ -71,6 +70,11 @@ export async function PATCH(req: NextRequest) {
     };
     if (raw.variantImages !== undefined) cfg.variantImages = imageMap(raw.variantImages);
     if (raw.bottomVariantImages !== undefined) cfg.bottomVariantImages = imageMap(raw.bottomVariantImages);
+    if (raw.topImage !== undefined) {
+      const v = typeof raw.topImage === 'string' && raw.topImage ? raw.topImage : null;
+      if (v && !isAllowedImageUrl(v)) throw new HttpError(400, 'image_host_not_allowed', 'כתובת תמונת הצד העליון לא מאושרת.');
+      cfg.topImage = v;
+    }
     if (raw.bottomImage !== undefined) {
       const v = typeof raw.bottomImage === 'string' && raw.bottomImage ? raw.bottomImage : null;
       if (v && !isAllowedImageUrl(v)) throw new HttpError(400, 'image_host_not_allowed', 'כתובת תמונת הצד התחתון לא מאושרת.');
@@ -87,17 +91,20 @@ export async function PATCH(req: NextRequest) {
     if (typeof raw.disabled === 'boolean') cfg.disabled = raw.disabled;
 
     if (isStyleId(productId)) {
-      // event-kippot style → stored in settings/logoStudioStyles (not a product document)
-      const styleId = productId.slice(STYLE_PREFIX.length);
-      const ref = getAdminDb().doc(COL.styleConfigDoc);
-      const merged = await getAdminDb().runTransaction(async tx => {
-        const snap = await tx.get(ref);
-        const prev = ((snap.exists ? snap.data() ?? {} : {})[styleId] ?? {}) as LogoStudioProductConfig;
-        const next = { ...prev, ...cfg };
-        tx.set(ref, { [styleId]: next }, { merge: true });
-        return next;
-      });
-      return NextResponse.json({ ok: true, logoStudio: merged });
+      // studio kippah (/event-kippot) → its studioKippot document (single source)
+      const id = productId.slice(STYLE_PREFIX.length);
+      const ref = getAdminDb().collection(STUDIO_KIPPOT_COLLECTION).doc(id);
+      const snap = await ref.get();
+      if (!snap.exists) throw new HttpError(404, 'not_found', 'הכיפה לא נמצאה — יש להריץ את המיגרציה או ליצור אותה מהדשבורד.');
+      const { topImage, bottomImage, disabled, variantImages: _vi, bottomVariantImages: _bvi, ...studioCfg } = cfg;
+      void _vi; void _bvi;
+      const prev = normalizeStudioKippah(id, snap.data());
+      const update: Record<string, unknown> = { studio: { ...prev.studio, ...studioCfg }, updatedAt: Date.now() };
+      if (topImage !== undefined) update.topDesignImage = topImage;
+      if (bottomImage !== undefined) update.bottomDesignImage = bottomImage;
+      if (disabled !== undefined) update.active = !disabled;
+      await ref.update(update);
+      return NextResponse.json({ ok: true });
     }
     const ref = getAdminDb().collection('products').doc(productId);
     const snap = await ref.get();

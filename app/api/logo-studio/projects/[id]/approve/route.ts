@@ -56,7 +56,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       product: {
         styleId, inventoryProductId,
         id: product.id, name: product.name ?? '', selectedVariants: proj.selectedVariants,
-        material: sel.material, color: sel.color, materialKind: sel.materialKind, imageUrl: mockup.imageUrl,
+        material: sel.material, color: sel.color, materialKind: sel.materialKind, embroidered: sel.embroidered, imageUrl: mockup.imageUrl,
       },
       spec: s,
       details: uploaded ? {
@@ -96,6 +96,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       productName: product.name ?? '',
       productImageUrl: mockup.imageUrl,
       materialKind: sel.materialKind,
+      embroidered: sel.embroidered,
       selectedVariants: proj.selectedVariants,
       spec: s,
       uploaded,

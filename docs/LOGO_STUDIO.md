@@ -22,7 +22,17 @@
 
 ## אוספי Firestore חדשים (Admin SDK בלבד, הלקוח חסום ב-rules)
 `logoProjects` (+ `versions`, `mockups`, `messages`), `logoApprovals`, `logoStudioUsers` (+ `ledger`), `logoStudioOps`, `logoStudioCodes` (+ `redemptions`), `logoStudioRate`, `logoStudioAssets`, `settings/logoStudio`.
-במוצר נוסף השדה האופציונלי `logoStudio` (תמונות וריאציה, אזור הדפסה, רוחב במ״מ, גימורים).
+במוצר נוסף השדה האופציונלי `logoStudio` (תמונות וריאציה, תמונת עיצוב לצד עליון `topImage`, אזור הדפסה, רוחב במ״מ, גימורים).
+
+## כיפות לעיצוב אישי — `studioKippot/{id}` (מקור אמת יחיד)
+הכיפות של `/event-kippot`, `/kippot-order` והסטודיו (`style:<id>`) נטענות **רק** מהאוסף הזה ומנוהלות מהדשבורד:
+„סטודיו לוגו וקודים” ← „כיפות והדמיה” ← „➕ הוספת כיפה לעיצוב אישי” / עריכה / הסתרה.
+- שדות: `label`, `material` (linen/satin — מדרגות מחיר), `embroidered` (כיפה עם רקמה — +₪5 לכיפה בכל המדרגות), `listImage` (רשימת הבחירה), `topDesignImage` / `bottomDesignImage` (משטח העיצוב בסטודיו לכל צד),
+  `sides {top,bottom}`, `active`, `sortOrder`, `productId`/`sku`/`productName` (שיוך למוצר — ניכוי מלאי), `studio` (אזורי הדפסה, מ״מ, גימורים).
+- בסטודיו: צד עליון ← `topDesignImage`, ואם ריק ← `listImage`. צד תחתון ← `bottomDesignImage` (ריק = אין הדמיה).
+- Rules: קריאה ציבורית, כתיבה אדמין בלבד. ה-API: `app/api/admin/studio-kippot/**` (requireAdmin).
+- מיגרציה חד-פעמית מהקוד ומ-`settings/eventKippotStyles` + `settings/logoStudioStyles`: `node scripts/migrateStudioKippot.mjs --live`
+  (בטוחה להרצה חוזרת; עד שהיא רצה האתר משתמש ברשימה הישנה כרשת ביטחון).
 
 ## משתני סביבה
 - `GEMINI_API_KEY` — קיים. משמש לעיטור, למונוגרמה ולשיחה. בלעדיו, סגנונות טקסט עובדים והשיחה עוברת לחוקים מקומיים.

@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       if (isStudioKippah(p)) products.push(publicProduct(p));
     }
     if (!products.length) throw new HttpError(404, 'no_products', 'אין כרגע כיפות זמינות לעיצוב.');
-    return NextResponse.json({ products }, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' } });
+    return NextResponse.json({ products }, { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120' } });
   } catch (e) {
     return errorResponse(e, 'catalog');
   }

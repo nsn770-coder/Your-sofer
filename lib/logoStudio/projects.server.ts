@@ -9,8 +9,8 @@ import { COL } from './db';
 import { HttpError } from './auth.server';
 import { DEFAULT_SPEC, validateSpec, describeSpecChanges, needsAiDecoration, needsAiMonogram, decorationKey, monogramKey, type LogoSpec } from './types';
 import { resolveSelection, clampPlacement, type RawProduct, type ResolvedSelection, type Placement, type KippahSide, type LogoStudioProductConfig } from './catalog';
-import { EVENT_KIPPOT_STYLES, getEventKippahStyle } from '@/app/lib/eventKippotStyles';
-import { DEFAULT_STYLE_PRODUCT_MAP, getKipaMaterial } from '@/app/lib/kippot';
+import type { StudioKippah } from '@/app/lib/studioKippot';
+import { loadStudioKippot, loadStudioKippah } from './studioKippot.server';
 import { composeLogo, type RasterLayer } from './compose.server';
 import { uploadPrivate, downloadPrivate, signedUrl, type StoredAsset } from './storage.server';
 import { generateFrame, generateDivider, generateMonogram } from './aiLayers.server';
@@ -51,53 +51,50 @@ export async function getSettings(): Promise<StudioSettings> {
 export function invalidateSettingsCache() { settingsCache = null; }
 
 // ── products ────────────────────────────────────────────────────────────────
-// Event-kippot styles (/event-kippot → /kippot-order) are offered in the studio
-// as virtual products "style:<id>". Their colour and fabric come from the style
-// definition (structured), their photo from the style, and their studio config
-// (bottom photo, print area, mm) from settings/logoStudioStyles.
+// Studio kippot (Firestore studioKippot — managed in the admin dashboard) are
+// offered in the studio as virtual products "style:<id>". Their colour and
+// fabric are structured fields of the kippah; the studio canvas shows the
+// kippah's DESIGN photo for the chosen side (top falls back to the list photo).
 export const STYLE_PREFIX = 'style:';
 export const isStyleId = (id: string) => id.startsWith(STYLE_PREFIX);
 export const PRODUCT_ID_RE = /^(?:[A-Za-z0-9_-]{1,128}|style:[a-z0-9-]{1,40})$/;
 
-export async function getStyleConfigs(): Promise<Record<string, LogoStudioProductConfig>> {
-  const snap = await fs().doc(COL.styleConfigDoc).get();
-  return (snap.exists ? snap.data() ?? {} : {}) as Record<string, LogoStudioProductConfig>;
-}
-
-/** Real catalog product mapped to an event style (stock / profitability), if any. */
+/** Real catalog product mapped to a studio kippah (stock / profitability), if any. */
 export async function styleInventoryProductId(styleId: string): Promise<string | null> {
-  const snap = await fs().doc('settings/eventKippotStyles').get().catch(() => null);
-  const map = { ...DEFAULT_STYLE_PRODUCT_MAP, ...((snap?.exists ? snap.data() : {}) as Record<string, { productId?: string }>) };
-  return map[styleId]?.productId ?? null;
+  return (await loadStudioKippah(styleId).catch(() => null))?.productId ?? null;
 }
 
-export function styleProduct(styleId: string, cfg: LogoStudioProductConfig | undefined): RawProduct | null {
-  const st = getEventKippahStyle(styleId);
-  if (!st) return null;
-  const material = getKipaMaterial(styleId) === 'satin' ? 'סאטן' : 'פשתן';
+export function styleProduct(k: StudioKippah): RawProduct {
+  const material = k.material === 'satin' ? 'סאטן' : 'פשתן';
+  const cfg: LogoStudioProductConfig = {
+    ...k.studio,
+    topImage: k.topDesignImage,
+    bottomImage: k.bottomDesignImage,
+  };
   return {
-    id: `${STYLE_PREFIX}${styleId}`,
-    name: `כיפה ${material} — ${st.label}`,
-    imgUrl: st.img,
-    filterAttributes: { 'חומר': material, 'צבע': st.label },
+    id: `${STYLE_PREFIX}${k.id}`,
+    name: `כיפה ${material} — ${k.label}`,
+    imgUrl: k.listImage,
+    filterAttributes: { 'חומר': material, 'צבע': k.label },
     customDesign: true,
     isEventKippot: true,
-    logoStudio: cfg ?? {},
+    embroideredKippah: k.embroidered,
+    hidden: !k.active,
+    logoStudio: cfg,
   };
 }
 
+/** Active studio kippot as studio products. */
 export async function listStyleProducts(): Promise<RawProduct[]> {
-  const cfgs = await getStyleConfigs();
-  return EVENT_KIPPOT_STYLES.map(s => styleProduct(s.id, cfgs[s.id])!).filter(Boolean);
+  return (await loadStudioKippot()).map(styleProduct);
 }
 
 export async function loadProduct(productId: string): Promise<RawProduct> {
   if (!PRODUCT_ID_RE.test(productId)) throw new HttpError(400, 'invalid_product');
   if (isStyleId(productId)) {
-    const styleId = productId.slice(STYLE_PREFIX.length);
-    const p = styleProduct(styleId, (await getStyleConfigs())[styleId]);
-    if (!p) throw new HttpError(404, 'product_not_found', 'דגם הכיפה לא נמצא.');
-    return p;
+    const k = await loadStudioKippah(productId.slice(STYLE_PREFIX.length));
+    if (!k) throw new HttpError(404, 'product_not_found', 'דגם הכיפה לא נמצא.');
+    return styleProduct(k);
   }
   const snap = await fs().collection('products').doc(productId).get();
   if (!snap.exists) throw new HttpError(404, 'product_not_found', 'המוצר לא נמצא.');

@@ -1,11 +1,10 @@
 'use client';
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/app/firebase';
 import { useCart } from '@/app/contexts/CartContext';
 import PageFaqSection from '@/app/components/faq/PageFaqSection';
-import { getKipaUnitPrice, getKipaMaterial, KIPA_MATERIAL_LABELS, KIPA_EXTRA_SIDE_PRICE, DEFAULT_STYLE_PRODUCT_MAP } from '@/app/lib/kippot';
+import { KIPA_MATERIAL_LABELS, KIPA_EXTRA_SIDE_PRICE } from '@/app/lib/kippot';
+import { fetchStudioKippotClient, designImageFor, studioKippahUnitPrice, LEGACY_STUDIO_KIPPOT, type StudioKippah } from '@/app/lib/studioKippot';
 import dynamic from 'next/dynamic';
 import type { KippaDesign } from '@/app/designer/utils/types';
 // עורך כיפה מותאמת אישית — נטען רק בלחיצה (ssr:false — canvas)
@@ -13,17 +12,7 @@ const KippaDesignModal = dynamic(() => import('@/app/designer/components/KippaDe
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const KIPPOT_STYLES: Record<string, { label: string; img: string }> = {
-  lavan:    { label: 'לבן ורדרד',  img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636051/%D7%9B%D7%99%D7%A4%D7%94_%D7%9C%D7%91%D7%9F_%D7%95%D7%A8%D7%93%D7%A8%D7%93_nauwhq.png' },
-  beige:    { label: "בז'",         img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1782636052/%D7%9B%D7%99%D7%A4%D7%94_%D7%91%D7%96_fhrr09.png' },
-  'linen-tchelet': { label: 'תכלת', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1789036165/gpmma8td8rvvqvhyptel.png' },
-  'white':         { label: 'לבן',       img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_25_PM_mcqhle.png' },
-  'beige-natural': { label: "בז' טבעי",  img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1784407273/ChatGPT_Image_Jul_18_2026_11_38_58_PM_wva57o.png' },
-  'beige-luxury':  { label: "בז' יוקרתי", img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1787821187/yu4zdyfhd4leqe4h5l4b.png' },
-  'navy':          { label: 'כחול כהה',   img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1787821093/kmmuycfw287ui8kcnyrs.png' },
-  'satin-white':    { label: 'סאטן',      img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781586601/a8c7n05vniv34n4qw44g.jpg' },
-  'satin-white-18': { label: 'סאטן לבן 18 ס"מ', img: 'https://res.cloudinary.com/dyxzq3ucy/image/upload/v1781587426/eu12gjypbrxlyhfi40tk.jpg' },
-};
+// רשימת הכיפות נטענת מ-Firestore (studioKippot) — מנוהלת מהדשבורד, לא מהקוד.
 
 const TYPE_LABELS: Record<string, string> = {
   'print-top':    'הדפסה למעלה',
@@ -96,20 +85,30 @@ function KippotOrderInner() {
 
   const qty    = Math.max(30, Number(searchParams.get('qty') || 30));
   const type   = (searchParams.get('type') || 'print-top') as 'print-top' | 'print-bottom' | 'print-both' | 'embroidery';
-  const style  = searchParams.get('style') || 'lavan';
-  const kippah = KIPPOT_STYLES[style] || KIPPOT_STYLES.lavan;
+  const styleParam = searchParams.get('style') || '';
 
-  // ── שיוך דגם ← מוצר אמיתי (settings/eventKippotStyles) — לניכוי מלאי ורווחיות ──
-  const [styleProductId, setStyleProductId] = useState<string | null>(null);
+  // ── הכיפה מ-Firestore (studioKippot) — שם, תמונות, חומר ומוצר משויך (מלאי/רווחיות) ──
+  const [kippahDoc, setKippahDoc] = useState<StudioKippah | null>(
+    () => LEGACY_STUDIO_KIPPOT.find(k => k.id === styleParam) ?? null,
+  );
   useEffect(() => {
-    getDoc(doc(db, 'settings', 'eventKippotStyles'))
-      .then(snap => {
-        // ברירת מחדל מהקוד (למשל סאטן ← UK00321); Firestore גובר עליה
-        const map = { ...DEFAULT_STYLE_PRODUCT_MAP, ...(snap.exists() ? snap.data() as Record<string, { productId?: string }> : {}) };
-        setStyleProductId(map[style]?.productId ?? null);
-      })
-      .catch(() => setStyleProductId(DEFAULT_STYLE_PRODUCT_MAP[style]?.productId ?? null)); // לא חוסם הזמנה אם אין שיוך
-  }, [style]);
+    let cancelled = false;
+    fetchStudioKippotClient({ includeInactive: true }).then(list => {
+      if (cancelled) return;
+      const active = list.filter(k => k.active);
+      setKippahDoc(list.find(k => k.id === styleParam) ?? active[0] ?? list[0] ?? null);
+    });
+    return () => { cancelled = true; };
+  }, [styleParam]);
+  const style = kippahDoc?.id ?? styleParam;
+  const material = kippahDoc?.material ?? 'linen';
+  const styleProductId = kippahDoc?.productId ?? null;
+  // img = תמונת המוצר (סיכום/סל) · designImg = משטח העיצוב לצד שנבחר (fallback לתמונת המוצר)
+  const kippah = {
+    label: kippahDoc?.label ?? '',
+    img: kippahDoc?.listImage ?? '',
+    designImg: (kippahDoc && (designImageFor(kippahDoc, type === 'print-bottom' ? 'bottom' : 'top') || kippahDoc.listImage)) || '',
+  };
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [designText, setDesignText] = useState('');
@@ -152,7 +151,8 @@ function KippotOrderInner() {
   const logoImgRef     = useRef<HTMLImageElement>(null);
 
   // ── Price — לפי חומר הדגם (פשתן/סאטן) ──────────────────────────────────────
-  const basePrice  = getKipaUnitPrice(qty, getKipaMaterial(style));
+  // מדרגות הבד + תוספת ₪5 לדגם רקום (סימון בדשבורד)
+  const basePrice  = studioKippahUnitPrice(kippahDoc, qty);
   const typeExtra  = type === 'embroidery' ? 5 : 0;
   const sideExtra  = (addSide || type === 'print-both') ? KIPA_EXTRA_SIDE_PRICE : 0;
   const unitPrice  = basePrice + typeExtra + sideExtra;
@@ -274,7 +274,7 @@ function KippotOrderInner() {
     const logoWpx = Math.round((logoWidthPct/100) * (paW/100) * BASE_W);
     const xpx = Math.round((cx/100)*BASE_W - logoWpx/2), ypx = Math.round((cy/100)*BASE_W - logoWpx/2);
     const rot = Math.round(imgRotation);
-    const logoPid = extractPublicId(logoUrl), templatePid = extractPublicId(kippah.img);
+    const logoPid = extractPublicId(logoUrl), templatePid = extractPublicId(kippah.designImg);
     if (!logoPid || !templatePid || logoWpx <= 0) return '';
     return `https://res.cloudinary.com/dyxzq3ucy/image/upload/w_${BASE_W}/l_${logoPid},w_${logoWpx}${rot?`,a_${rot}`:''},g_north_west,x_${xpx},y_${ypx}/${templatePid}.png`;
   }
@@ -286,10 +286,11 @@ function KippotOrderInner() {
       id: `kippot-bulk-${Date.now()}`,
       ...(styleProductId ? { productId: styleProductId } : {}),
       name: `כיפות ${kippah.label} × ${design.quantity} — עיצוב אישי מהעורך`,
-      price: getKipaUnitPrice(design.quantity, getKipaMaterial(style)),
+      price: studioKippahUnitPrice(kippahDoc, design.quantity),
       quantity: design.quantity,
       imgUrl: kippah.img,
       cat: 'כיפות',
+      embroideredKippah: !!kippahDoc?.embroidered,
       customDesign: design,
       printCustomization: {
         productType: 'kipa',
@@ -336,6 +337,7 @@ function KippotOrderInner() {
       quantity: qty,
       imgUrl: kippah.img,
       cat: 'כיפות',
+      embroideredKippah: !!kippahDoc?.embroidered,
       printCustomization: {
         productType:      'kipa',
         side:             type === 'print-bottom' ? 'bottom' : 'top',
@@ -386,10 +388,10 @@ function KippotOrderInner() {
 
       {/* כיפה נבחרת */}
       <div style={{ display: 'flex', gap: 16, alignItems: 'center', background: 'var(--ys-bg-warm)', border: '1px solid #E5E0D5', padding: 16, marginBottom: 28 }}>
-        <img src={kippah.img} alt={kippah.label} style={{ width: 80, height: 80, objectFit: 'cover', flexShrink: 0, border: '2px solid var(--ys-accent)' }} />
+        {kippah.img ? <img src={kippah.img} alt={kippah.label} style={{ width: 80, height: 80, objectFit: 'cover', flexShrink: 0, border: '2px solid var(--ys-accent)' }} /> : <div style={{ width: 80, height: 80, flexShrink: 0, background: '#F3EFE6' }} />}
         <div>
           <div style={{ fontSize: 15, fontWeight: 900 }}>{kippah.label}</div>
-          <div style={{ fontSize: 12, color: '#9C7B3F', fontWeight: 700, marginTop: 2 }}>{KIPA_MATERIAL_LABELS[getKipaMaterial(style)]}</div>
+          <div style={{ fontSize: 12, color: '#9C7B3F', fontWeight: 700, marginTop: 2 }}>{KIPA_MATERIAL_LABELS[material]}</div>
           <div style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>{TYPE_LABELS[type]}</div>
           <div style={{ fontSize: 13, color: 'var(--ys-accent)', fontWeight: 700, marginTop: 6 }}>₪{unitPrice} × {qty} = ₪{totalPrice.toLocaleString('he-IL')}</div>
         </div>
@@ -464,7 +466,7 @@ function KippotOrderInner() {
           <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 10 }}>גרור להזזה · שני אצבעות לשינוי גודל וסיבוב</div>
 
           <div style={{ position: 'relative', width: '100%', maxWidth: 300, margin: '0 auto', aspectRatio: '1', userSelect: 'none' }}>
-            <img src={kippah.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '50%' }} />
+            <img src={kippah.designImg || undefined} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '50%' }} />
             <div
               ref={printAreaRef}
               onMouseDown={handleMouseDown}
@@ -763,7 +765,7 @@ function KippotOrderInner() {
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>סיכום מחיר</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#6B7280' }}>
-            <span>₪{basePrice} × {qty}</span><span>כיפה + הדפסה</span>
+            <span>₪{basePrice} × {qty}</span><span>{kippahDoc?.embroidered ? 'כיפה עם רקמה + הדפסה' : 'כיפה + הדפסה'}</span>
           </div>
           {typeExtra > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#6B7280' }}>
@@ -827,8 +829,8 @@ function KippotOrderInner() {
       {designerOpen && (
         <KippaDesignModal
           open={designerOpen}
-          material={getKipaMaterial(style)}
-          productImageUrl={kippah.img}
+          material={material}
+          productImageUrl={kippah.designImg}
           onSave={handleDesignerSave}
           onClose={() => setDesignerOpen(false)}
         />
