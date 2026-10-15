@@ -497,7 +497,7 @@ export default function LogoStudioClient() {
         {d.mode === 'upload'
           ? <UploadLogoStep current={d.uploadedCurrent} signedIn={signedIn} busy={d.busy === 'uploadLogo' || d.busy === 'bg' ? d.busy : null} error={d.uploadErr}
               onRequireSignIn={() => requireSignIn()} onUpload={d.uploadLogo} onSetBackground={d.setLogoBackground} />
-          : <DetailsStep spec={d.spec} onChange={d.updateSpec} errors={d.specErrors} signedIn={signedIn}
+          : <DetailsStep side={d.side} spec={d.spec} onChange={d.updateSpec} errors={d.specErrors} signedIn={signedIn}
               onRequireSignIn={() => requireSignIn()} inspirationThumb={d.inspirationThumb} onInspiration={d.setInspiration} />}
       </>
     );

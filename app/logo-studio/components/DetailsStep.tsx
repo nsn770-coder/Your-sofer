@@ -12,7 +12,15 @@ import { relativeLuminance } from '@/lib/logoStudio/color';
 import { studioApi, ApiError } from '../studioApi';
 import ColorPalette from './ColorPalette';
 
+/**
+ * Example of a finished monogram on a kippah (shown on the top side).
+ * Set to a Cloudinary URL to show a real photo; empty = drawn example in the customer's font and color.
+ */
+export const MONOGRAM_EXAMPLE_URL = '';
+
 interface Props {
+  /** the side being designed — the top side leads with the 2-letter monogram (what most customers want) */
+  side?: 'top' | 'bottom';
   spec: LogoSpec;
   onChange: (patch: Partial<LogoSpec>) => void;
   errors: string[];
@@ -61,7 +69,7 @@ export function LivePreview({ spec }: { spec: LogoSpec }) {
   );
 }
 
-export default function DetailsStep({ spec, onChange, errors, signedIn, onRequireSignIn, inspirationThumb, onInspiration }: Props) {
+export default function DetailsStep({ side = 'top', spec, onChange, errors, signedIn, onRequireSignIn, inspirationThumb, onInspiration }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadErr, setUploadErr] = useState<string | null>(null);
@@ -84,29 +92,102 @@ export default function DetailsStep({ spec, onChange, errors, signedIn, onRequir
     }
   }
 
+  const isMono = spec.style === 'monogram';
+  const monoLetters = isMono ? (spec.monogramLetters || effectiveMonogramLetters(spec)) : '';
+  const fontFamily = `'${getLogoFont(spec.fontId).family}', Arial, sans-serif`;
+
+  /** typing letters turns the monogram on; clearing them turns it off (back to a text logo) */
+  function setMonoLetters(v: string) {
+    const letters = v.replace(/[^א-תA-Za-z]/g, '').slice(0, LIMITS.monogramLetters);
+    if (letters) onChange({ monogramLetters: letters, style: 'monogram' });
+    else onChange({ monogramLetters: '', style: isMono ? 'classic' : spec.style });
+  }
+
+  const monogramCard = (
+    <div className={`${s.card} ${side === 'top' ? s.featureCard : ''}`}>
+      {side === 'top' && <span className={s.featureBadge}>⭐ הבחירה הנפוצה לצד העליון</span>}
+      <p className={s.cardTitle}>מונוגרמה — 2 אותיות משולבות</p>
+      <div className={s.monoRow}>
+        <div className={s.monoExample}>
+          {MONOGRAM_EXAMPLE_URL
+            ? <img src={MONOGRAM_EXAMPLE_URL} alt="דוגמה לכיפה עם מונוגרמה" />
+            : (
+              <svg viewBox="0 0 200 200" role="img" aria-label="דוגמה לכיפה עם מונוגרמה">
+                <defs>
+                  <radialGradient id="lsKippahGrad" cx="45%" cy="40%" r="65%">
+                    <stop offset="0%" stopColor="#ffffff" />
+                    <stop offset="100%" stopColor="#e9e2d3" />
+                  </radialGradient>
+                </defs>
+                <circle cx="100" cy="100" r="92" fill="url(#lsKippahGrad)" stroke="#d8cfbd" strokeWidth="2" />
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#d8cfbd" strokeDasharray="3 4" />
+                <text x="100" y="118" textAnchor="middle" fontSize="62" fontWeight="700" fill={spec.color} style={{ fontFamily }}>{monoLetters || 'יח'}</text>
+              </svg>
+            )}
+          <div className={s.monoExampleCap}>{monoLetters ? 'כך בערך זה ייראה' : 'דוגמה'}</div>
+        </div>
+        <div className={s.grow}>
+          <label className={s.monoLabel} htmlFor="ls-mono">לסגנון כזה — כתבו כאן 2 אותיות</label>
+          <input id="ls-mono" className={`${s.input} ${s.monoInput}`} value={monoLetters} maxLength={LIMITS.monogramLetters} dir="auto"
+            onChange={e => setMonoLetters(e.target.value)} placeholder="לדוגמה: יח" style={{ fontFamily }} />
+          <div className={s.hint}>בדרך כלל ראשי התיבות של שם החתן / בר המצווה (אפשר עד 3 אותיות).</div>
+          {isMono && <button type="button" className={s.ghost} onClick={() => setMonoLetters('')}>ביטול המונוגרמה</button>}
+        </div>
+      </div>
+      {isMono && (
+        <>
+          <span className={s.label}>סוג המונוגרמה</span>
+          <div className={s.chips}>
+            <button type="button" className={s.chip} data-active={spec.monogramMode === 'artistic'} onClick={() => onChange({ monogramMode: 'artistic' })}>אותיות משולבות אמנותיות (AI)</button>
+            <button type="button" className={s.chip} data-active={spec.monogramMode === 'font'} onClick={() => onChange({ monogramMode: 'font' })}>אותיות רגילות בגופן שנבחר</button>
+          </div>
+          {spec.monogramMode === 'artistic' && (
+            <div className={s.chips} style={{ marginTop: 8 }}>
+              <button type="button" className={s.chip} data-active={spec.monogramFill !== 'outline'} onClick={() => onChange({ monogramFill: 'solid' })}>אותיות מלאות בצבע</button>
+              <button type="button" className={s.chip} data-active={spec.monogramFill === 'outline'} onClick={() => onChange({ monogramFill: 'outline' })}>קו מתאר בלבד (חלול)</button>
+            </div>
+          )}
+          <div className={s.hint}>המונוגרמה האמנותית נבדקת אוטומטית שהאותיות נכונות. אם הבדיקה נכשלת — תוצג מונוגרמה בגופן שבחרתם.</div>
+        </>
+      )}
+    </div>
+  );
+
+  const textCard = (
+    <div className={s.card}>
+      {side === 'top' ? (
+        <div className={s.textBanner}>✍️ רוצים כיתוב נוסף, או כיתוב בלי מונוגרמה? מלאו את השדות הבאים</div>
+      ) : (
+        <p className={s.cardTitle}>הטקסט בלוגו</p>
+      )}
+      <label className={s.label} htmlFor="ls-primary">
+        {isMono ? 'כיתוב מתחת למונוגרמה (לא חובה)' : 'שמות, ראשי תיבות או טקסט אישי *'}
+      </label>
+      <input id="ls-primary" className={s.input} value={spec.primaryText} maxLength={LIMITS.primaryText}
+        onChange={e => onChange({ primaryText: e.target.value })} placeholder={isMono ? 'לדוגמה: יוסף חיים' : 'לדוגמה: יוסף חיים · דוד ושרה'} dir="auto" />
+      <div className={s.hint}>הטקסט ייכתב בדיוק כפי שהקלדתם, באותיות הגופן שתבחרו (ללא ניקוד).</div>
+
+      <label className={s.label} htmlFor="ls-date">תאריך (לא חובה)</label>
+      <input id="ls-date" className={s.input} value={spec.date} maxLength={LIMITS.date} onChange={e => onChange({ date: e.target.value })} placeholder="לדוגמה: כ״ג אדר תשפ״ז או 12.03.2027" dir="auto" />
+
+      <label className={s.label} htmlFor="ls-sec">טקסט משני (לא חובה)</label>
+      <input id="ls-sec" className={s.input} value={spec.secondaryText} maxLength={LIMITS.secondaryText} onChange={e => onChange({ secondaryText: e.target.value })} placeholder="לדוגמה: בר מצווה" dir="auto" />
+    </div>
+  );
+
   return (
     <div className={s.twoCol}>
       <div>
-        <div className={s.card}>
-          <p className={s.cardTitle}>הטקסט בלוגו</p>
-          <label className={s.label} htmlFor="ls-primary">שמות, ראשי תיבות או טקסט אישי *</label>
-          <input id="ls-primary" className={s.input} value={spec.primaryText} maxLength={LIMITS.primaryText}
-            onChange={e => onChange({ primaryText: e.target.value })} placeholder="לדוגמה: יוסף חיים" dir="auto" />
-          <div className={s.hint}>הטקסט ייכתב בדיוק כפי שהקלדתם, באותיות הגופן שתבחרו (ללא ניקוד).</div>
+        {side === 'top' ? <>{monogramCard}{textCard}</> : <>{textCard}{monogramCard}</>}
 
-          <span className={s.label}>סוג האירוע</span>
+        <div className={s.card}>
+          <p className={s.cardTitle}>סוג האירוע</p>
           <div className={s.chips}>
             {LOGO_EVENTS.map(ev => (
               <button key={ev.id} type="button" className={s.chip} data-active={spec.eventType === ev.id} onClick={() => onChange({ eventType: ev.id })}>{ev.label}</button>
             ))}
           </div>
-          <div className={s.hint}>סוג האירוע משפיע על סגנון העיטור בלבד — הוא לא נכתב בלוגו.</div>
-
-          <label className={s.label} htmlFor="ls-date">תאריך (לא חובה)</label>
-          <input id="ls-date" className={s.input} value={spec.date} maxLength={LIMITS.date} onChange={e => onChange({ date: e.target.value })} placeholder="לדוגמה: כ״ג אדר תשפ״ז או 12.03.2027" dir="auto" />
-
-          <label className={s.label} htmlFor="ls-sec">טקסט משני (לא חובה)</label>
-          <input id="ls-sec" className={s.input} value={spec.secondaryText} maxLength={LIMITS.secondaryText} onChange={e => onChange({ secondaryText: e.target.value })} placeholder="לדוגמה: בר מצווה" dir="auto" />
+          <div className={s.hint}>משפיע על סגנון העיטור בלבד — לא נכתב בלוגו.</div>
         </div>
 
         <div className={s.card}>
@@ -128,34 +209,18 @@ export default function DetailsStep({ spec, onChange, errors, signedIn, onRequir
         </div>
 
         <div className={s.card}>
-          <p className={s.cardTitle}>סגנון</p>
-          <div className={s.chips}>
-            {LOGO_STYLES.map(st => (
-              <button key={st.id} type="button" className={s.chip} data-active={spec.style === st.id} onClick={() => onChange({ style: st.id })} title={st.hint}>{st.label}</button>
-            ))}
-          </div>
-          <div className={s.hint}>{LOGO_STYLES.find(x => x.id === spec.style)?.hint}</div>
-
-          {spec.style === 'monogram' && (
+          <p className={s.cardTitle}>{isMono ? 'סמל (לא חובה)' : 'סגנון וסמל'}</p>
+          {!isMono && (
             <>
-              <label className={s.label} htmlFor="ls-mono">אותיות למונוגרמה (1–3)</label>
-              <input id="ls-mono" className={s.input} value={spec.monogramLetters} maxLength={3} dir="auto"
-                onChange={e => onChange({ monogramLetters: e.target.value })} placeholder={effectiveMonogramLetters(spec) || 'לדוגמה: יח'} />
-              <div className={s.chips} style={{ marginTop: 8 }}>
-                <button type="button" className={s.chip} data-active={spec.monogramMode === 'artistic'} onClick={() => onChange({ monogramMode: 'artistic' })}>אמנותית (AI)</button>
-                <button type="button" className={s.chip} data-active={spec.monogramMode === 'font'} onClick={() => onChange({ monogramMode: 'font' })}>בגופן שנבחר</button>
+              <div className={s.chips}>
+                {LOGO_STYLES.filter(st => st.id !== 'monogram').map(st => (
+                  <button key={st.id} type="button" className={s.chip} data-active={spec.style === st.id} onClick={() => onChange({ style: st.id })} title={st.hint}>{st.label}</button>
+                ))}
               </div>
-              {spec.monogramMode === 'artistic' && (
-                <div className={s.chips} style={{ marginTop: 8 }}>
-                  <button type="button" className={s.chip} data-active={spec.monogramFill !== 'outline'} onClick={() => onChange({ monogramFill: 'solid' })}>אותיות מלאות בצבע</button>
-                  <button type="button" className={s.chip} data-active={spec.monogramFill === 'outline'} onClick={() => onChange({ monogramFill: 'outline' })}>קו מתאר בלבד (חלול)</button>
-                </div>
-              )}
-              <div className={s.hint}>מונוגרמה אמנותית נבדקת אוטומטית שהאותיות נכונות. אם הבדיקה נכשלת — תוצג מונוגרמה בגופן שבחרתם.</div>
+              <div className={s.hint}>{LOGO_STYLES.find(x => x.id === spec.style)?.hint}</div>
+              <span className={s.label}>סמל (לא חובה)</span>
             </>
           )}
-
-          <span className={s.label}>סמל (לא חובה)</span>
           <div className={s.chips}>
             {LOGO_SYMBOLS.map(sy => (
               <button key={sy.id} type="button" className={s.chip} data-active={spec.symbol === sy.id} onClick={() => onChange({ symbol: sy.id })}>{sy.label}</button>
