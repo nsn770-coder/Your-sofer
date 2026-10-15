@@ -84,7 +84,7 @@ export default function UploadLogoStep(p: Props) {
                   <div className={s.hint}>PNG, JPG או WEBP · עדיף PNG עם רקע שקוף ובאיכות גבוהה</div>
                 </>}
           </div>
-          {!p.signedIn && <div className={s.hint}>כדי לשמור את הקובץ ולצרף אותו להזמנה, נבקש להתחבר עם Google לפני ההעלאה.</div>}
+          {!p.signedIn && <div className={s.hint}>מכינים את הסטודיו…</div>}
           {(localErr || p.error) && <div className={s.error} role="alert">{localErr || p.error}</div>}
 
           {up && (

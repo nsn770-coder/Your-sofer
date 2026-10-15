@@ -24,12 +24,12 @@ function bearer(req: NextRequest): string | null {
 
 export async function requireUser(req: NextRequest): Promise<AuthedUser> {
   const token = bearer(req);
-  if (!token) throw new HttpError(401, 'auth_required', 'נדרשת התחברות כדי לשמור את העיצובים ואת הניסיונות שלך.');
+  if (!token) throw new HttpError(401, 'auth_required', 'החיבור לסטודיו לא נפתח. רעננו את הדף ונסו שוב.');
   try {
     const d = await getAdminAuth().verifyIdToken(token);
     return { uid: d.uid, email: d.email?.toLowerCase() ?? null, emailVerified: d.email_verified === true };
   } catch {
-    throw new HttpError(401, 'auth_invalid', 'פג תוקף ההתחברות. נא להתחבר מחדש.');
+    throw new HttpError(401, 'auth_invalid', 'פג תוקף החיבור לסטודיו. רעננו את הדף ונסו שוב.');
   }
 }
 

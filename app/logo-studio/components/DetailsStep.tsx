@@ -184,7 +184,7 @@ export default function DetailsStep({ spec, onChange, errors, signedIn, onRequir
             </button>
             {inspirationThumb && <button type="button" className={s.ghost} onClick={() => onInspiration(null, null)}>הסרה</button>}
           </div>
-          {!signedIn && <div className={s.hint}>העלאת תמונה זמינה אחרי התחברות.</div>}
+          {!signedIn && <div className={s.hint}>מכינים את הסטודיו…</div>}
           {uploadErr && <div className={s.error}>{uploadErr}</div>}
         </div>
       </div>

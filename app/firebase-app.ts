@@ -20,5 +20,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// pick the DEFAULT app explicitly — the Logo Studio also runs a named guest app
+const app = getApps().find(a => a.name === '[DEFAULT]') ?? initializeApp(firebaseConfig);
 export default app;

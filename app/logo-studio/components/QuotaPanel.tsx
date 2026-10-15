@@ -7,7 +7,7 @@ export const EXHAUSTED_TEXT = 'ניצלת את 3 ניסיונות העיצוב �
 
 export function QuotaBadge({ quota, signedIn }: { quota: QuotaView | null; signedIn: boolean }) {
   if (!signedIn) {
-    return <div className={s.quota}><span>🎁 3 ניסיונות עיצוב בחינם לכל לקוח</span><span className={s.src}>נדרשת התחברות לפני היצירה הראשונה</span></div>;
+    return <div className={s.quota}><span>🎁 3 ניסיונות עיצוב בחינם לכל לקוח</span><span className={s.src}>ללא הרשמה וללא התחברות</span></div>;
   }
   if (!quota) return null;
   return (

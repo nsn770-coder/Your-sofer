@@ -3,6 +3,7 @@
 // server derives the customer from it (never from local storage).
 
 import { getAuthLazy } from '@/lib/authLazy';
+import { getGuestAuth, ensureGuestUser } from '@/lib/logoStudio/guestAuth';
 import type { LogoSpec } from '@/lib/logoStudio/types';
 import type { ResolvedSelection, Placement, KippahSide } from '@/lib/logoStudio/catalog';
 import type { ProductionInfo } from '@/lib/logoStudio/production';
@@ -52,13 +53,19 @@ export class ApiError extends Error {
 }
 
 async function token(required: boolean): Promise<string | null> {
+  // a Google-signed-in customer keeps his own account; everyone else gets a guest session
   const auth = await getAuthLazy();
-  const u = auth.currentUser;
-  if (!u) {
-    if (required) throw new ApiError(401, 'auth_required', 'נדרשת התחברות.', {});
-    return null;
+  if (auth.currentUser) return auth.currentUser.getIdToken();
+  const guest = await getGuestAuth();
+  await guest.authStateReady();
+  if (guest.currentUser) return guest.currentUser.getIdToken();
+  if (!required) return null;
+  try {
+    const u = await ensureGuestUser();
+    return u.getIdToken();
+  } catch {
+    throw new ApiError(0, 'guest_failed', 'לא הצלחנו לפתוח את הסטודיו. רעננו את הדף ונסו שוב.', {});
   }
-  return u.getIdToken();
 }
 
 async function call<T>(path: string, init: RequestInit & { auth?: boolean } = {}): Promise<T> {
