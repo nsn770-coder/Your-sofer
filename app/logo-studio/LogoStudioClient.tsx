@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import s from './LogoStudio.module.css';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { ensureGuestUser, onGuestUid } from '@/lib/logoStudio/guestAuth';
 import { useCart, getEventKippahPricePerUnit } from '@/app/contexts/CartContext';
 import { logoFontFaceCss } from '@/lib/logoStudio/fonts';
 import { DEFAULT_SPEC, type LogoSpec } from '@/lib/logoStudio/types';
@@ -38,6 +39,8 @@ interface Draft {
   side: KippahSide; bothSides: boolean; qty: number;
   /** "רקמה — צד עליון" */
   embroidery?: boolean;
+  /** both sides: which sides the customer already approved (top first, then bottom) */
+  sidesDone?: Partial<Record<KippahSide, boolean>>;
   sides: Partial<Record<KippahSide, SideDraft>>;
 }
 function readDraft(): Draft | null {
@@ -60,16 +63,21 @@ const cartLineIdFor = (p: { styleId: string | null; inventoryProductId: string |
 export default function LogoStudioClient() {
   const router = useRouter();
   const params = useSearchParams();
-  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  /** anonymous studio session — customers design without signing in */
+  const [guestUid, setGuestUid] = useState<string | null>(null);
+  useEffect(() => onGuestUid(setGuestUid), []);
   const { items: cartItems, addItem, removeItem } = useCart();
 
   const [step, setStep] = useState<StepId>('kippah');
   const [productId, setProductId] = useState<string | null>(null);
   const [variants, setVariants] = useState<Record<string, string>>({});
-  /** the side on screen when printing ONE side */
+  /** the side being designed now (one side, or the current phase of "both sides") */
   const [side, setSide] = useState<KippahSide>('top');
-  /** "print both sides": every step shows the top AND the bottom design together */
+  /** "print both sides": design the top side first, approve it, then the bottom side, then approve both together */
   const [bothSides, setBothSides] = useState(false);
+  /** both sides: sides the customer approved ("✓ אישור הצד העליון") */
+  const [sidesDone, setSidesDone] = useState<Partial<Record<KippahSide, boolean>>>({});
   /** "רקמה — צד עליון": the logo is embroidered (not printed) on the top side (+₪5 per kippah) */
   const [embroidery, setEmbroidery] = useState(false);
   const [initialQty, setInitialQty] = useState<number>(KIPA_MIN_QTY);
@@ -87,9 +95,11 @@ export default function LogoStudioClient() {
   const [initDone, setInitDone] = useState(false);
   const pendingAfterLogin = useRef<null | (() => void)>(null);
 
-  const signedIn = !!user;
-  const userRef = useRef(user);
-  useEffect(() => { userRef.current = user; }, [user]);
+  /** the uid the studio works with: Google account if signed in, otherwise the guest session */
+  const sessionUid = user?.uid ?? guestUid;
+  const signedIn = !!sessionUid;
+  const userRef = useRef(sessionUid);
+  useEffect(() => { userRef.current = sessionUid; }, [sessionUid]);
   const exhausted = signedIn && quota !== null && quota.remaining < 1;
 
   const refreshMe = useCallback(async () => {
@@ -99,12 +109,20 @@ export default function LogoStudioClient() {
     } catch { /* non-fatal */ }
   }, []);
 
+  /** no Google sign-in: open (or reuse) a guest session, then continue the action */
   const requireSignIn = useCallback(async (then?: () => void) => {
-    pendingAfterLogin.current = then ?? null;
     setError(null);
-    try { await signInWithGoogle(); }
-    catch { setError('ההתחברות נכשלה. נסו שוב.'); pendingAfterLogin.current = null; }
-  }, [signInWithGoogle]);
+    if (userRef.current) { then?.(); return; }
+    pendingAfterLogin.current = then ?? null;
+    try { await ensureGuestUser(); }
+    catch { setError('לא הצלחנו לפתוח את הסטודיו. רעננו את הדף ונסו שוב.'); pendingAfterLogin.current = null; }
+  }, []);
+
+  // open the guest session up front, so the customer never sees a sign-in step
+  useEffect(() => {
+    if (authLoading || user || guestUid) return;
+    ensureGuestUser().catch(() => undefined);
+  }, [authLoading, user, guestUid]);
 
   const qpMode = params.get('mode');
   const ctx: SideContext = {
@@ -112,17 +130,21 @@ export default function LogoStudioClient() {
     isSignedIn: () => !!userRef.current,
     requireSignIn: then => { void requireSignIn(then); },
     setQuota, refreshMe,
-    // one side: a fresh AI logo opens the corrections step; both sides: stay until both are ready
-    onGenerated: () => { if (!bothSides) { setStep('design'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+    // a fresh AI logo opens the corrections step (both sides: of the side being designed now)
+    onGenerated: () => { setStep('design'); window.scrollTo({ top: 0, behavior: 'smooth' }); },
   };
   const initialMode: LogoMode = qpMode === 'upload' ? 'upload' : 'ai';
   const top = useSideDesign('top', ctx, initialMode);
   const bottom = useSideDesign('bottom', ctx, initialMode);
   const designs: Record<KippahSide, SideDesign> = { top, bottom };
-  const activeSides: KippahSide[] = bothSides ? SIDES : [side];
+  // both sides are shown together only on the final approval; every other step works on ONE side
+  const activeSides: KippahSide[] = bothSides && step === 'approve' ? SIDES : [side];
   const active = activeSides.map(sd => designs[sd]);
   const cur = designs[side];
   const anyBusy = active.some(d => !!d.busy) || approving;
+  /** a side counts as approved only while its approved design still has a valid mockup */
+  const sideReady = (sd: KippahSide) => !!sidesDone[sd] && designs[sd].hasVersion && !!designs[sd].approveMockup;
+  const bothReady = SIDES.every(sideReady);
 
   // ── init from URL / draft ──────────────────────────────────────────────────
   const initRan = useRef(false);
@@ -145,6 +167,8 @@ export default function LogoStudioClient() {
       setVariants(parseVariants(params.get('v')));
       setSide(qpSide === 'bottom' ? 'bottom' : 'top');
       setBothSides(qpBoth);
+      if (qpBoth) setSide('top');
+      setSidesDone({});
       setEmbroidery(qpEmbroidery && !qpBoth && qpSide !== 'bottom');
       if (Number.isFinite(qpQty) && qpQty >= KIPA_MIN_QTY) setInitialQty(Math.min(5000, Math.round(qpQty)));
       setStep('kippah');
@@ -158,6 +182,7 @@ export default function LogoStudioClient() {
       setVariants(draft.selectedVariants ?? {});
       setSide(draft.side === 'bottom' ? 'bottom' : 'top');
       setBothSides(!!draft.bothSides);
+      setSidesDone(draft.bothSides ? (draft.sidesDone ?? {}) : {});
       setEmbroidery(!!draft.embroidery && !draft.bothSides && draft.side !== 'bottom');
       if (draft.qty && draft.qty >= KIPA_MIN_QTY) setInitialQty(draft.qty);
       setStep(draft.step ?? 'kippah');
@@ -175,17 +200,17 @@ export default function LogoStudioClient() {
   useEffect(() => {
     if (!initDone) return;
     writeDraft({
-      productId, selectedVariants: variants, step, side, bothSides, embroidery, qty: initialQty,
+      productId, selectedVariants: variants, step, side, bothSides, embroidery, qty: initialQty, sidesDone,
       sides: {
         top: { projectId: top.projectId, spec: top.spec, mode: top.mode },
         bottom: { projectId: bottom.projectId, spec: bottom.spec, mode: bottom.mode },
       },
     });
-  }, [initDone, productId, variants, step, side, bothSides, embroidery, initialQty, top.projectId, top.spec, top.mode, bottom.projectId, bottom.spec, bottom.mode]);
+  }, [initDone, productId, variants, step, side, bothSides, embroidery, initialQty, sidesDone, top.projectId, top.spec, top.mode, bottom.projectId, bottom.spec, bottom.mode]);
 
   // ?project=<id> (link from "my designs"): open that project on its own side
   useEffect(() => {
-    if (!user || !pendingProject) return;
+    if (!sessionUid || !pendingProject) return;
     const pid = pendingProject;
     setPendingProject(null);
     studioApi.getProject(pid)
@@ -200,7 +225,7 @@ export default function LogoStudioClient() {
       })
       .catch(e => { if (!(e instanceof ApiError && e.status === 404)) setError(errText(e, 'טעינת הפרויקט נכשלה.')); });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- designs are stable per render
-  }, [user, pendingProject]);
+  }, [sessionUid, pendingProject]);
 
   // ── catalog item ───────────────────────────────────────────────────────────
   const catalogSide: KippahSide = bothSides ? 'top' : side;
@@ -219,16 +244,16 @@ export default function LogoStudioClient() {
     return () => { cancelled = true; };
   }, [productId, variants, catalogSide]);
 
-  useEffect(() => { if (user) refreshMe(); else setQuota(null); }, [user, refreshMe]);
+  useEffect(() => { if (sessionUid) refreshMe(); else setQuota(null); }, [sessionUid, refreshMe]);
 
   // run an action queued before sign-in
   useEffect(() => {
-    if (user && pendingAfterLogin.current) {
+    if (sessionUid && pendingAfterLogin.current) {
       const fn = pendingAfterLogin.current;
       pendingAfterLogin.current = null;
       fn();
     }
-  }, [user]);
+  }, [sessionUid]);
 
   // ── selection changes (apply to both sides' projects) ──────────────────────
   async function chooseProduct(id: string) {
@@ -243,7 +268,7 @@ export default function LogoStudioClient() {
   function chooseSide(choice: KippahSide | 'both' | 'embroidery') {
     if (choice === 'embroidery') { setBothSides(false); setSide('top'); setEmbroidery(true); return; }
     setEmbroidery(false);
-    if (choice === 'both') { setBothSides(true); return; }
+    if (choice === 'both') { setBothSides(true); setSide('top'); return; }
     setBothSides(false); setSide(choice);
   }
   /** the finish the customer chose on the kippah step — locks the mockup finish */
@@ -401,12 +426,40 @@ export default function LogoStudioClient() {
     details: !!productId,
     design: allHaveVersion,
     mockup: allHaveVersion,
-    approve: allHaveVersion && allHaveMockup,
+    // both sides: the final approval opens only after the top AND the bottom were each approved
+    approve: bothSides ? bothReady : allHaveVersion && allHaveMockup,
   };
-  const go = (id: StepId) => { if (stepEnabled[id]) { setStep(id); setError(null); setNotice(null); window.scrollTo({ top: 0, behavior: 'smooth' }); } };
+  const top0 = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const go = (id: StepId) => { if (stepEnabled[id]) { setStep(id); setError(null); setNotice(null); top0(); } };
   const stepIndex = STEPS.findIndex(x => x.id === step);
   const showRedeem = exhausted && step !== 'kippah' && active.some(d => d.mode === 'ai' && !d.uploadedCurrent);
-  const missingNames = (pred: (d: SideDesign) => boolean) => active.filter(d => !pred(d)).map(d => SIDE_TITLE[d.side]).join(' ו');
+
+  // ── both sides: top → bottom → final approval ──────────────────────────────
+  /** open a side where the customer left it: corrections if there is a logo, otherwise the details */
+  function openSide(sd: KippahSide) {
+    const d = designs[sd];
+    if (sd === 'bottom' && !d.hasVersion && !(d.spec.primaryText ?? '').trim() && !(d.spec.monogramLetters ?? '').trim()) {
+      // start the bottom side with the top side's event, font and color
+      d.reset({ ...DEFAULT_SPEC, eventType: top.spec.eventType, fontId: top.spec.fontId, color: top.spec.color });
+    }
+    setSide(sd); setError(null); setNotice(null);
+    setStep(!d.hasVersion ? 'details' : d.currentVersion?.upload ? 'mockup' : 'design');
+    top0();
+  }
+  /** "✓ אישור הצד" on the mockup step of the side being designed */
+  function approveSide() {
+    const sd = side;
+    setSidesDone(prev => ({ ...prev, [sd]: true }));
+    const other: KippahSide = sd === 'top' ? 'bottom' : 'top';
+    if (sideReady(other)) { setStep('approve'); setError(null); setNotice(null); top0(); return; }
+    openSide(other);
+    if (sd === 'top') setNotice('✓ הצד העליון אושר. עכשיו מעצבים את הצד התחתון (פנים הכיפה) — אפשר תמיד לחזור לצד העליון לתיקונים.');
+  }
+  const sideNextLabel = (): string => {
+    const other: KippahSide = side === 'top' ? 'bottom' : 'top';
+    if (sideReady(other)) return `✓ אישור ${SIDE_TITLE[side]} — לאישור הסופי של שני הצדדים ←`;
+    return side === 'top' ? '✓ אישור הצד העליון — המשך לעיצוב הצד התחתון ←' : '✓ אישור הצד התחתון — המשך לצד העליון ←';
+  };
 
   // ── per-side blocks ────────────────────────────────────────────────────────
   function modeTabs(d: SideDesign) {
@@ -428,11 +481,10 @@ export default function LogoStudioClient() {
   function generateButton(d: SideDesign) {
     return (
       <>
-        {!signedIn && !authLoading && <div className={s.costNote}>כדי לשמור את העיצובים ואת הניסיונות שלכם, נבקש להתחבר עם Google לפני היצירה.</div>}
         {signedIn && quota && !exhausted && <div className={s.costNote}>היצירה תצרוך ניסיון עיצוב אחד (נותרו {quota.remaining}). אם היצירה תיכשל — הניסיון לא ינוצל.</div>}
         {exhausted && <div className={s.costNote}>ניצלת את ניסיונות העיצוב — הזינו קוד למעלה כדי להמשיך.</div>}
         <button type="button" className={s.primary} disabled={!!d.busy || d.specErrors.length > 0 || exhausted || !productId} onClick={() => d.generateFromDraft()}>
-          {d.busy === 'generate' ? <><span className={s.spinner} /> יוצרים את הלוגו… (עד דקה)</> : !signedIn ? `התחברות ו${generateLabel(d)}` : `${generateLabel(d)}${bothSides ? ` — ${SIDE_TITLE[d.side]}` : ''}`}
+          {d.busy === 'generate' ? <><span className={s.spinner} /> יוצרים את הלוגו… (עד דקה)</> : `${generateLabel(d)}${bothSides ? ` — ${SIDE_TITLE[d.side]}` : ''}`}
         </button>
       </>
     );
@@ -447,12 +499,6 @@ export default function LogoStudioClient() {
               onRequireSignIn={() => requireSignIn()} onUpload={d.uploadLogo} onSetBackground={d.setLogoBackground} />
           : <DetailsStep spec={d.spec} onChange={d.updateSpec} errors={d.specErrors} signedIn={signedIn}
               onRequireSignIn={() => requireSignIn()} inspirationThumb={d.inspirationThumb} onInspiration={d.setInspiration} />}
-        {bothSides && d.mode === 'ai' && (
-          <div className={s.card}>
-            {d.hasVersion && d.currentVersion && !d.currentVersion.upload && <div className={s.ok}>✓ נוצר לוגו (גרסה {d.currentVersion.n}) — אפשר לתקן אותו בשלב הבא.</div>}
-            {generateButton(d)}
-          </div>
-        )}
       </>
     );
   }
@@ -468,23 +514,12 @@ export default function LogoStudioClient() {
     );
   }
 
-  const bothNav = (label: string, enabled: boolean, onClick: () => void, missing?: string) => (
-    <div className={s.sticky}>
-      <div className={s.stickyInner}>
-        {!enabled && missing && <div className={s.costNote}>חסר עדיין: {missing}</div>}
-        <button type="button" className={s.primary} disabled={!enabled || anyBusy} onClick={onClick}>{label}</button>
-      </div>
-    </div>
-  );
-
-  const anyAiVersion = active.some(d => d.currentVersion && !d.currentVersion.upload);
-
   return (
     <div className={s.page}>
       <style dangerouslySetInnerHTML={{ __html: logoFontFaceCss() }} />
       <div className={s.wrap}>
         <h1 className={s.title}>✨ סטודיו לוגו אישי לכיפה</h1>
-        <p className={s.subtitle}>{bothSides ? 'מעצבים את הצד העליון ואת הצד התחתון יחד — כל שלב לשני הצדדים.' : 'מעצבים לוגו, מתקנים בשיחה ורואים אותו על הכיפה שבחרתם.'}</p>
+        <p className={s.subtitle}>{bothSides ? 'הדפסה משני הצדדים: קודם מעצבים ומאשרים את הצד העליון, אחר כך את הצד התחתון, ובסוף מאשרים את שניהם יחד בהדמיה.' : 'מעצבים לוגו, מתקנים בשיחה ורואים אותו על הכיפה שבחרתם.'}</p>
 
         <nav className={s.steps} aria-label="שלבים">
           {STEPS.map((st, i) => (
@@ -499,13 +534,32 @@ export default function LogoStudioClient() {
         {notice && <div className={s.ok}>{notice}</div>}
 
         {bothSides && step !== 'kippah' && (
-          <div className={s.sidesBar}>
-            <span style={{ fontWeight: 800 }}>הדפסה משני הצדדים:</span>
-            {SIDES.map(sd => {
-              const d = designs[sd];
-              const ready = step === 'details' || step === 'design' ? d.hasVersion : !!d.approveMockup;
-              return <span key={sd} className={s.sidePill} data-done={ready}>{ready ? '✓ ' : ''}{SIDE_TITLE[sd]}</span>;
+          <div className={s.sidesBar} role="navigation" aria-label="שלבי העיצוב לשני הצדדים">
+            {SIDES.map((sd, i) => {
+              const isActive = step !== 'approve' && side === sd;
+              // the bottom side opens after the top side was approved; the top side is always reachable for fixes
+              const enabled = sd === 'top' || !!sidesDone.top;
+              return (
+                <span key={sd} style={{ display: 'contents' }}>
+                  <button type="button" className={s.sidePill} data-active={isActive} data-done={sideReady(sd)} disabled={anyBusy || !enabled || isActive}
+                    aria-current={isActive ? 'step' : undefined} onClick={() => openSide(sd)}>
+                    {sideReady(sd) ? '✓ ' : `${i + 1}. `}{SIDE_TITLE[sd]}
+                  </button>
+                  <span className={s.sidesArrow} aria-hidden>←</span>
+                </span>
+              );
             })}
+            <button type="button" className={s.sidePill} data-active={step === 'approve'} disabled={anyBusy || !bothReady || step === 'approve'}
+              aria-current={step === 'approve' ? 'step' : undefined} onClick={() => go('approve')}>
+              3. אישור סופי
+            </button>
+            <span className={s.phaseNote}>
+              {step === 'approve'
+                ? 'שני הצדדים אושרו — בדקו את שתי ההדמיות ואשרו סופית. אפשר עדיין לחזור לתיקון כל אחד מהצדדים.'
+                : side === 'top'
+                  ? (sidesDone.top ? 'מתקנים את הצד העליון. בסיום לחצו שוב על „אישור הצד” כדי לחזור להמשך.' : 'שלב 1 מתוך 2: מעצבים את הצד העליון. כשתסיימו ותאשרו אותו בהדמיה — נעבור לצד התחתון.')
+                  : 'שלב 2 מתוך 2: מעצבים את הצד התחתון (פנים הכיפה). אפשר לחזור לצד העליון לתיקונים בכל רגע.'}
+            </span>
             {selection && SIDES.some(sd => !selection.sidesAvailable[sd]) && (
               <span className={s.hint} style={{ width: '100%' }}>לאחד הצדדים עדיין אין תמונה לכיפה זו, ולכן לא ניתן ליצור עליו הדמיה. אפשר לפנות אלינו בוואטסאפ.</span>
             )}
@@ -524,12 +578,7 @@ export default function LogoStudioClient() {
           <div className={s.ok}>🧵 עיצוב לרקמה על הצד העליון — העלו לוגו מוכן או עצבו לוגו ב-AI. לרקמה מומלץ לוגו פשוט: עד 5 צבעים, בלי מעברי צבע ובלי פרטים קטנים מאוד.</div>
         )}
         {step === 'details' && active.map(d => sideBlock(d, detailsBody(d)))}
-        {step === 'details' && bothSides && bothNav(
-          anyAiVersion ? 'שני הלוגואים מוכנים — ליצירה ותיקונים ←' : 'שני הלוגואים מוכנים — להדמיה על הכיפה ←',
-          allHaveVersion, () => go(anyAiVersion ? 'design' : 'mockup'),
-          `לוגו ל${missingNames(d => d.hasVersion)}`,
-        )}
-        {step === 'details' && !bothSides && cur.mode === 'upload' && (
+        {step === 'details' && cur.mode === 'upload' && (
           <div className={s.sticky}>
             <div className={s.stickyInner}>
               {!cur.uploadedCurrent && <div className={s.costNote}>העלאת לוגו מוכן לא צורכת ניסיונות עיצוב.</div>}
@@ -537,33 +586,40 @@ export default function LogoStudioClient() {
             </div>
           </div>
         )}
-        {step === 'details' && !bothSides && cur.mode === 'ai' && (
-          <div className={s.sticky}><div className={s.stickyInner}>{generateButton(cur)}</div></div>
+        {step === 'details' && cur.mode === 'ai' && (
+          <div className={s.sticky}>
+            <div className={s.stickyInner}>
+              {cur.hasVersion && <button type="button" className={s.ghost} disabled={anyBusy} onClick={() => go('design')}>בלי שינוי — חזרה ללוגו הקיים (גרסה {cur.currentVersion?.n})</button>}
+              {generateButton(cur)}
+            </div>
+          </div>
         )}
 
         {step === 'design' && active.map(d => sideBlock(d, d.project
           ? <DesignStep project={d.project} quota={quota} busy={d.busy === 'generate' || d.busy === 'chat' || d.busy === 'select' ? d.busy : null}
               onSelectVersion={d.selectVersion} onSendChat={d.sendChat} onApplyProposal={d.applyProposal}
               onEditDetails={() => { if (d.currentVersion) { d.setSpec(d.currentVersion.spec); d.setMode(d.currentVersion.upload ? 'upload' : 'ai'); } go('details'); }}
-              onNext={() => go('mockup')} blocked={exhausted} hideNav={bothSides} />
+              onNext={() => go('mockup')} blocked={exhausted} />
           : null))}
-        {step === 'design' && bothSides && bothNav('שני הלוגואים מוכנים — להדמיה על הכיפה ←', allHaveVersion, () => go('mockup'))}
 
         {step === 'mockup' && active.map(d => sideBlock(d, d.project
           ? <MockupStep project={d.project} quota={quota} busy={d.busy === 'mockup' || d.busy === 'aiMockup' ? d.busy : null}
               selectedMockupId={d.selectedMockupId} onSelectMockup={d.setSelectedMockupId}
-              onCompose={d.compose} onAiMockup={d.aiMockup} onBackToKippah={() => go('kippah')} onNext={() => go('approve')} blocked={exhausted} hideNav={bothSides}
-              preferredFinish={finishFor(d.side)} />
+              onCompose={d.compose} onAiMockup={d.aiMockup} onBackToKippah={() => go('kippah')}
+              onNext={bothSides ? approveSide : () => go('approve')} nextLabel={bothSides ? sideNextLabel() : undefined}
+              blocked={exhausted} preferredFinish={finishFor(d.side)} />
           : null))}
-        {step === 'mockup' && bothSides && bothNav('לאישור שני הצדדים ←', allHaveMockup, () => go('approve'), `הדמיה ל${missingNames(d => !!d.approveMockup)}`)}
 
         {step === 'approve' && bothSides && top.project && bottom.project && (
           <>
             {active.map(d => d.error ? <div key={d.side} className={s.error} role="alert">{SIDE_TITLE[d.side]}: {d.error}</div> : null)}
             <ApproveBothStep
-              sides={[{ title: SIDE_TITLE.top, project: top.project, mockup: top.approveMockup }, { title: SIDE_TITLE.bottom, project: bottom.project, mockup: bottom.approveMockup }]}
+              sides={[
+                { title: SIDE_TITLE.top, project: top.project, mockup: top.approveMockup, onEdit: () => openSide('top') },
+                { title: SIDE_TITLE.bottom, project: bottom.project, mockup: bottom.approveMockup, onEdit: () => openSide('bottom') },
+              ]}
               product={product} busy={approving} error={null} initialQty={initialQty}
-              onApprove={approveBoth} onBack={() => go('mockup')} />
+              onApprove={approveBoth} onBack={() => openSide(SIDES.find(sd => !sideReady(sd)) ?? 'bottom')} />
           </>
         )}
         {step === 'approve' && !bothSides && cur.project && (

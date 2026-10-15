@@ -130,6 +130,11 @@
 button.sidePill { cursor: pointer; font-family: inherit; font-size: 13px; }
 button.sidePill:disabled { cursor: default; }
 button.sidePill:not(:disabled):hover { border-color: #51285F; color: #51285F; }
+.sidePill[data-active='true'][data-done='true'] { border-color: #51285F; color: #51285F; background: #fff; box-shadow: 0 0 0 2px rgba(81,40,95,.15); }
+.sidePill[data-active='true']:not([data-done='true']), button.sidePill[data-active='true']:not([data-done='true']):hover { background: #51285F; border-color: #51285F; color: #fff; }
+button.sidePill:disabled:not([data-active='true']) { opacity: .55; }
+.sidesArrow { color: #b8a77a; font-weight: 900; }
+.phaseNote { width: 100%; font-size: 13px; color: #51285F; line-height: 1.55; margin-top: 2px; }
 
 /* ── both sides on one page ── */
 .sideSection { border: 2px solid #ece6da; border-radius: 18px; padding: 12px 12px 2px; margin-bottom: 16px; background: rgba(255,255,255,.5); }

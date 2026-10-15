@@ -24,6 +24,8 @@ interface Props {
   hideNav?: boolean;
   /** finish chosen on the kippah step ("רקמה — צד עליון") */
   preferredFinish?: 'print' | 'embroidery';
+  /** label of the "next" button (both-sides mode: "approve this side and continue") */
+  nextLabel?: string;
 }
 
 export default function MockupStep(p: Props) {
@@ -205,7 +207,7 @@ export default function MockupStep(p: Props) {
         <div className={s.sticky}>
           <div className={s.stickyInner}>
             <button type="button" className={s.primary} disabled={!lastForVersion || !!p.busy} onClick={p.onNext}>
-              {lastForVersion ? 'לאישור ושמירה להזמנה ←' : 'צרו הדמיה לגרסה הנוכחית כדי להמשיך'}
+              {lastForVersion ? (p.nextLabel ?? 'לאישור ושמירה להזמנה ←') : 'צרו הדמיה לגרסה הנוכחית כדי להמשיך'}
             </button>
           </div>
         </div>

@@ -115,7 +115,7 @@ export function ApproveSummary({ project, product, mockup, title }: { project: P
 
 /** Both sides at once: one summary per side + one quantity / approval for the same kippot. */
 export function ApproveBothStep({ sides, product, busy, error, initialQty, onApprove, onBack }: {
-  sides: { title: string; project: ProjectView; mockup: MockupView | null }[];
+  sides: { title: string; project: ProjectView; mockup: MockupView | null; onEdit?: () => void }[];
   product: CatalogProduct | null;
   busy: boolean;
   error: string | null;
@@ -137,7 +137,12 @@ export function ApproveBothStep({ sides, product, busy, error, initialQty, onApp
   return (
     <div className={s.twoCol}>
       <div>
-        {sides.map(sd => <ApproveSummary key={sd.title} title={sd.title} project={sd.project} product={product} mockup={sd.mockup} />)}
+        {sides.map(sd => (
+          <div key={sd.title}>
+            <ApproveSummary title={sd.title} project={sd.project} product={product} mockup={sd.mockup} />
+            {sd.onEdit && <button type="button" className={s.ghost} style={{ marginTop: -6, marginBottom: 8 }} disabled={busy} onClick={sd.onEdit}>✏️ חזרה לתיקון — {sd.title}</button>}
+          </div>
+        ))}
       </div>
       <div>
         <div className={s.card} style={{ position: 'sticky', top: 70 }}>
